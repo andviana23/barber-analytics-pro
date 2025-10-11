@@ -1,0 +1,390 @@
+import React, { useState } from 'react';
+import { Copy, Check, Eye, EyeOff } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
+
+// Dados das paletas
+const LIGHT_PALETTE = {
+  neutral: [
+    {
+      name: 'Background',
+      hex: '#F9FAFB',
+      usage: 'Base da interface',
+      class: 'bg-light-bg',
+    },
+    {
+      name: 'Card/Surface',
+      hex: '#FFFFFF',
+      usage: 'Painéis e seções',
+      class: 'bg-light-surface',
+    },
+    {
+      name: 'Borda/Linha',
+      hex: '#E2E8F0',
+      usage: 'Separadores',
+      class: 'border-light-border',
+    },
+  ],
+  text: [
+    {
+      name: 'Texto Primário',
+      hex: '#1E293B',
+      usage: 'Alta legibilidade',
+      class: 'text-text-light-primary',
+    },
+    {
+      name: 'Texto Secundário',
+      hex: '#64748B',
+      usage: 'Labels e descrições',
+      class: 'text-text-light-secondary',
+    },
+  ],
+  primary: [
+    {
+      name: 'Azul Primário',
+      hex: '#4DA3FF',
+      usage: 'Ações e botões',
+      class: 'bg-primary',
+    },
+    {
+      name: 'Azul Hover',
+      hex: '#1E8CFF',
+      usage: 'Realce',
+      class: 'bg-primary-hover',
+    },
+    {
+      name: 'Azul Suave',
+      hex: '#E8F3FF',
+      usage: 'Fundo leve',
+      class: 'bg-primary-light',
+    },
+  ],
+  feedback: [
+    {
+      name: 'Sucesso',
+      hex: '#16A34A',
+      usage: 'Verde positivo',
+      class: 'bg-feedback-light-success',
+    },
+    {
+      name: 'Erro',
+      hex: '#EF4444',
+      usage: 'Vermelho para alertas',
+      class: 'bg-feedback-light-error',
+    },
+    {
+      name: 'Aviso',
+      hex: '#F59E0B',
+      usage: 'Dourado suave',
+      class: 'bg-feedback-light-warning',
+    },
+  ],
+};
+
+const DARK_PALETTE = {
+  neutral: [
+    {
+      name: 'Background',
+      hex: '#0F172A',
+      usage: 'Fundo principal',
+      class: 'bg-dark-bg',
+    },
+    {
+      name: 'Card/Surface',
+      hex: '#1E293B',
+      usage: 'Containers',
+      class: 'bg-dark-surface',
+    },
+    {
+      name: 'Borda/Linha',
+      hex: '#334155',
+      usage: 'Divisores',
+      class: 'border-dark-border',
+    },
+  ],
+  text: [
+    {
+      name: 'Texto Primário',
+      hex: '#F8FAFC',
+      usage: 'Branco suave',
+      class: 'text-text-dark-primary',
+    },
+    {
+      name: 'Texto Secundário',
+      hex: '#94A3B8',
+      usage: 'Textos complementares',
+      class: 'text-text-dark-secondary',
+    },
+  ],
+  primary: [
+    {
+      name: 'Azul Primário',
+      hex: '#4DA3FF',
+      usage: 'Azul bebê cromado',
+      class: 'bg-primary',
+    },
+    {
+      name: 'Azul Hover',
+      hex: '#1E8CFF',
+      usage: 'Azul intenso',
+      class: 'bg-primary-hover',
+    },
+    {
+      name: 'Azul Suave',
+      hex: '#E8F3FF',
+      usage: 'Fundo leve',
+      class: 'bg-primary-light',
+    },
+  ],
+  feedback: [
+    {
+      name: 'Sucesso',
+      hex: '#22C55E',
+      usage: 'Verde vibrante',
+      class: 'bg-feedback-dark-success',
+    },
+    {
+      name: 'Erro',
+      hex: '#F87171',
+      usage: 'Vermelho suave',
+      class: 'bg-feedback-dark-error',
+    },
+    {
+      name: 'Aviso',
+      hex: '#FBBF24',
+      usage: 'Amarelo dourado',
+      class: 'bg-feedback-dark-warning',
+    },
+  ],
+};
+
+// Componente para exibir uma cor individual
+function ColorSwatch({ color, onCopy }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(color.hex);
+    onCopy(color.hex);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="card-theme rounded-lg p-4 hover:shadow-lg theme-transition">
+      <div className="flex items-center gap-3 mb-3">
+        <div
+          className="w-12 h-12 rounded-lg border-2 border-light-border dark:border-dark-border flex-shrink-0"
+          style={{ backgroundColor: color.hex }}
+        />
+        <div className="flex-1 min-w-0">
+          <h3 className="text-theme-primary font-medium text-sm truncate">
+            {color.name}
+          </h3>
+          <p className="text-theme-secondary text-xs mt-1">{color.usage}</p>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between">
+        <code className="text-theme-primary font-mono text-sm bg-light-bg dark:bg-dark-bg px-2 py-1 rounded">
+          {color.hex}
+        </code>
+        <button
+          onClick={handleCopy}
+          className="p-1.5 rounded hover:bg-primary/10 text-theme-secondary hover:text-primary theme-transition"
+          title="Copiar cor"
+        >
+          {copied ? (
+            <Check className="h-4 w-4 text-green-500" />
+          ) : (
+            <Copy className="h-4 w-4" />
+          )}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// Componente para uma seção de cores
+function ColorSection({ title, colors, onCopy }) {
+  return (
+    <div className="mb-8">
+      <h2 className="text-theme-primary text-lg font-semibold mb-4 flex items-center gap-2">
+        {title}
+        <span className="text-theme-secondary text-sm font-normal">
+          ({colors.length} cores)
+        </span>
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {colors.map((color, index) => (
+          <ColorSwatch key={index} color={color} onCopy={onCopy} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Componente de demonstração prática
+function ThemeDemo() {
+  return (
+    <div className="card-theme rounded-xl p-6 mb-8">
+      <h2 className="text-theme-primary text-xl font-semibold mb-6">
+        🎨 Demonstração Prática
+      </h2>
+
+      <div className="space-y-6">
+        {/* Botões */}
+        <div>
+          <h3 className="text-theme-primary font-medium mb-3">Botões</h3>
+          <div className="flex flex-wrap gap-3">
+            <button className="btn-theme-primary px-4 py-2 rounded-lg font-medium">
+              Botão Primário
+            </button>
+            <button className="btn-theme-secondary px-4 py-2 rounded-lg font-medium">
+              Botão Secundário
+            </button>
+            <button className="bg-feedback-light-success dark:bg-feedback-dark-success text-white px-4 py-2 rounded-lg font-medium">
+              Sucesso
+            </button>
+            <button className="bg-feedback-light-error dark:bg-feedback-dark-error text-white px-4 py-2 rounded-lg font-medium">
+              Erro
+            </button>
+          </div>
+        </div>
+
+        {/* Cards */}
+        <div>
+          <h3 className="text-theme-primary font-medium mb-3">
+            Cards e Superfícies
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="card-theme rounded-lg p-4">
+              <h4 className="text-theme-primary font-medium mb-2">
+                Card de Exemplo
+              </h4>
+              <p className="text-theme-secondary text-sm">
+                Este é um exemplo de como os cards ficam com o tema atual.
+              </p>
+            </div>
+            <div className="card-theme rounded-lg p-4 border-l-4 border-primary">
+              <h4 className="text-theme-primary font-medium mb-2">
+                Card com Destaque
+              </h4>
+              <p className="text-theme-secondary text-sm">
+                Card com borda de destaque usando a cor primária.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Tipografia */}
+        <div>
+          <h3 className="text-theme-primary font-medium mb-3">Tipografia</h3>
+          <div className="space-y-2">
+            <h1 className="text-theme-primary text-3xl font-bold">
+              Título Principal (H1)
+            </h1>
+            <h2 className="text-theme-primary text-2xl font-semibold">
+              Subtítulo (H2)
+            </h2>
+            <p className="text-theme-primary">
+              Texto principal com alta legibilidade
+            </p>
+            <p className="text-theme-secondary">
+              Texto secundário para descrições e labels
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function PalettePreview() {
+  const { actualTheme } = useTheme();
+  const [copiedColor, setCopiedColor] = useState('');
+  const [showDemo, setShowDemo] = useState(true);
+
+  const currentPalette = actualTheme === 'light' ? LIGHT_PALETTE : DARK_PALETTE;
+  const paletteName =
+    actualTheme === 'light' ? '☀️ LIGHT MODE' : '🌙 DARK MODE';
+
+  const handleColorCopy = hex => {
+    setCopiedColor(hex);
+    setTimeout(() => setCopiedColor(''), 3000);
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto p-6">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-theme-primary text-3xl font-bold mb-2">
+            Barber Analytics Pro - Paleta de Cores
+          </h1>
+          <p className="text-theme-secondary">
+            Tema atual: <span className="font-medium">{paletteName}</span>
+          </p>
+        </div>
+
+        <button
+          onClick={() => setShowDemo(!showDemo)}
+          className="btn-theme-secondary px-4 py-2 rounded-lg font-medium flex items-center gap-2"
+        >
+          {showDemo ? (
+            <EyeOff className="h-4 w-4" />
+          ) : (
+            <Eye className="h-4 w-4" />
+          )}
+          {showDemo ? 'Ocultar Demo' : 'Mostrar Demo'}
+        </button>
+      </div>
+
+      {/* Notificação de cópia */}
+      {copiedColor && (
+        <div className="fixed top-4 right-4 card-theme rounded-lg p-3 shadow-lg z-50 border-l-4 border-primary">
+          <p className="text-theme-primary text-sm font-medium">
+            Cor copiada: <code className="font-mono">{copiedColor}</code>
+          </p>
+        </div>
+      )}
+
+      {/* Demonstração Prática */}
+      {showDemo && <ThemeDemo />}
+
+      {/* Paleta de Cores */}
+      <div className="space-y-8">
+        <ColorSection
+          title="🎨 Cores Neutras"
+          colors={currentPalette.neutral}
+          onCopy={handleColorCopy}
+        />
+
+        <ColorSection
+          title="📝 Cores de Texto"
+          colors={currentPalette.text}
+          onCopy={handleColorCopy}
+        />
+
+        <ColorSection
+          title="🚀 Cores Primárias"
+          colors={currentPalette.primary}
+          onCopy={handleColorCopy}
+        />
+
+        <ColorSection
+          title="💬 Cores de Feedback"
+          colors={currentPalette.feedback}
+          onCopy={handleColorCopy}
+        />
+      </div>
+
+      {/* Footer */}
+      <div className="mt-12 pt-8 border-t border-light-border dark:border-dark-border">
+        <p className="text-theme-secondary text-center text-sm">
+          🎨 Sistema de Design - Barber Analytics Pro © 2025
+          <br />
+          Desenvolvido com React, Tailwind CSS e Lucide Icons
+        </p>
+      </div>
+    </div>
+  );
+}

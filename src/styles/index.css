@@ -1,0 +1,83 @@
+/* Estilos globais da aplicação */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Variáveis CSS customizadas para temas */
+:root {
+  /* Light Mode Colors */
+  --bg-light: #f9fafb;
+  --surface-light: #ffffff;
+  --border-light: #e2e8f0;
+  --text-primary-light: #1e293b;
+  --text-secondary-light: #64748b;
+
+  /* Dark Mode Colors */
+  --bg-dark: #0f172a;
+  --surface-dark: #1e293b;
+  --border-dark: #334155;
+  --text-primary-dark: #f8fafc;
+  --text-secondary-dark: #94a3b8;
+
+  /* Cores primárias (iguais em ambos os temas) */
+  --primary: #4da3ff;
+  --primary-hover: #1e8cff;
+  --primary-light: #e8f3ff;
+
+  /* Feedback Colors - Light */
+  --success-light: #16a34a;
+  --error-light: #ef4444;
+  --warning-light: #f59e0b;
+
+  /* Feedback Colors - Dark */
+  --success-dark: #22c55e;
+  --error-dark: #f87171;
+  --warning-dark: #fbbf24;
+}
+
+/* Configurações base */
+@layer base {
+  * {
+    @apply transition-colors duration-300;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary;
+    @apply transition-colors duration-300;
+  }
+}
+
+/* Componentes customizados */
+@layer components {
+  .theme-transition {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  .card-theme {
+    @apply bg-light-surface dark:bg-dark-surface border border-light-border dark:border-dark-border;
+  }
+
+  .text-theme-primary {
+    @apply text-text-light-primary dark:text-text-dark-primary;
+  }
+
+  .text-theme-secondary {
+    @apply text-text-light-secondary dark:text-text-dark-secondary;
+  }
+
+  .btn-theme-primary {
+    @apply bg-primary hover:bg-primary-hover text-white;
+    @apply transition-colors duration-300;
+  }
+
+  .btn-theme-secondary {
+    @apply bg-light-surface dark:bg-dark-surface;
+    @apply border border-light-border dark:border-dark-border;
+    @apply text-text-light-primary dark:text-text-dark-primary;
+    @apply hover:bg-primary/10 hover:border-primary/20;
+  }
+}
