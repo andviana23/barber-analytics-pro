@@ -1,4 +1,7 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import UnitSelector from '../../atoms/UnitSelector/UnitSelector';
 import {
   LayoutDashboard,
   DollarSign,
@@ -54,6 +57,14 @@ const menuItems = [
     path: '/units',
     badge: null,
   },
+  {
+    id: 'user-management',
+    label: 'Usuários',
+    icon: Users,
+    path: '/user-management',
+    badge: null,
+    adminOnly: true,
+  },
 ];
 
 const bottomMenuItems = [
@@ -72,8 +83,27 @@ const bottomMenuItems = [
 ];
 
 export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
-  const handleItemClick = () => {
-    // TODO: Implementar navegação com React Router
+  const navigate = useNavigate();
+  const { signOut, isAdmin } = useAuth();
+  
+  // Filtrar itens do menu baseado nas permissões do usuário
+  const filteredMenuItems = menuItems.filter(item => {
+    if (item.adminOnly) {
+      return isAdmin();
+    }
+    return true;
+  });
+
+  const handleItemClick = async (item) => {
+    // Navega para a página correspondente
+    if (item.id === 'logout') {
+      // Faz logout e redireciona para login
+      await signOut();
+      navigate('/login');
+    } else {
+      navigate(item.path);
+    }
+    
     if (window.innerWidth < 1024) {
       onClose(); // Fecha sidebar no mobile após clique
     }
@@ -91,14 +121,7 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
 
       {/* Sidebar */}
       <aside
-        className={`
-          fixed top-0 left-0 z-50 w-64 h-full
-          bg-light-surface dark:bg-dark-surface
-          border-r border-light-border dark:border-dark-border
-          transform transition-transform duration-300 ease-in-out
-          lg:translate-x-0 lg:static lg:inset-0
-          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-        `}
+        className="w-64 h-full bg-light-surface dark:bg-dark-surface border-r border-light-border dark:border-dark-border flex-shrink-0"
       >
         <div className="flex flex-col h-full">
           {/* Header */}
@@ -126,7 +149,7 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
 
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-2">
-            {menuItems.map((item) => {
+            {filteredMenuItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeItem === item.id;
 
@@ -172,11 +195,7 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
                 UNIDADE ATUAL
               </label>
             </div>
-            <select className="w-full px-3 py-2 rounded-lg border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-300">
-              <option value="mangabeiras">Mangabeiras</option>
-              <option value="nova-lima">Nova Lima</option>
-              <option value="all">Todas as Unidades</option>
-            </select>
+            <UnitSelector className="w-full" />
           </div>
 
           {/* Bottom menu */}
@@ -195,23 +214,6 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
                 </button>
               );
             })}
-          </div>
-
-          {/* User info */}
-          <div className="p-4 border-t border-light-border dark:border-dark-border">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                <span className="text-white font-semibold text-sm">JS</span>
-              </div>
-              <div>
-                <p className="text-text-light-primary dark:text-text-dark-primary text-sm font-medium">
-                  João Silva
-                </p>
-                <p className="text-text-light-secondary dark:text-text-dark-secondary text-xs">
-                  Administrador
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </aside>

@@ -1,0 +1,381 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { X, DollarSign, Calendar, CreditCard, Building2, Tag, FileText } from 'lucide-react';
+import { Button, Input } from '../../../atoms';
+import { supabase } from '../../../services/supabase';
+import { useAuth } from '../../../context';
+
+const TIPOS_RECEITA = [
+  { value: 'servico', label: 'Serviço' },
+  { value: 'produto', label: 'Produto' },
+  { value: 'assinatura', label: 'Assinatura' },
+  { value: 'outros', label: 'Outros' }
+];
+
+export default function NovaReceitaModal({ onClose, onSubmit }) {
+  const { user } = useAuth();
+  const [formData, setFormData] = useState({
+    tipo: 'servico',
+    valor: '',
+    data: new Date().toISOString().split('T')[0],
+    origem: '',
+    observacoes: '',
+    accountId: '',
+    unitId: ''
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [bankAccounts, setBankAccounts] = useState([]);
+  const [units, setUnits] = useState([]);
+  const [errors, setErrors] = useState({});
+
+  const fetchUserUnit = async () => {
+    try {
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      
+      if (currentUser) {
+        // Buscar unidade do profissional logado e pré-selecionar
+        const { data: professional, error } = await supabase
+          .from('professionals')
+          .select('unit_id')
+          .eq('user_id', currentUser.id)
+          .single();
+
+        if (error) {
+          // eslint-disable-next-line no-console
+          console.error('Erro ao buscar unidade do usuário:', error);
+        } else if (professional && professional.unit_id) {
+          // Pré-selecionar a unidade do usuário
+          setFormData(prev => ({ ...prev, unitId: professional.unit_id }));
+        }
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Erro ao buscar unidade do usuário:', error);
+    }
+  };
+
+  const fetchBankAccounts = useCallback(async (unitId) => {
+    try {
+      let query = supabase
+        .from('bank_accounts')
+        .select('id, name, bank, agency, account_number, unit_id')
+        .eq('is_active', true)
+        .order('name');
+
+      // Filtrar pela unidade selecionada no formulário
+      if (unitId) {
+        query = query.eq('unit_id', unitId);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+      
+      // eslint-disable-next-line no-console
+      console.log(`Contas bancárias carregadas para unidade ${unitId}:`, data);
+      
+      setBankAccounts(data || []);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Erro ao buscar contas bancárias:', error);
+    }
+  }, []);
+
+  const fetchUnits = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('units')
+        .select('id, name')
+        .eq('status', true)
+        .order('name');
+
+      if (error) throw error;
+      setUnits(data || []);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Erro ao buscar unidades:', error);
+    }
+  };
+
+  // Buscar dados iniciais
+  useEffect(() => {
+    fetchUserUnit();
+    fetchUnits();
+  }, []);
+
+  // Buscar contas bancárias quando a unidade for definida ou alterada
+  useEffect(() => {
+    if (formData.unitId) {
+      fetchBankAccounts(formData.unitId);
+    } else {
+      setBankAccounts([]); // Limpar contas se não houver unidade selecionada
+    }
+  }, [formData.unitId, fetchBankAccounts]);
+
+  const handleInputChange = (field, value) => {
+    setFormData(prev => {
+      const updated = { ...prev, [field]: value };
+      
+      // Se a unidade mudou, limpar a conta bancária selecionada
+      if (field === 'unitId') {
+        updated.accountId = '';
+      }
+      
+      return updated;
+    });
+    
+    // Limpar erro do campo quando o usuário começar a digitar
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: null }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.tipo) {
+      newErrors.tipo = 'Tipo é obrigatório';
+    }
+
+    if (!formData.valor || isNaN(parseFloat(formData.valor)) || parseFloat(formData.valor) <= 0) {
+      newErrors.valor = 'Valor deve ser um número positivo';
+    }
+
+    if (!formData.data) {
+      newErrors.data = 'Data é obrigatória';
+    }
+
+    if (!formData.accountId) {
+      newErrors.accountId = 'Conta bancária é obrigatória';
+    }
+
+    if (!formData.unitId) {
+      newErrors.unitId = 'Unidade é obrigatória';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      const receita = {
+        tipo: formData.tipo,
+        valor: parseFloat(formData.valor),
+        data: formData.data,
+        origem: formData.origem || null,
+        observacoes: formData.observacoes || null,
+        account_id: formData.accountId,
+        unitId: formData.unitId
+      };
+
+      await onSubmit(receita);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Erro ao criar receita:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
+              <DollarSign className="h-5 w-5 text-green-600" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              Nova Receita
+            </h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+          >
+            <X className="h-6 w-6" />
+          </button>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Primeira linha: Tipo e Valor */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <Tag className="h-4 w-4 inline mr-2" />
+                Tipo de Receita *
+              </label>
+              <select
+                value={formData.tipo}
+                onChange={(e) => handleInputChange('tipo', e.target.value)}
+                className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                  errors.tipo ? 'border-red-300' : 'border-gray-300 dark:border-gray-600'
+                }`}
+              >
+                {TIPOS_RECEITA.map(tipo => (
+                  <option key={tipo.value} value={tipo.value}>
+                    {tipo.label}
+                  </option>
+                ))}
+              </select>
+              {errors.tipo && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.tipo}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <DollarSign className="h-4 w-4 inline mr-2" />
+                Valor *
+              </label>
+              <Input
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="0,00"
+                value={formData.valor}
+                onChange={(e) => handleInputChange('valor', e.target.value)}
+                className={errors.valor ? 'border-red-300' : ''}
+              />
+              {errors.valor && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.valor}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Segunda linha: Data e Conta Bancária */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <Calendar className="h-4 w-4 inline mr-2" />
+                Data *
+              </label>
+              <Input
+                type="date"
+                value={formData.data}
+                onChange={(e) => handleInputChange('data', e.target.value)}
+                className={errors.data ? 'border-red-300' : ''}
+              />
+              {errors.data && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.data}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <CreditCard className="h-4 w-4 inline mr-2" />
+                Conta Bancária *
+              </label>
+              <select
+                value={formData.accountId}
+                onChange={(e) => handleInputChange('accountId', e.target.value)}
+                className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                  errors.accountId ? 'border-red-300' : 'border-gray-300 dark:border-gray-600'
+                }`}
+              >
+                <option value="">Selecione uma conta</option>
+                {bankAccounts.map(account => (
+                  <option key={account.id} value={account.id}>
+                    {account.name} - {account.bank} ({account.agency}-{account.account_number})
+                  </option>
+                ))}
+              </select>
+              {errors.accountId && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.accountId}</p>
+              )}
+              {bankAccounts.length === 0 && formData.unitId && (
+                <p className="mt-1 text-sm text-amber-600 dark:text-amber-400">
+                  Nenhuma conta bancária cadastrada para esta unidade.
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Terceira linha: Unidade e Origem */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <Building2 className="h-4 w-4 inline mr-2" />
+                Unidade *
+              </label>
+              <select
+                value={formData.unitId}
+                onChange={(e) => handleInputChange('unitId', e.target.value)}
+                className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                  errors.unitId ? 'border-red-300' : 'border-gray-300 dark:border-gray-600'
+                }`}
+              >
+                <option value="">Selecione uma unidade</option>
+                {units.map(unit => (
+                  <option key={unit.id} value={unit.id}>
+                    {unit.name}
+                  </option>
+                ))}
+              </select>
+              {errors.unitId && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.unitId}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Origem
+              </label>
+              <Input
+                type="text"
+                placeholder="Ex: Cliente referenciado, promoção, etc."
+                value={formData.origem}
+                onChange={(e) => handleInputChange('origem', e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Observações */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <FileText className="h-4 w-4 inline mr-2" />
+              Observações
+            </label>
+            <textarea
+              rows={3}
+              placeholder="Informações adicionais sobre esta receita..."
+              value={formData.observacoes}
+              onChange={(e) => handleInputChange('observacoes', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+            />
+          </div>
+
+          {/* Buttons */}
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={loading}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              disabled={loading}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              {loading ? 'Salvando...' : 'Salvar Receita'}
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../services/supabase';
+// import auditService from '../services/auditService'; // Desabilitado temporariamente
 
 // Criar o contexto
 const AuthContext = createContext({});
@@ -18,21 +19,68 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState(null);
+  const [adminStatus, setAdminStatus] = useState(false);
+
+  // Timeout de segurança para loading
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setLoading(false);
+    }, 10000); // 10 segundos máximo de loading
+
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   useEffect(() => {
-    // Obter sessão inicial
+    // Obter sessão inicial com refresh forçado
     const getInitialSession = async () => {
       try {
+        setLoading(true);
+        
+        // 1. Tentar obter sessão atual
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
-          // Erro ao obter sessão inicial
-        } else {
-          setSession(session);
-          setUser(session?.user ?? null);
+          console.error('❌ Erro ao obter sessão inicial:', error);
+          setSession(null);
+          setUser(null);
+          return;
         }
-      } catch {
-        // Erro ao inicializar auth
+        
+        // 2. Se há sessão, verificar se token precisa refresh
+        if (session?.user) {
+          const now = Math.floor(Date.now() / 1000);
+          const expiresAt = session.expires_at || 0;
+          
+          // Se token expira em menos de 5 minutos, fazer refresh
+          if (expiresAt - now < 300) {
+            console.log('🔄 Token próximo do vencimento, fazendo refresh...');
+            const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession();
+            
+            if (refreshError) {
+              console.error('❌ Erro no refresh da sessão:', refreshError);
+            } else if (refreshed.session) {
+              console.log('✅ Sessão refreshed com sucesso');
+              setSession(refreshed.session);
+              setUser(refreshed.session.user);
+              await fetchUserRole(refreshed.session);
+              return;
+            }
+          }
+          
+          // 3. Usar sessão atual
+          setSession(session);
+          setUser(session.user);
+          
+          // Se há usuário, buscar role
+          if (session.user) {
+            await fetchUserRole(session);
+          }
+        }
+      } catch (err) {
+        console.error('Erro ao inicializar auth:', err);
+        setSession(null);
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -40,17 +88,144 @@ export function AuthProvider({ children }) {
 
     getInitialSession();
 
-    // Escutar mudanças de autenticação
+    // Função para buscar papel do usuário
+    const fetchUserRole = async (userSession) => {
+      if (!userSession?.user) {
+        setAdminStatus(false);
+        setUserRole(null);
+        return;
+      }
+      
+      console.log('🔍 Buscando role do usuário:', userSession.user.email);
+      console.log('📋 User metadata:', userSession.user.user_metadata);
+      
+      try {
+        // 1. PRIMEIRO: Usar metadados do usuário (mais confiável)
+        const userRole = userSession.user?.user_metadata?.role;
+        
+        if (userRole) {
+          console.log('✅ Role encontrado nos metadados:', userRole);
+          setUserRole(userRole);
+          setAdminStatus(userRole === 'admin');
+          return;
+        }
+        
+        // 2. FALLBACK: Buscar na tabela professionals se não tem metadados
+        console.log('⚠️ Sem role nos metadados, buscando na tabela professionals...');
+        const { data: profData, error: profError } = await supabase
+          .from('professionals')
+          .select('role')
+          .eq('user_id', userSession.user.id)
+          .single();
+        
+        if (profError) {
+          console.error('❌ Erro ao buscar role na tabela professionals:', profError);
+          // Se não conseguir buscar, usar role padrão baseado no email
+          const defaultRole = userSession.user.email === 'andrey@tratodebarbados.com' ? 'admin' : 'barbeiro';
+          setUserRole(defaultRole);
+          setAdminStatus(defaultRole === 'admin');
+        } else if (profData?.role) {
+          console.log('✅ Role encontrado na tabela professionals:', profData.role);
+          setUserRole(profData.role);
+          setAdminStatus(profData.role === 'admin');
+        } else {
+          console.log('⚠️ Nenhum role encontrado, usando padrão');
+          setUserRole('barbeiro');
+          setAdminStatus(false);
+        }
+        
+      } catch (err) {
+        console.error('❌ Erro ao buscar role:', err);
+        // Fallback final para metadados do usuário ou padrão
+        const userRole = userSession.user?.user_metadata?.role || 'barbeiro';
+        setUserRole(userRole);
+        setAdminStatus(userRole === 'admin');
+      }
+    };
+
+    // Escutar mudanças de autenticação com logs detalhados
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
+        console.log('🔔 Auth State Change:', event, 'Session exists:', !!session);
+        
+        try {
+          if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+            console.log('✅ User authenticated, updating state...');
+            setSession(session);
+            setUser(session?.user ?? null);
+            if (session?.user) {
+              await fetchUserRole(session);
+            }
+          } else if (event === 'SIGNED_OUT') {
+            console.log('👋 User signed out, clearing state...');
+            setSession(null);
+            setUser(null);
+            setUserRole(null);
+            setAdminStatus(false);
+          } else if (event === 'INITIAL_SESSION') {
+            console.log('🚀 Initial session loaded');
+            setSession(session);
+            setUser(session?.user ?? null);
+            if (session?.user) {
+              await fetchUserRole(session);
+            }
+          }
+          
+          // Para eventos que não têm usuário
+          if (!session?.user && event !== 'SIGNED_OUT') {
+            setAdminStatus(false);
+            setUserRole(null);
+          }
+        } catch (error) {
+          // Erro na mudança de estado de autenticação
+          setSession(null);
+          setUser(null);
+          setAdminStatus(false);
+          setUserRole(null);
+        } finally {
+          setLoading(false);
+        }
       }
     );
 
     return () => subscription?.unsubscribe();
   }, []);
+
+  // Função para forçar refresh da sessão
+  const forceSessionRefresh = async () => {
+    try {
+      setLoading(true);
+      console.log('🔄 Forçando refresh da sessão...');
+      
+      const { data, error } = await supabase.auth.refreshSession();
+      
+      if (error) {
+        console.error('❌ Erro no refresh forçado:', error);
+        return false;
+      }
+      
+      if (data.session) {
+        console.log('✅ Sessão refreshed com sucesso');
+        setSession(data.session);
+        setUser(data.session.user);
+        // Usar a função local fetchUserRole em vez de chamar diretamente
+        // Buscar role manualmente aqui
+        const userRole = data.session.user?.user_metadata?.role;
+        if (userRole) {
+          setUserRole(userRole);
+          setAdminStatus(userRole === 'admin');
+        }
+        return true;
+      }
+      
+      return false;
+    } catch (err) {
+      console.error('❌ Erro ao forçar refresh:', err);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Função de login
   const signIn = async (email, password) => {
@@ -64,6 +239,14 @@ export function AuthProvider({ children }) {
       if (error) {
         throw error;
       }
+
+      // TODO: Registrar login no sistema de auditoria (desabilitado temporariamente)
+      // if (data.user) {
+      //   auditService.logLogin({
+      //     method: 'email',
+      //     user_email: data.user.email
+      //   });
+      // }
 
       return { data, error: null };
     } catch (error) {
@@ -101,6 +284,10 @@ export function AuthProvider({ children }) {
   const signOut = async () => {
     try {
       setLoading(true);
+      
+      // TODO: Registrar logout no sistema de auditoria (desabilitado temporariamente)
+      // await auditService.logLogout();
+      
       const { error } = await supabase.auth.signOut();
       
       if (error) {
@@ -178,7 +365,7 @@ export function AuthProvider({ children }) {
 
   // Verificar se é admin
   const isAdmin = () => {
-    return user?.user_metadata?.role === 'admin' || false;
+    return adminStatus;
   };
 
   // Obter dados do perfil do usuário
@@ -202,6 +389,7 @@ export function AuthProvider({ children }) {
     session,
     loading,
     isAuthenticated,
+    userRole,
     
     // Funções de autenticação
     signIn,
@@ -210,6 +398,7 @@ export function AuthProvider({ children }) {
     resetPassword,
     updatePassword,
     updateProfile,
+    forceSessionRefresh,
     
     // Funções utilitárias
     hasPermission,

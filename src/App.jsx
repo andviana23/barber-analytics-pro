@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
+import { UnitProvider } from './context/UnitContext';
 import { ProtectedRoute, PublicRoute, UnauthorizedPage } from './components/ProtectedRoute/ProtectedRoute';
 import { Layout } from './components/Layout/Layout';
+import { useSkipLinks } from './utils/accessibility';
 
 // Páginas públicas (não precisam de autenticação)
 import { LoginPage } from './pages/LoginPage/LoginPage';
@@ -12,14 +15,41 @@ import { ForgotPasswordPage } from './pages/ForgotPasswordPage/ForgotPasswordPag
 
 // Páginas protegidas (precisam de autenticação)
 import { DashboardPage } from './pages/DashboardPage/DashboardPage';
+import { UserProfilePage } from './pages/UserProfilePage';
+import { UserManagementPage } from './pages/UserManagementPage';
+import FinanceiroAdvancedPage from './pages/FinanceiroAdvancedPage/FinanceiroAdvancedPage';
+import { BankAccountsPage } from './pages';
+import { ListaDaVezPage } from './pages/ListaDaVezPage';
+import { ProfessionalsPage } from './pages/ProfessionalsPage/ProfessionalsPage';
+import UnitsPage from './pages/UnitsPage/UnitsPage';
+import RelatoriosPage from './pages/RelatoriosPage/RelatoriosPage';
 
 import './styles/index.css';
+
+// Skip Links Component
+function SkipLinks() {
+  const { addSkipLink, removeSkipLink } = useSkipLinks();
+
+  useEffect(() => {
+    addSkipLink('main-content', 'Pular para o conteúdo principal');
+    addSkipLink('sidebar-navigation', 'Pular para a navegação');
+    
+    return () => {
+      removeSkipLink();
+    };
+  }, [addSkipLink, removeSkipLink]);
+
+  return null;
+}
 
 function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <Router>
+      <ToastProvider>
+        <AuthProvider>
+          <UnitProvider>
+            <SkipLinks />
+            <Router>
           <Routes>
             {/* Rota raiz - redireciona para dashboard se autenticado, senão para login */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -66,16 +96,18 @@ function App() {
             <Route 
               path="/financial" 
               element={
-                <ProtectedRoute>
+                <ProtectedRoute roles={['admin', 'gerente']}>
+                  <FinanceiroAdvancedPage />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/financial/banks" 
+              element={
+                <ProtectedRoute roles={['admin']}>
                   <Layout activeMenuItem="financial">
-                    <div className="text-center py-12">
-                      <h2 className="text-2xl font-bold text-text-light-primary dark:text-text-dark-primary mb-4">
-                        Módulo Financeiro
-                      </h2>
-                      <p className="text-text-light-secondary dark:text-text-dark-secondary">
-                        Em desenvolvimento...
-                      </p>
-                    </div>
+                    <BankAccountsPage />
                   </Layout>
                 </ProtectedRoute>
               } 
@@ -86,14 +118,18 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Layout activeMenuItem="professionals">
-                    <div className="text-center py-12">
-                      <h2 className="text-2xl font-bold text-text-light-primary dark:text-text-dark-primary mb-4">
-                        Profissionais
-                      </h2>
-                      <p className="text-text-light-secondary dark:text-text-dark-secondary">
-                        Em desenvolvimento...
-                      </p>
-                    </div>
+                    <ProfessionalsPage />
+                  </Layout>
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/units" 
+              element={
+                <ProtectedRoute>
+                  <Layout activeMenuItem="units">
+                    <UnitsPage />
                   </Layout>
                 </ProtectedRoute>
               } 
@@ -104,14 +140,7 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Layout activeMenuItem="queue">
-                    <div className="text-center py-12">
-                      <h2 className="text-2xl font-bold text-text-light-primary dark:text-text-dark-primary mb-4">
-                        Lista da Vez
-                      </h2>
-                      <p className="text-text-light-secondary dark:text-text-dark-secondary">
-                        Em desenvolvimento...
-                      </p>
-                    </div>
+                    <ListaDaVezPage />
                   </Layout>
                 </ProtectedRoute>
               } 
@@ -122,14 +151,7 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Layout activeMenuItem="reports">
-                    <div className="text-center py-12">
-                      <h2 className="text-2xl font-bold text-text-light-primary dark:text-text-dark-primary mb-4">
-                        Relatórios
-                      </h2>
-                      <p className="text-text-light-secondary dark:text-text-dark-secondary">
-                        Em desenvolvimento...
-                      </p>
-                    </div>
+                    <RelatoriosPage />
                   </Layout>
                 </ProtectedRoute>
               } 
@@ -148,6 +170,29 @@ function App() {
                         Em desenvolvimento...
                       </p>
                     </div>
+                  </Layout>
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute>
+                  <Layout activeMenuItem="profile">
+                    <UserProfilePage />
+                  </Layout>
+                </ProtectedRoute>
+              } 
+            />
+
+            {/* Rota de gerenciamento de usuários - apenas para Admins */}
+            <Route 
+              path="/user-management" 
+              element={
+                <ProtectedRoute roles={['admin']}>
+                  <Layout activeMenuItem="user-management">
+                    <UserManagementPage />
                   </Layout>
                 </ProtectedRoute>
               } 
@@ -202,8 +247,10 @@ function App() {
               } 
             />
           </Routes>
-        </Router>
-      </AuthProvider>
+            </Router>
+          </UnitProvider>
+        </AuthProvider>
+      </ToastProvider>
     </ThemeProvider>
   );
 }

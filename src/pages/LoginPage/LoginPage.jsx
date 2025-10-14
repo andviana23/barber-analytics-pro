@@ -55,19 +55,41 @@ export function LoginPage() {
     setError('');
 
     try {
+      console.log('🔐 Tentando login com:', formData.email);
       const { data, error: authError } = await signIn(formData.email, formData.password);
       
+      console.log('📊 Resultado do login:', { data, authError });
+      
       if (authError) {
-        setError(authError.message || 'Email ou senha incorretos');
+        console.error('❌ Erro de autenticação:', authError);
+        
+        // Mensagens de erro mais específicas
+        let errorMessage = 'Email ou senha incorretos';
+        
+        if (authError.message?.includes('Invalid login credentials')) {
+          errorMessage = 'Email ou senha incorretos';
+        } else if (authError.message?.includes('Email not confirmed')) {
+          errorMessage = 'Email não confirmado. Verifique sua caixa de entrada.';
+        } else if (authError.message?.includes('Too many requests')) {
+          errorMessage = 'Muitas tentativas. Tente novamente em alguns minutos.';
+        } else if (authError.message) {
+          errorMessage = authError.message;
+        }
+        
+        setError(errorMessage);
         return;
       }
 
       if (data?.user) {
+        console.log('✅ Login bem-sucedido!');
         // Sucesso - redirecionar para dashboard
         navigate('/dashboard');
+      } else {
+        setError('Erro inesperado no login. Tente novamente.');
       }
-    } catch {
-      setError('Erro ao fazer login. Tente novamente.');
+    } catch (err) {
+      console.error('❌ Erro crítico no login:', err);
+      setError('Erro de conexão. Verifique sua internet e tente novamente.');
     } finally {
       setIsLoading(false);
     }

@@ -3,6 +3,15 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   darkMode: 'class', // Habilita dark mode via classe
   theme: {
+    screens: {
+      'xs': '375px',     // iPhone SE, small phones
+      'sm': '640px',     // Large phones
+      'md': '768px',     // Tablets portrait
+      'lg': '1024px',    // Tablets landscape / Small desktop
+      'xl': '1280px',    // Desktop
+      '2xl': '1536px',   // Large desktop
+      '3xl': '1920px',   // Ultra wide
+    },
     extend: {
       colors: {
         // === CORES PRIMÁRIAS ===
