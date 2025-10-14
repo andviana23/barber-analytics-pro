@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testes: usePaymentMethods Hook</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .test-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .test-section h2 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .test-icon {
+            font-size: 28px;
+        }
+        
+        .test-item {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        .test-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .test-item h3 {
+            color: #667eea;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .test-item p {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+        
+        .test-steps {
+            background: white;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        
+        .test-steps ol {
+            margin-left: 20px;
+        }
+        
+        .test-steps li {
+            color: #666;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+        }
+        
+        .checkbox-container input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .checkbox-container label {
+            color: #333;
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-running {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-passed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-failed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e5e7eb;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .quick-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            text-align: center;
+            font-weight: 600;
+            transition: transform 0.3s;
+        }
+        
+        .quick-link:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+        
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Suite de Testes: usePaymentMethods Hook</h1>
+            <p>Sistema de validação interativa para formas de pagamento</p>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%">
+                    0% Completo
+                </div>
+            </div>
+        </div>
+
+        <div class="quick-links">
+            <a href="http://localhost:3000/cadastros/formas-pagamento" target="_blank" class="quick-link">
+                🚀 Abrir Página de Testes
+            </a>
+            <a href="#" onclick="resetTests(); return false;" class="quick-link">
+                🔄 Resetar Testes
+            </a>
+            <a href="#" onclick="exportResults(); return false;" class="quick-link">
+                📊 Exportar Resultados
+            </a>
+        </div>
+
+        <!-- TESTE 1 -->
+        <div class="test-section">
+            <h2>
+                <span class="test-icon">🔄</span>
+                Teste 1: Ciclo de Vida do isMountedRef
+                <span class="status-badge status-pending" id="status-test1">Pendente</span>
+            </h2>
+            
+            <div class="test-item">
+                <h3>Objetivo</h3>
+                <p>Validar que <code>isMountedRef.current</code> permanece <code>true</code> durante todo o ciclo de vida do componente e só é zerado no unmount.</p>
+                
+                <div class="test-steps">
+                    <strong>Passos:</strong>
+                    <ol>
+                        <li>Abra o DevTools Console (F12)</li>
+                        <li>Acesse a página de formas de pagamento</li>
+                        <li>Observe o console - deve mostrar "Component mounted"</li>
+                        <li>Troque a unidade selecionada 3 vezes</li>
+                        <li>Verifique que não aparece "Component unmounted"</li>
+                        <li>Navegue para outra página</li>
+                        <li>Verifique que agora aparece "Component unmounted"</li>
+                    </ol>
+                </div>
+                
+                <div class="alert alert-info">
+                    <strong>✅ Resultado Esperado:</strong> isMountedRef permanece true durante mudanças de parâmetros, false apenas no unmount.
+                </div>
+                
+                <div class="checkbox-container">
+                    <input type="checkbox" id="check-test1" onchange="updateProgress()">
+                    <label for="check-test1">✅ Teste 1 passou com sucesso</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- TESTE 2 -->
+        <div class="test-section">
+            <h2>
+                <span class="test-icon">⚡</span>
+                Teste 2: Feedback Visual Instantâneo
+                <span class="status-badge status-pending" id="status-test2">Pendente</span>
+            </h2>
+            
+            <div class="test-item">
+                <h3>Objetivo</h3>
+                <p>Validar que o loading aparece <strong>imediatamente</strong> (&lt;50ms) ao trocar de unidade.</p>
+                
+                <div class="test-steps">
+                    <strong>Passos:</strong>
+                    <ol>
+                        <li>Abra a página de formas de pagamento</li>
+                        <li>Observe o seletor de unidades</li>
+                        <li>Troque para outra unidade</li>
+                        <li>Observe se o spinner aparece INSTANTANEAMENTE</li>
+                        <li>Use o Performance monitor (DevTools) para medir tempo</li>
+                        <li>Tempo entre clique e spinner deve ser &lt;50ms</li>
+                    </ol>
+                </div>
+                
+                <div class="alert alert-info">
+                    <strong>✅ Resultado Esperado:</strong> Spinner aparece em menos de 50ms após trocar unidade.
+                </div>
+                
+                <div class="checkbox-container">
+                    <input type="checkbox" id="check-test2" onchange="updateProgress()">
+                    <label for="check-test2">✅ Teste 2 passou com sucesso</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- TESTE 3 -->
+        <div class="test-section">
+            <h2>
+                <span class="test-icon">🔄</span>
+                Teste 3: Updates Não Bloqueados
+                <span class="status-badge status-pending" id="status-test3">Pendente</span>
+            </h2>
+            
+            <div class="test-item">
+                <h3>Objetivo</h3>
+                <p>Validar que dados são atualizados corretamente após mudanças de <code>unitId</code> ou <code>includeInactive</code>.</p>
+                
+                <div class="test-steps">
+                    <strong>Passos:</strong>
+                    <ol>
+                        <li>Carregue a página com unidade "Mangabeiras"</li>
+                        <li>Verifique que dados aparecem</li>
+                        <li>Troque para unidade "Nova Lima"</li>
+                        <li>Verifique que:
+                            <ul>
+                                <li>Loading aparece</li>
+                                <li>Novos dados são carregados</li>
+                                <li>Lista é atualizada</li>
+                                <li>Sem erros no console</li>
+                            </ul>
+                        </li>
+                        <li>Ative filtro "Mostrar inativos"</li>
+                        <li>Verifique que lista atualiza</li>
+                    </ol>
+                </div>
+                
+                <div class="alert alert-info">
+                    <strong>✅ Resultado Esperado:</strong> Dados atualizados sem bloqueios ou erros.
+                </div>
+                
+                <div class="checkbox-container">
+                    <input type="checkbox" id="check-test3" onchange="updateProgress()">
+                    <label for="check-test3">✅ Teste 3 passou com sucesso</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- TESTE 4 -->
+        <div class="test-section">
+            <h2>
+                <span class="test-icon">🎯</span>
+                Teste 4: Toasts Funcionando
+                <span class="status-badge status-pending" id="status-test4">Pendente</span>
+            </h2>
+            
+            <div class="test-item">
+                <h3>Objetivo</h3>
+                <p>Validar que todos os toasts aparecem com formato correto.</p>
+                
+                <div class="test-steps">
+                    <strong>Passos:</strong>
+                    <ol>
+                        <li><strong>Criar:</strong> Clique em "+ Nova Forma de Pagamento"</li>
+                        <li>Preencha e salve</li>
+                        <li>Verifique toast verde: "Forma de pagamento criada com sucesso"</li>
+                        <li><strong>Editar:</strong> Clique no botão de editar</li>
+                        <li>Altere dados e salve</li>
+                        <li>Verifique toast verde: "Forma de pagamento atualizada com sucesso"</li>
+                        <li><strong>Desativar:</strong> Clique no botão de desativar</li>
+                        <li>Confirme</li>
+                        <li>Verifique toast verde: "Forma de pagamento desativada com sucesso"</li>
+                        <li><strong>Ativar:</strong> Ative filtro de inativos, clique em ativar</li>
+                        <li>Verifique toast verde: "Forma de pagamento ativada com sucesso"</li>
+                    </ol>
+                </div>
+                
+                <div class="alert alert-info">
+                    <strong>✅ Resultado Esperado:</strong> Todos os toasts aparecem com mensagens corretas.
+                </div>
+                
+                <div class="checkbox-container">
+                    <input type="checkbox" id="check-test4" onchange="updateProgress()">
+                    <label for="check-test4">✅ Teste 4 passou com sucesso</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- TESTE 5 -->
+        <div class="test-section">
+            <h2>
+                <span class="test-icon">💾</span>
+                Teste 5: Cache Funcionando
+                <span class="status-badge status-pending" id="status-test5">Pendente</span>
+            </h2>
+            
+            <div class="test-item">
+                <h3>Objetivo</h3>
+                <p>Validar que cache é criado, utilizado e limpo corretamente.</p>
+                
+                <div class="test-steps">
+                    <strong>Passos:</strong>
+                    <ol>
+                        <li>Abra DevTools Network tab</li>
+                        <li>Carregue a página - deve fazer 1 requisição</li>
+                        <li>Navegue para outra página e volte</li>
+                        <li>Se voltar em menos de 5 min, NÃO deve fazer requisição (cache)</li>
+                        <li>Crie nova forma de pagamento</li>
+                        <li>Verifique que lista atualiza (cache limpo)</li>
+                        <li>Espere 5 minutos</li>
+                        <li>Recarregue - deve fazer nova requisição (cache expirou)</li>
+                    </ol>
+                </div>
+                
+                <div class="alert alert-info">
+                    <strong>✅ Resultado Esperado:</strong> Cache TTL de 5 min, limpo após mutations.
+                </div>
+                
+                <div class="checkbox-container">
+                    <input type="checkbox" id="check-test5" onchange="updateProgress()">
+                    <label for="check-test5">✅ Teste 5 passou com sucesso</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- TESTE 6 -->
+        <div class="test-section">
+            <h2>
+                <span class="test-icon">🔴</span>
+                Teste 6: Tratamento de Erros
+                <span class="status-badge status-pending" id="status-test6">Pendente</span>
+            </h2>
+            
+            <div class="test-item">
+                <h3>Objetivo</h3>
+                <p>Validar que erros são tratados gracefully com toasts apropriados.</p>
+                
+                <div class="test-steps">
+                    <strong>Passos:</strong>
+                    <ol>
+                        <li>Abra DevTools Console</li>
+                        <li>Tente criar forma com nome vazio</li>
+                        <li>Verifique toast vermelho com erro de validação</li>
+                        <li>Desconecte internet (DevTools > Network > Offline)</li>
+                        <li>Tente criar forma de pagamento</li>
+                        <li>Verifique toast vermelho com erro de rede</li>
+                        <li>Reconecte internet</li>
+                        <li>Verifique que funciona novamente</li>
+                    </ol>
+                </div>
+                
+                <div class="alert alert-info">
+                    <strong>✅ Resultado Esperado:</strong> Erros mostram toasts vermelhos com descrição.
+                </div>
+                
+                <div class="checkbox-container">
+                    <input type="checkbox" id="check-test6" onchange="updateProgress()">
+                    <label for="check-test6">✅ Teste 6 passou com sucesso</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- TESTE 7 -->
+        <div class="test-section">
+            <h2>
+                <span class="test-icon">🔄</span>
+                Teste 7: Sem Loop Infinito
+                <span class="status-badge status-pending" id="status-test7">Pendente</span>
+            </h2>
+            
+            <div class="test-item">
+                <h3>Objetivo</h3>
+                <p>Validar que NÃO existe loop infinito de requisições.</p>
+                
+                <div class="test-steps">
+                    <strong>Passos:</strong>
+                    <ol>
+                        <li>Abra DevTools Network tab</li>
+                        <li>Carregue a página de formas de pagamento</li>
+                        <li>Observe Network tab por 30 segundos</li>
+                        <li>Deve ter APENAS 1 requisição inicial</li>
+                        <li>Troque de unidade 10 vezes rapidamente</li>
+                        <li>Deve ter 1 requisição por troca (máximo 10)</li>
+                        <li>Abra Task Manager / Activity Monitor</li>
+                        <li>CPU deve estar &lt;10%</li>
+                    </ol>
+                </div>
+                
+                <div class="alert alert-success">
+                    <strong>✅ Resultado Esperado:</strong> 1 requisição inicial, CPU normal, sem loop.
+                </div>
+                
+                <div class="checkbox-container">
+                    <input type="checkbox" id="check-test7" onchange="updateProgress()">
+                    <label for="check-test7">✅ Teste 7 passou com sucesso</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESUMO FINAL -->
+        <div class="test-section" id="final-summary" style="display: none;">
+            <h2>
+                <span class="test-icon">🎉</span>
+                Parabéns! Todos os Testes Passaram
+            </h2>
+            
+            <div class="alert alert-success">
+                <h3>✅ Sistema Validado com Sucesso</h3>
+                <p><strong>O hook usePaymentMethods está funcionando perfeitamente!</strong></p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>✅ Ciclo de vida correto</li>
+                    <li>✅ Feedback visual instantâneo</li>
+                    <li>✅ Updates não bloqueados</li>
+                    <li>✅ Toasts funcionando</li>
+                    <li>✅ Cache otimizado</li>
+                    <li>✅ Erros tratados</li>
+                    <li>✅ Sem loops infinitos</li>
+                </ul>
+                
+                <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
+                    <strong>📊 Status Final:</strong><br>
+                    <span style="color: #10b981; font-size: 24px; font-weight: bold;">PRONTO PARA PRODUÇÃO! 🚀</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateProgress() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            const checked = document.querySelectorAll('input[type="checkbox"]:checked').length;
+            const total = checkboxes.length;
+            const percentage = Math.round((checked / total) * 100);
+            
+            const progressFill = document.getElementById('progress-fill');
+            progressFill.style.width = percentage + '%';
+            progressFill.textContent = percentage + '% Completo';
+            
+            // Atualizar badges
+            for (let i = 1; i <= 7; i++) {
+                const checkbox = document.getElementById(`check-test${i}`);
+                const badge = document.getElementById(`status-test${i}`);
+                
+                if (checkbox.checked) {
+                    badge.className = 'status-badge status-passed';
+                    badge.textContent = 'Passou ✓';
+                }
+            }
+            
+            // Mostrar resumo final
+            if (percentage === 100) {
+                document.getElementById('final-summary').style.display = 'block';
+                document.getElementById('final-summary').scrollIntoView({ behavior: 'smooth' });
+            } else {
+                document.getElementById('final-summary').style.display = 'none';
+            }
+        }
+        
+        function resetTests() {
+            if (confirm('Tem certeza que deseja resetar todos os testes?')) {
+                const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(cb => cb.checked = false);
+                updateProgress();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+        
+        function exportResults() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            const checked = document.querySelectorAll('input[type="checkbox"]:checked').length;
+            const total = checkboxes.length;
+            
+            let report = '=== RELATÓRIO DE TESTES ===\n\n';
+            report += `Data: ${new Date().toLocaleString('pt-BR')}\n`;
+            report += `Progresso: ${checked}/${total} (${Math.round((checked/total)*100)}%)\n\n`;
+            
+            for (let i = 1; i <= 7; i++) {
+                const checkbox = document.getElementById(`check-test${i}`);
+                const status = checkbox.checked ? '✅ PASSOU' : '❌ PENDENTE';
+                report += `Teste ${i}: ${status}\n`;
+            }
+            
+            report += '\n' + '='.repeat(50) + '\n';
+            report += checked === total ? '\n🎉 TODOS OS TESTES PASSARAM!\n' : '\n⚠️ Alguns testes ainda pendentes\n';
+            
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `teste-payment-methods-${Date.now()}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // Salvar progresso no localStorage
+        document.addEventListener('DOMContentLoaded', () => {
+            // Carregar progresso salvo
+            for (let i = 1; i <= 7; i++) {
+                const saved = localStorage.getItem(`test${i}`);
+                if (saved === 'true') {
+                    document.getElementById(`check-test${i}`).checked = true;
+                }
+            }
+            updateProgress();
+            
+            // Salvar ao marcar
+            document.querySelectorAll('input[type="checkbox"]').forEach((cb, index) => {
+                cb.addEventListener('change', () => {
+                    localStorage.setItem(`test${index + 1}`, cb.checked);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

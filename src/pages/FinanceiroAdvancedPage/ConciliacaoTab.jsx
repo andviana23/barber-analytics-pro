@@ -144,20 +144,26 @@ const ConciliacaoTab = ({ globalFilters }) => {
       {/* Panel principal de conciliação */}
       {globalFilters.accountId ? (
         <ConciliacaoPanel
-          matches={matches}
-          statements={statements}
-          unreconciled={unreconciled}
+          // Props adaptadas para o painel
+          reconciliationMatches={matches}
+          bankTransactions={statements}
+          internalTransactions={unreconciled}
+          selectedAccount={availableAccounts.find(acc => acc.id === globalFilters.accountId) || { id: globalFilters.accountId, nome: 'Conta Selecionada' }}
+          
+          // Estados
           loading={matchesLoading || statementsLoading}
           error={matchesError || statementsError}
-          onConfirmMatch={handleConfirmMatch}
+          
+          // Callbacks
+          onApproveMatch={handleConfirmMatch}
           onRejectMatch={handleRejectMatch}
-          onRefresh={() => {
+          onRefreshData={() => {
             refetchMatches();
             refetchStatements();
           }}
           onRunAutoMatch={handleRunAutoMatch}
           onImportStatement={() => setIsImportModalOpen(true)}
-          onManualReconciliation={() => setIsManualModalOpen(true)}
+          onCreateManualMatch={() => setIsManualModalOpen(true)}
         />
       ) : (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-12">

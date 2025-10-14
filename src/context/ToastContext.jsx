@@ -185,6 +185,7 @@ export function ToastProvider({ children }) {
   }, [showSuccess, showError, showWarning, showInfo]);
 
   const value = {
+    addToast, // Inclui addToast para compatibilidade com hooks
     showSuccess,
     showError,
     showWarning,

@@ -23,6 +23,7 @@ import { ListaDaVezPage } from './pages/ListaDaVezPage';
 import { ProfessionalsPage } from './pages/ProfessionalsPage/ProfessionalsPage';
 import UnitsPage from './pages/UnitsPage/UnitsPage';
 import RelatoriosPage from './pages/RelatoriosPage/RelatoriosPage';
+import PaymentMethodsPage from './pages/PaymentMethodsPage/PaymentMethodsPage';
 
 import './styles/index.css';
 
@@ -162,15 +163,18 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Layout activeMenuItem="units">
-                    <div className="text-center py-12">
-                      <h2 className="text-2xl font-bold text-text-light-primary dark:text-text-dark-primary mb-4">
-                        Unidades
-                      </h2>
-                      <p className="text-text-light-secondary dark:text-text-dark-secondary">
-                        Em desenvolvimento...
-                      </p>
-                    </div>
+                    <UnitsPage />
                   </Layout>
+                </ProtectedRoute>
+              } 
+            />
+
+            {/* Rotas de Cadastros */}
+            <Route 
+              path="/cadastros/formas-pagamento" 
+              element={
+                <ProtectedRoute roles={['admin', 'gerente']}>
+                  <PaymentMethodsPage />
                 </ProtectedRoute>
               } 
             />

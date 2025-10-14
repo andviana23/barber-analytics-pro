@@ -163,9 +163,9 @@ const CalendarioToolbar = ({
     }).format(value || 0);
   };
 
-  // Renderizar barra principal
+  // Renderizar barra principal com Dark Mode
   const renderMainToolbar = () => (
-    <div className="bg-white border-b border-gray-200 px-6 py-4">
+    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
       <div className="flex items-center justify-between">
         {/* Lado esquerdo - Controles principais */}
         <div className="flex items-center space-x-4">
@@ -176,9 +176,9 @@ const CalendarioToolbar = ({
             className="w-64"
           />
 
-          {/* Busca */}
+          {/* Busca com Dark Mode */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4" />
             <input
               type="text"
               placeholder="Buscar eventos..."
@@ -186,7 +186,7 @@ const CalendarioToolbar = ({
               onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
               onFocus={() => setSearchFocused(true)}
               onBlur={() => setSearchFocused(false)}
-              className={`pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+              className={`pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 rounded-md text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all ${
                 searchFocused ? 'w-64' : 'w-48'
               }`}
             />
@@ -194,26 +194,28 @@ const CalendarioToolbar = ({
               <button
                 type="button"
                 onClick={() => onSearchChange && onSearchChange('')}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
               >
                 <X className="w-4 h-4" />
               </button>
             )}
           </div>
 
-          {/* Filtros */}
+          {/* Filtros com Dark Mode */}
           <div className="relative">
             <button
               type="button"
               onClick={() => setIsFilterMenuOpen(!isFilterMenuOpen)}
-              className={`flex items-center px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors ${
-                activeFiltersCount > 0 ? 'bg-blue-50 border-blue-300 text-blue-700' : ''
+              className={`flex items-center px-3 py-2 text-sm border rounded-md transition-colors ${
+                activeFiltersCount > 0 
+                  ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300' 
+                  : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
               }`}
             >
               <Filter className="w-4 h-4 mr-2" />
               Filtros
               {activeFiltersCount > 0 && (
-                <span className="ml-2 px-2 py-0.5 bg-blue-600 text-white text-xs rounded-full">
+                <span className="ml-2 px-2 py-0.5 bg-blue-600 dark:bg-blue-500 text-white text-xs rounded-full">
                   {activeFiltersCount}
                 </span>
               )}
@@ -221,17 +223,17 @@ const CalendarioToolbar = ({
           </div>
         </div>
 
-        {/* Lado direito - Ações e visualização */}
+        {/* Lado direito - Ações e visualização com Dark Mode */}
         <div className="flex items-center space-x-4">
-          {/* View Mode Toggle */}
-          <div className="flex bg-gray-100 rounded-lg p-1">
+          {/* View Mode Toggle com Dark Mode */}
+          <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
             <button
               type="button"
               onClick={() => onViewModeChange && onViewModeChange('month')}
               className={`px-3 py-1 text-sm rounded transition-colors ${
                 viewMode === 'month'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
               }`}
               title="Visualização mensal"
             >
@@ -242,8 +244,8 @@ const CalendarioToolbar = ({
               onClick={() => onViewModeChange && onViewModeChange('week')}
               className={`px-3 py-1 text-sm rounded transition-colors ${
                 viewMode === 'week'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
               }`}
               title="Visualização semanal"
             >
@@ -254,8 +256,8 @@ const CalendarioToolbar = ({
               onClick={() => onViewModeChange && onViewModeChange('list')}
               className={`px-3 py-1 text-sm rounded transition-colors ${
                 viewMode === 'list'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
               }`}
               title="Visualização em lista"
             >
@@ -263,24 +265,24 @@ const CalendarioToolbar = ({
             </button>
           </div>
 
-          {/* Botão de refresh */}
+          {/* Botão de refresh com Dark Mode */}
           <button
             type="button"
             onClick={() => onRefresh && onRefresh()}
             disabled={loading}
-            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors disabled:opacity-50"
+            className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors disabled:opacity-50"
             title="Atualizar dados"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
 
-          {/* Ações principais */}
+          {/* Ações principais com Dark Mode */}
           <div className="flex items-center space-x-2">
             {onImportStatement && (
               <button
                 type="button"
                 onClick={() => onImportStatement()}
-                className="flex items-center px-3 py-2 text-sm text-blue-600 border border-blue-600 rounded-md hover:bg-blue-50 transition-colors"
+                className="flex items-center px-3 py-2 text-sm text-blue-600 dark:text-blue-400 border border-blue-600 dark:border-blue-500 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
               >
                 <Upload className="w-4 h-4 mr-2" />
                 Importar
@@ -291,7 +293,7 @@ const CalendarioToolbar = ({
               <button
                 type="button"
                 onClick={() => onExportData()}
-                className="flex items-center px-3 py-2 text-sm text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                className="flex items-center px-3 py-2 text-sm text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
                 <Download className="w-4 h-4 mr-2" />
                 Exportar
@@ -319,16 +321,16 @@ const CalendarioToolbar = ({
     if (!isFilterMenuOpen) return null;
 
     return (
-      <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 shadow-lg z-50">
+      <div className="absolute top-full left-0 right-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg z-50">
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-900">Filtros Avançados</h3>
+            <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filtros Avançados</h3>
             <div className="flex items-center space-x-2">
               {activeFiltersCount > 0 && (
                 <button
                   type="button"
                   onClick={clearAllFilters}
-                  className="text-xs text-red-600 hover:text-red-800"
+                  className="text-xs text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 font-medium"
                 >
                   Limpar tudo
                 </button>
@@ -336,15 +338,15 @@ const CalendarioToolbar = ({
               <button
                 type="button"
                 onClick={() => setIsFilterMenuOpen(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
           </div>
 
-          {/* Abas de filtros */}
-          <div className="flex space-x-4 mb-4 border-b border-gray-200">
+          {/* Abas de filtros com Dark Mode */}
+          <div className="flex space-x-4 mb-4 border-b border-gray-200 dark:border-gray-700">
             {['status', 'types', 'parties', 'accounts'].map((tab) => (
               <button
                 key={tab}
@@ -352,8 +354,8 @@ const CalendarioToolbar = ({
                 onClick={() => setActiveFilterTab(tab)}
                 className={`pb-2 px-1 text-sm font-medium transition-colors ${
                   activeFilterTab === tab
-                    ? 'border-b-2 border-blue-500 text-blue-600'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'border-b-2 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-400'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                 }`}
               >
                 {tab === 'status' && 'Status'}
@@ -364,19 +366,19 @@ const CalendarioToolbar = ({
             ))}
           </div>
 
-          {/* Conteúdo das abas */}
+          {/* Conteúdo das abas com Dark Mode */}
           <div className="min-h-32">
             {activeFilterTab === 'status' && (
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700 mb-2">Status dos Eventos</h4>
+                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status dos Eventos</h4>
                 <div className="grid grid-cols-3 gap-2">
                   {statusesConfig.filter(s => s.available).map((status) => (
-                    <label key={status.id} className="flex items-center space-x-2 cursor-pointer">
+                    <label key={status.id} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 p-2 rounded transition-colors">
                       <input
                         type="checkbox"
                         checked={selectedStatuses.includes(status.id)}
                         onChange={() => toggleStatus(status.id)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700"
                       />
                       <StatusBadge status={status.id} size="sm" />
                     </label>
@@ -387,21 +389,21 @@ const CalendarioToolbar = ({
 
             {activeFilterTab === 'types' && (
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700 mb-2">Tipos de Eventos</h4>
+                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tipos de Eventos</h4>
                 <div className="grid grid-cols-3 gap-2">
                   {typesConfig.filter(t => t.available).map((type) => {
                     const IconComponent = type.icon;
                     return (
-                      <label key={type.id} className="flex items-center space-x-2 cursor-pointer">
+                      <label key={type.id} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 p-2 rounded transition-colors">
                         <input
                           type="checkbox"
                           checked={selectedTypes.includes(type.id)}
                           onChange={() => toggleType(type.id)}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          className="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700"
                         />
                         <div className="flex items-center space-x-2">
-                          <IconComponent className={`w-4 h-4 text-${type.color}-600`} />
-                          <span className="text-sm text-gray-700">{type.label}</span>
+                          <IconComponent className={`w-4 h-4 text-${type.color}-600 dark:text-${type.color}-400`} />
+                          <span className="text-sm text-gray-700 dark:text-gray-300">{type.label}</span>
                         </div>
                       </label>
                     );
@@ -412,7 +414,7 @@ const CalendarioToolbar = ({
 
             {activeFilterTab === 'parties' && (
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700 mb-2">Clientes e Fornecedores</h4>
+                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Clientes e Fornecedores</h4>
                 <PartySelector
                   value={selectedParties}
                   onChange={onPartiesChange}
@@ -425,10 +427,10 @@ const CalendarioToolbar = ({
 
             {activeFilterTab === 'accounts' && availableAccounts.length > 0 && (
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700 mb-2">Contas Bancárias</h4>
+                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Contas Bancárias</h4>
                 <div className="grid grid-cols-2 gap-2">
                   {availableAccounts.map((account) => (
-                    <label key={account.id} className="flex items-center space-x-2 cursor-pointer">
+                    <label key={account.id} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 p-2 rounded transition-colors">
                       <input
                         type="checkbox"
                         checked={selectedAccounts.includes(account.id)}
@@ -438,11 +440,11 @@ const CalendarioToolbar = ({
                             : [...selectedAccounts, account.id];
                           onAccountsChange && onAccountsChange(newAccounts);
                         }}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700"
                       />
                       <div className="flex items-center space-x-2">
-                        <Building2 className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm text-gray-700">{account.nome}</span>
+                        <Building2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">{account.nome}</span>
                       </div>
                     </label>
                   ))}
@@ -455,12 +457,12 @@ const CalendarioToolbar = ({
     );
   };
 
-  // Renderizar barra de status/resumo
+  // Renderizar barra de status/resumo com Dark Mode
   const renderStatusBar = () => (
-    <div className="bg-gray-50 border-b border-gray-200 px-6 py-3">
+    <div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-3">
       <div className="flex items-center justify-between">
-        {/* Resumo dos dados */}
-        <div className="flex items-center space-x-6 text-sm text-gray-600">
+        {/* Resumo dos dados com Dark Mode */}
+        <div className="flex items-center space-x-6 text-sm text-gray-600 dark:text-gray-400">
           <div className="flex items-center space-x-2">
             <Calendar className="w-4 h-4" />
             <span>{eventsCount} evento{eventsCount !== 1 ? 's' : ''}</span>
@@ -469,53 +471,53 @@ const CalendarioToolbar = ({
           {totalValue !== 0 && (
             <div className="flex items-center space-x-2">
               <DollarSign className="w-4 h-4" />
-              <span className={totalValue >= 0 ? 'text-green-600' : 'text-red-600'}>
+              <span className={totalValue >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
                 {formatCurrency(totalValue)}
               </span>
             </div>
           )}
 
           {activeFiltersCount > 0 && (
-            <div className="flex items-center space-x-2 text-blue-600">
+            <div className="flex items-center space-x-2 text-blue-600 dark:text-blue-400">
               <Filter className="w-4 h-4" />
               <span>{activeFiltersCount} filtro{activeFiltersCount !== 1 ? 's' : ''} ativo{activeFiltersCount !== 1 ? 's' : ''}</span>
             </div>
           )}
         </div>
 
-        {/* Opções de visualização */}
+        {/* Opções de visualização com Dark Mode */}
         <div className="flex items-center space-x-4">
           {/* Toggle finais de semana */}
-          <label className="flex items-center space-x-2 cursor-pointer">
+          <label className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity">
             <input
               type="checkbox"
               checked={showWeekends}
               onChange={(e) => onShowWeekendsChange && onShowWeekendsChange(e.target.checked)}
-              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              className="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700"
             />
-            <span className="text-sm text-gray-600">Finais de semana</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">Finais de semana</span>
           </label>
 
           {/* Toggle cards de eventos */}
-          <label className="flex items-center space-x-2 cursor-pointer">
+          <label className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity">
             <input
               type="checkbox"
               checked={showEventCards}
               onChange={(e) => onShowEventCardsChange && onShowEventCardsChange(e.target.checked)}
-              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              className="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700"
             />
-            <span className="text-sm text-gray-600">Cards detalhados</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">Cards detalhados</span>
           </label>
 
           {/* Toggle modo compacto */}
-          <label className="flex items-center space-x-2 cursor-pointer">
+          <label className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity">
             <input
               type="checkbox"
               checked={compactMode}
               onChange={(e) => onCompactModeChange && onCompactModeChange(e.target.checked)}
-              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              className="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700"
             />
-            <span className="text-sm text-gray-600">Modo compacto</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">Modo compacto</span>
           </label>
 
           {/* Configurações */}
@@ -523,7 +525,7 @@ const CalendarioToolbar = ({
             <button
               type="button"
               onClick={() => onOpenSettings()}
-              className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+              className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
               title="Configurações"
             >
               <Settings className="w-4 h-4" />
@@ -580,7 +582,7 @@ const CalendarioToolbar = ({
     );
   };
 
-  const containerClasses = `relative bg-white border border-gray-200 rounded-lg shadow-sm ${className}`;
+  const containerClasses = `relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm ${className}`;
 
   return (
     <div className={containerClasses}>

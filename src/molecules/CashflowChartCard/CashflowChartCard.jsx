@@ -26,17 +26,90 @@ import {
 } from 'recharts';
 import { 
   TrendingUp, 
-  TrendingDown, 
-  DollarSign,
+  TrendingDown,
   Calendar,
   BarChart3,
   Download,
   Maximize2,
-  Filter,
   RefreshCw,
   AlertCircle,
   CheckCircle
 } from 'lucide-react';
+
+// Função auxiliar para formatar datas completas
+const formatFullDate = (dateString, periodType) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  
+  switch (periodType) {
+    case 'daily':
+      return format(date, 'EEEE, dd \'de\' MMMM', { locale: ptBR });
+    case 'weekly':
+      return `Semana de ${format(date, 'dd/MM/yyyy', { locale: ptBR })}`;
+    case 'monthly':
+      return format(date, 'MMMM \'de\' yyyy', { locale: ptBR });
+    default:
+      return format(date, 'dd/MM/yyyy', { locale: ptBR });
+  }
+};
+
+// Função auxiliar para formatar valores monetários
+const formatCurrency = (value) => {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  }).format(value || 0);
+};
+
+// Tooltip customizado com Dark Mode - MOVIDO PARA FORA DO COMPONENTE
+const CustomTooltip = ({ active, payload, period }) => {
+  if (!active || !payload || payload.length === 0) return null;
+
+  const data = payload[0]?.payload;
+  if (!data) return null;
+
+  return (
+    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-3 min-w-48">
+      <div className="font-medium text-gray-900 dark:text-white mb-2">
+        {formatFullDate(data.date, period)}
+      </div>
+      
+      <div className="space-y-1">
+        {payload.map((entry) => (
+          <div key={entry.dataKey} className="flex items-center justify-between text-sm">
+            <div className="flex items-center">
+              <div 
+                className="w-3 h-3 rounded mr-2" 
+                style={{ backgroundColor: entry.color }}
+              />
+              <span className="text-gray-600 dark:text-gray-400">{entry.name}:</span>
+            </div>
+            <span className="font-medium text-gray-900 dark:text-white">
+              {formatCurrency(entry.value)}
+            </span>
+          </div>
+        ))}
+        
+        {data.saldoDiario !== undefined && (
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-1 mt-1">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-600 dark:text-gray-400">Saldo do dia:</span>
+              <span className={`font-medium ${data.saldoDiario >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                {formatCurrency(data.saldoDiario)}
+              </span>
+            </div>
+          </div>
+        )}
+        
+        {data.transactions_count > 0 && (
+          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            {data.transactions_count} transações
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const CashflowChartCard = ({
   data = [],
@@ -55,7 +128,6 @@ const CashflowChartCard = ({
   className = ''
 }) => {
   const [activeView, setActiveView] = useState('combined'); // 'combined', 'bars', 'line'
-  const [hoveredData, setHoveredData] = useState(null);
 
   // Processar dados para o gráfico
   const processedData = useMemo(() => {
@@ -129,75 +201,9 @@ const CashflowChartCard = ({
     }
   };
 
-  // Tooltip customizado
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (!active || !payload || payload.length === 0) return null;
-
-    const data = payload[0]?.payload;
-    if (!data) return null;
-
-    return (
-      <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3 min-w-48">
-        <div className="font-medium text-gray-900 mb-2">
-          {formatFullDate(data.date, period)}
-        </div>
-        
-        <div className="space-y-1">
-          {payload.map((entry) => (
-            <div key={entry.dataKey} className="flex items-center justify-between text-sm">
-              <div className="flex items-center">
-                <div 
-                  className="w-3 h-3 rounded mr-2" 
-                  style={{ backgroundColor: entry.color }}
-                />
-                <span className="text-gray-600">{entry.name}:</span>
-              </div>
-              <span className="font-medium">
-                {formatCurrency(entry.value)}
-              </span>
-            </div>
-          ))}
-          
-          {data.saldoDiario !== undefined && (
-            <div className="border-t border-gray-200 pt-1 mt-1">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Saldo do dia:</span>
-                <span className={`font-medium ${data.saldoDiario >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {formatCurrency(data.saldoDiario)}
-                </span>
-              </div>
-            </div>
-          )}
-          
-          {data.transactions_count > 0 && (
-            <div className="text-xs text-gray-500 mt-1">
-              {data.transactions_count} transações
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  const formatFullDate = (dateString, periodType) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    
-    switch (periodType) {
-      case 'daily':
-        return format(date, 'EEEE, dd \'de\' MMMM', { locale: ptBR });
-      case 'weekly':
-        return `Semana de ${format(date, 'dd/MM/yyyy', { locale: ptBR })}`;
-      case 'monthly':
-        return format(date, 'MMMM \'de\' yyyy', { locale: ptBR });
-      default:
-        return format(date, 'dd/MM/yyyy', { locale: ptBR });
-    }
-  };
-
-  // Classes CSS
+  // Classes CSS com Dark Mode
   const cardClasses = `
-    bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow
+    bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow
     ${className}
   `;
 
@@ -205,9 +211,9 @@ const CashflowChartCard = ({
     return (
       <div className={cardClasses}>
         <div className="p-6 text-center">
-          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Erro ao carregar dados</h3>
-          <p className="text-gray-600 mb-4">{error}</p>
+          <AlertCircle className="w-12 h-12 text-red-500 dark:text-red-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Erro ao carregar dados</h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
           {onRefresh && (
             <button
               type="button"
@@ -225,29 +231,29 @@ const CashflowChartCard = ({
 
   return (
     <div className={cardClasses}>
-      {/* Header */}
-      <div className="p-4 border-b border-gray-200">
+      {/* Header com Dark Mode */}
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-start justify-between">
           <div className="min-w-0 flex-1">
             <div className="flex items-center">
-              <BarChart3 className="w-5 h-5 text-blue-500 mr-2" />
-              <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+              <BarChart3 className="w-5 h-5 text-blue-500 dark:text-blue-400 mr-2" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
             </div>
             {subtitle && (
-              <p className="text-sm text-gray-600 mt-1">{subtitle}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{subtitle}</p>
             )}
           </div>
 
           <div className="flex items-center space-x-2 ml-4">
-            {/* View toggles */}
-            <div className="flex bg-gray-100 rounded-lg p-1">
+            {/* View toggles com Dark Mode */}
+            <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
               <button
                 type="button"
                 onClick={() => setActiveView('combined')}
-                className={`px-2 py-1 text-xs rounded ${
+                className={`px-2 py-1 text-xs rounded transition-colors ${
                   activeView === 'combined' 
-                    ? 'bg-white text-gray-900 shadow-sm' 
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' 
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                 }`}
               >
                 Completo
@@ -255,10 +261,10 @@ const CashflowChartCard = ({
               <button
                 type="button"
                 onClick={() => setActiveView('bars')}
-                className={`px-2 py-1 text-xs rounded ${
+                className={`px-2 py-1 text-xs rounded transition-colors ${
                   activeView === 'bars' 
-                    ? 'bg-white text-gray-900 shadow-sm' 
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' 
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                 }`}
               >
                 Barras
@@ -266,10 +272,10 @@ const CashflowChartCard = ({
               <button
                 type="button"
                 onClick={() => setActiveView('line')}
-                className={`px-2 py-1 text-xs rounded ${
+                className={`px-2 py-1 text-xs rounded transition-colors ${
                   activeView === 'line' 
-                    ? 'bg-white text-gray-900 shadow-sm' 
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' 
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                 }`}
               >
                 Linha
@@ -312,30 +318,38 @@ const CashflowChartCard = ({
           </div>
         </div>
 
-        {/* Métricas resumo */}
+        {/* Métricas resumo com Dark Mode */}
         {metrics && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
             <div className="text-center">
-              <div className="text-xs text-gray-500">Entradas</div>
-              <div className="text-lg font-semibold text-green-600">
+              <div className="text-xs text-gray-500 dark:text-gray-400">Entradas</div>
+              <div className="text-lg font-semibold text-green-600 dark:text-green-400">
                 {formatCurrency(metrics.totalEntradas)}
               </div>
             </div>
             <div className="text-center">
-              <div className="text-xs text-gray-500">Saídas</div>
-              <div className="text-lg font-semibold text-red-600">
+              <div className="text-xs text-gray-500 dark:text-gray-400">Saídas</div>
+              <div className="text-lg font-semibold text-red-600 dark:text-red-400">
                 -{formatCurrency(metrics.totalSaidas)}
               </div>
             </div>
             <div className="text-center">
-              <div className="text-xs text-gray-500">Saldo Final</div>
-              <div className={`text-lg font-semibold ${metrics.saldoFinal >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              <div className="text-xs text-gray-500 dark:text-gray-400">Saldo Final</div>
+              <div className={`text-lg font-semibold ${
+                metrics.saldoFinal >= 0 
+                  ? 'text-green-600 dark:text-green-400' 
+                  : 'text-red-600 dark:text-red-400'
+              }`}>
                 {formatCurrency(metrics.saldoFinal)}
               </div>
             </div>
             <div className="text-center">
-              <div className="text-xs text-gray-500">Variação</div>
-              <div className={`text-lg font-semibold flex items-center justify-center ${metrics.variacao >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              <div className="text-xs text-gray-500 dark:text-gray-400">Variação</div>
+              <div className={`text-lg font-semibold flex items-center justify-center ${
+                metrics.variacao >= 0 
+                  ? 'text-green-600 dark:text-green-400' 
+                  : 'text-red-600 dark:text-red-400'
+              }`}>
                 {metrics.variacao >= 0 ? (
                   <TrendingUp className="w-4 h-4 mr-1" />
                 ) : (
@@ -352,11 +366,11 @@ const CashflowChartCard = ({
       <div className="p-4">
         {loading ? (
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-            <span className="ml-2 text-gray-600">Carregando dados...</span>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 dark:border-blue-400"></div>
+            <span className="ml-2 text-gray-600 dark:text-gray-400">Carregando dados...</span>
           </div>
         ) : processedData.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+          <div className="flex flex-col items-center justify-center h-64 text-gray-500 dark:text-gray-400">
             <Calendar className="w-12 h-12 mb-4" />
             <p>Nenhum dado disponível para o período selecionado</p>
           </div>
@@ -388,7 +402,7 @@ const CashflowChartCard = ({
                   tickFormatter={(value) => formatCurrency(value).replace('R$', 'R$')}
                 />
               )}
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip period={period} />} />
               <Legend />
 
               {/* Reference line at zero for accumulated balance */}
@@ -548,8 +562,8 @@ CashflowChartCard.propTypes = {
 
 // Componente de preview para demonstração
 export const CashflowChartCardPreview = () => {
-  // Mock data para 30 dias
-  const generateMockData = () => {
+  // Mock data para 30 dias - movido para useMemo para evitar re-renderizações
+  const mockData = useMemo(() => {
     const data = [];
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - 30);
@@ -560,8 +574,10 @@ export const CashflowChartCardPreview = () => {
       const date = new Date(startDate);
       date.setDate(date.getDate() + i);
       
-      const entradas = Math.random() * 1000 + 200; // 200-1200
-      const saidas = Math.random() * 800 + 100; // 100-900
+      // Usar valores baseados no índice para evitar Math.random no render
+      const seedValue = (i * 137 + 42) % 1000; // Pseudo-random determinístico
+      const entradas = (seedValue % 1000) + 200; // 200-1200
+      const saidas = (seedValue % 800) + 100; // 100-900
       const dailyBalance = entradas - saidas;
       accumulatedBalance += dailyBalance;
       
@@ -570,15 +586,13 @@ export const CashflowChartCardPreview = () => {
         inflows: entradas,
         outflows: saidas,
         accumulated_balance: accumulatedBalance,
-        transactions_count: Math.floor(Math.random() * 10) + 1,
-        reconciled_percentage: Math.random() * 30 + 70 // 70-100%
+        transactions_count: (i % 10) + 1,
+        reconciled_percentage: 70 + (i % 30) // 70-100%
       });
     }
     
     return data;
-  };
-
-  const mockData = generateMockData();
+  }, []); // Array vazio significa que só gera uma vez
 
   const handleAction = (action) => {
     alert(`Ação: ${action}`);

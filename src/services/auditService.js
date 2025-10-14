@@ -233,8 +233,8 @@ class AuditService {
    */
   getClientIP() {
     // Em produção, você pode usar um serviço externo para obter o IP real
-    // Por ora, retorna um placeholder
-    return 'client_ip';
+    // Por ora, retorna null (a função do banco aceita null)
+    return null;
   }
 }
 

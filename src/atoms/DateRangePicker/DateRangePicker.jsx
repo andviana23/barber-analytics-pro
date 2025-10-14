@@ -201,12 +201,20 @@ const DateRangePicker = ({
 
   return (
     <div className={containerClasses}>
-      {/* Trigger */}
-      <button
-        type="button"
+      {/* Trigger - Usando div para evitar button aninhado */}
+      <div
         className={triggerClasses}
         onClick={() => !disabled && setIsOpen(!isOpen)}
-        disabled={disabled}
+        role="button"
+        tabIndex={disabled ? -1 : 0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            !disabled && setIsOpen(!isOpen);
+          }
+        }}
+        aria-disabled={disabled}
+        aria-expanded={isOpen}
       >
         <div className="flex items-center">
           <Calendar className="w-4 h-4 mr-2 text-gray-400" />
@@ -217,7 +225,10 @@ const DateRangePicker = ({
           {clearable && value && (
             <button
               type="button"
-              onClick={handleClear}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleClear(e);
+              }}
               className="p-0.5 hover:bg-gray-100 rounded"
               title="Limpar"
             >
@@ -228,7 +239,7 @@ const DateRangePicker = ({
             className={`w-4 h-4 ml-1 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           />
         </div>
-      </button>
+      </div>
 
       {/* Dropdown */}
       {isOpen && (

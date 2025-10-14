@@ -18,7 +18,14 @@ export const useBankStatements = (accountId, startDate, endDate) => {
     error: null
   });
 
-  const { addToast } = useToast();
+  // Proteção contra ausência de ToastContext
+  const toast = useToast();
+  const safeAddToast = useCallback((toastData) => {
+    if (toast?.addToast) {
+      toast.addToast(toastData);
+    }
+  }, [toast]);
+
   const cacheRef = useRef(new Map());
   const abortControllerRef = useRef(null);
 
@@ -117,14 +124,14 @@ export const useBankStatements = (accountId, startDate, endDate) => {
           error: err.message || 'Erro ao carregar extratos'
         }));
         
-        addToast({
+        safeAddToast({
           type: 'error',
           title: 'Erro ao carregar extratos',
           message: 'Não foi possível carregar os extratos bancários'
         });
       }
     }
-  }, [accountId, startDate, endDate, getCacheKey, addToast]);
+  }, [accountId, startDate, endDate, getCacheKey, safeAddToast]);
 
   // Função para buscar statement por ID
   const getStatementById = useCallback(async (statementId) => {
@@ -148,7 +155,7 @@ export const useBankStatements = (accountId, startDate, endDate) => {
       return { success: true, data };
 
     } catch (err) {
-      addToast({
+      safeAddToast({
         type: 'error',
         title: 'Erro ao buscar extrato',
         message: 'Não foi possível encontrar o extrato especificado'
@@ -156,7 +163,7 @@ export const useBankStatements = (accountId, startDate, endDate) => {
       
       return { success: false, error: err.message };
     }
-  }, [state.statements, state.unreconciled, addToast]);
+  }, [state.statements, state.unreconciled, safeAddToast]);
 
   // Funcao para importar extratos
   const importStatements = useCallback(async (payload = {}) => {
@@ -229,7 +236,7 @@ export const useBankStatements = (accountId, startDate, endDate) => {
 
       await fetchStatements(false);
 
-      addToast({
+      safeAddToast({
         type: 'success',
         title: 'Importacao concluida',
         message: `${data?.imported || 0} registros importados. ${data?.duplicates || 0} duplicatas ignoradas.`,
@@ -247,7 +254,7 @@ export const useBankStatements = (accountId, startDate, endDate) => {
     } catch (err) {
       setState(prev => ({ ...prev, loading: false }));
 
-      addToast({
+      safeAddToast({
         type: 'error',
         title: 'Erro na importacao',
         message: err.message || 'Nao foi possivel importar o arquivo'
@@ -255,7 +262,7 @@ export const useBankStatements = (accountId, startDate, endDate) => {
 
       return { success: false, error: err.message };
     }
-  }, [accountId, addToast, fetchStatements]);
+  }, [accountId, safeAddToast, fetchStatements]);
   // Função para refetch (limpa cache)
   const refetch = useCallback(() => {
     cacheRef.current.clear();

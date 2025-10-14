@@ -6,7 +6,7 @@ export { DashboardPage } from './DashboardPage';
 export { LoginPage } from './LoginPage';
 export { SignUpPage } from './SignUpPage';
 export { ForgotPasswordPage } from './ForgotPasswordPage';
-export { FinanceiroPage } from './FinanceiroPage';
+export { default as FinanceiroAdvancedPage } from './FinanceiroAdvancedPage';
 export { RelatoriosPage } from './RelatoriosPage';
 export { UserProfilePage } from './UserProfilePage';
 export { UserManagementPage } from './UserManagementPage';

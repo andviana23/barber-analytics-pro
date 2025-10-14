@@ -153,7 +153,7 @@ export const useCalendarEvents = (unitId, startDate, endDate, filters = {}) => {
         abortControllerRef.current.abort();
       }
     };
-  }, [fetchEvents]);
+  }, [unitId, startDate, endDate, JSON.stringify(filters)]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Cleanup do cache quando componente for desmontado
   useEffect(() => {

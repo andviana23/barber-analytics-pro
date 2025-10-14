@@ -4,6 +4,12 @@ import { DollarSign, Plus } from 'lucide-react';
 // Components
 import { NovaReceitaAccrualModal } from '../../templates/NovaReceitaAccrualModal';
 
+// Services
+import financeiroService from '../../services/financeiroService';
+
+// Context
+import { useToast } from '../../context/ToastContext';
+
 /**
  * Tab de Receitas por Competência
  * 
@@ -15,10 +21,16 @@ import { NovaReceitaAccrualModal } from '../../templates/NovaReceitaAccrualModal
 const ReceitasAccrualTab = ({ globalFilters }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [accrualMode, setAccrualMode] = useState(true); // true = Competência, false = Caixa
+  const { addToast } = useToast();
 
   const handleCreateSuccess = () => {
     setIsModalOpen(false);
     // TODO: Refresh da lista de receitas
+    addToast({
+      type: 'success',
+      message: 'Receita cadastrada com sucesso!',
+      description: 'A receita foi salva e aparecerá nos relatórios.'
+    });
   };
 
   return (
@@ -135,8 +147,34 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
       <NovaReceitaAccrualModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSuccess={handleCreateSuccess}
-        unitId={globalFilters.unitId}
+        onSubmit={async (receita) => {
+          try {
+            console.log('📤 Enviando receita para o banco:', receita);
+            
+            const { data, error } = await financeiroService.createReceita(receita);
+            
+            if (error) {
+              console.error('❌ Erro ao criar receita:', error);
+              addToast({
+                type: 'error',
+                message: 'Erro ao cadastrar receita',
+                description: error
+              });
+              return;
+            }
+            
+            console.log('✅ Receita criada com sucesso:', data);
+            handleCreateSuccess();
+            
+          } catch (err) {
+            console.error('❌ Erro inesperado:', err);
+            addToast({
+              type: 'error',
+              message: 'Erro ao cadastrar receita',
+              description: err.message || 'Erro inesperado. Tente novamente.'
+            });
+          }
+        }}
       />
     </div>
   );

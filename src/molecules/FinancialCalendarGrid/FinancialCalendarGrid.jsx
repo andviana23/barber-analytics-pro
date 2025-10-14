@@ -184,7 +184,7 @@ const FinancialCalendarGrid = ({
     }).format(value || 0);
   };
 
-  // Obter classe CSS do dia
+  // Obter classe CSS do dia com Dark Mode
   const getDayClasses = (date, summary) => {
     const isCurrentMonth = isSameMonth(date, currentDate);
     const isSelected = isSameDay(date, selectedDate);
@@ -192,43 +192,43 @@ const FinancialCalendarGrid = ({
     const hasEvents = summary.total > 0;
     
     let classes = `
-      relative border border-gray-200 min-h-24 p-1 cursor-pointer transition-all duration-200
-      ${isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-400'}
-      ${isSelected ? 'ring-2 ring-blue-500 bg-blue-50' : ''}
-      ${isHovered ? 'bg-gray-100' : ''}
+      relative border border-gray-200 dark:border-gray-700 min-h-24 p-1 cursor-pointer transition-all duration-200
+      ${isCurrentMonth ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white' : 'bg-gray-50 dark:bg-gray-900 text-gray-400 dark:text-gray-600'}
+      ${isSelected ? 'ring-2 ring-blue-500 dark:ring-blue-400 bg-blue-50 dark:bg-blue-900/20' : ''}
+      ${isHovered ? 'bg-gray-100 dark:bg-gray-700' : ''}
       ${hasEvents ? 'shadow-sm' : ''}
-      ${isToday(date) ? 'bg-yellow-50 border-yellow-300' : ''}
+      ${isToday(date) ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-300 dark:border-yellow-700' : ''}
     `;
 
-    // Cores baseadas no saldo do dia
+    // Cores baseadas no saldo do dia com Dark Mode
     if (hasEvents && isCurrentMonth) {
       if (summary.saldo > 0) {
-        classes += ' border-l-4 border-l-green-500';
+        classes += ' border-l-4 border-l-green-500 dark:border-l-green-400';
       } else if (summary.saldo < 0) {
-        classes += ' border-l-4 border-l-red-500';
+        classes += ' border-l-4 border-l-red-500 dark:border-l-red-400';
       } else {
-        classes += ' border-l-4 border-l-gray-400';
+        classes += ' border-l-4 border-l-gray-400 dark:border-l-gray-500';
       }
     }
 
     return classes;
   };
 
-  // Renderizar cabeçalho do calendário
+  // Renderizar cabeçalho do calendário com Dark Mode
   const renderCalendarHeader = () => (
-    <div className="bg-white border-b border-gray-200 p-4">
+    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
             <button
               type="button"
               onClick={navigatePrevious}
-              className="p-2 hover:bg-gray-100 rounded-md"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
             >
-              <ChevronLeft className="w-5 h-5 text-gray-600" />
+              <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
             
-            <h2 className="text-xl font-semibold text-gray-900 min-w-48 text-center">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white min-w-48 text-center capitalize">
               {viewMode === 'month' 
                 ? format(currentDate, 'MMMM \'de\' yyyy', { locale: ptBR })
                 : `Semana de ${format(startOfWeek(currentDate), 'dd/MM', { locale: ptBR })}`
@@ -238,31 +238,31 @@ const FinancialCalendarGrid = ({
             <button
               type="button"
               onClick={navigateNext}
-              className="p-2 hover:bg-gray-100 rounded-md"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
             >
-              <ChevronRight className="w-5 h-5 text-gray-600" />
+              <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
           </div>
 
           <button
             type="button"
             onClick={navigateToday}
-            className="px-3 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            className="px-3 py-2 text-sm bg-blue-600 dark:bg-blue-500 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
           >
             Hoje
           </button>
         </div>
 
         <div className="flex items-center space-x-2">
-          {/* View Mode Toggles */}
-          <div className="flex bg-gray-100 rounded-lg p-1">
+          {/* View Mode Toggles com Dark Mode */}
+          <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
             <button
               type="button"
               onClick={() => onViewModeChange && onViewModeChange('month')}
-              className={`px-3 py-1 text-sm rounded ${
+              className={`px-3 py-1 text-sm rounded transition-colors ${
                 viewMode === 'month' 
-                  ? 'bg-white text-gray-900 shadow-sm' 
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' 
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
               }`}
             >
               <Grid3x3 className="w-4 h-4" />
@@ -270,10 +270,10 @@ const FinancialCalendarGrid = ({
             <button
               type="button"
               onClick={() => onViewModeChange && onViewModeChange('week')}
-              className={`px-3 py-1 text-sm rounded ${
+              className={`px-3 py-1 text-sm rounded transition-colors ${
                 viewMode === 'week' 
-                  ? 'bg-white text-gray-900 shadow-sm' 
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' 
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
               }`}
             >
               <Calendar className="w-4 h-4" />
@@ -281,22 +281,22 @@ const FinancialCalendarGrid = ({
             <button
               type="button"
               onClick={() => onViewModeChange && onViewModeChange('list')}
-              className={`px-3 py-1 text-sm rounded ${
+              className={`px-3 py-1 text-sm rounded transition-colors ${
                 viewMode === 'list' 
-                  ? 'bg-white text-gray-900 shadow-sm' 
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' 
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
               }`}
             >
               <List className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Add Event */}
+          {/* Add Event com Dark Mode */}
           {onAddEvent && (
             <button
               type="button"
               onClick={() => onAddEvent(selectedDate)}
-              className="px-3 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center"
+              className="px-3 py-2 text-sm bg-green-600 dark:bg-green-500 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-600 flex items-center transition-colors"
             >
               <Plus className="w-4 h-4 mr-1" />
               Novo
@@ -307,7 +307,7 @@ const FinancialCalendarGrid = ({
     </div>
   );
 
-  // Renderizar cabeçalho dos dias da semana
+  // Renderizar cabeçalho dos dias da semana com Dark Mode
   const renderWeekdaysHeader = () => {
     const weekdays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
     
@@ -317,9 +317,9 @@ const FinancialCalendarGrid = ({
     }
 
     return (
-      <div className={`grid ${showWeekends ? 'grid-cols-7' : 'grid-cols-5'} border-b border-gray-200 bg-gray-50`}>
+      <div className={`grid ${showWeekends ? 'grid-cols-7' : 'grid-cols-5'} border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800`}>
         {weekdays.map((day) => (
-          <div key={day} className="p-2 text-center text-sm font-medium text-gray-700">
+          <div key={day} className="p-2 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
             {day}
           </div>
         ))}
@@ -414,9 +414,9 @@ const FinancialCalendarGrid = ({
           </div>
         )}
 
-        {/* Eventos expandidos */}
+        {/* Eventos expandidos com Dark Mode */}
         {isExpanded && showEventCards && dayEvents.length > 0 && (
-          <div className="absolute top-full left-0 right-0 z-10 bg-white border border-gray-200 rounded-b-lg shadow-lg max-h-80 overflow-y-auto">
+          <div className="absolute top-full left-0 right-0 z-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-b-lg shadow-lg max-h-80 overflow-y-auto">
             <div className="p-2 space-y-2">
               {dayEvents.slice(0, compactMode ? 3 : 10).map((event) => (
                 <CalendarEventCard
@@ -432,7 +432,7 @@ const FinancialCalendarGrid = ({
               ))}
               
               {dayEvents.length > (compactMode ? 3 : 10) && (
-                <div className="text-center text-xs text-gray-500 py-1">
+                <div className="text-center text-xs text-gray-500 dark:text-gray-400 py-1">
                   +{dayEvents.length - (compactMode ? 3 : 10)} eventos
                 </div>
               )}
@@ -473,28 +473,28 @@ const FinancialCalendarGrid = ({
           const summary = getDaySummary(date);
           
           return (
-            <div key={dateKey} className="bg-white border border-gray-200 rounded-lg">
-              <div className="p-4 border-b border-gray-200 bg-gray-50">
+            <div key={dateKey} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
+              <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-medium text-gray-900">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white capitalize">
                     {format(date, 'EEEE, dd \'de\' MMMM', { locale: ptBR })}
                   </h3>
                   <div className="flex items-center space-x-4 text-sm">
                     {summary.receitas > 0 && (
-                      <div className="flex items-center text-green-600">
+                      <div className="flex items-center text-green-600 dark:text-green-400">
                         <TrendingUp className="w-4 h-4 mr-1" />
                         {formatCurrency(summary.receitas)}
                       </div>
                     )}
                     {summary.despesas > 0 && (
-                      <div className="flex items-center text-red-600">
+                      <div className="flex items-center text-red-600 dark:text-red-400">
                         <TrendingDown className="w-4 h-4 mr-1" />
                         {formatCurrency(summary.despesas)}
                       </div>
                     )}
                     <div className={`font-medium ${
-                      summary.saldo > 0 ? 'text-green-700' : 
-                      summary.saldo < 0 ? 'text-red-700' : 'text-gray-700'
+                      summary.saldo > 0 ? 'text-green-700 dark:text-green-400' : 
+                      summary.saldo < 0 ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-gray-400'
                     }`}>
                       Saldo: {formatCurrency(summary.saldo)}
                     </div>
@@ -530,14 +530,14 @@ const FinancialCalendarGrid = ({
     );
   };
 
-  const containerClasses = `bg-white border border-gray-200 rounded-lg shadow-sm ${className}`;
+  const containerClasses = `bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm ${className}`;
 
   if (loading) {
     return (
       <div className={containerClasses}>
         <div className="flex items-center justify-center h-96">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-          <span className="ml-2 text-gray-600">Carregando calendário...</span>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 dark:border-blue-400"></div>
+          <span className="ml-2 text-gray-600 dark:text-gray-400">Carregando calendário...</span>
         </div>
       </div>
     );

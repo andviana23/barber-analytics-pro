@@ -23,7 +23,14 @@ export const useReconciliationMatches = (accountId, options = {}) => {
     error: null
   });
 
-  const { addToast } = useToast();
+  // Proteção contra ausência de ToastContext
+  const toast = useToast();
+  const safeAddToast = useCallback((toastData) => {
+    if (toast?.addToast) {
+      toast.addToast(toastData);
+    }
+  }, [toast]);
+
   const cacheRef = useRef(new Map());
   const abortControllerRef = useRef(null);
 
@@ -89,14 +96,14 @@ export const useReconciliationMatches = (accountId, options = {}) => {
           error: err.message || 'Erro ao carregar matches'
         }));
         
-        addToast({
+        safeAddToast({
           type: 'error',
           title: 'Erro ao carregar matches',
           message: 'Não foi possível carregar os matches de conciliação'
         });
       }
     }
-  }, [accountId, defaultOptions, getCacheKey, addToast]);
+  }, [accountId, defaultOptions, getCacheKey, safeAddToast]);
 
   // Função para executar auto-matching
   const runAutoMatch = useCallback(async () => {
@@ -118,7 +125,7 @@ export const useReconciliationMatches = (accountId, options = {}) => {
         loading: false
       }));
 
-      addToast({
+      safeAddToast({
         type: 'success',
         title: 'Auto-matching concluído',
         message: `${data?.length || 0} matches encontrados`
@@ -133,7 +140,7 @@ export const useReconciliationMatches = (accountId, options = {}) => {
         error: err.message
       }));
 
-      addToast({
+      safeAddToast({
         type: 'error',
         title: 'Erro no auto-matching',
         message: err.message || 'Não foi possível executar o auto-matching'
@@ -141,7 +148,7 @@ export const useReconciliationMatches = (accountId, options = {}) => {
 
       return { success: false, error: err.message };
     }
-  }, [accountId, defaultOptions, addToast]);
+  }, [accountId, defaultOptions, safeAddToast]);
 
   // Função para confirmar um match
   const confirmMatch = useCallback(async (matchId, adjustmentData = null) => {
@@ -159,7 +166,7 @@ export const useReconciliationMatches = (accountId, options = {}) => {
       // Limpar cache para garantir sincronização
       cacheRef.current.clear();
 
-      addToast({
+      safeAddToast({
         type: 'success',
         title: 'Match confirmado',
         message: 'Conciliação confirmada com sucesso'
@@ -168,7 +175,7 @@ export const useReconciliationMatches = (accountId, options = {}) => {
       return { success: true };
 
     } catch (err) {
-      addToast({
+      safeAddToast({
         type: 'error',
         title: 'Erro ao confirmar match',
         message: err.message || 'Não foi possível confirmar o match'
@@ -176,7 +183,7 @@ export const useReconciliationMatches = (accountId, options = {}) => {
       
       return { success: false, error: err.message };
     }
-  }, [addToast]);
+  }, [safeAddToast]);
 
   // Função para rejeitar um match
   const rejectMatch = useCallback(async (matchId, reason = '') => {
@@ -191,7 +198,7 @@ export const useReconciliationMatches = (accountId, options = {}) => {
         matches: prev.matches.filter(match => match.id !== matchId)
       }));
 
-      addToast({
+      safeAddToast({
         type: 'info',
         title: 'Match rejeitado',
         message: 'Match rejeitado com sucesso'
@@ -200,7 +207,7 @@ export const useReconciliationMatches = (accountId, options = {}) => {
       return { success: true };
 
     } catch (err) {
-      addToast({
+      safeAddToast({
         type: 'error',
         title: 'Erro ao rejeitar match',
         message: err.message || 'Não foi possível rejeitar o match'
@@ -208,7 +215,7 @@ export const useReconciliationMatches = (accountId, options = {}) => {
       
       return { success: false, error: err.message };
     }
-  }, [addToast]);
+  }, [safeAddToast]);
 
   // Função para ajustar um match (criar vinculação manual)
   const adjustMatch = useCallback(async (statementId, transactionType, transactionId, adjustmentData) => {
@@ -226,7 +233,7 @@ export const useReconciliationMatches = (accountId, options = {}) => {
       cacheRef.current.clear();
       await fetchMatches(false);
 
-      addToast({
+      safeAddToast({
         type: 'success',
         title: 'Vinculação manual criada',
         message: 'Vinculação manual criada com sucesso'
@@ -235,7 +242,7 @@ export const useReconciliationMatches = (accountId, options = {}) => {
       return { success: true };
 
     } catch (err) {
-      addToast({
+      safeAddToast({
         type: 'error',
         title: 'Erro na vinculação manual',
         message: err.message || 'Não foi possível criar a vinculação manual'
@@ -243,7 +250,7 @@ export const useReconciliationMatches = (accountId, options = {}) => {
       
       return { success: false, error: err.message };
     }
-  }, [addToast, fetchMatches]);
+  }, [safeAddToast, fetchMatches]);
 
   // Função para refetch (limpa cache)
   const refetch = useCallback(() => {
@@ -261,7 +268,7 @@ export const useReconciliationMatches = (accountId, options = {}) => {
         abortControllerRef.current.abort();
       }
     };
-  }, [fetchMatches]);
+  }, [accountId, JSON.stringify(defaultOptions)]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Cleanup do cache quando componente for desmontado
   useEffect(() => {

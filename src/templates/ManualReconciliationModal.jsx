@@ -49,18 +49,7 @@ const ManualReconciliationModal = ({
     { value: 'rejected', label: 'Rejeitadas' }
   ];
 
-  // Função auxiliar para calcular similaridade de strings
-  const calculateStringSimilarity = useCallback((str1, str2) => {
-    const longer = str1.length > str2.length ? str1 : str2;
-    const shorter = str1.length > str2.length ? str2 : str1;
-    
-    if (longer.length === 0) return 1.0;
-    
-    const editDistance = levenshteinDistance(longer, shorter);
-    return (longer.length - editDistance) / longer.length;
-  }, [levenshteinDistance]);
-
-  // Função auxiliar para calcular distância de Levenshtein
+  // Função auxiliar para calcular distância de Levenshtein (definida ANTES de ser usada)
   const levenshteinDistance = useCallback((str1, str2) => {
     const matrix = Array(str2.length + 1).fill(null).map(() => Array(str1.length + 1).fill(null));
     
@@ -80,6 +69,17 @@ const ManualReconciliationModal = ({
     
     return matrix[str2.length][str1.length];
   }, []);
+
+  // Função auxiliar para calcular similaridade de strings
+  const calculateStringSimilarity = useCallback((str1, str2) => {
+    const longer = str1.length > str2.length ? str1 : str2;
+    const shorter = str1.length > str2.length ? str2 : str1;
+    
+    if (longer.length === 0) return 1.0;
+    
+    const editDistance = levenshteinDistance(longer, shorter);
+    return (longer.length - editDistance) / longer.length;
+  }, [levenshteinDistance]);
 
   // Função para calcular confiança de match
   const calculateMatchConfidence = useCallback((bankTxn, internalTxn) => {

@@ -8,7 +8,8 @@ import {
   BarChart3,
   ArrowUpRight,
   ArrowDownRight,
-  Activity
+  Activity,
+  Building2
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useUnit } from '../../context/UnitContext';
@@ -19,6 +20,7 @@ import FluxoTab from './FluxoTab';
 import ConciliacaoTab from './ConciliacaoTab';
 import ReceitasAccrualTab from './ReceitasAccrualTab';
 import DespesasAccrualTab from './DespesasAccrualTab';
+import ContasBancariasTab from './ContasBancariasTab';
 
 // Layout
 import { Layout } from '../../components/Layout/Layout';
@@ -77,6 +79,12 @@ const FinanceiroAdvancedPage = () => {
       description: 'Conciliação bancária e matching automático'
     },
     {
+      id: 'contas-bancarias',
+      label: 'Contas Bancárias',
+      icon: Building2,
+      description: 'Gestão de contas bancárias'
+    },
+    {
       id: 'receitas-accrual',
       label: 'Receitas (Competência)',
       icon: DollarSign,
@@ -110,6 +118,8 @@ const FinanceiroAdvancedPage = () => {
         return <FluxoTab {...tabProps} />;
       case 'conciliacao':
         return <ConciliacaoTab {...tabProps} />;
+      case 'contas-bancarias':
+        return <ContasBancariasTab {...tabProps} />;
       case 'receitas-accrual':
         return <ReceitasAccrualTab {...tabProps} />;
       case 'despesas-accrual':
