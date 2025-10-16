@@ -120,26 +120,28 @@ export function AuthProvider({ children }) {
         
         if (profError) {
           console.error('❌ Erro ao buscar role na tabela professionals:', profError);
-          // Se não conseguir buscar, usar role padrão baseado no email
-          const defaultRole = userSession.user.email === 'andrey@tratodebarbados.com' ? 'admin' : 'barbeiro';
-          setUserRole(defaultRole);
-          setAdminStatus(defaultRole === 'admin');
+          // 🛡️ CORREÇÃO BUG-007: Removido email hardcoded - usuário deve ser configurado no sistema
+          console.error('❌ Usuário não configurado no sistema. Contate o administrador.');
+          setUserRole(null);
+          setAdminStatus(false);
+          // Opcionalmente, deslogar usuário não configurado
+          // await signOut();
         } else if (profData?.role) {
           console.log('✅ Role encontrado na tabela professionals:', profData.role);
           setUserRole(profData.role);
           setAdminStatus(profData.role === 'admin');
         } else {
-          console.log('⚠️ Nenhum role encontrado, usando padrão');
-          setUserRole('barbeiro');
+          // 🛡️ CORREÇÃO BUG-007: Sem fallback inseguro - usuário deve estar configurado
+          console.error('❌ Usuário não possui role configurado no sistema.');
+          setUserRole(null);
           setAdminStatus(false);
         }
         
       } catch (err) {
         console.error('❌ Erro ao buscar role:', err);
-        // Fallback final para metadados do usuário ou padrão
-        const userRole = userSession.user?.user_metadata?.role || 'barbeiro';
-        setUserRole(userRole);
-        setAdminStatus(userRole === 'admin');
+        // 🛡️ CORREÇÃO BUG-007: Removido fallback inseguro - negar acesso em erro
+        setUserRole(null);
+        setAdminStatus(false);
       }
     };
 

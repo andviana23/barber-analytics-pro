@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, LogIn, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { logger } from '../../utils/secureLogger';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -55,13 +56,14 @@ export function LoginPage() {
     setError('');
 
     try {
-      console.log('🔐 Tentando login com:', formData.email);
+      // 🛡️ CORREÇÃO BUG-002: Log sanitizado de autenticação
+      logger.auth('Tentativa de login', { email: formData.email });
       const { data, error: authError } = await signIn(formData.email, formData.password);
       
-      console.log('📊 Resultado do login:', { data, authError });
+      logger.auth('Resultado do login', { success: !authError, hasData: !!data });
       
       if (authError) {
-        console.error('❌ Erro de autenticação:', authError);
+        logger.error('Erro de autenticação', authError);
         
         // Mensagens de erro mais específicas
         let errorMessage = 'Email ou senha incorretos';
@@ -81,14 +83,14 @@ export function LoginPage() {
       }
 
       if (data?.user) {
-        console.log('✅ Login bem-sucedido!');
+        logger.success('Login realizado com sucesso');
         // Sucesso - redirecionar para dashboard
         navigate('/dashboard');
       } else {
         setError('Erro inesperado no login. Tente novamente.');
       }
     } catch (err) {
-      console.error('❌ Erro crítico no login:', err);
+      logger.error('Erro crítico no login', err);
       setError('Erro de conexão. Verifique sua internet e tente novamente.');
     } finally {
       setIsLoading(false);

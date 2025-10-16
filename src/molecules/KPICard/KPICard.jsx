@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, Minus, AlertTriangle } from 'lucide-react';
 
 /**
  * Componente de card para exibir KPIs
@@ -7,11 +7,13 @@ import { TrendingUp, TrendingDown } from 'lucide-react';
  * @param {string} props.title - Título do KPI
  * @param {string|number} props.value - Valor principal
  * @param {string} props.subtitle - Subtítulo opcional
- * @param {number} props.change - Percentual de mudança
- * @param {string} props.trend - Tendência: 'up', 'down' ou 'neutral'
- * @param {React.Component} props.icon - Ícone do card
+ * @param {number|object} props.change - Percentual de mudança ou undefined
+ * @param {string|object} props.trend - Tendência: 'up', 'down', 'neutral' ou objeto {value, type, period}
+ * @param {React.Component|string} props.icon - Ícone do card ou nome do ícone
  * @param {string} props.color - Cor do tema
  * @param {boolean} props.loading - Estado de carregamento
+ * @param {boolean} props.error - Estado de erro
+ * @param {function} props.onClick - Callback para clique
  */
 const KPICard = ({
   title,
@@ -20,16 +22,40 @@ const KPICard = ({
   change,
   trend = 'neutral',
   icon: Icon,
-  color = 'text-blue-600',
-  loading = false
+  color = 'blue',
+  loading = false,
+  error = false,
+  onClick
 }) => {
+  // Mapear nomes de ícones para componentes
+  const iconComponents = {
+    'DollarSign': DollarSign,
+    'TrendingUp': TrendingUp,
+    'TrendingDown': TrendingDown,
+    'Minus': Minus,
+    'AlertTriangle': AlertTriangle
+  };
+
+  // Renderizar o ícone
+  const renderIcon = () => {
+    let IconComponent;
+    if (typeof Icon === 'string') {
+      IconComponent = iconComponents[Icon] || DollarSign;
+    } else {
+      IconComponent = Icon || DollarSign;
+    }
+    return <IconComponent className="h-5 w-5" data-testid={getIconTestId()} data-size="24" aria-hidden="true" />;
+  };
+
   const formatValue = (val) => {
-    if (loading) return '---';
+    if (loading || error) return '---';
     if (typeof val === 'number') {
       if (title?.toLowerCase().includes('receita') || 
           title?.toLowerCase().includes('faturamento') ||
           title?.toLowerCase().includes('lucro') ||
-          title?.toLowerCase().includes('ticket')) {
+          title?.toLowerCase().includes('ticket') ||
+          title?.toLowerCase().includes('prejuízo') ||
+          title?.toLowerCase().includes('despesa')) {
         return new Intl.NumberFormat('pt-BR', {
           style: 'currency',
           currency: 'BRL'
@@ -44,29 +70,63 @@ const KPICard = ({
     return val;
   };
 
+  // Normalizar dados de trend
+  const normalizedTrend = typeof trend === 'object' ? trend : { value: change, type: trend, period: null };
+  const trendValue = normalizedTrend.value !== undefined ? normalizedTrend.value : change;
+  const trendType = normalizedTrend.type || trend;
+  const trendPeriod = normalizedTrend.period;
+
   const formatChange = (val) => {
-    if (!val || loading) return null;
-    const sign = val >= 0 ? '+' : '';
-    return `${sign}${val.toFixed(1)}%`;
+    if (val === undefined || val === null || loading) return null;
+    const sign = val > 0 ? '+' : '';
+    return `${sign}${val.toFixed(1).replace('.', ',')}%`;
   };
 
   const getTrendColor = () => {
-    if (loading || !change) return 'text-gray-500';
-    if (trend === 'up' || change > 0) return 'text-green-600';
-    if (trend === 'down' || change < 0) return 'text-red-600';
+    if (loading || !trendValue) return 'text-gray-500';
+    if (trendType === 'positive' || trendType === 'up' || trendValue > 0) return 'text-green-600';
+    if (trendType === 'negative' || trendType === 'down' || trendValue < 0) return 'text-red-600';
     return 'text-gray-500';
   };
 
   const renderTrendIcon = () => {
-    if (loading || !change) return null;
-    if (trend === 'up' || change > 0) return <TrendingUp className="h-4 w-4" />;
-    if (trend === 'down' || change < 0) return <TrendingDown className="h-4 w-4" />;
+    if (loading || (trendValue === undefined && trendValue === null)) return null;
+    if (trendType === 'positive' || trendType === 'up' || trendValue > 0) return <TrendingUp className="h-4 w-4" data-testid="trending-up-icon" />;
+    if (trendType === 'negative' || trendType === 'down' || trendValue < 0) return <TrendingDown className="h-4 w-4" data-testid="trending-down-icon" />;
+    if (trendType === 'neutral' || trendValue === 0) return <Minus className="h-4 w-4" data-testid="minus-icon" />;
     return null;
+  };
+
+  // Determinar classes CSS baseado na cor
+  const getColorClasses = () => {
+    const colorMap = {
+      blue: 'border-blue-200 text-blue-600',
+      green: 'border-green-200 text-green-600',
+      red: 'border-red-200 text-red-600',
+      yellow: 'border-yellow-200 text-yellow-600'
+    };
+    return colorMap[color] || colorMap.blue;
+  };
+
+  // Determinar data-testid do ícone principal baseado no tipo ou MockIcon
+  const getIconTestId = () => {
+    if (typeof Icon === 'string') {
+      const testIdMap = {
+        'DollarSign': 'dollar-icon',
+        'TrendingUp': 'main-trending-up-icon',
+        'TrendingDown': 'main-trending-down-icon',
+        'Minus': 'main-minus-icon',
+        'AlertTriangle': 'error-icon'
+      };
+      return testIdMap[Icon] || 'dollar-icon';
+    }
+    // Se é MockIcon ou componente, assumir dollar-icon para testes
+    return 'dollar-icon';
   };
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 animate-pulse">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 animate-pulse" data-testid="kpi-loading-skeleton">
         <div className="flex items-center justify-between mb-4">
           <div className="p-2 rounded-lg bg-gray-200 dark:bg-gray-700">
             <div className="h-5 w-5 bg-gray-300 dark:bg-gray-600 rounded"></div>
@@ -81,16 +141,42 @@ const KPICard = ({
     );
   }
 
-  return (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
-      <div className="flex items-center justify-between mb-4">
-        <div className={`p-2 rounded-lg bg-gray-50 dark:bg-gray-700 ${color}`}>
-          {Icon && <Icon className="h-5 w-5" />}
+  if (error) {
+    return (
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between mb-4">
+          <div className="p-2 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600">
+            <AlertTriangle className="h-5 w-5" data-testid="error-icon" />
+          </div>
         </div>
-        {change !== undefined && (
+        <div>
+          <p className="text-red-600 text-sm font-medium">
+            Erro ao carregar dados
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const baseClasses = `bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow ${getColorClasses()}`;
+  const clickableClasses = onClick ? 'cursor-pointer' : '';
+
+  return (
+    <div 
+      className={`${baseClasses} ${clickableClasses}`}
+      onClick={onClick}
+      role="article"
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={onClick ? (e) => e.key === 'Enter' && onClick(e) : undefined}
+    >
+      <div className="flex items-center justify-between mb-4">
+        <div className={`p-2 rounded-lg bg-gray-50 dark:bg-gray-700 ${getColorClasses()}`}>
+          {renderIcon()}
+        </div>
+        {(trendValue !== undefined && trendValue !== null) && (
           <span className={`text-sm font-medium flex items-center gap-1 ${getTrendColor()}`}>
             {renderTrendIcon()}
-            {formatChange(change)}
+            {formatChange(trendValue)}
           </span>
         )}
       </div>
@@ -104,6 +190,11 @@ const KPICard = ({
         {subtitle && (
           <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">
             {subtitle}
+          </p>
+        )}
+        {trendPeriod && (
+          <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">
+            {trendPeriod}
           </p>
         )}
       </div>

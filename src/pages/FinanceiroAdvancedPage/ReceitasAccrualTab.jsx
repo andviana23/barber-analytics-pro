@@ -149,29 +149,70 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
         onClose={() => setIsModalOpen(false)}
         onSubmit={async (receita) => {
           try {
+            // eslint-disable-next-line no-console
             console.log('📤 Enviando receita para o banco:', receita);
             
             const { data, error } = await financeiroService.createReceita(receita);
             
             if (error) {
+              // eslint-disable-next-line no-console
               console.error('❌ Erro ao criar receita:', error);
+              
+              // Mensagem amigável baseada no tipo de erro
+              let userMessage = 'Erro ao cadastrar receita';
+              let description = error;
+              
+              // Detectar tipo de erro e personalizar mensagem
+              if (error.includes('Campo obrigatório')) {
+                userMessage = 'Dados incompletos';
+                description = error;
+              } else if (error.includes('inválido') || error.includes('deve')) {
+                userMessage = 'Dados inválidos';
+                description = error;
+              } else if (error.includes('configuração')) {
+                userMessage = 'Erro de configuração';
+                description = 'Há um problema com a estrutura do banco de dados. Contate o suporte técnico.';
+              } else if (error.includes('duplicada')) {
+                userMessage = 'Receita duplicada';
+                description = 'Já existe uma receita com estes dados no sistema.';
+              } else if (error.includes('Referência inválida')) {
+                userMessage = 'Dados de referência inválidos';
+                description = 'Verifique se a unidade, conta bancária ou profissional estão corretos.';
+              }
+              
               addToast({
                 type: 'error',
-                message: 'Erro ao cadastrar receita',
-                description: error
+                message: userMessage,
+                description: description
               });
               return;
             }
             
+            // eslint-disable-next-line no-console
             console.log('✅ Receita criada com sucesso:', data);
+            
+            // Mensagem de sucesso personalizada
+            const valorFormatado = data.value ? 
+              new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+              }).format(data.value) : 'R$ 0,00';
+            
+            addToast({
+              type: 'success',
+              message: 'Receita cadastrada com sucesso! ✅',
+              description: `Receita de ${valorFormatado} registrada no sistema.`
+            });
+            
             handleCreateSuccess();
             
           } catch (err) {
+            // eslint-disable-next-line no-console
             console.error('❌ Erro inesperado:', err);
             addToast({
               type: 'error',
-              message: 'Erro ao cadastrar receita',
-              description: err.message || 'Erro inesperado. Tente novamente.'
+              message: 'Erro inesperado',
+              description: 'Ocorreu um erro ao processar a receita. Por favor, tente novamente ou contate o suporte.'
             });
           }
         }}

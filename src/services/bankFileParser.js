@@ -780,11 +780,116 @@ export class BankFileParser {
   }
 
   /**
-   * Lê arquivo como string
+   * 🛡️ CORREÇÃO BUG-006: Lê arquivo com detecção automática de encoding
    * @param {File} file - Arquivo
+   * @param {string} [forceEncoding] - Encoding específico (opcional)
    * @returns {Promise<string>} Conteúdo do arquivo
    */
-  async readFile(file) {
+  async readFile(file, forceEncoding = null) {
+    // ✅ Se encoding específico foi fornecido, usar diretamente
+    if (forceEncoding) {
+      return this.readFileWithEncoding(file, forceEncoding);
+    }
+
+    // ✅ Tentar detectar encoding automaticamente
+    try {
+      const encoding = await this.detectFileEncoding(file);
+      return this.readFileWithEncoding(file, encoding);
+    } catch {
+      // ✅ Fallback: tentar encodings comuns para bancos brasileiros
+      const fallbackEncodings = ['utf8', 'latin1', 'windows-1252'];
+      
+      for (const encoding of fallbackEncodings) {
+        try {
+          const content = await this.readFileWithEncoding(file, encoding);
+          
+          // ✅ Validar se o conteúdo parece correto (sem caracteres corrompidos)
+          if (this.isValidTextContent(content)) {
+            return content;
+          }
+        } catch {
+          continue; // Tentar próximo encoding
+        }
+      }
+      
+      // ✅ Se nenhum encoding funcionou, usar UTF-8 como último recurso
+      return this.readFileWithEncoding(file, 'utf8');
+    }
+  }
+
+  /**
+   * 🔧 CORREÇÃO BUG-006: Detecta encoding do arquivo
+   * @param {File} file - Arquivo
+   * @returns {Promise<string>} Encoding detectado
+   * @private
+   */
+  async detectFileEncoding(file) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      
+      reader.onload = (event) => {
+        const buffer = new Uint8Array(event.target.result);
+        const encoding = this.detectEncodingFromBOM(buffer);
+        resolve(encoding);
+      };
+      
+      // Ler apenas os primeiros 1024 bytes para detectar BOM
+      const slice = file.slice(0, 1024);
+      reader.readAsArrayBuffer(slice);
+    });
+  }
+
+  /**
+   * 🔧 CORREÇÃO BUG-006: Detecta encoding via BOM (Byte Order Mark)
+   * @param {Uint8Array} buffer - Buffer do arquivo
+   * @returns {string} Encoding detectado
+   * @private
+   */
+  detectEncodingFromBOM(buffer) {
+    // ✅ UTF-8 BOM
+    if (buffer.length >= 3 && 
+        buffer[0] === 0xEF && buffer[1] === 0xBB && buffer[2] === 0xBF) {
+      return 'utf8';
+    }
+    
+    // ✅ UTF-16 Little Endian BOM
+    if (buffer.length >= 2 && buffer[0] === 0xFF && buffer[1] === 0xFE) {
+      return 'utf16le';
+    }
+    
+    // ✅ UTF-16 Big Endian BOM  
+    if (buffer.length >= 2 && buffer[0] === 0xFE && buffer[1] === 0xFF) {
+      return 'utf16be';
+    }
+    
+    // ✅ Heurística para bancos brasileiros
+    // Verificar se tem caracteres típicos de Latin1 (acentos)
+    let hasLatinChars = false;
+    for (let i = 0; i < Math.min(buffer.length, 500); i++) {
+      // Caracteres acentuados em Latin1: À-ÿ (192-255)
+      if (buffer[i] >= 192 && buffer[i] <= 255) {
+        hasLatinChars = true;
+        break;
+      }
+    }
+    
+    // ✅ Se tem caracteres latinos, provavelmente é Latin1 (comum no Bradesco)
+    if (hasLatinChars) {
+      return 'latin1';
+    }
+    
+    // ✅ Default para UTF-8 (comum no Itaú, BB, Santander)
+    return 'utf8';
+  }
+
+  /**
+   * 🔧 CORREÇÃO BUG-006: Lê arquivo com encoding específico
+   * @param {File} file - Arquivo
+   * @param {string} encoding - Encoding
+   * @returns {Promise<string>} Conteúdo do arquivo
+   * @private
+   */
+  readFileWithEncoding(file, encoding) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       
@@ -793,11 +898,38 @@ export class BankFileParser {
       };
       
       reader.onerror = (error) => {
-        reject(new Error(`Erro ao ler arquivo: ${error.message}`));
+        reject(new Error(`Erro ao ler arquivo com encoding ${encoding}: ${error.message}`));
       };
       
-      reader.readAsText(file, 'utf8');
+      reader.readAsText(file, encoding);
     });
+  }
+
+  /**
+   * 🔧 CORREÇÃO BUG-006: Valida se o conteúdo do texto está correto
+   * @param {string} content - Conteúdo do arquivo
+   * @returns {boolean} True se válido
+   * @private
+   */
+  isValidTextContent(content) {
+    // ✅ Verificar se não tem caracteres de controle inválidos
+    // eslint-disable-next-line no-control-regex
+    const invalidChars = /[\x00-\x08\x0E-\x1F\x7F]/g;
+    if (invalidChars.test(content)) {
+      return false;
+    }
+    
+    // ✅ Verificar se não tem muitos caracteres de substituição (�)
+    const replacementChars = (content.match(/�/g) || []).length;
+    const totalChars = content.length;
+    
+    // Se mais de 1% são caracteres de substituição, provavelmente encoding errado
+    if (totalChars > 0 && (replacementChars / totalChars) > 0.01) {
+      return false;
+    }
+    
+    // ✅ Conteúdo parece válido
+    return true;
   }
 
   /**

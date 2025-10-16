@@ -225,23 +225,35 @@ export class ReconciliationService {
   }
 
   /**
-   * Calcula matches entre extratos e lançamentos financeiros
+   * 🛡️ CORREÇÃO BUG-005: Algoritmo de matching único que previne múltiplas correspondências
+   * Calcula matches entre extratos e lançamentos financeiros usando algoritmo otimizado
    * @param {Array} statements - Extratos bancários
    * @param {Array} transactions - Receitas e despesas
    * @param {Object} options - Opções do algoritmo
-   * @returns {Array} Array de matches encontrados
+   * @returns {Array} Array de matches únicos encontrados
    * @private
    */
   static calculateMatches(statements, transactions, options) {
     const { daysTolerance, amountTolerance, minScore } = options;
-    const matches = [];
+    
+    // ✅ Usar Sets para rastrear itens já correspondidos
+    const usedStatements = new Set();
+    const usedTransactions = new Set();
+    const finalMatches = [];
 
     for (const statement of statements) {
+      if (usedStatements.has(statement.id)) continue;
+
       const statementDate = new Date(statement.transaction_date);
       const statementAmount = Math.abs(statement.amount);
       const isCredit = statement.type === 'Credit' || statement.amount > 0;
 
+      // ✅ Encontrar TODOS os candidatos para este statement
+      const candidates = [];
+
       for (const transaction of transactions) {
+        if (usedTransactions.has(transaction.id)) continue;
+
         // Definir tipo de transação e datas relevantes
         const isRevenue = 'actual_receipt_date' in transaction;
         const transactionDate = new Date(
@@ -271,9 +283,9 @@ export class ReconciliationService {
           { daysTolerance, amountTolerance }
         );
 
-        // Se o score atende o mínimo, adicionar como match
+        // ✅ Se o score atende o mínimo, adicionar como candidato
         if (score >= minScore) {
-          matches.push({
+          candidates.push({
             statement_id: statement.id,
             transaction_id: transaction.id,
             transaction_type: isRevenue ? 'Revenue' : 'Expense',
@@ -295,28 +307,33 @@ export class ReconciliationService {
               party_name: transaction.parties?.nome
             },
             difference: Math.abs(statementAmount - transactionAmount),
-            date_difference: Math.abs(statementDate - transactionDate) / (1000 * 60 * 60 * 24) // dias
+            date_difference: Math.abs(statementDate - transactionDate) / (1000 * 60 * 60 * 24), // dias
+            // ✅ Adicionar confiança ponderada para desempate
+            weightedScore: score + (score > 80 ? 10 : 0) // Bonus para matches de alta confiança
           });
         }
       }
-    }
 
-    // Ordenar por score descendente
-    matches.sort((a, b) => b.score - a.score);
-
-    // Remover matches duplicados (mesmo extrato com múltiplas transações)
-    // Manter apenas o de maior score para cada extrato
-    const uniqueMatches = [];
-    const usedStatements = new Set();
-
-    for (const match of matches) {
-      if (!usedStatements.has(match.statement_id)) {
-        uniqueMatches.push(match);
-        usedStatements.add(match.statement_id);
+      // ✅ Se há candidatos, escolher o MELHOR e marcar ambos como usados
+      if (candidates.length > 0) {
+        // Ordenar por score ponderado (melhor primeiro)
+        candidates.sort((a, b) => b.weightedScore - a.weightedScore);
+        
+        const bestMatch = candidates[0];
+        
+        // ✅ Marcar ambos como usados para prevenir duplicatas
+        usedStatements.add(bestMatch.statement_id);
+        usedTransactions.add(bestMatch.transaction_id);
+        
+        // Remover propriedade auxiliar antes de adicionar
+        delete bestMatch.weightedScore;
+        
+        finalMatches.push(bestMatch);
       }
     }
 
-    return uniqueMatches;
+    // ✅ Retornar matches únicos ordenados por confiança
+    return finalMatches.sort((a, b) => b.score - a.score);
   }
 
   /**
@@ -624,6 +641,121 @@ export class ReconciliationService {
       return { data: stats, error: null };
     } catch (err) {
       return { data: null, error: err.message };
+    }
+  }
+
+  /**
+   * Executa reconciliação automática entre receitas e extratos bancários
+   * @param {Object} options - Opções de reconciliação
+   * @param {string} options.account_id - ID da conta bancária
+   * @param {number} options.tolerance - Tolerância de valor (default: 0.01)
+   * @param {number} options.dateTolerance - Tolerância de data em dias (default: 2)
+   * @param {number} options.limit - Limite de registros (default: 100)
+   * @returns {Object} { data: Reconciliation[], error: string|null }
+   */
+  static async autoReconcile(options = {}) {
+    try {
+      const {
+        account_id,
+        tolerance = 0.01,
+        dateTolerance = 2,
+        limit = 100
+      } = options;
+
+      // Validações
+      if (!account_id) {
+        return { data: [], error: 'account_id é obrigatório' };
+      }
+
+      if (tolerance < 0 || tolerance > 1000) {
+        return { data: [], error: 'Tolerância deve estar entre 0 e 1000' };
+      }
+
+      // Buscar extratos não reconciliados
+      const { data: statements, error: statementsError } = await supabase
+        .from('bank_statements')
+        .select('*')
+        .eq('account_id', account_id)
+        .eq('reconciliation_status', 'pending')
+        .limit(limit);
+
+      if (statementsError) {
+        throw new Error(statementsError.message);
+      }
+
+      if (!statements || statements.length === 0) {
+        return { data: [], error: null };
+      }
+
+      // Buscar receitas não reconciliadas para a mesma conta
+      const { data: revenues, error: revenuesError } = await supabase
+        .from('receitas')
+        .select('*')
+        .eq('account_id', account_id)
+        .eq('reconciliation_status', 'pending')
+        .limit(limit);
+
+      if (revenuesError) {
+        throw new Error(revenuesError.message);
+      }
+
+      if (!revenues || revenues.length === 0) {
+        return { data: [], error: null };
+      }
+
+      const reconciliations = [];
+
+      // Algoritmo de matching
+      for (const statement of statements) {
+        for (const revenue of revenues) {
+          // Skip se já foram reconciliados
+          if (statement.reconciliation_status !== 'pending' || 
+              revenue.reconciliation_status !== 'pending') {
+            continue;
+          }
+
+          // Calcular diferenças
+          const valueDiff = Math.abs(statement.amount - revenue.value);
+          const statementDate = new Date(statement.transaction_date);
+          const revenueDate = new Date(revenue.date);
+          const dateDiff = Math.abs(statementDate - revenueDate) / (1000 * 60 * 60 * 24);
+
+          // Verificar tolerâncias
+          const withinValueTolerance = valueDiff <= tolerance;
+          const withinDateTolerance = dateDiff <= dateTolerance;
+
+          if (withinValueTolerance && withinDateTolerance) {
+            // Calcular confidence score (0-100)
+            const valueScore = Math.max(0, 100 - (valueDiff / tolerance) * 50);
+            const dateScore = Math.max(0, 100 - (dateDiff / dateTolerance) * 50);
+            const confidence_score = Math.round((valueScore + dateScore) / 2);
+
+            reconciliations.push({
+              id: `rec-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+              bank_statement_id: statement.id,
+              revenue_id: revenue.id,
+              value_difference: valueDiff,
+              date_difference: dateDiff,
+              confidence_score,
+              status: 'pending',
+              created_at: new Date().toISOString()
+            });
+
+            // Marcar como processados para evitar duplicação nesta execução
+            statement.reconciliation_status = 'processing';
+            revenue.reconciliation_status = 'processing';
+            break; // Uma receita por extrato
+          }
+        }
+      }
+
+      // Ordenar por confidence_score (maior primeiro)
+      reconciliations.sort((a, b) => b.confidence_score - a.confidence_score);
+
+      return { data: reconciliations, error: null };
+
+    } catch (error) {
+      return { data: [], error: error.message };
     }
   }
 }

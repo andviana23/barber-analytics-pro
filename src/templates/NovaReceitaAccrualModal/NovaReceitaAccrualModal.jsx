@@ -24,6 +24,7 @@ import { Input } from '../../atoms/Input/Input';
 import unitsService from '../../services/unitsService';
 import { getPaymentMethods } from '../../services/paymentMethodsService';
 import { addCalendarDaysWithBusinessDayAdjustment } from '../../utils/businessDays';
+import { logger } from '../../utils/secureLogger';
 
 const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
   // Estados do formulário simplificado
@@ -161,6 +162,10 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
     try {
       const valorNumerico = parseFloat(formData.valor);
       
+      // �️ CORREÇÃO BUG-002: Log sanitizado
+      logger.financial('FormData recebido no modal', formData);
+      logger.debug('Campos do formData', Object.keys(formData));
+      
       const receita = {
         // Campos obrigatórios
         type: 'service', // income_type ENUM: service, product, subscription, other
@@ -184,9 +189,13 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
         // Relacionamentos
         unit_id: formData.unit_id,
         
-        // Status inicial
+        // Status inicial (ENUM em inglês: Pending, Partial, Received, Paid, Cancelled, Overdue)
         status: 'Pending'
       };
+
+      // �️ CORREÇÃO BUG-002: Log sanitizado de dados financeiros
+      logger.financial('Objeto receita criado', receita);
+      logger.debug('Campos da receita', Object.keys(receita));
 
       await onSubmit(receita);
     } catch (error) {

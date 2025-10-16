@@ -24,6 +24,7 @@ import { ProfessionalsPage } from './pages/ProfessionalsPage/ProfessionalsPage';
 import UnitsPage from './pages/UnitsPage/UnitsPage';
 import RelatoriosPage from './pages/RelatoriosPage/RelatoriosPage';
 import PaymentMethodsPage from './pages/PaymentMethodsPage/PaymentMethodsPage';
+import TesteFase2Page from './pages/TesteFase2Page';
 
 import './styles/index.css';
 
@@ -248,6 +249,16 @@ function App() {
                     </div>
                   </div>
                 </div>
+              } 
+            />
+
+            {/* Rota de teste - Fase 2 */}
+            <Route 
+              path="/teste-fase-2" 
+              element={
+                <ProtectedRoute roles={['admin']}>
+                  <TesteFase2Page />
+                </ProtectedRoute>
               } 
             />
           </Routes>
