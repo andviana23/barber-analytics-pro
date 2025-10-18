@@ -18,10 +18,12 @@ import {
   FileText,
   Building2,
   AlertCircle,
-  CreditCard
+  CreditCard,
+  Landmark
 } from 'lucide-react';
 import { Input } from '../../atoms/Input/Input';
 import unitsService from '../../services/unitsService';
+import bankAccountsService from '../../services/bankAccountsService';
 import { getPaymentMethods } from '../../services/paymentMethodsService';
 import { addCalendarDaysWithBusinessDayAdjustment } from '../../utils/businessDays';
 import { logger } from '../../utils/secureLogger';
@@ -33,11 +35,13 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
     valor: '',
     data_pagamento: new Date().toISOString().split('T')[0],
     unit_id: '',
-    payment_method_id: ''
+    payment_method_id: '',
+    account_id: ''
   });
 
   const [units, setUnits] = useState([]);
   const [paymentMethods, setPaymentMethods] = useState([]);
+  const [bankAccounts, setBankAccounts] = useState([]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [calculatedReceiptDate, setCalculatedReceiptDate] = useState(null);
   const [errors, setErrors] = useState({});
@@ -67,13 +71,23 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
       if (!formData.unit_id) {
         setPaymentMethods([]);
         setSelectedPaymentMethod(null);
+        setBankAccounts([]);
         return;
       }
 
+      // Buscar formas de pagamento
       const { data, error } = await getPaymentMethods(formData.unit_id);
       if (!error && data) {
         const activeMethods = data.filter(method => method.is_active);
         setPaymentMethods(activeMethods);
+      }
+
+      // Buscar contas bancárias da unidade
+      try {
+        const accounts = await bankAccountsService.getBankAccounts(formData.unit_id);
+        setBankAccounts(accounts || []);
+      } catch {
+        setBankAccounts([]);
       }
     };
     fetchPaymentMethodsData();
@@ -108,7 +122,7 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
     
     // Se mudar unidade, limpar forma de pagamento
     if (field === 'unit_id') {
-      setFormData(prev => ({ ...prev, payment_method_id: '' }));
+      setFormData(prev => ({ ...prev, payment_method_id: '', account_id: '' }));
     }
 
     // Limpar erro do campo
@@ -188,6 +202,9 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
         
         // Relacionamentos
         unit_id: formData.unit_id,
+        
+        // Conta bancária (opcional)
+        ...(formData.account_id && { account_id: formData.account_id }),
         
         // Status inicial (ENUM em inglês: Pending, Partial, Received, Paid, Cancelled, Overdue)
         status: 'Pending'
@@ -373,6 +390,39 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
               {paymentMethods.length === 0 && formData.unit_id && (
                 <p className="mt-1 text-sm text-amber-600 dark:text-amber-400">
                   ⚠️ Nenhuma forma de pagamento cadastrada para esta unidade.
+                </p>
+              )}
+            </div>
+
+            {/* Campo: Conta Bancária */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <Landmark className="h-4 w-4 inline mr-2" />
+                Conta Bancária (Opcional)
+              </label>
+              <select
+                value={formData.account_id}
+                onChange={(e) => handleInputChange('account_id', e.target.value)}
+                disabled={!formData.unit_id}
+                className={`w-full px-3 py-2.5 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                  errors.account_id ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'
+                }`}
+              >
+                <option value="">
+                  {formData.unit_id ? 'Nenhuma (deixar em branco)' : 'Selecione uma unidade primeiro'}
+                </option>
+                {bankAccounts.map(account => (
+                  <option key={account.id} value={account.id}>
+                    {account.name} - {account.bank} (Ag: {account.agency}, Conta: {account.account_number})
+                  </option>
+                ))}
+              </select>
+              {errors.account_id && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.account_id}</p>
+              )}
+              {bankAccounts.length === 0 && formData.unit_id && (
+                <p className="mt-1 text-sm text-blue-600 dark:text-blue-400">
+                  ℹ️ Nenhuma conta bancária cadastrada para esta unidade. Você pode deixar em branco.
                 </p>
               )}
             </div>

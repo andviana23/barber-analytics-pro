@@ -433,16 +433,68 @@ export class ReconciliationService {
    * @param {string} params.notes - Observações (opcional)
    * @returns {Object} { data: Reconciliation|null, error: string|null }
    */
-  static async confirmReconciliation(params) {
+  static async confirmReconciliation(reconciliationId, statementId, referenceType, referenceId, difference = 0, notes = '') {
     try {
-      const { statementId, referenceType, referenceId, difference = 0, notes = '' } = params;
-
-      if (!statementId || !referenceType || !referenceId) {
-        return { data: null, error: 'Statement ID, Reference Type e Reference ID são obrigatórios' };
+      // Aceitar tanto chamada com objeto quanto parâmetros individuais (compatibilidade)
+      if (typeof reconciliationId === 'object' && reconciliationId !== null) {
+        const params = reconciliationId;
+        reconciliationId = params.reconciliationId;
+        statementId = params.statementId;
+        referenceType = params.referenceType;
+        referenceId = params.referenceId;
+        difference = params.difference || 0;
+        notes = params.notes || '';
       }
 
+      // Validação: ou reconciliationId ou os outros parâmetros
+      if (!reconciliationId && (!statementId || !referenceType || !referenceId)) {
+        return { success: false, data: null, error: 'Reconciliation ID ou (Statement ID, Reference Type e Reference ID) são obrigatórios' };
+      }
+
+      // Se reconciliationId foi fornecido, buscar a reconciliação existente
+      if (reconciliationId) {
+        const { data: existing, error: existingError } = await supabase
+          .from('reconciliations')
+          .select('*')
+          .eq('id', reconciliationId)
+          .single();
+
+        if (existingError || !existing) {
+          return { success: false, data: null, error: 'Reconciliação não encontrada' };
+        }
+
+        if (existing.status === 'confirmed') {
+          return { success: false, data: null, error: 'Reconciliação já foi confirmada' };
+        }
+
+        // Atualizar status para confirmed
+        const { data: updated, error: updateError } = await supabase
+          .from('reconciliations')
+          .update({ 
+            status: 'confirmed',
+            confirmed_at: new Date().toISOString(),
+            notes: notes || existing.notes
+          })
+          .eq('id', reconciliationId)
+          .select()
+          .single();
+
+        if (updateError) {
+          return { success: false, data: null, error: updateError.message };
+        }
+
+        // Atualizar status do bank_statement para "reconciled"
+        await supabase
+          .from('bank_statements')
+          .update({ status: 'reconciled' })
+          .eq('id', existing.statement_id);
+
+        return { success: true, data: updated, error: null };
+      }
+
+      // Fluxo tradicional: criar nova reconciliação
       if (!['Revenue', 'Expense'].includes(referenceType)) {
-        return { data: null, error: 'Reference Type deve ser Revenue ou Expense' };
+        return { success: false, data: null, error: 'Reference Type deve ser Revenue ou Expense' };
       }
 
       // Verificar se o extrato existe e não está conciliado
@@ -453,11 +505,11 @@ export class ReconciliationService {
         .single();
 
       if (statementError || !statement) {
-        return { data: null, error: 'Extrato bancário não encontrado' };
+        return { success: false, data: null, error: 'Extrato bancário não encontrado' };
       }
 
       if (statement.reconciled) {
-        return { data: null, error: 'Extrato já está conciliado' };
+        return { success: false, data: null, error: 'Extrato já está conciliado' };
       }
 
       // Verificar se a referência existe
@@ -469,7 +521,7 @@ export class ReconciliationService {
         .single();
 
       if (referenceError || !reference) {
-        return { data: null, error: `${referenceType} não encontrada` };
+        return { success: false, data: null, error: `${referenceType} não encontrada` };
       }
 
       // Criar conciliação
@@ -478,7 +530,7 @@ export class ReconciliationService {
         reference_type: referenceType,
         reference_id: referenceId,
         reconciliation_date: new Date().toISOString(),
-        status: Math.abs(difference) > 0.01 ? 'Divergent' : 'Reconciled',
+        status: Math.abs(difference) > 0.01 ? 'Divergent' : 'confirmed',
         difference: difference,
         notes: notes.trim()
       };
@@ -490,16 +542,18 @@ export class ReconciliationService {
         .single();
 
       if (reconciliationError) {
-        return { data: null, error: reconciliationError.message };
+        return { success: false, data: null, error: reconciliationError.message };
       }
 
-      // O trigger automaticamente atualizará o banco de dados:
-      // - bank_statements.reconciled = true
-      // - revenues/expenses.status = 'Conciliado' (se difference <= 0.01)
+      // Atualizar status do bank_statement para "reconciled"
+      await supabase
+        .from('bank_statements')
+        .update({ status: 'reconciled' })
+        .eq('id', statementId);
 
-      return { data: reconciliation, error: null };
+      return { success: true, data: reconciliation, error: null };
     } catch (err) {
-      return { data: null, error: err.message };
+      return { success: false, data: null, error: err.message };
     }
   }
 
@@ -658,33 +712,48 @@ export class ReconciliationService {
       const {
         account_id,
         tolerance = 0.01,
-        dateTolerance = 2,
+        date_tolerance = 2,
         limit = 100
       } = options;
 
       // Validações
       if (!account_id) {
-        return { data: [], error: 'account_id é obrigatório' };
+        return { success: false, data: null, error: 'account_id é obrigatório' };
       }
 
-      if (tolerance < 0 || tolerance > 1000) {
-        return { data: [], error: 'Tolerância deve estar entre 0 e 1000' };
+      if (tolerance < 0) {
+        return { success: false, data: null, error: 'Tolerância deve ser maior que zero' };
       }
 
-      // Buscar extratos não reconciliados
+      if (tolerance > 100) {
+        return { success: false, data: null, error: 'Tolerância não pode ser superior a R$ 100' };
+      }
+
+      // Buscar extratos (todos para contar reconciliados + não reconciliados para matching)
       const { data: statements, error: statementsError } = await supabase
         .from('bank_statements')
         .select('*')
         .eq('account_id', account_id)
-        .eq('reconciliation_status', 'pending')
         .limit(limit);
 
       if (statementsError) {
-        throw new Error(statementsError.message);
+        return { success: false, data: null, error: statementsError.message };
       }
 
       if (!statements || statements.length === 0) {
-        return { data: [], error: null };
+        return { 
+          success: true, 
+          data: { 
+            matches: [], 
+            summary: { 
+              total_statements: 0, 
+              total_revenues: 0, 
+              matches_found: 0,
+              already_reconciled: 0 
+            } 
+          }, 
+          error: null 
+        };
       }
 
       // Buscar receitas não reconciliadas para a mesma conta
@@ -692,50 +761,87 @@ export class ReconciliationService {
         .from('receitas')
         .select('*')
         .eq('account_id', account_id)
-        .eq('reconciliation_status', 'pending')
+        .in('status', ['Pending', 'Scheduled'])
         .limit(limit);
 
       if (revenuesError) {
-        throw new Error(revenuesError.message);
+        return { success: false, data: null, error: revenuesError.message };
       }
 
       if (!revenues || revenues.length === 0) {
-        return { data: [], error: null };
+        return { 
+          success: true, 
+          data: { 
+            matches: [], 
+            summary: { 
+              total_statements: statements.length, 
+              total_revenues: 0, 
+              matches_found: 0,
+              already_reconciled: 0 
+            } 
+          }, 
+          error: null 
+        };
       }
 
-      const reconciliations = [];
+      const matches = [];
+      let alreadyReconciledCount = 0;
+
+      // Contar statements já reconciliados antes do matching
+      for (const statement of statements) {
+        if (statement.status === 'reconciled') {
+          alreadyReconciledCount++;
+        }
+      }
 
       // Algoritmo de matching
       for (const statement of statements) {
+        // Skip se statement já foi reconciliado
+        if (statement.status === 'reconciled') {
+          continue;
+        }
+
         for (const revenue of revenues) {
           // Skip se já foram reconciliados
-          if (statement.reconciliation_status !== 'pending' || 
-              revenue.reconciliation_status !== 'pending') {
+          if (statement.status !== 'pending' || 
+              !['Pending', 'Scheduled'].includes(revenue.status)) {
             continue;
           }
 
           // Calcular diferenças
           const valueDiff = Math.abs(statement.amount - revenue.value);
           const statementDate = new Date(statement.transaction_date);
-          const revenueDate = new Date(revenue.date);
+          // Usar expected_receipt_date se disponível, senão usar date
+          const revenueCompareDate = revenue.expected_receipt_date || revenue.date;
+          const revenueDate = new Date(revenueCompareDate);
           const dateDiff = Math.abs(statementDate - revenueDate) / (1000 * 60 * 60 * 24);
 
           // Verificar tolerâncias
           const withinValueTolerance = valueDiff <= tolerance;
-          const withinDateTolerance = dateDiff <= dateTolerance;
+          const withinDateTolerance = dateDiff <= date_tolerance;
 
           if (withinValueTolerance && withinDateTolerance) {
             // Calcular confidence score (0-100)
-            const valueScore = Math.max(0, 100 - (valueDiff / tolerance) * 50);
-            const dateScore = Math.max(0, 100 - (dateDiff / dateTolerance) * 50);
-            const confidence_score = Math.round((valueScore + dateScore) / 2);
+            let confidence_score = 100;
+            
+            if (tolerance > 0 && valueDiff > 0) {
+              const valuePenalty = (valueDiff / tolerance) * 15; // Max 15% penalty  
+              confidence_score -= Math.min(15, valuePenalty);
+            }
+            
+            if (date_tolerance > 0 && dateDiff > 0) {
+              const datePenalty = (dateDiff / date_tolerance) * 30; // Max 30% penalty
+              confidence_score -= Math.min(30, datePenalty);
+            }
+            
+            confidence_score = Math.max(50, Math.round(confidence_score)); // Min 50%
 
-            reconciliations.push({
+            matches.push({
               id: `rec-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-              bank_statement_id: statement.id,
+              statement_id: statement.id,
               revenue_id: revenue.id,
-              value_difference: valueDiff,
-              date_difference: dateDiff,
+              amount_difference: valueDiff,
+              date_difference: Math.round(dateDiff),
               confidence_score,
               status: 'pending',
               created_at: new Date().toISOString()
@@ -750,12 +856,24 @@ export class ReconciliationService {
       }
 
       // Ordenar por confidence_score (maior primeiro)
-      reconciliations.sort((a, b) => b.confidence_score - a.confidence_score);
+      matches.sort((a, b) => b.confidence_score - a.confidence_score);
 
-      return { data: reconciliations, error: null };
+      return { 
+        success: true, 
+        data: { 
+          matches, 
+          summary: { 
+            total_statements: statements.length, 
+            total_revenues: revenues.length, 
+            matches_found: matches.length,
+            already_reconciled: alreadyReconciledCount 
+          } 
+        }, 
+        error: null 
+      };
 
     } catch (error) {
-      return { data: [], error: error.message };
+      return { success: false, data: null, error: error.message };
     }
   }
 }

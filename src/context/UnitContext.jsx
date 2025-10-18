@@ -1,11 +1,17 @@
 /**
  * UNIT CONTEXT
- * 
+ *
  * Contexto global para gerenciamento da unidade selecionada
  * Permite filtrar dados globalmente baseado na unidade ativa
  */
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from 'react';
 import { unitsService } from '../services';
 
 const UnitContext = createContext({});
@@ -29,12 +35,13 @@ export const UnitProvider = ({ children }) => {
       setError(null);
 
       const units = await unitsService.getUnits(false); // Apenas ativas
+      console.log('📍 UnitContext - Unidades carregadas:', units.length, units);
       setAllUnits(units);
 
       // Se não há unidade selecionada, verificar localStorage
       if (!selectedUnit) {
         const savedUnitId = localStorage.getItem(SELECTED_UNIT_KEY);
-        
+
         if (savedUnitId && savedUnitId !== 'all') {
           const savedUnit = units.find(unit => unit.id === savedUnitId);
           if (savedUnit) {
@@ -55,9 +62,9 @@ export const UnitProvider = ({ children }) => {
   /**
    * Selecionar uma unidade específica
    */
-  const selectUnit = useCallback((unit) => {
+  const selectUnit = useCallback(unit => {
     setSelectedUnit(unit);
-    
+
     // Salvar no localStorage
     if (unit) {
       localStorage.setItem(SELECTED_UNIT_KEY, unit.id);
@@ -98,13 +105,16 @@ export const UnitProvider = ({ children }) => {
   /**
    * Filtrar dados baseado na unidade selecionada
    */
-  const filterBySelectedUnit = useCallback((data, unitIdField = 'unit_id') => {
-    if (!selectedUnit || !Array.isArray(data)) {
-      return data;
-    }
+  const filterBySelectedUnit = useCallback(
+    (data, unitIdField = 'unit_id') => {
+      if (!selectedUnit || !Array.isArray(data)) {
+        return data;
+      }
 
-    return data.filter(item => item[unitIdField] === selectedUnit.id);
-  }, [selectedUnit]);
+      return data.filter(item => item[unitIdField] === selectedUnit.id);
+    },
+    [selectedUnit]
+  );
 
   /**
    * Refresh - recarregar unidades
@@ -149,14 +159,10 @@ export const UnitProvider = ({ children }) => {
 
     // Dados computados
     hasMultipleUnits: allUnits.length > 1,
-    activeUnitsCount: allUnits.length
+    activeUnitsCount: allUnits.length,
   };
 
-  return (
-    <UnitContext.Provider value={value}>
-      {children}
-    </UnitContext.Provider>
-  );
+  return <UnitContext.Provider value={value}>{children}</UnitContext.Provider>;
 };
 
 /**
@@ -164,7 +170,7 @@ export const UnitProvider = ({ children }) => {
  */
 export const useUnit = () => {
   const context = useContext(UnitContext);
-  
+
   if (!context) {
     throw new Error('useUnit deve ser usado dentro de um UnitProvider');
   }

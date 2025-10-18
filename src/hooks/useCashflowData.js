@@ -4,19 +4,24 @@ import { useToast } from '../context/ToastContext';
 
 /**
  * Custom hook para gerenciar dados de fluxo de caixa
- * 
+ *
  * @param {string} unitId - ID da unidade
  * @param {string} startDate - Data de início (ISO string)
  * @param {string} endDate - Data de fim (ISO string)
  * @param {string} accountId - ID da conta (opcional)
  * @returns {Object} { entries, summary, loading, error, refetch, refreshSummary }
  */
-export const useCashflowData = (unitId, startDate, endDate, accountId = null) => {
+export const useCashflowData = (
+  unitId,
+  startDate,
+  endDate,
+  accountId = null
+) => {
   const [state, setState] = useState({
     entries: [],
     summary: null,
     loading: true,
-    error: null
+    error: null,
   });
 
   const { addToast } = useToast();
@@ -24,9 +29,12 @@ export const useCashflowData = (unitId, startDate, endDate, accountId = null) =>
   const abortControllerRef = useRef(null);
 
   // Função para gerar chave de cache
-  const getCacheKey = useCallback((type, unitId, startDate, endDate, accountId) => {
-    return `cashflow_${type}_${unitId}_${startDate}_${endDate}_${accountId || 'all'}`;
-  }, []);
+  const getCacheKey = useCallback(
+    (type, unitId, startDate, endDate, accountId) => {
+      return `cashflow_${type}_${unitId}_${startDate}_${endDate}_${accountId || 'all'}`;
+    },
+    []
+  );
 
   // Função para buscar entries do fluxo de caixa
   const fetchCashflowEntries = useCallback(async () => {
@@ -34,8 +42,14 @@ export const useCashflowData = (unitId, startDate, endDate, accountId = null) =>
       return { data: [], error: null };
     }
 
-    const cacheKey = getCacheKey('entries', unitId, startDate, endDate, accountId);
-    
+    const cacheKey = getCacheKey(
+      'entries',
+      unitId,
+      startDate,
+      endDate,
+      accountId
+    );
+
     // Verificar cache (TTL: 60 segundos para entries)
     const cachedData = cacheRef.current.get(cacheKey);
     if (cachedData && Date.now() - cachedData.timestamp < 60000) {
@@ -43,24 +57,27 @@ export const useCashflowData = (unitId, startDate, endDate, accountId = null) =>
     }
 
     try {
-      const { data, error } = await cashflowService.getCashflowEntries(
-        unitId, 
-        startDate, 
-        endDate, 
-        accountId
-      );
+      const { data, error } = await cashflowService.getCashflowEntries({
+        unitId,
+        startDate,
+        endDate,
+        accountId,
+      });
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ useCashflowData: Erro ao buscar entries:', error);
+        throw error;
+      }
 
       // Armazenar no cache
       cacheRef.current.set(cacheKey, {
         data: data || [],
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
 
       return { data: data || [], error: null };
-
     } catch (err) {
+      console.error('❌ useCashflowData: Erro ao buscar entries:', err);
       return { data: [], error: err };
     }
   }, [unitId, startDate, endDate, accountId, getCacheKey]);
@@ -73,7 +90,7 @@ export const useCashflowData = (unitId, startDate, endDate, accountId = null) =>
 
     const period = `${startDate}_${endDate}`;
     const cacheKey = getCacheKey('summary', unitId, period, '', accountId);
-    
+
     // Verificar cache (TTL: 120 segundos para summary)
     const cachedData = cacheRef.current.get(cacheKey);
     if (cachedData && Date.now() - cachedData.timestamp < 120000) {
@@ -81,77 +98,109 @@ export const useCashflowData = (unitId, startDate, endDate, accountId = null) =>
     }
 
     try {
-      const { data, error } = await cashflowService.getCashflowSummary(
-        unitId, 
-        period,
-        accountId
-      );
+      const { data, error } = await cashflowService.getCashflowSummary({
+        unitId,
+        period: 'custom', // ✅ Sempre usar 'custom' quando temos startDate/endDate
+        startDate,
+        endDate,
+        accountId,
+      });
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ useCashflowData: Erro ao buscar summary:', error);
+        throw error;
+      }
 
       // Armazenar no cache
       cacheRef.current.set(cacheKey, {
         data: data || null,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
 
       return { data: data || null, error: null };
-
     } catch (err) {
+      console.error('❌ useCashflowData: Erro ao buscar summary:', err);
       return { data: null, error: err };
     }
   }, [unitId, startDate, endDate, accountId, getCacheKey]);
 
   // Função principal para buscar todos os dados
-  const fetchData = useCallback(async (showLoading = true) => {
-    // Cancelar requisição anterior se existir
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-    
-    abortControllerRef.current = new AbortController();
-
-    if (showLoading) {
-      setState(prev => ({ ...prev, loading: true, error: null }));
-    }
-
-    try {
-      // Buscar entries e summary em paralelo
-      const [entriesResult, summaryResult] = await Promise.all([
-        fetchCashflowEntries(),
-        fetchCashflowSummary()
-      ]);
-
-      // Verificar se houve erros
-      if (entriesResult.error || summaryResult.error) {
-        const error = entriesResult.error || summaryResult.error;
-        throw error;
+  const fetchData = useCallback(
+    async (showLoading = true) => {
+      // Cancelar requisição anterior se existir
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
       }
 
-      setState(prev => ({
-        ...prev,
-        entries: entriesResult.data,
-        summary: summaryResult.data,
-        loading: false,
-        error: null
-      }));
+      abortControllerRef.current = new AbortController();
 
-    } catch (err) {
-      if (err.name !== 'AbortError') {
+      if (showLoading) {
+        setState(prev => ({ ...prev, loading: true, error: null }));
+      }
+
+      try {
+        // Buscar entries e summary em paralelo
+        const [entriesResult, summaryResult] = await Promise.all([
+          fetchCashflowEntries(),
+          fetchCashflowSummary(),
+        ]);
+
+        // Verificar se houve erros
+        if (entriesResult.error || summaryResult.error) {
+          const error = entriesResult.error || summaryResult.error;
+          throw error;
+        }
+
+        // ✅ Validar estrutura dos dados antes de processar
+        if (!Array.isArray(entriesResult.data)) {
+          throw new Error('Formato de dados inválido retornado pela API');
+        }
+
+        // eslint-disable-next-line no-console
+        console.log('✅ useCashflowData: Dados carregados com sucesso', {
+          entries: entriesResult.data?.length || 0,
+          summary: summaryResult.data,
+        });
+
         setState(prev => ({
           ...prev,
+          entries: entriesResult.data,
+          summary: summaryResult.data,
           loading: false,
-          error: err.message || 'Erro ao carregar dados do fluxo de caixa'
+          error: null,
         }));
-        
-        addToast({
-          type: 'error',
-          title: 'Erro ao carregar fluxo de caixa',
-          message: 'Não foi possível carregar os dados do fluxo de caixa'
-        });
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          const errorMessage =
+            err.message || 'Erro ao carregar dados do fluxo de caixa';
+
+          setState(prev => ({
+            ...prev,
+            loading: false,
+            error: errorMessage,
+          }));
+
+          addToast({
+            type: 'error',
+            title: 'Erro ao carregar fluxo de caixa',
+            message: errorMessage,
+          });
+
+          // ✅ Log estruturado para debug
+          console.error('❌ useCashflowData Error:', {
+            error: err,
+            message: errorMessage,
+            unitId,
+            startDate,
+            endDate,
+            accountId,
+            timestamp: new Date().toISOString(),
+          });
+        }
       }
-    }
-  }, [fetchCashflowEntries, fetchCashflowSummary, addToast]);
+    },
+    [fetchCashflowEntries, fetchCashflowSummary, addToast]
+  );
 
   // Função para refresh apenas do summary (útil após operações)
   const refreshSummary = useCallback(async () => {
@@ -162,26 +211,33 @@ export const useCashflowData = (unitId, startDate, endDate, accountId = null) =>
       cacheRef.current.delete(cacheKey);
 
       const summaryResult = await fetchCashflowSummary();
-      
+
       if (summaryResult.error) throw summaryResult.error;
 
       setState(prev => ({
         ...prev,
-        summary: summaryResult.data
+        summary: summaryResult.data,
       }));
 
       return { success: true };
-
     } catch (err) {
       addToast({
         type: 'error',
         title: 'Erro ao atualizar resumo',
-        message: 'Não foi possível atualizar o resumo do fluxo de caixa'
+        message: 'Não foi possível atualizar o resumo do fluxo de caixa',
       });
-      
+
       return { success: false, error: err.message };
     }
-  }, [startDate, endDate, unitId, accountId, getCacheKey, fetchCashflowSummary, addToast]);
+  }, [
+    startDate,
+    endDate,
+    unitId,
+    accountId,
+    getCacheKey,
+    fetchCashflowSummary,
+    addToast,
+  ]);
 
   // Função para refetch (limpa cache)
   const refetch = useCallback(() => {
@@ -192,7 +248,7 @@ export const useCashflowData = (unitId, startDate, endDate, accountId = null) =>
   // Effect para buscar dados quando parâmetros mudarem
   useEffect(() => {
     fetchData();
-    
+
     // Cleanup na desmontagem
     return () => {
       if (abortControllerRef.current) {
@@ -215,7 +271,7 @@ export const useCashflowData = (unitId, startDate, endDate, accountId = null) =>
     loading: state.loading,
     error: state.error,
     refetch,
-    refreshSummary
+    refreshSummary,
   };
 };
 

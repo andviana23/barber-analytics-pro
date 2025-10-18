@@ -1,16 +1,16 @@
 /**
  * ConciliacaoPanel.jsx
- * 
+ *
  * Painel completo de reconciliação bancária
  * Combina múltiplas moléculas para workflow completo de conciliação
- * 
+ *
  * Autor: Sistema Barber Analytics Pro
  * Data: 2024
  */
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { 
+import {
   Upload,
   Download,
   Search,
@@ -35,13 +35,13 @@ import {
   Target,
   Check,
   X,
-  Info
+  Info,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ReconciliationMatchCard } from '../../molecules/ReconciliationMatchCard';
-import StatusBadge from '../../atoms/StatusBadge';
-import DateRangePicker from '../../atoms/DateRangePicker';
+import { StatusBadge } from '../../atoms/StatusBadge';
+import { DateRangePicker } from '../../atoms/DateRangePicker';
 
 const ConciliacaoPanel = ({
   // Dados
@@ -49,7 +49,7 @@ const ConciliacaoPanel = ({
   internalTransactions = [],
   reconciliationMatches = [],
   selectedAccount,
-  
+
   // Callbacks para ações
   onImportStatement,
   onExportResults,
@@ -59,7 +59,7 @@ const ConciliacaoPanel = ({
   onCreateManualMatch,
   onDeleteMatch,
   onRefreshData,
-  
+
   // Filtros
   dateRange,
   onDateRangeChange,
@@ -69,24 +69,24 @@ const ConciliacaoPanel = ({
   onConfidenceFilterChange,
   amountRangeFilter,
   onAmountRangeFilterChange,
-  
+
   // Configurações
   autoMatchThreshold = 0.8,
   onAutoMatchThresholdChange,
   showOnlyUnreconciled = false,
   onShowOnlyUnreconciledChange,
-  
+
   // Estados
   loading = false,
   autoMatchRunning = false,
-  
+
   // Configuração da interface
   viewMode = 'matches', // 'matches', 'bank', 'internal'
   onViewModeChange,
   showFilters = true,
   compactMode = false,
-  
-  className = ''
+
+  className = '',
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMatches, setSelectedMatches] = useState([]);
@@ -99,18 +99,33 @@ const ConciliacaoPanel = ({
     const totalBankTransactions = bankTransactions.length;
     const totalInternalTransactions = internalTransactions.length;
     const totalMatches = reconciliationMatches.length;
-    const approvedMatches = reconciliationMatches.filter(m => m.status === 'approved').length;
-    const pendingMatches = reconciliationMatches.filter(m => m.status === 'pending').length;
-    const rejectedMatches = reconciliationMatches.filter(m => m.status === 'rejected').length;
-    const autoMatches = reconciliationMatches.filter(m => m.matchType === 'automatic').length;
-    const manualMatches = reconciliationMatches.filter(m => m.matchType === 'manual').length;
-    
+    const approvedMatches = reconciliationMatches.filter(
+      m => m.status === 'approved'
+    ).length;
+    const pendingMatches = reconciliationMatches.filter(
+      m => m.status === 'pending'
+    ).length;
+    const rejectedMatches = reconciliationMatches.filter(
+      m => m.status === 'rejected'
+    ).length;
+    const autoMatches = reconciliationMatches.filter(
+      m => m.matchType === 'automatic'
+    ).length;
+    const manualMatches = reconciliationMatches.filter(
+      m => m.matchType === 'manual'
+    ).length;
+
     const matchedBankAmount = reconciliationMatches
       .filter(m => m.status === 'approved')
       .reduce((sum, m) => sum + (m.bankTransaction?.valor || 0), 0);
-    
+
     const unmatchedBankAmount = bankTransactions
-      .filter(bt => !reconciliationMatches.some(m => m.bankTransaction?.id === bt.id && m.status === 'approved'))
+      .filter(
+        bt =>
+          !reconciliationMatches.some(
+            m => m.bankTransaction?.id === bt.id && m.status === 'approved'
+          )
+      )
       .reduce((sum, bt) => sum + (bt.valor || 0), 0);
 
     return {
@@ -124,7 +139,10 @@ const ConciliacaoPanel = ({
       manualMatches,
       matchedBankAmount,
       unmatchedBankAmount,
-      reconciliationRate: totalBankTransactions > 0 ? (approvedMatches / totalBankTransactions) * 100 : 0
+      reconciliationRate:
+        totalBankTransactions > 0
+          ? (approvedMatches / totalBankTransactions) * 100
+          : 0,
     };
   }, [bankTransactions, internalTransactions, reconciliationMatches]);
 
@@ -145,7 +163,9 @@ const ConciliacaoPanel = ({
 
     // Filtro por confiança
     if (confidenceFilter > 0) {
-      filtered = filtered.filter(m => (m.confidence || 0) >= confidenceFilter / 100);
+      filtered = filtered.filter(
+        m => (m.confidence || 0) >= confidenceFilter / 100
+      );
     }
 
     // Filtro por termo de busca
@@ -153,12 +173,20 @@ const ConciliacaoPanel = ({
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(m => {
         const bankDesc = (m.bankTransaction?.descricao || '').toLowerCase();
-        const internalDesc = (m.internalTransaction?.descricao || '').toLowerCase();
+        const internalDesc = (
+          m.internalTransaction?.descricao || ''
+        ).toLowerCase();
         const bankRef = (m.bankTransaction?.referencia || '').toLowerCase();
-        const internalRef = (m.internalTransaction?.referencia || '').toLowerCase();
-        
-        return bankDesc.includes(term) || internalDesc.includes(term) || 
-               bankRef.includes(term) || internalRef.includes(term);
+        const internalRef = (
+          m.internalTransaction?.referencia || ''
+        ).toLowerCase();
+
+        return (
+          bankDesc.includes(term) ||
+          internalDesc.includes(term) ||
+          bankRef.includes(term) ||
+          internalRef.includes(term)
+        );
       });
     }
 
@@ -166,15 +194,19 @@ const ConciliacaoPanel = ({
     if (amountRangeFilter) {
       filtered = filtered.filter(m => {
         const amount = Math.abs(m.bankTransaction?.valor || 0);
-        return amount >= (amountRangeFilter.min || 0) && 
-               amount <= (amountRangeFilter.max || Infinity);
+        return (
+          amount >= (amountRangeFilter.min || 0) &&
+          amount <= (amountRangeFilter.max || Infinity)
+        );
       });
     }
 
     // Filtro por período
     if (dateRange?.startDate && dateRange?.endDate) {
       filtered = filtered.filter(m => {
-        const bankDate = m.bankTransaction?.data ? new Date(m.bankTransaction.data) : null;
+        const bankDate = m.bankTransaction?.data
+          ? new Date(m.bankTransaction.data)
+          : null;
         if (!bankDate) return false;
         return bankDate >= dateRange.startDate && bankDate <= dateRange.endDate;
       });
@@ -183,7 +215,7 @@ const ConciliacaoPanel = ({
     // Ordenação
     filtered.sort((a, b) => {
       let aVal, bVal;
-      
+
       switch (sortBy) {
         case 'confidence':
           aVal = a.confidence || 0;
@@ -200,41 +232,56 @@ const ConciliacaoPanel = ({
         default:
           return 0;
       }
-      
+
       return sortOrder === 'asc' ? aVal - bVal : bVal - aVal;
     });
 
     return filtered;
-  }, [reconciliationMatches, matchStatusFilter, confidenceFilter, searchTerm, amountRangeFilter, dateRange, sortBy, sortOrder]);
+  }, [
+    reconciliationMatches,
+    matchStatusFilter,
+    confidenceFilter,
+    searchTerm,
+    amountRangeFilter,
+    dateRange,
+    sortBy,
+    sortOrder,
+  ]);
 
   // Transações não reconciliadas
   const unReconciledBankTransactions = useMemo(() => {
-    return bankTransactions.filter(bt => 
-      !reconciliationMatches.some(m => m.bankTransaction?.id === bt.id && m.status === 'approved')
+    return bankTransactions.filter(
+      bt =>
+        !reconciliationMatches.some(
+          m => m.bankTransaction?.id === bt.id && m.status === 'approved'
+        )
     );
   }, [bankTransactions, reconciliationMatches]);
 
   const unReconciledInternalTransactions = useMemo(() => {
-    return internalTransactions.filter(it => 
-      !reconciliationMatches.some(m => m.internalTransaction?.id === it.id && m.status === 'approved')
+    return internalTransactions.filter(
+      it =>
+        !reconciliationMatches.some(
+          m => m.internalTransaction?.id === it.id && m.status === 'approved'
+        )
     );
   }, [internalTransactions, reconciliationMatches]);
 
   // Formatação de moeda
-  const formatCurrency = (value) => {
+  const formatCurrency = value => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
-      currency: 'BRL'
+      currency: 'BRL',
     }).format(value || 0);
   };
 
   // Formatação de porcentagem
-  const formatPercentage = (value) => {
+  const formatPercentage = value => {
     return `${(value || 0).toFixed(1)}%`;
   };
 
   // Toggle seleção de match
-  const toggleMatchSelection = useCallback((matchId) => {
+  const toggleMatchSelection = useCallback(matchId => {
     setSelectedMatches(prev => {
       if (prev.includes(matchId)) {
         return prev.filter(id => id !== matchId);
@@ -245,7 +292,7 @@ const ConciliacaoPanel = ({
   }, []);
 
   // Toggle expansão de match
-  const toggleMatchExpansion = useCallback((matchId) => {
+  const toggleMatchExpansion = useCallback(matchId => {
     setExpandedMatches(prev => {
       const newSet = new Set(prev);
       if (newSet.has(matchId)) {
@@ -258,23 +305,40 @@ const ConciliacaoPanel = ({
   }, []);
 
   // Ações em lote
-  const handleBulkAction = useCallback((action) => {
-    const selectedMatchObjects = filteredMatches.filter(m => selectedMatches.includes(m.id));
-    
-    switch (action) {
-      case 'approve':
-        selectedMatchObjects.forEach(match => onApproveMatch && onApproveMatch(match));
-        break;
-      case 'reject':
-        selectedMatchObjects.forEach(match => onRejectMatch && onRejectMatch(match));
-        break;
-      case 'delete':
-        selectedMatchObjects.forEach(match => onDeleteMatch && onDeleteMatch(match));
-        break;
-    }
-    
-    setSelectedMatches([]);
-  }, [selectedMatches, filteredMatches, onApproveMatch, onRejectMatch, onDeleteMatch]);
+  const handleBulkAction = useCallback(
+    action => {
+      const selectedMatchObjects = filteredMatches.filter(m =>
+        selectedMatches.includes(m.id)
+      );
+
+      switch (action) {
+        case 'approve':
+          selectedMatchObjects.forEach(
+            match => onApproveMatch && onApproveMatch(match)
+          );
+          break;
+        case 'reject':
+          selectedMatchObjects.forEach(
+            match => onRejectMatch && onRejectMatch(match)
+          );
+          break;
+        case 'delete':
+          selectedMatchObjects.forEach(
+            match => onDeleteMatch && onDeleteMatch(match)
+          );
+          break;
+      }
+
+      setSelectedMatches([]);
+    },
+    [
+      selectedMatches,
+      filteredMatches,
+      onApproveMatch,
+      onRejectMatch,
+      onDeleteMatch,
+    ]
+  );
 
   // Renderizar cabeçalho do painel
   const renderPanelHeader = () => (
@@ -285,10 +349,12 @@ const ConciliacaoPanel = ({
             Reconciliação Bancária
           </h2>
           <p className="text-sm text-gray-600 mt-1">
-            {selectedAccount ? `Conta: ${selectedAccount.nome}` : 'Selecione uma conta bancária'}
+            {selectedAccount
+              ? `Conta: ${selectedAccount.nome}`
+              : 'Selecione uma conta bancária'}
           </p>
         </div>
-        
+
         <div className="flex items-center space-x-3">
           <button
             type="button"
@@ -299,7 +365,7 @@ const ConciliacaoPanel = ({
           >
             <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
           </button>
-          
+
           <button
             type="button"
             onClick={() => onImportStatement && onImportStatement()}
@@ -308,14 +374,16 @@ const ConciliacaoPanel = ({
             <Upload className="w-4 h-4 mr-2" />
             Importar Extrato
           </button>
-          
+
           <button
             type="button"
             onClick={() => onRunAutoMatch && onRunAutoMatch()}
             disabled={autoMatchRunning}
             className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:opacity-50"
           >
-            <Zap className={`w-4 h-4 mr-2 ${autoMatchRunning ? 'animate-pulse' : ''}`} />
+            <Zap
+              className={`w-4 h-4 mr-2 ${autoMatchRunning ? 'animate-pulse' : ''}`}
+            />
             {autoMatchRunning ? 'Processando...' : 'Auto Match'}
           </button>
         </div>
@@ -325,33 +393,42 @@ const ConciliacaoPanel = ({
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
         <div className="bg-gray-50 p-3 rounded-lg">
           <div className="text-xs text-gray-600 mb-1">Transações Bancárias</div>
-          <div className="text-lg font-semibold text-gray-900">{reconciliationStats.totalBankTransactions}</div>
+          <div className="text-lg font-semibold text-gray-900">
+            {reconciliationStats.totalBankTransactions}
+          </div>
         </div>
-        
+
         <div className="bg-green-50 p-3 rounded-lg">
           <div className="text-xs text-green-600 mb-1">Reconciliadas</div>
-          <div className="text-lg font-semibold text-green-700">{reconciliationStats.approvedMatches}</div>
+          <div className="text-lg font-semibold text-green-700">
+            {reconciliationStats.approvedMatches}
+          </div>
         </div>
-        
+
         <div className="bg-yellow-50 p-3 rounded-lg">
           <div className="text-xs text-yellow-600 mb-1">Pendentes</div>
-          <div className="text-lg font-semibold text-yellow-700">{reconciliationStats.pendingMatches}</div>
+          <div className="text-lg font-semibold text-yellow-700">
+            {reconciliationStats.pendingMatches}
+          </div>
         </div>
-        
+
         <div className="bg-red-50 p-3 rounded-lg">
           <div className="text-xs text-red-600 mb-1">Não Reconciliadas</div>
           <div className="text-lg font-semibold text-red-700">
-            {reconciliationStats.totalBankTransactions - reconciliationStats.approvedMatches}
+            {reconciliationStats.totalBankTransactions -
+              reconciliationStats.approvedMatches}
           </div>
         </div>
-        
+
         <div className="bg-blue-50 p-3 rounded-lg">
-          <div className="text-xs text-blue-600 mb-1">Taxa de Reconciliação</div>
+          <div className="text-xs text-blue-600 mb-1">
+            Taxa de Reconciliação
+          </div>
           <div className="text-lg font-semibold text-blue-700">
             {formatPercentage(reconciliationStats.reconciliationRate)}
           </div>
         </div>
-        
+
         <div className="bg-purple-50 p-3 rounded-lg">
           <div className="text-xs text-purple-600 mb-1">Valor Reconciliado</div>
           <div className="text-sm font-semibold text-purple-700">
@@ -384,7 +461,7 @@ const ConciliacaoPanel = ({
                 type="text"
                 placeholder="Buscar por descrição, referência..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-64"
               />
             </div>
@@ -392,7 +469,10 @@ const ConciliacaoPanel = ({
             {/* Filtro de status */}
             <select
               value={matchStatusFilter}
-              onChange={(e) => onMatchStatusFilterChange && onMatchStatusFilterChange(e.target.value)}
+              onChange={e =>
+                onMatchStatusFilterChange &&
+                onMatchStatusFilterChange(e.target.value)
+              }
               className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="all">Todos os Status</option>
@@ -413,16 +493,21 @@ const ConciliacaoPanel = ({
                 min="0"
                 max="100"
                 value={confidenceFilter}
-                onChange={(e) => onConfidenceFilterChange && onConfidenceFilterChange(Number(e.target.value))}
+                onChange={e =>
+                  onConfidenceFilterChange &&
+                  onConfidenceFilterChange(Number(e.target.value))
+                }
                 className="w-24"
               />
-              <span className="text-sm text-gray-600 w-10">{confidenceFilter}%</span>
+              <span className="text-sm text-gray-600 w-10">
+                {confidenceFilter}%
+              </span>
             </div>
 
             {/* Ordenação */}
             <select
               value={`${sortBy}_${sortOrder}`}
-              onChange={(e) => {
+              onChange={e => {
                 const [field, order] = e.target.value.split('_');
                 setSortBy(field);
                 setSortOrder(order);
@@ -443,9 +528,11 @@ const ConciliacaoPanel = ({
         {selectedMatches.length > 0 && (
           <div className="flex items-center justify-between bg-blue-50 p-3 rounded-md">
             <span className="text-sm text-blue-700">
-              {selectedMatches.length} match{selectedMatches.length !== 1 ? 'es' : ''} selecionado{selectedMatches.length !== 1 ? 's' : ''}
+              {selectedMatches.length} match
+              {selectedMatches.length !== 1 ? 'es' : ''} selecionado
+              {selectedMatches.length !== 1 ? 's' : ''}
             </span>
-            
+
             <div className="flex items-center space-x-2">
               <button
                 type="button"
@@ -455,7 +542,7 @@ const ConciliacaoPanel = ({
                 <Check className="w-4 h-4 mr-1 inline" />
                 Aprovar
               </button>
-              
+
               <button
                 type="button"
                 onClick={() => handleBulkAction('reject')}
@@ -464,7 +551,7 @@ const ConciliacaoPanel = ({
                 <X className="w-4 h-4 mr-1 inline" />
                 Rejeitar
               </button>
-              
+
               <button
                 type="button"
                 onClick={() => setSelectedMatches([])}
@@ -487,15 +574,14 @@ const ConciliacaoPanel = ({
           <Target className="w-12 h-12 mb-4" />
           <h3 className="text-lg font-medium mb-2">Nenhum match encontrado</h3>
           <p className="text-sm text-center">
-            {reconciliationMatches.length === 0 
+            {reconciliationMatches.length === 0
               ? 'Execute o auto-match ou importe um extrato para começar'
-              : 'Ajuste os filtros para ver outros matches'
-            }
+              : 'Ajuste os filtros para ver outros matches'}
           </p>
         </div>
       ) : (
         <div className="p-4 space-y-3">
-          {filteredMatches.map((match) => (
+          {filteredMatches.map(match => (
             <div key={match.id} className="relative">
               <ReconciliationMatchCard
                 match={match}
@@ -531,7 +617,7 @@ const ConciliacaoPanel = ({
         >
           Matches ({filteredMatches.length})
         </button>
-        
+
         <button
           type="button"
           onClick={() => onViewModeChange && onViewModeChange('bank')}
@@ -543,7 +629,7 @@ const ConciliacaoPanel = ({
         >
           Extrato Bancário ({bankTransactions.length})
         </button>
-        
+
         <button
           type="button"
           onClick={() => onViewModeChange && onViewModeChange('internal')}
@@ -567,7 +653,9 @@ const ConciliacaoPanel = ({
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-500" />
-            <p className="text-gray-600">Carregando dados de reconciliação...</p>
+            <p className="text-gray-600">
+              Carregando dados de reconciliação...
+            </p>
           </div>
         </div>
       </div>
@@ -578,30 +666,34 @@ const ConciliacaoPanel = ({
     <div className={containerClasses}>
       {/* Cabeçalho */}
       {renderPanelHeader()}
-      
+
       {/* Tabs de visualização */}
       {renderViewTabs()}
-      
+
       {/* Barra de filtros */}
       {renderFiltersBar()}
-      
+
       {/* Conteúdo principal */}
       <div className="flex-1 overflow-hidden">
         {viewMode === 'matches' && renderMatchesList()}
-        
+
         {viewMode === 'bank' && (
           <div className="p-4">
             <h3 className="text-lg font-medium mb-4">Transações Bancárias</h3>
             {/* Lista de transações bancárias seria implementada aqui */}
-            <div className="text-gray-500">Lista de transações bancárias em desenvolvimento...</div>
+            <div className="text-gray-500">
+              Lista de transações bancárias em desenvolvimento...
+            </div>
           </div>
         )}
-        
+
         {viewMode === 'internal' && (
           <div className="p-4">
             <h3 className="text-lg font-medium mb-4">Transações Internas</h3>
             {/* Lista de transações internas seria implementada aqui */}
-            <div className="text-gray-500">Lista de transações internas em desenvolvimento...</div>
+            <div className="text-gray-500">
+              Lista de transações internas em desenvolvimento...
+            </div>
           </div>
         )}
       </div>
@@ -613,43 +705,49 @@ ConciliacaoPanel.propTypes = {
   /**
    * Transações bancárias
    */
-  bankTransactions: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    data: PropTypes.string.isRequired,
-    descricao: PropTypes.string.isRequired,
-    valor: PropTypes.number.isRequired,
-    referencia: PropTypes.string
-  })),
+  bankTransactions: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      data: PropTypes.string.isRequired,
+      descricao: PropTypes.string.isRequired,
+      valor: PropTypes.number.isRequired,
+      referencia: PropTypes.string,
+    })
+  ),
 
   /**
    * Transações internas (receitas/despesas)
    */
-  internalTransactions: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    data: PropTypes.string.isRequired,
-    descricao: PropTypes.string.isRequired,
-    valor: PropTypes.number.isRequired,
-    tipo: PropTypes.oneOf(['receita', 'despesa']).isRequired
-  })),
+  internalTransactions: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      data: PropTypes.string.isRequired,
+      descricao: PropTypes.string.isRequired,
+      valor: PropTypes.number.isRequired,
+      tipo: PropTypes.oneOf(['receita', 'despesa']).isRequired,
+    })
+  ),
 
   /**
    * Matches de reconciliação
    */
-  reconciliationMatches: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    bankTransaction: PropTypes.object,
-    internalTransaction: PropTypes.object,
-    confidence: PropTypes.number,
-    status: PropTypes.oneOf(['pending', 'approved', 'rejected']).isRequired,
-    matchType: PropTypes.oneOf(['automatic', 'manual']).isRequired
-  })),
+  reconciliationMatches: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      bankTransaction: PropTypes.object,
+      internalTransaction: PropTypes.object,
+      confidence: PropTypes.number,
+      status: PropTypes.oneOf(['pending', 'approved', 'rejected']).isRequired,
+      matchType: PropTypes.oneOf(['automatic', 'manual']).isRequired,
+    })
+  ),
 
   /**
    * Conta bancária selecionada
    */
   selectedAccount: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    nome: PropTypes.string.isRequired
+    nome: PropTypes.string.isRequired,
   }),
 
   /**
@@ -697,7 +795,7 @@ ConciliacaoPanel.propTypes = {
    */
   dateRange: PropTypes.shape({
     startDate: PropTypes.instanceOf(Date),
-    endDate: PropTypes.instanceOf(Date)
+    endDate: PropTypes.instanceOf(Date),
   }),
 
   /**
@@ -730,7 +828,7 @@ ConciliacaoPanel.propTypes = {
    */
   amountRangeFilter: PropTypes.shape({
     min: PropTypes.number,
-    max: PropTypes.number
+    max: PropTypes.number,
   }),
 
   /**
@@ -791,14 +889,14 @@ ConciliacaoPanel.propTypes = {
   /**
    * Classes CSS adicionais
    */
-  className: PropTypes.string
+  className: PropTypes.string,
 };
 
 // Componente de preview para demonstração
 export const ConciliacaoPanelPreview = () => {
   const [dateRange, setDateRange] = useState({
     startDate: new Date(2024, 0, 1),
-    endDate: new Date(2024, 2, 31)
+    endDate: new Date(2024, 2, 31),
   });
   const [matchStatusFilter, setMatchStatusFilter] = useState('all');
   const [confidenceFilter, setConfidenceFilter] = useState(0);
@@ -810,16 +908,16 @@ export const ConciliacaoPanelPreview = () => {
       id: 'bank1',
       data: '2024-01-15',
       descricao: 'PIX Recebido - João Silva',
-      valor: 150.00,
-      referencia: 'PIX123456'
+      valor: 150.0,
+      referencia: 'PIX123456',
     },
     {
       id: 'bank2',
       data: '2024-01-16',
       descricao: 'Débito Automático - Conta de Luz',
-      valor: -89.50,
-      referencia: 'DEB789'
-    }
+      valor: -89.5,
+      referencia: 'DEB789',
+    },
   ];
 
   const mockInternalTransactions = [
@@ -827,16 +925,16 @@ export const ConciliacaoPanelPreview = () => {
       id: 'int1',
       data: '2024-01-15',
       descricao: 'Serviço de Corte - João Silva',
-      valor: 150.00,
-      tipo: 'receita'
+      valor: 150.0,
+      tipo: 'receita',
     },
     {
       id: 'int2',
       data: '2024-01-16',
       descricao: 'Conta de Luz - Energia',
-      valor: 89.50,
-      tipo: 'despesa'
-    }
+      valor: 89.5,
+      tipo: 'despesa',
+    },
   ];
 
   const mockMatches = [
@@ -847,7 +945,7 @@ export const ConciliacaoPanelPreview = () => {
       confidence: 0.95,
       status: 'pending',
       matchType: 'automatic',
-      matchReasons: ['Valor igual', 'Data próxima', 'Descrição similar']
+      matchReasons: ['Valor igual', 'Data próxima', 'Descrição similar'],
     },
     {
       id: 'match2',
@@ -856,13 +954,13 @@ export const ConciliacaoPanelPreview = () => {
       confidence: 0.87,
       status: 'approved',
       matchType: 'automatic',
-      matchReasons: ['Valor próximo', 'Data igual']
-    }
+      matchReasons: ['Valor próximo', 'Data igual'],
+    },
   ];
 
   const mockAccount = {
     id: 'acc1',
-    nome: 'Conta Corrente - Banco do Brasil'
+    nome: 'Conta Corrente - Banco do Brasil',
   };
 
   const handleAction = (action, data) => {
@@ -873,7 +971,7 @@ export const ConciliacaoPanelPreview = () => {
   return (
     <div className="space-y-6 p-4 max-w-7xl">
       <h3 className="text-lg font-semibold">ConciliacaoPanel Preview</h3>
-      
+
       {/* Painel completo */}
       <div className="h-96">
         <ConciliacaoPanel
@@ -891,10 +989,12 @@ export const ConciliacaoPanelPreview = () => {
           onViewModeChange={setViewMode}
           onImportStatement={() => handleAction('Import Statement')}
           onRunAutoMatch={() => handleAction('Run Auto Match')}
-          onApproveMatch={(match) => handleAction('Approve Match', match)}
-          onRejectMatch={(match) => handleAction('Reject Match', match)}
-          onCreateManualMatch={(match) => handleAction('Create Manual Match', match)}
-          onDeleteMatch={(match) => handleAction('Delete Match', match)}
+          onApproveMatch={match => handleAction('Approve Match', match)}
+          onRejectMatch={match => handleAction('Reject Match', match)}
+          onCreateManualMatch={match =>
+            handleAction('Create Manual Match', match)
+          }
+          onDeleteMatch={match => handleAction('Delete Match', match)}
           onRefreshData={() => handleAction('Refresh Data')}
           showFilters={true}
         />
@@ -903,10 +1003,7 @@ export const ConciliacaoPanelPreview = () => {
       {/* Versão em loading */}
       <div className="h-64">
         <h4 className="text-md font-medium mb-2">Estado de carregamento</h4>
-        <ConciliacaoPanel
-          loading={true}
-          selectedAccount={mockAccount}
-        />
+        <ConciliacaoPanel loading={true} selectedAccount={mockAccount} />
       </div>
     </div>
   );

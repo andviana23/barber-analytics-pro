@@ -59,12 +59,12 @@ export function PublicRoute({ children, redirectTo = '/dashboard' }) {
 }
 
 // Componente para rotas que precisam de permissões específicas
-export function RoleProtectedRoute({ 
-  children, 
-  requiredRole, 
+export function RoleProtectedRoute({
+  children,
+  requiredRole,
   requiredPermission,
   fallback = null,
-  redirectTo = '/unauthorized' 
+  redirectTo = '/unauthorized',
 }) {
   const { isAuthenticated, loading, hasPermission, isAdmin, user } = useAuth();
   const location = useLocation();
@@ -110,6 +110,39 @@ export function RoleProtectedRoute({
   }
 
   // Se passou em todas as verificações, renderizar o componente
+  return children;
+}
+
+// Componente específico para Recepcionista - redireciona para Lista da Vez
+export function ReceptionistRoute({ children }) {
+  const { isAuthenticated, loading, receptionistStatus } = useAuth();
+  const location = useLocation();
+
+  // Mostrar loading enquanto verifica autenticação
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-light-bg dark:bg-dark-bg">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-text-light-secondary dark:text-text-dark-secondary">
+            Verificando permissões...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Se não estiver autenticado, redirecionar para login
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Se for Recepcionista, redirecionar para Lista da Vez
+  if (receptionistStatus) {
+    return <Navigate to="/queue" replace />;
+  }
+
+  // Se não for Recepcionista, renderizar o componente normalmente
   return children;
 }
 

@@ -1,0 +1,12 @@
+{
+  "name": "Testing & Coverage Rules",
+  "description": "Garante cobertura mínima de testes e boas práticas em Jest e integração com Supabase.",
+  "alwaysApply": true,
+  "rules": [
+    "Todo novo Service, Repository e DTO deve ter pelo menos um teste unitário.",
+    "Os testes de integração devem rodar em ambiente isolado (mock ou test DB).",
+    "A cobertura mínima é 80% de statements e branches.",
+    "Use describe e it de forma semântica e clara.",
+    "Nunca misture testes unitários e de integração no mesmo arquivo."
+  ]
+}

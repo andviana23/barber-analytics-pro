@@ -63,7 +63,11 @@ describe('FinanceiroService', () => {
 
       // Assert
       expect(result.success).toBe(true);
-      expect(result.data).toEqual(createdRevenue);
+      expect(result.data).toEqual(expect.objectContaining({
+        ...createdRevenue,
+        // Ignorar updated_at devido a diferenças de timing
+        updated_at: expect.any(String)
+      }));
       expect(result.error).toBeNull();
       
       // Verificar que repository foi chamado corretamente
@@ -172,8 +176,8 @@ describe('FinanceiroService', () => {
       // Assert
       expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
-      expect(result.error).toContain('tipo deve ser um dos valores válidos');
-      expect(result.error).toContain('valor deve ser maior que zero');
+      expect(result.error).toContain('Campo "type" deve ser um dos valores válidos');
+      expect(result.error).toContain('Campo "value" deve ser maior que zero');
       
       // Repository não deve ser chamado
       expect(mockRevenueRepository.create).not.toHaveBeenCalled();

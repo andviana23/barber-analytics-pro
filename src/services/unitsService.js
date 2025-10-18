@@ -1,7 +1,7 @@
 /**
  * UNITS SERVICE
  * Serviço para gerenciamento de unidades
- * 
+ *
  * Funcionalidades:
  * - CRUD completo de unidades
  * - Estatísticas por unidade
@@ -30,8 +30,16 @@ class UnitsService {
 
       const { data, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ unitsService.getUnits - Erro:', error);
+        throw error;
+      }
 
+      console.log(
+        '✅ unitsService.getUnits - Sucesso:',
+        data?.length || 0,
+        'unidades'
+      );
       return data || [];
     } catch (error) {
       console.error('Erro ao buscar unidades:', error);
@@ -67,8 +75,10 @@ class UnitsService {
    */
   async createUnit(unitData) {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
       if (!user) {
         throw new Error('Usuário não autenticado');
       }
@@ -78,7 +88,7 @@ class UnitsService {
         status: unitData.status !== false, // Default true se não especificado
         user_id: user.id,
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       };
 
       const { data, error } = await supabase
@@ -104,15 +114,17 @@ class UnitsService {
    */
   async updateUnit(id, updateData) {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
       if (!user) {
         throw new Error('Usuário não autenticado');
       }
 
       const updatePayload = {
         ...updateData,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       };
 
       const { data, error } = await supabase
@@ -158,7 +170,7 @@ class UnitsService {
     try {
       // Verificar se há dados vinculados
       const dependentData = await this.checkUnitDependencies(id);
-      
+
       if (dependentData.hasDependencies) {
         throw new Error(
           `Unidade possui dados vinculados: ${dependentData.dependencies.join(', ')}`
@@ -166,9 +178,9 @@ class UnitsService {
       }
 
       // Soft delete - marcar como inativa
-      await this.updateUnit(id, { 
+      await this.updateUnit(id, {
         status: false,
-        name: `[EXCLUÍDA] ${dependentData.unitName}`
+        name: `[EXCLUÍDA] ${dependentData.unitName}`,
       });
 
       return true;
@@ -186,7 +198,7 @@ class UnitsService {
   async checkUnitDependencies(unitId) {
     try {
       const dependencies = [];
-      
+
       // Verificar profissionais
       const { data: professionals } = await supabase
         .from('professionals')
@@ -226,7 +238,7 @@ class UnitsService {
       return {
         hasDependencies: dependencies.length > 0,
         dependencies,
-        unitName: unit.name
+        unitName: unit.name,
       };
     } catch (error) {
       console.error('Erro ao verificar dependências:', error);
@@ -244,7 +256,7 @@ class UnitsService {
   async getUnitStats(unitId, mes = null, ano = null) {
     try {
       const currentDate = new Date();
-      const targetMonth = mes || (currentDate.getMonth() + 1);
+      const targetMonth = mes || currentDate.getMonth() + 1;
       const targetYear = ano || currentDate.getFullYear();
 
       // Profissionais ativos na unidade
@@ -254,7 +266,9 @@ class UnitsService {
         .eq('unit_id', unitId)
         .eq('is_active', true);
 
-      const professionalsCount = professionalsData ? professionalsData.length : 0;
+      const professionalsCount = professionalsData
+        ? professionalsData.length
+        : 0;
 
       // Faturamento do mês
       const { data: revenuesData } = await supabase
@@ -262,9 +276,16 @@ class UnitsService {
         .select('value')
         .eq('unit_id', unitId)
         .gte('date', `${targetYear}-${String(targetMonth).padStart(2, '0')}-01`)
-        .lt('date', `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}-01`);
+        .lt(
+          'date',
+          `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}-01`
+        );
 
-      const monthlyRevenue = revenuesData?.reduce((sum, rev) => sum + (parseFloat(rev.value) || 0), 0) || 0;
+      const monthlyRevenue =
+        revenuesData?.reduce(
+          (sum, rev) => sum + (parseFloat(rev.value) || 0),
+          0
+        ) || 0;
 
       // Despesas do mês
       const { data: expensesData } = await supabase
@@ -272,9 +293,16 @@ class UnitsService {
         .select('value')
         .eq('unit_id', unitId)
         .gte('date', `${targetYear}-${String(targetMonth).padStart(2, '0')}-01`)
-        .lt('date', `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}-01`);
+        .lt(
+          'date',
+          `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}-01`
+        );
 
-      const monthlyExpenses = expensesData?.reduce((sum, exp) => sum + (parseFloat(exp.value) || 0), 0) || 0;
+      const monthlyExpenses =
+        expensesData?.reduce(
+          (sum, exp) => sum + (parseFloat(exp.value) || 0),
+          0
+        ) || 0;
 
       // Atendimentos do mês (via histórico_atendimentos)
       const { data: attendancesData } = await supabase
@@ -282,17 +310,32 @@ class UnitsService {
         .select('valor_servico, duracao_minutos')
         .eq('unidade_id', unitId)
         .eq('status', 'concluido')
-        .gte('data_atendimento', `${targetYear}-${String(targetMonth).padStart(2, '0')}-01`)
-        .lt('data_atendimento', `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}-01`);
+        .gte(
+          'data_atendimento',
+          `${targetYear}-${String(targetMonth).padStart(2, '0')}-01`
+        )
+        .lt(
+          'data_atendimento',
+          `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}-01`
+        );
 
       const attendancesCount = attendancesData ? attendancesData.length : 0;
-      const attendancesRevenue = attendancesData?.reduce((sum, att) => sum + (parseFloat(att.valor_servico) || 0), 0) || 0;
-      const averageDuration = attendancesData?.length > 0 
-        ? attendancesData.reduce((sum, att) => sum + (parseFloat(att.duracao_minutos) || 0), 0) / attendancesData.length 
-        : 0;
+      const attendancesRevenue =
+        attendancesData?.reduce(
+          (sum, att) => sum + (parseFloat(att.valor_servico) || 0),
+          0
+        ) || 0;
+      const averageDuration =
+        attendancesData?.length > 0
+          ? attendancesData.reduce(
+              (sum, att) => sum + (parseFloat(att.duracao_minutos) || 0),
+              0
+            ) / attendancesData.length
+          : 0;
 
       // Ticket médio
-      const averageTicket = attendancesCount > 0 ? attendancesRevenue / attendancesCount : 0;
+      const averageTicket =
+        attendancesCount > 0 ? attendancesRevenue / attendancesCount : 0;
 
       // Lucro
       const profit = monthlyRevenue - monthlyExpenses;
@@ -303,24 +346,27 @@ class UnitsService {
         year: targetYear,
         professionals: {
           total: professionalsCount,
-          list: professionalsData || []
+          list: professionalsData || [],
         },
         financial: {
           monthlyRevenue,
           monthlyExpenses,
           profit,
-          profitMargin: monthlyRevenue > 0 ? (profit / monthlyRevenue) * 100 : 0
+          profitMargin:
+            monthlyRevenue > 0 ? (profit / monthlyRevenue) * 100 : 0,
         },
         attendances: {
           count: attendancesCount,
           revenue: attendancesRevenue,
           averageTicket,
-          averageDuration
+          averageDuration,
         },
         performance: {
-          revenuePerProfessional: professionalsCount > 0 ? monthlyRevenue / professionalsCount : 0,
-          attendancesPerProfessional: professionalsCount > 0 ? attendancesCount / professionalsCount : 0
-        }
+          revenuePerProfessional:
+            professionalsCount > 0 ? monthlyRevenue / professionalsCount : 0,
+          attendancesPerProfessional:
+            professionalsCount > 0 ? attendancesCount / professionalsCount : 0,
+        },
       };
     } catch (error) {
       console.error('Erro ao buscar estatísticas da unidade:', error);
@@ -330,7 +376,7 @@ class UnitsService {
 
   /**
    * Obter comparativo entre unidades
-   * @param {number} mes - Mês (1-12) 
+   * @param {number} mes - Mês (1-12)
    * @param {number} ano - Ano
    * @returns {Promise<Array>} Comparativo entre unidades
    */
@@ -343,12 +389,15 @@ class UnitsService {
         const stats = await this.getUnitStats(unit.id, mes, ano);
         comparisons.push({
           ...unit,
-          stats
+          stats,
         });
       }
 
       // Ordenar por faturamento (maior para menor)
-      comparisons.sort((a, b) => b.stats.financial.monthlyRevenue - a.stats.financial.monthlyRevenue);
+      comparisons.sort(
+        (a, b) =>
+          b.stats.financial.monthlyRevenue - a.stats.financial.monthlyRevenue
+      );
 
       return comparisons;
     } catch (error) {
@@ -367,18 +416,26 @@ class UnitsService {
   async getUnitsRanking(metric = 'revenue', mes = null, ano = null) {
     try {
       const comparison = await this.getUnitsComparison(mes, ano);
-      
+
       let sortedUnits = [...comparison];
 
       switch (metric) {
         case 'profit':
-          sortedUnits.sort((a, b) => b.stats.financial.profit - a.stats.financial.profit);
+          sortedUnits.sort(
+            (a, b) => b.stats.financial.profit - a.stats.financial.profit
+          );
           break;
         case 'attendances':
-          sortedUnits.sort((a, b) => b.stats.attendances.count - a.stats.attendances.count);
+          sortedUnits.sort(
+            (a, b) => b.stats.attendances.count - a.stats.attendances.count
+          );
           break;
         case 'efficiency':
-          sortedUnits.sort((a, b) => b.stats.performance.revenuePerProfessional - a.stats.performance.revenuePerProfessional);
+          sortedUnits.sort(
+            (a, b) =>
+              b.stats.performance.revenuePerProfessional -
+              a.stats.performance.revenuePerProfessional
+          );
           break;
         case 'revenue':
         default:
@@ -391,8 +448,8 @@ class UnitsService {
         ranking: {
           position: index + 1,
           metric,
-          value: this.getRankingValue(unit.stats, metric)
-        }
+          value: this.getRankingValue(unit.stats, metric),
+        },
       }));
     } catch (error) {
       console.error('Erro ao gerar ranking:', error);
@@ -429,20 +486,24 @@ class UnitsService {
     try {
       const evolution = [];
       const currentDate = new Date();
-      
+
       // Buscar dados dos últimos 6 meses
       for (let i = 5; i >= 0; i--) {
-        const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+        const date = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth() - i,
+          1
+        );
         const month = date.getMonth() + 1;
         const year = date.getFullYear();
-        
+
         const stats = await this.getUnitStats(unitId, month, year);
-        
+
         evolution.push({
           month: `${String(month).padStart(2, '0')}/${year}`,
           monthNumber: month,
           year: year,
-          ...stats
+          ...stats,
         });
       }
 

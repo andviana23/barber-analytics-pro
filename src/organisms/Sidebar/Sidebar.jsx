@@ -16,6 +16,9 @@ import {
   ChevronDown,
   ChevronRight,
   CreditCard,
+  Package,
+  Tags,
+  Target,
 } from 'lucide-react';
 
 // Estrutura hierárquica do menu organizada por grupos funcionais
@@ -91,6 +94,24 @@ const menuGroups = [
             icon: CreditCard,
             path: '/cadastros/formas-pagamento',
           },
+          {
+            id: 'suppliers',
+            label: 'Fornecedores',
+            icon: Package,
+            path: '/cadastros/fornecedores',
+          },
+          {
+            id: 'categories',
+            label: 'Categorias',
+            icon: Tags,
+            path: '/cadastros/categorias',
+          },
+          {
+            id: 'goals',
+            label: 'Metas',
+            icon: Target,
+            path: '/cadastros/metas',
+          },
         ],
       },
       {
@@ -122,21 +143,29 @@ const bottomMenuItems = [
 
 export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
   const navigate = useNavigate();
-  const { signOut, isAdmin } = useAuth();
+  const { signOut, isAdmin, receptionistStatus } = useAuth();
   const [openSubmenu, setOpenSubmenu] = useState(null);
-  
-  // Filtrar grupos do menu baseado nas permissões do usuário
-  const filteredMenuGroups = menuGroups.map(group => ({
-    ...group,
-    items: group.items.filter(item => {
-      if (item.adminOnly) {
-        return isAdmin();
-      }
-      return true;
-    }),
-  })).filter(group => group.items.length > 0);
 
-  const handleItemClick = async (item) => {
+  // Filtrar grupos do menu baseado nas permissões do usuário
+  const filteredMenuGroups = menuGroups
+    .map(group => ({
+      ...group,
+      items: group.items.filter(item => {
+        // Se for Recepcionista, mostrar apenas "Lista da Vez"
+        if (receptionistStatus) {
+          return item.id === 'queue';
+        }
+
+        // Lógica normal para outros papéis
+        if (item.adminOnly) {
+          return isAdmin();
+        }
+        return true;
+      }),
+    }))
+    .filter(group => group.items.length > 0);
+
+  const handleItemClick = async item => {
     // Se tem submenu, toggle o submenu
     if (item.hasSubmenu) {
       setOpenSubmenu(openSubmenu === item.id ? null : item.id);
@@ -151,15 +180,15 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
     } else if (item.path) {
       navigate(item.path);
     }
-    
+
     if (window.innerWidth < 1024) {
       onClose(); // Fecha sidebar no mobile após clique
     }
   };
 
-  const handleSubmenuClick = (submenuItem) => {
+  const handleSubmenuClick = submenuItem => {
     navigate(submenuItem.path);
-    
+
     if (window.innerWidth < 1024) {
       onClose(); // Fecha sidebar no mobile após clique
     }
@@ -176,9 +205,7 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
       )}
 
       {/* Sidebar */}
-      <aside
-        className="w-64 h-full bg-light-surface dark:bg-dark-surface border-r border-light-border dark:border-dark-border flex-shrink-0"
-      >
+      <aside className="w-64 h-full bg-light-surface dark:bg-dark-surface border-r border-light-border dark:border-dark-border flex-shrink-0">
         <style>{`
           /* Custom Scrollbar - Minimalista e Elegante */
           .sidebar-scroll::-webkit-scrollbar {
@@ -237,7 +264,7 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
 
                 {/* Itens do Grupo */}
                 <div className="space-y-1">
-                  {group.items.map((item) => {
+                  {group.items.map(item => {
                     const Icon = item.icon;
                     const isActive = activeItem === item.id;
                     const isSubmenuOpen = openSubmenu === item.id;
@@ -261,19 +288,25 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
                         >
                           {/* Linha Lateral Dourada (Active State) */}
                           {isActive && (
-                            <div 
+                            <div
                               className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-7 bg-[#C5A676] rounded-r-full"
-                              style={{ boxShadow: '0 0 8px rgba(197, 166, 118, 0.5)' }}
+                              style={{
+                                boxShadow: '0 0 8px rgba(197, 166, 118, 0.5)',
+                              }}
                             />
                           )}
 
-                          <Icon 
+                          <Icon
                             className={`h-4 w-4 flex-shrink-0 transition-opacity duration-200 ${
-                              isActive ? 'opacity-100' : 'opacity-70 group-hover:opacity-100'
+                              isActive
+                                ? 'opacity-100'
+                                : 'opacity-70 group-hover:opacity-100'
                             }`}
                           />
-                          <span className="flex-1 lg:block hidden">{item.label}</span>
-                          
+                          <span className="flex-1 lg:block hidden">
+                            {item.label}
+                          </span>
+
                           {/* Badge */}
                           {item.badge && !item.hasSubmenu && (
                             <span
@@ -306,7 +339,7 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
                         {/* Submenu */}
                         {item.hasSubmenu && isSubmenuOpen && item.submenu && (
                           <div className="ml-5 mt-1 space-y-1 border-l border-gray-700 dark:border-gray-700 pl-2">
-                            {item.submenu.map((subItem) => {
+                            {item.submenu.map(subItem => {
                               const SubIcon = subItem.icon;
                               const isSubActive = activeItem === subItem.id;
 
@@ -326,12 +359,16 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
                                     }
                                   `}
                                 >
-                                  <SubIcon 
+                                  <SubIcon
                                     className={`h-3.5 w-3.5 flex-shrink-0 transition-opacity duration-200 ${
-                                      isSubActive ? 'opacity-100' : 'opacity-70 group-hover:opacity-100'
+                                      isSubActive
+                                        ? 'opacity-100'
+                                        : 'opacity-70 group-hover:opacity-100'
                                     }`}
                                   />
-                                  <span className="lg:block hidden">{subItem.label}</span>
+                                  <span className="lg:block hidden">
+                                    {subItem.label}
+                                  </span>
                                 </button>
                               );
                             })}
@@ -347,7 +384,7 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
 
           {/* Bottom menu */}
           <div className="px-4 py-3 border-t border-light-border dark:border-dark-border">
-            {bottomMenuItems.map((item) => {
+            {bottomMenuItems.map(item => {
               const Icon = item.icon;
 
               return (

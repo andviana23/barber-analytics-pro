@@ -4,7 +4,6 @@ import { supabase } from './supabase';
  * Service para gerenciar operações CRUD de parties (clientes e fornecedores)
  */
 export class PartiesService {
-  
   /**
    * Lista todas as parties com filtros opcionais
    * @param {Object} filters - Filtros de busca
@@ -17,7 +16,7 @@ export class PartiesService {
   static async getParties(filters = {}) {
     try {
       const { unitId, tipo, search, isActive = true } = filters;
-      
+
       if (!unitId) {
         return { data: null, error: 'Unit ID é obrigatório' };
       }
@@ -36,9 +35,7 @@ export class PartiesService {
 
       // Busca por nome ou CPF/CNPJ
       if (search) {
-        query = query.or(
-          `nome.ilike.%${search}%,cpf_cnpj.ilike.%${search}%`
-        );
+        query = query.or(`nome.ilike.%${search}%,cpf_cnpj.ilike.%${search}%`);
       }
 
       const { data, error } = await query;
@@ -137,11 +134,12 @@ export class PartiesService {
         nome: nome.trim(),
         tipo,
         cpf_cnpj: cpf_cnpj.replace(/\D/g, ''), // Remove caracteres não numéricos
+        razao_social: partyData.razao_social?.trim() || null,
         telefone: partyData.telefone?.replace(/\D/g, '') || null,
         email: partyData.email?.toLowerCase().trim() || null,
         endereco: partyData.endereco?.trim() || null,
         observacoes: partyData.observacoes?.trim() || null,
-        is_active: true
+        is_active: true,
       };
 
       const { data, error } = await supabase
@@ -173,7 +171,10 @@ export class PartiesService {
       }
 
       // Validar dados se fornecidos
-      if (updateData.tipo && !['Cliente', 'Fornecedor'].includes(updateData.tipo)) {
+      if (
+        updateData.tipo &&
+        !['Cliente', 'Fornecedor'].includes(updateData.tipo)
+      ) {
         return { data: null, error: 'Tipo deve ser Cliente ou Fornecedor' };
       }
 
@@ -190,15 +191,23 @@ export class PartiesService {
 
       // Preparar dados para atualização
       const cleanData = {};
-      
+
       if (updateData.nome) cleanData.nome = updateData.nome.trim();
       if (updateData.tipo) cleanData.tipo = updateData.tipo;
-      if (updateData.cpf_cnpj) cleanData.cpf_cnpj = updateData.cpf_cnpj.replace(/\D/g, '');
-      if (updateData.telefone !== undefined) cleanData.telefone = updateData.telefone?.replace(/\D/g, '') || null;
-      if (updateData.email !== undefined) cleanData.email = updateData.email?.toLowerCase().trim() || null;
-      if (updateData.endereco !== undefined) cleanData.endereco = updateData.endereco?.trim() || null;
-      if (updateData.observacoes !== undefined) cleanData.observacoes = updateData.observacoes?.trim() || null;
-      if (updateData.is_active !== undefined) cleanData.is_active = updateData.is_active;
+      if (updateData.cpf_cnpj)
+        cleanData.cpf_cnpj = updateData.cpf_cnpj.replace(/\D/g, '');
+      if (updateData.razao_social !== undefined)
+        cleanData.razao_social = updateData.razao_social?.trim() || null;
+      if (updateData.telefone !== undefined)
+        cleanData.telefone = updateData.telefone?.replace(/\D/g, '') || null;
+      if (updateData.email !== undefined)
+        cleanData.email = updateData.email?.toLowerCase().trim() || null;
+      if (updateData.endereco !== undefined)
+        cleanData.endereco = updateData.endereco?.trim() || null;
+      if (updateData.observacoes !== undefined)
+        cleanData.observacoes = updateData.observacoes?.trim() || null;
+      if (updateData.is_active !== undefined)
+        cleanData.is_active = updateData.is_active;
 
       const { data, error } = await supabase
         .from('parties')
@@ -284,7 +293,10 @@ export class PartiesService {
     } else if (numbers.length === 14) {
       return this.validateCnpj(numbers);
     } else {
-      return { isValid: false, error: 'CPF deve ter 11 dígitos e CNPJ deve ter 14 dígitos' };
+      return {
+        isValid: false,
+        error: 'CPF deve ter 11 dígitos e CNPJ deve ter 14 dígitos',
+      };
     }
   }
 
@@ -368,7 +380,33 @@ export class PartiesService {
   }
 
   /**
-   * Formata CPF/CNPJ para exibição
+   * Ativa uma party (reverter soft delete)
+   * @param {string} id - ID da party
+   * @returns {Object} { data: boolean, error: string|null }
+   */
+  static async activateParty(id) {
+    try {
+      if (!id) {
+        return { data: false, error: 'ID é obrigatório' };
+      }
+
+      const { error } = await supabase
+        .from('parties')
+        .update({ is_active: true })
+        .eq('id', id);
+
+      if (error) {
+        return { data: false, error: error.message };
+      }
+
+      return { data: true, error: null };
+    } catch (err) {
+      return { data: false, error: err.message };
+    }
+  }
+
+  /**
+   * Formata CPF ou CNPJ para exibição
    * @param {string} cpfCnpj - CPF/CNPJ com apenas números
    * @returns {string} CPF/CNPJ formatado
    */
@@ -378,7 +416,10 @@ export class PartiesService {
     if (numbers.length === 11) {
       return numbers.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
     } else if (numbers.length === 14) {
-      return numbers.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+      return numbers.replace(
+        /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
+        '$1.$2.$3/$4-$5'
+      );
     }
 
     return cpfCnpj;

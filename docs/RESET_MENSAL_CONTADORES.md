@@ -1,8 +1,12 @@
 # RESET MENSAL DOS CONTADORES - DOCUMENTAÇÃO
 
+> **Atualizado em:** 2024-10-17 via Supabase MCP
+
 ## ✅ IMPLEMENTAÇÃO CONCLUÍDA
 
 O sistema de reset dos contadores foi modificado para executar **no último dia do mês às 23:59**, conforme solicitado.
+
+> **Nota:** Este documento refere-se ao sistema de fila de atendimento que pode não estar mais ativo no sistema atual.
 
 ## 🔄 FUNCIONAMENTO
 

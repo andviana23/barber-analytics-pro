@@ -21,6 +21,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState(null);
   const [adminStatus, setAdminStatus] = useState(false);
+  const [receptionistStatus, setReceptionistStatus] = useState(false);
 
   // Timeout de segurança para loading
   useEffect(() => {
@@ -36,27 +37,31 @@ export function AuthProvider({ children }) {
     const getInitialSession = async () => {
       try {
         setLoading(true);
-        
+
         // 1. Tentar obter sessão atual
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+
         if (error) {
           console.error('❌ Erro ao obter sessão inicial:', error);
           setSession(null);
           setUser(null);
           return;
         }
-        
+
         // 2. Se há sessão, verificar se token precisa refresh
         if (session?.user) {
           const now = Math.floor(Date.now() / 1000);
           const expiresAt = session.expires_at || 0;
-          
+
           // Se token expira em menos de 5 minutos, fazer refresh
           if (expiresAt - now < 300) {
             console.log('🔄 Token próximo do vencimento, fazendo refresh...');
-            const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession();
-            
+            const { data: refreshed, error: refreshError } =
+              await supabase.auth.refreshSession();
+
             if (refreshError) {
               console.error('❌ Erro no refresh da sessão:', refreshError);
             } else if (refreshed.session) {
@@ -67,11 +72,11 @@ export function AuthProvider({ children }) {
               return;
             }
           }
-          
+
           // 3. Usar sessão atual
           setSession(session);
           setUser(session.user);
-          
+
           // Se há usuário, buscar role
           if (session.user) {
             await fetchUserRole(session);
@@ -89,106 +94,125 @@ export function AuthProvider({ children }) {
     getInitialSession();
 
     // Função para buscar papel do usuário
-    const fetchUserRole = async (userSession) => {
+    const fetchUserRole = async userSession => {
       if (!userSession?.user) {
         setAdminStatus(false);
         setUserRole(null);
         return;
       }
-      
+
       console.log('🔍 Buscando role do usuário:', userSession.user.email);
       console.log('📋 User metadata:', userSession.user.user_metadata);
-      
+
       try {
         // 1. PRIMEIRO: Usar metadados do usuário (mais confiável)
         const userRole = userSession.user?.user_metadata?.role;
-        
+
         if (userRole) {
           console.log('✅ Role encontrado nos metadados:', userRole);
           setUserRole(userRole);
           setAdminStatus(userRole === 'admin');
+          setReceptionistStatus(
+            userRole === 'receptionist' || userRole === 'recepcionista'
+          );
           return;
         }
-        
+
         // 2. FALLBACK: Buscar na tabela professionals se não tem metadados
-        console.log('⚠️ Sem role nos metadados, buscando na tabela professionals...');
+        console.log(
+          '⚠️ Sem role nos metadados, buscando na tabela professionals...'
+        );
         const { data: profData, error: profError } = await supabase
           .from('professionals')
           .select('role')
           .eq('user_id', userSession.user.id)
           .single();
-        
+
         if (profError) {
-          console.error('❌ Erro ao buscar role na tabela professionals:', profError);
+          console.error(
+            '❌ Erro ao buscar role na tabela professionals:',
+            profError
+          );
           // 🛡️ CORREÇÃO BUG-007: Removido email hardcoded - usuário deve ser configurado no sistema
-          console.error('❌ Usuário não configurado no sistema. Contate o administrador.');
+          console.error(
+            '❌ Usuário não configurado no sistema. Contate o administrador.'
+          );
           setUserRole(null);
           setAdminStatus(false);
           // Opcionalmente, deslogar usuário não configurado
           // await signOut();
         } else if (profData?.role) {
-          console.log('✅ Role encontrado na tabela professionals:', profData.role);
+          console.log(
+            '✅ Role encontrado na tabela professionals:',
+            profData.role
+          );
           setUserRole(profData.role);
           setAdminStatus(profData.role === 'admin');
+          setReceptionistStatus(
+            profData.role === 'receptionist' ||
+              profData.role === 'recepcionista'
+          );
         } else {
           // 🛡️ CORREÇÃO BUG-007: Sem fallback inseguro - usuário deve estar configurado
           console.error('❌ Usuário não possui role configurado no sistema.');
           setUserRole(null);
           setAdminStatus(false);
+          setReceptionistStatus(false);
         }
-        
       } catch (err) {
         console.error('❌ Erro ao buscar role:', err);
         // 🛡️ CORREÇÃO BUG-007: Removido fallback inseguro - negar acesso em erro
         setUserRole(null);
         setAdminStatus(false);
+        setReceptionistStatus(false);
       }
     };
 
     // Escutar mudanças de autenticação com logs detalhados
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('🔔 Auth State Change:', event, 'Session exists:', !!session);
-        
-        try {
-          if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-            console.log('✅ User authenticated, updating state...');
-            setSession(session);
-            setUser(session?.user ?? null);
-            if (session?.user) {
-              await fetchUserRole(session);
-            }
-          } else if (event === 'SIGNED_OUT') {
-            console.log('👋 User signed out, clearing state...');
-            setSession(null);
-            setUser(null);
-            setUserRole(null);
-            setAdminStatus(false);
-          } else if (event === 'INITIAL_SESSION') {
-            console.log('🚀 Initial session loaded');
-            setSession(session);
-            setUser(session?.user ?? null);
-            if (session?.user) {
-              await fetchUserRole(session);
-            }
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('🔔 Auth State Change:', event, 'Session exists:', !!session);
+
+      try {
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          console.log('✅ User authenticated, updating state...');
+          setSession(session);
+          setUser(session?.user ?? null);
+          if (session?.user) {
+            await fetchUserRole(session);
           }
-          
-          // Para eventos que não têm usuário
-          if (!session?.user && event !== 'SIGNED_OUT') {
-            setAdminStatus(false);
-            setUserRole(null);
-          }
-        } catch (error) {
-          // Erro na mudança de estado de autenticação
+        } else if (event === 'SIGNED_OUT') {
+          console.log('👋 User signed out, clearing state...');
           setSession(null);
           setUser(null);
+          setUserRole(null);
+          setAdminStatus(false);
+          setReceptionistStatus(false);
+        } else if (event === 'INITIAL_SESSION') {
+          console.log('🚀 Initial session loaded');
+          setSession(session);
+          setUser(session?.user ?? null);
+          if (session?.user) {
+            await fetchUserRole(session);
+          }
+        }
+
+        // Para eventos que não têm usuário
+        if (!session?.user && event !== 'SIGNED_OUT') {
           setAdminStatus(false);
           setUserRole(null);
-        } finally {
-          setLoading(false);
         }
+      } catch (error) {
+        // Erro na mudança de estado de autenticação
+        setSession(null);
+        setUser(null);
+        setAdminStatus(false);
+        setUserRole(null);
+      } finally {
+        setLoading(false);
       }
-    );
+    });
 
     return () => subscription?.unsubscribe();
   }, []);
@@ -198,14 +222,14 @@ export function AuthProvider({ children }) {
     try {
       setLoading(true);
       console.log('🔄 Forçando refresh da sessão...');
-      
+
       const { data, error } = await supabase.auth.refreshSession();
-      
+
       if (error) {
         console.error('❌ Erro no refresh forçado:', error);
         return false;
       }
-      
+
       if (data.session) {
         console.log('✅ Sessão refreshed com sucesso');
         setSession(data.session);
@@ -216,10 +240,13 @@ export function AuthProvider({ children }) {
         if (userRole) {
           setUserRole(userRole);
           setAdminStatus(userRole === 'admin');
+          setReceptionistStatus(
+            userRole === 'receptionist' || userRole === 'recepcionista'
+          );
         }
         return true;
       }
-      
+
       return false;
     } catch (err) {
       console.error('❌ Erro ao forçar refresh:', err);
@@ -286,12 +313,12 @@ export function AuthProvider({ children }) {
   const signOut = async () => {
     try {
       setLoading(true);
-      
+
       // TODO: Registrar logout no sistema de auditoria (desabilitado temporariamente)
       // await auditService.logLogout();
-      
+
       const { error } = await supabase.auth.signOut();
-      
+
       if (error) {
         throw error;
       }
@@ -305,7 +332,7 @@ export function AuthProvider({ children }) {
   };
 
   // Função de reset de senha
-  const resetPassword = async (email) => {
+  const resetPassword = async email => {
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reset-password`,
@@ -322,7 +349,7 @@ export function AuthProvider({ children }) {
   };
 
   // Função para atualizar senha
-  const updatePassword = async (newPassword) => {
+  const updatePassword = async newPassword => {
     try {
       const { error } = await supabase.auth.updateUser({
         password: newPassword,
@@ -339,7 +366,7 @@ export function AuthProvider({ children }) {
   };
 
   // Função para atualizar perfil
-  const updateProfile = async (updates) => {
+  const updateProfile = async updates => {
     try {
       const { error } = await supabase.auth.updateUser({
         data: updates,
@@ -359,10 +386,25 @@ export function AuthProvider({ children }) {
   const isAuthenticated = !!user;
 
   // Verificar se usuário tem permissão específica
-  const hasPermission = (permission) => {
-    // Implementar lógica de permissões baseada em roles
-    // Por exemplo, verificar se user.user_metadata.role inclui a permissão
-    return user?.user_metadata?.roles?.includes(permission) || false;
+  const hasPermission = permission => {
+    if (!user) return false;
+
+    // Se permission é um array, verificar se usuário tem alguma das permissões
+    if (Array.isArray(permission)) {
+      return permission.some(perm => hasPermission(perm));
+    }
+
+    // Verificar no campo 'role' (singular)
+    if (user.user_metadata?.role === permission) {
+      return true;
+    }
+
+    // Verificar no array 'permissions'
+    if (user.user_metadata?.permissions?.includes(permission)) {
+      return true;
+    }
+
+    return false;
   };
 
   // Verificar se é admin
@@ -373,7 +415,7 @@ export function AuthProvider({ children }) {
   // Obter dados do perfil do usuário
   const getUserProfile = () => {
     if (!user) return null;
-    
+
     return {
       id: user.id,
       email: user.email,
@@ -392,7 +434,9 @@ export function AuthProvider({ children }) {
     loading,
     isAuthenticated,
     userRole,
-    
+    adminStatus,
+    receptionistStatus,
+
     // Funções de autenticação
     signIn,
     signUp,
@@ -401,16 +445,12 @@ export function AuthProvider({ children }) {
     updatePassword,
     updateProfile,
     forceSessionRefresh,
-    
+
     // Funções utilitárias
     hasPermission,
     isAdmin,
     getUserProfile,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

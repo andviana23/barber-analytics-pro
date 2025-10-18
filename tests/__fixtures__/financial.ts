@@ -19,7 +19,7 @@ export interface Revenue {
   accrual_end_date?: string;
   expected_receipt_date?: string;
   actual_receipt_date?: string;
-  status: 'pending' | 'scheduled' | 'received' | 'paid' | 'overdue' | 'cancelled';
+  status: 'Pending' | 'Scheduled' | 'Received' | 'Paid' | 'Overdue' | 'Cancelled';
   created_at: string;
   updated_at: string;
 }
@@ -84,7 +84,7 @@ export class RevenueBuilder {
     professional_id: 'prof-1',
     user_id: 'user-1',
     account_id: 'acc-1',
-    status: 'pending',
+    status: 'Pending', // Status normalizado para compatibilidade com DTO
     created_at: DateHelpers.iso(),
     updated_at: DateHelpers.iso(),
   };
@@ -136,13 +136,13 @@ export class RevenueBuilder {
   }
 
   overdue(): RevenueBuilder {
-    this.revenue.status = 'overdue';
+    this.revenue.status = 'Overdue';
     this.revenue.expected_receipt_date = DateHelpers.daysAgo(5);
     return this;
   }
 
   received(): RevenueBuilder {
-    this.revenue.status = 'received';
+    this.revenue.status = 'Received';
     this.revenue.actual_receipt_date = DateHelpers.today();
     return this;
   }
@@ -304,7 +304,7 @@ export const FinancialFixtures = {
   
   makeOverdueRevenue: (daysOverdue = 5) => 
     RevenueBuilder.create()
-      .withStatus('overdue')
+      .withStatus('Overdue')
       .withReceiptDates(DateHelpers.daysAgo(daysOverdue))
       .build(),
 

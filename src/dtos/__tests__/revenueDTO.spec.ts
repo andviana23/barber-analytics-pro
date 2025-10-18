@@ -13,9 +13,10 @@ describe('CreateRevenueDTO', () => {
       const validData = createValidData();
 
       const dto = new CreateRevenueDTO(validData);
-      const errors = dto.validate();
+      const validation = dto.validate();
 
-      expect(errors).toHaveLength(0);
+      expect(validation.errors).toHaveLength(0);
+      expect(validation.isValid).toBe(true);
       expect(dto.type).toBe('service');
       expect(dto.value).toBe(150.00);
     });
@@ -31,9 +32,9 @@ describe('CreateRevenueDTO', () => {
       };
 
       const dto = new CreateRevenueDTO(invalidData);
-      const errors = dto.validate();
+      const validation = dto.validate();
 
-      expect(errors).toContain('Campo "type" é obrigatório');
+      expect(validation.errors).toContain('Campo "type" é obrigatório');
     });
 
     it('deve rejeitar quando value está ausente', () => {
@@ -47,9 +48,9 @@ describe('CreateRevenueDTO', () => {
       };
 
       const dto = new CreateRevenueDTO(invalidData);
-      const errors = dto.validate();
+      const validation = dto.validate();
 
-      expect(errors).toContain('Campo "value" é obrigatório');
+      expect(validation.errors).toContain('Campo "value" é obrigatório');
     });
 
     it('deve usar data atual quando date não fornecida', () => {
@@ -72,57 +73,57 @@ describe('CreateRevenueDTO', () => {
     it('deve aceitar type válido: service', () => {
       const data = createValidData({ type: 'service' });
       const dto = new CreateRevenueDTO(data);
-      const errors = dto.validate();
+      const validation = dto.validate();
 
-      expect(errors).not.toContain(expect.stringMatching(/type.*deve ser um dos valores/));
+      expect(validation.errors).not.toContain(expect.stringMatching(/type.*deve ser um dos valores/));
     });
 
     it('deve aceitar type válido: product', () => {
       const data = createValidData({ type: 'product' });
       const dto = new CreateRevenueDTO(data);
-      const errors = dto.validate();
+      const validation = dto.validate();
 
-      expect(errors).not.toContain(expect.stringMatching(/type.*deve ser um dos valores/));
+      expect(validation.errors).not.toContain(expect.stringMatching(/type.*deve ser um dos valores/));
     });
 
     it('deve rejeitar type inválido', () => {
       const data = createValidData({ type: 'invalid_type' });
       const dto = new CreateRevenueDTO(data);
-      const errors = dto.validate();
+      const validation = dto.validate();
 
-      expect(errors).toContain('Campo "type" deve ser um dos valores válidos: service, product, commission, other');
+      expect(validation.errors).toContain('Campo "type" deve ser um dos valores válidos: service, product, commission, other');
     });
 
     it('deve aceitar valor positivo', () => {
       const data = createValidData({ value: 99.99 });
       const dto = new CreateRevenueDTO(data);
-      const errors = dto.validate();
+      const validation = dto.validate();
 
-      expect(errors).not.toContain(expect.stringMatching(/value.*deve ser maior que zero/));
+      expect(validation.errors).not.toContain(expect.stringMatching(/value.*deve ser maior que zero/));
     });
 
     it('deve rejeitar valor zero', () => {
       const data = createValidData({ value: 0 });
       const dto = new CreateRevenueDTO(data);
-      const errors = dto.validate();
+      const validation = dto.validate();
 
-      expect(errors).toContain('Campo "value" deve ser maior que zero');
+      expect(validation.errors).toContain('Campo "value" deve ser maior que zero');
     });
 
     it('deve rejeitar valor negativo', () => {
       const data = createValidData({ value: -50.00 });
       const dto = new CreateRevenueDTO(data);
-      const errors = dto.validate();
+      const validation = dto.validate();
 
-      expect(errors).toContain('Campo "value" deve ser maior que zero');
+      expect(validation.errors).toContain('Campo "value" deve ser maior que zero');
     });
 
     it('deve rejeitar valores muito grandes (>999999)', () => {
       const data = createValidData({ value: 1000000.01 });
       const dto = new CreateRevenueDTO(data);
-      const errors = dto.validate();
+      const validation = dto.validate();
 
-      expect(errors).toContain('Campo "value" não pode ser maior que 999999.99');
+      expect(validation.errors).toContain('Campo "value" não pode ser maior que 999999.99');
     });
   });
 
@@ -130,25 +131,25 @@ describe('CreateRevenueDTO', () => {
     it('deve aceitar data no formato YYYY-MM-DD válido', () => {
       const data = createValidData({ date: '2025-01-15' });
       const dto = new CreateRevenueDTO(data);
-      const errors = dto.validate();
+      const validation = dto.validate();
 
-      expect(errors).not.toContain(expect.stringMatching(/date.*formato/));
+      expect(validation.errors).not.toContain(expect.stringMatching(/date.*formato/));
     });
 
     it('deve rejeitar formato de data inválido', () => {
       const data = createValidData({ date: '15/01/2025' });
       const dto = new CreateRevenueDTO(data);
-      const errors = dto.validate();
+      const validation = dto.validate();
 
-      expect(errors).toContain('Campo "date" deve estar no formato YYYY-MM-DD');
+      expect(validation.errors).toContain('Campo "date" deve estar no formato YYYY-MM-DD');
     });
 
     it('deve rejeitar data inexistente', () => {
       const data = createValidData({ date: '2025-02-30' }); // 30 de fevereiro
       const dto = new CreateRevenueDTO(data);
-      const errors = dto.validate();
+      const validation = dto.validate();
 
-      expect(errors).toContain('Campo "date" deve estar no formato YYYY-MM-DD');
+      expect(validation.errors).toContain('Campo "date" deve estar no formato YYYY-MM-DD');
     });
 
     it('deve aceitar datas de competência válidas', () => {
@@ -157,9 +158,9 @@ describe('CreateRevenueDTO', () => {
         accrual_end_date: '2025-01-31',
       });
       const dto = new CreateRevenueDTO(data);
-      const errors = dto.validate();
+      const validation = dto.validate();
 
-      expect(errors).not.toContain(expect.stringMatching(/competência/));
+      expect(validation.errors).not.toContain(expect.stringMatching(/competência/));
     });
 
     it('deve rejeitar quando accrual_end_date < accrual_start_date', () => {
@@ -168,9 +169,9 @@ describe('CreateRevenueDTO', () => {
         accrual_end_date: '2025-01-01',
       });
       const dto = new CreateRevenueDTO(data);
-      const errors = dto.validate();
+      const validation = dto.validate();
 
-      expect(errors).toContain('Data de fim da competência (accrual_end_date) deve ser maior ou igual à data de início (accrual_start_date)');
+      expect(validation.errors).toContain('Data de fim da competência (accrual_end_date) deve ser maior ou igual à data de início (accrual_start_date)');
     });
 
     it('deve rejeitar datas de competência inválidas antes da comparação', () => {
@@ -179,9 +180,9 @@ describe('CreateRevenueDTO', () => {
         accrual_end_date: '2025-01-31',
       });
       const dto = new CreateRevenueDTO(data);
-      const errors = dto.validate();
+      const validation = dto.validate();
 
-      expect(errors).toContain('Datas de competência devem ser válidas para comparação');
+      expect(validation.errors).toContain('Datas de competência devem ser válidas para comparação');
     });
 
     it('deve aceitar expected_receipt_date válida', () => {
@@ -189,9 +190,9 @@ describe('CreateRevenueDTO', () => {
         expected_receipt_date: DateHelpers.daysFromNow(7),
       });
       const dto = new CreateRevenueDTO(data);
-      const errors = dto.validate();
+      const validation = dto.validate();
 
-      expect(errors).not.toContain(expect.stringMatching(/expected_receipt_date/));
+      expect(validation.errors).not.toContain(expect.stringMatching(/expected_receipt_date/));
     });
   });
 
@@ -201,17 +202,17 @@ describe('CreateRevenueDTO', () => {
         unit_id: '123e4567-e89b-12d3-a456-426614174000' 
       });
       const dto = new CreateRevenueDTO(data);
-      const errors = dto.validate();
+      const validation = dto.validate();
 
-      expect(errors).not.toContain(expect.stringMatching(/unit_id.*formato UUID/));
+      expect(validation.errors).not.toContain(expect.stringMatching(/unit_id.*formato UUID/));
     });
 
     it('deve rejeitar UUID inválido para unit_id', () => {
       const data = createValidData({ unit_id: 'invalid-uuid' });
       const dto = new CreateRevenueDTO(data);
-      const errors = dto.validate();
+      const validation = dto.validate();
 
-      expect(errors).toContain('Campo "unit_id" deve estar no formato UUID válido');
+      expect(validation.errors).toContain('Campo "unit_id" deve estar no formato UUID válido');
     });
 
     it('deve aceitar UUIDs válidos para todos os campos', () => {
@@ -223,9 +224,9 @@ describe('CreateRevenueDTO', () => {
         account_id: validUuid,
       });
       const dto = new CreateRevenueDTO(data);
-      const errors = dto.validate();
+      const validation = dto.validate();
 
-      expect(errors).not.toContain(expect.stringMatching(/formato UUID/));
+      expect(validation.errors).not.toContain(expect.stringMatching(/formato UUID/));
     });
   });
 
@@ -309,12 +310,12 @@ describe('CreateRevenueDTO', () => {
 
     it('deve validar corretamente com dados vazios', () => {
       const dto = new CreateRevenueDTO({});
-      const errors = dto.validate();
+      const validation = dto.validate();
 
-      expect(Array.isArray(errors)).toBe(true);
-      expect((errors as string[]).length).toBeGreaterThan(0);
-      expect(errors).toContain('Campo "type" é obrigatório');
-      expect(errors).toContain('Campo "value" é obrigatório');
+      expect(Array.isArray(validation.errors)).toBe(true);
+      expect((validation.errors as string[]).length).toBeGreaterThan(0);
+      expect(validation.errors).toContain('Campo "type" é obrigatório');
+      expect(validation.errors).toContain('Campo "value" é obrigatório');
     });
 
     it('deve lidar com números de ponto flutuante com precisão', () => {

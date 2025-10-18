@@ -7,14 +7,11 @@ export function MainContainer({ children, className = '' }) {
         flex-1 p-6 
         bg-light-bg dark:bg-dark-bg
         transition-colors duration-300
-        min-h-screen
         overflow-auto
         ${className}
       `}
     >
-      <div className="max-w-7xl mx-auto">
-        {children}
-      </div>
+      <div className="max-w-7xl mx-auto">{children}</div>
     </main>
   );
 }

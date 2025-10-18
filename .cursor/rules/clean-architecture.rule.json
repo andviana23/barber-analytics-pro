@@ -1,0 +1,12 @@
+{
+  "name": "Clean Architecture Enforcement",
+  "description": "Garante que todo o código gerado siga os princípios da Clean Architecture. As camadas devem permanecer independentes e respeitar a separação de responsabilidades.",
+  "alwaysApply": true,
+  "rules": [
+    "A camada de apresentação (pages, components, UI) não pode acessar diretamente o banco de dados.",
+    "A camada de domínio deve conter apenas regras de negócio puras, sem dependências externas.",
+    "A camada de aplicação deve orquestrar os fluxos de negócio, mas nunca acessar APIs externas diretamente.",
+    "A camada de infraestrutura deve conter apenas implementações técnicas (repositories, Supabase, APIs externas).",
+    "Use sempre injeção de dependência (Dependency Inversion) para acoplamento fraco entre camadas."
+  ]
+}

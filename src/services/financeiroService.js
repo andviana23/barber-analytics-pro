@@ -30,7 +30,7 @@ class FinanceiroService {
    * @param {number} limit - Limite por página
    * @returns {Promise<{data: RevenueResponseDTO[], error: string|null, count: number}>}
    */
-  async getReceitas(filters = {}, page = 1, limit = 50) {
+  async getReceitas(filters = {}, pagination = null) {
     try {
       // eslint-disable-next-line no-console
       console.log('🔄 Service: Buscando receitas...', filters);
@@ -38,7 +38,14 @@ class FinanceiroService {
       // ==========================================
       // PASSO 1: DELEGAR BUSCA AO REPOSITORY
       // ==========================================
-      const { data, error, count } = await revenueRepository.findAll(filters, page, limit);
+      let result;
+      if (pagination) {
+        result = await revenueRepository.findAll(filters, pagination);
+      } else {
+        result = await revenueRepository.findAll(filters);
+      }
+      
+      const { data, error, count } = result;
       
       if (error) {
         // eslint-disable-next-line no-console
@@ -49,7 +56,7 @@ class FinanceiroService {
       // ==========================================
       // PASSO 2: TRANSFORMAR EM DTOs
       // ==========================================
-      const revenues = (data || []).map(record => new RevenueResponseDTO(record));
+      const revenues = (data || []).map(record => new RevenueResponseDTO(record).toPlainObject());
       
       // eslint-disable-next-line no-console
       console.log(`✅ Service: ${revenues.length} receitas transformadas em DTOs (total: ${count})`);
@@ -178,7 +185,14 @@ class FinanceiroService {
       if (error) {
         // eslint-disable-next-line no-console
         console.error('❌ Service: Erro do Repository:', error);
-        return { data: null, error };
+        
+        // Traduzir erros comuns do PostgreSQL para português
+        let errorMessage = error;
+        if (error.includes('duplicate key value violates unique constraint')) {
+          errorMessage = 'Receita já existe';
+        }
+        
+        return { data: null, error: errorMessage };
       }
       
       // ==========================================
@@ -194,7 +208,7 @@ class FinanceiroService {
       // eslint-disable-next-line no-console
       console.log('📤 DTO de resposta:', responseDTO);
       
-      return { data: responseDTO, error: null };
+      return { data: responseDTO.toPlainObject(), error: null };
       
     } catch (err) {
       // eslint-disable-next-line no-console
@@ -231,7 +245,7 @@ class FinanceiroService {
       // eslint-disable-next-line no-console
       console.log('✅ Service: Receita encontrada e transformada em DTO');
       
-      return { data: revenueDTO, error: null };
+      return { data: revenueDTO.toPlainObject(), error: null };
       
     } catch (err) {
       // eslint-disable-next-line no-console
@@ -252,24 +266,27 @@ class FinanceiroService {
       // eslint-disable-next-line no-console
       console.log('🔄 Service: Atualizando receita:', id);
       
-      // Validar dados com DTO (reutilizar validações)
-      const dto = new CreateRevenueDTO(updateData);
-      const validation = dto.validate();
+      // Para updates, não validamos campos obrigatórios
+      // Só validamos tipos de dados fornecidos
+      const allowedUpdateFields = ['status', 'value', 'date', 'type', 'actual_receipt_date'];
+      const cleanUpdateData = {};
       
-      if (!validation.isValid) {
-        return { 
-          data: null, 
-          error: validation.errors.join(' | ')
-        };
+      // Filtrar apenas campos permitidos para update
+      for (const [key, value] of Object.entries(updateData)) {
+        if (allowedUpdateFields.includes(key) && value !== undefined) {
+          cleanUpdateData[key] = value;
+        }
       }
       
-      const dbData = dto.toDatabase();
-      
       // Delegar ao Repository
-      const { data, error } = await revenueRepository.update(id, dbData);
+      const { data, error } = await revenueRepository.update(id, cleanUpdateData);
       
       if (error) {
-        return { data: null, error };
+        return { 
+          success: false,
+          data: null, 
+          error
+        };
       }
       
       const responseDTO = new RevenueResponseDTO(data);
@@ -277,7 +294,11 @@ class FinanceiroService {
       // eslint-disable-next-line no-console
       console.log('✅ Service: Receita atualizada com sucesso');
       
-      return { data: responseDTO, error: null };
+      return { 
+        success: true,
+        data: responseDTO.toPlainObject(), 
+        error: null
+      };
       
     } catch (err) {
       // eslint-disable-next-line no-console
@@ -336,7 +357,7 @@ class FinanceiroService {
       }
       
       // Transformar receitas em DTOs
-      const revenues = data.revenues.map(record => new RevenueResponseDTO(record));
+      const revenues = data.revenues.map(record => new RevenueResponseDTO(record).toPlainObject());
       
       // eslint-disable-next-line no-console
       console.log('✅ Service: Receitas do período transformadas em DTOs');
@@ -395,8 +416,18 @@ class FinanceiroService {
     };
   }
 
-  async getRevenues(filters = {}, page = 1, limit = 50) {
-    const result = await this.getReceitas(filters, page, limit);
+  async findById(id) {
+    return this.getReceitaById(id);
+  }
+
+  async getRevenues(filters = {}, pagination = null) {
+    let result;
+    if (pagination && typeof pagination === 'object') {
+      result = await this.getReceitas(filters, pagination);
+    } else {
+      result = await this.getReceitas(filters);
+    }
+    
     return {
       success: !result.error,
       data: result.data,
@@ -406,38 +437,127 @@ class FinanceiroService {
   }
 
   async getKPIs(unitId, period) {
-    // Mock implementation para testes
-    const filters = { unitId, period };
-    const revenues = await this.getReceitas(filters);
-    
-    // Cálculo básico de KPIs
-    const totalRevenue = revenues.data?.reduce((sum, r) => sum + (r.value || 0), 0) || 0;
-    const totalCount = revenues.count || 0;
-    const averageRevenue = totalCount > 0 ? totalRevenue / totalCount : 0;
-
-    return {
-      success: true,
-      data: {
-        totalRevenue,
-        totalCount,
-        averageRevenue,
-        trends: {
-          growth_direction: 'up',
-          revenue_growth: 5.2
+    try {
+      // Buscar receitas do período atual
+      const currentFilters = { unitId, period };
+      const currentRevenues = await this.getReceitas(currentFilters);
+      
+      // Calcular período anterior
+      const [year, month] = period.split('-');
+      const prevYear = month === '01' ? (parseInt(year) - 1).toString() : year;
+      const prevMonth = month === '01' ? '12' : (parseInt(month) - 1).toString().padStart(2, '0');
+      const previousPeriod = `${prevYear}-${prevMonth}`;
+      
+      const prevFilters = { unitId, period: previousPeriod };
+      const previousRevenues = await this.getReceitas(prevFilters);
+      
+      // Calcular métricas do período atual
+      const currentTotal = currentRevenues.data?.reduce((sum, r) => sum + (r.value || 0), 0) || 0;
+      const currentPending = currentRevenues.data?.filter(r => r.status === 'pending').reduce((sum, r) => sum + (r.value || 0), 0) || 0;
+      const currentReceived = currentRevenues.data?.filter(r => r.status === 'received').reduce((sum, r) => sum + (r.value || 0), 0) || 0;
+      
+      // Calcular métricas do período anterior
+      const previousTotal = previousRevenues.data?.reduce((sum, r) => sum + (r.value || 0), 0) || 0;
+      
+      // Calcular crescimento
+      let growthPercentage = 0;
+      let growthDirection = 'stable';
+      
+      if (previousTotal === 0 && currentTotal > 0) {
+        growthPercentage = 100; // 100% quando base era zero
+        growthDirection = 'up';
+      } else if (previousTotal > 0) {
+        growthPercentage = ((currentTotal - previousTotal) / previousTotal) * 100;
+        if (growthPercentage > 0) {
+          growthDirection = 'up';
+        } else if (growthPercentage < 0) {
+          growthDirection = 'down';
         }
-      },
-      error: null
-    };
+      }
+      
+      return {
+        success: true,
+        data: {
+          current_period: {
+            total_revenue: currentTotal,
+            pending_revenue: currentPending,
+            received_revenue: currentReceived
+          },
+          trends: {
+            growth_direction: growthDirection,
+            revenue_growth: Math.round(growthPercentage * 100) / 100 // Arredonda para 2 casas decimais
+          }
+        },
+        error: null
+      };
+    } catch (error) {
+      return {
+        success: false,
+        data: null,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Helper para normalizar status (primeira letra maiúscula)
+   * @private
+   * @param {string} status 
+   * @returns {string|null}
+   */
+  _normalizeStatus(status) {
+    if (!status) return null;
+    // Converte para formato com primeira letra maiúscula (ex: "Pending")
+    return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
   }
 
   async updateRevenueStatus(revenueId, status, metadata = {}) {
-    const updateData = { status, ...metadata };
-    const result = await this.updateReceita(revenueId, updateData);
-    return {
-      success: !result.error,
-      data: result.data,
-      error: result.error
-    };
+    try {
+      // eslint-disable-next-line no-console
+      console.log('🔄 Service: Atualizando receita:', revenueId);
+      
+      // Buscar receita atual
+      const currentRevenue = await this.getReceitaById(revenueId);
+      if (!currentRevenue || currentRevenue.error) {
+        return {
+          success: false,
+          data: null,
+          error: 'Receita não encontrada'
+        };
+      }
+      
+      // Validar transição de status usando normalização
+      const currentStatus = this._normalizeStatus(currentRevenue.data?.status);
+      const newStatus = this._normalizeStatus(status);
+      
+      const validTransitions = {
+        'Pending': ['Received', 'Cancelled'],
+        'Received': ['Refunded'],
+        'Cancelled': ['Pending'], // Pode reativar
+        'Refunded': [] // Estado final
+      };
+      
+      if (!validTransitions[currentStatus]?.includes(newStatus)) {
+        return {
+          success: false,
+          data: null,
+          error: 'Transição de status inválida'
+        };
+      }
+      
+      // Atualizar receita com status normalizado
+      const normalizedStatus = this._normalizeStatus(status);
+      const updateData = { status: normalizedStatus, ...metadata };
+      const result = await this.updateReceita(revenueId, updateData);
+      return result;
+      
+    } catch (error) {
+      return {
+        success: false,
+        data: null,
+        error: error.message
+      };
+    }
   }
 }
 

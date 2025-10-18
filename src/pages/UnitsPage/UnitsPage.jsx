@@ -1,11 +1,17 @@
 /**
- * UNITS PAGE
+ * UNITS PAGE - REFATORADA 100%
  * 
- * Página de gerenciamento de unidades do sistema
- * Permite visualizar, criar, editar e gerenciar unidades
+ * Página moderna de gerenciamento de unidades
+ * Features:
+ * - Visualização em cards, estatísticas e comparação
+ * - CRUD completo de unidades
+ * - Filtros por status (ativas/todas)
+ * - KPIs em tempo real
+ * - Interface responsiva e acessível
+ * - Permissões baseadas em roles
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card } from '../../atoms';
 import { KPICard } from '../../molecules';
 import { MainContainer } from '../../organisms';
@@ -28,16 +34,18 @@ import {
   XCircle,
   BarChart3,
   Settings,
-  Filter
+  Filter,
+  RefreshCw,
+  TrendingUp,
+  Search
 } from 'lucide-react';
 
 const UnitsPage = () => {
-  // Hooks
-  const { user, hasPermission } = useAuth();
+  // ==================== HOOKS ====================
+  const { hasPermission } = useAuth();
   const {
     units,
-    activeUnits, 
-    inactiveUnits,
+    activeUnits,
     stats,
     loading,
     error,
@@ -45,291 +53,412 @@ const UnitsPage = () => {
     getUnitsComparison
   } = useUnits();
 
-  // Estado local
+  // ==================== STATE ====================
+  // Modais
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState(null);
+  
+  // Visualização
   const [showInactive, setShowInactive] = useState(false);
   const [view, setView] = useState('cards'); // cards, stats, comparison
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  // Comparação de unidades
   const [comparison, setComparison] = useState([]);
   const [loadingComparison, setLoadingComparison] = useState(false);
 
-  // Permissões
+  // ==================== PERMISSÕES ====================
   const canCreate = hasPermission('admin');
   const canEdit = hasPermission('admin');
   const canDelete = hasPermission('admin');
   const canViewStats = hasPermission(['admin', 'gerente']);
-
-  /**
-   * Carregar comparativo entre unidades
-   */
-  const loadComparison = async () => {
-    if (!canViewStats) return;
-
-    try {
-      setLoadingComparison(true);
-      const comparisonData = await getUnitsComparison();
-      setComparison(comparisonData);
-    } catch (error) {
-      // Error já tratado no hook
-    } finally {
-      setLoadingComparison(false);
-    }
-  };
-
-  // Carregar dados na inicialização
+  
+  // Debug de permissões (temporário)
   useEffect(() => {
-    if (view === 'comparison') {
-      loadComparison();
+    if (!loading) {
+      // eslint-disable-next-line no-console
+      console.log('🔐 Permissões UnitsPage:', {
+        canCreate,
+        canEdit,
+        canDelete,
+        canViewStats
+      });
     }
-  }, [view]);
+  }, [canCreate, canEdit, canDelete, canViewStats, loading]);
+
+  // ==================== EFFECTS ====================
+  /**
+   * Carregar comparativo entre unidades quando view mudar
+   */
+  useEffect(() => {
+    const loadComparison = async () => {
+      if (!canViewStats) return;
+      if (view !== 'comparison' && view !== 'stats') return;
+
+      try {
+        setLoadingComparison(true);
+        const comparisonData = await getUnitsComparison();
+        setComparison(comparisonData);
+      } catch {
+        // Erro já tratado no hook useUnits
+        setComparison([]);
+      } finally {
+        setLoadingComparison(false);
+      }
+    };
+
+    loadComparison();
+  }, [view, canViewStats, getUnitsComparison]);
+
+  // ==================== HANDLERS ====================
+  /**
+   * Abrir modal de criação
+   */
+  const handleCreate = useCallback(() => {
+    setShowCreateModal(true);
+  }, []);
 
   /**
-   * Handlers para modais
+   * Abrir modal de edição
    */
-  const handleCreate = () => {
-    setShowCreateModal(true);
-  };
-
-  const handleEdit = (unit) => {
+  const handleEdit = useCallback((unit) => {
     setSelectedUnit(unit);
     setShowEditModal(true);
-  };
+  }, []);
 
-  const handleDelete = (unit) => {
+  /**
+   * Abrir modal de exclusão
+   */
+  const handleDelete = useCallback((unit) => {
     setSelectedUnit(unit);
     setShowDeleteModal(true);
-  };
+  }, []);
 
-  const closeModals = () => {
+  /**
+   * Fechar todos os modais
+   */
+  const closeModals = useCallback(() => {
     setShowCreateModal(false);
     setShowEditModal(false);
     setShowDeleteModal(false);
     setSelectedUnit(null);
-  };
-
-  const handleModalSuccess = () => {
-    closeModals();
-    refresh();
-  };
+  }, []);
 
   /**
-   * Filtrar unidades baseado na visualização
+   * Sucesso em operação - fechar modal e atualizar lista
    */
-  const getDisplayUnits = () => {
-    if (showInactive) {
-      return units;
+  const handleModalSuccess = useCallback(() => {
+    closeModals();
+    refresh();
+  }, [closeModals, refresh]);
+
+  /**
+   * Atualizar lista de unidades
+   */
+  const handleRefresh = useCallback(() => {
+    refresh();
+  }, [refresh]);
+
+  // ==================== COMPUTED VALUES ====================
+  /**
+   * Filtrar unidades baseado no status e busca
+   */
+  const displayUnits = useCallback(() => {
+    let filtered = showInactive ? units : activeUnits;
+    
+    // Aplicar filtro de busca se houver termo
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(unit => 
+        unit.name.toLowerCase().includes(term)
+      );
     }
-    return activeUnits;
-  };
+    
+    return filtered;
+  }, [units, activeUnits, showInactive, searchTerm])();
 
-  const displayUnits = getDisplayUnits();
-
+  // ==================== RENDER FUNCTIONS ====================
   /**
    * Renderizar conteúdo baseado na view selecionada
    */
   const renderContent = () => {
+    // View: Estatísticas
     if (view === 'stats') {
       return <UnitsStats units={comparison} loading={loadingComparison} />;
     }
 
+    // View: Comparação
     if (view === 'comparison') {
       return <UnitsComparison units={comparison} loading={loadingComparison} />;
     }
 
-    // View padrão: cards
+    // View: Cards (padrão)
+    // Estado Vazio
+    if (displayUnits.length === 0 && !loading) {
+      return (
+        <Card className="p-16">
+          <div className="text-center max-w-md mx-auto">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full mb-6">
+              <Building2 className="h-10 w-10 text-gray-400" />
+            </div>
+            
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+              {searchTerm ? 'Nenhuma unidade encontrada' : showInactive ? 'Nenhuma unidade cadastrada' : 'Nenhuma unidade ativa'}
+            </h3>
+            
+            <p className="text-gray-600 dark:text-gray-400 mb-8">
+              {searchTerm ? (
+                <>Nenhuma unidade corresponde à busca &ldquo;<strong>{searchTerm}</strong>&rdquo;. Tente outro termo.</>
+              ) : showInactive ? (
+                'Comece criando sua primeira unidade para gerenciar sua rede de barbearias.'
+              ) : (
+                'Não há unidades ativas no momento. Verifique as unidades inativas ou crie uma nova.'
+              )}
+            </p>
+            
+            {canCreate && !searchTerm && (
+              <button
+                onClick={handleCreate}
+                className="inline-flex items-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-xl shadow-xl hover:shadow-2xl transition-all transform hover:scale-105"
+              >
+                <Plus className="h-6 w-6 mr-2" />
+                Criar Primeira Unidade
+              </button>
+            )}
+          </div>
+        </Card>
+      );
+    }
+
+    // Grid de Unidades
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {displayUnits.map((unit) => (
           <UnitCard
             key={unit.id}
             unit={unit}
-            onEdit={canEdit ? () => handleEdit(unit) : null}
-            onDelete={canDelete ? () => handleDelete(unit) : null}
+            onEdit={canEdit ? handleEdit : null}
+            onDelete={canDelete ? handleDelete : null}
             canViewStats={canViewStats}
           />
         ))}
-
-        {displayUnits.length === 0 && !loading && (
-          <div className="col-span-full">
-            <Card className="p-8 text-center">
-              <Building2 className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                {showInactive ? 'Nenhuma unidade encontrada' : 'Nenhuma unidade ativa'}
-              </h3>
-              <p className="text-gray-500 dark:text-gray-400 mb-4">
-                {showInactive 
-                  ? 'Não há unidades cadastradas no sistema.' 
-                  : 'Não há unidades ativas. Verifique as unidades inativas ou crie uma nova.'
-                }
-              </p>
-              {canCreate && (
-                <button
-                  onClick={handleCreate}
-                  className="btn btn-primary"
-                >
-                  <Plus className="h-5 w-5 mr-2" />
-                  Criar Primeira Unidade
-                </button>
-              )}
-            </Card>
-          </div>
-        )}
       </div>
     );
   };
 
   return (
     <MainContainer>
-      {/* Header */}
+      {/* ==================== HEADER ==================== */}
       <div className="mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Unidades
-            </h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
-              Gerencie as unidades da sua rede de barbearias
-            </p>
-          </div>
-
-          <div className="mt-4 sm:mt-0 flex items-center space-x-4">
-            {/* Filtros */}
-            <div className="flex items-center space-x-2">
-              <Filter className="h-5 w-5 text-gray-400" />
-              <select
-                value={showInactive ? 'all' : 'active'}
-                onChange={(e) => setShowInactive(e.target.value === 'all')}
-                className="input-field text-sm"
-              >
-                <option value="active">Apenas Ativas</option>
-                <option value="all">Todas as Unidades</option>
-              </select>
+        <div className="flex flex-col gap-4">
+          {/* Linha 1: Título + Botão Principal */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+                <Building2 className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                  Unidades
+                </h1>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {stats.total} {stats.total === 1 ? 'unidade' : 'unidades'} cadastradas
+                </p>
+              </div>
             </div>
 
-            {/* Seletor de Visualização */}
-            {canViewStats && (
-              <div className="flex rounded-lg bg-gray-100 dark:bg-gray-700 p-1">
-                <button
-                  onClick={() => setView('cards')}
-                  className={`px-3 py-1 text-sm rounded-md transition-colors ${
-                    view === 'cards'
-                      ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-                  }`}
-                >
-                  <Building2 className="h-4 w-4 mr-1 inline" />
-                  Cards
-                </button>
-                <button
-                  onClick={() => setView('stats')}
-                  className={`px-3 py-1 text-sm rounded-md transition-colors ${
-                    view === 'stats'
-                      ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-                  }`}
-                >
-                  <BarChart3 className="h-4 w-4 mr-1 inline" />
-                  Stats
-                </button>
-                <button
-                  onClick={() => setView('comparison')}
-                  className={`px-3 py-1 text-sm rounded-md transition-colors ${
-                    view === 'comparison'
-                      ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-                  }`}
-                >
-                  <Settings className="h-4 w-4 mr-1 inline" />
-                  Comparar
-                </button>
-              </div>
-            )}
+            {/* BOTÃO PRINCIPAL - SEMPRE VISÍVEL NO TOPO */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleRefresh}
+                disabled={loading}
+                className="inline-flex items-center justify-center px-4 py-2.5 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-medium rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Atualizar lista"
+              >
+                <RefreshCw className={`h-5 w-5 ${loading ? 'animate-spin' : ''}`} />
+              </button>
 
-            {/* Botão Criar */}
-            {canCreate && (
+              {/* BOTÃO SEMPRE VISÍVEL - SEM VERIFICAÇÃO DE PERMISSÃO */}
               <button
                 onClick={handleCreate}
-                className="btn btn-primary"
-                disabled={loading}
+                disabled={loading || !canCreate}
+                className="inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold text-lg rounded-xl shadow-2xl hover:shadow-blue-500/50 transform hover:scale-105 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 disabled:transform-none"
+                title={canCreate ? "Criar nova unidade" : "Apenas administradores podem criar unidades"}
               >
-                <Plus className="h-5 w-5 mr-2" />
+                <Plus className="h-6 w-6 mr-2" />
                 Nova Unidade
               </button>
-            )}
+            </div>
           </div>
+
+          {/* Linha 2: Descrição */}
+          <p className="text-gray-600 dark:text-gray-400">
+            Gerencie as unidades da sua rede de barbearias
+          </p>
         </div>
       </div>
 
-      {/* KPI Cards */}
-      {view === 'cards' && (
+      {/* ==================== FILTROS E VISUALIZAÇÃO ==================== */}
+      <div className="mb-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+        {/* Barra de Busca e Filtros */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
+          {/* Busca */}
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Buscar unidades..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            />
+          </div>
+
+          {/* Filtro de Status */}
+          <div className="flex items-center gap-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-2.5">
+            <Filter className="h-5 w-5 text-gray-400" />
+            <select
+              value={showInactive ? 'all' : 'active'}
+              onChange={(e) => setShowInactive(e.target.value === 'all')}
+              className="bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 dark:text-gray-200 cursor-pointer"
+            >
+              <option value="active">Apenas Ativas ({stats.active})</option>
+              <option value="all">Todas ({stats.total})</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Seletor de Visualização */}
+        {canViewStats && (
+          <div className="flex rounded-xl bg-gray-100 dark:bg-gray-800 p-1 border border-gray-200 dark:border-gray-700">
+            <button
+              onClick={() => setView('cards')}
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+                view === 'cards'
+                  ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
+              }`}
+              title="Visualização em cards"
+            >
+              <Building2 className="h-4 w-4" />
+              <span className="hidden sm:inline">Cards</span>
+            </button>
+            <button
+              onClick={() => setView('stats')}
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+                view === 'stats'
+                  ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
+              }`}
+              title="Estatísticas detalhadas"
+            >
+              <BarChart3 className="h-4 w-4" />
+              <span className="hidden sm:inline">Estatísticas</span>
+            </button>
+            <button
+              onClick={() => setView('comparison')}
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+                view === 'comparison'
+                  ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
+              }`}
+              title="Comparar unidades"
+            >
+              <Settings className="h-4 w-4" />
+              <span className="hidden sm:inline">Comparar</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* ==================== KPI CARDS ==================== */}
+      {view === 'cards' && !loading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <KPICard
             title="Total de Unidades"
             value={stats.total}
-            icon={<Building2 className="h-6 w-6" />}
-            trend={{ value: 0, isPositive: true }}
-            className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
+            subtitle="Todas cadastradas"
+            icon={Building2}
+            color="blue"
+            loading={loading}
           />
 
           <KPICard
             title="Unidades Ativas"
             value={stats.active}
-            icon={<CheckCircle className="h-6 w-6" />}
-            trend={{ 
-              value: stats.activePercentage, 
-              isPositive: true, 
-              isPercentage: true 
+            subtitle={`${stats.activePercentage.toFixed(1)}% do total`}
+            icon={CheckCircle}
+            color="green"
+            trend={{
+              value: stats.activePercentage,
+              isPositive: true,
+              period: 'Operacionais'
             }}
-            className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+            loading={loading}
           />
 
           <KPICard
             title="Unidades Inativas"
             value={stats.inactive}
-            icon={<XCircleIcon className="h-6 w-6" />}
-            trend={{ 
-              value: 100 - stats.activePercentage, 
-              isPositive: false, 
-              isPercentage: true 
+            subtitle={`${(100 - stats.activePercentage).toFixed(1)}% do total`}
+            icon={XCircle}
+            color="red"
+            trend={{
+              value: 100 - stats.activePercentage,
+              isPositive: false,
+              period: 'Desativadas'
             }}
-            className="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
+            loading={loading}
           />
 
           <KPICard
             title="Taxa de Ativação"
             value={`${stats.activePercentage.toFixed(1)}%`}
-            icon={<ChartBarIcon className="h-6 w-6" />}
-            trend={{ value: 0, isPositive: true }}
-            className="bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800"
+            subtitle="Unidades operacionais"
+            icon={TrendingUp}
+            color="blue"
+            loading={loading}
           />
         </div>
       )}
 
-      {/* Conteúdo Principal */}
+      {/* ==================== CONTEÚDO PRINCIPAL ==================== */}
       {loading && view === 'cards' ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <span className="ml-2 text-gray-600 dark:text-gray-400">
-            Carregando unidades...
-          </span>
-        </div>
+        /* Loading State */
+        <Card className="p-12">
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+            <p className="text-gray-600 dark:text-gray-400 font-medium">
+              Carregando unidades...
+            </p>
+          </div>
+        </Card>
       ) : error ? (
-        <Card className="p-8 text-center">
-          <XCircleIcon className="h-16 w-16 text-red-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-            Erro ao carregar unidades
-          </h3>
-          <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
-          <button
-            onClick={() => refresh()}
-            className="btn btn-primary"
-          >
-            Tentar Novamente
-          </button>
+        /* Error State */
+        <Card className="p-12">
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full mb-4">
+              <XCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              Erro ao carregar unidades
+            </h3>
+            <p className="text-red-600 dark:text-red-400 mb-6 max-w-md mx-auto">
+              {error}
+            </p>
+            <button
+              onClick={handleRefresh}
+              className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all"
+            >
+              <RefreshCw className="h-5 w-5 mr-2" />
+              Tentar Novamente
+            </button>
+          </div>
         </Card>
       ) : (
+        /* Content */
         renderContent()
       )}
 

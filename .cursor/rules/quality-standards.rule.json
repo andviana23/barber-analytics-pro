@@ -1,0 +1,14 @@
+{
+  "name": "Code Quality & ESLint Standards",
+  "description": "Regras de qualidade e linting obrigatórias para manter o código consistente e profissional.",
+  "alwaysApply": true,
+  "rules": [
+    "Sempre utilize ESLint + Prettier para formatar o código.",
+    "O código deve estar em conformidade com TypeScript estrito (strict mode).",
+    "Imports devem estar organizados por ordem de escopo e removidos se não usados.",
+    "Evite variáveis globais; prefira const e let.",
+    "Funções devem ter tipagem explícita de parâmetros e retorno.",
+    "Todos os arquivos devem terminar com nova linha e usar aspas simples.",
+    "Comentários devem ser claros e padronizados (// TODO, // NOTE, // FIX)."
+  ]
+}

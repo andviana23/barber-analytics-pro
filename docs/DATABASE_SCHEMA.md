@@ -1,1058 +1,497 @@
-# 🗄️ DATABASE SCHEMA
+# 🧩 Barber Analytics Pro — Database Schema
 
-> **PostgreSQL + Supabase | Row Level Security + Views + Functions + Triggers**
-
----
-
-## 🎯 Visão Geral
-
-O **BARBER-ANALYTICS-PRO** utiliza **PostgreSQL 17** via **Supabase** com arquitetura robusta incluindo:
-
-- 🔐 **Row Level Security (RLS)** para isolamento multi-tenant
-- 📊 **Views Otimizadas** para relatórios complexos
-- ⚡ **Functions & Triggers** para automação
-- 🔍 **Índices Estratégicos** para performance
-- ✅ **Constraints** para integridade de dados
+> Estrutura de banco de dados relacional (PostgreSQL) utilizada no Supabase  
+> Todas as tabelas seguem convenção `snake_case` e possuem `UUID` como chave primária.
+> **Atualizado em:** 2024-10-17 via Supabase MCP
 
 ---
 
-## 📊 Diagrama de Relacionamentos
+## 🏢 Table: `units`
 
-```mermaid
-erDiagram
-    UNITS ||--o{ PROFESSIONALS : has
-    UNITS ||--o{ REVENUES : belongs_to
-    UNITS ||--o{ EXPENSES : belongs_to
-    UNITS ||--o{ BANK_ACCOUNTS : owns
-    
-    PROFESSIONALS ||--o{ REVENUES : generated_by
-    PROFESSIONALS }o--|| AUTH_USERS : linked_to
-    
-    BANK_ACCOUNTS ||--o{ BANK_STATEMENTS : contains
-    BANK_ACCOUNTS ||--o{ REVENUES : deposited_in
-    
-    PARTIES ||--o{ REVENUES : client
-    PARTIES ||--o{ EXPENSES : supplier
-    
-    BANK_STATEMENTS ||--o{ RECONCILIATIONS : reconciled_with
-    REVENUES ||--o{ RECONCILIATIONS : matched_to
-    EXPENSES ||--o{ RECONCILIATIONS : matched_to
-    
-    PROFESSIONALS ||--o{ FILA_ATENDIMENTO : queued
-    FILA_ATENDIMENTO ||--o{ HISTORICO_ATENDIMENTOS : generates
-```
+| Column     | Type        | Description                        | Constraints                   |
+| ---------- | ----------- | ---------------------------------- | ----------------------------- |
+| id         | UUID        | Primary key                        | PK, DEFAULT gen_random_uuid() |
+| name       | VARCHAR     | Nome da unidade (mín 3 caracteres) | CHECK char_length(name) >= 3  |
+| user_id    | UUID        | Proprietário da unidade            | FK → auth.users.id            |
+| status     | BOOLEAN     | Status ativo (soft delete legado)  | DEFAULT true                  |
+| is_active  | BOOLEAN     | Soft delete flag                   | DEFAULT true                  |
+| created_at | TIMESTAMPTZ | Data de criação                    | DEFAULT now()                 |
+| updated_at | TIMESTAMPTZ | Data da última atualização         | DEFAULT now()                 |
+
+**Comentário:** Unidades/lojas do sistema (base multi-tenant)  
+**RLS:** ✅ Ativo  
+**Registros:** 2
 
 ---
 
-## 🏗️ Core Tables
+## 💈 Table: `professionals`
 
-### **units** (Unidades)
-> Representa cada barbearia da rede
+| Column          | Type        | Description                | Constraints                           |
+| --------------- | ----------- | -------------------------- | ------------------------------------- |
+| id              | UUID        | Primary key                | PK, DEFAULT gen_random_uuid()         |
+| unit_id         | UUID        | Referência à unidade       | FK → units.id                         |
+| user_id         | UUID        | Usuário vinculado          | FK → auth.users.id                    |
+| name            | VARCHAR     | Nome do profissional       | CHECK char_length(name) >= 3          |
+| role            | VARCHAR     | Cargo/função               | -                                     |
+| commission_rate | NUMERIC     | Taxa de comissão (0-100%)  | CHECK commission_rate >= 0 AND <= 100 |
+| is_active       | BOOLEAN     | Status ativo               | DEFAULT true                          |
+| created_at      | TIMESTAMPTZ | Data de criação            | DEFAULT now()                         |
+| updated_at      | TIMESTAMPTZ | Data da última atualização | DEFAULT now()                         |
 
-```sql
-CREATE TABLE units (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name TEXT NOT NULL,
-    status BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    user_id UUID REFERENCES auth.users(id)
-);
-
--- RLS Policy
-CREATE POLICY "users_can_manage_own_units" ON units
-    FOR ALL USING (user_id = auth.uid());
-
--- Triggers
-CREATE TRIGGER trigger_update_units 
-    BEFORE UPDATE ON units 
-    FOR EACH ROW EXECUTE FUNCTION update_timestamp();
-```
-
-### **professionals** (Profissionais)
-> Barbeiros, gerentes e administradores
-
-```sql
-CREATE TYPE user_role AS ENUM ('admin', 'gerente', 'barbeiro');
-
-CREATE TABLE professionals (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name TEXT NOT NULL,
-    commission_rate NUMERIC(5,2) DEFAULT 0.0,
-    is_active BOOLEAN DEFAULT TRUE,
-    unit_id UUID REFERENCES units(id) ON DELETE CASCADE,
-    user_id UUID REFERENCES auth.users(id),
-    role user_role DEFAULT 'barbeiro',
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
-);
-
--- RLS Policies
-CREATE POLICY "professionals_unit_access" ON professionals
-    FOR SELECT USING (
-        unit_id IN (
-            SELECT unit_id FROM professionals 
-            WHERE user_id = auth.uid()
-        ) OR get_user_role() = 'admin'
-    );
-
--- Índices
-CREATE INDEX idx_professionals_unit_id ON professionals(unit_id);
-CREATE INDEX idx_professionals_user_id ON professionals(user_id);
-```
+**Comentário:** Profissionais vinculados às unidades  
+**RLS:** ✅ Ativo  
+**Registros:** 0
 
 ---
 
-## 💰 Financial Tables
+## 👥 Table: `parties`
 
-### **revenues** (Receitas)
-> Receitas com contabilidade por competência
+| Column      | Type        | Description                | Constraints                                    |
+| ----------- | ----------- | -------------------------- | ---------------------------------------------- |
+| id          | UUID        | Primary key                | PK, DEFAULT gen_random_uuid()                  |
+| unit_id     | UUID        | Referência à unidade       | FK → units.id                                  |
+| nome        | VARCHAR     | Nome da parte              | CHECK char_length(nome) >= 3                   |
+| tipo        | PARTY_TYPE  | Tipo: Cliente/Fornecedor   | ENUM                                           |
+| cpf_cnpj    | VARCHAR     | CPF (11) ou CNPJ (14)      | CHECK char_length(cpf_cnpj) IN (11, 14)        |
+| telefone    | VARCHAR     | Telefone de contato        | NULLABLE                                       |
+| email       | VARCHAR     | Email de contato           | NULLABLE, CHECK email ~\* '^\\S+@\\S+\\.\\S+$' |
+| endereco    | TEXT        | Endereço completo          | NULLABLE                                       |
+| observacoes | TEXT        | Observações adicionais     | NULLABLE                                       |
+| is_active   | BOOLEAN     | Status ativo               | DEFAULT true                                   |
+| created_at  | TIMESTAMPTZ | Data de criação            | DEFAULT now()                                  |
+| updated_at  | TIMESTAMPTZ | Data da última atualização | DEFAULT now()                                  |
 
-```sql
-CREATE TYPE income_type AS ENUM (
-    'service', 'product', 'subscription', 'commission', 'other'
-);
-
-CREATE TYPE transaction_status AS ENUM (
-    'Pending', 'Received', 'Overdue', 'Cancelled'
-);
-
-CREATE TABLE revenues (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    unit_id UUID REFERENCES units(id) ON DELETE CASCADE,
-    professional_id UUID REFERENCES professionals(id) ON DELETE SET NULL,
-    type income_type NOT NULL,
-    source TEXT,
-    value NUMERIC(12,2) NOT NULL,
-    date DATE DEFAULT CURRENT_DATE NOT NULL,
-    
-    -- Contabilidade por Competência
-    accrual_start_date DATE,
-    accrual_end_date DATE,
-    expected_receipt_date DATE,
-    actual_receipt_date DATE,
-    
-    -- Valores Bruto/Líquido
-    gross_amount NUMERIC(15,2),
-    fees NUMERIC(15,2) DEFAULT 0,
-    net_amount NUMERIC(15,2),
-    
-    -- Relacionamentos
-    party_id UUID REFERENCES parties(id) ON DELETE SET NULL,
-    account_id UUID REFERENCES bank_accounts(id) ON DELETE SET NULL,
-    
-    -- Status Automático (via Trigger)
-    status transaction_status DEFAULT 'Pending',
-    
-    -- Metadados
-    observations TEXT,
-    created_at TIMESTAMP DEFAULT NOW(),
-    user_id UUID REFERENCES auth.users(id),
-    
-    -- Constraints
-    CONSTRAINT revenues_net_amount_positive CHECK (net_amount > 0),
-    CONSTRAINT revenues_accrual_dates CHECK (accrual_end_date >= accrual_start_date),
-    CONSTRAINT revenues_fees_non_negative CHECK (fees >= 0),
-    CONSTRAINT revenues_gross_amount_positive CHECK (gross_amount > 0)
-);
-
--- RLS Policy
-CREATE POLICY "revenues_unit_access" ON revenues
-    FOR ALL USING (
-        unit_id IN (
-            SELECT unit_id FROM professionals WHERE user_id = auth.uid()
-        )
-    );
-
--- Triggers
-CREATE TRIGGER trigger_calculate_revenue_status
-    BEFORE INSERT OR UPDATE ON revenues
-    FOR EACH ROW EXECUTE FUNCTION calculate_revenue_status();
-
-CREATE TRIGGER trigger_revenues_summary
-    AFTER INSERT OR UPDATE OR DELETE ON revenues
-    FOR EACH ROW EXECUTE FUNCTION update_monthly_summary();
-
--- Índices Estratégicos
-CREATE INDEX idx_revenues_unit_id ON revenues(unit_id);
-CREATE INDEX idx_revenues_status ON revenues(status);
-CREATE INDEX idx_revenues_accrual_start_date ON revenues(accrual_start_date);
-CREATE INDEX idx_revenues_expected_receipt_date ON revenues(expected_receipt_date);
-CREATE INDEX idx_revenues_actual_receipt_date ON revenues(actual_receipt_date);
-CREATE INDEX idx_revenues_unit_accrual ON revenues(unit_id, accrual_start_date);
-CREATE INDEX idx_revenues_status_pending ON revenues(unit_id, status) 
-    WHERE status IN ('Pending', 'Overdue');
-```
-
-### **expenses** (Despesas)
-> Despesas com contabilidade por competência
-
-```sql
-CREATE TYPE expense_type AS ENUM (
-    'salary', 'rent', 'utilities', 'supplies', 'marketing', 
-    'equipment', 'maintenance', 'insurance', 'taxes', 'other'
-);
-
-CREATE TABLE expenses (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    unit_id UUID REFERENCES units(id) ON DELETE CASCADE,
-    type expense_type NOT NULL,
-    description TEXT NOT NULL,
-    value NUMERIC(12,2) NOT NULL,
-    date DATE DEFAULT CURRENT_DATE NOT NULL,
-    
-    -- Contabilidade por Competência
-    accrual_start_date DATE,
-    accrual_end_date DATE,
-    expected_payment_date DATE,
-    actual_payment_date DATE,
-    
-    -- Relacionamentos
-    party_id UUID REFERENCES parties(id) ON DELETE SET NULL,
-    
-    -- Status Automático
-    status transaction_status DEFAULT 'Pending',
-    
-    -- Metadados
-    observations TEXT,
-    created_at TIMESTAMP DEFAULT NOW(),
-    user_id UUID REFERENCES auth.users(id),
-    
-    -- Constraints
-    CONSTRAINT expenses_value_positive CHECK (value > 0),
-    CONSTRAINT expenses_accrual_dates CHECK (accrual_end_date >= accrual_start_date)
-);
-
--- Trigger para Status Automático
-CREATE TRIGGER trigger_calculate_expense_status
-    BEFORE INSERT OR UPDATE ON expenses
-    FOR EACH ROW EXECUTE FUNCTION calculate_expense_status();
-
--- Índices
-CREATE INDEX idx_expenses_unit_id ON expenses(unit_id);
-CREATE INDEX idx_expenses_status ON expenses(status);
-CREATE INDEX idx_expenses_expected_payment_date ON expenses(expected_payment_date);
-CREATE INDEX idx_expenses_unit_accrual ON expenses(unit_id, accrual_start_date);
-```
+**Comentário:** Clientes e fornecedores (terceiros)  
+**RLS:** ✅ Ativo  
+**Registros:** 0
 
 ---
 
-## 🏦 Banking Tables
+## 🏦 Table: `bank_accounts`
 
-### **bank_accounts** (Contas Bancárias)
-```sql
-CREATE TABLE bank_accounts (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    unit_id UUID REFERENCES units(id) ON DELETE CASCADE,
-    bank_name VARCHAR(100) NOT NULL,
-    account_type VARCHAR(50) NOT NULL, -- 'checking', 'savings', 'business'
-    account_number VARCHAR(20) NOT NULL,
-    agency VARCHAR(10),
-    balance NUMERIC(15,2) DEFAULT 0,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    
-    CONSTRAINT bank_accounts_balance_can_be_negative CHECK (balance >= -999999999)
-);
+| Column          | Type        | Description                | Constraints                        |
+| --------------- | ----------- | -------------------------- | ---------------------------------- |
+| id              | UUID        | Primary key                | PK, DEFAULT gen_random_uuid()      |
+| unit_id         | UUID        | Referência à unidade       | FK → units.id                      |
+| name            | VARCHAR     | Nome da conta              | CHECK char_length(name) >= 3       |
+| bank_name       | VARCHAR     | Nome do banco              | -                                  |
+| agency          | VARCHAR     | Agência (apenas números)   | CHECK agency ~ '^[\\d-]+$'         |
+| account_number  | VARCHAR     | Número da conta            | CHECK account_number ~ '^[\\d-]+$' |
+| nickname        | VARCHAR     | Apelido da conta           | NULLABLE                           |
+| initial_balance | NUMERIC     | Saldo inicial              | DEFAULT 0.00                       |
+| is_active       | BOOLEAN     | Status ativo               | DEFAULT true                       |
+| created_at      | TIMESTAMPTZ | Data de criação            | DEFAULT now()                      |
+| updated_at      | TIMESTAMPTZ | Data da última atualização | DEFAULT now()                      |
 
--- Trigger
-CREATE TRIGGER trigger_update_bank_accounts_updated_at
-    BEFORE UPDATE ON bank_accounts
-    FOR EACH ROW EXECUTE FUNCTION update_bank_accounts_updated_at();
-
--- Índices
-CREATE INDEX idx_bank_accounts_unit_id ON bank_accounts(unit_id);
-CREATE INDEX idx_bank_accounts_is_active ON bank_accounts(is_active);
-```
-
-### **bank_statements** (Extratos Bancários)
-```sql
-CREATE TYPE statement_type AS ENUM ('credit', 'debit');
-
-CREATE TABLE bank_statements (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    bank_account_id UUID REFERENCES bank_accounts(id) ON DELETE CASCADE,
-    transaction_date DATE NOT NULL,
-    description TEXT NOT NULL,
-    amount NUMERIC(15,2) NOT NULL,
-    type statement_type NOT NULL,
-    balance_after NUMERIC(15,2),
-    reconciled BOOLEAN DEFAULT FALSE,
-    hash_unique VARCHAR(32) UNIQUE, -- Para evitar duplicatas
-    created_at TIMESTAMP DEFAULT NOW(),
-    
-    CONSTRAINT bank_statements_amount_not_zero CHECK (amount != 0)
-);
-
--- Trigger para Hash Único
-CREATE TRIGGER trigger_set_statement_hash
-    BEFORE INSERT ON bank_statements
-    FOR EACH ROW EXECUTE FUNCTION set_statement_hash();
-
--- Índices Otimizados
-CREATE INDEX idx_bank_statements_account_id ON bank_statements(bank_account_id);
-CREATE INDEX idx_bank_statements_transaction_date ON bank_statements(transaction_date);
-CREATE INDEX idx_bank_statements_reconciled ON bank_statements(reconciled);
-CREATE INDEX idx_bank_statements_account_date ON bank_statements(bank_account_id, transaction_date);
-CREATE INDEX idx_bank_statements_not_reconciled ON bank_statements(bank_account_id, reconciled) 
-    WHERE reconciled = FALSE;
-```
-
-### **reconciliations** (Conciliações)
-```sql
-CREATE TYPE reconciliation_status AS ENUM ('Pending', 'Reconciled', 'Divergent');
-CREATE TYPE reference_type AS ENUM ('Revenue', 'Expense');
-
-CREATE TABLE reconciliations (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    bank_statement_id UUID REFERENCES bank_statements(id) ON DELETE CASCADE,
-    reference_type reference_type NOT NULL,
-    reference_id UUID NOT NULL, -- ID da revenue ou expense
-    reconciliation_date DATE DEFAULT CURRENT_DATE NOT NULL,
-    status reconciliation_status DEFAULT 'Pending' NOT NULL,
-    difference NUMERIC(15,2) DEFAULT 0,
-    notes TEXT,
-    reconciled_by UUID REFERENCES auth.users(id) NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    
-    CONSTRAINT reconciliations_difference_check CHECK (difference >= 0),
-    CONSTRAINT reconciliations_unique_statement UNIQUE (bank_statement_id, reference_type, reference_id)
-);
-
--- Trigger para Atualizar Bank Statement
-CREATE TRIGGER trigger_update_bank_statement_reconciliation
-    AFTER INSERT OR UPDATE OR DELETE ON reconciliations
-    FOR EACH ROW EXECUTE FUNCTION update_bank_statement_reconciliation();
-
--- Índices
-CREATE INDEX idx_reconciliations_statement_id ON reconciliations(bank_statement_id);
-CREATE INDEX idx_reconciliations_reference ON reconciliations(reference_type, reference_id);
-CREATE INDEX idx_reconciliations_status ON reconciliations(status);
-```
+**Comentário:** Contas bancárias das unidades  
+**RLS:** ✅ Ativo  
+**Registros:** 1
 
 ---
 
-## 👥 Third Parties
+## 💳 Table: `payment_methods`
 
-### **parties** (Terceiros - Clientes/Fornecedores)
-```sql
-CREATE TYPE party_type AS ENUM ('pessoa_fisica', 'pessoa_juridica');
+| Column         | Type        | Description                | Constraints                         |
+| -------------- | ----------- | -------------------------- | ----------------------------------- |
+| id             | UUID        | Primary key                | PK, DEFAULT gen_random_uuid()       |
+| unit_id        | UUID        | Referência à unidade       | FK → units.id                       |
+| created_by     | UUID        | Usuário criador            | FK → auth.users.id, NULLABLE        |
+| name           | VARCHAR     | Nome do método             | CHECK char_length(name) >= 3        |
+| fee_percentage | NUMERIC     | Taxa em % (0-100)          | DEFAULT 0.00, CHECK >= 0 AND <= 100 |
+| receipt_days   | INTEGER     | Prazo de recebimento (D+N) | DEFAULT 0, CHECK >= 0               |
+| is_active      | BOOLEAN     | Status ativo               | DEFAULT true                        |
+| created_at     | TIMESTAMPTZ | Data de criação            | DEFAULT now()                       |
+| updated_at     | TIMESTAMPTZ | Data da última atualização | DEFAULT now()                       |
 
-CREATE TABLE parties (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    unit_id UUID REFERENCES units(id) ON DELETE CASCADE,
-    nome VARCHAR(255) NOT NULL,
-    tipo party_type NOT NULL,
-    cpf_cnpj VARCHAR(18) UNIQUE,
-    telefone VARCHAR(20),
-    email VARCHAR(255),
-    endereco TEXT,
-    observacoes TEXT,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    
-    CONSTRAINT parties_nome_not_empty CHECK (TRIM(nome) != '')
-);
-
--- Índices
-CREATE INDEX idx_parties_unit_id ON parties(unit_id);
-CREATE INDEX idx_parties_tipo ON parties(tipo);
-CREATE INDEX idx_parties_nome ON parties(nome);
-CREATE INDEX idx_parties_unit_tipo ON parties(unit_id, tipo) WHERE is_active = TRUE;
-```
+**Comentário:** Métodos de pagamento configuráveis por unidade  
+**RLS:** ✅ Ativo  
+**Registros:** 1
 
 ---
 
-## 💳 Payment Methods
+## 📊 Table: `bank_statements`
 
-### **payment_methods** (Formas de Pagamento)
-```sql
-CREATE TABLE payment_methods (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    unit_id UUID REFERENCES units(id) ON DELETE CASCADE,
-    name VARCHAR(100) NOT NULL,
-    fee_percentage NUMERIC(5,2) DEFAULT 0.00 NOT NULL,
-    receipt_days INTEGER DEFAULT 0 NOT NULL,
-    is_active BOOLEAN DEFAULT TRUE NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW() NOT NULL,
-    updated_at TIMESTAMP DEFAULT NOW() NOT NULL,
-    created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
-    
-    CONSTRAINT payment_methods_fee_percentage_range 
-        CHECK (fee_percentage >= 0 AND fee_percentage <= 100),
-    CONSTRAINT payment_methods_name_not_empty 
-        CHECK (TRIM(name) != ''),
-    CONSTRAINT payment_methods_receipt_days_non_negative 
-        CHECK (receipt_days >= 0)
-);
+| Column           | Type                  | Description                      | Constraints                         |
+| ---------------- | --------------------- | -------------------------------- | ----------------------------------- |
+| id               | UUID                  | Primary key                      | PK, DEFAULT gen_random_uuid()       |
+| bank_account_id  | UUID                  | Referência à conta               | FK → bank_accounts.id               |
+| transaction_date | DATE                  | Data da transação                | -                                   |
+| description      | TEXT                  | Descrição da transação           | CHECK char_length(description) >= 3 |
+| amount           | NUMERIC               | Valor da transação               | CHECK amount <> 0                   |
+| type             | BANK_TRANSACTION_TYPE | Credit/Debit                     | ENUM                                |
+| balance_after    | NUMERIC               | Saldo após transação             | NULLABLE                            |
+| reconciled       | BOOLEAN               | Flag de conciliação              | DEFAULT false                       |
+| status           | VARCHAR               | Status: pending/reconciled       | DEFAULT 'pending'                   |
+| hash_unique      | VARCHAR               | Hash para detecção de duplicatas | UNIQUE                              |
+| created_at       | TIMESTAMPTZ           | Data de criação                  | DEFAULT now()                       |
 
--- RLS Policy (Apenas Admins)
-CREATE POLICY "payment_methods_admin_only" ON payment_methods
-    FOR ALL USING (get_user_role() = 'admin');
-
--- Trigger
-CREATE TRIGGER trigger_update_payment_methods_updated_at
-    BEFORE UPDATE ON payment_methods
-    FOR EACH ROW EXECUTE FUNCTION update_payment_methods_updated_at();
-
--- Índices
-CREATE INDEX idx_payment_methods_unit_id ON payment_methods(unit_id);
-CREATE INDEX idx_payment_methods_is_active ON payment_methods(is_active) WHERE is_active = TRUE;
-```
+**Comentário:** Extratos bancários importados  
+**RLS:** ✅ Ativo  
+**Registros:** 0
 
 ---
 
-## 🎯 Queue System
+## 💰 Table: `revenues`
 
-### **fila_atendimento** (Fila de Atendimento)
-```sql
-CREATE TYPE queue_status AS ENUM ('active', 'paused', 'attending');
+| Column                | Type               | Description                            | Constraints                                          |
+| --------------------- | ------------------ | -------------------------------------- | ---------------------------------------------------- |
+| id                    | UUID               | Primary key                            | PK, DEFAULT gen_random_uuid()                        |
+| type                  | INCOME_TYPE        | Tipo: service/product/commission/other | ENUM                                                 |
+| value                 | NUMERIC            | Valor principal (0.01-999999.99)       | CHECK value > 0 AND <= 999999.99                     |
+| date                  | DATE               | Data da receita                        | DEFAULT CURRENT_DATE, CHECK <= CURRENT_DATE + 1 year |
+| unit_id               | UUID               | Unidade que gerou                      | FK → units.id, NULLABLE                              |
+| account_id            | UUID               | Conta bancária destino                 | FK → bank_accounts.id, NULLABLE                      |
+| category_id           | UUID               | Categoria da receita                   | FK → categories.id, NULLABLE                         |
+| professional_id       | UUID               | Profissional responsável               | FK → professionals.id, NULLABLE                      |
+| user_id               | UUID               | Usuário que registrou                  | FK → auth.users.id, NULLABLE                         |
+| party_id              | UUID               | Cliente/parte relacionada              | FK → parties.id, NULLABLE                            |
+| source                | TEXT               | Origem/fonte da receita                | NULLABLE                                             |
+| observations          | TEXT               | Observações adicionais                 | NULLABLE                                             |
+| gross_amount          | NUMERIC            | Valor bruto (antes taxas)              | NULLABLE, CHECK > 0                                  |
+| net_amount            | NUMERIC            | Valor líquido (após taxas)             | NULLABLE, CHECK > 0                                  |
+| fees                  | NUMERIC            | Taxas descontadas                      | DEFAULT 0.00, CHECK >= 0                             |
+| accrual_start_date    | DATE               | Início período competência             | NULLABLE                                             |
+| accrual_end_date      | DATE               | Fim período competência                | NULLABLE                                             |
+| expected_receipt_date | DATE               | Data prevista recebimento              | NULLABLE                                             |
+| actual_receipt_date   | DATE               | Data efetiva recebimento               | NULLABLE                                             |
+| status                | TRANSACTION_STATUS | Status da transação                    | DEFAULT 'Pending', ENUM                              |
+| is_active             | BOOLEAN            | Soft delete flag                       | DEFAULT true                                         |
+| created_at            | TIMESTAMPTZ        | Data de criação                        | DEFAULT now()                                        |
+| updated_at            | TIMESTAMPTZ        | Data da última atualização             | DEFAULT now()                                        |
 
-CREATE TABLE fila_atendimento (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    barbeiro_id UUID REFERENCES professionals(id) ON DELETE CASCADE,
-    unidade_id UUID REFERENCES units(id) ON DELETE CASCADE,
-    total_atendimentos INTEGER DEFAULT 0,
-    status queue_status DEFAULT 'active',
-    data_atual DATE DEFAULT CURRENT_DATE,
-    ultima_atualizacao TIMESTAMP DEFAULT NOW(),
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    user_id UUID REFERENCES auth.users(id),
-    
-    CONSTRAINT fila_atendimento_barbeiro_id_unidade_id_data_atual_key 
-        UNIQUE (barbeiro_id, unidade_id, data_atual)
-);
-
--- Triggers
-CREATE TRIGGER trigger_atualizar_timestamp_fila
-    BEFORE UPDATE ON fila_atendimento
-    FOR EACH ROW EXECUTE FUNCTION atualizar_timestamp_fila();
-
--- Índices Otimizados
-CREATE INDEX idx_fila_atendimento_unidade_status 
-    ON fila_atendimento(unidade_id, status, total_atendimentos, ultima_atualizacao);
-CREATE INDEX idx_fila_atendimento_barbeiro_data ON fila_atendimento(barbeiro_id, data_atual);
-CREATE INDEX idx_fila_atendimento_data_status ON fila_atendimento(data_atual, status);
-```
-
-### **historico_atendimentos** (Histórico)
-```sql
-CREATE TABLE historico_atendimentos (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    barbeiro_id UUID REFERENCES professionals(id) ON DELETE CASCADE,
-    unidade_id UUID REFERENCES units(id) ON DELETE CASCADE,
-    data_atendimento DATE DEFAULT CURRENT_DATE,
-    hora_inicio TIMESTAMP,
-    hora_fim TIMESTAMP,
-    duracao_minutos INTEGER GENERATED ALWAYS AS (
-        EXTRACT(EPOCH FROM (hora_fim - hora_inicio)) / 60
-    ) STORED,
-    valor_servico NUMERIC(10,2),
-    tipo_servico TEXT,
-    status VARCHAR(20) DEFAULT 'em_andamento',
-    observacoes TEXT,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    user_id UUID REFERENCES auth.users(id)
-);
-
--- Trigger para Atualizar Contador
-CREATE TRIGGER trigger_atualizar_contador_atendimentos
-    AFTER INSERT OR UPDATE ON historico_atendimentos
-    FOR EACH ROW EXECUTE FUNCTION atualizar_contador_atendimentos();
-
--- Índices
-CREATE INDEX idx_historico_atendimentos_barbeiro_data 
-    ON historico_atendimentos(barbeiro_id, data_atendimento);
-CREATE INDEX idx_historico_atendimentos_unidade_data 
-    ON historico_atendimentos(unidade_id, data_atendimento);
-```
+**Comentário:** Receitas do sistema (núcleo financeiro)  
+**RLS:** ✅ Ativo  
+**Registros:** 3
 
 ---
 
-## 📊 Reporting Views
+## 💸 Table: `expenses`
 
-### **vw_monthly_dre** (DRE Mensal)
+| Column                | Type               | Description                                | Constraints                                          |
+| --------------------- | ------------------ | ------------------------------------------ | ---------------------------------------------------- |
+| id                    | UUID               | Primary key                                | PK, DEFAULT gen_random_uuid()                        |
+| type                  | EXPENSE_TYPE       | Tipo: rent/salary/supplies/utilities/other | ENUM                                                 |
+| value                 | NUMERIC            | Valor da despesa                           | CHECK value > 0 AND <= 999999.99                     |
+| date                  | DATE               | Data da despesa                            | DEFAULT CURRENT_DATE, CHECK <= CURRENT_DATE + 1 year |
+| unit_id               | UUID               | Referência à unidade                       | FK → units.id                                        |
+| account_id            | UUID               | Conta bancária origem                      | FK → bank_accounts.id, NULLABLE                      |
+| category_id           | UUID               | Categoria da despesa                       | FK → categories.id, NULLABLE                         |
+| party_id              | UUID               | Fornecedor relacionado                     | FK → parties.id, NULLABLE                            |
+| user_id               | UUID               | Usuário que registrou                      | FK → auth.users.id, NULLABLE                         |
+| description           | TEXT               | Descrição da despesa                       | NULLABLE                                             |
+| observations          | TEXT               | Observações adicionais                     | NULLABLE                                             |
+| expected_payment_date | DATE               | Data prevista pagamento                    | NULLABLE                                             |
+| actual_payment_date   | DATE               | Data efetiva pagamento                     | NULLABLE                                             |
+| status                | TRANSACTION_STATUS | Status da despesa                          | DEFAULT 'Pending', ENUM                              |
+| is_active             | BOOLEAN            | Status ativo                               | DEFAULT true                                         |
+| created_at            | TIMESTAMPTZ        | Data de criação                            | DEFAULT now()                                        |
+| updated_at            | TIMESTAMPTZ        | Data da última atualização                 | DEFAULT now()                                        |
+
+**Comentário:** Despesas do sistema (saídas financeiras)  
+**RLS:** ✅ Ativo  
+**Registros:** 0
+
+---
+
+## 🏷️ Table: `categories`
+
+| Column        | Type         | Description                | Constraints                               |
+| ------------- | ------------ | -------------------------- | ----------------------------------------- |
+| id            | UUID         | Primary key                | PK, DEFAULT gen_random_uuid()             |
+| unit_id       | UUID         | Referência à unidade       | FK → units.id                             |
+| name          | VARCHAR(100) | Nome da categoria          | NOT NULL, CHECK char_length(name) >= 2    |
+| description   | TEXT         | Descrição da categoria     | NULLABLE                                  |
+| category_type | VARCHAR(20)  | Tipo: Revenue/Expense      | NOT NULL, CHECK IN ('Revenue', 'Expense') |
+| parent_id     | UUID         | Categoria pai (hierarquia) | FK → categories.id, NULLABLE              |
+| is_active     | BOOLEAN      | Status ativo               | DEFAULT true                              |
+| created_at    | TIMESTAMPTZ  | Data de criação            | DEFAULT now()                             |
+| updated_at    | TIMESTAMPTZ  | Data da última atualização | DEFAULT now()                             |
+
+**Comentário:** Categorias hierárquicas para classificação de receitas e despesas  
+**RLS:** ✅ Ativo (políticas por unit_id)  
+**Registros:** 0  
+**Índices:**
+
+- `idx_categories_unit_type` - (unit_id, category_type) WHERE is_active = true
+- `idx_categories_name_search` - (name)
+- `idx_categories_parent` - (parent_id) WHERE parent_id IS NOT NULL
+- `idx_categories_active` - (unit_id, category_type, is_active)
+
+**Relacionamentos:**
+
+- `revenues.category_id` → categories.id (índice: idx_revenues_category)
+- `expenses.category_id` → categories.id (índice: idx_expenses_category)
+
+**Regras de Negócio:**
+
+- Categoria pai deve ser do mesmo tipo (Revenue ou Expense)
+- Categoria pai deve estar ativa (is_active = true)
+- Categoria não pode ser pai de si mesma
+- Apenas categorias principais (sem parent_id) podem ser pais
+- Não pode excluir categoria com subcategorias ativas
+- Suporta hierarquia de 2 níveis (Principal → Subcategoria)
+
+**Exemplos de Uso:**
+
 ```sql
-CREATE VIEW vw_monthly_dre AS
-WITH revenues AS (
-    SELECT 
-        date_trunc('month', revenue_dt) AS month,
-        SUM(amount) AS total_revenues
-    FROM vw_revenues_detailed
-    GROUP BY date_trunc('month', revenue_dt)
-),
-expenses AS (
-    SELECT 
-        date_trunc('month', expense_dt) AS month,
-        SUM(amount) AS total_expenses
-    FROM vw_expenses_detailed
-    GROUP BY date_trunc('month', expense_dt)
+-- Criar categoria principal de Receitas
+INSERT INTO categories (unit_id, name, category_type, description)
+VALUES ('uuid-unit', 'Serviços', 'Revenue', 'Serviços prestados aos clientes');
+
+-- Criar subcategoria
+INSERT INTO categories (unit_id, name, category_type, parent_id)
+VALUES ('uuid-unit', 'Corte de Cabelo', 'Revenue', 'uuid-servicos');
+
+-- Buscar árvore de categorias
+WITH RECURSIVE category_tree AS (
+  SELECT id, name, parent_id, category_type, 0 as level
+  FROM categories
+  WHERE parent_id IS NULL AND unit_id = 'uuid-unit' AND is_active = true
+  UNION ALL
+  SELECT c.id, c.name, c.parent_id, c.category_type, ct.level + 1
+  FROM categories c
+  INNER JOIN category_tree ct ON c.parent_id = ct.id
+  WHERE c.is_active = true
 )
-SELECT 
-    COALESCE(r.month, e.month) AS month,
-    COALESCE(r.total_revenues, 0) AS total_revenues,
-    COALESCE(e.total_expenses, 0) AS total_expenses,
-    COALESCE(r.total_revenues, 0) - COALESCE(e.total_expenses, 0) AS net_profit,
-    CASE 
-        WHEN COALESCE(r.total_revenues, 0) > 0 
-        THEN (COALESCE(r.total_revenues, 0) - COALESCE(e.total_expenses, 0)) / COALESCE(r.total_revenues, 0)
-        ELSE NULL 
-    END AS profit_margin
-FROM revenues r
-FULL JOIN expenses e ON r.month = e.month
-ORDER BY month DESC;
-```
-
-### **vw_cashflow_entries** (Fluxo de Caixa)
-```sql
-CREATE VIEW vw_cashflow_entries AS
-WITH daily_transactions AS (
-    -- Receitas Efetivas
-    SELECT 
-        actual_receipt_date AS transaction_date,
-        unit_id,
-        account_id,
-        COALESCE(net_amount, value) AS amount,
-        'inflow' AS type
-    FROM revenues
-    WHERE actual_receipt_date IS NOT NULL 
-      AND status = 'Received'
-    
-    UNION ALL
-    
-    -- Despesas Efetivas
-    SELECT 
-        actual_payment_date AS transaction_date,
-        unit_id,
-        NULL AS account_id,
-        value AS amount,
-        'outflow' AS type
-    FROM expenses
-    WHERE actual_payment_date IS NOT NULL 
-      AND status = 'Paid'
-),
-daily_aggregated AS (
-    SELECT 
-        transaction_date,
-        unit_id,
-        account_id,
-        SUM(CASE WHEN type = 'inflow' THEN amount ELSE 0 END) AS inflows,
-        SUM(CASE WHEN type = 'outflow' THEN amount ELSE 0 END) AS outflows,
-        SUM(CASE WHEN type = 'inflow' THEN amount ELSE -amount END) AS daily_balance
-    FROM daily_transactions
-    GROUP BY transaction_date, unit_id, account_id
-)
-SELECT 
-    transaction_date,
-    unit_id,
-    account_id,
-    inflows,
-    outflows,
-    daily_balance,
-    SUM(daily_balance) OVER (
-        PARTITION BY unit_id, account_id 
-        ORDER BY transaction_date 
-        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-    ) AS accumulated_balance
-FROM daily_aggregated
-ORDER BY transaction_date, unit_id, account_id;
-```
-
-### **vw_calendar_events** (Calendário Financeiro)
-```sql
-CREATE VIEW vw_calendar_events AS
--- Recebimentos Esperados
-SELECT 
-    r.id,
-    'Receive' AS tipo,
-    CASE 
-        WHEN r.status = 'Overdue' THEN 'Overdue'
-        ELSE 'Expected'
-    END AS status,
-    r.expected_receipt_date AS event_date,
-    COALESCE(p.nome, r.source, 'Revenue') AS title,
-    COALESCE(r.net_amount, r.value) AS amount,
-    r.unit_id,
-    r.account_id,
-    r.party_id,
-    'Revenue' AS ref_type,
-    r.id AS ref_id,
-    r.status::TEXT AS transaction_status,
-    r.type::TEXT AS category
-FROM revenues r
-LEFT JOIN parties p ON p.id = r.party_id
-WHERE r.actual_receipt_date IS NULL 
-  AND r.status NOT IN ('Cancelled', 'Received')
-
-UNION ALL
-
--- Recebimentos Efetivos
-SELECT 
-    r.id,
-    'Receive' AS tipo,
-    'Effective' AS status,
-    r.actual_receipt_date AS event_date,
-    COALESCE(p.nome, r.source, 'Revenue') AS title,
-    COALESCE(r.net_amount, r.value) AS amount,
-    r.unit_id,
-    r.account_id,
-    r.party_id,
-    'Revenue' AS ref_type,
-    r.id AS ref_id,
-    r.status::TEXT AS transaction_status,
-    r.type::TEXT AS category
-FROM revenues r
-LEFT JOIN parties p ON p.id = r.party_id
-WHERE r.actual_receipt_date IS NOT NULL 
-  AND r.status = 'Received'
-
-UNION ALL
-
--- Pagamentos Esperados/Efetivos (similar para expenses)
-SELECT 
-    e.id,
-    'Pay' AS tipo,
-    CASE 
-        WHEN e.status = 'Overdue' THEN 'Overdue'
-        WHEN e.actual_payment_date IS NOT NULL THEN 'Effective'
-        ELSE 'Expected'
-    END AS status,
-    COALESCE(e.actual_payment_date, e.expected_payment_date) AS event_date,
-    COALESCE(p.nome, e.description, 'Expense') AS title,
-    e.value AS amount,
-    e.unit_id,
-    NULL AS account_id,
-    e.party_id,
-    'Expense' AS ref_type,
-    e.id AS ref_id,
-    e.status::TEXT AS transaction_status,
-    e.type::TEXT AS category
-FROM expenses e
-LEFT JOIN parties p ON p.id = e.party_id
-WHERE (e.actual_payment_date IS NULL AND e.status NOT IN ('Cancelled', 'Paid'))
-   OR (e.actual_payment_date IS NOT NULL AND e.status = 'Paid')
-
-ORDER BY event_date DESC;
+SELECT * FROM category_tree ORDER BY level, name;
 ```
 
 ---
 
-## ⚡ Functions & Triggers
+## 🔗 Table: `reconciliations`
 
-### **Status Calculation Functions**
+| Column              | Type        | Description                                  | Constraints                     |
+| ------------------- | ----------- | -------------------------------------------- | ------------------------------- |
+| id                  | UUID        | Primary key                                  | PK, DEFAULT gen_random_uuid()   |
+| bank_statement_id   | UUID        | Referência ao extrato                        | FK → bank_statements.id, UNIQUE |
+| reference_type      | VARCHAR     | Tipo: Revenue/Expense                        | CHECK IN ('Revenue', 'Expense') |
+| reference_id        | UUID        | ID da receita/despesa                        | -                               |
+| reconciliation_date | TIMESTAMPTZ | Data da conciliação                          | DEFAULT now()                   |
+| status              | VARCHAR     | Status: pending/confirmed/Divergent/rejected | DEFAULT 'confirmed'             |
+| difference          | NUMERIC     | Diferença entre valores                      | DEFAULT 0.00, NULLABLE          |
+| notes               | TEXT        | Notas da conciliação                         | NULLABLE                        |
+| confirmed_at        | TIMESTAMPTZ | Data de confirmação                          | NULLABLE                        |
+| created_at          | TIMESTAMPTZ | Data de criação                              | DEFAULT now()                   |
 
-#### **calculate_revenue_status()**
-```sql
-CREATE OR REPLACE FUNCTION calculate_revenue_status()
-RETURNS TRIGGER AS $$
-BEGIN
-    -- Se tem data de recebimento efetivo, está Received
-    IF NEW.actual_receipt_date IS NOT NULL THEN
-        NEW.status := 'Received';
-    
-    -- Se está Pending e passou da data prevista, marca como Overdue
-    ELSIF NEW.status = 'Pending' AND NEW.expected_receipt_date < CURRENT_DATE THEN
-        NEW.status := 'Overdue';
-    
-    -- Se não tem status, define como Pending
-    ELSIF NEW.status IS NULL THEN
-        NEW.status := 'Pending';
-    END IF;
-    
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-```
-
-#### **calculate_expense_status()**
-```sql
-CREATE OR REPLACE FUNCTION calculate_expense_status()
-RETURNS TRIGGER AS $$
-BEGIN
-    -- Se tem data de pagamento efetivo, está Paid
-    IF NEW.actual_payment_date IS NOT NULL THEN
-        NEW.status := 'Paid';
-    
-    -- Se está Pending e passou da data prevista, marca como Overdue
-    ELSIF NEW.status = 'Pending' AND NEW.expected_payment_date < CURRENT_DATE THEN
-        NEW.status := 'Overdue';
-    
-    -- Se não tem status, define como Pending
-    ELSIF NEW.status IS NULL THEN
-        NEW.status := 'Pending';
-    END IF;
-    
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-```
-
-### **User Functions**
-
-#### **get_user_role()**
-```sql
-CREATE OR REPLACE FUNCTION get_user_role()
-RETURNS user_role
-LANGUAGE SQL STABLE SECURITY DEFINER AS $$
-    SELECT COALESCE(
-        (SELECT role FROM professionals WHERE user_id = auth.uid()),
-        'barbeiro'::user_role
-    );
-$$;
-```
-
-#### **get_user_unit_id()**
-```sql
-CREATE OR REPLACE FUNCTION get_user_unit_id()
-RETURNS UUID
-LANGUAGE SQL STABLE SECURITY DEFINER AS $$
-    SELECT unit_id FROM professionals WHERE user_id = auth.uid();
-$$;
-```
-
-### **Queue Management Functions**
-
-#### **get_fila_ordenada()**
-```sql
-CREATE OR REPLACE FUNCTION get_fila_ordenada(p_unidade_id UUID)
-RETURNS TABLE(
-    barbeiro_id UUID,
-    barbeiro_nome TEXT,
-    posicao INTEGER,
-    total_atendimentos INTEGER,
-    status queue_status,
-    ultima_atualizacao TIMESTAMP,
-    tempo_desde_ultimo TEXT
-)
-LANGUAGE plpgsql AS $$
-BEGIN
-    RETURN QUERY
-    SELECT 
-        f.barbeiro_id,
-        p.name::TEXT AS barbeiro_nome,
-        ROW_NUMBER() OVER (
-            ORDER BY 
-                CASE f.status 
-                    WHEN 'attending' THEN 0  -- Em atendimento fica no topo
-                    WHEN 'active' THEN 1     -- Disponíveis ordenados por critério
-                    WHEN 'paused' THEN 2     -- Pausados por último
-                END,
-                f.total_atendimentos ASC,    -- Menos atendimentos primeiro
-                f.ultima_atualizacao ASC     -- Em caso de empate, quem entrou há mais tempo
-        )::INTEGER AS posicao,
-        f.total_atendimentos,
-        f.status,
-        f.ultima_atualizacao,
-        -- Calcular tempo desde a última atualização
-        CASE 
-            WHEN f.ultima_atualizacao > NOW() - INTERVAL '1 minute' THEN 'Agora mesmo'
-            WHEN f.ultima_atualizacao > NOW() - INTERVAL '1 hour' THEN 
-                EXTRACT(EPOCH FROM (NOW() - f.ultima_atualizacao))::INTEGER / 60 || ' min'
-            ELSE 
-                EXTRACT(EPOCH FROM (NOW() - f.ultima_atualizacao))::INTEGER / 3600 || ' h'
-        END::TEXT AS tempo_desde_ultimo
-    FROM fila_atendimento f
-    JOIN professionals p ON f.barbeiro_id = p.id
-    WHERE f.unidade_id = p_unidade_id 
-        AND f.data_atual = CURRENT_DATE
-        AND p.is_active = TRUE
-        AND p.role = 'barbeiro'
-    ORDER BY posicao;
-END;
-$$;
-```
+**Comentário:** Conciliação bancária - vínculo extratos x lançamentos  
+**RLS:** ✅ Ativo  
+**Registros:** 0
 
 ---
 
-## 🔐 Row Level Security (RLS)
+## 📝 Table: `access_logs`
 
-### **Políticas Principais**
+| Column     | Type        | Description             | Constraints                    |
+| ---------- | ----------- | ----------------------- | ------------------------------ |
+| id         | UUID        | Primary key             | PK, DEFAULT gen_random_uuid()  |
+| user_id    | UUID        | Usuário que executou    | FK → auth.users.id, NULLABLE   |
+| action     | VARCHAR     | Ação realizada          | CHECK char_length(action) >= 3 |
+| resource   | VARCHAR     | Recurso acessado        | NULLABLE                       |
+| timestamp  | TIMESTAMPTZ | Data/hora da ação       | DEFAULT now()                  |
+| ip_address | INET        | Endereço IP             | NULLABLE                       |
+| user_agent | TEXT        | User Agent do navegador | NULLABLE                       |
 
-#### **Unit Isolation** (Isolamento por Unidade)
-```sql
--- Aplicada em todas as tabelas principais
-CREATE POLICY "unit_isolation" ON [table_name]
-    FOR ALL USING (
-        unit_id IN (
-            SELECT unit_id 
-            FROM professionals 
-            WHERE user_id = auth.uid()
-        )
-    );
-```
-
-#### **Admin Override** (Acesso Total para Admins)
-```sql
-CREATE POLICY "admin_full_access" ON [table_name]
-    FOR ALL USING (get_user_role() = 'admin');
-```
-
-#### **Role-Based Access** (Acesso por Perfil)
-```sql
--- Exemplo: Payment Methods apenas para Admins
-CREATE POLICY "payment_methods_admin_only" ON payment_methods
-    FOR ALL USING (get_user_role() = 'admin');
-
--- Exemplo: Relatórios para Gerentes e Admins
-CREATE POLICY "reports_managers_and_admins" ON reports
-    FOR SELECT USING (get_user_role() IN ('admin', 'gerente'));
-```
+**Comentário:** Logs de auditoria e acesso ao sistema  
+**RLS:** ✅ Ativo  
+**Registros:** 0
 
 ---
 
-## 📈 Performance Optimization
+## 🎯 Table: `goals`
 
-### **Índices Estratégicos**
+| Column         | Type        | Description                        | Constraints                         |
+| -------------- | ----------- | ---------------------------------- | ----------------------------------- |
+| id             | UUID        | Primary key                        | PK, DEFAULT gen_random_uuid()       |
+| unit_id        | UUID        | Referência à unidade               | FK → units.id                       |
+| goal_type      | ENUM        | Tipo de meta                       | goal_type ENUM                      |
+| period         | ENUM        | Período da meta                    | goal_period ENUM, DEFAULT 'monthly' |
+| target_value   | DECIMAL     | Valor alvo da meta                 | NOT NULL                            |
+| achieved_value | DECIMAL     | Valor atingido                     | DEFAULT 0                           |
+| goal_year      | INTEGER     | Ano da meta                        | NOT NULL                            |
+| goal_month     | INTEGER     | Mês da meta (NULL para anual)      | -                                   |
+| goal_quarter   | INTEGER     | Trimestre (NULL para mensal/anual) | -                                   |
+| is_active      | BOOLEAN     | Meta ativa                         | DEFAULT true                        |
+| created_at     | TIMESTAMPTZ | Data de criação                    | DEFAULT now()                       |
+| updated_at     | TIMESTAMPTZ | Data da última atualização         | DEFAULT now()                       |
+| created_by     | UUID        | Usuário criador                    | FK → auth.users.id                  |
 
-#### **Consultas Frequentes**
-```sql
--- Dashboard Queries
-CREATE INDEX idx_revenues_dashboard ON revenues(unit_id, date, status) 
-    WHERE is_active = TRUE;
-
-CREATE INDEX idx_expenses_dashboard ON expenses(unit_id, date, status);
-
--- Relatórios Mensais
-CREATE INDEX idx_revenues_monthly ON revenues(unit_id, accrual_start_date);
-CREATE INDEX idx_expenses_monthly ON expenses(unit_id, accrual_start_date);
-
--- Calendário Financeiro
-CREATE INDEX idx_revenues_calendar ON revenues(unit_id, expected_receipt_date) 
-    WHERE status IN ('Pending', 'Overdue');
-CREATE INDEX idx_expenses_calendar ON expenses(unit_id, expected_payment_date) 
-    WHERE status IN ('Pending', 'Overdue');
-```
-
-#### **Conciliação Bancária**
-```sql
--- Auto-matching Algorithm
-CREATE INDEX idx_bank_statements_matching ON bank_statements(
-    bank_account_id, transaction_date, amount
-) WHERE reconciled = FALSE;
-
--- Reconciliation Status
-CREATE INDEX idx_reconciliations_pending ON reconciliations(status, created_at) 
-    WHERE status = 'Pending';
-```
-
-### **Partitioning Strategy**
-```sql
--- Para grandes volumes de dados históricos
-CREATE TABLE revenues_2024 PARTITION OF revenues
-    FOR VALUES FROM ('2024-01-01') TO ('2025-01-01');
-
-CREATE TABLE revenues_2025 PARTITION OF revenues
-    FOR VALUES FROM ('2025-01-01') TO ('2026-01-01');
-
--- Índices automáticos em partições
-CREATE INDEX idx_revenues_2024_unit_date ON revenues_2024(unit_id, date);
-CREATE INDEX idx_revenues_2025_unit_date ON revenues_2025(unit_id, date);
-```
+**Comentário:** Metas financeiras por unidade e período  
+**RLS:** ✅ Ativo  
+**Registros:** 0
 
 ---
 
-## 🧪 Database Testing
+## 📊 Views
 
-### **Data Integrity Tests**
-```sql
--- Test: Revenue Status Consistency
-SELECT 'FAIL: Status inconsistency' AS test_result
-FROM revenues 
-WHERE (actual_receipt_date IS NOT NULL AND status != 'Received')
-   OR (actual_receipt_date IS NULL AND expected_receipt_date < CURRENT_DATE AND status = 'Pending')
-HAVING COUNT(*) > 0
+### `vw_goals_with_units`
 
-UNION ALL
+View que combina metas com informações das unidades, incluindo cálculos de progresso e status.
 
-SELECT 'PASS: Revenue status consistent' AS test_result
-WHERE NOT EXISTS (
-    SELECT 1 FROM revenues 
-    WHERE (actual_receipt_date IS NOT NULL AND status != 'Received')
-       OR (actual_receipt_date IS NULL AND expected_receipt_date < CURRENT_DATE AND status = 'Pending')
-);
+| Column              | Type        | Description                               |
+| ------------------- | ----------- | ----------------------------------------- |
+| id                  | UUID        | ID da meta                                |
+| unit_id             | UUID        | ID da unidade                             |
+| unit_name           | TEXT        | Nome da unidade                           |
+| goal_type           | ENUM        | Tipo da meta                              |
+| period              | ENUM        | Período da meta                           |
+| target_value        | DECIMAL     | Valor alvo                                |
+| achieved_value      | DECIMAL     | Valor atingido                            |
+| goal_year           | INTEGER     | Ano da meta                               |
+| goal_month          | INTEGER     | Mês da meta (NULL para anual)             |
+| goal_quarter        | INTEGER     | Trimestre (NULL para mensal/anual)        |
+| is_active           | BOOLEAN     | Meta ativa                                |
+| created_at          | TIMESTAMPTZ | Data de criação                           |
+| updated_at          | TIMESTAMPTZ | Data da última atualização                |
+| created_by          | UUID        | Usuário criador                           |
+| progress_percentage | DECIMAL     | Percentual de progresso (0-100)           |
+| remaining_value     | DECIMAL     | Valor restante para atingir meta          |
+| status              | TEXT        | Status: achieved/on_track/behind/critical |
 
--- Test: RLS Isolation
-DO $$
-DECLARE
-    test_user_id UUID;
-    test_count INTEGER;
-BEGIN
-    -- Criar usuário de teste
-    INSERT INTO auth.users (id, email) VALUES (gen_random_uuid(), 'test@example.com')
-    RETURNING id INTO test_user_id;
-    
-    -- Simular contexto do usuário
-    PERFORM set_config('request.jwt.claims', json_build_object('sub', test_user_id)::text, true);
-    
-    -- Testar isolamento
-    SELECT COUNT(*) INTO test_count FROM revenues;
-    
-    IF test_count > 0 THEN
-        RAISE EXCEPTION 'RLS FAIL: User can see other unit data';
-    ELSE
-        RAISE NOTICE 'RLS PASS: Proper isolation';
-    END IF;
-    
-    -- Cleanup
-    DELETE FROM auth.users WHERE id = test_user_id;
-END;
-$$;
-```
+**Comentário:** View para consultas otimizadas de metas com informações das unidades  
+**Registros:** 10 (5 metas por unidade)
 
-### **Performance Tests**
-```sql
--- Test: Query Performance
-EXPLAIN (ANALYZE, BUFFERS, FORMAT TEXT)
-SELECT 
-    month,
-    total_revenues,
-    total_expenses,
-    net_profit
-FROM vw_monthly_dre
-WHERE month >= '2024-01-01'
-ORDER BY month DESC
-LIMIT 12;
+### `vw_financial_summary`
 
--- Test: Index Usage
-SELECT 
-    schemaname,
-    tablename,
-    indexname,
-    idx_scan,
-    idx_tup_read,
-    idx_tup_fetch
-FROM pg_stat_user_indexes
-WHERE tablename IN ('revenues', 'expenses', 'bank_statements')
-ORDER BY idx_scan DESC;
-```
+View agregada para relatórios financeiros com dados consolidados por unidade.
+
+| Column             | Type        | Description                                      |
+| ------------------ | ----------- | ------------------------------------------------ |
+| unit_id            | UUID        | ID da unidade                                    |
+| unit_name          | TEXT        | Nome da unidade                                  |
+| total_revenue      | DECIMAL     | Receita total                                    |
+| total_expenses     | DECIMAL     | Despesas total                                   |
+| net_profit         | DECIMAL     | Lucro líquido                                    |
+| avg_profit_margin  | DECIMAL     | Margem média de lucro (%)                        |
+| months_with_data   | INTEGER     | Meses com dados                                  |
+| last_month         | DATE        | Último mês com dados                             |
+| first_month        | DATE        | Primeiro mês com dados                           |
+| performance_status | TEXT        | Status: excellent/good/average/needs_improvement |
+| activity_status    | TEXT        | Status: active/recent/inactive                   |
+| generated_at       | TIMESTAMPTZ | Data de geração da view                          |
+
+**Comentário:** View para relatórios gerenciais com dados agregados dos últimos 12 meses  
+**Registros:** Dinâmico (baseado nas unidades ativas)
 
 ---
 
-## 🚀 Migration Scripts
+### `vw_calendar_events`
 
-### **Version Upgrade Template**
-```sql
--- Migration: v1.2.0 -> v1.3.0
--- Add: Payment Methods Support
+**Propósito:** Unifica eventos financeiros (receitas e despesas) para exibição no calendário
 
-BEGIN;
+**Colunas:**
 
--- 1. Create new table
-CREATE TABLE payment_methods (
-    -- [table definition]
-);
+- `id`, `tipo` (Receive/Pay), `status` (Expected/Effective/Overdue)
+- `event_date`, `title`, `amount`, `unit_id`, `account_id`, `party_id`
+- `ref_type` (Revenue/Expense), `ref_id`, `transaction_status`, `category`
 
--- 2. Add new columns
-ALTER TABLE revenues 
-ADD COLUMN payment_method_id UUID REFERENCES payment_methods(id);
+### `vw_cashflow_entries`
 
--- 3. Migrate existing data
-UPDATE revenues 
-SET payment_method_id = (
-    SELECT id FROM payment_methods 
-    WHERE name = 'Dinheiro' 
-    LIMIT 1
-)
-WHERE payment_method_id IS NULL;
+**Propósito:** Entradas e saídas agregadas para análise de fluxo de caixa
 
--- 4. Add constraints
-ALTER TABLE revenues 
-ADD CONSTRAINT revenues_payment_method_required 
-CHECK (payment_method_id IS NOT NULL);
+**Colunas:**
 
--- 5. Create indexes
-CREATE INDEX idx_revenues_payment_method ON revenues(payment_method_id);
+- `transaction_id`, `transaction_type` (Revenue/Expense)
+- `unit_id`, `account_id`, `transaction_date`, `description`
+- `inflows`, `outflows`, `daily_balance`, `status`
 
--- 6. Update RLS policies
-CREATE POLICY "payment_methods_unit_access" ON payment_methods
-    FOR ALL USING (unit_id IN (SELECT unit_id FROM professionals WHERE user_id = auth.uid()));
+### `vw_dashboard_financials`
 
--- 7. Grant permissions
-GRANT SELECT ON payment_methods TO authenticated;
+**Propósito:** Métricas financeiras agregadas por mês para dashboard
 
--- 8. Update version
-INSERT INTO schema_migrations (version, applied_at) VALUES ('1.3.0', NOW());
+**Colunas:**
 
-COMMIT;
-```
+- `unit_id`, `period`, `total_revenue`, `total_net_revenue`, `total_fees`
+- `received_revenue`, `pending_revenue`, `overdue_revenue`
+- `total_transactions`, `received_count`, `pending_count`
+
+### `vw_reconciliation_summary`
+
+**Propósito:** Resumo de conciliação bancária por conta e período
+
+**Colunas:**
+
+- `account_id`, `account_name`, `unit_id`, `period`
+- `total_statements`, `total_reconciled`, `total_pending`
+- `total_amount`, `reconciled_amount`, `pending_amount`, `divergent_amount`
 
 ---
 
-## 📊 Monitoring & Maintenance
+## 🔤 Enums
 
-### **Health Check Queries**
-```sql
--- Database Size
-SELECT 
-    pg_size_pretty(pg_database_size(current_database())) AS database_size;
+### `income_type`
 
--- Table Statistics
-SELECT 
-    schemaname,
-    tablename,
-    n_tup_ins AS inserts,
-    n_tup_upd AS updates,
-    n_tup_del AS deletes,
-    n_live_tup AS live_rows,
-    n_dead_tup AS dead_rows
-FROM pg_stat_user_tables
-ORDER BY n_live_tup DESC;
+- `service` - Serviços prestados
+- `product` - Venda de produtos
+- `commission` - Comissões recebidas
+- `other` - Outras receitas
 
--- Index Usage
-SELECT 
-    i.tablename,
-    i.indexname,
-    i.idx_scan AS scans,
-    pg_size_pretty(pg_relation_size(i.indexrelid)) AS size
-FROM pg_stat_user_indexes i
-JOIN pg_stat_user_tables t ON i.tablename = t.tablename
-WHERE i.idx_scan < 100 AND pg_relation_size(i.indexrelid) > 1000000
-ORDER BY pg_relation_size(i.indexrelid) DESC;
-```
+### `expense_type`
 
-### **Cleanup Procedures**
-```sql
--- Monthly Cleanup Procedure
-CREATE OR REPLACE FUNCTION monthly_cleanup()
-RETURNS void AS $$
-BEGIN
-    -- Limpar logs antigos (> 6 meses)
-    DELETE FROM access_logs 
-    WHERE created_at < NOW() - INTERVAL '6 months';
-    
-    -- Arquivar dados antigos
-    INSERT INTO historical_data 
-    SELECT * FROM bank_statements 
-    WHERE transaction_date < NOW() - INTERVAL '2 years'
-      AND reconciled = TRUE;
-    
-    DELETE FROM bank_statements 
-    WHERE transaction_date < NOW() - INTERVAL '2 years'
-      AND reconciled = TRUE;
-    
-    -- Vacuum e Analyze
-    VACUUM ANALYZE;
-    
-    RAISE NOTICE 'Monthly cleanup completed at %', NOW();
-END;
-$$ LANGUAGE plpgsql;
+- `rent` - Aluguel
+- `salary` - Salários
+- `supplies` - Suprimentos
+- `utilities` - Utilidades (energia, água, etc.)
+- `other` - Outras despesas
 
--- Agendar via pg_cron (se disponível)
-SELECT cron.schedule('monthly-cleanup', '0 2 1 * *', 'SELECT monthly_cleanup();');
-```
+### `transaction_status`
+
+- `Pending` - Pendente
+- `Partial` - Parcial
+- `Received` - Recebido
+- `Paid` - Pago
+- `Cancelled` - Cancelado
+- `Overdue` - Vencido
+
+### `party_type`
+
+- `Cliente` - Cliente
+- `Fornecedor` - Fornecedor
+
+### `bank_transaction_type`
+
+- `Credit` - Crédito (entrada)
+- `Debit` - Débito (saída)
+
+### `goal_type`
+
+- `revenue_general` - Meta de Faturamento Geral
+- `subscription` - Meta de Assinatura
+- `product_sales` - Meta de Venda de Produtos
+- `expenses` - Meta de Despesas
+- `profit` - Meta de Resultado/Lucro
+
+### `goal_period`
+
+- `monthly` - Mensal
+- `quarterly` - Trimestral
+- `yearly` - Anual
 
 ---
 
-**🔗 Links Relacionados:**
-- [Architecture Overview](./ARCHITECTURE.md)
-- [Financial Module](./FINANCIAL_MODULE.md)
-- [API Reference](./API_REFERENCE.md)
+## 🔐 Triggers and Functions
+
+| Name                           | Purpose                                         |
+| ------------------------------ | ----------------------------------------------- |
+| `update_timestamp()`           | Atualiza automaticamente `updated_at`           |
+| `trigger_update_professionals` | Mantém timestamps dos profissionais atualizados |
+| `trigger_update_units`         | Mantém timestamps das unidades atualizados      |
 
 ---
 
-*Última atualização: 18/10/2025*
+## 🧭 Notes
+
+- **Multi-tenant:** Todas as tabelas principais são filtradas por `unit_id`
+- **RLS Ativo:** Row Level Security habilitado em todas as tabelas
+- **UUIDs:** Todos os IDs usam `gen_random_uuid()` para consistência
+- **ENUMs:** Garantem integridade de dados e simplificam filtros na UI
+- **Soft Delete:** Campo `is_active` para exclusão lógica
+- **Auditoria:** Campos `created_at` e `updated_at` em todas as tabelas
+- **Integração:** Projetado para Supabase Realtime e Edge Functions
+- **Arquitetura:** Segue Clean Architecture e normalização 3NF
+
+---
+
+📘 **Arquivo atualizado por:** AI Agent via Supabase MCP  
+📅 **Para o Projeto:** Barber Analytics Pro  
+🧠 **Stack:** Supabase + React + TypeScript + Tailwind  
+🔄 **Última atualização:** 2024-10-17

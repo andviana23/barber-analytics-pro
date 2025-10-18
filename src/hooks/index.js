@@ -11,8 +11,10 @@ export { default as useProfissionais } from './useProfissionais';
 export { useUnits } from './useUnits';
 
 // FASE 4 - Custom Hooks para Módulo Financeiro Avançado
-export { useCalendarEvents } from './useCalendarEvents';
 export { useCashflowData } from './useCashflowData';
 export { useReconciliationMatches } from './useReconciliationMatches';
 export { useParties } from './useParties';
 export { useBankStatements } from './useBankStatements';
+export { useGoals } from './useGoals';
+export { useDRE } from './useDRE';
+export { useListaDaVez } from './useListaDaVez';

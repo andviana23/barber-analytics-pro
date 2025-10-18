@@ -1,0 +1,14 @@
+{
+  "name": "Domain-Driven Design Rules",
+  "description": "Define os padrões obrigatórios de DDD utilizados no projeto BARBER-ANALYTICS-PRO.",
+  "alwaysApply": true,
+  "rules": [
+    "Cada módulo deve conter: DTOs, Repositories, Services, Hooks e Componentes React.",
+    "Entidades de domínio devem ter nomes no singular e refletir o modelo de negócio (ex: Revenue, Expense, Professional).",
+    "DTOs devem validar e normalizar dados antes de enviar para o repositório.",
+    "Services devem conter a lógica de negócio e orquestrar os repositórios.",
+    "Repositories são responsáveis exclusivamente pelo acesso ao banco (Supabase/PostgreSQL).",
+    "Nunca manipule estado global diretamente dentro de Services. Use Hooks ou Contexts.",
+    "Cada módulo deve ser autocontido e isolado por domínio (Financeiro, Profissionais, Unidades, Fila, etc.)."
+  ]
+}

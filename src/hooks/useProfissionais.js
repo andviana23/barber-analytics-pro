@@ -42,24 +42,28 @@ export function useProfissionais(initialFilters = {}) {
   /**
    * Cria um novo profissional
    */
-  const createProfissional = useCallback(async (profissionalData) => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const newProfissional = await ProfissionaisService.createProfissional(profissionalData);
-      
-      // Atualizar lista local
-      setProfissionais(prev => [newProfissional, ...prev]);
-      
-      return newProfissional;
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const createProfissional = useCallback(
+    async profissionalData => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const newProfissional =
+          await ProfissionaisService.createProfissional(profissionalData);
+
+        // Recarregar lista completa após criar para garantir dados corretos
+        await loadProfissionais();
+
+        return newProfissional;
+      } catch (err) {
+        setError(err.message);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [loadProfissionais]
+  );
 
   /**
    * Atualiza um profissional existente
@@ -68,14 +72,17 @@ export function useProfissionais(initialFilters = {}) {
     try {
       setLoading(true);
       setError(null);
-      
-      const updatedProfissional = await ProfissionaisService.updateProfissional(id, updates);
-      
-      // Atualizar lista local
-      setProfissionais(prev => 
-        prev.map(p => p.id === id ? updatedProfissional : p)
+
+      const updatedProfissional = await ProfissionaisService.updateProfissional(
+        id,
+        updates
       );
-      
+
+      // Atualizar lista local
+      setProfissionais(prev =>
+        prev.map(p => (p.id === id ? updatedProfissional : p))
+      );
+
       return updatedProfissional;
     } catch (err) {
       setError(err.message);
@@ -88,18 +95,19 @@ export function useProfissionais(initialFilters = {}) {
   /**
    * Alterna status ativo/inativo de um profissional
    */
-  const toggleStatus = useCallback(async (id) => {
+  const toggleStatus = useCallback(async id => {
     try {
       setLoading(true);
       setError(null);
-      
-      const updatedProfissional = await ProfissionaisService.toggleProfissionalStatus(id);
-      
+
+      const updatedProfissional =
+        await ProfissionaisService.toggleProfissionalStatus(id);
+
       // Atualizar lista local
-      setProfissionais(prev => 
-        prev.map(p => p.id === id ? updatedProfissional : p)
+      setProfissionais(prev =>
+        prev.map(p => (p.id === id ? updatedProfissional : p))
       );
-      
+
       return updatedProfissional;
     } catch (err) {
       setError(err.message);
@@ -112,16 +120,16 @@ export function useProfissionais(initialFilters = {}) {
   /**
    * Remove um profissional (soft delete)
    */
-  const deleteProfissional = useCallback(async (id) => {
+  const deleteProfissional = useCallback(async id => {
     try {
       setLoading(true);
       setError(null);
-      
+
       await ProfissionaisService.deleteProfissional(id);
-      
+
       // Remover da lista local
       setProfissionais(prev => prev.filter(p => p.id !== id));
-      
+
       return true;
     } catch (err) {
       setError(err.message);
@@ -134,7 +142,7 @@ export function useProfissionais(initialFilters = {}) {
   /**
    * Atualiza os filtros e recarrega os dados
    */
-  const updateFilters = useCallback((newFilters) => {
+  const updateFilters = useCallback(newFilters => {
     setFilters(prev => ({ ...prev, ...newFilters }));
   }, []);
 
@@ -156,7 +164,7 @@ export function useProfissionais(initialFilters = {}) {
     loading,
     error,
     filters,
-    
+
     // Ações
     createProfissional,
     updateProfissional,
@@ -164,7 +172,7 @@ export function useProfissionais(initialFilters = {}) {
     deleteProfissional,
     updateFilters,
     refresh,
-    
+
     // Utilitários
     totalProfissionais: profissionais.length,
     profissionaisAtivos: profissionais.filter(p => p.is_active).length,

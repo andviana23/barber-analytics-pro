@@ -12,21 +12,25 @@ import FluxoSummaryPanel from '../../organisms/FluxoSummaryPanel/FluxoSummaryPan
 
 /**
  * Tab do Fluxo de Caixa
- * 
+ *
  * Features:
  * - Análise de fluxo de caixa acumulado com gráficos
  * - Filtros de período e conta bancária
  * - Resumo com KPIs e indicadores
  * - useCashflowData hook para gerenciamento de dados
  */
-const FluxoTab = ({ globalFilters, units }) => {
+const FluxoTab = ({ globalFilters, units = [] }) => {
+  // eslint-disable-next-line no-console
+  console.log('🔄 FluxoTab - Recebeu units:', units);
+  // eslint-disable-next-line no-console
+  console.log('🔄 FluxoTab - Recebeu globalFilters:', globalFilters);
   // Estado local da tab
   const [dateRange, setDateRange] = useState(() => {
     const endDate = new Date();
     const startDate = subMonths(endDate, 2); // 3 meses por padrão
     return {
       startDate: format(startDate, 'yyyy-MM-dd'),
-      endDate: format(endDate, 'yyyy-MM-dd')
+      endDate: format(endDate, 'yyyy-MM-dd'),
     };
   });
 
@@ -35,54 +39,46 @@ const FluxoTab = ({ globalFilters, units }) => {
     return {
       unitId: globalFilters.unitId,
       accountId: globalFilters.accountId,
-      ...dateRange
+      ...dateRange,
     };
   }, [globalFilters, dateRange]);
 
   // Hook para buscar dados do fluxo de caixa
-  const {
-    entries,
-    summary,
-    loading,
-    error,
-    refetch,
-    refreshSummary
-  } = useCashflowData(
-    combinedFilters.unitId,
-    combinedFilters.startDate,
-    combinedFilters.endDate,
-    combinedFilters.accountId
-  );
+  const { entries, summary, loading, error, refetch, refreshSummary } =
+    useCashflowData(
+      combinedFilters.unitId,
+      combinedFilters.startDate,
+      combinedFilters.endDate,
+      combinedFilters.accountId
+    );
 
   // Handlers
-  const handleDateRangeChange = (newRange) => {
+  const handleDateRangeChange = newRange => {
     if (newRange.startDate && newRange.endDate) {
       setDateRange({
         startDate: format(new Date(newRange.startDate), 'yyyy-MM-dd'),
-        endDate: format(new Date(newRange.endDate), 'yyyy-MM-dd')
+        endDate: format(new Date(newRange.endDate), 'yyyy-MM-dd'),
       });
     }
   };
 
-
-
-  const handlePeriodNavigation = (direction) => {
+  const handlePeriodNavigation = direction => {
     const currentStart = new Date(dateRange.startDate);
     const currentEnd = new Date(dateRange.endDate);
-    
+
     if (direction === 'prev') {
       const newStart = subMonths(currentStart, 1);
       const newEnd = subMonths(currentEnd, 1);
       setDateRange({
         startDate: format(newStart, 'yyyy-MM-dd'),
-        endDate: format(newEnd, 'yyyy-MM-dd')
+        endDate: format(newEnd, 'yyyy-MM-dd'),
       });
     } else if (direction === 'next') {
       const newStart = addMonths(currentStart, 1);
       const newEnd = addMonths(currentEnd, 1);
       setDateRange({
         startDate: format(newStart, 'yyyy-MM-dd'),
-        endDate: format(newEnd, 'yyyy-MM-dd')
+        endDate: format(newEnd, 'yyyy-MM-dd'),
       });
     }
   };
@@ -94,15 +90,34 @@ const FluxoTab = ({ globalFilters, units }) => {
 
   // Preparar dados para o gráfico
   const chartData = useMemo(() => {
+    // eslint-disable-next-line no-console
+    console.log('📊 FluxoTab - Processando chartData:', {
+      entriesCount: entries?.length || 0,
+      firstEntry: entries?.[0],
+    });
+
     if (!entries || entries.length === 0) return [];
 
-    return entries.map(entry => ({
-      date: entry.data,
-      entradas: entry.entradas || 0,
-      saidas: entry.saidas || 0,
-      saldoAcumulado: entry.saldoAcumulado || 0,
-      dateFormatted: format(new Date(entry.data), 'dd/MM', { locale: ptBR })
+    const processed = entries.map(entry => ({
+      date: entry.transaction_date, // ✅ Corrigido de entry.data
+      inflows: entry.inflows || 0, // ✅ Campo esperado pelo CashflowChartCard
+      outflows: entry.outflows || 0, // ✅ Campo esperado pelo CashflowChartCard
+      accumulated_balance: entry.accumulated_balance || 0, // ✅ Campo esperado pelo CashflowChartCard
+      entradas: entry.inflows || 0, // ✅ Manter compatibilidade
+      saidas: Math.abs(entry.outflows || 0), // ✅ Manter compatibilidade
+      saldoAcumulado: entry.accumulated_balance || 0, // ✅ Manter compatibilidade
+      dateFormatted: format(new Date(entry.transaction_date), 'dd/MM', {
+        locale: ptBR,
+      }),
     }));
+
+    // eslint-disable-next-line no-console
+    console.log('📊 FluxoTab - chartData processado:', {
+      count: processed.length,
+      first: processed[0],
+    });
+
+    return processed;
   }, [entries]);
 
   return (
@@ -165,15 +180,21 @@ const FluxoTab = ({ globalFilters, units }) => {
           <div className="text-sm text-gray-600 dark:text-gray-400">
             Analisando período de{' '}
             <span className="font-medium text-gray-900 dark:text-white">
-              {format(new Date(dateRange.startDate), 'dd/MM/yyyy', { locale: ptBR })}
-            </span>
-            {' '}até{' '}
+              {format(new Date(dateRange.startDate), 'dd/MM/yyyy', {
+                locale: ptBR,
+              })}
+            </span>{' '}
+            até{' '}
             <span className="font-medium text-gray-900 dark:text-white">
-              {format(new Date(dateRange.endDate), 'dd/MM/yyyy', { locale: ptBR })}
+              {format(new Date(dateRange.endDate), 'dd/MM/yyyy', {
+                locale: ptBR,
+              })}
             </span>
             {combinedFilters.unitId && (
               <span className="ml-2">
-                • Unidade: {units?.find(u => u.id === combinedFilters.unitId)?.nome || 'Carregando...'}
+                • Unidade:{' '}
+                {units?.find(u => u.id === combinedFilters.unitId)?.name ||
+                  'Carregando...'}
               </span>
             )}
           </div>
@@ -182,10 +203,13 @@ const FluxoTab = ({ globalFilters, units }) => {
 
       {/* Resumo KPIs */}
       <FluxoSummaryPanel
+        cashflowData={entries || []}
         summary={summary}
         loading={loading}
         error={error}
-        onRefresh={refetch}
+        onRefreshData={refetch}
+        showTrendAnalysis={true}
+        showProjections={false}
       />
 
       {/* Gráfico do Fluxo - Dark Mode */}
@@ -213,8 +237,18 @@ const FluxoTab = ({ globalFilters, units }) => {
         {error ? (
           <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
             <div className="w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                className="w-6 h-6 text-red-600 dark:text-red-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
@@ -235,6 +269,12 @@ const FluxoTab = ({ globalFilters, units }) => {
             data={chartData}
             loading={loading}
             height={400}
+            period="daily"
+            showBalance={true}
+            showBars={true}
+            showLine={true}
+            onRefresh={refetch}
+            onExport={handleExport}
           />
         )}
       </div>
@@ -245,7 +285,9 @@ const FluxoTab = ({ globalFilters, units }) => {
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-xl border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3">
               <div className="animate-spin rounded-full h-6 w-6 border-2 border-gray-200 dark:border-gray-700 border-t-blue-600 dark:border-t-blue-400"></div>
-              <span className="text-gray-900 dark:text-white font-medium">Carregando fluxo de caixa...</span>
+              <span className="text-gray-900 dark:text-white font-medium">
+                Carregando fluxo de caixa...
+              </span>
             </div>
           </div>
         </div>

@@ -4,6 +4,9 @@ import { ALLOWED_REVENUE_COLUMNS, FORBIDDEN_REVENUE_FIELDS } from '../dtos/reven
 /**
  * RevenueRepository - Repository Pattern
  * 
+ * // [FIX] Removido campo 'profit' do payload inserido em revenues (campo calculado no banco)
+ * // Adicionada proteção extra contra campos calculados que não existem na tabela base
+ * 
  * Encapsula toda a lógica de acesso ao banco de dados para a entidade Revenue.
  * Abstraindo os detalhes de implementação do Supabase, facilitando:
  * - Testes unitários (mock do repository)
@@ -87,10 +90,21 @@ class RevenueRepository {
       const blocked = [];
       const ignored = [];
       
+      // [FIX] Removido campo 'profit' do payload (campo gerado automaticamente no BD)
+      // Proteção extra contra campos calculados (profit, profit_margin, etc.)
+      const calculatedFields = ['profit', 'net_profit', 'profit_margin', 'lucro', 'lucro_liquido', 'margem'];
+      
       for (const [key, value] of Object.entries(data)) {
         // 🚫 BLACKLIST: Bloquear campos proibidos (português, calculados, auto-gerados)
         if (FORBIDDEN_REVENUE_FIELDS.includes(key)) {
           blocked.push(key);
+          continue;
+        }
+        
+        // 🚫 BLACKLIST EXTRA: Bloquear campos calculados explicitamente
+        // [FIX] Removido campo 'profit' do payload (campo gerado automaticamente no BD)
+        if (calculatedFields.includes(key)) {
+          blocked.push(key + ' (calculated field)');
           continue;
         }
         
@@ -122,16 +136,55 @@ class RevenueRepository {
       console.log('🔥 Repository: Payload final para Supabase:');
       // eslint-disable-next-line no-console
       console.log(JSON.stringify(sanitizedData, null, 2));
+      
+      // 🔥 DEBUGGING EXTRA: Verificar campos específicos
+      // eslint-disable-next-line no-console
+      console.log('🔍 Repository: Campo "profit" presente?', 'profit' in sanitizedData ? '❌ SIM - PROBLEMA!' : '✅ NÃO - OK');
+      // eslint-disable-next-line no-console
+      console.log('🔍 Repository: Campos calculados encontrados:', Object.keys(sanitizedData).filter(k => ['profit', 'net_profit', 'profit_margin'].includes(k)));
+      // eslint-disable-next-line no-console
+      console.log('🔍 Repository: Total de campos no payload:', Object.keys(sanitizedData).length);
 
       // ========================================
       // 💾 INSERÇÃO NO BANCO DE DADOS
       // ========================================
 
       try {
+        // [EMERGENCY FIX] Proteção final contra coluna GENERATED 'profit'
+        // Remove campos calculados que podem ser adicionados por outros códigos
+        const finalPayload = { ...sanitizedData };
+        delete finalPayload.profit;
+        delete finalPayload.net_profit; 
+        delete finalPayload.profit_margin;
+        
+        // eslint-disable-next-line no-console
+        console.log('🛡️ Repository: Proteção GENERATED aplicada, campos finais:', Object.keys(finalPayload));
+
+        // [EMERGENCY FIX] Insert com campos específicos (evita coluna profit GENERATED)
+        // Lista explícita de campos permitidos para INSERT
+        const allowedInsertFields = [
+          'type', 'value', 'date', 'source', 'observations', 'unit_id', 
+          'account_id', 'professional_id', 'user_id', 'party_id',
+          'gross_amount', 'net_amount', 'fees', 'status',
+          'accrual_start_date', 'accrual_end_date', 
+          'expected_receipt_date', 'actual_receipt_date'
+        ];
+        
+        // Criar payload apenas com campos permitidos para INSERT
+        const insertPayload = {};
+        allowedInsertFields.forEach(field => {
+          if (field in finalPayload && finalPayload[field] !== undefined) {
+            insertPayload[field] = finalPayload[field];
+          }
+        });
+        
+        // eslint-disable-next-line no-console
+        console.log('🛡️ Repository: INSERT payload final (sem profit):', Object.keys(insertPayload));
+
         // Promise.race para implementar timeout manual
         const insertPromise = supabase
           .from(this.tableName)
-          .insert(sanitizedData)
+          .insert(insertPayload)
           .select()
           .single();
 
@@ -205,7 +258,8 @@ class RevenueRepository {
 
       let query = supabase
         .from(this.tableName)
-        .select('*', { count: 'exact' });
+        .select('*', { count: 'exact' })
+        .eq('is_active', true); // ✅ FIX: Filtrar apenas receitas ativas (não deletadas)
 
       // Aplicar filtros
       if (filters.unit_id) {
@@ -261,8 +315,81 @@ class RevenueRepository {
         };
       }
 
+      // ✅ Buscar unidades e contas bancárias separadamente
+      if (data && data.length > 0) {
+        // Coletar IDs únicos de unidades e contas bancárias
+        const unitIds = [...new Set(data.map(r => r.unit_id).filter(Boolean))];
+        const accountIds = [...new Set(data.map(r => r.account_id).filter(Boolean))];
+
+        // eslint-disable-next-line no-console
+        console.log('🔍 Repository: IDs de unidades encontrados:', unitIds);
+        // eslint-disable-next-line no-console
+        console.log('🔍 Repository: IDs de contas bancárias encontrados:', accountIds);
+
+        // Buscar unidades
+        let unitsMap = {};
+        if (unitIds.length > 0) {
+          const { data: units } = await supabase
+            .from('units')
+            .select('id, name')
+            .in('id', unitIds);
+          
+          // eslint-disable-next-line no-console
+          console.log('🔍 Repository: Unidades buscadas:', units);
+          
+          if (units) {
+            units.forEach(unit => {
+              unitsMap[unit.id] = unit;
+            });
+          }
+        }
+
+        // Buscar contas bancárias
+        let accountsMap = {};
+        if (accountIds.length > 0) {
+          // eslint-disable-next-line no-console
+          console.log('🔍 Repository: Buscando contas bancárias para IDs:', accountIds);
+          
+          const { data: accounts, error: accountsError } = await supabase
+            .from('bank_accounts')
+            .select('id, name, bank_name, account_number')
+            .in('id', accountIds);
+          
+          // eslint-disable-next-line no-console
+          console.log('🔍 Repository: Contas bancárias buscadas:', accounts);
+          // eslint-disable-next-line no-console
+          console.log('🔍 Repository: Erro ao buscar contas:', accountsError);
+          
+          if (accounts && !accountsError) {
+            accounts.forEach(account => {
+              accountsMap[account.id] = account;
+            });
+          }
+        }
+
+        // eslint-disable-next-line no-console
+        console.log('🔍 Repository: Map de contas:', accountsMap);
+
+        // Mapear dados nas receitas
+        data.forEach(receita => {
+          if (receita.unit_id && unitsMap[receita.unit_id]) {
+            receita.unit = unitsMap[receita.unit_id];
+          }
+          if (receita.account_id && accountsMap[receita.account_id]) {
+            receita.bank_account = accountsMap[receita.account_id];
+            // eslint-disable-next-line no-console
+            console.log('✅ Repository: Conta mapeada para receita:', receita.id, receita.bank_account);
+          } else {
+            // eslint-disable-next-line no-console
+            console.log('⚠️ Repository: Receita sem account_id ou conta não encontrada:', receita.id, receita.account_id);
+          }
+        });
+      }
+
       // eslint-disable-next-line no-console
       console.log(`✅ Repository: ${data.length} receitas encontradas (total: ${count})`);
+      // eslint-disable-next-line no-console
+      console.log('📊 Repository: Primeira receita com dados:', data[0]);
 
       return { data: data || [], error: null, count: count || 0 };
 

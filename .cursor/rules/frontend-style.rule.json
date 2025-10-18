@@ -1,0 +1,12 @@
+{
+  "name": "Frontend UI/UX & Atomic Design Standards",
+  "description": "Aplica os princípios do Atomic Design e garante que o frontend mantenha a consistência visual da Trato de Barbados.",
+  "alwaysApply": true,
+  "rules": [
+    "Siga a hierarquia: Atoms → Molecules → Organisms → Templates → Pages.",
+    "Componentes devem ser pequenos, reutilizáveis e com tipagem explícita de props.",
+    "Evite CSS direto; use Tailwind ou componentes estilizados (shadcn/ui).",
+    "Sempre priorize acessibilidade (aria-label, role).",
+    "UI deve refletir elegância, sobriedade e sofisticação (público premium)."
+  ]
+}

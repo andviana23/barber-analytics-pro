@@ -1,0 +1,12 @@
+{
+  "name": "Git Workflow & Commits",
+  "description": "Define o fluxo de commits e versionamento para manter consistência e rastreabilidade.",
+  "alwaysApply": true,
+  "rules": [
+    "Commits devem seguir o padrão Conventional Commits (feat:, fix:, chore:, refactor:, docs:, test:).",
+    "Toda nova feature deve ter branch própria: feature/nome-da-feature.",
+    "Pull Requests devem passar nos testes antes de mergear.",
+    "Commits grandes devem ser quebrados em unidades lógicas menores.",
+    "Mensagens de commit devem ser escritas em português técnico claro e direto."
+  ]
+}

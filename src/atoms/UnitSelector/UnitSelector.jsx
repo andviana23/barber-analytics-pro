@@ -1,6 +1,6 @@
 /**
  * UNIT SELECTOR COMPONENT
- * 
+ *
  * Seletor de unidades usando contexto global
  * Permite filtrar visualização por unidade específica ou "Todas"
  */
@@ -10,7 +10,7 @@ import { useUnit } from '../../context/UnitContext';
 import { useAuth } from '../../context/AuthContext';
 
 const UnitSelector = ({ className = '' }) => {
-  const { user } = useAuth();
+  const { user, receptionistStatus } = useAuth();
   const {
     selectedUnit,
     allUnits,
@@ -19,11 +19,26 @@ const UnitSelector = ({ className = '' }) => {
     selectUnit,
     selectAllUnits,
     getSelectedUnitName,
-    hasMultipleUnits
+    hasMultipleUnits,
   } = useUnit();
 
-  // Se não há múltiplas unidades ou usuário não tem permissão, não exibe
-  if (!hasMultipleUnits || !user) {
+  // Debug para verificar estado
+  console.log('🔍 UnitSelector Debug:', {
+    receptionistStatus,
+    hasMultipleUnits,
+    allUnitsCount: allUnits.length,
+    loading,
+    error,
+    selectedUnit: selectedUnit?.name,
+  });
+
+  // Recepcionista sempre vê o seletor (acesso a todas as unidades)
+  // Outros usuários só veem se houver múltiplas unidades
+  if (!user) {
+    return null;
+  }
+
+  if (!receptionistStatus && !hasMultipleUnits) {
     return null;
   }
 
@@ -43,7 +58,7 @@ const UnitSelector = ({ className = '' }) => {
     );
   }
 
-  const handleUnitChange = (unitId) => {
+  const handleUnitChange = unitId => {
     if (unitId === 'all' || unitId === '') {
       selectAllUnits();
     } else {
@@ -55,18 +70,11 @@ const UnitSelector = ({ className = '' }) => {
   };
 
   return (
-    <div className={`flex flex-col gap-2 ${className}`}>
-      <label 
-        htmlFor="unit-select" 
-        className="text-sm font-medium text-gray-700 dark:text-gray-300"
-      >
-        Unidade:
-      </label>
-      
+    <div className={`flex flex-col gap-1 ${className}`}>
       <select
         id="unit-select"
         value={selectedUnit?.id || 'all'}
-        onChange={(e) => handleUnitChange(e.target.value)}
+        onChange={e => handleUnitChange(e.target.value)}
         className="
           w-full px-3 py-2 text-sm
           bg-white dark:bg-gray-800
@@ -86,8 +94,9 @@ const UnitSelector = ({ className = '' }) => {
       </select>
 
       {/* Indicador da seleção atual */}
-      <div className="text-xs text-gray-500 dark:text-gray-400">
-        Visualizando: <span className="font-medium">{getSelectedUnitName()}</span>
+      <div className="text-xs text-gray-500 dark:text-gray-400 ml-0">
+        Visualizando:{' '}
+        <span className="font-medium">{getSelectedUnitName()}</span>
       </div>
     </div>
   );

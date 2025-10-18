@@ -1,6 +1,8 @@
 # 🏗️ ARQUITETURA DO SISTEMA
 
 > **Clean Architecture + Domain-Driven Design + CQRS + Event Sourcing**
+> 
+> **Atualizado em:** 2024-10-17 via Supabase MCP
 
 ---
 
@@ -13,6 +15,13 @@ O **BARBER-ANALYTICS-PRO** implementa **Clean Architecture** com separação cla
 - ✅ **Independence of Database** - Regras de negócio não conhecem detalhes do BD
 - ✅ **Independence of External Agency** - Core isolado de frameworks
 - ✅ **Testability** - Regras de negócio testáveis sem dependências externas
+
+### **Estrutura Atual do Banco (Supabase)**
+- **10 Tabelas** com RLS ativo
+- **4 Views** otimizadas para relatórios
+- **5 ENUMs** para integridade de dados
+- **Multi-tenant** por `unit_id`
+- **Soft delete** com `is_active`
 
 ---
 
@@ -483,10 +492,95 @@ useEffect(() => {
 
 ---
 
+## 🧠 Automação IA do Sistema
+
+O **BARBER-ANALYTICS-PRO** possui **comandos Cursor** automatizados para acelerar o desenvolvimento e manter a qualidade arquitetural.
+
+### **Comandos Disponíveis** (`.cursor/commands/`)
+
+| Comando | Descrição | Uso |
+|---------|-----------|-----|
+| **create-module** | Gera módulo completo (DTO → Service → Repository → Hook → Page) | Cria nova funcionalidade seguindo Clean Architecture |
+| **generate-dto** | Cria DTO validado a partir da tabela do banco via @pgsql | Analisa schema e gera validações automáticas |
+| **generate-sql-rls** | Cria tabela com RLS automático (isolamento multi-tenant) | Garante segurança desde o início |
+| **document-endpoint** | Gera documentação técnica em Markdown | Documenta endpoints e payloads automaticamente |
+| **audit-architecture** | Audita violações de Clean Architecture e SOLID | Identifica acoplamento, duplicação, etc. |
+| **generate-tests** | Cria testes unitários e de integração (cobertura 80%+) | Gera suíte de testes completa |
+| **sync-schema** | Sincroniza DATABASE_SCHEMA.md com banco real via @pgsql | Mantém documentação sempre atualizada |
+
+### **Como Usar os Comandos**
+
+#### **1. Via Paleta do Cursor**
+```
+Ctrl+Shift+P → Digite o nome do comando → Enter
+```
+
+#### **2. Via Prompt Direto**
+```
+> /create-module clients
+> /generate-dto revenues
+> /audit-architecture
+```
+
+### **Exemplo de Fluxo Completo**
+
+```bash
+# 1. Criar tabela no banco com RLS
+> /generate-sql-rls clients
+
+# 2. Gerar DTO a partir da tabela
+> /generate-dto clients
+
+# 3. Criar módulo completo
+> /create-module clients
+
+# 4. Gerar testes
+> /generate-tests clientsService
+
+# 5. Documentar endpoints
+> /document-endpoint clientsService
+
+# 6. Auditar arquitetura
+> /audit-architecture
+
+# 7. Sincronizar schema
+> /sync-schema
+```
+
+### **Integração com MCP (@pgsql)**
+
+Todos os comandos que interagem com o banco usam o conector **@pgsql** configurado no Cursor:
+
+```json
+// .cursor/mcp.json
+{
+  "mcpServers": {
+    "supabase-mcp": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "env": {
+        "POSTGRES_CONNECTION_URL": "postgresql://..."
+      }
+    }
+  }
+}
+```
+
+### **Benefícios da Automação**
+
+✅ **Consistência Arquitetural:** Todos os módulos seguem o mesmo padrão
+✅ **Velocidade:** Cria módulos completos em minutos
+✅ **Qualidade:** Validações, RLS e testes gerados automaticamente
+✅ **Documentação Sincronizada:** Schema sempre atualizado
+✅ **Auditoria Contínua:** Detecta violações arquiteturais cedo
+
+---
+
 **🔗 Links Relacionados:**
 - [Financial Module Documentation](./FINANCIAL_MODULE.md)
 - [API Reference](./API_REFERENCE.md)
 - [Database Schema](./DATABASE_SCHEMA.md)
+- [Cursor Commands](.cursor/commands/)
 
 ---
 

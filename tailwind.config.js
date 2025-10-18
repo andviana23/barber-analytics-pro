@@ -30,9 +30,9 @@ export default {
 
         // === CORES NEUTRAS - DARK MODE ===
         dark: {
-          bg: '#0F172A',
-          surface: '#1E293B',
-          border: '#334155',
+          bg: '#0C0F12',
+          surface: '#161B22',
+          border: '#242C37',
         },
 
         // === CORES DE TEXTO - LIGHT MODE ===
@@ -43,8 +43,8 @@ export default {
 
         // === CORES DE TEXTO - DARK MODE ===
         'text-dark': {
-          primary: '#F8FAFC',
-          secondary: '#94A3B8',
+          primary: '#F5F7FA',
+          secondary: '#A5AFBE',
         },
 
         // === FEEDBACK - LIGHT MODE ===
@@ -56,9 +56,9 @@ export default {
 
         // === FEEDBACK - DARK MODE ===
         'feedback-dark': {
-          success: '#22C55E',
-          error: '#F87171',
-          warning: '#FBBF24',
+          success: '#3BD671',
+          error: '#FF7E5F',
+          warning: '#F4B400',
         },
       },
 

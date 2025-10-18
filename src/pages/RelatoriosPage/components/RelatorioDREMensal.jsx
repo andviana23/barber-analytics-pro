@@ -1,456 +1,532 @@
-import React, { useState, useEffect } from 'react';
-import { TrendingUp, TrendingDown, DollarSign, Download, FileText, Loader } from 'lucide-react';
-import { Card, Button } from '../../../atoms';
-import relatoriosService from '../../../services/relatoriosService';
-import { exportToPDF, exportToExcel } from '../../../utils/exportUtils';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell
-} from 'recharts';
+/**
+ * RELATÓRIO DRE MENSAL - UI Premium
+ * Demonstração do Resultado do Exercício com categorias expandíveis
+ */
+
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  Download,
+  FileText,
+  Loader,
+  AlertCircle,
+  ChevronDown,
+  ChevronRight,
+  TrendingUp,
+  TrendingDown,
+} from 'lucide-react';
+import { useUnit } from '../../../context/UnitContext';
+import dreService from '../../../services/dreService';
 
 const RelatorioDREMensal = ({ filters }) => {
+  const { selectedUnit } = useUnit();
   const [dadosDRE, setDadosDRE] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [expandedSections, setExpandedSections] = useState({
+    receitas: true,
+    custosVariaveis: false,
+    despesasOperacionais: false,
+  });
+
+  const toggleSection = section => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
+
+  const carregarDadosDRE = useCallback(async () => {
+    if (!selectedUnit?.id || !filters?.periodo?.mes || !filters?.periodo?.ano) {
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { data, error: dreError } = await dreService.getDREMensal(
+        filters.periodo.mes,
+        filters.periodo.ano,
+        selectedUnit.id
+      );
+
+      if (dreError) {
+        throw new Error(dreError);
+      }
+
+      setDadosDRE(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedUnit?.id, filters?.periodo?.mes, filters?.periodo?.ano]);
 
   useEffect(() => {
     carregarDadosDRE();
-  }, []);
+  }, [carregarDadosDRE]);
 
-  const carregarDadosDRE = async () => {
-    setLoading(true);
-    try {
-      const { success, data } = await relatoriosService.getDREMensal(
-        filters.periodo.mes,
-        filters.periodo.ano,
-        filters.unidade
-      );
-
-      if (success && data.length > 0) {
-        // Processar dados reais do Supabase
-        const dreData = data[0];
-        setDadosDRE({
-          receitas: {
-            receitaBruta: dreData.receita_bruta || 0,
-            deducoes: dreData.deducoes || 0,
-            receitaLiquida: dreData.receita_liquida || 0
-          },
-          custos: {
-            custosVariaveis: dreData.custos_variaveis || 0,
-            margemContribuicao: dreData.margem_contribuicao || 0
-          },
-          despesas: {
-            despesasFixas: dreData.despesas_fixas || 0,
-            resultadoOperacional: dreData.resultado_operacional || 0,
-            depreciacaoAmortizacao: dreData.depreciacao || 0,
-            lucroLiquido: dreData.lucro_liquido || 0
-          },
-          comparativo: {
-            mesAnterior: {
-              receitaBruta: dreData.receita_bruta_anterior || 0,
-              lucroLiquido: dreData.lucro_liquido_anterior || 0
-            },
-            variacao: {
-              receita: dreData.variacao_receita || 0,
-              lucro: dreData.variacao_lucro || 0
-            }
-          }
-        });
-      } else {
-        // Fallback para dados mockados se não houver dados reais
-        setDadosDRE({
-        receitas: {
-          receitaBruta: 45000,
-          deducoes: 2500,
-          receitaLiquida: 42500
-        },
-        custos: {
-          custosVariaveis: 12000,
-          margemContribuicao: 30500
-        },
-        despesas: {
-          despesasFixas: 18000,
-          resultadoOperacional: 12500,
-          depreciacaoAmortizacao: 1500,
-          lucroLiquido: 11000
-        },
-        comparativo: {
-          mesAnterior: {
-            receitaBruta: 41000,
-            lucroLiquido: 9500
-          },
-          variacao: {
-            receita: 9.76,
-            lucro: 15.79
-          }
-        },
-        composicaoReceitas: [
-          { name: 'Serviços', value: 35000, color: '#3B82F6' },
-          { name: 'Produtos', value: 7000, color: '#10B981' },
-          { name: 'Assinaturas', value: 3000, color: '#F59E0B' }
-        ],
-        composicaoDespesas: [
-          { name: 'Salários', value: 12000, color: '#EF4444' },
-          { name: 'Aluguel', value: 4000, color: '#F97316' },
-          { name: 'Produtos', value: 8000, color: '#8B5CF6' },
-          { name: 'Marketing', value: 2000, color: '#06B6D4' },
-          { name: 'Outros', value: 4500, color: '#84CC16' }
-          ]
-        });
-      }
-    } catch (error) {
-      console.error('Erro ao carregar DRE:', error);
-      // Fallback para dados mockados em caso de erro
-      setDadosDRE({
-        receitas: {
-          receitaBruta: 45000,
-          deducoes: 2500,
-          receitaLiquida: 42500
-        },
-        custos: {
-          custosVariaveis: 12000,
-          margemContribuicao: 30500
-        },
-        despesas: {
-          despesasFixas: 18000,
-          resultadoOperacional: 12500,
-          depreciacaoAmortizacao: 1500,
-          lucroLiquido: 11000
-        },
-        comparativo: {
-          mesAnterior: {
-            receitaBruta: 41000,
-            lucroLiquido: 9500
-          },
-          variacao: {
-            receita: 9.76,
-            lucro: 15.79
-          }
-        },
-        composicaoReceitas: [
-          { name: 'Serviços', value: 35000, color: '#3B82F6' },
-          { name: 'Produtos', value: 7000, color: '#10B981' },
-          { name: 'Assinaturas', value: 3000, color: '#F59E0B' }
-        ],
-        composicaoDespesas: [
-          { name: 'Salários', value: 12000, color: '#EF4444' },
-          { name: 'Aluguel', value: 4000, color: '#F97316' },
-          { name: 'Produtos', value: 8000, color: '#8B5CF6' },
-          { name: 'Marketing', value: 2000, color: '#06B6D4' },
-          { name: 'Outros', value: 4500, color: '#84CC16' }
-        ]
-      });
-    }
-    setLoading(false);
+  const formatarMoeda = valor => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(valor || 0);
   };
 
-  const handleExportPDF = async () => {
-    const result = await exportToPDF(
-      'relatorio-dre',
-      `DRE_${filters.periodo.mes}_${filters.periodo.ano}`,
-      `DRE Mensal - ${filters.periodo.mes}/${filters.periodo.ano}`
-    );
-    
-    if (result.success) {
-      alert('PDF exportado com sucesso!');
-    } else {
-      alert('Erro ao exportar PDF: ' + result.error);
-    }
-  };
-
-  const handleExportExcel = () => {
-    if (!dadosDRE) return;
-
-    const dadosExcel = [
-      { Item: '(+) Receita Bruta', Valor: dadosDRE.receitas.receitaBruta },
-      { Item: '(-) Deduções', Valor: dadosDRE.receitas.deducoes },
-      { Item: '(=) Receita Líquida', Valor: dadosDRE.receitas.receitaLiquida },
-      { Item: '', Valor: '' },
-      { Item: '(-) Custos Variáveis', Valor: dadosDRE.custos.custosVariaveis },
-      { Item: '(=) Margem de Contribuição', Valor: dadosDRE.custos.margemContribuicao },
-      { Item: '', Valor: '' },
-      { Item: '(-) Despesas Fixas', Valor: dadosDRE.despesas.despesasFixas },
-      { Item: '(=) Resultado Operacional', Valor: dadosDRE.despesas.resultadoOperacional },
-      { Item: '(-) Depreciação/Amortização', Valor: dadosDRE.despesas.depreciacaoAmortizacao },
-      { Item: '(=) LUCRO LÍQUIDO', Valor: dadosDRE.despesas.lucroLiquido }
+  const formatarMes = mes => {
+    const meses = [
+      'Janeiro',
+      'Fevereiro',
+      'Março',
+      'Abril',
+      'Maio',
+      'Junho',
+      'Julho',
+      'Agosto',
+      'Setembro',
+      'Outubro',
+      'Novembro',
+      'Dezembro',
     ];
-
-    const result = exportToExcel(
-      dadosExcel,
-      `DRE_${filters.periodo.mes}_${filters.periodo.ano}`
-    );
-    
-    if (result.success) {
-      alert('Excel exportado com sucesso!');
-    } else {
-      alert('Erro ao exportar Excel: ' + result.error);
-    }
+    return meses[mes - 1] || '';
   };
 
   if (loading) {
     return (
-      <div className="p-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
-            ))}
-          </div>
-          <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded"></div>
-        </div>
+      <div className="flex items-center justify-center py-20">
+        <Loader className="w-10 h-10 text-primary animate-spin" />
       </div>
     );
   }
 
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(value);
-  };
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <AlertCircle className="w-16 h-16 text-danger mb-4" />
+        <h3 className="text-xl font-semibold text-text-light-primary dark:text-text-dark-primary mb-2">
+          Erro ao carregar DRE
+        </h3>
+        <p className="text-text-light-secondary dark:text-text-dark-secondary mb-6 text-center max-w-md">
+          {error}
+        </p>
+        <button
+          onClick={carregarDadosDRE}
+          className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-600 transition-all duration-200 font-medium"
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
+  }
 
-  const formatPercentage = (value) => {
-    const signal = value > 0 ? '+' : '';
-    return `${signal}${value.toFixed(1)}%`;
-  };
+  if (!dadosDRE) {
+    return (
+      <div className="text-center py-16">
+        <FileText className="w-16 h-16 text-text-light-secondary dark:text-text-dark-secondary mx-auto mb-4 opacity-50" />
+        <p className="text-text-light-secondary dark:text-text-dark-secondary text-lg">
+          Nenhum dado encontrado para o período selecionado
+        </p>
+      </div>
+    );
+  }
+
+  // Calcular estrutura do DRE
+  const receitaBruta = dadosDRE.receitas.total;
+  const categoriasReceitas = dadosDRE.receitas.categorias || [];
+
+  const deducoes = 0;
+  const receitaLiquida = receitaBruta - deducoes;
+
+  const categoriasCustosVariaveis = dadosDRE.despesas.categorias.filter(
+    cat =>
+      cat.name.toLowerCase().includes('custo') ||
+      cat.name.toLowerCase().includes('variável') ||
+      cat.name.toLowerCase().includes('variavel')
+  );
+  const custosVariaveis = categoriasCustosVariaveis.reduce(
+    (sum, cat) => sum + cat.value,
+    0
+  );
+
+  const margemContribuicao = receitaLiquida - custosVariaveis;
+
+  const categoriasDespesasOperacionais = dadosDRE.despesas.categorias.filter(
+    cat =>
+      cat.name.toLowerCase().includes('operacional') ||
+      cat.name.toLowerCase().includes('administrativa') ||
+      cat.name.toLowerCase().includes('vendas') ||
+      cat.name.toLowerCase().includes('fixa')
+  );
+  const despesasOperacionais = categoriasDespesasOperacionais.reduce(
+    (sum, cat) => sum + cat.value,
+    0
+  );
+
+  const resultadoOperacional = margemContribuicao - despesasOperacionais;
+
+  const lucroLiquido = resultadoOperacional;
+
+  // Calcular margens
+  const margemContribuicaoPct =
+    receitaLiquida > 0 ? (margemContribuicao / receitaLiquida) * 100 : 0;
+  const margemOperacionalPct =
+    receitaLiquida > 0 ? (resultadoOperacional / receitaLiquida) * 100 : 0;
+  const margemLiquidaPct =
+    receitaLiquida > 0 ? (lucroLiquido / receitaLiquida) * 100 : 0;
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header com ações */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            DRE - Demonstração do Resultado do Exercício
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400">
-            {filters.periodo.tipo === 'mes' 
-              ? `${filters.periodo.mes}/${filters.periodo.ano}`
-              : 'Período selecionado'
-            }
+    <div className="space-y-6">
+      {/* Header Card - Melhorado */}
+      <div className="bg-gradient-to-br from-indigo-500/20 via-blue-500/10 to-purple-500/20 dark:from-indigo-500/30 dark:via-blue-500/20 dark:to-purple-500/30 rounded-3xl p-8 border-2 border-indigo-200/50 dark:border-indigo-500/30 shadow-xl">
+        <div className="flex items-center gap-5">
+          <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-2xl transform hover:scale-105 transition-transform">
+            <FileText className="w-9 h-9 text-white" strokeWidth={2.5} />
+          </div>
+          <div>
+            <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600 dark:from-indigo-400 dark:to-blue-400">
+              DRE Mensal
+            </h1>
+            <p className="text-text-light-secondary dark:text-text-dark-secondary text-lg mt-1 font-medium">
+              Demonstração de Resultado do Exercício Completa
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* DRE Principal - UI Premium */}
+      <div className="bg-gradient-to-br from-white to-gray-50/50 dark:from-dark-surface dark:to-dark-hover rounded-3xl border-2 border-gray-200/50 dark:border-gray-700/50 overflow-hidden shadow-2xl">
+        {/* Período - Header Melhorado */}
+        <div className="bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 px-8 py-6">
+          <h2 className="text-2xl font-bold text-white drop-shadow-lg">
+            Demonstração do Resultado do Exercício
+          </h2>
+          <p className="text-white/90 text-sm mt-2 font-medium flex items-center gap-2">
+            <span className="px-3 py-1 bg-white/20 rounded-full backdrop-blur-sm">
+              Período: {formatarMes(filters.periodo.mes)}/{filters.periodo.ano}
+            </span>
           </p>
         </div>
-        <div className="flex space-x-2">
-          <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-            <FileText size={16} />
-            <span>PDF</span>
-          </button>
-          <button className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-            <Download size={16} />
-            <span>Excel</span>
-          </button>
-        </div>
-      </div>
 
-      {/* KPIs principais */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Receita Bruta</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">
-                {formatCurrency(dadosDRE.receitas.receitaBruta)}
-              </p>
-            </div>
-            <div className={`flex items-center space-x-1 text-sm ${
-              dadosDRE.comparativo.variacao.receita > 0 
-                ? 'text-green-600' 
-                : 'text-red-600'
-            }`}>
-              {dadosDRE.comparativo.variacao.receita > 0 ? (
-                <TrendingUp size={16} />
-              ) : (
-                <TrendingDown size={16} />
-              )}
-              <span>{formatPercentage(dadosDRE.comparativo.variacao.receita)}</span>
-            </div>
-          </div>
-        </Card>
+        {/* Linhas do DRE com Categorias */}
+        <div className="divide-y divide-gray-200 dark:divide-gray-700/50">
+          {/* (+) RECEITA BRUTA - Expandível */}
+          <div>
+            <button
+              onClick={() => toggleSection('receitas')}
+              className="w-full px-8 py-5 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all duration-200 group"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {expandedSections.receitas ? (
+                    <ChevronDown className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  ) : (
+                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                  )}
+                  <TrendingUp className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  <span className="text-lg font-bold text-emerald-700 dark:text-emerald-400">
+                    (+) Receita Bruta
+                  </span>
+                </div>
+                <span className="text-lg font-bold text-emerald-700 dark:text-emerald-400">
+                  {formatarMoeda(receitaBruta)}
+                </span>
+              </div>
+            </button>
 
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Receita Líquida</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">
-                {formatCurrency(dadosDRE.receitas.receitaLiquida)}
-              </p>
-            </div>
-            <DollarSign className="text-blue-500" size={24} />
-          </div>
-        </Card>
+            {/* Categorias de Receita */}
+            {expandedSections.receitas && categoriasReceitas.length > 0 && (
+              <div className="bg-emerald-50/30 dark:bg-emerald-900/5 border-t border-emerald-100 dark:border-emerald-900/20">
+                {categoriasReceitas.map(categoria => (
+                  <div
+                    key={categoria.id}
+                    className="border-b border-emerald-100/50 dark:border-emerald-900/10 last:border-b-0"
+                  >
+                    <div className="px-8 py-3 pl-20 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                          {categoria.name}
+                        </span>
+                        <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                          {formatarMoeda(categoria.value)}
+                        </span>
+                      </div>
+                    </div>
 
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Margem Contribuição</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">
-                {formatCurrency(dadosDRE.custos.margemContribuicao)}
-              </p>
-            </div>
-            <div className="text-orange-500">
-              {((dadosDRE.custos.margemContribuicao / dadosDRE.receitas.receitaLiquida) * 100).toFixed(1)}%
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Lucro Líquido</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">
-                {formatCurrency(dadosDRE.despesas.lucroLiquido)}
-              </p>
-            </div>
-            <div className={`flex items-center space-x-1 text-sm ${
-              dadosDRE.comparativo.variacao.lucro > 0 
-                ? 'text-green-600' 
-                : 'text-red-600'
-            }`}>
-              {dadosDRE.comparativo.variacao.lucro > 0 ? (
-                <TrendingUp size={16} />
-              ) : (
-                <TrendingDown size={16} />
-              )}
-              <span>{formatPercentage(dadosDRE.comparativo.variacao.lucro)}</span>
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      {/* DRE Estrutural */}
-      <Card className="p-6">
-        <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Demonstração do Resultado
-        </h4>
-        <div className="space-y-3">
-          <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
-            <span className="font-medium text-gray-900 dark:text-white">
-              (+) Receita Bruta
-            </span>
-            <span className="font-medium text-gray-900 dark:text-white">
-              {formatCurrency(dadosDRE.receitas.receitaBruta)}
-            </span>
-          </div>
-          
-          <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700 ml-4">
-            <span className="text-gray-600 dark:text-gray-400">
-              (-) Deduções
-            </span>
-            <span className="text-red-600">
-              {formatCurrency(dadosDRE.receitas.deducoes)}
-            </span>
-          </div>
-          
-          <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/20 px-4 rounded">
-            <span className="font-semibold text-blue-900 dark:text-blue-100">
-              (=) Receita Líquida
-            </span>
-            <span className="font-semibold text-blue-900 dark:text-blue-100">
-              {formatCurrency(dadosDRE.receitas.receitaLiquida)}
-            </span>
-          </div>
-          
-          <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700 ml-4">
-            <span className="text-gray-600 dark:text-gray-400">
-              (-) Custos Variáveis
-            </span>
-            <span className="text-red-600">
-              {formatCurrency(dadosDRE.custos.custosVariaveis)}
-            </span>
-          </div>
-          
-          <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700 bg-green-50 dark:bg-green-900/20 px-4 rounded">
-            <span className="font-semibold text-green-900 dark:text-green-100">
-              (=) Margem de Contribuição
-            </span>
-            <span className="font-semibold text-green-900 dark:text-green-100">
-              {formatCurrency(dadosDRE.custos.margemContribuicao)}
-            </span>
-          </div>
-          
-          <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700 ml-4">
-            <span className="text-gray-600 dark:text-gray-400">
-              (-) Despesas Fixas
-            </span>
-            <span className="text-red-600">
-              {formatCurrency(dadosDRE.despesas.despesasFixas)}
-            </span>
-          </div>
-          
-          <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700 bg-purple-50 dark:bg-purple-900/20 px-4 rounded">
-            <span className="font-semibold text-purple-900 dark:text-purple-100">
-              (=) Resultado Operacional
-            </span>
-            <span className="font-semibold text-purple-900 dark:text-purple-100">
-              {formatCurrency(dadosDRE.despesas.resultadoOperacional)}
-            </span>
-          </div>
-          
-          <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700 ml-4">
-            <span className="text-gray-600 dark:text-gray-400">
-              (-) Depreciação/Amortização
-            </span>
-            <span className="text-red-600">
-              {formatCurrency(dadosDRE.despesas.depreciacaoAmortizacao)}
-            </span>
-          </div>
-          
-          <div className="flex justify-between items-center py-3 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-4 rounded font-bold text-lg">
-            <span>(=) LUCRO LÍQUIDO</span>
-            <span>{formatCurrency(dadosDRE.despesas.lucroLiquido)}</span>
-          </div>
-        </div>
-      </Card>
-
-      {/* Gráficos */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Composição de Receitas */}
-        <Card className="p-6">
-          <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Composição das Receitas
-          </h4>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={dadosDRE.composicaoReceitas}
-                cx="50%"
-                cy="50%"
-                outerRadius={80}
-                dataKey="value"
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-              >
-                {dadosDRE.composicaoReceitas.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
+                    {/* Subcategorias */}
+                    {categoria.subcategorias &&
+                      categoria.subcategorias.length > 0 && (
+                        <div className="bg-emerald-50/50 dark:bg-emerald-900/5">
+                          {categoria.subcategorias.map(sub => (
+                            <div
+                              key={sub.id}
+                              className="px-8 py-2 pl-28 hover:bg-emerald-100/50 dark:hover:bg-emerald-900/10 transition-colors"
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                                  <span className="text-emerald-400">└─</span>
+                                  {sub.name}
+                                </span>
+                                <span className="text-xs font-semibold text-emerald-500 dark:text-emerald-400">
+                                  {formatarMoeda(sub.value)}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                  </div>
                 ))}
-              </Pie>
-              <Tooltip formatter={(value) => formatCurrency(value)} />
-            </PieChart>
-          </ResponsiveContainer>
-        </Card>
+              </div>
+            )}
+          </div>
 
-        {/* Composição de Despesas */}
-        <Card className="p-6">
-          <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Composição das Despesas
-          </h4>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={dadosDRE.composicaoDespesas}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`} />
-              <Tooltip formatter={(value) => formatCurrency(value)} />
-              <Bar dataKey="value" fill="#EF4444" />
-            </BarChart>
-          </ResponsiveContainer>
-        </Card>
+          {/* (=) RECEITA LÍQUIDA */}
+          <div className="px-8 py-5 bg-gradient-to-r from-blue-100/50 to-cyan-100/50 dark:from-blue-900/20 dark:to-cyan-900/20 border-y-2 border-blue-200 dark:border-blue-800">
+            <div className="flex items-center justify-between">
+              <span className="text-lg font-bold text-blue-700 dark:text-blue-300 flex items-center gap-2">
+                <span className="px-2 py-0.5 bg-blue-200 dark:bg-blue-800 rounded text-sm">
+                  =
+                </span>
+                Receita Líquida
+              </span>
+              <span className="text-lg font-bold text-blue-700 dark:text-blue-300">
+                {formatarMoeda(receitaLiquida)}
+              </span>
+            </div>
+          </div>
+
+          {/* (-) CUSTOS VARIÁVEIS - Expandível */}
+          {categoriasCustosVariaveis.length > 0 && (
+            <div>
+              <button
+                onClick={() => toggleSection('custosVariaveis')}
+                className="w-full px-8 py-5 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all duration-200 group"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {expandedSections.custosVariaveis ? (
+                      <ChevronDown className="w-5 h-5 text-red-600 dark:text-red-400" />
+                    ) : (
+                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                    )}
+                    <TrendingDown className="w-5 h-5 text-red-600 dark:text-red-400" />
+                    <span className="text-lg font-bold text-red-700 dark:text-red-400">
+                      (-) Custos Variáveis
+                    </span>
+                  </div>
+                  <span className="text-lg font-bold text-red-700 dark:text-red-400">
+                    {formatarMoeda(custosVariaveis)}
+                  </span>
+                </div>
+              </button>
+
+              {/* Categorias de Custos */}
+              {expandedSections.custosVariaveis && (
+                <div className="bg-red-50/30 dark:bg-red-900/5 border-t border-red-100 dark:border-red-900/20">
+                  {categoriasCustosVariaveis.map(categoria => (
+                    <div
+                      key={categoria.id}
+                      className="border-b border-red-100/50 dark:border-red-900/10 last:border-b-0"
+                    >
+                      <div className="px-8 py-3 pl-20 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                            {categoria.name}
+                          </span>
+                          <span className="text-sm font-bold text-red-600 dark:text-red-400">
+                            {formatarMoeda(categoria.value)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Subcategorias */}
+                      {categoria.subcategorias &&
+                        categoria.subcategorias.length > 0 && (
+                          <div className="bg-red-50/50 dark:bg-red-900/5">
+                            {categoria.subcategorias.map(sub => (
+                              <div
+                                key={sub.id}
+                                className="px-8 py-2 pl-28 hover:bg-red-100/50 dark:hover:bg-red-900/10 transition-colors"
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                                    <span className="text-red-400">└─</span>
+                                    {sub.name}
+                                  </span>
+                                  <span className="text-xs font-semibold text-red-500 dark:text-red-400">
+                                    {formatarMoeda(sub.value)}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* (=) MARGEM DE CONTRIBUIÇÃO */}
+          <div className="px-8 py-5 bg-gradient-to-r from-green-100/50 to-emerald-100/50 dark:from-green-900/20 dark:to-emerald-900/20 border-y-2 border-green-300 dark:border-green-700">
+            <div className="flex items-center justify-between">
+              <span className="text-lg font-bold text-green-700 dark:text-green-300 flex items-center gap-2">
+                <span className="px-2 py-0.5 bg-green-200 dark:bg-green-800 rounded text-sm">
+                  =
+                </span>
+                Margem de Contribuição
+              </span>
+              <span className="text-lg font-bold text-green-700 dark:text-green-300">
+                {formatarMoeda(margemContribuicao)}
+              </span>
+            </div>
+          </div>
+
+          {/* (-) DESPESAS OPERACIONAIS - Expandível */}
+          {categoriasDespesasOperacionais.length > 0 && (
+            <div>
+              <button
+                onClick={() => toggleSection('despesasOperacionais')}
+                className="w-full px-8 py-5 hover:bg-orange-50 dark:hover:bg-orange-900/10 transition-all duration-200 group"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {expandedSections.despesasOperacionais ? (
+                      <ChevronDown className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                    ) : (
+                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                    )}
+                    <TrendingDown className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                    <span className="text-lg font-bold text-orange-700 dark:text-orange-400">
+                      (-) Despesas Operacionais
+                    </span>
+                  </div>
+                  <span className="text-lg font-bold text-orange-700 dark:text-orange-400">
+                    {formatarMoeda(despesasOperacionais)}
+                  </span>
+                </div>
+              </button>
+
+              {/* Categorias de Despesas */}
+              {expandedSections.despesasOperacionais && (
+                <div className="bg-orange-50/30 dark:bg-orange-900/5 border-t border-orange-100 dark:border-orange-900/20">
+                  {categoriasDespesasOperacionais.map(categoria => (
+                    <div
+                      key={categoria.id}
+                      className="border-b border-orange-100/50 dark:border-orange-900/10 last:border-b-0"
+                    >
+                      <div className="px-8 py-3 pl-20 hover:bg-orange-50 dark:hover:bg-orange-900/10 transition-colors">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-orange-500"></span>
+                            {categoria.name}
+                          </span>
+                          <span className="text-sm font-bold text-orange-600 dark:text-orange-400">
+                            {formatarMoeda(categoria.value)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Subcategorias */}
+                      {categoria.subcategorias &&
+                        categoria.subcategorias.length > 0 && (
+                          <div className="bg-orange-50/50 dark:bg-orange-900/5">
+                            {categoria.subcategorias.map(sub => (
+                              <div
+                                key={sub.id}
+                                className="px-8 py-2 pl-28 hover:bg-orange-100/50 dark:hover:bg-orange-900/10 transition-colors"
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                                    <span className="text-orange-400">└─</span>
+                                    {sub.name}
+                                  </span>
+                                  <span className="text-xs font-semibold text-orange-500 dark:text-orange-400">
+                                    {formatarMoeda(sub.value)}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* (=) RESULTADO OPERACIONAL */}
+          <div className="px-8 py-5 bg-gradient-to-r from-purple-100/50 to-pink-100/50 dark:from-purple-900/20 dark:to-pink-900/20 border-y-2 border-purple-300 dark:border-purple-700">
+            <div className="flex items-center justify-between">
+              <span className="text-lg font-bold text-purple-700 dark:text-purple-300 flex items-center gap-2">
+                <span className="px-2 py-0.5 bg-purple-200 dark:bg-purple-800 rounded text-sm">
+                  =
+                </span>
+                Resultado Operacional
+              </span>
+              <span className="text-lg font-bold text-purple-700 dark:text-purple-300">
+                {formatarMoeda(resultadoOperacional)}
+              </span>
+            </div>
+          </div>
+
+          {/* (=) LUCRO LÍQUIDO - Destaque Especial */}
+          <div className="px-8 py-7 bg-gradient-to-r from-indigo-500 via-blue-600 to-purple-600 shadow-inner">
+            <div className="flex items-center justify-between">
+              <span className="text-2xl font-black text-white uppercase tracking-wider flex items-center gap-3 drop-shadow-lg">
+                <span className="px-3 py-1 bg-white/30 rounded-lg text-lg backdrop-blur-sm">
+                  =
+                </span>
+                LUCRO LÍQUIDO
+              </span>
+              <span className="text-2xl font-black text-white drop-shadow-lg">
+                {formatarMoeda(lucroLiquido)}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Cards de Margens - UI Premium */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Margem de Contribuição */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-green-100 via-emerald-50 to-teal-100 dark:from-green-900/30 dark:via-emerald-900/20 dark:to-teal-900/30 rounded-3xl p-8 border-2 border-green-300/50 dark:border-green-600/30 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-3xl"></div>
+          <p className="text-sm font-bold text-green-800 dark:text-green-300 mb-3 uppercase tracking-wide">
+            Margem de Contribuição
+          </p>
+          <p className="text-5xl font-black text-green-700 dark:text-green-400 drop-shadow-sm">
+            {margemContribuicaoPct.toFixed(1)}%
+          </p>
+        </div>
+
+        {/* Margem Operacional */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-orange-100 via-amber-50 to-yellow-100 dark:from-orange-900/30 dark:via-amber-900/20 dark:to-yellow-900/30 rounded-3xl p-8 border-2 border-orange-300/50 dark:border-orange-600/30 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl"></div>
+          <p className="text-sm font-bold text-orange-800 dark:text-orange-300 mb-3 uppercase tracking-wide">
+            Margem Operacional
+          </p>
+          <p className="text-5xl font-black text-orange-700 dark:text-orange-400 drop-shadow-sm">
+            {margemOperacionalPct.toFixed(1)}%
+          </p>
+        </div>
+
+        {/* Margem Líquida */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-blue-100 via-indigo-50 to-purple-100 dark:from-blue-900/30 dark:via-indigo-900/20 dark:to-purple-900/30 rounded-3xl p-8 border-2 border-blue-300/50 dark:border-blue-600/30 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"></div>
+          <p className="text-sm font-bold text-blue-800 dark:text-blue-300 mb-3 uppercase tracking-wide">
+            Margem Líquida
+          </p>
+          <p
+            className={`text-5xl font-black drop-shadow-sm ${lucroLiquido >= 0 ? 'text-blue-700 dark:text-blue-400' : 'text-red-700 dark:text-red-400'}`}
+          >
+            {margemLiquidaPct.toFixed(1)}%
+          </p>
+        </div>
       </div>
     </div>
   );

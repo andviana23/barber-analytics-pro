@@ -1,0 +1,12 @@
+{
+  "name": "Supabase RLS & Database Security",
+  "description": "Garante que todo o acesso ao banco via Supabase respeite RLS, policies e boas práticas de segurança.",
+  "alwaysApply": true,
+  "rules": [
+    "Todas as queries devem respeitar as policies RLS baseadas em unit_id e auth.uid().",
+    "Nunca retornar dados sem filtro de unidade ou usuário autenticado.",
+    "Toda nova tabela deve incluir created_at, updated_at e user_id.",
+    "Funções SQL devem ser criadas com SECURITY DEFINER apenas quando necessário.",
+    "Policies devem ser documentadas no arquivo DATABASE_SCHEMA.md."
+  ]
+}

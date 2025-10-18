@@ -84,19 +84,19 @@ const DARK_PALETTE = {
   neutral: [
     {
       name: 'Background',
-      hex: '#0F172A',
+      hex: '#0C0F12',
       usage: 'Fundo principal',
       class: 'bg-dark-bg',
     },
     {
       name: 'Card/Surface',
-      hex: '#1E293B',
+      hex: '#161B22',
       usage: 'Containers',
       class: 'bg-dark-surface',
     },
     {
       name: 'Borda/Linha',
-      hex: '#334155',
+      hex: '#242C37',
       usage: 'Divisores',
       class: 'border-dark-border',
     },
@@ -104,13 +104,13 @@ const DARK_PALETTE = {
   text: [
     {
       name: 'Texto Primário',
-      hex: '#F8FAFC',
+      hex: '#F5F7FA',
       usage: 'Branco suave',
       class: 'text-text-dark-primary',
     },
     {
       name: 'Texto Secundário',
-      hex: '#94A3B8',
+      hex: '#A5AFBE',
       usage: 'Textos complementares',
       class: 'text-text-dark-secondary',
     },
@@ -138,19 +138,19 @@ const DARK_PALETTE = {
   feedback: [
     {
       name: 'Sucesso',
-      hex: '#22C55E',
+      hex: '#3BD671',
       usage: 'Verde vibrante',
       class: 'bg-feedback-dark-success',
     },
     {
       name: 'Erro',
-      hex: '#F87171',
+      hex: '#FF7E5F',
       usage: 'Vermelho suave',
       class: 'bg-feedback-dark-error',
     },
     {
       name: 'Aviso',
-      hex: '#FBBF24',
+      hex: '#F4B400',
       usage: 'Amarelo dourado',
       class: 'bg-feedback-dark-warning',
     },

@@ -1,243 +1,478 @@
 import React, { useState, useEffect } from 'react';
-import { Users, RefreshCw, Clock, MapPin, AlertCircle } from 'lucide-react';
-import { Button } from '../../atoms';
-import BarbeiroCard from './components/BarbeiroCard';
-import filaService from '../../services/filaService';
+import { useNavigate } from 'react-router-dom';
+import { Card, Button, UnitSelector } from '../../atoms';
+import { useListaDaVez } from '../../hooks/useListaDaVez';
+import { useToast } from '../../context/ToastContext';
+import {
+  FiRefreshCw,
+  FiCalendar,
+  FiDownload,
+  FiUsers,
+  FiTrendingUp,
+  FiClock,
+  FiAward,
+} from 'react-icons/fi';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Doughnut } from 'react-chartjs-2';
 
-export default function ListaDaVezPage() {
-  const [filaMangabeiras, setFilaMangabeiras] = useState([]);
-  const [filaNovLima, setFilaNovLima] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [lastUpdate, setLastUpdate] = useState(new Date());
+// Registrar componentes do Chart.js
+ChartJS.register(ArcElement, Tooltip, Legend);
 
-  // IDs das unidades (deverão vir de um contexto ou configuração)
-  const UNIDADES = {
-    MANGABEIRAS: 'unidade-mangabeiras-id', // Substituir pelo ID real
-    NOVA_LIMA: 'unidade-nova-lima-id'      // Substituir pelo ID real
-  };
+/**
+ * CORES PARA BARBEIROS
+ * Paleta premium inspirada no design system
+ */
+const BARBER_COLORS = [
+  '#3B82F6', // Azul
+  '#EF4444', // Vermelho
+  '#F59E0B', // Amarelo/Laranja
+  '#10B981', // Verde
+  '#8B5CF6', // Roxo
+  '#EC4899', // Rosa
+  '#06B6D4', // Ciano
+  '#F97316', // Laranja escuro
+];
 
-  const carregarFilas = React.useCallback(async () => {
+const ListaDaVezPage = () => {
+  const navigate = useNavigate();
+  const {
+    turnList,
+    stats,
+    loading,
+    error,
+    selectedUnit,
+    addPoint,
+    initializeTurnList,
+    loadTurnList,
+    refresh,
+  } = useListaDaVez();
+
+  // Estados locais
+  const [processingBarber, setProcessingBarber] = useState(null);
+
+  // Calcular estatísticas
+  const totalBarbers = turnList.length;
+  const totalPoints = turnList.reduce((sum, b) => sum + b.points, 0);
+  const averagePoints =
+    totalBarbers > 0 ? (totalPoints / totalBarbers).toFixed(1) : 0;
+
+  /**
+   * Adicionar ponto a um barbeiro
+   */
+  const handleAddPoint = async barberId => {
     try {
-      setLoading(true);
-      setError(null);
-      
-      const [mangabeiras, novaLima] = await Promise.all([
-        filaService.getFilaOrdenada(UNIDADES.MANGABEIRAS),
-        filaService.getFilaOrdenada(UNIDADES.NOVA_LIMA)
-      ]);
-
-      setFilaMangabeiras(mangabeiras);
-      setFilaNovLima(novaLima);
-      setLastUpdate(new Date());
+      setProcessingBarber(barberId);
+      await addPoint(barberId);
+      showToast('Ponto adicionado com sucesso!', 'success');
     } catch (err) {
-      setError(err.message);
-      // eslint-disable-next-line no-console
-      console.error('Erro ao carregar filas:', err);
+      showToast(`Erro: ${err.message}`, 'error');
     } finally {
-      setLoading(false);
+      setProcessingBarber(null);
     }
-  }, [UNIDADES.MANGABEIRAS, UNIDADES.NOVA_LIMA]);
-
-  useEffect(() => {
-    carregarFilas();
-
-    // Atualizar automaticamente a cada 30 segundos
-    const interval = setInterval(carregarFilas, 30000);
-    
-    return () => clearInterval(interval);
-  }, [carregarFilas]);
-
-  const formatLastUpdate = () => {
-    return lastUpdate.toLocaleTimeString('pt-BR', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    });
   };
 
-  const getTotalBarbeiros = () => {
-    return filaMangabeiras.length + filaNovLima.length;
+  /**
+   * Inicializar lista da vez
+   */
+  const handleInitialize = async () => {
+    if (!selectedUnit?.id) {
+      showToast('Selecione uma unidade primeiro', 'warning');
+      return;
+    }
+
+    try {
+      await initializeTurnList(selectedUnit.id);
+      showToast('Lista inicializada com sucesso!', 'success');
+    } catch (err) {
+      showToast(`Erro ao inicializar: ${err.message}`, 'error');
+    }
   };
 
-  const getBarbeirosAtivos = () => {
-    const ativosMangabeiras = filaMangabeiras.filter(b => b.status === 'active').length;
-    const ativosNovaLima = filaNovLima.filter(b => b.status === 'active').length;
-    return ativosMangabeiras + ativosNovaLima;
+  /**
+   * Atualizar dados
+   */
+  const handleRefresh = async () => {
+    try {
+      await refresh();
+      showToast('Dados atualizados!', 'success');
+    } catch (err) {
+      showToast(`Erro ao atualizar: ${err.message}`, 'error');
+    }
   };
 
-  const getBarbeirosAtendendo = () => {
-    const atendendoMangabeiras = filaMangabeiras.filter(b => b.status === 'attending').length;
-    const atendendoNovaLima = filaNovLima.filter(b => b.status === 'attending').length;
-    return atendendoMangabeiras + atendendoNovaLima;
+  /**
+   * Preparar dados para o gráfico
+   */
+  const getChartData = () => {
+    if (totalPoints === 0) {
+      return {
+        labels: ['Sem dados'],
+        datasets: [
+          {
+            data: [1],
+            backgroundColor: ['#E5E7EB'],
+            borderColor: ['#D1D5DB'],
+            borderWidth: 2,
+          },
+        ],
+      };
+    }
+
+    return {
+      labels: turnList.map(b => b.professionalName),
+      datasets: [
+        {
+          data: turnList.map(b => b.points),
+          backgroundColor: turnList.map(
+            (_, idx) => BARBER_COLORS[idx % BARBER_COLORS.length]
+          ),
+          borderColor: turnList.map(
+            (_, idx) => BARBER_COLORS[idx % BARBER_COLORS.length]
+          ),
+          borderWidth: 2,
+        },
+      ],
+    };
   };
 
-  if (loading && filaMangabeiras.length === 0 && filaNovLima.length === 0) {
-    return (
-      <div className="p-6">
-        <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-64"></div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {[1, 2].map(i => (
-              <div key={i} className="space-y-4">
-                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-48"></div>
-                {[1, 2, 3].map(j => (
-                  <div key={j} className="h-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        callbacks: {
+          label: context => {
+            const label = context.label || '';
+            const value = context.parsed || 0;
+            const percentage =
+              totalPoints > 0 ? ((value / totalPoints) * 100).toFixed(1) : 0;
+            return `${label}: ${value} atendimentos (${percentage}%)`;
+          },
+        },
+      },
+    },
+  };
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 space-y-6">
+      {/* Cabeçalho */}
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-            <Users className="h-8 w-8 text-blue-600" />
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             Lista da Vez
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Gerenciamento da fila de atendimento em tempo real
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            Gerencie a ordem de atendimento dos barbeiros
           </p>
         </div>
 
-        <div className="flex items-center gap-4">
-          {/* Estatísticas rápidas */}
-          <div className="hidden sm:flex items-center gap-6 text-sm">
-            <div className="text-center">
-              <div className="text-lg font-bold text-gray-900 dark:text-white">
-                {getTotalBarbeiros()}
-              </div>
-              <div className="text-gray-500 dark:text-gray-400">Total</div>
-            </div>
-            <div className="text-center">
-              <div className="text-lg font-bold text-green-600">
-                {getBarbeirosAtivos()}
-              </div>
-              <div className="text-gray-500 dark:text-gray-400">Disponíveis</div>
-            </div>
-            <div className="text-center">
-              <div className="text-lg font-bold text-blue-600">
-                {getBarbeirosAtendendo()}
-              </div>
-              <div className="text-gray-500 dark:text-gray-400">Atendendo</div>
-            </div>
-          </div>
-
-          {/* Botão atualizar */}
+        <div className="flex items-center gap-3">
           <Button
-            onClick={carregarFilas}
-            variant="outline"
+            onClick={handleRefresh}
+            variant="secondary"
             disabled={loading}
             className="flex items-center gap-2"
           >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            <FiRefreshCw className={loading ? 'animate-spin' : ''} />
             Atualizar
+          </Button>
+
+          <Button
+            onClick={() => navigate('/queue/history')}
+            variant="secondary"
+            className="flex items-center gap-2"
+          >
+            <FiCalendar />
+            Ver Histórico
+          </Button>
+
+          <Button
+            onClick={() => {
+              /* TODO: Implementar exportação */
+            }}
+            variant="secondary"
+            className="flex items-center gap-2"
+          >
+            <FiDownload />
+            Exportar
           </Button>
         </div>
       </div>
 
-      {/* Status da última atualização */}
-      <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-        <Clock className="h-4 w-4" />
-        Última atualização: {formatLastUpdate()}
-        {error && (
-          <div className="flex items-center gap-1 text-red-600 ml-4">
-            <AlertCircle className="h-4 w-4" />
-            {error}
+      {/* Seletor de Unidade */}
+      <Card className="p-4">
+        <div className="flex items-center gap-4">
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
+            Unidade:
+          </label>
+          <UnitSelector />
+        </div>
+      </Card>
+
+      {/* Indicadores Superiores */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+              <FiUsers className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Total de Barbeiros
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                {totalBarbers}
+              </p>
+            </div>
           </div>
-        )}
+        </Card>
+
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-green-100 dark:bg-green-900/20 rounded-lg">
+              <FiTrendingUp className="w-6 h-6 text-green-600 dark:text-green-400" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Total de Atendimentos
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                {totalPoints}
+              </p>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
+              <FiAward className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Média de Atendimentos
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                {averagePoints}
+              </p>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-orange-100 dark:bg-orange-900/20 rounded-lg">
+              <FiClock className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Última Atualização
+              </p>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                {new Date().toLocaleTimeString('pt-BR', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </p>
+            </div>
+          </div>
+        </Card>
       </div>
 
-      {/* Grid principal - Divisão por unidades */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        
-        {/* Coluna Mangabeiras */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-orange-600" />
-              Mangabeiras
-            </h2>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              {filaMangabeiras.length} barbeiro(s)
-            </span>
+      {/* Conteúdo Principal */}
+      {!selectedUnit?.id ? (
+        <Card className="p-12 text-center">
+          <FiUsers className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            Selecione uma Unidade
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400">
+            Escolha uma unidade acima para visualizar a lista da vez
+          </p>
+        </Card>
+      ) : turnList.length === 0 ? (
+        <Card className="p-12 text-center">
+          <FiUsers className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            Nenhuma lista encontrada
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            Inicialize a lista para esta unidade
+          </p>
+          <Button onClick={handleInitialize} disabled={loading}>
+            {loading ? 'Inicializando...' : '+ Inicializar Lista'}
+          </Button>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Lista de Barbeiros (2/3) */}
+          <div className="lg:col-span-2">
+            <Card className="p-6">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                Ordem de Atendimento
+              </h2>
+
+              <div className="space-y-2">
+                {turnList.map((barber, index) => {
+                  const isFirst = index === 0;
+                  const percentage =
+                    totalPoints > 0
+                      ? ((barber.points / totalPoints) * 100).toFixed(1)
+                      : '0.0';
+                  const color = BARBER_COLORS[index % BARBER_COLORS.length];
+                  const isProcessing =
+                    processingBarber === barber.professionalId;
+
+                  return (
+                    <div
+                      key={barber.id}
+                      className={`
+                        flex items-center gap-3 p-3 rounded-lg border-l-4 transition-all
+                        ${
+                          isFirst
+                            ? 'bg-green-600 dark:bg-green-700 text-white border-green-800'
+                            : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700'
+                        }
+                        ${isProcessing ? 'opacity-50' : ''}
+                      `}
+                      style={{
+                        borderLeftColor: isFirst ? '#065F46' : color,
+                      }}
+                    >
+                      {/* Posição */}
+                      <div className="flex-shrink-0 w-10 text-center">
+                        <span
+                          className={`text-xl font-bold ${isFirst ? 'text-white' : 'text-gray-900 dark:text-white'}`}
+                        >
+                          {barber.position}°
+                        </span>
+                      </div>
+
+                      {/* Nome */}
+                      <div className="flex-1 min-w-0">
+                        <h3
+                          className={`text-base font-semibold truncate ${isFirst ? 'text-white' : 'text-gray-900 dark:text-white'}`}
+                        >
+                          {barber.professionalName}
+                        </h3>
+                        {isFirst && (
+                          <span className="inline-flex items-center gap-1 text-xs font-medium text-green-100">
+                            🔹 PRÓXIMO NA VEZ
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Pontos */}
+                      <div className="text-center px-3">
+                        <p
+                          className={`text-xl font-bold ${isFirst ? 'text-white' : 'text-gray-900 dark:text-white'}`}
+                        >
+                          {barber.points}
+                        </p>
+                        <p
+                          className={`text-xs ${isFirst ? 'text-green-100' : 'text-gray-500 dark:text-gray-400'}`}
+                        >
+                          atendimentos
+                        </p>
+                      </div>
+
+                      {/* Percentual */}
+                      <div className="text-center px-3">
+                        <p
+                          className={`text-base font-semibold ${isFirst ? 'text-white' : 'text-gray-900 dark:text-white'}`}
+                        >
+                          {percentage}%
+                        </p>
+                        <p
+                          className={`text-xs ${isFirst ? 'text-green-100' : 'text-gray-500 dark:text-gray-400'}`}
+                        >
+                          participação
+                        </p>
+                      </div>
+
+                      {/* Botão +1 */}
+                      <Button
+                        onClick={() => handleAddPoint(barber.professionalId)}
+                        disabled={loading || isProcessing}
+                        size="sm"
+                        className={`
+                          flex-shrink-0
+                          ${
+                            isFirst
+                              ? 'bg-green-800 text-white hover:bg-green-900 border-green-900 font-bold shadow-lg'
+                              : 'bg-blue-600 text-white hover:bg-blue-700 border-blue-600 font-semibold'
+                          }
+                        `}
+                      >
+                        {isProcessing ? '...' : '+1'}
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-            {filaMangabeiras.length > 0 ? (
-              <div className="space-y-4">
-                {filaMangabeiras.map((barbeiro, index) => (
-                  <BarbeiroCard
-                    key={barbeiro.barbeiro_id}
-                    barbeiro={barbeiro}
-                    posicao={index + 1}
-                    unidadeId={UNIDADES.MANGABEIRAS}
-                    onUpdate={carregarFilas}
-                  />
-                ))}
+          {/* Gráfico de Distribuição (1/3) */}
+          <div className="lg:col-span-1">
+            <Card className="p-6 h-full">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                Distribuição de Atendimentos
+              </h2>
+
+              <div
+                className="flex items-center justify-center"
+                style={{ height: '300px' }}
+              >
+                <Doughnut data={getChartData()} options={chartOptions} />
               </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                <p>Nenhum barbeiro na fila hoje</p>
+
+              {/* Legenda */}
+              <div className="mt-6 space-y-2">
+                {turnList.map((barber, index) => {
+                  const percentage =
+                    totalPoints > 0
+                      ? ((barber.points / totalPoints) * 100).toFixed(1)
+                      : '0.0';
+                  const color = BARBER_COLORS[index % BARBER_COLORS.length];
+
+                  return (
+                    <div
+                      key={barber.id}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: color }}
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300 truncate">
+                          {barber.professionalName}
+                        </span>
+                      </div>
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                        {percentage}%
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
-            )}
+            </Card>
           </div>
         </div>
+      )}
 
-        {/* Coluna Nova Lima */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-green-600" />
-              Nova Lima
-            </h2>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              {filaNovLima.length} barbeiro(s)
-            </span>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-            {filaNovLima.length > 0 ? (
-              <div className="space-y-4">
-                {filaNovLima.map((barbeiro, index) => (
-                  <BarbeiroCard
-                    key={barbeiro.barbeiro_id}
-                    barbeiro={barbeiro}
-                    posicao={index + 1}
-                    unidadeId={UNIDADES.NOVA_LIMA}
-                    onUpdate={carregarFilas}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                <p>Nenhum barbeiro na fila hoje</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Rodapé com instruções */}
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
-        <h3 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
-          💡 Como funciona a Lista da Vez:
-        </h3>
-        <div className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-          <p>• <strong>Ordem:</strong> Barbeiros com menos atendimentos ficam na frente</p>
-          <p>• <strong>Empate:</strong> Quem entrou na fila há mais tempo tem prioridade</p>
-          <p>• <strong>Status:</strong> Verde (disponível), Azul (atendendo), Cinza (pausado)</p>
-          <p>• <strong>Atualização:</strong> Automática a cada 30 segundos</p>
-        </div>
-      </div>
+      {/* Mensagem de Erro */}
+      {error && (
+        <Card className="p-4 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800">
+          <p className="text-red-800 dark:text-red-200">⚠️ {error}</p>
+        </Card>
+      )}
     </div>
   );
-}
+};
+
+export default ListaDaVezPage;

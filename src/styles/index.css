@@ -13,11 +13,11 @@
   --text-secondary-light: #64748b;
 
   /* Dark Mode Colors */
-  --bg-dark: #0f172a;
-  --surface-dark: #1e293b;
-  --border-dark: #334155;
-  --text-primary-dark: #f8fafc;
-  --text-secondary-dark: #94a3b8;
+  --bg-dark: #0c0f12;
+  --surface-dark: #161b22;
+  --border-dark: #242c37;
+  --text-primary-dark: #f5f7fa;
+  --text-secondary-dark: #a5afbe;
 
   /* Cores primárias (iguais em ambos os temas) */
   --primary: #4da3ff;
@@ -30,9 +30,9 @@
   --warning-light: #f59e0b;
 
   /* Feedback Colors - Dark */
-  --success-dark: #22c55e;
-  --error-dark: #f87171;
-  --warning-dark: #fbbf24;
+  --success-dark: #3bd671;
+  --error-dark: #ff7e5f;
+  --warning-dark: #f4b400;
 }
 
 /* Configurações base */

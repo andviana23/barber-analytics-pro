@@ -18,6 +18,16 @@ vi.mock('../../services/financeiroService', () => ({
   },
 }));
 
+// Mock do AuthContext
+vi.mock('../../context/AuthContext', () => ({
+  useAuth: () => ({
+    user: {
+      id: 'user-123',
+      email: 'test@test.com',
+    },
+  }),
+}));
+
 const mockFinanceiroService = financeiroService as {
   getKPIs: ReturnType<typeof vi.fn>;
 };

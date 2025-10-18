@@ -173,7 +173,7 @@ describe('useRevenueDistribution', () => {
     });
 
     // Assert
-    expect(mockDashboardService.getRevenueDistribution).toHaveBeenCalledWith(undefined);
+    expect(mockDashboardService.getRevenueDistribution).toHaveBeenCalledWith(null);
     expect(result.current.distribution).toHaveLength(1);
     expect(result.current.distribution[0].percentage).toBe(100);
   });
