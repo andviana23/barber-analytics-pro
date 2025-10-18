@@ -7,7 +7,7 @@ import { logger } from '../../utils/secureLogger';
 export function LoginPage() {
   const navigate = useNavigate();
   const { signIn } = useAuth();
-  
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -17,11 +17,11 @@ export function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
     // Limpar erro quando usuário começar a digitar
     if (error) setError('');
@@ -47,9 +47,9 @@ export function LoginPage() {
     return true;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setIsLoading(true);
@@ -58,26 +58,34 @@ export function LoginPage() {
     try {
       // 🛡️ CORREÇÃO BUG-002: Log sanitizado de autenticação
       logger.auth('Tentativa de login', { email: formData.email });
-      const { data, error: authError } = await signIn(formData.email, formData.password);
-      
-      logger.auth('Resultado do login', { success: !authError, hasData: !!data });
-      
+      const { data, error: authError } = await signIn(
+        formData.email,
+        formData.password
+      );
+
+      logger.auth('Resultado do login', {
+        success: !authError,
+        hasData: !!data,
+      });
+
       if (authError) {
         logger.error('Erro de autenticação', authError);
-        
+
         // Mensagens de erro mais específicas
         let errorMessage = 'Email ou senha incorretos';
-        
+
         if (authError.message?.includes('Invalid login credentials')) {
           errorMessage = 'Email ou senha incorretos';
         } else if (authError.message?.includes('Email not confirmed')) {
-          errorMessage = 'Email não confirmado. Verifique sua caixa de entrada.';
+          errorMessage =
+            'Email não confirmado. Verifique sua caixa de entrada.';
         } else if (authError.message?.includes('Too many requests')) {
-          errorMessage = 'Muitas tentativas. Tente novamente em alguns minutos.';
+          errorMessage =
+            'Muitas tentativas. Tente novamente em alguns minutos.';
         } else if (authError.message) {
           errorMessage = authError.message;
         }
-        
+
         setError(errorMessage);
         return;
       }
@@ -109,7 +117,7 @@ export function LoginPage() {
             Bem-vindo de volta
           </h2>
           <p className="mt-2 text-text-light-secondary dark:text-text-dark-secondary">
-            Faça login em sua conta do Barber Analytics Pro
+            Faça login em sua conta da Trato de Barbados
           </p>
         </div>
 
@@ -118,8 +126,8 @@ export function LoginPage() {
           <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Email Field */}
             <div>
-              <label 
-                htmlFor="email" 
+              <label
+                htmlFor="email"
                 className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2"
               >
                 Email
@@ -144,8 +152,8 @@ export function LoginPage() {
 
             {/* Password Field */}
             <div>
-              <label 
-                htmlFor="password" 
+              <label
+                htmlFor="password"
                 className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2"
               >
                 Senha
@@ -230,15 +238,6 @@ export function LoginPage() {
               </Link>
             </p>
           </div>
-        </div>
-
-        {/* Demo Credentials */}
-        <div className="bg-info/10 border border-info/20 rounded-lg p-4 text-center">
-          <p className="text-info font-medium mb-2">Demo - Credenciais de Teste</p>
-          <p className="text-text-light-secondary dark:text-text-dark-secondary text-sm">
-            <strong>Email:</strong> teste@teste.com<br />
-            <strong>Senha:</strong> 123456
-          </p>
         </div>
       </div>
     </div>
