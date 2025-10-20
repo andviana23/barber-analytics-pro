@@ -111,7 +111,7 @@ export function LoginPage() {
         {/* Header */}
         <div className="text-center">
           <div className="mx-auto w-16 h-16 bg-primary rounded-xl flex items-center justify-center mb-4">
-            <span className="text-white font-bold text-xl">BA</span>
+            <span className="text-white font-bold text-xl">TB</span>
           </div>
           <h2 className="text-3xl font-bold text-text-light-primary dark:text-text-dark-primary">
             Bem-vindo de volta

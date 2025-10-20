@@ -64,14 +64,14 @@ export function Navbar({ onMenuToggle }) {
             {/* Logo */}
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">BA</span>
+                <span className="text-white font-bold text-sm">TB</span>
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-text-light-primary dark:text-text-dark-primary font-semibold text-lg">
-                  Barber Analytics
+                  Gestão Trato de Barbados
                 </h1>
                 <p className="text-text-light-secondary dark:text-text-dark-secondary text-xs">
-                  Pro Dashboard
+                  Sistema de Gestão
                 </p>
               </div>
             </div>
