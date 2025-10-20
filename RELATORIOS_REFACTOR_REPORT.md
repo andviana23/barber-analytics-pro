@@ -177,3 +177,5 @@ CREATE OR REPLACE VIEW vw_financial_summary AS
 
 A página de relatórios está agora **100% refatorada** e pronta para uso em produção! 🚀
 
+
+

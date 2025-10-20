@@ -30,13 +30,19 @@ export const UnitProvider = ({ children }) => {
    * Carregar lista de unidades ativas
    */
   const loadUnits = useCallback(async () => {
+    console.log('🔄 UnitContext - Iniciando loadUnits...');
     try {
       setLoading(true);
       setError(null);
 
+      console.log('🔄 UnitContext - Chamando unitsService.getUnits...');
       const units = await unitsService.getUnits(false); // Apenas ativas
-      console.log('📍 UnitContext - Unidades carregadas:', units.length, units);
-      setAllUnits(units);
+      console.log(
+        '📍 UnitContext - Unidades carregadas:',
+        units?.length || 0,
+        units
+      );
+      setAllUnits(units || []);
 
       // Se não há unidade selecionada, verificar localStorage
       if (!selectedUnit) {
@@ -52,12 +58,13 @@ export const UnitProvider = ({ children }) => {
 
       return units;
     } catch (err) {
+      console.error('❌ UnitContext - Erro ao carregar unidades:', err);
       setError(err.message || 'Erro ao carregar unidades');
       return [];
     } finally {
       setLoading(false);
     }
-  }, [selectedUnit]);
+  }, []);
 
   /**
    * Selecionar uma unidade específica
