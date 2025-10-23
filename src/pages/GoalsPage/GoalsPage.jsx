@@ -712,6 +712,19 @@ const GoalModal = ({
 
 // 🎯 Componente para card de meta (100% Design System)
 const GoalCard = ({ goal, onEdit, onDelete, onToggleStatus }) => {
+  // Debug: verificar dados recebidos
+  React.useEffect(() => {
+    console.log('📊 GoalCard - Dados da meta:', {
+      type: goal.goal_type,
+      target: goal.target_value,
+      achieved: goal.achieved_value,
+      percentage:
+        goal.target_value > 0
+          ? ((goal.achieved_value || 0) / goal.target_value) * 100
+          : 0,
+    });
+  }, [goal]);
+
   const getGoalTypeInfo = type => {
     const types = {
       revenue_general: {

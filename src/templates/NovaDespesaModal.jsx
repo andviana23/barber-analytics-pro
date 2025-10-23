@@ -166,21 +166,18 @@ const NovaDespesaModal = ({
     ];
   }, []);
   const [formData, setFormData] = useState({
-    titulo: '',
-    valor: '',
-    descricao: '',
-    categoria_id: '',
-    centro_custo_id: '',
     fornecedor_id: '',
     data_competencia: new Date(),
-    codigo_referencia: '',
+    descricao: '',
+    valor: '',
+    categoria_id: '',
     parcelamento: 'avista',
     data_vencimento: new Date(),
     forma_pagamento: 'pix',
     conta_id: '',
-    status: 'pendente',
     observacoes: '',
     anexos: [],
+    status: 'pendente',
   });
 
   const [isRecurring, setIsRecurring] = useState(false);
@@ -286,7 +283,7 @@ const NovaDespesaModal = ({
         previews.push({
           date: targetDate,
           value: parseFloat(formData.valor || 0),
-          title: `${formData.titulo} (${count + 1}ª parcela)`,
+          title: `${formData.descricao} (${count + 1}ª parcela)`,
           parcela: count + 1,
         });
       }
@@ -300,7 +297,7 @@ const NovaDespesaModal = ({
     isRecurring,
     formData.data_vencimento,
     formData.valor,
-    formData.titulo,
+    formData.descricao,
     recurringConfig,
   ]);
 
@@ -326,8 +323,12 @@ const NovaDespesaModal = ({
   const validateForm = useCallback(() => {
     const newErrors = {};
 
-    if (!formData.titulo.trim()) {
-      newErrors.titulo = 'Título é obrigatório';
+    if (!formData.fornecedor_id) {
+      newErrors.fornecedor_id = 'Fornecedor é obrigatório';
+    }
+
+    if (!formData.descricao.trim()) {
+      newErrors.descricao = 'Descrição é obrigatória';
     }
 
     if (!formData.valor || parseFloat(formData.valor) <= 0) {
@@ -377,18 +378,12 @@ const NovaDespesaModal = ({
         party_id: formData.fornecedor_id || null,
         account_id: formData.conta_id || null,
         category_id: formData.categoria_id || null,
-        description: formData.titulo,
+        description: formData.descricao,
         value: parseFloat(formData.valor),
         date: formData.data_competencia,
         data_competencia: formData.data_competencia,
-        codigo_referencia: formData.codigo_referencia || null,
         forma_pagamento: formData.forma_pagamento || null,
         parcelamento: formData.parcelamento || null,
-        centro_custo: formData.centro_custo || null,
-        habilitar_rateio: formData.habilitar_rateio || false,
-        valor_rateio: formData.habilitar_rateio
-          ? parseFloat(formData.valor_rateio || 0)
-          : 0,
         expected_payment_date: formData.data_vencimento || null,
         status: formData.status === 'pago' ? 'Paid' : 'Pending',
         observations: formData.observacoes || null,
@@ -467,25 +462,22 @@ const NovaDespesaModal = ({
   useEffect(() => {
     if (initialData) {
       setFormData({
-        titulo: initialData.titulo || '',
-        valor: initialData.valor?.toString() || '',
-        descricao: initialData.descricao || '',
-        categoria_id: initialData.categoria_id || '',
-        centro_custo_id: initialData.centro_custo_id || '',
-        fornecedor_id: initialData.fornecedor_id || '',
-        data_vencimento: initialData.data_vencimento
-          ? new Date(initialData.data_vencimento)
+        fornecedor_id: initialData.fornecedor_id || initialData.party_id || '',
+        data_competencia: initialData.data_competencia || initialData.date
+          ? new Date(initialData.data_competencia || initialData.date)
           : new Date(),
-        data_competencia: initialData.data_competencia
-          ? new Date(initialData.data_competencia)
-          : new Date(),
-        codigo_referencia: initialData.codigo_referencia || '',
+        descricao: initialData.descricao || initialData.description || '',
+        valor: (initialData.valor || initialData.value)?.toString() || '',
+        categoria_id: initialData.categoria_id || initialData.category_id || '',
         parcelamento: initialData.parcelamento || 'avista',
+        data_vencimento: initialData.data_vencimento || initialData.expected_payment_date
+          ? new Date(initialData.data_vencimento || initialData.expected_payment_date)
+          : new Date(),
         forma_pagamento: initialData.forma_pagamento || 'pix',
-        conta_id: initialData.conta_id || '',
-        status: initialData.status || 'pendente',
-        observacoes: initialData.observacoes || '',
+        conta_id: initialData.conta_id || initialData.account_id || '',
+        observacoes: initialData.observacoes || initialData.observations || '',
         anexos: initialData.anexos || [],
+        status: initialData.status || 'pendente',
       });
 
       if (initialData.recorrencia) {
@@ -560,50 +552,102 @@ const NovaDespesaModal = ({
                 </div>
                 <div>
                   <h3 className="text-base font-semibold text-gray-900 dark:text-white">
-                    Informações do Lançamento
+                    Informações do lançamento
                   </h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
-                    Dados essenciais da despesa
-                  </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {/* Título da Despesa */}
-                <div className="lg:col-span-2">
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                {/* Fornecedor */}
+                <div className="lg:col-span-1">
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Título da Despesa *
+                    Fornecedor
                   </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={formData.titulo}
-                      onChange={e =>
-                        handleInputChange('titulo', e.target.value)
+                  <div className="bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-300 dark:border-gray-600 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/20 transition-all duration-200">
+                    <PartySelector
+                      value={formData.fornecedor_id}
+                      onChange={value =>
+                        handleInputChange('fornecedor_id', value)
                       }
-                      placeholder="Ex: Aluguel mensal, Material de limpeza..."
-                      className={`w-full px-3 py-2 text-sm border-2 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
-                        errors.titulo
-                          ? 'border-red-400 dark:border-red-500'
-                          : 'border-gray-300 dark:border-gray-600'
-                      }`}
+                      unitId={unidadeId}
+                      tipo="fornecedor"
+                      placeholder="Buscar ou criar fornecedor..."
+                      allowCreate={true}
                     />
-                    {errors.titulo && (
-                      <div className="mt-2 flex items-center gap-2 text-red-600 dark:text-red-400 text-sm">
-                        <AlertCircle className="w-4 h-4" />
-                        {errors.titulo}
-                      </div>
-                    )}
                   </div>
+                  {errors.fornecedor_id && (
+                    <div className="mt-2 flex items-center gap-2 text-red-600 dark:text-red-400 text-xs">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.fornecedor_id}
+                    </div>
+                  )}
+                </div>
+
+                {/* Data de Competência */}
+                <div className="lg:col-span-1">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Data de competência *
+                  </label>
+                  <input
+                    type="date"
+                    value={
+                      formData.data_competencia
+                        ? format(formData.data_competencia, 'yyyy-MM-dd')
+                        : ''
+                    }
+                    onChange={e =>
+                      handleInputChange(
+                        'data_competencia',
+                        e.target.value ? new Date(e.target.value) : null
+                      )
+                    }
+                    className={`w-full px-3 py-2 text-sm border-2 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
+                      errors.data_competencia
+                        ? 'border-red-400 dark:border-red-500'
+                        : 'border-gray-300 dark:border-gray-600'
+                    }`}
+                  />
+                  {errors.data_competencia && (
+                    <div className="mt-2 flex items-center gap-2 text-red-600 dark:text-red-400 text-xs">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.data_competencia}
+                    </div>
+                  )}
+                </div>
+
+                {/* Descrição */}
+                <div className="lg:col-span-1">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Descrição *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.descricao}
+                    onChange={e =>
+                      handleInputChange('descricao', e.target.value)
+                    }
+                    placeholder="Ex: Aluguel, Material..."
+                    className={`w-full px-3 py-2 text-sm border-2 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
+                      errors.descricao
+                        ? 'border-red-400 dark:border-red-500'
+                        : 'border-gray-300 dark:border-gray-600'
+                    }`}
+                  />
+                  {errors.descricao && (
+                    <div className="mt-2 flex items-center gap-2 text-red-600 dark:text-red-400 text-xs">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.descricao}
+                    </div>
+                  )}
                 </div>
 
                 {/* Valor */}
-                <div>
+                <div className="lg:col-span-1">
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Valor *
                   </label>
                   <div className="relative">
-                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400 font-semibold text-lg">
+                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400 font-medium text-sm">
                       R$
                     </div>
                     <input
@@ -613,27 +657,25 @@ const NovaDespesaModal = ({
                       value={formData.valor}
                       onChange={e => handleInputChange('valor', e.target.value)}
                       placeholder="0,00"
-                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
+                      className={`w-full pl-10 pr-4 py-2 text-sm border-2 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
                         errors.valor
                           ? 'border-red-400 dark:border-red-500'
                           : 'border-gray-300 dark:border-gray-600'
                       }`}
                     />
-                    {errors.valor && (
-                      <div className="mt-2 flex items-center gap-2 text-red-600 dark:text-red-400 text-sm">
-                        <AlertCircle className="w-4 h-4" />
-                        {errors.valor}
-                      </div>
-                    )}
                   </div>
+                  {errors.valor && (
+                    <div className="mt-2 flex items-center gap-2 text-red-600 dark:text-red-400 text-xs">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.valor}
+                    </div>
+                  )}
                 </div>
 
                 {/* Categoria */}
-                <div>
+                <div className="lg:col-span-4">
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Categoria *{' '}
-                    {categories.length > 0 &&
-                      `(${categories.length} disponíveis)`}
+                    Categoria *
                   </label>
                   <div className="relative">
                     <select
@@ -702,7 +744,7 @@ const NovaDespesaModal = ({
                       })()}
                     </select>
                     {errors.categoria_id && (
-                      <div className="mt-2 flex items-center gap-2 text-red-600 dark:text-red-400 text-sm">
+                      <div className="mt-2 flex items-center gap-2 text-red-600 dark:text-red-400 text-xs">
                         <AlertCircle className="w-4 h-4" />
                         {errors.categoria_id}
                       </div>
@@ -712,286 +754,17 @@ const NovaDespesaModal = ({
               </div>
             </div>
 
-            {/* 👥 2. Fornecedor e Datas */}
+            {/* 🔁 2. Configuração de Repetição */}
             <div className="space-y-6">
-              <div className="flex items-center gap-4 pb-6 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg">
-                  <Building2 className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-white">
-                    Fornecedor e Datas
-                  </h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
-                    Informações do fornecedor e período contábil
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {/* Fornecedor */}
-                <div className="lg:col-span-2">
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Fornecedor
-                  </label>
-                  <div className="bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-300 dark:border-gray-600 focus-within:border-green-500 focus-within:ring-4 focus-within:ring-green-500/20 transition-all duration-200">
-                    <PartySelector
-                      value={formData.fornecedor_id}
-                      onChange={value =>
-                        handleInputChange('fornecedor_id', value)
-                      }
-                      unitId={unidadeId}
-                      tipo="fornecedor"
-                      placeholder="Buscar ou criar fornecedor..."
-                      allowCreate={true}
-                    />
-                  </div>
-                </div>
-
-                {/* Data de Competência */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Data de Competência *
-                  </label>
-                  <input
-                    type="date"
-                    value={
-                      formData.data_competencia
-                        ? format(formData.data_competencia, 'yyyy-MM-dd')
-                        : ''
-                    }
-                    onChange={e =>
-                      handleInputChange(
-                        'data_competencia',
-                        e.target.value ? new Date(e.target.value) : null
-                      )
-                    }
-                    className={`w-full px-3 py-2 text-sm border-2 rounded-lg focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
-                      errors.data_competencia
-                        ? 'border-red-400 dark:border-red-500'
-                        : 'border-gray-300 dark:border-gray-600'
-                    }`}
-                  />
-                  {errors.data_competencia && (
-                    <div className="mt-2 flex items-center gap-2 text-red-600 dark:text-red-400 text-sm">
-                      <AlertCircle className="w-4 h-4" />
-                      {errors.data_competencia}
-                    </div>
-                  )}
-                </div>
-
-                {/* Código de Referência */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Código de Referência
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.codigo_referencia}
-                    onChange={e =>
-                      handleInputChange('codigo_referencia', e.target.value)
-                    }
-                    placeholder="Ex: NF 12345, Boleto 67890..."
-                    className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* 💳 3. Condição de Pagamento */}
-            <div className="space-y-6">
-              <div className="flex items-center gap-4 pb-6 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg">
-                  <CreditCard className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-white">
-                    Condição de Pagamento
-                  </h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
-                    Parcelas, vencimentos e forma de pagamento
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {/* Parcelamento */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Parcelamento
-                  </label>
-                  <select
-                    value={formData.parcelamento}
-                    onChange={e =>
-                      handleInputChange('parcelamento', e.target.value)
-                    }
-                    className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                  >
-                    {installmentOptions.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Data de Vencimento */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Data de Vencimento *
-                  </label>
-                  <input
-                    type="date"
-                    value={
-                      formData.data_vencimento
-                        ? format(formData.data_vencimento, 'yyyy-MM-dd')
-                        : ''
-                    }
-                    onChange={e =>
-                      handleInputChange(
-                        'data_vencimento',
-                        e.target.value ? new Date(e.target.value) : null
-                      )
-                    }
-                    className={`w-full px-3 py-2 text-sm border-2 rounded-lg focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
-                      errors.data_vencimento
-                        ? 'border-red-400 dark:border-red-500'
-                        : 'border-gray-300 dark:border-gray-600'
-                    }`}
-                  />
-                  {errors.data_vencimento && (
-                    <div className="mt-2 flex items-center gap-2 text-red-600 dark:text-red-400 text-sm">
-                      <AlertCircle className="w-4 h-4" />
-                      {errors.data_vencimento}
-                    </div>
-                  )}
-                </div>
-
-                {/* Forma de Pagamento */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Forma de Pagamento
-                  </label>
-                  <div className="grid grid-cols-2 gap-3">
-                    {paymentMethods.map(method => {
-                      const IconComponent = method.icon;
-                      return (
-                        <button
-                          key={method.value}
-                          type="button"
-                          onClick={() =>
-                            handleInputChange('forma_pagamento', method.value)
-                          }
-                          className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all duration-200 ${
-                            formData.forma_pagamento === method.value
-                              ? `border-${method.color}-500 bg-${method.color}-50 dark:bg-${method.color}-900/20 ring-2 ring-${method.color}-500/20`
-                              : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:border-gray-500'
-                          }`}
-                        >
-                          <IconComponent
-                            className={`w-5 h-5 ${
-                              formData.forma_pagamento === method.value
-                                ? `text-${method.color}-600 dark:text-${method.color}-400`
-                                : 'text-gray-500 dark:text-gray-400'
-                            }`}
-                          />
-                          <span
-                            className={`text-sm font-medium ${
-                              formData.forma_pagamento === method.value
-                                ? `text-${method.color}-700 dark:text-${method.color}-300`
-                                : 'text-gray-700 dark:text-gray-300'
-                            }`}
-                          >
-                            {method.label}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Conta de Pagamento */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Conta de Pagamento
-                  </label>
-                  <select
-                    value={formData.conta_id}
-                    onChange={e =>
-                      handleInputChange('conta_id', e.target.value)
-                    }
-                    className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                  >
-                    <option value="">Selecionar conta...</option>
-                    {accounts.map(account => (
-                      <option key={account.id} value={account.id}>
-                        {account.name} - {account.bank_name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Status */}
-                <div className="lg:col-span-2">
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Status da Despesa
-                  </label>
-                  <div className="flex items-center gap-6">
-                    <label className="flex items-center gap-3 cursor-pointer group">
-                      <div className="relative">
-                        <input
-                          type="checkbox"
-                          checked={formData.status === 'pago'}
-                          onChange={e =>
-                            handleInputChange(
-                              'status',
-                              e.target.checked ? 'pago' : 'pendente'
-                            )
-                          }
-                          className="w-5 h-5 rounded border-2 border-gray-300 dark:border-gray-600 text-green-600 focus:ring-2 focus:ring-green-500/20 focus:ring-offset-0 cursor-pointer"
-                        />
-                      </div>
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
-                        Pago
-                      </span>
-                    </label>
-                    <label className="flex items-center gap-3 cursor-pointer group">
-                      <div className="relative">
-                        <input
-                          type="checkbox"
-                          checked={formData.status === 'agendado'}
-                          onChange={e =>
-                            handleInputChange(
-                              'status',
-                              e.target.checked ? 'agendado' : 'pendente'
-                            )
-                          }
-                          className="w-5 h-5 rounded border-2 border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:ring-offset-0 cursor-pointer"
-                        />
-                      </div>
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
-                        Agendado
-                      </span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 🔁 4. Configuração de Repetição */}
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between pb-6 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center gap-4">
                   <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg">
                     <Repeat className="w-5 h-5 text-white" />
                   </div>
                   <div>
                     <h3 className="text-base font-semibold text-gray-900 dark:text-white">
-                      Despesa Recorrente
+                      Configurações de repetição
                     </h3>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">
-                      Configure lançamentos automáticos futuros
-                    </p>
                   </div>
                 </div>
                 <button
@@ -1003,6 +776,9 @@ const NovaDespesaModal = ({
                       : 'bg-gray-300 dark:bg-gray-600'
                   }`}
                 >
+                  <span className="text-xs font-medium text-white absolute left-2">
+                    {isRecurring ? 'Repetir lançamento?' : ''}
+                  </span>
                   <span
                     className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform duration-300 shadow-lg ${
                       isRecurring ? 'translate-x-7' : 'translate-x-1'
@@ -1012,57 +788,33 @@ const NovaDespesaModal = ({
               </div>
 
               {isRecurring && (
-                <div className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 border-2 border-purple-200 dark:border-purple-700 rounded-2xl p-8 space-y-8">
+                <div className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 border-2 border-purple-200 dark:border-purple-700 rounded-2xl p-6 space-y-6">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Configurações de Repetição
                       </label>
-                      <div className="grid grid-cols-2 gap-3">
-                        {recurringOptions.map(option => {
-                          const IconComponent = option.icon;
-                          return (
-                            <button
-                              key={option.value}
-                              type="button"
-                              onClick={() =>
-                                setRecurringConfig(prev => ({
-                                  ...prev,
-                                  configuracao: option.value,
-                                }))
-                              }
-                              className={`flex flex-col items-center gap-2 px-4 py-4 rounded-xl border-2 transition-all duration-200 ${
-                                recurringConfig.configuracao === option.value
-                                  ? `border-${option.color}-500 bg-${option.color}-50 dark:bg-${option.color}-900/20 ring-2 ring-${option.color}-500/20`
-                                  : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:border-gray-500'
-                              }`}
-                            >
-                              <IconComponent
-                                className={`w-6 h-6 ${
-                                  recurringConfig.configuracao === option.value
-                                    ? `text-${option.color}-600 dark:text-${option.color}-400`
-                                    : 'text-gray-500 dark:text-gray-400'
-                                }`}
-                              />
-                              <div className="text-center">
-                                <div
-                                  className={`text-sm font-medium ${
-                                    recurringConfig.configuracao ===
-                                    option.value
-                                      ? `text-${option.color}-700 dark:text-${option.color}-300`
-                                      : 'text-gray-700 dark:text-gray-300'
-                                  }`}
-                                >
-                                  {option.label}
-                                </div>
-                                <div className="text-xs text-gray-500 dark:text-gray-400">
-                                  {option.description}
-                                </div>
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
+                      <select
+                        value={recurringConfig.configuracao}
+                        onChange={e =>
+                          setRecurringConfig(prev => ({
+                            ...prev,
+                            configuracao: e.target.value,
+                          }))
+                        }
+                        className="w-full px-4 py-3 border-2 border-purple-300 dark:border-purple-600 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                      >
+                        <option value="mensal-12x">
+                          Mensal - A cada 1 mês(es), 8 vez(es)
+                        </option>
+                        <option value="mensal-36x">
+                          Mensal - A cada 1 mês(es), 36 vez(es)
+                        </option>
+                        <option value="mensal-8x">
+                          Mensal - A cada 1 mês(es), 8 vez(es)
+                        </option>
+                        <option value="personalizar">Personalizar</option>
+                      </select>
                     </div>
 
                     <div>
@@ -1108,143 +860,151 @@ const NovaDespesaModal = ({
                       />
                     </div>
                   )}
-
-                  {/* Preview das próximas despesas */}
-                  {recurringPreview.length > 0 && (
-                    <div>
-                      <div className="flex items-center justify-between mb-4">
-                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                          <Sparkles className="w-5 h-5 text-purple-500" />
-                          Próximas Despesas
-                        </h4>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setRecurringConfig(prev => ({
-                              ...prev,
-                              previewExpanded: !prev.previewExpanded,
-                            }))
-                          }
-                          className="text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/20 transition-all duration-200"
-                        >
-                          {recurringConfig.previewExpanded ? (
-                            <>
-                              <EyeOff className="w-4 h-4" />
-                              Ocultar
-                            </>
-                          ) : (
-                            <>
-                              <Eye className="w-4 h-4" />
-                              Ver preview
-                            </>
-                          )}
-                        </button>
-                      </div>
-
-                      {recurringConfig.previewExpanded && (
-                        <div className="space-y-3 max-h-60 overflow-y-auto">
-                          {recurringPreview.map((preview, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center justify-between py-4 px-6 bg-white dark:bg-gray-800 rounded-xl border border-purple-200 dark:border-purple-700 shadow-sm hover:shadow-md transition-all duration-200"
-                            >
-                              <div className="flex items-center gap-4">
-                                <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg">
-                                  <Calendar className="w-5 h-5 text-white" />
-                                </div>
-                                <div>
-                                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                                    {preview.title}
-                                  </p>
-                                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                                    {format(
-                                      preview.date,
-                                      "dd 'de' MMMM 'de' yyyy",
-                                      { locale: ptBR }
-                                    )}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <span className="text-lg font-bold text-purple-600 dark:text-purple-400">
-                                  R${' '}
-                                  {preview.value.toLocaleString('pt-BR', {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2,
-                                  })}
-                                </span>
-                                <div className="text-xs text-gray-500 dark:text-gray-400">
-                                  {preview.parcela}ª parcela
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
                 </div>
               )}
             </div>
 
-            {/* 📎 5. Observações e Anexos */}
+            {/* 💳 3. Condição de Pagamento */}
             <div className="space-y-6">
               <div className="flex items-center gap-4 pb-6 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-gray-500 to-gray-600 rounded-xl shadow-lg">
-                  <FileText className="w-5 h-5 text-white" />
+                <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg">
+                  <CreditCard className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <h3 className="text-base font-semibold text-gray-900 dark:text-white">
-                    Observações e Anexos
+                    Condição de pagamento
                   </h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
-                    Informações complementares e documentos
-                  </p>
                 </div>
               </div>
 
-              <div className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                {/* Cobrar sempre no */}
                 <div>
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Observações
+                    Cobrar sempre no
                   </label>
-                  <textarea
-                    value={formData.observacoes}
+                  <select
+                    value={recurringConfig.cobrar_sempre_no}
                     onChange={e =>
-                      handleInputChange('observacoes', e.target.value)
+                      setRecurringConfig(prev => ({
+                        ...prev,
+                        cobrar_sempre_no: parseInt(e.target.value),
+                      }))
                     }
-                    placeholder="Observações internas..."
-                    rows={4}
-                    className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-gray-500/20 focus:border-gray-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none"
-                  />
+                    className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  >
+                    {dayOptions.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.value}º dia do mês
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
+                {/* 1º vencimento */}
                 <div>
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Anexos
+                    1º vencimento *
                   </label>
-                  <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 group">
-                    <Upload className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4 group-hover:text-gray-600 dark:group-hover:text-gray-400 transition-colors" />
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 font-medium">
-                      Arraste arquivos aqui ou clique para selecionar
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-500 mb-4">
-                      PDF, imagens ou comprovantes (máx. 5MB)
-                    </p>
-                    <input
-                      type="file"
-                      multiple
-                      accept=".pdf,.jpg,.jpeg,.png"
-                      className="hidden"
-                      id="file-upload"
-                    />
-                    <label
-                      htmlFor="file-upload"
-                      className="inline-flex items-center px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer transition-all duration-200 font-medium"
-                    >
-                      <Upload className="w-4 h-4 mr-2" />
-                      Selecionar Arquivos
+                  <input
+                    type="date"
+                    value={
+                      formData.data_vencimento
+                        ? format(formData.data_vencimento, 'yyyy-MM-dd')
+                        : ''
+                    }
+                    onChange={e =>
+                      handleInputChange(
+                        'data_vencimento',
+                        e.target.value ? new Date(e.target.value) : null
+                      )
+                    }
+                    className={`w-full px-3 py-2 text-sm border-2 rounded-lg focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
+                      errors.data_vencimento
+                        ? 'border-red-400 dark:border-red-500'
+                        : 'border-gray-300 dark:border-gray-600'
+                    }`}
+                  />
+                  {errors.data_vencimento && (
+                    <div className="mt-2 flex items-center gap-2 text-red-600 dark:text-red-400 text-xs">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.data_vencimento}
+                    </div>
+                  )}
+                </div>
+
+                {/* Forma de pagamento */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Forma de pagamento
+                  </label>
+                  <select
+                    value={formData.forma_pagamento}
+                    onChange={e =>
+                      handleInputChange('forma_pagamento', e.target.value)
+                    }
+                    className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  >
+                    {paymentMethods.map(method => (
+                      <option key={method.value} value={method.value}>
+                        {method.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Conta de pagamento */}
+                <div className="lg:col-span-3">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Conta de pagamento
+                  </label>
+                  <select
+                    value={formData.conta_id}
+                    onChange={e =>
+                      handleInputChange('conta_id', e.target.value)
+                    }
+                    className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  >
+                    <option value="">Selecionar conta...</option>
+                    {accounts.map(account => (
+                      <option key={account.id} value={account.id}>
+                        {account.name} - {account.bank_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* 📎 4. Observações */}
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Observações Tab */}
+                <div className="lg:col-span-2">
+                  <div className="border-b border-gray-200 dark:border-gray-700 mb-4">
+                    <div className="flex gap-4">
+                      <button className="px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400">
+                        Observações
+                      </button>
+                      <button className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+                        Anexo
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Observações
                     </label>
+                    <textarea
+                      value={formData.observacoes}
+                      onChange={e =>
+                        handleInputChange('observacoes', e.target.value)
+                      }
+                      placeholder="Descreva observações relevantes sobre esse lançamento financeiro"
+                      rows={4}
+                      className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-gray-500/20 focus:border-gray-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none"
+                    />
                   </div>
                 </div>
               </div>
@@ -1333,16 +1093,13 @@ export const NovaDespesaModalPreview = () => {
 
   const mockInitialData = isEditing
     ? {
-        titulo: 'Aluguel Mensal - Unidade Centro',
-        valor: 2500.0,
-        descricao: 'Aluguel referente ao mês de dezembro/2024',
-        categoria_id: '1',
-        centro_custo_id: '1',
         fornecedor_id: '1',
-        data_vencimento: new Date('2024-12-05'),
         data_competencia: new Date('2024-12-01'),
-        codigo_referencia: 'CONT-2024-12-001',
+        descricao: 'Aluguel Mensal - Unidade Centro',
+        valor: 2500.0,
+        categoria_id: '1',
         parcelamento: 'avista',
+        data_vencimento: new Date('2024-12-05'),
         forma_pagamento: 'pix',
         conta_id: '1',
         status: 'pendente',
@@ -1410,10 +1167,6 @@ export const NovaDespesaModalPreview = () => {
           isEditing={isEditing}
           loading={loading}
           unidadeId="unidade-1"
-          availableCategories={categories}
-          availableAccounts={accounts}
-          availableCostCenters={costCenters}
-          availableSuppliers={suppliers}
         />
       </div>
     </div>

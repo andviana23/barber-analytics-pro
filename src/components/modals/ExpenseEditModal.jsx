@@ -17,7 +17,7 @@ import { useToast } from '../../context/ToastContext';
 import { format } from 'date-fns';
 
 /**
- * 🎨 Modal de Edição de Despesa - 100% Refatorado
+ * 🎨 Modal de Edição/Criação de Despesa - 100% Refatorado
  *
  * Design System Compliant:
  * - Tokens de cor do Design System
@@ -28,8 +28,10 @@ import { format } from 'date-fns';
  * - UX melhorada com visual hierárquico
  * - Seleção hierárquica de categorias (Pai → Filho)
  * - Detecção inteligente de categoria "Comissão"
+ * - Suporte para criação (expense = null) e edição (expense != null)
  */
-const ExpenseEditModal = ({ expense, isOpen, onClose, onSave }) => {
+const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
+  const isCreateMode = !expense;
   const [formData, setFormData] = useState({
     description: '',
     value: '',
@@ -64,19 +66,44 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave }) => {
 
   // Carregar dados relacionados
   useEffect(() => {
-    if (isOpen && expense) {
+    if (isOpen) {
       loadRelatedData();
-      populateForm();
+      if (expense) {
+        populateForm();
+      } else {
+        // Modo criação: definir valores padrão
+        setFormData({
+          description: '',
+          value: '',
+          date: format(new Date(), 'yyyy-MM-dd'),
+          expected_payment_date: format(new Date(), 'yyyy-MM-dd'),
+          category_id: '',
+          party_id: '',
+          account_id: '',
+          observations: '',
+          forma_pagamento: '',
+          data_competencia: format(new Date(), 'yyyy-MM-dd'),
+          status: 'pending',
+          actual_payment_date: null,
+        });
+      }
     }
   }, [isOpen, expense]);
 
   const loadRelatedData = async () => {
     try {
+      const currentUnitId = expense?.unit_id || unitId;
+
+      if (!currentUnitId) {
+        console.error('❌ unitId não fornecido');
+        return;
+      }
+
       // Carregar apenas categorias PAI (sem parent_id)
       const { data: parentCategoriesData } = await supabase
         .from('categories')
         .select('id, name')
-        .eq('unit_id', expense.unit_id)
+        .eq('unit_id', currentUnitId)
         .eq('category_type', 'Expense')
         .eq('is_active', true)
         .is('parent_id', null)
@@ -88,7 +115,7 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave }) => {
       const { data: partiesData } = await supabase
         .from('parties')
         .select('id, nome')
-        .eq('unit_id', expense.unit_id)
+        .eq('unit_id', currentUnitId)
         .eq('is_active', true)
         .order('nome');
 
@@ -96,7 +123,7 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave }) => {
       const { data: professionalsData } = await supabase
         .from('professionals')
         .select('id, name, party_id')
-        .eq('unit_id', expense.unit_id)
+        .eq('unit_id', currentUnitId)
         .eq('is_active', true)
         .order('name');
 
@@ -104,7 +131,7 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave }) => {
       const { data: accountsData } = await supabase
         .from('bank_accounts')
         .select('id, name, bank_name')
-        .eq('unit_id', expense.unit_id)
+        .eq('unit_id', currentUnitId)
         .eq('is_active', true)
         .order('name');
 
@@ -113,7 +140,7 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave }) => {
       setBankAccounts(accountsData || []);
 
       // Se a despesa já tem categoria, carregar a hierarquia
-      if (expense.category_id) {
+      if (expense?.category_id) {
         await loadCategoryHierarchy(expense.category_id);
       }
     } catch (error) {
@@ -233,7 +260,7 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave }) => {
       // Se não selecionou categoria filha, usa a categoria pai
       const finalCategoryId = formData.category_id || selectedParentId || null;
 
-      const updateData = {
+      const dataToSave = {
         description: formData.description,
         value: parseFloat(formData.value),
         date: formData.date,
@@ -246,30 +273,72 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave }) => {
         data_competencia: formData.data_competencia,
         status: formData.status,
         actual_payment_date: formData.actual_payment_date,
-        updated_at: new Date().toISOString(),
       };
 
-      const { error } = await supabase
-        .from('expenses')
-        .update(updateData)
-        .eq('id', expense.id);
+      let error;
+
+      if (isCreateMode) {
+        // Modo criação
+        const currentUnitId = unitId;
+
+        if (!currentUnitId) {
+          throw new Error('Unit ID não fornecido');
+        }
+
+        const createData = {
+          ...dataToSave,
+          unit_id: currentUnitId,
+          is_active: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+
+        const result = await supabase.from('expenses').insert([createData]);
+        error = result.error;
+
+        if (!error) {
+          showToast({
+            type: 'success',
+            message: 'Despesa criada com sucesso!',
+            description: 'A nova despesa foi adicionada ao sistema.',
+          });
+        }
+      } else {
+        // Modo edição
+        const updateData = {
+          ...dataToSave,
+          updated_at: new Date().toISOString(),
+        };
+
+        const result = await supabase
+          .from('expenses')
+          .update(updateData)
+          .eq('id', expense.id);
+
+        error = result.error;
+
+        if (!error) {
+          showToast({
+            type: 'success',
+            message: 'Despesa atualizada com sucesso!',
+            description:
+              formData.status === 'paid' ? 'Status alterado para Pago' : '',
+          });
+        }
+      }
 
       if (error) throw error;
-
-      showToast({
-        type: 'success',
-        message: 'Despesa atualizada com sucesso!',
-        description:
-          formData.status === 'paid' ? 'Status alterado para Pago' : '',
-      });
 
       onSave();
       onClose();
     } catch (error) {
-      console.error('❌ Erro ao atualizar despesa:', error);
+      console.error(
+        `❌ Erro ao ${isCreateMode ? 'criar' : 'atualizar'} despesa:`,
+        error
+      );
       showToast({
         type: 'error',
-        message: 'Erro ao atualizar despesa',
+        message: `Erro ao ${isCreateMode ? 'criar' : 'atualizar'} despesa`,
         description: error.message,
       });
     } finally {
@@ -277,7 +346,7 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave }) => {
     }
   };
 
-  if (!isOpen || !expense) return null;
+  if (!isOpen) return null;
 
   return (
     <div
@@ -299,10 +368,12 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave }) => {
                 id="expense-edit-title"
                 className="text-xl font-semibold text-theme-primary mb-1"
               >
-                Editar Despesa
+                {isCreateMode ? 'Nova Despesa' : 'Editar Despesa'}
               </h2>
               <p className="text-sm text-theme-secondary">
-                Atualize as informações da despesa
+                {isCreateMode
+                  ? 'Cadastre uma nova despesa no sistema'
+                  : 'Atualize as informações da despesa'}
               </p>
             </div>
             <button
@@ -622,12 +693,12 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave }) => {
               {loading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Salvando...
+                  {isCreateMode ? 'Criando...' : 'Salvando...'}
                 </>
               ) : (
                 <>
                   <Save className="w-4 h-4" />
-                  Salvar Alterações
+                  {isCreateMode ? 'Criar Despesa' : 'Salvar Alterações'}
                 </>
               )}
             </button>

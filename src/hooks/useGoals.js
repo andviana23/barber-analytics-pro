@@ -13,8 +13,9 @@ export const useGoals = (unitId, year, month) => {
     setError(null);
 
     try {
+      // 🎯 Usar view vw_goals_detailed para obter achieved_value calculado
       let query = supabase
-        .from('goals')
+        .from('vw_goals_detailed')
         .select('*')
         .eq('unit_id', unitId)
         .eq('goal_year', year || new Date().getFullYear());
@@ -28,7 +29,23 @@ export const useGoals = (unitId, year, month) => {
 
       if (fetchError) throw fetchError;
 
-      setGoals(data || []);
+      // Debug: verificar dados retornados
+      console.log('🎯 useGoals - Dados da view vw_goals_detailed:', data);
+
+      // Se a view não existir, fallback para tabela goals
+      if (!data) {
+        const { data: fallbackData, error: fallbackError } = await supabase
+          .from('goals')
+          .select('*')
+          .eq('unit_id', unitId)
+          .eq('goal_year', year || new Date().getFullYear())
+          .order('goal_type');
+
+        if (fallbackError) throw fallbackError;
+        setGoals(fallbackData || []);
+      } else {
+        setGoals(data || []);
+      }
     } catch (err) {
       console.error('Erro ao buscar metas:', err);
       setError(err.message);

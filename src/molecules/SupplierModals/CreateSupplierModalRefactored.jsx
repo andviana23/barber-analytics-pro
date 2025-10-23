@@ -1,22 +1,30 @@
 /**
- * 🎨 Modal: Editar Fornecedor - 100% REFATORADO COM DESIGN SYSTEM
+ * 🎨 Modal: Criar Fornecedor - 100% REFATORADO COM DESIGN SYSTEM
  *
- * Formulário premium para edição de fornecedor existente
+ * Formulário premium para cadastro de novo fornecedor
  *
  * Features:
  * - ✅ Design System completo aplicado
  * - ✅ Layout em 2 colunas responsivo
  * - ✅ Validação em tempo real
- * - ✅ Máscaras automáticas (CPF/CNPJ, telefone)
+ * - ✅ Máscaras automáticas (CPF/CNPJ)
  * - ✅ Feedback visual de erros
  * - ✅ Loading states elegantes
  * - ✅ Dark mode completo
  * - ✅ Animações suaves
  * - ✅ Acessibilidade (ARIA, foco)
- * - ✅ Auto-populate com dados do fornecedor
+ *
+ * Campos:
+ * - Descrição* (nome de exibição)
+ * - CNPJ* (CPF ou CNPJ com máscara)
+ * - Razão Social (para CNPJ)
+ * - Email (com validação)
+ * - Telefone (com máscara)
+ * - Endereço
+ * - Observações (textarea)
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   X,
   Package,
@@ -26,11 +34,10 @@ import {
   Phone,
   MapPin,
   FileText,
-  Edit3,
 } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 
-const EditSupplierModal = ({ isOpen, onClose, onSave, supplier }) => {
+const CreateSupplierModalRefactored = ({ isOpen, onClose, onSave, unitId }) => {
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -42,52 +49,8 @@ const EditSupplierModal = ({ isOpen, onClose, onSave, supplier }) => {
     endereco: '',
     observacoes: '',
   });
+
   const [errors, setErrors] = useState({});
-
-  // 🔧 Funções de formatação (ANTES do useEffect)
-  const formatCNPJ = value => {
-    const cleaned = value.replace(/\D/g, '');
-    if (cleaned.length <= 11) {
-      return cleaned
-        .replace(/(\d{3})(\d)/, '$1.$2')
-        .replace(/(\d{3})(\d)/, '$1.$2')
-        .replace(/(\d{3})(\d{1,2})/, '$1-$2')
-        .replace(/(-\d{2})\d+?$/, '$1');
-    }
-    return cleaned
-      .replace(/(\d{2})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d)/, '$1/$2')
-      .replace(/(\d{4})(\d)/, '$1-$2')
-      .replace(/(-\d{2})\d+?$/, '$1');
-  };
-
-  const formatPhone = value => {
-    const cleaned = value.replace(/\D/g, '');
-    if (cleaned.length <= 10) {
-      return cleaned
-        .replace(/(\d{2})(\d)/, '($1) $2')
-        .replace(/(\d{4})(\d)/, '$1-$2');
-    }
-    return cleaned
-      .replace(/(\d{2})(\d)/, '($1) $2')
-      .replace(/(\d{5})(\d)/, '$1-$2')
-      .replace(/(-\d{4})\d+?$/, '$1');
-  };
-
-  useEffect(() => {
-    if (supplier) {
-      setFormData({
-        nome: supplier.nome || '',
-        cpf_cnpj: formatCNPJ(supplier.cpf_cnpj || ''),
-        razao_social: supplier.razao_social || '',
-        email: supplier.email || '',
-        telefone: formatPhone(supplier.telefone || ''),
-        endereco: supplier.endereco || '',
-        observacoes: supplier.observacoes || '',
-      });
-    }
-  }, [supplier]);
 
   if (!isOpen) return null;
 
@@ -98,7 +61,7 @@ const EditSupplierModal = ({ isOpen, onClose, onSave, supplier }) => {
   };
 
   const validateEmail = email => {
-    if (!email) return true;
+    if (!email) return true; // Email é opcional
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
@@ -125,9 +88,44 @@ const EditSupplierModal = ({ isOpen, onClose, onSave, supplier }) => {
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    // Limpar erro do campo ao digitar
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: null }));
     }
+  };
+
+  const formatCNPJ = value => {
+    const cleaned = value.replace(/\D/g, '');
+    if (cleaned.length <= 11) {
+      // CPF: 000.000.000-00
+      return cleaned
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+        .replace(/(-\d{2})\d+?$/, '$1');
+    }
+    // CNPJ: 00.000.000/0000-00
+    return cleaned
+      .replace(/(\d{2})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1/$2')
+      .replace(/(\d{4})(\d)/, '$1-$2')
+      .replace(/(-\d{2})\d+?$/, '$1');
+  };
+
+  const formatPhone = value => {
+    const cleaned = value.replace(/\D/g, '');
+    if (cleaned.length <= 10) {
+      // (00) 0000-0000
+      return cleaned
+        .replace(/(\d{2})(\d)/, '($1) $2')
+        .replace(/(\d{4})(\d)/, '$1-$2');
+    }
+    // (00) 00000-0000
+    return cleaned
+      .replace(/(\d{2})(\d)/, '($1) $2')
+      .replace(/(\d{5})(\d)/, '$1-$2')
+      .replace(/(-\d{4})\d+?$/, '$1');
   };
 
   const handleSubmit = async e => {
@@ -145,6 +143,7 @@ const EditSupplierModal = ({ isOpen, onClose, onSave, supplier }) => {
     setLoading(true);
 
     try {
+      // Limpar formatação do CNPJ e telefone antes de enviar
       const cleanedData = {
         ...formData,
         cpf_cnpj: formData.cpf_cnpj.replace(/\D/g, ''),
@@ -155,14 +154,25 @@ const EditSupplierModal = ({ isOpen, onClose, onSave, supplier }) => {
 
       showToast({
         type: 'success',
-        message: 'Fornecedor atualizado com sucesso!',
+        message: 'Fornecedor cadastrado com sucesso!',
       });
 
+      // Resetar formulário
+      setFormData({
+        nome: '',
+        cpf_cnpj: '',
+        razao_social: '',
+        email: '',
+        telefone: '',
+        endereco: '',
+        observacoes: '',
+      });
+      setErrors({});
       onClose();
     } catch (error) {
       showToast({
         type: 'error',
-        message: 'Erro ao atualizar fornecedor',
+        message: 'Erro ao cadastrar fornecedor',
         description: error.message,
       });
     } finally {
@@ -184,14 +194,14 @@ const EditSupplierModal = ({ isOpen, onClose, onSave, supplier }) => {
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
-                <Edit3 className="w-6 h-6 text-white" />
+                <Package className="w-6 h-6 text-white" />
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-theme-primary">
-                  Editar Fornecedor
+                  Novo Fornecedor
                 </h2>
                 <p className="text-sm text-theme-secondary mt-1">
-                  Atualize as informações do fornecedor
+                  Cadastre um novo fornecedor no sistema
                 </p>
               </div>
             </div>
@@ -210,6 +220,7 @@ const EditSupplierModal = ({ isOpen, onClose, onSave, supplier }) => {
           onSubmit={handleSubmit}
           className="flex-1 overflow-y-auto px-6 py-6 max-h-[calc(90vh-180px)]"
         >
+          {/* Seção: Dados Cadastrais */}
           <div className="space-y-6">
             <div className="flex items-center gap-3 pb-3 border-b-2 border-gray-200 dark:border-gray-700">
               <Building2 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -388,7 +399,7 @@ const EditSupplierModal = ({ isOpen, onClose, onSave, supplier }) => {
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold transition-all duration-200 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-dark-bg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transform hover:scale-105"
+              className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold transition-all duration-200 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg shadow-green-500/30 hover:shadow-green-500/50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-dark-bg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transform hover:scale-105"
             >
               {loading ? (
                 <>
@@ -398,7 +409,7 @@ const EditSupplierModal = ({ isOpen, onClose, onSave, supplier }) => {
               ) : (
                 <>
                   <Save className="w-5 h-5" />
-                  Salvar Alterações
+                  Cadastrar Fornecedor
                 </>
               )}
             </button>
@@ -409,4 +420,4 @@ const EditSupplierModal = ({ isOpen, onClose, onSave, supplier }) => {
   );
 };
 
-export default EditSupplierModal;
+export default CreateSupplierModalRefactored;

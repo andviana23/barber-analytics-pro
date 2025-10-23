@@ -31,11 +31,9 @@ import { useAuth } from '../../context/AuthContext';
 import { useUnit } from '../../context/UnitContext';
 import { useToast } from '../../context/ToastContext';
 import useSuppliers from '../../hooks/useSuppliers';
-import {
-  CreateSupplierModal,
-  EditSupplierModal,
-  SupplierInfoModal,
-} from '../../molecules/SupplierModals';
+import CreateSupplierModalRefactored from '../../molecules/SupplierModals/CreateSupplierModalRefactored';
+import EditSupplierModal from '../../molecules/SupplierModals/EditSupplierModal';
+import SupplierInfoModal from '../../molecules/SupplierModals/SupplierInfoModal';
 
 const SuppliersPage = () => {
   const { user } = useAuth();
@@ -108,6 +106,7 @@ const SuppliersPage = () => {
   };
 
   const handleInfo = supplier => {
+    console.log('🔍 handleInfo - Fornecedor selecionado:', supplier);
     setSelectedSupplier(supplier);
     setIsInfoModalOpen(true);
   };
@@ -500,7 +499,7 @@ const SuppliersPage = () => {
       </div>
 
       {/* Modals */}
-      <CreateSupplierModal
+      <CreateSupplierModalRefactored
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSave={async data => {

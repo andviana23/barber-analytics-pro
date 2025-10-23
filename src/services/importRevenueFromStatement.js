@@ -42,7 +42,17 @@ class ImportRevenueFromStatementService {
       'Preço',
       'Preco',
     ],
-    valor: ['Valor', 'valor', 'VALUE', 'Total', 'TOTAL'],
+    valor: [
+      'Valor',
+      'valor',
+      'VALUE',
+      'Total',
+      'TOTAL',
+      'Valor Comanda Bruto',
+      'Valor Comanda',
+      'VALOR COMANDA BRUTO',
+      'valor comanda bruto',
+    ],
     qtd: ['Qtd', 'qtd', 'QTD', 'Quantidade', 'quantidade', 'QUANTIDADE', 'Qty'],
     data: ['Data', 'data', 'DATE', 'Data Lançamento', 'Data Lancamento'],
     pagamento: [
@@ -99,6 +109,8 @@ class ImportRevenueFromStatementService {
   static async readFile(file) {
     const fileName = file.name.toLowerCase();
 
+    console.log('🚀 [VERSÃO ATUALIZADA] readFile chamado para:', fileName);
+
     if (fileName.endsWith('.csv')) {
       console.log('📄 Detectado arquivo CSV:', file.name);
       return this.readCsvFile(file);
@@ -112,6 +124,35 @@ class ImportRevenueFromStatementService {
           'Formato de arquivo não suportado. Use CSV ou Excel (.xlsx/.xls)',
       };
     }
+  }
+
+  /**
+   * Detecta o delimitador CSV automaticamente
+   */
+  static detectCsvDelimiter(csvText) {
+    const delimiters = [';', ',', '\t', '|'];
+    const firstLine = csvText.split('\n')[0];
+
+    // Conta ocorrências de cada delimitador na primeira linha
+    const counts = delimiters.map(d => ({
+      delimiter: d,
+      count: (firstLine.match(new RegExp(`\\${d}`, 'g')) || []).length,
+    }));
+
+    // Ordena por contagem decrescente
+    counts.sort((a, b) => b.count - a.count);
+
+    const detected = counts[0].count > 0 ? counts[0].delimiter : ',';
+    console.log(
+      '🔍 Delimitador detectado:',
+      detected === ';'
+        ? 'ponto-e-vírgula'
+        : detected === ','
+          ? 'vírgula'
+          : detected
+    );
+
+    return detected;
   }
 
   /**
@@ -132,6 +173,9 @@ class ImportRevenueFromStatementService {
               csvText.substring(0, 200)
             );
 
+            // Detectar delimitador automaticamente
+            const delimiter = this.detectCsvDelimiter(csvText);
+
             // Parse CSV manualmente para maior controle
             const lines = csvText.split('\n').filter(line => line.trim());
 
@@ -146,7 +190,7 @@ class ImportRevenueFromStatementService {
 
             // Primeira linha é o header
             const headerLine = lines[0];
-            const headers = this.parseCsvLine(headerLine);
+            const headers = this.parseCsvLine(headerLine, delimiter);
 
             console.log('📋 Headers detectados:', headers);
 
@@ -156,7 +200,7 @@ class ImportRevenueFromStatementService {
               const line = lines[i].trim();
               if (!line) continue; // Pular linhas vazias
 
-              const values = this.parseCsvLine(line);
+              const values = this.parseCsvLine(line, delimiter);
 
               // Criar objeto com headers como chaves
               const row = {};
@@ -197,9 +241,9 @@ class ImportRevenueFromStatementService {
   }
 
   /**
-   * Parse uma linha CSV respeitando aspas e vírgulas
+   * Parse uma linha CSV respeitando aspas e vírgulas/ponto-e-vírgula
    */
-  static parseCsvLine(line) {
+  static parseCsvLine(line, delimiter = ',') {
     const result = [];
     let current = '';
     let inQuotes = false;
@@ -216,7 +260,7 @@ class ImportRevenueFromStatementService {
           // Toggle quotes
           inQuotes = !inQuotes;
         }
-      } else if (char === ',' && !inQuotes) {
+      } else if (char === delimiter && !inQuotes) {
         // Separador encontrado fora de aspas
         result.push(current.trim());
         current = '';
@@ -369,10 +413,22 @@ class ImportRevenueFromStatementService {
     const errors = [];
 
     console.log('🔄 Normalizando', rawData.length, 'linhas...');
+    console.log('🗺️ Mapeamento de headers:', headerMapping);
+    console.log('📋 Primeira linha (raw):', rawData[0]);
 
     rawData.forEach((row, index) => {
       try {
         const lineNumber = index + 2; // +2 porque Excel começa em 1 e tem header
+
+        // Log detalhado da linha para debug
+        if (index < 3) {
+          console.log(`\n📍 DEBUG Linha ${lineNumber}:`, {
+            row_completa: row,
+            profissional_col: headerMapping.profissional,
+            data_col: headerMapping.data,
+            valor_col: headerMapping.valor,
+          });
+        }
 
         // Extrair valores usando o mapeamento das novas colunas
         const profissionalNome = (row[headerMapping.profissional] || '')
@@ -386,16 +442,21 @@ class ImportRevenueFromStatementService {
         const formaPagamento = (row[headerMapping.pagamento] || '')
           .toString()
           .trim();
-
-        console.log(
-          '💳 Forma de pagamento extraída:',
-          formaPagamento,
-          'da linha',
-          lineNumber
-        );
         const clienteNome = (row[headerMapping.cliente] || '')
           .toString()
           .trim();
+
+        // Log dos valores extraídos (primeiras 3 linhas)
+        if (index < 3) {
+          console.log(`📊 Valores extraídos linha ${lineNumber}:`, {
+            profissional: profissionalNome,
+            item,
+            data: rawDate,
+            valor: rawValor,
+            pagamento: formaPagamento,
+            cliente: clienteNome,
+          });
+        }
 
         // Parsear data
         const parsedDate = this.parseDate(rawDate);
@@ -413,9 +474,11 @@ class ImportRevenueFromStatementService {
         const parsedValue = this.parseValue(rawValor);
         if (parsedValue <= 0) {
           // Ignora silenciosamente linhas com valor zero (não adiciona erro)
-          console.log(
-            `⚠️ Linha ${lineNumber} ignorada: valor R$ ${parsedValue.toFixed(2)}`
-          );
+          if (index < 5) {
+            console.log(
+              `⚠️ Linha ${lineNumber} ignorada: valor R$ ${parsedValue.toFixed(2)} (raw: "${rawValor}")`
+            );
+          }
           return;
         }
 

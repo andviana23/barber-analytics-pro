@@ -31,7 +31,7 @@ import {
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import ExpenseDetailsModal from '../../components/modals/ExpenseDetailsModal';
-import ExpenseEditModal from '../../components/modals/ExpenseEditModal';
+import NovaDespesaModal from '../../templates/NovaDespesaModal';
 import DeleteConfirmationModal from '../../components/modals/DeleteConfirmationModal';
 import ImportExpensesFromOFXButton from '../../components/finance/ImportExpensesFromOFXButton';
 
@@ -347,7 +347,7 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
       {/* 🎛️ Filtros e Ações Premium - DESIGN SYSTEM */}
       <div className="card-theme rounded-xl p-5 border-2 border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-300">
         <div className="flex flex-col gap-4">
-          {/* Linha 1: Busca e Filtros */}
+          {/* Linha 1: Busca, Filtros e Botão Nova Despesa */}
           <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
             {/* Busca Premium */}
             <div className="relative flex-1 max-w-md">
@@ -405,6 +405,18 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
                   className="bg-transparent text-sm font-medium text-theme-primary focus:outline-none cursor-pointer"
                 />
               </div>
+
+              {/* Botão Nova Despesa */}
+              <button
+                onClick={() => {
+                  setSelectedExpenseForAction(null);
+                  setIsEditModalOpen(true);
+                }}
+                className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+              >
+                <Plus className="w-5 h-5" />
+                Nova Despesa
+              </button>
 
               {/* Botão Importar OFX */}
               <ImportExpensesFromOFXButton
@@ -676,14 +688,16 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
         />
       )}
 
-      {isEditModalOpen && selectedExpenseForAction && (
-        <ExpenseEditModal
+      {isEditModalOpen && (
+        <NovaDespesaModal
           isOpen={isEditModalOpen}
           onClose={() => {
             setIsEditModalOpen(false);
             setSelectedExpenseForAction(null);
           }}
-          expense={selectedExpenseForAction}
+          initialData={selectedExpenseForAction}
+          isEditing={!!selectedExpenseForAction}
+          unidadeId={globalFilters.unitId}
           onSave={() => {
             fetchExpenses();
             setIsEditModalOpen(false);

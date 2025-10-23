@@ -1,5 +1,18 @@
 /**
- * Modal: Informações do Fornecedor
+ * 🎨 Modal: Informações do Fornecedor - 100% REFATORADO COM DESIGN SYSTEM
+ *
+ * Modal premium de visualização de detalhes do fornecedor
+ *
+ * Features:
+ * - ✅ Design System completo aplicado
+ * - ✅ Layout otimizado com cards e ícones
+ * - ✅ Badge de status com gradiente
+ * - ✅ Formatação automática (CNPJ, datas)
+ * - ✅ Dark mode completo
+ * - ✅ Animações suaves
+ * - ✅ Separação visual por seções
+ * - ✅ Metadados de auditoria
+ * - ✅ Responsivo e acessível
  */
 
 import React from 'react';
@@ -10,115 +23,340 @@ import {
   Phone,
   MapPin,
   FileText,
-  Building,
+  Building2,
+  Calendar,
+  Info,
+  CheckCircle,
+  XCircle,
 } from 'lucide-react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
-  if (!isOpen || !supplier) return null;
+  // Debug log
+  React.useEffect(() => {
+    if (isOpen) {
+      console.log('📋 SupplierInfoModal - Modal aberto');
+      console.log('📦 SupplierInfoModal - Dados do fornecedor:', supplier);
+    }
+  }, [isOpen, supplier]);
+
+  if (!isOpen) return null;
+
+  if (!supplier) {
+    console.warn('⚠️ SupplierInfoModal - Fornecedor não fornecido!');
+    // Mostrar modal vazio com mensagem
+    return (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn"
+        onClick={onClose}
+      >
+        <div
+          className="card-theme max-w-md w-full rounded-2xl shadow-2xl p-8"
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="text-center">
+            <XCircle className="w-16 h-16 mx-auto text-red-500 mb-4" />
+            <h3 className="text-xl font-bold text-theme-primary mb-2">
+              Erro ao Carregar Fornecedor
+            </h3>
+            <p className="text-theme-secondary mb-6">
+              Não foi possível carregar os dados do fornecedor.
+            </p>
+            <button
+              onClick={onClose}
+              className="px-6 py-2.5 rounded-xl font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700"
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Garantir valores padrão para evitar erros
+  const supplierData = {
+    nome: supplier?.nome || '',
+    cpf_cnpj: supplier?.cpf_cnpj || '',
+    razao_social: supplier?.razao_social || '',
+    email: supplier?.email || '',
+    telefone: supplier?.telefone || '',
+    endereco: supplier?.endereco || '',
+    observacoes: supplier?.observacoes || '',
+    is_active: supplier?.is_active ?? true,
+    created_at: supplier?.created_at || new Date().toISOString(),
+    updated_at: supplier?.updated_at || null,
+  };
 
   const formatCNPJ = cnpj => {
     if (!cnpj) return '';
-    if (cnpj.length === 11) {
-      return cnpj.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    const cleaned = cnpj.replace(/\D/g, '');
+    if (cleaned.length === 11) {
+      return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
     }
-    return cnpj.replace(
+    return cleaned.replace(
       /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
       '$1.$2.$3/$4-$5'
     );
   };
 
-  const InfoRow = ({ icon: Icon, label, value }) => (
-    <div className="flex items-start gap-3 py-3 border-b border-gray-200 dark:border-gray-700 last:border-0">
-      <Icon className="w-5 h-5 text-gray-500 dark:text-gray-400 mt-0.5" />
-      <div className="flex-1">
-        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+  const formatPhone = phone => {
+    if (!phone) return '';
+    const cleaned = phone.replace(/\D/g, '');
+    if (cleaned.length === 10) {
+      return cleaned.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+    }
+    return cleaned.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+  };
+
+  const formatDate = date => {
+    try {
+      return format(new Date(date), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
+    } catch {
+      return '-';
+    }
+  };
+
+  const InfoRow = ({ icon: Icon, label, value, multiline = false }) => (
+    <div className="flex items-start gap-4 py-4 border-b-2 border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-750/50 transition-colors px-4 rounded-lg">
+      <div className="flex-shrink-0 p-2.5 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 dark:from-blue-500/20 dark:to-indigo-500/20 rounded-lg">
+        <Icon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs font-bold text-theme-secondary uppercase tracking-wide mb-1">
           {label}
         </p>
-        <p className="text-base text-gray-900 dark:text-white mt-1">
-          {value || '-'}
+        <p
+          className={`text-sm font-medium text-theme-primary ${multiline ? 'whitespace-pre-wrap' : ''}`}
+        >
+          {value || (
+            <span className="text-gray-400 dark:text-gray-500 italic">
+              Não informado
+            </span>
+          )}
         </p>
       </div>
     </div>
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center gap-3">
-            <Package className="w-6 h-6 text-primary-600" />
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-              Informações do Fornecedor
-            </h2>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn"
+      onClick={onClose}
+    >
+      <div
+        className="card-theme max-w-3xl w-full max-h-[90vh] overflow-hidden rounded-2xl shadow-2xl animate-slideUp"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* 🎯 Header Premium - DESIGN SYSTEM */}
+        <div className="bg-gradient-to-r from-blue-600/10 via-indigo-600/10 to-transparent dark:from-blue-600/20 dark:via-indigo-600/20 px-6 py-5 border-b-2 border-light-border dark:border-dark-border">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
+                <Info className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-theme-primary">
+                  Detalhes do Fornecedor
+                </h2>
+                <p className="text-sm text-theme-secondary mt-1">
+                  Informações completas do cadastro
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="flex-shrink-0 p-2 rounded-lg hover:bg-light-surface dark:hover:bg-dark-surface transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50"
+              aria-label="Fechar modal"
+            >
+              <X className="w-6 h-6 text-theme-secondary hover:text-theme-primary transition-colors" />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-          >
-            <X className="w-6 h-6" />
-          </button>
         </div>
 
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
-          {/* Status Badge */}
-          <div className="mb-6">
-            <span
-              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                supplier.is_active
-                  ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-                  : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+        {/* 📊 Conteúdo Scrollável - DESIGN SYSTEM */}
+        <div className="flex-1 overflow-y-auto px-6 py-6 max-h-[calc(90vh-180px)]">
+          {/* Badge de Status Premium */}
+          <div className="mb-6 flex items-center gap-3">
+            <div
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm shadow-lg transition-all duration-200 ${
+                supplierData.is_active
+                  ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-green-500/30'
+                  : 'bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-red-500/30'
               }`}
             >
-              {supplier.is_active ? 'Ativo' : 'Inativo'}
-            </span>
+              {supplierData.is_active ? (
+                <>
+                  <CheckCircle className="w-5 h-5" />
+                  Fornecedor Ativo
+                </>
+              ) : (
+                <>
+                  <XCircle className="w-5 h-5" />
+                  Fornecedor Inativo
+                </>
+              )}
+            </div>
           </div>
 
-          {/* Informações */}
-          <div className="space-y-0">
-            <InfoRow
-              icon={Package}
-              label="Nome/Descrição"
-              value={supplier.nome}
-            />
-            <InfoRow
-              icon={Building}
-              label="Razão Social"
-              value={supplier.razao_social}
-            />
-            <InfoRow
-              icon={FileText}
-              label="CNPJ"
-              value={formatCNPJ(supplier.cpf_cnpj)}
-            />
-            <InfoRow icon={Mail} label="Email" value={supplier.email} />
-            <InfoRow icon={Phone} label="Telefone" value={supplier.telefone} />
-            <InfoRow icon={MapPin} label="Endereço" value={supplier.endereco} />
-            <InfoRow
-              icon={FileText}
-              label="Observações"
-              value={supplier.observacoes}
-            />
+          {/* Seção: Dados Cadastrais */}
+          <div className="space-y-6">
+            <div className="flex items-center gap-3 pb-3 border-b-2 border-gray-200 dark:border-gray-700">
+              <Building2 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <h3 className="text-lg font-bold text-theme-primary">
+                Dados Cadastrais
+              </h3>
+            </div>
+
+            <div className="space-y-1">
+              <InfoRow
+                icon={Package}
+                label="Nome/Descrição"
+                value={supplierData.nome}
+              />
+              <InfoRow
+                icon={Building2}
+                label="Razão Social"
+                value={supplierData.razao_social}
+              />
+              <InfoRow
+                icon={FileText}
+                label="CNPJ/CPF"
+                value={formatCNPJ(supplierData.cpf_cnpj)}
+              />
+            </div>
           </div>
 
-          {/* Metadados */}
-          <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Cadastrado em:{' '}
-              {new Date(supplier.created_at).toLocaleString('pt-BR')}
-            </p>
-            {supplier.updated_at && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Última atualização:{' '}
-                {new Date(supplier.updated_at).toLocaleString('pt-BR')}
-              </p>
+          {/* Seção: Contato */}
+          <div className="space-y-6 mt-8">
+            <div className="flex items-center gap-3 pb-3 border-b-2 border-gray-200 dark:border-gray-700">
+              <Mail className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <h3 className="text-lg font-bold text-theme-primary">
+                Informações de Contato
+              </h3>
+            </div>
+
+            <div className="space-y-1">
+              <InfoRow
+                icon={Mail}
+                label="Email"
+                value={
+                  supplierData.email ? (
+                    <a
+                      href={`mailto:${supplierData.email}`}
+                      className="text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      {supplierData.email}
+                    </a>
+                  ) : (
+                    <span className="text-gray-400 dark:text-gray-500 italic">
+                      Não informado
+                    </span>
+                  )
+                }
+              />
+              <InfoRow
+                icon={Phone}
+                label="Telefone"
+                value={
+                  supplierData.telefone ? (
+                    <a
+                      href={`tel:${supplierData.telefone}`}
+                      className="text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      {formatPhone(supplierData.telefone)}
+                    </a>
+                  ) : (
+                    <span className="text-gray-400 dark:text-gray-500 italic">
+                      Não informado
+                    </span>
+                  )
+                }
+              />
+              <InfoRow
+                icon={MapPin}
+                label="Endereço"
+                value={
+                  supplierData.endereco || (
+                    <span className="text-gray-400 dark:text-gray-500 italic">
+                      Não informado
+                    </span>
+                  )
+                }
+                multiline
+              />
+            </div>
+          </div>
+
+          {/* Seção: Observações - SEMPRE VISÍVEL */}
+          <div className="space-y-6 mt-8">
+            <div className="flex items-center gap-3 pb-3 border-b-2 border-gray-200 dark:border-gray-700">
+              <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <h3 className="text-lg font-bold text-theme-primary">
+                Observações
+              </h3>
+            </div>
+
+            {supplierData.observacoes ? (
+              <div className="bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-900/10 dark:to-indigo-900/10 rounded-xl p-4 border-2 border-blue-200 dark:border-blue-800">
+                <p className="text-sm text-theme-primary whitespace-pre-wrap">
+                  {supplierData.observacoes}
+                </p>
+              </div>
+            ) : (
+              <div className="bg-gradient-to-br from-gray-50/50 to-gray-100/50 dark:from-gray-800/30 dark:to-gray-750/30 rounded-xl p-4 border-2 border-gray-200 dark:border-gray-700">
+                <p className="text-sm text-gray-400 dark:text-gray-500 italic text-center">
+                  Nenhuma observação cadastrada para este fornecedor
+                </p>
+              </div>
             )}
+          </div>
+
+          {/* Seção: Auditoria */}
+          <div className="space-y-6 mt-8">
+            <div className="flex items-center gap-3 pb-3 border-b-2 border-gray-200 dark:border-gray-700">
+              <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <h3 className="text-lg font-bold text-theme-primary">
+                Informações de Auditoria
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750 rounded-xl border-2 border-gray-200 dark:border-gray-700">
+                <p className="text-xs font-bold text-theme-secondary uppercase tracking-wide mb-2">
+                  Cadastrado em
+                </p>
+                <p className="text-sm font-semibold text-theme-primary">
+                  {formatDate(supplierData.created_at)}
+                </p>
+              </div>
+
+              {supplierData.updated_at && (
+                <div className="p-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750 rounded-xl border-2 border-gray-200 dark:border-gray-700">
+                  <p className="text-xs font-bold text-theme-secondary uppercase tracking-wide mb-2">
+                    Última Atualização
+                  </p>
+                  <p className="text-sm font-semibold text-theme-primary">
+                    {formatDate(supplierData.updated_at)}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-end p-6 border-t border-gray-200 dark:border-gray-700">
-          <button onClick={onClose} className="btn-primary">
-            Fechar
-          </button>
+        {/* 🎬 Footer com Ações - DESIGN SYSTEM */}
+        <div className="px-6 py-4 border-t-2 border-light-border dark:border-dark-border bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750">
+          <div className="flex items-center justify-end gap-3">
+            <button
+              onClick={onClose}
+              className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold transition-all duration-200 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-dark-bg transform hover:scale-105"
+            >
+              <X className="w-5 h-5" />
+              Fechar
+            </button>
+          </div>
         </div>
       </div>
     </div>
