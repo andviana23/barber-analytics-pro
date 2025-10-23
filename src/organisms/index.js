@@ -7,3 +7,4 @@ export { Navbar } from './Navbar/Navbar';
 export { Sidebar } from './Sidebar/Sidebar';
 export { DashboardDemo } from './DashboardDemo/DashboardDemo';
 export { PalettePreview } from './PalettePreview/PalettePreview';
+export { AutoMatchStep } from './AutoMatchStep';

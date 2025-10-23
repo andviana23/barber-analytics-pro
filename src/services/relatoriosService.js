@@ -10,22 +10,22 @@ export const getDREMensal = async (mes, ano, unidadeId = null) => {
       .select('*')
       .eq('mes', mes)
       .eq('ano', ano)
-      .modify((query) => {
+      .modify(query => {
         if (unidadeId) query.eq('unidade_id', unidadeId);
       });
 
     if (error) throw error;
-    
+
     return {
       success: true,
-      data: data || []
+      data: data || [],
     };
   } catch (error) {
     console.error('Erro ao buscar DRE mensal:', error);
     return {
       success: false,
       error: error.message,
-      data: []
+      data: [],
     };
   }
 };
@@ -46,7 +46,7 @@ export const getComparativoUnidades = async (periodo, ano) => {
         1: [1, 2, 3],
         2: [4, 5, 6],
         3: [7, 8, 9],
-        4: [10, 11, 12]
+        4: [10, 11, 12],
       };
       query = query.in('mes', mesesTrimestre[periodo.trimestre]);
     }
@@ -54,23 +54,27 @@ export const getComparativoUnidades = async (periodo, ano) => {
     const { data, error } = await query;
 
     if (error) throw error;
-    
+
     return {
       success: true,
-      data: data || []
+      data: data || [],
     };
   } catch (error) {
     console.error('Erro ao buscar comparativo de unidades:', error);
     return {
       success: false,
       error: error.message,
-      data: []
+      data: [],
     };
   }
 };
 
 // Função para buscar análise de receitas e despesas
-export const getAnaliseReceitaDespesa = async (dataInicio, dataFim, unidadeId = null) => {
+export const getAnaliseReceitaDespesa = async (
+  dataInicio,
+  dataFim,
+  unidadeId = null
+) => {
   try {
     let query = supabase
       .from('receita_despesa_view')
@@ -85,23 +89,27 @@ export const getAnaliseReceitaDespesa = async (dataInicio, dataFim, unidadeId = 
     const { data, error } = await query;
 
     if (error) throw error;
-    
+
     return {
       success: true,
-      data: data || []
+      data: data || [],
     };
   } catch (error) {
     console.error('Erro ao buscar análise de receita/despesa:', error);
     return {
       success: false,
       error: error.message,
-      data: []
+      data: [],
     };
   }
 };
 
 // Função para buscar performance dos profissionais
-export const getPerformanceProfissionais = async (mes, ano, unidadeId = null) => {
+export const getPerformanceProfissionais = async (
+  mes,
+  ano,
+  unidadeId = null
+) => {
   try {
     let query = supabase
       .from('performance_profissionais_view')
@@ -116,23 +124,27 @@ export const getPerformanceProfissionais = async (mes, ano, unidadeId = null) =>
     const { data, error } = await query;
 
     if (error) throw error;
-    
+
     return {
       success: true,
-      data: data || []
+      data: data || [],
     };
   } catch (error) {
     console.error('Erro ao buscar performance de profissionais:', error);
     return {
       success: false,
       error: error.message,
-      data: []
+      data: [],
     };
   }
 };
 
 // Função para buscar análise de atendimentos
-export const getAnaliseAtendimentos = async (dataInicio, dataFim, unidadeId = null) => {
+export const getAnaliseAtendimentos = async (
+  dataInicio,
+  dataFim,
+  unidadeId = null
+) => {
   try {
     let query = supabase
       .from('analise_atendimentos_view')
@@ -147,17 +159,17 @@ export const getAnaliseAtendimentos = async (dataInicio, dataFim, unidadeId = nu
     const { data, error } = await query;
 
     if (error) throw error;
-    
+
     return {
       success: true,
-      data: data || []
+      data: data || [],
     };
   } catch (error) {
     console.error('Erro ao buscar análise de atendimentos:', error);
     return {
       success: false,
       error: error.message,
-      data: []
+      data: [],
     };
   }
 };
@@ -172,17 +184,17 @@ export const getUnidadesParaFiltro = async () => {
       .order('nome_fantasia');
 
     if (error) throw error;
-    
+
     return {
       success: true,
-      data: data || []
+      data: data || [],
     };
   } catch (error) {
     console.error('Erro ao buscar unidades:', error);
     return {
       success: false,
       error: error.message,
-      data: []
+      data: [],
     };
   }
 };
@@ -203,17 +215,17 @@ export const getProfissionaisParaFiltro = async (unidadeId = null) => {
     const { data, error } = await query;
 
     if (error) throw error;
-    
+
     return {
       success: true,
-      data: data || []
+      data: data || [],
     };
   } catch (error) {
     console.error('Erro ao buscar profissionais:', error);
     return {
       success: false,
       error: error.message,
-      data: []
+      data: [],
     };
   }
 };
@@ -223,19 +235,19 @@ export const exportarRelatorioPDF = async (tipoRelatorio, dados, filtros) => {
   try {
     // Aqui será implementada a lógica de exportação para PDF
     // usando uma biblioteca como jsPDF ou react-pdf
-    
+
     console.log('Exportando para PDF:', { tipoRelatorio, dados, filtros });
-    
+
     // Placeholder - implementação futura
     return {
       success: true,
-      message: 'Exportação para PDF será implementada'
+      message: 'Exportação para PDF será implementada',
     };
   } catch (error) {
     console.error('Erro ao exportar PDF:', error);
     return {
       success: false,
-      error: error.message
+      error: error.message,
     };
   }
 };
@@ -245,54 +257,54 @@ export const exportarRelatorioExcel = async (tipoRelatorio, dados, filtros) => {
   try {
     // Aqui será implementada a lógica de exportação para Excel
     // usando uma biblioteca como xlsx ou exceljs
-    
+
     console.log('Exportando para Excel:', { tipoRelatorio, dados, filtros });
-    
+
     // Placeholder - implementação futura
     return {
       success: true,
-      message: 'Exportação para Excel será implementada'
+      message: 'Exportação para Excel será implementada',
     };
   } catch (error) {
     console.error('Erro ao exportar Excel:', error);
     return {
       success: false,
-      error: error.message
+      error: error.message,
     };
   }
 };
 
 // Função para formatar valores monetários
-export const formatarValor = (valor) => {
+export const formatarValor = valor => {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
-    currency: 'BRL'
+    currency: 'BRL',
   }).format(valor || 0);
 };
 
 // Função para formatar percentuais
-export const formatarPercentual = (valor) => {
+export const formatarPercentual = valor => {
   return new Intl.NumberFormat('pt-BR', {
     style: 'percent',
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2
+    maximumFractionDigits: 2,
   }).format((valor || 0) / 100);
 };
 
 // Função para calcular período anterior para comparação
-export const calcularPeriodoAnterior = (periodo) => {
+export const calcularPeriodoAnterior = periodo => {
   if (periodo.tipo === 'mes') {
     const mes = periodo.mes === 1 ? 12 : periodo.mes - 1;
     const ano = periodo.mes === 1 ? periodo.ano - 1 : periodo.ano;
     return { mes, ano };
   }
-  
+
   if (periodo.tipo === 'trimestre') {
     const trimestre = periodo.trimestre === 1 ? 4 : periodo.trimestre - 1;
     const ano = periodo.trimestre === 1 ? periodo.ano - 1 : periodo.ano;
     return { trimestre, ano };
   }
-  
+
   return { ano: periodo.ano - 1 };
 };
 
@@ -308,5 +320,235 @@ export default {
   exportarRelatorioExcel,
   formatarValor,
   formatarPercentual,
-  calcularPeriodoAnterior
+  calcularPeriodoAnterior,
+  // Novos métodos para views SQL otimizadas
+  getKPIs,
+  getComparativos,
+  getRankingProfissionais,
+  getTopPerformers,
+  getCurrentPeriodSummary,
+  getRevenueTrend,
 };
+
+// =========================================================================
+// NOVOS MÉTODOS - Views SQL Otimizadas (2025-10-22)
+// =========================================================================
+
+/**
+ * Busca KPIs consolidados da view vw_relatorios_kpis
+ * @param {Object} filters - Filtros de busca
+ * @param {string} filters.unitId - ID da unidade (opcional)
+ * @param {string} filters.startDate - Data inicial (YYYY-MM-DD)
+ * @param {string} filters.endDate - Data final (YYYY-MM-DD)
+ * @param {number} filters.limit - Limite de registros
+ * @returns {Promise<{data: Array, error: Error|null}>}
+ */
+export async function getKPIs(filters = {}) {
+  try {
+    let query = supabase
+      .from('vw_relatorios_kpis')
+      .select('*')
+      .order('period', { ascending: false });
+
+    if (filters.unitId && filters.unitId !== 'todas') {
+      query = query.eq('unit_id', filters.unitId);
+    }
+
+    if (filters.startDate) {
+      query = query.gte('period', filters.startDate);
+    }
+
+    if (filters.endDate) {
+      query = query.lte('period', filters.endDate);
+    }
+
+    if (filters.limit) {
+      query = query.limit(filters.limit);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    return { data: data || [], error: null };
+  } catch (error) {
+    return { data: null, error };
+  }
+}
+
+/**
+ * Busca comparativos de períodos da view vw_comparativo_periodos
+ * @param {Object} filters - Filtros de busca
+ * @param {string} filters.unitId - ID da unidade (opcional)
+ * @param {string} filters.startDate - Data inicial (YYYY-MM-DD)
+ * @param {string} filters.endDate - Data final (YYYY-MM-DD)
+ * @param {number} filters.limit - Limite de registros
+ * @returns {Promise<{data: Array, error: Error|null}>}
+ */
+export async function getComparativos(filters = {}) {
+  try {
+    let query = supabase
+      .from('vw_comparativo_periodos')
+      .select('*')
+      .order('current_period', { ascending: false });
+
+    if (filters.unitId && filters.unitId !== 'todas') {
+      query = query.eq('unit_id', filters.unitId);
+    }
+
+    if (filters.startDate) {
+      query = query.gte('current_period', filters.startDate);
+    }
+
+    if (filters.endDate) {
+      query = query.lte('current_period', filters.endDate);
+    }
+
+    if (filters.limit) {
+      query = query.limit(filters.limit);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    return { data: data || [], error: null };
+  } catch (error) {
+    return { data: null, error };
+  }
+}
+
+/**
+ * Busca ranking de profissionais da view vw_ranking_profissionais
+ * @param {Object} filters - Filtros de busca
+ * @param {string} filters.unitId - ID da unidade (opcional)
+ * @param {string} filters.professionalId - ID do profissional (opcional)
+ * @param {string} filters.period - Período específico (YYYY-MM-01)
+ * @param {string} filters.startDate - Data inicial (YYYY-MM-DD)
+ * @param {string} filters.endDate - Data final (YYYY-MM-DD)
+ * @param {number} filters.limit - Limite de registros (padrão: 10)
+ * @returns {Promise<{data: Array, error: Error|null}>}
+ */
+export async function getRankingProfissionais(filters = {}) {
+  try {
+    let query = supabase
+      .from('vw_ranking_profissionais')
+      .select('*')
+      .order('rank_by_revenue', { ascending: true });
+
+    if (filters.unitId && filters.unitId !== 'todas') {
+      query = query.eq('unit_id', filters.unitId);
+    }
+
+    if (filters.professionalId && filters.professionalId !== 'todos') {
+      query = query.eq('professional_id', filters.professionalId);
+    }
+
+    if (filters.period) {
+      query = query.eq('period', filters.period);
+    } else {
+      if (filters.startDate) {
+        query = query.gte('period', filters.startDate);
+      }
+
+      if (filters.endDate) {
+        query = query.lte('period', filters.endDate);
+      }
+    }
+
+    const limit = filters.limit || 10;
+    query = query.limit(limit);
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    return { data: data || [], error: null };
+  } catch (error) {
+    return { data: null, error };
+  }
+}
+
+/**
+ * Busca top performers (profissionais top 10%)
+ * @param {Object} filters - Filtros de busca
+ * @param {string} filters.unitId - ID da unidade (obrigatório)
+ * @param {string} filters.period - Período específico (YYYY-MM-01)
+ * @returns {Promise<{data: Array, error: Error|null}>}
+ */
+export async function getTopPerformers(filters = {}) {
+  try {
+    let query = supabase
+      .from('vw_ranking_profissionais')
+      .select('*')
+      .in('performance_badge', ['top_10', 'top_20'])
+      .order('rank_by_revenue', { ascending: true });
+
+    if (filters.unitId && filters.unitId !== 'todas') {
+      query = query.eq('unit_id', filters.unitId);
+    }
+
+    if (filters.period) {
+      query = query.eq('period', filters.period);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    return { data: data || [], error: null };
+  } catch (error) {
+    return { data: null, error };
+  }
+}
+
+/**
+ * Busca resumo de KPIs do período atual
+ * @param {string} unitId - ID da unidade
+ * @returns {Promise<{data: Object|null, error: Error|null}>}
+ */
+export async function getCurrentPeriodSummary(unitId) {
+  try {
+    const currentMonth = new Date().toISOString().substring(0, 7) + '-01';
+
+    const { data, error } = await supabase
+      .from('vw_relatorios_kpis')
+      .select('*')
+      .eq('unit_id', unitId)
+      .eq('period', currentMonth)
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error; // Ignora "not found"
+
+    return { data: data || null, error: null };
+  } catch (error) {
+    return { data: null, error };
+  }
+}
+
+/**
+ * Busca tendência de receita dos últimos N meses
+ * @param {string} unitId - ID da unidade
+ * @param {number} months - Quantidade de meses (padrão: 6)
+ * @returns {Promise<{data: Array, error: Error|null}>}
+ */
+export async function getRevenueTrend(unitId, months = 6) {
+  try {
+    const startDate = new Date();
+    startDate.setMonth(startDate.getMonth() - months);
+    const startDateStr = startDate.toISOString().substring(0, 10);
+
+    const { data, error } = await supabase
+      .from('vw_relatorios_kpis')
+      .select('period, period_formatted, total_revenue, revenue_growth_percent')
+      .eq('unit_id', unitId)
+      .gte('period', startDateStr)
+      .order('period', { ascending: true });
+
+    if (error) throw error;
+
+    return { data: data || [], error: null };
+  } catch (error) {
+    return { data: null, error };
+  }
+}

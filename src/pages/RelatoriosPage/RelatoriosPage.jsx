@@ -25,6 +25,7 @@ import {
 import { useUnit } from '../../context/UnitContext';
 import { useToast } from '../../context/ToastContext';
 import { supabase } from '../../services/supabase';
+import DREDynamicView from '../../components/finance/DREDynamicView';
 import {
   format,
   startOfMonth,
@@ -35,7 +36,12 @@ import {
 import { ptBR } from 'date-fns/locale';
 
 // Componente de filtros avançados
-const FiltrosAvancados = ({ filters, onFiltersChange, units }) => {
+const FiltrosAvancados = ({
+  filters,
+  onFiltersChange,
+  units,
+  onApplyFilters,
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -152,6 +158,17 @@ const FiltrosAvancados = ({ filters, onFiltersChange, units }) => {
           </div>
         </div>
       )}
+
+      {/* Botão Aplicar Filtros */}
+      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <Button
+          onClick={onApplyFilters}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+        >
+          <RefreshCw className="w-4 h-4" />
+          Aplicar Filtros
+        </Button>
+      </div>
     </div>
   );
 };
@@ -329,6 +346,7 @@ const RelatoriosPage = () => {
   const [activeReport, setActiveReport] = useState(null);
   const [loading, setLoading] = useState(false);
   const [reportData, setReportData] = useState(null);
+  const [dreData, setDreData] = useState(null);
   const [filters, setFilters] = useState({
     periodo: 'mes-atual',
     unidade: selectedUnit?.id || 'todas',
@@ -339,10 +357,30 @@ const RelatoriosPage = () => {
 
   // Sincronizar filtro de unidade com selectedUnit do contexto
   useEffect(() => {
-    if (selectedUnit?.id && filters.unidade !== selectedUnit.id && filters.unidade === 'todas') {
+    if (
+      selectedUnit?.id &&
+      filters.unidade !== selectedUnit.id &&
+      filters.unidade === 'todas'
+    ) {
       setFilters(prev => ({ ...prev, unidade: selectedUnit.id }));
     }
   }, [selectedUnit?.id]);
+
+  // Função para aplicar filtros
+  const handleApplyFilters = () => {
+    if (activeReport) {
+      // Se já tem um relatório ativo, recarregar com novos filtros
+      fetchReportData(activeReport);
+    } else {
+      // Se não tem relatório ativo, mostrar mensagem
+      addToast({
+        type: 'info',
+        title: 'Selecione um relatório',
+        message:
+          'Escolha um relatório abaixo para visualizar com os filtros selecionados.',
+      });
+    }
+  };
 
   // Definição dos tipos de relatórios disponíveis
   const reportTypes = useMemo(
@@ -412,35 +450,117 @@ const RelatoriosPage = () => {
       addToast({
         type: 'warning',
         title: 'Selecione uma unidade',
-        message: 'Por favor, selecione uma unidade para visualizar os relatórios.',
+        message:
+          'Por favor, selecione uma unidade para visualizar os relatórios.',
       });
       return;
     }
 
     setLoading(true);
     try {
-      // Construir query condicionalmente
-      let query = supabase.from('vw_financial_summary').select('*');
+      // DRE Mensal - usar função dinâmica do PostgreSQL
+      if (reportId === 'dre-mensal') {
+        const unitId =
+          filters.unidade !== 'todas' ? filters.unidade : selectedUnit?.id;
 
-      // Aplicar filtro de unidade apenas se não for "todas"
-      if (filters.unidade !== 'todas') {
-        query = query.eq('unit_id', filters.unidade);
+        if (!unitId) {
+          addToast({
+            type: 'warning',
+            title: 'Selecione uma unidade',
+            message:
+              'É necessário selecionar uma unidade para visualizar o DRE.',
+          });
+          setLoading(false);
+          return;
+        }
+
+        // Calcular período baseado no filtro
+        let startDate, endDate;
+        const now = new Date();
+
+        switch (filters.periodo) {
+          case 'mes-atual':
+            startDate = startOfMonth(now);
+            endDate = endOfMonth(now);
+            break;
+          case 'mes-anterior':
+            const lastMonth = subMonths(now, 1);
+            startDate = startOfMonth(lastMonth);
+            endDate = endOfMonth(lastMonth);
+            break;
+          case 'trimestre-atual':
+            const quarter = Math.floor(now.getMonth() / 3);
+            startDate = new Date(now.getFullYear(), quarter * 3, 1);
+            endDate = new Date(now.getFullYear(), quarter * 3 + 3, 0);
+            break;
+          case 'semestre-atual':
+            const semester = now.getMonth() < 6 ? 0 : 6;
+            startDate = new Date(now.getFullYear(), semester, 1);
+            endDate = new Date(now.getFullYear(), semester + 6, 0);
+            break;
+          case 'ano-atual':
+            startDate = new Date(now.getFullYear(), 0, 1);
+            endDate = new Date(now.getFullYear(), 11, 31);
+            break;
+          case 'personalizado':
+            if (filters.dataInicio && filters.dataFim) {
+              startDate = parseISO(filters.dataInicio);
+              endDate = parseISO(filters.dataFim);
+            } else {
+              startDate = startOfMonth(now);
+              endDate = endOfMonth(now);
+            }
+            break;
+          default:
+            startDate = startOfMonth(now);
+            endDate = endOfMonth(now);
+        }
+
+        const { data, error } = await supabase.rpc('fn_calculate_dre_dynamic', {
+          p_unit_id: unitId,
+          p_start_date: format(startDate, 'yyyy-MM-dd'),
+          p_end_date: format(endDate, 'yyyy-MM-dd'),
+        });
+
+        if (error) throw error;
+
+        setDreData(data);
+
+        // Também atualizar reportData para as métricas rápidas
+        if (data && data.sucesso) {
+          setReportData({
+            receitaTotal: data.receita_bruta || 0,
+            despesasTotal:
+              (data.custos_operacionais || 0) +
+              (data.despesas_fixas || 0) +
+              (data.impostos || 0),
+            lucroLiquido: data.lucro_liquido || 0,
+            margemPercentual: data.percentuais?.margem_liquida || 0,
+            dados: data,
+          });
+        }
+      } else {
+        // Outros relatórios - manter lógica original
+        let query = supabase.from('vw_financial_summary').select('*');
+
+        if (filters.unidade !== 'todas') {
+          query = query.eq('unit_id', filters.unidade);
+        }
+
+        const { data, error } = await query;
+
+        if (error) throw error;
+
+        const processedData = processReportData(data, reportId);
+        setReportData(processedData);
       }
-      // Se for "todas", não adicionar filtro de unit_id (busca todas as unidades)
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-
-      // Processar dados baseado no tipo de relatório
-      const processedData = processReportData(data, reportId);
-      setReportData(processedData);
     } catch (error) {
       console.error('Erro ao buscar dados do relatório:', error);
       addToast({
         type: 'error',
         title: 'Erro ao carregar relatório',
-        message: error.message || 'Não foi possível carregar os dados do relatório.',
+        message:
+          error.message || 'Não foi possível carregar os dados do relatório.',
       });
     } finally {
       setLoading(false);
@@ -592,6 +712,8 @@ const RelatoriosPage = () => {
                 Carregando dados...
               </span>
             </div>
+          ) : activeReport === 'dre-mensal' ? (
+            <DREDynamicView dreData={dreData} isLoading={loading} />
           ) : (
             <div className="text-center py-12">
               <Eye className="w-16 h-16 text-gray-400 mx-auto mb-4" />
@@ -666,6 +788,7 @@ const RelatoriosPage = () => {
               filters={filters}
               onFiltersChange={setFilters}
               units={allUnits}
+              onApplyFilters={handleApplyFilters}
             />
           </div>
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { categoriesService } from '../services/categoriesService';
+import categoriesService from '../services/categoriesService';
 
 // Cache simples para evitar requests desnecessários
 const cache = {};

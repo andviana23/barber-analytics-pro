@@ -4,7 +4,6 @@ import { supabase } from './supabase';
  * Service para gerenciar operações de extratos bancários
  */
 export class BankStatementsService {
-  
   /**
    * Lista extratos bancários com filtros
    * @param {Object} filters - Filtros de busca
@@ -18,14 +17,15 @@ export class BankStatementsService {
   static async getStatements(filters = {}) {
     try {
       const { accountId, startDate, endDate, reconciled, type } = filters;
-      
+
       if (!accountId) {
         return { data: null, error: 'Account ID é obrigatório' };
       }
 
       let query = supabase
         .from('bank_statements')
-        .select(`
+        .select(
+          `
           *,
           bank_accounts(
             id,
@@ -33,7 +33,8 @@ export class BankStatementsService {
             account_number,
             nickname
           )
-        `)
+        `
+        )
         .eq('bank_account_id', accountId)
         .order('transaction_date', { ascending: false });
 
@@ -41,7 +42,7 @@ export class BankStatementsService {
       if (startDate) {
         query = query.gte('transaction_date', startDate);
       }
-      
+
       if (endDate) {
         query = query.lte('transaction_date', endDate);
       }
@@ -82,7 +83,8 @@ export class BankStatementsService {
 
       const { data, error } = await supabase
         .from('bank_statements')
-        .select(`
+        .select(
+          `
           *,
           bank_accounts(
             id,
@@ -90,7 +92,8 @@ export class BankStatementsService {
             account_number,
             nickname
           )
-        `)
+        `
+        )
         .eq('bank_account_id', accountId)
         .eq('reconciled', false)
         .order('transaction_date', { ascending: false })
@@ -119,7 +122,8 @@ export class BankStatementsService {
 
       const { data, error } = await supabase
         .from('bank_statements')
-        .select(`
+        .select(
+          `
           *,
           bank_accounts(
             id,
@@ -136,7 +140,8 @@ export class BankStatementsService {
             difference,
             notes
           )
-        `)
+        `
+        )
         .eq('id', id)
         .single();
 
@@ -167,7 +172,10 @@ export class BankStatementsService {
       }
 
       if (!Array.isArray(statements) || statements.length === 0) {
-        return { data: null, error: 'Lista de extratos é obrigatória e não pode estar vazia' };
+        return {
+          data: null,
+          error: 'Lista de extratos é obrigatória e não pode estar vazia',
+        };
       }
 
       // Validar estrutura dos extratos
@@ -177,10 +185,22 @@ export class BankStatementsService {
       }
 
       // Preparar dados para inserção com hash único para detecção de duplicatas
-      const processedStatements = statements.map(statement => {
+      const processedStatements = statements.map((statement, index) => {
         // Gerar hash único para detecção de duplicatas
         const hashString = `${accountId}-${statement.transaction_date}-${statement.amount}-${statement.description}`;
         const hash_unique = this.generateHash(hashString);
+
+        // 🔍 DEBUG: Log do hash gerado (primeiros 3 registros)
+        if (index < 3) {
+          // eslint-disable-next-line no-console
+          console.log(`[DEBUG] Statement ${index + 1}:`, {
+            hashString,
+            hash_unique,
+            transaction_date: statement.transaction_date,
+            amount: statement.amount,
+            description: statement.description?.substring(0, 30),
+          });
+        }
 
         return {
           bank_account_id: accountId,
@@ -188,9 +208,11 @@ export class BankStatementsService {
           description: statement.description?.trim() || '',
           amount: parseFloat(statement.amount),
           type: statement.type || (statement.amount >= 0 ? 'Credit' : 'Debit'),
-          balance_after: statement.balance_after ? parseFloat(statement.balance_after) : null,
+          balance_after: statement.balance_after
+            ? parseFloat(statement.balance_after)
+            : null,
           reconciled: false,
-          hash_unique
+          hash_unique,
         };
       });
 
@@ -202,20 +224,21 @@ export class BankStatementsService {
 
       if (error) {
         // Se o erro for de violação de unicidade (duplicata), tentar inserir um por um
-        if (error.code === '23505') { // Unique violation
+        if (error.code === '23505') {
+          // Unique violation
           return await this.insertStatementsOneByOne(processedStatements);
         }
         return { data: null, error: error.message };
       }
 
-      return { 
+      return {
         data: {
           imported: data.length,
           duplicates: 0,
           total: statements.length,
-          statements: data
-        }, 
-        error: null 
+          statements: data,
+        },
+        error: null,
       };
     } catch (err) {
       return { data: null, error: err.message };
@@ -242,7 +265,8 @@ export class BankStatementsService {
           .single();
 
         if (error) {
-          if (error.code === '23505') { // Unique violation - duplicata
+          if (error.code === '23505') {
+            // Unique violation - duplicata
             duplicates++;
           } else {
             throw error;
@@ -262,9 +286,9 @@ export class BankStatementsService {
         imported,
         duplicates,
         total: statements.length,
-        statements: importedStatements
+        statements: importedStatements,
       },
-      error: null
+      error: null,
     };
   }
 
@@ -279,12 +303,16 @@ export class BankStatementsService {
 
     for (let i = 0; i < statements.length; i++) {
       const statement = statements[i];
-      
+
       for (const field of requiredFields) {
-        if (!(field in statement) || statement[field] === null || statement[field] === undefined) {
-          return { 
-            isValid: false, 
-            error: `Extrato ${i + 1}: Campo obrigatório '${field}' está ausente ou vazio` 
+        if (
+          !(field in statement) ||
+          statement[field] === null ||
+          statement[field] === undefined
+        ) {
+          return {
+            isValid: false,
+            error: `Extrato ${i + 1}: Campo obrigatório '${field}' está ausente ou vazio`,
           };
         }
       }
@@ -292,26 +320,26 @@ export class BankStatementsService {
       // Validar data
       const date = new Date(statement.transaction_date);
       if (isNaN(date.getTime())) {
-        return { 
-          isValid: false, 
-          error: `Extrato ${i + 1}: Data da transação inválida: ${statement.transaction_date}` 
+        return {
+          isValid: false,
+          error: `Extrato ${i + 1}: Data da transação inválida: ${statement.transaction_date}`,
         };
       }
 
       // Validar valor
       const amount = parseFloat(statement.amount);
       if (isNaN(amount)) {
-        return { 
-          isValid: false, 
-          error: `Extrato ${i + 1}: Valor inválido: ${statement.amount}` 
+        return {
+          isValid: false,
+          error: `Extrato ${i + 1}: Valor inválido: ${statement.amount}`,
         };
       }
 
       // Validar tipo se fornecido
       if (statement.type && !['Credit', 'Debit'].includes(statement.type)) {
-        return { 
-          isValid: false, 
-          error: `Extrato ${i + 1}: Tipo deve ser 'Credit' ou 'Debit': ${statement.type}` 
+        return {
+          isValid: false,
+          error: `Extrato ${i + 1}: Tipo deve ser 'Credit' ou 'Debit': ${statement.type}`,
         };
       }
     }
@@ -360,7 +388,10 @@ export class BankStatementsService {
       // Verificar se o extrato está conciliado
       const { data: statement } = await this.getStatementById(id);
       if (statement?.reconciled) {
-        return { data: false, error: 'Não é possível excluir extrato que já foi conciliado' };
+        return {
+          data: false,
+          error: 'Não é possível excluir extrato que já foi conciliado',
+        };
       }
 
       const { error } = await supabase
@@ -394,7 +425,7 @@ export class BankStatementsService {
       const statementsResult = await this.getStatements({
         accountId,
         startDate,
-        endDate
+        endDate,
       });
 
       if (statementsResult.error) {
@@ -411,7 +442,7 @@ export class BankStatementsService {
         net_amount: 0,
         reconciled_count: 0,
         unreconciled_count: 0,
-        reconciliation_percentage: 0
+        reconciliation_percentage: 0,
       };
 
       statements.forEach(statement => {
@@ -429,16 +460,17 @@ export class BankStatementsService {
       });
 
       summary.net_amount = summary.total_credits - summary.total_debits;
-      summary.reconciliation_percentage = statements.length > 0 
-        ? Math.round((summary.reconciled_count / statements.length) * 100)
-        : 0;
+      summary.reconciliation_percentage =
+        statements.length > 0
+          ? Math.round((summary.reconciled_count / statements.length) * 100)
+          : 0;
 
       return {
         data: {
           statements,
-          summary
+          summary,
         },
-        error: null
+        error: null,
       };
     } catch (err) {
       return { data: null, error: err.message };
@@ -456,13 +488,13 @@ export class BankStatementsService {
     // Em produção, considerar usar uma biblioteca como crypto-js
     let hash = 0;
     if (str.length === 0) return hash.toString();
-    
+
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Converter para 32bit
     }
-    
+
     return Math.abs(hash).toString(36);
   }
 
@@ -475,10 +507,10 @@ export class BankStatementsService {
     if (typeof amount !== 'number') {
       return 'R$ 0,00';
     }
-    
+
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
-      currency: 'BRL'
+      currency: 'BRL',
     }).format(amount);
   }
 
@@ -489,10 +521,10 @@ export class BankStatementsService {
    */
   static formatDate(date) {
     if (!date) return '';
-    
+
     const dateObj = new Date(date);
     if (isNaN(dateObj.getTime())) return '';
-    
+
     return dateObj.toLocaleDateString('pt-BR');
   }
 
@@ -515,7 +547,10 @@ export class BankStatementsService {
         .single();
 
       if (error || !data) {
-        return { isValid: false, error: 'Conta bancária não encontrada ou inativa' };
+        return {
+          isValid: false,
+          error: 'Conta bancária não encontrada ou inativa',
+        };
       }
 
       return { isValid: true, error: null };

@@ -1,217 +1,143 @@
 /**
- * BUSINESS DAYS UTILITY
- * Funções para cálculo de dias úteis (segunda a sexta, excluindo feriados)
+ * Utilitário para cálculo de dias úteis
+ * Considera finais de semana e feriados nacionais brasileiros
  */
 
-/**
- * Feriados nacionais brasileiros fixos e variáveis
- * Formato: { month: [day1, day2, ...] } para feriados fixos
- */
-const FIXED_HOLIDAYS = {
-  1: [1],      // Ano Novo
-  4: [21],     // Tiradentes
-  5: [1],      // Dia do Trabalho
-  9: [7],      // Independência
-  10: [12],    // Nossa Senhora Aparecida
-  11: [2, 15], // Finados, Proclamação da República
-  12: [25]     // Natal
-};
+import { addDays, isWeekend, getYear, format } from 'date-fns';
 
 /**
- * Calcula feriados móveis (Páscoa, Carnaval, Corpus Christi)
- * Baseado no algoritmo de Meeus/Jones/Butcher
+ * Feriados fixos brasileiros (dia/mês)
  */
-const getEasterDate = (year) => {
-  const a = year % 19;
-  const b = Math.floor(year / 100);
-  const c = year % 100;
-  const d = Math.floor(b / 4);
-  const e = b % 4;
-  const f = Math.floor((b + 8) / 25);
-  const g = Math.floor((b - f + 1) / 3);
-  const h = (19 * a + b - d - g + 15) % 30;
-  const i = Math.floor(c / 4);
-  const k = c % 4;
-  const l = (32 + 2 * e + 2 * i - h - k) % 7;
-  const m = Math.floor((a + 11 * h + 22 * l) / 451);
-  const month = Math.floor((h + l - 7 * m + 114) / 31);
-  const day = ((h + l - 7 * m + 114) % 31) + 1;
-  
-  return new Date(year, month - 1, day);
-};
+const FIXED_HOLIDAYS = [
+  '01/01', // Ano Novo
+  '21/04', // Tiradentes
+  '01/05', // Dia do Trabalho
+  '07/09', // Independência
+  '12/10', // Nossa Senhora Aparecida
+  '02/11', // Finados
+  '15/11', // Proclamação da República
+  '25/12', // Natal
+];
 
 /**
- * Retorna array com todos os feriados do ano (fixos + móveis)
+ * Feriados móveis brasileiros por ano
+ * Atualizar anualmente ou calcular dinamicamente
  */
-const getHolidays = (year) => {
-  const holidays = [];
-  
-  // Feriados fixos
-  Object.entries(FIXED_HOLIDAYS).forEach(([month, days]) => {
-    days.forEach(day => {
-      holidays.push(new Date(year, parseInt(month) - 1, day));
-    });
-  });
-  
-  // Feriados móveis baseados na Páscoa
-  const easter = getEasterDate(year);
-  
-  // Carnaval (47 dias antes da Páscoa)
-  const carnaval = new Date(easter);
-  carnaval.setDate(easter.getDate() - 47);
-  holidays.push(carnaval);
-  
-  // Sexta-feira Santa (2 dias antes da Páscoa)
-  const goodFriday = new Date(easter);
-  goodFriday.setDate(easter.getDate() - 2);
-  holidays.push(goodFriday);
-  
-  // Corpus Christi (60 dias após a Páscoa)
-  const corpusChristi = new Date(easter);
-  corpusChristi.setDate(easter.getDate() + 60);
-  holidays.push(corpusChristi);
-  
-  return holidays;
+const MOVABLE_HOLIDAYS = {
+  2024: [
+    '2024-02-13', // Carnaval
+    '2024-03-29', // Sexta-feira Santa
+    '2024-05-30', // Corpus Christi
+  ],
+  2025: [
+    '2025-03-04', // Carnaval
+    '2025-04-18', // Sexta-feira Santa
+    '2025-06-19', // Corpus Christi
+  ],
+  2026: [
+    '2026-02-17', // Carnaval
+    '2026-04-03', // Sexta-feira Santa
+    '2026-06-04', // Corpus Christi
+  ],
 };
 
 /**
  * Verifica se uma data é feriado
+ * @param {Date} date - Data a verificar
+ * @returns {boolean} - True se for feriado
  */
-export const isHoliday = (date) => {
-  const year = date.getFullYear();
-  const holidays = getHolidays(year);
-  
-  return holidays.some(holiday => 
-    holiday.getDate() === date.getDate() &&
-    holiday.getMonth() === date.getMonth() &&
-    holiday.getFullYear() === date.getFullYear()
-  );
-};
+export function isHoliday(date) {
+  const dayMonth = format(date, 'dd/MM');
+  const fullDate = format(date, 'yyyy-MM-dd');
+  const year = getYear(date);
+
+  // Verifica feriados fixos
+  if (FIXED_HOLIDAYS.includes(dayMonth)) {
+    return true;
+  }
+
+  // Verifica feriados móveis
+  const yearHolidays = MOVABLE_HOLIDAYS[year] || [];
+  if (yearHolidays.includes(fullDate)) {
+    return true;
+  }
+
+  return false;
+}
 
 /**
- * Verifica se uma data é dia útil (segunda a sexta, não feriado)
+ * Verifica se uma data é dia útil (não é fim de semana nem feriado)
+ * @param {Date} date - Data a verificar
+ * @returns {boolean} - True se for dia útil
  */
-export const isBusinessDay = (date) => {
-  const dayOfWeek = date.getDay();
-  
-  // 0 = Domingo, 6 = Sábado
-  if (dayOfWeek === 0 || dayOfWeek === 6) {
-    return false;
-  }
-  
-  // Verifica se é feriado
-  if (isHoliday(date)) {
-    return false;
-  }
-  
-  return true;
-};
+export function isBusinessDay(date) {
+  return !isWeekend(date) && !isHoliday(date);
+}
 
 /**
- * Adiciona N dias úteis a uma data
+ * Adiciona dias CORRIDOS e ajusta para o próximo dia útil se necessário
+ * Usado para calcular previsão de recebimento de pagamentos
+ *
  * @param {Date} startDate - Data inicial
- * @param {number} businessDays - Quantidade de dias úteis a adicionar
- * @returns {Date} - Data final após adicionar os dias úteis
+ * @param {number} calendarDays - Número de dias corridos a adicionar
+ * @returns {Date} - Data final ajustada para dia útil
+ *
+ * @example
+ * // 18/10/2025 (sábado) + 1 dia corrido = 19/10 (domingo) → ajusta para 20/10 (segunda)
+ * addBusinessDays(new Date('2025-10-18'), 1) // 2025-10-20
  */
-export const addBusinessDays = (startDate, businessDays) => {
-  if (businessDays === 0) {
-    return new Date(startDate);
+export function addCalendarDaysAndAdjustToBusinessDay(startDate, calendarDays) {
+  // Adicionar dias corridos
+  let resultDate = addDays(startDate, calendarDays);
+
+  // Ajustar para o próximo dia útil se cair em fim de semana ou feriado
+  while (!isBusinessDay(resultDate)) {
+    resultDate = addDays(resultDate, 1);
   }
-  
-  const result = new Date(startDate);
+
+  return resultDate;
+}
+
+/**
+ * Adiciona dias ÚTEIS (pula finais de semana e feriados)
+ * @param {Date} startDate - Data inicial
+ * @param {number} businessDays - Número de dias úteis a adicionar
+ * @returns {Date} - Data final
+ *
+ * @example
+ * // 18/10/2025 (sábado) + 1 dia útil = 20/10 (segunda)
+ * addBusinessDays(new Date('2025-10-18'), 1) // 2025-10-20
+ */
+export function addBusinessDays(startDate, businessDays) {
+  let currentDate = new Date(startDate);
   let daysAdded = 0;
-  
+
   while (daysAdded < businessDays) {
-    result.setDate(result.getDate() + 1);
-    
-    if (isBusinessDay(result)) {
+    currentDate = addDays(currentDate, 1);
+    if (isBusinessDay(currentDate)) {
       daysAdded++;
     }
   }
-  
-  return result;
-};
 
-/**
- * Adiciona N dias CORRIDOS a uma data e ajusta para o próximo dia útil
- * Esta função implementa o padrão real do mercado financeiro:
- * - Adiciona dias corridos (incluindo sábados, domingos e feriados)
- * - Se o dia final cair em final de semana ou feriado, avança para o próximo dia útil
- * 
- * @param {Date} startDate - Data inicial (data de pagamento/competência)
- * @param {number} calendarDays - Quantidade de dias corridos a adicionar (ex: 30, 14, 7)
- * @returns {Date} - Data final ajustada para dia útil
- * 
- * @example
- * // Pagamento em 01/10/2025
- * const paymentDate = new Date(2025, 9, 1);
- * const receiptDate = addCalendarDaysWithBusinessDayAdjustment(paymentDate, 30);
- * // Resultado: 31/10/2025 (se for dia útil) ou próximo dia útil
- * // Se 31/10 for sábado, retorna 02/11 (segunda-feira)
- */
-export const addCalendarDaysWithBusinessDayAdjustment = (startDate, calendarDays) => {
-  if (calendarDays === 0) {
-    return new Date(startDate);
-  }
-  
-  // 1. Adiciona os dias corridos
-  const result = new Date(startDate);
-  result.setDate(result.getDate() + calendarDays);
-  
-  // 2. Se cair em dia não útil, avança para o próximo dia útil
-  while (!isBusinessDay(result)) {
-    result.setDate(result.getDate() + 1);
-  }
-  
-  return result;
-};
+  return currentDate;
+}
 
 /**
  * Calcula a diferença em dias úteis entre duas datas
  * @param {Date} startDate - Data inicial
  * @param {Date} endDate - Data final
- * @returns {number} - Quantidade de dias úteis entre as datas
+ * @returns {number} - Número de dias úteis entre as datas
  */
-export const countBusinessDays = (startDate, endDate) => {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-  
+export function getBusinessDaysBetween(startDate, endDate) {
+  let currentDate = new Date(startDate);
   let count = 0;
-  const current = new Date(start);
-  
-  while (current <= end) {
-    if (isBusinessDay(current)) {
+
+  while (currentDate <= endDate) {
+    if (isBusinessDay(currentDate)) {
       count++;
     }
-    current.setDate(current.getDate() + 1);
+    currentDate = addDays(currentDate, 1);
   }
-  
+
   return count;
-};
-
-/**
- * Formata uma data para exibição
- * @param {Date} date - Data a formatar
- * @returns {string} - Data formatada (DD/MM/YYYY)
- */
-export const formatDate = (date) => {
-  return date.toLocaleDateString('pt-BR');
-};
-
-/**
- * Exemplo de uso:
- * 
- * import { addBusinessDays, isBusinessDay, countBusinessDays } from '@/utils/businessDays';
- * 
- * // Adicionar 30 dias úteis a partir de hoje
- * const today = new Date();
- * const receiptDate = addBusinessDays(today, 30);
- * console.log(`Recebimento em: ${formatDate(receiptDate)}`);
- * 
- * // Verificar se uma data é dia útil
- * const isWorkDay = isBusinessDay(new Date(2024, 0, 1)); // false (feriado)
- * 
- * // Contar dias úteis entre duas datas
- * const days = countBusinessDays(new Date(2024, 0, 1), new Date(2024, 0, 31));
- * console.log(`Dias úteis em janeiro/2024: ${days}`);
- */
+}

@@ -1,9 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { format, subMonths, addMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Download, FileSpreadsheet, FileText, Loader2 } from 'lucide-react';
+
+// Services
+import fluxoExportService from '../../services/fluxoExportService';
 
 // Custom Hooks
 import { useCashflowData } from '../../hooks/useCashflowData';
+import { useToast } from '../../context/ToastContext';
 
 // Components
 import DateRangePicker from '../../atoms/DateRangePicker/DateRangePicker';
@@ -20,6 +25,9 @@ import FluxoSummaryPanel from '../../organisms/FluxoSummaryPanel/FluxoSummaryPan
  * - useCashflowData hook para gerenciamento de dados
  */
 const FluxoTab = ({ globalFilters, units = [] }) => {
+  const { showToast } = useToast();
+  const [exporting, setExporting] = useState(false);
+
   // eslint-disable-next-line no-console
   console.log('🔄 FluxoTab - Recebeu units:', units);
   // eslint-disable-next-line no-console
@@ -83,9 +91,50 @@ const FluxoTab = ({ globalFilters, units = [] }) => {
     }
   };
 
-  const handleExport = () => {
-    // TODO: Implementar exportação dos dados
-    // Funcionalidade será implementada em versão futura
+  const handleExport = async format => {
+    if (!entries || entries.length === 0) {
+      showToast('Não há dados para exportar', 'warning');
+      return;
+    }
+
+    setExporting(true);
+    try {
+      const filters = {
+        periodo: {
+          tipo: 'custom',
+          dataInicio: dateRange.startDate,
+          dataFim: dateRange.endDate,
+        },
+      };
+
+      let result;
+      switch (format) {
+        case 'csv':
+          result = fluxoExportService.exportAsCSV(entries, filters);
+          break;
+        case 'excel':
+          result = fluxoExportService.exportAsExcel(entries, filters);
+          break;
+        case 'pdf':
+          result = fluxoExportService.exportAsPDF(entries, filters);
+          break;
+        default:
+          throw new Error('Formato não suportado');
+      }
+
+      if (result.success) {
+        showToast(
+          `Relatório exportado como ${format.toUpperCase()}`,
+          'success'
+        );
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      showToast(`Erro ao exportar: ${error.message}`, 'error');
+    } finally {
+      setExporting(false);
+    }
   };
 
   // Preparar dados para o gráfico
@@ -166,12 +215,54 @@ const FluxoTab = ({ globalFilters, units = [] }) => {
             >
               Atualizar
             </button>
-            <button
-              onClick={handleExport}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              Exportar
-            </button>
+
+            {/* Botões de Exportação */}
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => handleExport('csv')}
+                disabled={exporting || !entries || entries.length === 0}
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                data-testid="btn-export-csv"
+                title="Exportar como CSV"
+              >
+                {exporting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <FileText className="w-4 h-4" />
+                )}
+                CSV
+              </button>
+
+              <button
+                onClick={() => handleExport('excel')}
+                disabled={exporting || !entries || entries.length === 0}
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                data-testid="btn-export-excel"
+                title="Exportar como Excel"
+              >
+                {exporting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <FileSpreadsheet className="w-4 h-4" />
+                )}
+                Excel
+              </button>
+
+              <button
+                onClick={() => handleExport('pdf')}
+                disabled={exporting || !entries || entries.length === 0}
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                data-testid="btn-export-pdf"
+                title="Exportar como PDF"
+              >
+                {exporting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Download className="w-4 h-4" />
+                )}
+                PDF
+              </button>
+            </div>
           </div>
         </div>
 

@@ -226,6 +226,7 @@ class UnitsService {
         .from('expenses')
         .select('id')
         .eq('unit_id', unitId)
+        .eq('is_active', true) // ✅ FIX: Filtrar apenas despesas ativas
         .limit(1);
 
       if (expenses && expenses.length > 0) {
@@ -292,6 +293,7 @@ class UnitsService {
         .from('expenses')
         .select('value')
         .eq('unit_id', unitId)
+        .eq('is_active', true) // ✅ FIX: Filtrar apenas despesas ativas
         .gte('date', `${targetYear}-${String(targetMonth).padStart(2, '0')}-01`)
         .lt(
           'date',

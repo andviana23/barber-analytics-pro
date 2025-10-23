@@ -1,11 +1,15 @@
 /**
  * BANK ACCOUNTS SERVICE
  * Serviço para gerenciamento de contas bancárias
- * 
+ *
  * Funcionalidades:
  * - CRUD completo de contas bancárias
  * - Listagem por unidade
  * - Gestão de status (ativa/inativa)
+ * - Gestão de saldos (inicial, atual, disponível)
+ * - Atualização automática de saldos
+ * - Histórico de alterações de saldo
+ * - Saldo consolidado por unidade
  * - Validações de dados
  */
 
@@ -13,15 +17,16 @@ import { supabase } from './supabase';
 
 class BankAccountsService {
   /**
-   * Listar todas as contas bancárias
+   * Listar todas as contas bancárias COM SALDOS CALCULADOS
    * @param {string} unitId - ID da unidade (opcional para filtrar)
    * @param {boolean} incluirInativas - Se deve incluir contas inativas
-   * @returns {Promise<Array>} Lista de contas bancárias
+   * @returns {Promise<Array>} Lista de contas bancárias com saldos
    */
   async getBankAccounts(unitId = null, incluirInativas = false) {
     try {
+      // Usar view com saldos calculados
       let query = supabase
-        .from('bank_accounts')
+        .from('vw_bank_accounts_with_balances')
         .select('*')
         .order('created_at', { ascending: false });
 
@@ -36,8 +41,6 @@ class BankAccountsService {
       const { data, error } = await query;
 
       if (error) {
-        // eslint-disable-next-line no-console
-        console.error('Erro ao buscar contas bancárias:', error);
         throw error;
       }
 
@@ -50,7 +53,6 @@ class BankAccountsService {
           .in('id', unitIds);
 
         if (units) {
-          // Mapear unidades aos dados
           const unitsMap = {};
           units.forEach(unit => {
             unitsMap[unit.id] = unit;
@@ -60,7 +62,7 @@ class BankAccountsService {
             if (account.unit_id && unitsMap[account.unit_id]) {
               account.units = unitsMap[account.unit_id];
             }
-            // ✅ Adicionar campo 'bank' para compatibilidade com o frontend
+            // Compatibilidade com frontend
             account.bank = account.bank_name;
           });
         }
@@ -68,8 +70,6 @@ class BankAccountsService {
 
       return data || [];
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Erro completo:', error);
       throw new Error('Falha ao carregar contas bancárias: ' + error.message);
     }
   }
@@ -100,7 +100,7 @@ class BankAccountsService {
           .select('id, name')
           .eq('id', data.unit_id)
           .single();
-        
+
         if (unit) {
           data.units = unit;
         }
@@ -126,16 +126,18 @@ class BankAccountsService {
 
       const { data, error } = await supabase
         .from('bank_accounts')
-        .insert([{
-          name: accountData.name.trim(),
-          bank_name: accountData.bank.trim(), // ✅ Corrigido: bank → bank_name
-          agency: accountData.agency.trim(),
-          account_number: accountData.account_number.trim(),
-          unit_id: accountData.unit_id,
-          initial_balance: accountData.initial_balance || 0,
-          nickname: accountData.nickname?.trim() || null,
-          is_active: true
-        }])
+        .insert([
+          {
+            name: accountData.name.trim(),
+            bank_name: accountData.bank.trim(), // ✅ Corrigido: bank → bank_name
+            agency: accountData.agency.trim(),
+            account_number: accountData.account_number.trim(),
+            unit_id: accountData.unit_id,
+            initial_balance: accountData.initial_balance || 0,
+            nickname: accountData.nickname?.trim() || null,
+            is_active: true,
+          },
+        ])
         .select('*')
         .single();
 
@@ -152,7 +154,7 @@ class BankAccountsService {
           .select('id, name')
           .eq('id', data.unit_id)
           .single();
-        
+
         if (unit) {
           data.units = unit;
         }
@@ -183,7 +185,7 @@ class BankAccountsService {
       this._validateAccountData(updateData, false);
 
       const updates = {};
-      
+
       if (updateData.name !== undefined) {
         updates.name = updateData.name.trim();
       }
@@ -229,7 +231,7 @@ class BankAccountsService {
           .select('id, name')
           .eq('id', data.unit_id)
           .single();
-        
+
         if (unit) {
           data.units = unit;
         }
@@ -297,7 +299,13 @@ class BankAccountsService {
    * @param {string} excludeId - ID para excluir da verificação (usado na edição)
    * @returns {Promise<boolean>} Se a conta já existe
    */
-  async checkAccountExists(bank, agency, accountNumber, unitId, excludeId = null) {
+  async checkAccountExists(
+    bank,
+    agency,
+    accountNumber,
+    unitId,
+    excludeId = null
+  ) {
     try {
       let query = supabase
         .from('bank_accounts')
@@ -353,7 +361,7 @@ class BankAccountsService {
         inactive: data.filter(account => !account.is_active).length,
         totalBalance: data
           .filter(account => account.is_active)
-          .reduce((sum, account) => sum + (account.initial_balance || 0), 0)
+          .reduce((sum, account) => sum + (account.initial_balance || 0), 0),
       };
 
       return stats;
@@ -403,6 +411,168 @@ class BankAccountsService {
     }
     if (data.initial_balance !== undefined && data.initial_balance < 0) {
       throw new Error('Saldo inicial não pode ser negativo');
+    }
+  }
+
+  /**
+   * 🆕 ATUALIZAR SALDO INICIAL COM LOG
+   * @param {string} accountId - ID da conta bancária
+   * @param {number} newValue - Novo valor do saldo inicial
+   * @param {string} userId - ID do usuário que fez a alteração
+   * @param {string} reason - Motivo da alteração (opcional)
+   * @returns {Promise<Object>} Resultado da operação
+   */
+  async updateInitialBalance(
+    accountId,
+    newValue,
+    userId = null,
+    reason = null
+  ) {
+    try {
+      const { data, error } = await supabase.rpc(
+        'update_account_initial_balance',
+        {
+          p_account_id: accountId,
+          p_new_value: newValue,
+          p_user_id: userId,
+          p_reason: reason,
+        }
+      );
+
+      if (error) throw error;
+
+      return { data, error: null };
+    } catch (error) {
+      return {
+        data: null,
+        error: 'Falha ao atualizar saldo inicial: ' + error.message,
+      };
+    }
+  }
+
+  /**
+   * 🆕 BUSCAR SALDO CONSOLIDADO POR UNIDADE
+   * @param {string} unitId - ID da unidade
+   * @returns {Promise<Object>} Saldo consolidado
+   */
+  async getConsolidatedBalance(unitId) {
+    try {
+      const { data, error } = await supabase
+        .from('vw_unit_consolidated_balance')
+        .select('*')
+        .eq('unit_id', unitId)
+        .single();
+
+      if (error) throw error;
+
+      return { data, error: null };
+    } catch (error) {
+      return {
+        data: null,
+        error: 'Falha ao buscar saldo consolidado: ' + error.message,
+      };
+    }
+  }
+
+  /**
+   * 🆕 BUSCAR HISTÓRICO DE ALTERAÇÕES DE SALDO
+   * @param {string} accountId - ID da conta bancária
+   * @param {number} limit - Limite de registros (padrão: 50)
+   * @returns {Promise<Array>} Histórico de alterações
+   */
+  async getBalanceHistory(accountId, limit = 50) {
+    try {
+      const { data, error } = await supabase
+        .from('bank_account_balance_logs')
+        .select('*, profiles:user_id(full_name, email)')
+        .eq('account_id', accountId)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+
+      return { data: data || [], error: null };
+    } catch (error) {
+      return {
+        data: [],
+        error: 'Falha ao buscar histórico: ' + error.message,
+      };
+    }
+  }
+
+  /**
+   * 🆕 RECALCULAR SALDO DE UMA CONTA
+   * Útil para corrigir inconsistências
+   * @param {string} accountId - ID da conta bancária
+   * @returns {Promise<Object>} Saldos recalculados
+   */
+  async recalculateBalance(accountId) {
+    try {
+      // Calcular saldo atual
+      const { data: currentBalance, error: errorCurrent } = await supabase.rpc(
+        'calculate_account_current_balance',
+        { p_account_id: accountId }
+      );
+
+      if (errorCurrent) throw errorCurrent;
+
+      // Calcular saldo disponível
+      const { data: availableBalance, error: errorAvailable } =
+        await supabase.rpc('calculate_account_available_balance', {
+          p_account_id: accountId,
+        });
+
+      if (errorAvailable) throw errorAvailable;
+
+      // Atualizar tabela
+      const { error: errorUpdate } = await supabase
+        .from('bank_accounts')
+        .update({
+          current_balance: currentBalance,
+          saldo_disponivel: availableBalance,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', accountId);
+
+      if (errorUpdate) throw errorUpdate;
+
+      return {
+        data: {
+          current_balance: currentBalance,
+          available_balance: availableBalance,
+        },
+        error: null,
+      };
+    } catch (error) {
+      return {
+        data: null,
+        error: 'Falha ao recalcular saldo: ' + error.message,
+      };
+    }
+  }
+
+  /**
+   * 🆕 BUSCAR RESUMO FINANCEIRO DA CONTA
+   * Retorna movimentações detalhadas
+   * @param {string} accountId - ID da conta bancária
+   * @returns {Promise<Object>} Resumo financeiro
+   */
+  async getAccountFinancialSummary(accountId) {
+    try {
+      const { data: account, error } = await supabase
+        .from('vw_bank_accounts_with_balances')
+        .select('*')
+        .eq('id', accountId)
+        .single();
+
+      if (error) throw error;
+
+      return { data: account, error: null };
+    } catch (error) {
+      return {
+        data: null,
+        error: 'Falha ao buscar resumo: ' + error.message,
+      };
     }
   }
 }

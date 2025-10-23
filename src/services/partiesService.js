@@ -139,6 +139,7 @@ export class PartiesService {
         email: partyData.email?.toLowerCase().trim() || null,
         endereco: partyData.endereco?.trim() || null,
         observacoes: partyData.observacoes?.trim() || null,
+        date_of_birth: partyData.date_of_birth || null, // ✅ Cliente birthdate support
         is_active: true,
       };
 
@@ -206,6 +207,8 @@ export class PartiesService {
         cleanData.endereco = updateData.endereco?.trim() || null;
       if (updateData.observacoes !== undefined)
         cleanData.observacoes = updateData.observacoes?.trim() || null;
+      if (updateData.date_of_birth !== undefined)
+        cleanData.date_of_birth = updateData.date_of_birth || null; // ✅ Cliente birthdate support
       if (updateData.is_active !== undefined)
         cleanData.is_active = updateData.is_active;
 

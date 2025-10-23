@@ -3,14 +3,17 @@ import { supabase } from './supabase';
 export class GoalsService {
   async getGoals(filters = {}) {
     try {
-      const { unitId, year, month, goalType, isActive = true } = filters;
-      
-      let query = supabase
-        .from('goals')
-        .select(`
-          *,
-          unit:units(id, name)
-        `);
+      const {
+        unitId,
+        year,
+        month,
+        goalType,
+        categoryId,
+        isActive = true,
+      } = filters;
+
+      // Usar a view otimizada com cálculos automáticos
+      let query = supabase.from('vw_goals_detailed').select('*');
 
       if (unitId) {
         query = query.eq('unit_id', unitId);
@@ -28,11 +31,17 @@ export class GoalsService {
         query = query.eq('goal_type', goalType);
       }
 
+      if (categoryId) {
+        query = query.eq('category_id', categoryId);
+      }
+
       if (isActive !== undefined) {
         query = query.eq('is_active', isActive);
       }
 
-      const { data, error } = await query.order('goal_type');
+      const { data, error } = await query
+        .order('goal_year', { ascending: false })
+        .order('goal_month', { ascending: false, nullsFirst: false });
 
       if (error) throw error;
 
@@ -48,10 +57,12 @@ export class GoalsService {
       const { data, error } = await supabase
         .from('goals')
         .insert(goalData)
-        .select(`
+        .select(
+          `
           *,
           unit:units(id, name)
-        `)
+        `
+        )
         .single();
 
       if (error) throw error;
@@ -69,10 +80,12 @@ export class GoalsService {
         .from('goals')
         .update(updates)
         .eq('id', goalId)
-        .select(`
+        .select(
+          `
           *,
           unit:units(id, name)
-        `)
+        `
+        )
         .single();
 
       if (error) throw error;
@@ -86,10 +99,7 @@ export class GoalsService {
 
   async deleteGoal(goalId) {
     try {
-      const { error } = await supabase
-        .from('goals')
-        .delete()
-        .eq('id', goalId);
+      const { error } = await supabase.from('goals').delete().eq('id', goalId);
 
       if (error) throw error;
 
@@ -106,10 +116,12 @@ export class GoalsService {
         .from('goals')
         .update({ achieved_value: achievedValue })
         .eq('id', goalId)
-        .select(`
+        .select(
+          `
           *,
           unit:units(id, name)
-        `)
+        `
+        )
         .single();
 
       if (error) throw error;
@@ -124,7 +136,7 @@ export class GoalsService {
   async getGoalsSummary(unitId, year, month) {
     try {
       const { data, error } = await supabase
-        .from('goals')
+        .from('vw_goals_detailed')
         .select('*')
         .eq('unit_id', unitId)
         .eq('goal_year', year)
@@ -133,13 +145,17 @@ export class GoalsService {
 
       if (error) throw error;
 
-      // Organizar metas por tipo
+      // Organizar metas por tipo (incluindo metas específicas por categoria)
       const summary = {
-        revenue_general: data?.find(g => g.goal_type === 'revenue_general'),
-        subscription: data?.find(g => g.goal_type === 'subscription'),
-        product_sales: data?.find(g => g.goal_type === 'product_sales'),
-        expenses: data?.find(g => g.goal_type === 'expenses'),
-        profit: data?.find(g => g.goal_type === 'profit')
+        revenue_general: data?.filter(
+          g => g.goal_type === 'revenue_general' && !g.category_id
+        ),
+        subscription: data?.filter(g => g.goal_type === 'subscription'),
+        product_sales: data?.filter(g => g.goal_type === 'product_sales'),
+        expenses: data?.filter(g => g.goal_type === 'expenses'),
+        profit: data?.filter(g => g.goal_type === 'profit'),
+        // Metas específicas por categoria
+        by_category: data?.filter(g => g.category_id !== null),
       };
 
       return { data: summary, error: null };
@@ -149,109 +165,70 @@ export class GoalsService {
     }
   }
 
-  async calculateGoalProgress(unitId, goalType, year, month) {
+  async refreshGoalAchievedValue(goalId) {
     try {
-      // Buscar meta
-      const { data: goal } = await supabase
-        .from('goals')
+      // Chamar a função do banco para recalcular o achieved_value
+      const { data, error } = await supabase.rpc(
+        'calculate_goal_achieved_value',
+        { p_goal_id: goalId }
+      );
+
+      if (error) throw error;
+
+      return { data, error: null };
+    } catch (error) {
+      console.error('Erro ao recalcular valor atingido:', error);
+      return { data: null, error: error.message };
+    }
+  }
+
+  async calculateGoalProgress(
+    unitId,
+    goalType,
+    year,
+    month,
+    categoryId = null
+  ) {
+    try {
+      // Buscar meta usando a view otimizada
+      let query = supabase
+        .from('vw_goals_detailed')
         .select('*')
         .eq('unit_id', unitId)
         .eq('goal_type', goalType)
         .eq('goal_year', year)
-        .eq('goal_month', month)
-        .eq('is_active', true)
-        .single();
+        .eq('is_active', true);
 
-      if (!goal) {
+      if (month) {
+        query = query.eq('goal_month', month);
+      }
+
+      if (categoryId) {
+        query = query.eq('category_id', categoryId);
+      } else {
+        query = query.is('category_id', null);
+      }
+
+      const { data: goal, error } = await query.single();
+
+      if (error || !goal) {
         return { data: { progress: 0, percentage: 0 }, error: null };
       }
 
-      // Calcular valor atingido baseado no tipo de meta
-      let achievedValue = 0;
-      const startDate = new Date(year, month - 1, 1);
-      const endDate = new Date(year, month, 0);
+      // A view já calcula automaticamente o achieved_value
+      const percentage = goal.progress_percentage || 0;
 
-      switch (goalType) {
-        case 'revenue_general':
-          const { data: revenues } = await supabase
-            .from('revenues')
-            .select('value')
-            .eq('unit_id', unitId)
-            .gte('date', startDate.toISOString().split('T')[0])
-            .lte('date', endDate.toISOString().split('T')[0]);
-          
-          achievedValue = revenues?.reduce((sum, r) => sum + (r.value || 0), 0) || 0;
-          break;
-
-        case 'subscription':
-          const { data: subscriptions } = await supabase
-            .from('revenues')
-            .select('value')
-            .eq('unit_id', unitId)
-            .eq('type', 'subscription')
-            .gte('date', startDate.toISOString().split('T')[0])
-            .lte('date', endDate.toISOString().split('T')[0]);
-          
-          achievedValue = subscriptions?.reduce((sum, s) => sum + (s.value || 0), 0) || 0;
-          break;
-
-        case 'product_sales':
-          const { data: products } = await supabase
-            .from('revenues')
-            .select('value')
-            .eq('unit_id', unitId)
-            .eq('type', 'product')
-            .gte('date', startDate.toISOString().split('T')[0])
-            .lte('date', endDate.toISOString().split('T')[0]);
-          
-          achievedValue = products?.reduce((sum, p) => sum + (p.value || 0), 0) || 0;
-          break;
-
-        case 'expenses':
-          const { data: expenses } = await supabase
-            .from('expenses')
-            .select('value')
-            .eq('unit_id', unitId)
-            .gte('date', startDate.toISOString().split('T')[0])
-            .lte('date', endDate.toISOString().split('T')[0]);
-          
-          achievedValue = expenses?.reduce((sum, e) => sum + (e.value || 0), 0) || 0;
-          break;
-
-        case 'profit':
-          // Calcular lucro (receitas - despesas)
-          const { data: allRevenues } = await supabase
-            .from('revenues')
-            .select('value')
-            .eq('unit_id', unitId)
-            .gte('date', startDate.toISOString().split('T')[0])
-            .lte('date', endDate.toISOString().split('T')[0]);
-
-          const { data: allExpenses } = await supabase
-            .from('expenses')
-            .select('value')
-            .eq('unit_id', unitId)
-            .gte('date', startDate.toISOString().split('T')[0])
-            .lte('date', endDate.toISOString().split('T')[0]);
-
-          const totalRevenues = allRevenues?.reduce((sum, r) => sum + (r.value || 0), 0) || 0;
-          const totalExpenses = allExpenses?.reduce((sum, e) => sum + (e.value || 0), 0) || 0;
-          achievedValue = totalRevenues - totalExpenses;
-          break;
-      }
-
-      const percentage = goal.target_value > 0 
-        ? Math.round((achievedValue / goal.target_value) * 100) 
-        : 0;
-
-      return { 
-        data: { 
-          progress: achievedValue, 
+      return {
+        data: {
+          progress: goal.achieved_value,
           percentage,
           target: goal.target_value,
-          goal
-        }, 
-        error: null 
+          remaining: goal.remaining_value,
+          status: goal.status,
+          category_name: goal.category_name,
+          goal,
+        },
+        error: null,
       };
     } catch (error) {
       console.error('Erro ao calcular progresso da meta:', error);

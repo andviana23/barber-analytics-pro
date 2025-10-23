@@ -4,8 +4,12 @@ import { useAuth } from '../../context/AuthContext';
 import { Loader2 } from 'lucide-react';
 
 // Componente para proteger rotas que precisam de autenticação
-export function ProtectedRoute({ children, redirectTo = '/login' }) {
-  const { isAuthenticated, loading } = useAuth();
+export function ProtectedRoute({
+  children,
+  roles = [],
+  redirectTo = '/login',
+}) {
+  const { isAuthenticated, loading, userRole, adminStatus } = useAuth();
   const location = useLocation();
 
   // Mostrar loading enquanto verifica autenticação
@@ -27,7 +31,20 @@ export function ProtectedRoute({ children, redirectTo = '/login' }) {
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
 
-  // Se autenticado, renderizar o componente
+  // Se roles foram especificados, verificar permissão
+  if (roles.length > 0) {
+    // Admin sempre tem acesso
+    if (adminStatus) {
+      return children;
+    }
+
+    // Verificar se o role do usuário está na lista permitida
+    if (!roles.includes(userRole)) {
+      return <Navigate to="/unauthorized" replace />;
+    }
+  }
+
+  // Se autenticado e com permissão, renderizar o componente
   return children;
 }
 

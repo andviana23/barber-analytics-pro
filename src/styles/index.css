@@ -49,6 +49,34 @@
     @apply bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary;
     @apply transition-colors duration-300;
   }
+
+  /* Custom Scrollbar - Dark Mode */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-dark-bg rounded-lg;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-dark-border hover:bg-primary/50 rounded-lg transition-colors;
+  }
+
+  /* Scrollbar para overflow geral em dark mode */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 dark:bg-dark-border hover:bg-gray-400 dark:hover:bg-primary/50 rounded-full transition-colors;
+  }
 }
 
 /* Componentes customizados */
@@ -79,5 +107,32 @@
     @apply border border-light-border dark:border-dark-border;
     @apply text-text-light-primary dark:text-text-dark-primary;
     @apply hover:bg-primary/10 hover:border-primary/20;
+  }
+
+  /* Inputs e selects com tema */
+  .input-theme {
+    @apply w-full px-3 py-2.5 rounded-lg;
+    @apply bg-light-surface dark:bg-dark-surface;
+    @apply border border-light-border dark:border-dark-border;
+    @apply text-text-light-primary dark:text-text-dark-primary;
+    @apply placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary;
+    @apply transition-all duration-200;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .input-theme:hover:not(:disabled) {
+    @apply border-primary/30;
+  }
+
+  /* Textarea com tema */
+  textarea.input-theme {
+    @apply resize-none;
+  }
+
+  /* Select com tema - melhorar aparência */
+  select.input-theme {
+    @apply cursor-pointer;
+    @apply bg-no-repeat bg-right;
   }
 }

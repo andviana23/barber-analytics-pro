@@ -462,6 +462,7 @@ export class CashflowService {
         .from('expenses')
         .select('*')
         .eq('unit_id', period.unit_id)
+        .eq('is_active', true) // ✅ FIX: Filtrar apenas despesas ativas
         .not('actual_payment_date', 'is', null)
         .gte('actual_payment_date', period.start_date)
         .lte('actual_payment_date', period.end_date);
@@ -549,6 +550,7 @@ export class CashflowService {
         .from('expenses')
         .select('*')
         .eq('unit_id', period.unit_id)
+        .eq('is_active', true) // ✅ FIX: Filtrar apenas despesas ativas
         .gte('expected_payment_date', period.start_date)
         .lte('expected_payment_date', period.end_date);
 
@@ -707,6 +709,7 @@ export class CashflowService {
         .from('expenses')
         .select('*')
         .eq('unit_id', period.unit_id)
+        .eq('is_active', true) // ✅ FIX: Filtrar apenas despesas ativas
         .gte('expected_payment_date', period.start_date)
         .lte('expected_payment_date', period.end_date);
 

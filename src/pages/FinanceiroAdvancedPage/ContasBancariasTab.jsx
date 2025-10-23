@@ -12,6 +12,7 @@ import {
   Phone,
   Mail,
   Edit,
+  Edit3,
   Trash2,
   Eye,
   EyeOff,
@@ -39,6 +40,7 @@ import { useAuth } from '../../context/AuthContext';
 import CreateBankAccountModal from '../../organisms/BankAccountModals/CreateBankAccountModal';
 import EditBankAccountModal from '../../organisms/BankAccountModals/EditBankAccountModal';
 import DeleteBankAccountModal from '../../organisms/BankAccountModals/DeleteBankAccountModal';
+import EditInitialBalanceModal from '../../organisms/BankAccountModals/EditInitialBalanceModal';
 
 /**
  * 🏦 Contas Bancárias - Tab Refatorada
@@ -64,11 +66,12 @@ const ContasBancariasTab = ({ globalFilters }) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isEditBalanceModalOpen, setIsEditBalanceModalOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState(null);
 
-  // Hook para carregar contas bancárias
+  // Hook para carregar contas bancárias com novos saldos calculados
   const { bankAccounts, loading, error, refetch } = useBankAccounts({
-    unitId: null, // ✅ Buscar TODAS as contas, não filtrar por unidade
+    unitId: globalFilters?.unitId || null, // Usar filtro global de unidade
     incluirInativas: showInactive,
   });
 
@@ -143,15 +146,18 @@ const ContasBancariasTab = ({ globalFilters }) => {
     return banks.sort();
   }, [bankAccounts]);
 
-  // Estatísticas avançadas
+  // Estatísticas avançadas com saldos calculados
   const stats = useMemo(() => {
     if (!bankAccounts)
       return {
         total: 0,
         active: 0,
         inactive: 0,
-        totalBalance: 0,
-        averageBalance: 0,
+        totalInitialBalance: 0,
+        totalCurrentBalance: 0,
+        totalAvailableBalance: 0,
+        totalRevenues: 0,
+        totalExpenses: 0,
         topBank: '',
         recentActivity: 0,
       };
@@ -159,15 +165,33 @@ const ContasBancariasTab = ({ globalFilters }) => {
     const total = bankAccounts.length;
     const active = bankAccounts.filter(acc => acc.is_active).length;
     const inactive = total - active;
-    const totalBalance = bankAccounts.reduce(
-      (sum, acc) => sum + (acc.balance || 0),
+
+    // Somar saldos calculados
+    const totalInitialBalance = bankAccounts.reduce(
+      (sum, acc) => sum + (parseFloat(acc.initial_balance) || 0),
       0
     );
-    const averageBalance = total > 0 ? totalBalance / total : 0;
+    const totalCurrentBalance = bankAccounts.reduce(
+      (sum, acc) => sum + (parseFloat(acc.current_balance) || 0),
+      0
+    );
+    const totalAvailableBalance = bankAccounts.reduce(
+      (sum, acc) => sum + (parseFloat(acc.saldo_disponivel) || 0),
+      0
+    );
+    const totalRevenues = bankAccounts.reduce(
+      (sum, acc) => sum + (parseFloat(acc.total_revenues) || 0),
+      0
+    );
+    const totalExpenses = bankAccounts.reduce(
+      (sum, acc) => sum + (parseFloat(acc.total_expenses) || 0),
+      0
+    );
 
     // Banco mais comum
     const bankCounts = bankAccounts.reduce((acc, account) => {
-      acc[account.bank] = (acc[account.bank] || 0) + 1;
+      const bankName = account.bank_name || account.bank;
+      acc[bankName] = (acc[bankName] || 0) + 1;
       return acc;
     }, {});
     const topBank = Object.keys(bankCounts).reduce(
@@ -179,8 +203,11 @@ const ContasBancariasTab = ({ globalFilters }) => {
       total,
       active,
       inactive,
-      totalBalance,
-      averageBalance,
+      totalInitialBalance,
+      totalCurrentBalance,
+      totalAvailableBalance,
+      totalRevenues,
+      totalExpenses,
       topBank,
       recentActivity: bankAccounts.filter(acc => {
         const createdDate = new Date(acc.created_at);
@@ -206,11 +233,17 @@ const ContasBancariasTab = ({ globalFilters }) => {
     setIsDeleteModalOpen(true);
   };
 
+  const handleEditBalance = account => {
+    setSelectedAccount(account);
+    setIsEditBalanceModalOpen(true);
+  };
+
   const handleSuccess = () => {
     refetch(); // Recarregar lista
     setIsCreateModalOpen(false);
     setIsEditModalOpen(false);
     setIsDeleteModalOpen(false);
+    setIsEditBalanceModalOpen(false);
     setSelectedAccount(null);
   };
 
@@ -233,104 +266,222 @@ const ContasBancariasTab = ({ globalFilters }) => {
     });
   };
 
-  // Componente de Card de Conta Melhorado
-  const AccountCard = ({ account }) => (
-    <div className="group bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-xl hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 hover:-translate-y-1">
-      {/* Header do Card */}
-      <div className="flex items-start justify-between mb-6">
-        <div className="flex items-center space-x-4">
-          <div className="relative">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg">
-              <Building2 className="w-6 h-6 text-white" />
-            </div>
-            {account.is_active && (
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center">
-                <CheckCircle className="w-2.5 h-2.5 text-white" />
+  // Componente de Card de Conta Melhorado com Saldos Calculados
+  const AccountCard = ({ account }) => {
+    // 🔍 DEBUG - Verificar dados da conta
+    console.log('💳 Conta:', account.name, {
+      initial_balance: account.initial_balance,
+      current_balance: account.current_balance,
+      saldo_disponivel: account.saldo_disponivel,
+      total_revenues: account.total_revenues,
+      total_expenses: account.total_expenses,
+    });
+
+    const balanceVariation =
+      (account.current_balance || 0) - (account.initial_balance || 0);
+    const isPositiveVariation = balanceVariation >= 0;
+
+    return (
+      <div className="group bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-2xl hover:border-blue-400 dark:hover:border-blue-500 transition-all duration-300 hover:-translate-y-1">
+        {/* Header do Card */}
+        <div className="flex items-start justify-between mb-6">
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
+                <Building2 className="w-6 h-6 text-white" />
               </div>
-            )}
-          </div>
-          <div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-              {account.name}
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-              {account.bank}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <div className="relative">
-            <button className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-              <MoreVertical className="w-5 h-5" />
-            </button>
-            {/* Menu dropdown aqui */}
-          </div>
-        </div>
-      </div>
-
-      {/* Detalhes da Conta */}
-      <div className="space-y-4 mb-6">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-              <MapPin className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+              {account.is_active && (
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-800 animate-pulse" />
+              )}
             </div>
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Agência
-              </p>
-              <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                {account.agency}
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                {account.name}
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 font-medium flex items-center gap-2">
+                <Building2 className="w-3.5 h-3.5" />
+                {account.bank_name || account.bank}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-              <CreditCard className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+          {canManage && (
+            <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button
+                onClick={() => handleEdit(account)}
+                className="p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all"
+                title="Editar conta"
+              >
+                <Edit className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => handleDelete(account)}
+                className="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
+                title="Excluir conta"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
             </div>
-            <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Conta</p>
-              <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                {account.account_number}
-              </p>
+          )}
+        </div>
+
+        {/* Detalhes da Conta */}
+        <div className="space-y-3 mb-6">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex items-center space-x-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+              <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <div>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Agência
+                </p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                  {account.agency}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+              <CreditCard className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <div>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Conta
+                </p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                  {account.account_number}
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-            <DollarSign className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+        {/* SALDOS - NOVO LAYOUT */}
+        <div className="space-y-3 mb-5">
+          {/* Saldo Inicial */}
+          <div className="p-4 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl border border-blue-100 dark:border-blue-800/30">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-lg">
+                  <DollarSign className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                    Saldo Inicial
+                  </p>
+                  <p className="text-lg font-bold text-blue-700 dark:text-blue-300">
+                    {formatCurrency(account.initial_balance || 0)}
+                  </p>
+                </div>
+              </div>
+              {canManage && (
+                <button
+                  onClick={() => handleEditBalance(account)}
+                  className="p-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-lg transition-all"
+                  title="Editar saldo inicial"
+                >
+                  <Edit3 className="w-4 h-4" />
+                </button>
+              )}
+            </div>
           </div>
-          <div className="flex-1">
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Saldo Atual
-            </p>
-            <p className="text-lg font-bold text-green-600 dark:text-green-400">
-              {formatCurrency(account.balance)}
-            </p>
+
+          {/* Saldo Atual */}
+          <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl border border-green-100 dark:border-green-800/30">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-green-100 dark:bg-green-900/40 rounded-lg">
+                  <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400" />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-green-600 dark:text-green-400 uppercase tracking-wide">
+                    Saldo Atual
+                  </p>
+                  <p className="text-xl font-bold text-green-700 dark:text-green-300">
+                    {formatCurrency(account.current_balance || 0)}
+                  </p>
+                </div>
+              </div>
+              {balanceVariation !== 0 && (
+                <div
+                  className={`flex items-center space-x-1 px-2 py-1 rounded-lg ${
+                    isPositiveVariation
+                      ? 'bg-green-100 dark:bg-green-900/30'
+                      : 'bg-red-100 dark:bg-red-900/30'
+                  }`}
+                >
+                  {isPositiveVariation ? (
+                    <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  ) : (
+                    <TrendingDown className="w-4 h-4 text-red-600 dark:text-red-400" />
+                  )}
+                  <span
+                    className={`text-xs font-semibold ${
+                      isPositiveVariation
+                        ? 'text-green-700 dark:text-green-300'
+                        : 'text-red-700 dark:text-red-300'
+                    }`}
+                  >
+                    {formatCurrency(Math.abs(balanceVariation))}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Saldo Disponível */}
+          <div className="p-4 bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 rounded-xl border border-purple-100 dark:border-purple-800/30">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-purple-100 dark:bg-purple-900/40 rounded-lg">
+                  <DollarSign className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wide">
+                    Saldo Disponível
+                  </p>
+                  <p className="text-xl font-bold text-purple-700 dark:text-purple-300">
+                    {formatCurrency(account.saldo_disponivel || 0)}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-            <Calendar className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-          </div>
-          <div>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Criada em
+        {/* Resumo de Movimentações */}
+        {(account.total_revenues > 0 || account.total_expenses > 0) && (
+          <div className="pt-4 border-t border-gray-200 dark:border-gray-700 mb-4">
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
+              Movimentações
             </p>
-            <p className="text-sm font-medium text-gray-900 dark:text-white">
-              {formatDate(account.created_at)}
-            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex items-center space-x-2">
+                <TrendingUp className="w-4 h-4 text-green-500" />
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Receitas
+                  </p>
+                  <p className="text-sm font-semibold text-green-600 dark:text-green-400">
+                    {formatCurrency(account.total_revenues || 0)}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <TrendingDown className="w-4 h-4 text-red-500" />
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Despesas
+                  </p>
+                  <p className="text-sm font-semibold text-red-600 dark:text-red-400">
+                    {formatCurrency(account.total_expenses || 0)}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        )}
 
-      {/* Status e Ações */}
-      <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-        <div className="flex items-center space-x-2">
+        {/* Status e Data de Criação */}
+        <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
           <span
             className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
               account.is_active
@@ -350,29 +501,15 @@ const ContasBancariasTab = ({ globalFilters }) => {
               </>
             )}
           </span>
-        </div>
 
-        {canManage && (
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => handleEdit(account)}
-              className="p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-              title="Editar conta"
-            >
-              <Edit className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => handleDelete(account)}
-              className="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-              title="Excluir conta"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
+          <div className="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-400">
+            <Calendar className="w-3.5 h-3.5" />
+            <span>{formatDate(account.created_at)}</span>
           </div>
-        )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   // Componente de Linha da Tabela Melhorado
   const TableRow = ({ account }) => (
@@ -531,72 +668,118 @@ const ContasBancariasTab = ({ globalFilters }) => {
           </div>
         </div>
 
-        {/* Cards de Estatísticas */}
+        {/* Cards de Estatísticas - Saldos Consolidados */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl p-5 border border-blue-100 dark:border-blue-800/30">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
-                  Total de Contas
+                <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide mb-1">
+                  Saldo Inicial Total
                 </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
-                  {stats.total}
+                <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+                  {formatCurrency(stats.totalInitialBalance)}
+                </p>
+                <p className="text-xs text-blue-600/70 dark:text-blue-400/70 mt-1">
+                  {stats.total} conta{stats.total !== 1 ? 's' : ''}
                 </p>
               </div>
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                <CreditCard className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <div className="p-3 bg-blue-100 dark:bg-blue-900/40 rounded-xl">
+                <DollarSign className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
             </div>
           </div>
 
-          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-5 border border-green-100 dark:border-green-800/30">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
-                  Contas Ativas
+                <p className="text-xs font-semibold text-green-600 dark:text-green-400 uppercase tracking-wide mb-1">
+                  Saldo Atual Total
                 </p>
-                <p className="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">
-                  {stats.active}
+                <p className="text-2xl font-bold text-green-700 dark:text-green-300">
+                  {formatCurrency(stats.totalCurrentBalance)}
+                </p>
+                <p className="text-xs text-green-600/70 dark:text-green-400/70 mt-1 flex items-center gap-1">
+                  <TrendingUp className="w-3 h-3" />
+                  {stats.active} ativa{stats.active !== 1 ? 's' : ''}
                 </p>
               </div>
-              <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+              <div className="p-3 bg-green-100 dark:bg-green-900/40 rounded-xl">
+                <Activity className="w-6 h-6 text-green-600 dark:text-green-400" />
               </div>
             </div>
           </div>
 
-          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+          <div className="bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 rounded-xl p-5 border border-purple-100 dark:border-purple-800/30">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
-                  Saldo Total
+                <p className="text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wide mb-1">
+                  Saldo Disponível
                 </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
-                  {formatCurrency(stats.totalBalance)}
+                <p className="text-2xl font-bold text-purple-700 dark:text-purple-300">
+                  {formatCurrency(stats.totalAvailableBalance)}
+                </p>
+                <p className="text-xs text-purple-600/70 dark:text-purple-400/70 mt-1">
+                  Líquido compensado
                 </p>
               </div>
-              <div className="p-2 bg-gray-100 dark:bg-gray-600 rounded-lg">
-                <DollarSign className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <div className="p-3 bg-purple-100 dark:bg-purple-900/40 rounded-xl">
+                <Zap className="w-6 h-6 text-purple-600 dark:text-purple-400" />
               </div>
             </div>
           </div>
 
-          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+          <div className="bg-gradient-to-br from-gray-50 to-slate-50 dark:from-gray-700/50 dark:to-slate-700/50 rounded-xl p-5 border border-gray-200 dark:border-gray-600">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+                <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1">
                   Banco Principal
                 </p>
-                <p className="text-lg font-semibold text-gray-900 dark:text-white mt-1 truncate">
+                <p className="text-lg font-bold text-gray-900 dark:text-white truncate">
                   {stats.topBank || 'N/A'}
                 </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Mais utilizado
+                </p>
               </div>
-              <div className="p-2 bg-gray-100 dark:bg-gray-600 rounded-lg">
-                <Building2 className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <div className="p-3 bg-gray-100 dark:bg-gray-600/50 rounded-xl">
+                <Building2 className="w-6 h-6 text-gray-600 dark:text-gray-400" />
               </div>
             </div>
           </div>
         </div>
+
+        {/* Resumo de Movimentações */}
+        {(stats.totalRevenues > 0 || stats.totalExpenses > 0) && (
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-green-50 dark:bg-green-900/10 rounded-xl p-4 border border-green-100 dark:border-green-800/30">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-semibold text-green-600 dark:text-green-400 uppercase tracking-wide mb-1">
+                    Total de Receitas
+                  </p>
+                  <p className="text-xl font-bold text-green-700 dark:text-green-300">
+                    {formatCurrency(stats.totalRevenues)}
+                  </p>
+                </div>
+                <TrendingUp className="w-5 h-5 text-green-500" />
+              </div>
+            </div>
+
+            <div className="bg-red-50 dark:bg-red-900/10 rounded-xl p-4 border border-red-100 dark:border-red-800/30">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wide mb-1">
+                    Total de Despesas
+                  </p>
+                  <p className="text-xl font-bold text-red-700 dark:text-red-300">
+                    {formatCurrency(stats.totalExpenses)}
+                  </p>
+                </div>
+                <TrendingDown className="w-5 h-5 text-red-500" />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Filtros e Controles */}
@@ -792,6 +975,13 @@ const ContasBancariasTab = ({ globalFilters }) => {
       <DeleteBankAccountModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
+        onSuccess={handleSuccess}
+        account={selectedAccount}
+      />
+
+      <EditInitialBalanceModal
+        isOpen={isEditBalanceModalOpen}
+        onClose={() => setIsEditBalanceModalOpen(false)}
         onSuccess={handleSuccess}
         account={selectedAccount}
       />

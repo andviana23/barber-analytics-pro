@@ -1,23 +1,26 @@
 import { supabase } from '../services/supabase';
-import { ALLOWED_REVENUE_COLUMNS, FORBIDDEN_REVENUE_FIELDS } from '../dtos/revenueDTO';
+import {
+  ALLOWED_REVENUE_COLUMNS,
+  FORBIDDEN_REVENUE_FIELDS,
+} from '../dtos/revenueDTO';
 
 /**
  * RevenueRepository - Repository Pattern
- * 
+ *
  * // [FIX] Removido campo 'profit' do payload inserido em revenues (campo calculado no banco)
  * // Adicionada proteção extra contra campos calculados que não existem na tabela base
- * 
+ *
  * Encapsula toda a lógica de acesso ao banco de dados para a entidade Revenue.
  * Abstraindo os detalhes de implementação do Supabase, facilitando:
  * - Testes unitários (mock do repository)
  * - Troca de banco de dados no futuro
  * - Manutenibilidade e organização do código
- * 
+ *
  * Princípios:
  * - Single Responsibility: Apenas acesso a dados
  * - Dependency Inversion: Service depende de abstração, não de implementação
  * - Clean Architecture: Camada de infraestrutura isolada
- * 
+ *
  * 🛡️ SEGURANÇA: Aplica whitelist/blacklist redundante antes de inserir no banco
  */
 class RevenueRepository {
@@ -41,37 +44,37 @@ class RevenueRepository {
    */
   normalizeError(error) {
     if (!error) return 'Erro desconhecido';
-    
+
     // Erros de conectividade
     if (error.code === 'NETWORK_ERROR' || error.message?.includes('network')) {
       return 'Erro de conexão. Verifique sua internet e tente novamente.';
     }
-    
+
     // Erros de validação/constraint
     if (error.code === '23505') {
       return 'Já existe um registro com essas informações.';
     }
-    
+
     if (error.code === '23503') {
       return 'Referência inválida. Verifique os dados informados.';
     }
-    
+
     if (error.code === '23514') {
       return 'Dados inválidos. Verifique os valores informados.';
     }
-    
+
     // Erros de autenticação
     if (error.message?.includes('JWT') || error.message?.includes('auth')) {
       return 'Sessão expirada. Faça login novamente.';
     }
-    
+
     // Fallback para erro genérico
     return error.message || 'Erro interno do sistema. Tente novamente.';
   }
 
   /**
    * Criar uma nova receita no banco de dados
-   * 
+   *
    * @param {Object} data - Dados sanitizados da receita (já validados pelo DTO)
    * @returns {Promise<{data: Object|null, error: string|null}>}
    */
@@ -85,50 +88,60 @@ class RevenueRepository {
       // ========================================
       // 🛡️ SANITIZAÇÃO REDUNDANTE (ÚLTIMA LINHA DE DEFESA)
       // ========================================
-      
+
       const sanitizedData = {};
       const blocked = [];
       const ignored = [];
-      
+
       // [FIX] Removido campo 'profit' do payload (campo gerado automaticamente no BD)
       // Proteção extra contra campos calculados (profit, profit_margin, etc.)
-      const calculatedFields = ['profit', 'net_profit', 'profit_margin', 'lucro', 'lucro_liquido', 'margem'];
-      
+      const calculatedFields = [
+        'profit',
+        'net_profit',
+        'profit_margin',
+        'lucro',
+        'lucro_liquido',
+        'margem',
+      ];
+
       for (const [key, value] of Object.entries(data)) {
         // 🚫 BLACKLIST: Bloquear campos proibidos (português, calculados, auto-gerados)
         if (FORBIDDEN_REVENUE_FIELDS.includes(key)) {
           blocked.push(key);
           continue;
         }
-        
+
         // 🚫 BLACKLIST EXTRA: Bloquear campos calculados explicitamente
         // [FIX] Removido campo 'profit' do payload (campo gerado automaticamente no BD)
         if (calculatedFields.includes(key)) {
           blocked.push(key + ' (calculated field)');
           continue;
         }
-        
+
         // 🛡️ WHITELIST: Aceitar apenas colunas existentes na tabela
         if (!ALLOWED_REVENUE_COLUMNS.includes(key)) {
           ignored.push(key);
           continue;
         }
-        
+
         // ✅ Campo válido: incluir
         if (value !== null && value !== undefined) {
           sanitizedData[key] = value;
         }
       }
-      
+
       // Log de avisos
       if (blocked.length > 0) {
         // eslint-disable-next-line no-console
         console.error('🚨 Repository: Campos PROIBIDOS bloqueados:', blocked);
       }
-      
+
       if (ignored.length > 0) {
         // eslint-disable-next-line no-console
-        console.warn('⚠️ Repository: Campos não reconhecidos ignorados:', ignored);
+        console.warn(
+          '⚠️ Repository: Campos não reconhecidos ignorados:',
+          ignored
+        );
       }
 
       // 🔥 LOG CRÍTICO: Ver o JSON EXATO que será enviado ao Supabase
@@ -136,14 +149,25 @@ class RevenueRepository {
       console.log('🔥 Repository: Payload final para Supabase:');
       // eslint-disable-next-line no-console
       console.log(JSON.stringify(sanitizedData, null, 2));
-      
+
       // 🔥 DEBUGGING EXTRA: Verificar campos específicos
       // eslint-disable-next-line no-console
-      console.log('🔍 Repository: Campo "profit" presente?', 'profit' in sanitizedData ? '❌ SIM - PROBLEMA!' : '✅ NÃO - OK');
+      console.log(
+        '🔍 Repository: Campo "profit" presente?',
+        'profit' in sanitizedData ? '❌ SIM - PROBLEMA!' : '✅ NÃO - OK'
+      );
       // eslint-disable-next-line no-console
-      console.log('🔍 Repository: Campos calculados encontrados:', Object.keys(sanitizedData).filter(k => ['profit', 'net_profit', 'profit_margin'].includes(k)));
+      console.log(
+        '🔍 Repository: Campos calculados encontrados:',
+        Object.keys(sanitizedData).filter(k =>
+          ['profit', 'net_profit', 'profit_margin'].includes(k)
+        )
+      );
       // eslint-disable-next-line no-console
-      console.log('🔍 Repository: Total de campos no payload:', Object.keys(sanitizedData).length);
+      console.log(
+        '🔍 Repository: Total de campos no payload:',
+        Object.keys(sanitizedData).length
+      );
 
       // ========================================
       // 💾 INSERÇÃO NO BANCO DE DADOS
@@ -154,22 +178,41 @@ class RevenueRepository {
         // Remove campos calculados que podem ser adicionados por outros códigos
         const finalPayload = { ...sanitizedData };
         delete finalPayload.profit;
-        delete finalPayload.net_profit; 
+        delete finalPayload.net_profit;
         delete finalPayload.profit_margin;
-        
+
         // eslint-disable-next-line no-console
-        console.log('🛡️ Repository: Proteção GENERATED aplicada, campos finais:', Object.keys(finalPayload));
+        console.log(
+          '🛡️ Repository: Proteção GENERATED aplicada, campos finais:',
+          Object.keys(finalPayload)
+        );
 
         // [EMERGENCY FIX] Insert com campos específicos (evita coluna profit GENERATED)
         // Lista explícita de campos permitidos para INSERT
         const allowedInsertFields = [
-          'type', 'value', 'date', 'source', 'observations', 'unit_id', 
-          'account_id', 'professional_id', 'user_id', 'party_id',
-          'gross_amount', 'net_amount', 'fees', 'status',
-          'accrual_start_date', 'accrual_end_date', 
-          'expected_receipt_date', 'actual_receipt_date'
+          'type',
+          'value',
+          'date',
+          'source',
+          'observations',
+          'unit_id',
+          'account_id',
+          'professional_id',
+          'user_id',
+          'party_id',
+          'gross_amount',
+          'net_amount',
+          'fees',
+          'status',
+          'accrual_start_date',
+          'accrual_end_date',
+          'expected_receipt_date',
+          'actual_receipt_date',
+          'source_hash',
+          'category_id',
+          'payment_method_id', // NEW
         ];
-        
+
         // Criar payload apenas com campos permitidos para INSERT
         const insertPayload = {};
         allowedInsertFields.forEach(field => {
@@ -177,9 +220,12 @@ class RevenueRepository {
             insertPayload[field] = finalPayload[field];
           }
         });
-        
+
         // eslint-disable-next-line no-console
-        console.log('🛡️ Repository: INSERT payload final (sem profit):', Object.keys(insertPayload));
+        console.log(
+          '🛡️ Repository: INSERT payload final (sem profit):',
+          Object.keys(insertPayload)
+        );
 
         // Promise.race para implementar timeout manual
         const insertPromise = supabase
@@ -188,21 +234,24 @@ class RevenueRepository {
           .select()
           .single();
 
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('NETWORK_TIMEOUT')), this.defaultTimeout)
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(
+            () => reject(new Error('NETWORK_TIMEOUT')),
+            this.defaultTimeout
+          )
         );
 
         const { data: record, error } = await Promise.race([
           insertPromise,
-          timeoutPromise
+          timeoutPromise,
         ]);
 
         if (error) {
           // eslint-disable-next-line no-console
           console.error('❌ Repository: Erro do Supabase:', error);
-          return { 
-            data: null, 
-            error: this.normalizeError(error)
+          return {
+            data: null,
+            error: this.normalizeError(error),
           };
         }
 
@@ -210,37 +259,36 @@ class RevenueRepository {
         console.log('✅ Repository: Receita criada com ID:', record.id);
 
         return { data: record, error: null };
-
       } catch (networkError) {
         // eslint-disable-next-line no-console
         console.error('❌ Repository: Erro de rede/timeout:', networkError);
-        
+
         if (networkError.message === 'NETWORK_TIMEOUT') {
-          return { 
-            data: null, 
-            error: 'Operação demorou muito para ser concluída. Tente novamente.' 
+          return {
+            data: null,
+            error:
+              'Operação demorou muito para ser concluída. Tente novamente.',
           };
         }
-        
-        return { 
-          data: null, 
-          error: 'Erro de conexão. Verifique sua internet e tente novamente.' 
+
+        return {
+          data: null,
+          error: 'Erro de conexão. Verifique sua internet e tente novamente.',
         };
       }
-
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('❌ Repository: Exceção inesperada:', err);
-      return { 
-        data: null, 
-        error: 'Erro inesperado ao salvar receita. Tente novamente.' 
+      return {
+        data: null,
+        error: 'Erro inesperado ao salvar receita. Tente novamente.',
       };
     }
   }
 
   /**
    * Buscar todas as receitas com filtros opcionais
-   * 
+   *
    * @param {Object} filters - Filtros de busca
    * @param {string} [filters.unit_id] - ID da unidade
    * @param {string} [filters.start_date] - Data de início (YYYY-MM-DD)
@@ -255,6 +303,10 @@ class RevenueRepository {
     try {
       // eslint-disable-next-line no-console
       console.log('🏦 Repository: Buscando receitas com filtros:', filters);
+      console.log(
+        '🔍 Repository: unit_id do filtro:',
+        filters?.unit_id || filters?.unitId
+      );
 
       let query = supabase
         .from(this.tableName)
@@ -262,8 +314,14 @@ class RevenueRepository {
         .eq('is_active', true); // ✅ FIX: Filtrar apenas receitas ativas (não deletadas)
 
       // Aplicar filtros
-      if (filters.unit_id) {
-        query = query.eq('unit_id', filters.unit_id);
+      const unitId = filters.unit_id || filters.unitId;
+      if (unitId) {
+        console.log('🔍 Repository: Aplicando filtro unit_id:', unitId);
+        query = query.eq('unit_id', unitId);
+      } else {
+        console.warn(
+          '⚠️ Repository: Nenhum unit_id fornecido! Buscando todas as receitas.'
+        );
       }
 
       if (filters.start_date) {
@@ -308,10 +366,10 @@ class RevenueRepository {
       if (error) {
         // eslint-disable-next-line no-console
         console.error('❌ Repository: Erro ao buscar receitas:', error);
-        return { 
-          data: [], 
+        return {
+          data: [],
           error: error.message || 'Erro ao buscar receitas',
-          count: 0
+          count: 0,
         };
       }
 
@@ -319,12 +377,17 @@ class RevenueRepository {
       if (data && data.length > 0) {
         // Coletar IDs únicos de unidades e contas bancárias
         const unitIds = [...new Set(data.map(r => r.unit_id).filter(Boolean))];
-        const accountIds = [...new Set(data.map(r => r.account_id).filter(Boolean))];
+        const accountIds = [
+          ...new Set(data.map(r => r.account_id).filter(Boolean)),
+        ];
 
         // eslint-disable-next-line no-console
         console.log('🔍 Repository: IDs de unidades encontrados:', unitIds);
         // eslint-disable-next-line no-console
-        console.log('🔍 Repository: IDs de contas bancárias encontrados:', accountIds);
+        console.log(
+          '🔍 Repository: IDs de contas bancárias encontrados:',
+          accountIds
+        );
 
         // Buscar unidades
         let unitsMap = {};
@@ -333,10 +396,10 @@ class RevenueRepository {
             .from('units')
             .select('id, name')
             .in('id', unitIds);
-          
+
           // eslint-disable-next-line no-console
           console.log('🔍 Repository: Unidades buscadas:', units);
-          
+
           if (units) {
             units.forEach(unit => {
               unitsMap[unit.id] = unit;
@@ -348,18 +411,21 @@ class RevenueRepository {
         let accountsMap = {};
         if (accountIds.length > 0) {
           // eslint-disable-next-line no-console
-          console.log('🔍 Repository: Buscando contas bancárias para IDs:', accountIds);
-          
+          console.log(
+            '🔍 Repository: Buscando contas bancárias para IDs:',
+            accountIds
+          );
+
           const { data: accounts, error: accountsError } = await supabase
             .from('bank_accounts')
             .select('id, name, bank_name, account_number')
             .in('id', accountIds);
-          
+
           // eslint-disable-next-line no-console
           console.log('🔍 Repository: Contas bancárias buscadas:', accounts);
           // eslint-disable-next-line no-console
           console.log('🔍 Repository: Erro ao buscar contas:', accountsError);
-          
+
           if (accounts && !accountsError) {
             accounts.forEach(account => {
               accountsMap[account.id] = account;
@@ -378,35 +444,44 @@ class RevenueRepository {
           if (receita.account_id && accountsMap[receita.account_id]) {
             receita.bank_account = accountsMap[receita.account_id];
             // eslint-disable-next-line no-console
-            console.log('✅ Repository: Conta mapeada para receita:', receita.id, receita.bank_account);
+            console.log(
+              '✅ Repository: Conta mapeada para receita:',
+              receita.id,
+              receita.bank_account
+            );
           } else {
             // eslint-disable-next-line no-console
-            console.log('⚠️ Repository: Receita sem account_id ou conta não encontrada:', receita.id, receita.account_id);
+            console.log(
+              '⚠️ Repository: Receita sem account_id ou conta não encontrada:',
+              receita.id,
+              receita.account_id
+            );
           }
         });
       }
 
       // eslint-disable-next-line no-console
-      console.log(`✅ Repository: ${data.length} receitas encontradas (total: ${count})`);
+      console.log(
+        `✅ Repository: ${data.length} receitas encontradas (total: ${count})`
+      );
       // eslint-disable-next-line no-console
       console.log('📊 Repository: Primeira receita com dados:', data[0]);
 
       return { data: data || [], error: null, count: count || 0 };
-
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('❌ Repository: Erro inesperado ao buscar receitas:', err);
-      return { 
-        data: [], 
+      return {
+        data: [],
         error: 'Erro inesperado ao buscar receitas. Tente novamente.',
-        count: 0
+        count: 0,
       };
     }
   }
 
   /**
    * Buscar uma receita específica por ID
-   * 
+   *
    * @param {string} id - UUID da receita
    * @returns {Promise<{data: Object|null, error: string|null}>}
    */
@@ -424,9 +499,9 @@ class RevenueRepository {
       if (error) {
         // eslint-disable-next-line no-console
         console.error('❌ Repository: Erro ao buscar receita:', error);
-        return { 
-          data: null, 
-          error: error.message || 'Receita não encontrada' 
+        return {
+          data: null,
+          error: error.message || 'Receita não encontrada',
         };
       }
 
@@ -434,20 +509,19 @@ class RevenueRepository {
       console.log('✅ Repository: Receita encontrada:', id);
 
       return { data, error: null };
-
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('❌ Repository: Erro inesperado ao buscar receita:', err);
-      return { 
-        data: null, 
-        error: 'Erro inesperado ao buscar receita. Tente novamente.' 
+      return {
+        data: null,
+        error: 'Erro inesperado ao buscar receita. Tente novamente.',
       };
     }
   }
 
   /**
    * Atualizar uma receita existente
-   * 
+   *
    * @param {string} id - UUID da receita
    * @param {Object} data - Dados atualizados (já validados pelo DTO)
    * @returns {Promise<{data: Object|null, error: string|null}>}
@@ -467,9 +541,9 @@ class RevenueRepository {
       if (error) {
         // eslint-disable-next-line no-console
         console.error('❌ Repository: Erro ao atualizar receita:', error);
-        return { 
-          data: null, 
-          error: error.message || 'Erro ao atualizar receita' 
+        return {
+          data: null,
+          error: error.message || 'Erro ao atualizar receita',
         };
       }
 
@@ -477,20 +551,22 @@ class RevenueRepository {
       console.log('✅ Repository: Receita atualizada com sucesso:', id);
 
       return { data: record, error: null };
-
     } catch (err) {
       // eslint-disable-next-line no-console
-      console.error('❌ Repository: Erro inesperado ao atualizar receita:', err);
-      return { 
-        data: null, 
-        error: 'Erro inesperado ao atualizar receita. Tente novamente.' 
+      console.error(
+        '❌ Repository: Erro inesperado ao atualizar receita:',
+        err
+      );
+      return {
+        data: null,
+        error: 'Erro inesperado ao atualizar receita. Tente novamente.',
       };
     }
   }
 
   /**
    * Deletar uma receita (soft delete - marca como inativo)
-   * 
+   *
    * @param {string} id - UUID da receita
    * @returns {Promise<{success: boolean, error: string|null}>}
    */
@@ -507,9 +583,9 @@ class RevenueRepository {
       if (error) {
         // eslint-disable-next-line no-console
         console.error('❌ Repository: Erro ao desativar receita:', error);
-        return { 
-          success: false, 
-          error: error.message || 'Erro ao desativar receita' 
+        return {
+          success: false,
+          error: error.message || 'Erro ao desativar receita',
         };
       }
 
@@ -517,13 +593,15 @@ class RevenueRepository {
       console.log('✅ Repository: Receita desativada com sucesso:', id);
 
       return { success: true, error: null };
-
     } catch (err) {
       // eslint-disable-next-line no-console
-      console.error('❌ Repository: Erro inesperado ao desativar receita:', err);
-      return { 
-        success: false, 
-        error: 'Erro inesperado ao desativar receita. Tente novamente.' 
+      console.error(
+        '❌ Repository: Erro inesperado ao desativar receita:',
+        err
+      );
+      return {
+        success: false,
+        error: 'Erro inesperado ao desativar receita. Tente novamente.',
       };
     }
   }
@@ -531,7 +609,7 @@ class RevenueRepository {
   /**
    * Deletar permanentemente uma receita (hard delete)
    * ⚠️ Use com cautela! Dados não podem ser recuperados.
-   * 
+   *
    * @param {string} id - UUID da receita
    * @returns {Promise<{success: boolean, error: string|null}>}
    */
@@ -548,9 +626,9 @@ class RevenueRepository {
       if (error) {
         // eslint-disable-next-line no-console
         console.error('❌ Repository: Erro ao deletar receita:', error);
-        return { 
-          success: false, 
-          error: error.message || 'Erro ao deletar receita' 
+        return {
+          success: false,
+          error: error.message || 'Erro ao deletar receita',
         };
       }
 
@@ -558,20 +636,19 @@ class RevenueRepository {
       console.log('✅ Repository: Receita deletada permanentemente:', id);
 
       return { success: true, error: null };
-
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('❌ Repository: Erro inesperado ao deletar receita:', err);
-      return { 
-        success: false, 
-        error: 'Erro inesperado ao deletar receita. Tente novamente.' 
+      return {
+        success: false,
+        error: 'Erro inesperado ao deletar receita. Tente novamente.',
       };
     }
   }
 
   /**
    * Contar total de receitas com filtros
-   * 
+   *
    * @param {Object} filters - Filtros de contagem
    * @returns {Promise<{count: number, error: string|null}>}
    */
@@ -606,9 +683,9 @@ class RevenueRepository {
       if (error) {
         // eslint-disable-next-line no-console
         console.error('❌ Repository: Erro ao contar receitas:', error);
-        return { 
-          count: 0, 
-          error: error.message || 'Erro ao contar receitas' 
+        return {
+          count: 0,
+          error: error.message || 'Erro ao contar receitas',
         };
       }
 
@@ -616,13 +693,12 @@ class RevenueRepository {
       console.log('✅ Repository: Total de receitas:', count);
 
       return { count: count || 0, error: null };
-
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('❌ Repository: Erro inesperado ao contar receitas:', err);
-      return { 
-        count: 0, 
-        error: 'Erro inesperado ao contar receitas. Tente novamente.' 
+      return {
+        count: 0,
+        error: 'Erro inesperado ao contar receitas. Tente novamente.',
       };
     }
   }
@@ -630,7 +706,7 @@ class RevenueRepository {
   /**
    * Buscar receitas por período (agregado)
    * Útil para dashboards e relatórios
-   * 
+   *
    * @param {Object} params
    * @param {string} params.unit_id - ID da unidade
    * @param {string} params.start_date - Data de início
@@ -640,11 +716,13 @@ class RevenueRepository {
   async getByPeriod({ unit_id, start_date, end_date }) {
     try {
       // eslint-disable-next-line no-console
-      console.log('🏦 Repository: Buscando receitas por período:', { unit_id, start_date, end_date });
+      console.log('🏦 Repository: Buscando receitas por período:', {
+        unit_id,
+        start_date,
+        end_date,
+      });
 
-      let query = supabase
-        .from(this.tableName)
-        .select('*');
+      let query = supabase.from(this.tableName).select('*');
 
       if (unit_id) {
         query = query.eq('unit_id', unit_id);
@@ -664,23 +742,31 @@ class RevenueRepository {
 
       if (error) {
         // eslint-disable-next-line no-console
-        console.error('❌ Repository: Erro ao buscar receitas por período:', error);
-        return { 
-          data: null, 
-          error: error.message || 'Erro ao buscar receitas por período' 
+        console.error(
+          '❌ Repository: Erro ao buscar receitas por período:',
+          error
+        );
+        return {
+          data: null,
+          error: error.message || 'Erro ao buscar receitas por período',
         };
       }
 
       // Calcular totais
       const total = data.reduce((sum, r) => sum + (r.value || 0), 0);
-      const totalGross = data.reduce((sum, r) => sum + (r.gross_amount || 0), 0);
+      const totalGross = data.reduce(
+        (sum, r) => sum + (r.gross_amount || 0),
+        0
+      );
       const totalNet = data.reduce((sum, r) => sum + (r.net_amount || 0), 0);
       const totalFees = data.reduce((sum, r) => sum + (r.fees || 0), 0);
 
       // eslint-disable-next-line no-console
-      console.log(`✅ Repository: ${data.length} receitas no período (Total: R$ ${total.toFixed(2)})`);
+      console.log(
+        `✅ Repository: ${data.length} receitas no período (Total: R$ ${total.toFixed(2)})`
+      );
 
-      return { 
+      return {
         data: {
           revenues: data,
           summary: {
@@ -688,18 +774,21 @@ class RevenueRepository {
             total,
             totalGross,
             totalNet,
-            totalFees
-          }
-        }, 
-        error: null 
+            totalFees,
+          },
+        },
+        error: null,
       };
-
     } catch (err) {
       // eslint-disable-next-line no-console
-      console.error('❌ Repository: Erro inesperado ao buscar receitas por período:', err);
-      return { 
-        data: null, 
-        error: 'Erro inesperado ao buscar receitas por período. Tente novamente.' 
+      console.error(
+        '❌ Repository: Erro inesperado ao buscar receitas por período:',
+        err
+      );
+      return {
+        data: null,
+        error:
+          'Erro inesperado ao buscar receitas por período. Tente novamente.',
       };
     }
   }

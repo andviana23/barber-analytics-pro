@@ -11,3 +11,4 @@ export * from './Tooltip';
 export * from './DateRangePicker';
 export * from './PartySelector';
 export * from './StatusBadge';
+export * from './ConfidenceBadge';

@@ -1,12 +1,9 @@
 {
-  "servers": {
+  "mcpServers": {
     "supabase": {
-      "type": "stdio",
-      "command": "mcp-supabase",
-      "env": {
-        "SUPABASE_URL": "https://waxpclctxaeegptihsmc.supabase.co",
-        "SUPABASE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndheHBjbGN0eGFlZWdwdGloc21jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAxODAwMDEsImV4cCI6MjA3NTc1NjAwMX0.WWxmNprv2hxRzDdYL6VjWO21dig-CeDu4xcJ4nIrP-0",
-        "SUPABASE_ACCESS_TOKEN": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndheHBjbGN0eGFlZWdwdGloc21jIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MDE4MDAwMSwiZXhwIjoyMDc1NzU2MDAxfQ.bXCgDrXOGI6a6SLT1YMnRexkgMISdyAFAh4UCf2NwsY"
+      "url": "https://mcp.supabase.com/mcp?project_ref=cwfrtqtienguzwsybvwm",
+      "headers": {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3ZnJ0cXRpZW5ndXp3c3lidndtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MDYyMjkxOCwiZXhwIjoyMDc2MTk4OTE4fQ.H006Dmx4Kwqm3UYLYnei-twxdwkaBY9OrseIb9lqUKA"
       }
     }
   }

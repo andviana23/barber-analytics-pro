@@ -22,6 +22,7 @@ export function AuthProvider({ children }) {
   const [userRole, setUserRole] = useState(null);
   const [adminStatus, setAdminStatus] = useState(false);
   const [receptionistStatus, setReceptionistStatus] = useState(false);
+  const [gerenteStatus, setGerenteStatus] = useState(false);
 
   // Timeout de segurança para loading
   useEffect(() => {
@@ -112,6 +113,7 @@ export function AuthProvider({ children }) {
           console.log('✅ Role encontrado nos metadados:', userRole);
           setUserRole(userRole);
           setAdminStatus(userRole === 'admin');
+          setGerenteStatus(userRole === 'gerente');
           setReceptionistStatus(
             userRole === 'receptionist' || userRole === 'recepcionista'
           );
@@ -148,6 +150,7 @@ export function AuthProvider({ children }) {
           );
           setUserRole(profData.role);
           setAdminStatus(profData.role === 'admin');
+          setGerenteStatus(profData.role === 'gerente');
           setReceptionistStatus(
             profData.role === 'receptionist' ||
               profData.role === 'recepcionista'
@@ -188,6 +191,7 @@ export function AuthProvider({ children }) {
           setUser(null);
           setUserRole(null);
           setAdminStatus(false);
+          setGerenteStatus(false);
           setReceptionistStatus(false);
         } else if (event === 'INITIAL_SESSION') {
           console.log('🚀 Initial session loaded');
@@ -240,6 +244,7 @@ export function AuthProvider({ children }) {
         if (userRole) {
           setUserRole(userRole);
           setAdminStatus(userRole === 'admin');
+          setGerenteStatus(userRole === 'gerente');
           setReceptionistStatus(
             userRole === 'receptionist' || userRole === 'recepcionista'
           );
@@ -435,6 +440,7 @@ export function AuthProvider({ children }) {
     isAuthenticated,
     userRole,
     adminStatus,
+    gerenteStatus,
     receptionistStatus,
 
     // Funções de autenticação

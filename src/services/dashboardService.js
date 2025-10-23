@@ -4,7 +4,6 @@ import { supabase } from './supabase';
  * Serviço para gerenciar dados do dashboard
  */
 class DashboardService {
-  
   /**
    * Busca KPIs financeiros do período atual
    * @param {string} unitId - ID da unidade (opcional)
@@ -18,7 +17,7 @@ class DashboardService {
         startDate = new Date();
         startDate.setDate(1); // Primeiro dia do mês
       }
-      
+
       if (!endDate) {
         endDate = new Date(); // Hoje
       }
@@ -42,6 +41,7 @@ class DashboardService {
       let expensesQuery = supabase
         .from('expenses')
         .select('value, date, unit_id')
+        .eq('is_active', true) // ✅ FIX: Filtrar apenas despesas ativas
         .gte('date', startDate.toISOString().split('T')[0])
         .lte('date', endDate.toISOString().split('T')[0]);
 
@@ -54,14 +54,18 @@ class DashboardService {
       if (expError) throw expError;
 
       // Calcular KPIs
-      const totalRevenue = revenues?.reduce((sum, rev) => sum + Number(rev.value), 0) || 0;
-      const totalExpenses = expenses?.reduce((sum, exp) => sum + Number(exp.value), 0) || 0;
+      const totalRevenue =
+        revenues?.reduce((sum, rev) => sum + Number(rev.value), 0) || 0;
+      const totalExpenses =
+        expenses?.reduce((sum, exp) => sum + Number(exp.value), 0) || 0;
       const netProfit = totalRevenue - totalExpenses;
-      const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
-      
+      const profitMargin =
+        totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
+
       // Contar atendimentos únicos
       const uniqueAttendances = revenues?.length || 0;
-      const averageTicket = uniqueAttendances > 0 ? totalRevenue / uniqueAttendances : 0;
+      const averageTicket =
+        uniqueAttendances > 0 ? totalRevenue / uniqueAttendances : 0;
 
       // Comparar com mês anterior
       const lastMonth = new Date(startDate);
@@ -75,9 +79,13 @@ class DashboardService {
         .gte('date', lastMonth.toISOString().split('T')[0])
         .lte('date', lastMonthEnd.toISOString().split('T')[0]);
 
-      const lastMonthRevenue = lastMonthRevenues?.reduce((sum, rev) => sum + Number(rev.value), 0) || 0;
-      const revenueGrowth = lastMonthRevenue > 0 ? 
-        ((totalRevenue - lastMonthRevenue) / lastMonthRevenue) * 100 : 0;
+      const lastMonthRevenue =
+        lastMonthRevenues?.reduce((sum, rev) => sum + Number(rev.value), 0) ||
+        0;
+      const revenueGrowth =
+        lastMonthRevenue > 0
+          ? ((totalRevenue - lastMonthRevenue) / lastMonthRevenue) * 100
+          : 0;
 
       return {
         totalRevenue,
@@ -89,10 +97,9 @@ class DashboardService {
         revenueGrowth,
         period: {
           startDate: startDate.toISOString().split('T')[0],
-          endDate: endDate.toISOString().split('T')[0]
-        }
+          endDate: endDate.toISOString().split('T')[0],
+        },
       };
-
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Erro ao buscar KPIs:', error);
@@ -122,14 +129,15 @@ class DashboardService {
 
       if (error) throw error;
 
-      return data?.map(item => ({
-        month: item.month,
-        revenues: Number(item.total_revenues || 0),
-        expenses: Number(item.total_expenses || 0),
-        profit: Number(item.net_profit || 0),
-        margin: Number(item.profit_margin || 0) * 100
-      })) || [];
-
+      return (
+        data?.map(item => ({
+          month: item.month,
+          revenues: Number(item.total_revenues || 0),
+          expenses: Number(item.total_expenses || 0),
+          profit: Number(item.net_profit || 0),
+          margin: Number(item.profit_margin || 0) * 100,
+        })) || []
+      );
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Erro ao buscar evolução mensal:', error);
@@ -146,13 +154,15 @@ class DashboardService {
     try {
       let query = supabase
         .from('professionals')
-        .select(`
+        .select(
+          `
           id,
           name,
           commission_rate,
           unit_id,
           revenues:revenues(value, date)
-        `)
+        `
+        )
         .eq('is_active', true);
 
       if (unitId) {
@@ -164,24 +174,27 @@ class DashboardService {
       if (error) throw error;
 
       // Calcular totais para cada profissional
-      const ranking = data?.map(prof => {
-        const totalRevenue = prof.revenues?.reduce((sum, rev) => sum + Number(rev.value), 0) || 0;
-        const attendances = prof.revenues?.length || 0;
-        const averageTicket = attendances > 0 ? totalRevenue / attendances : 0;
+      const ranking =
+        data?.map(prof => {
+          const totalRevenue =
+            prof.revenues?.reduce((sum, rev) => sum + Number(rev.value), 0) ||
+            0;
+          const attendances = prof.revenues?.length || 0;
+          const averageTicket =
+            attendances > 0 ? totalRevenue / attendances : 0;
 
-        return {
-          id: prof.id,
-          name: prof.name,
-          totalRevenue,
-          attendances,
-          averageTicket,
-          commissionRate: prof.commission_rate
-        };
-      }) || [];
+          return {
+            id: prof.id,
+            name: prof.name,
+            totalRevenue,
+            attendances,
+            averageTicket,
+            commissionRate: prof.commission_rate,
+          };
+        }) || [];
 
       // Ordenar por faturamento
       return ranking.sort((a, b) => b.totalRevenue - a.totalRevenue);
-
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Erro ao buscar ranking:', error);
@@ -208,12 +221,11 @@ class DashboardService {
         comparison.push({
           unitId: unit.id,
           unitName: unit.name,
-          ...kpis
+          ...kpis,
         });
       }
 
       return comparison;
-
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Erro ao buscar comparativo:', error);
@@ -227,9 +239,7 @@ class DashboardService {
    */
   async getRevenueDistribution(unitId = null) {
     try {
-      let query = supabase
-        .from('revenues')
-        .select('type, value');
+      let query = supabase.from('revenues').select('type, value');
 
       if (unitId) {
         query = query.eq('unit_id', unitId);
@@ -241,7 +251,7 @@ class DashboardService {
 
       // Agrupar por tipo
       const distribution = {};
-      
+
       data?.forEach(revenue => {
         const type = revenue.type || 'outros';
         distribution[type] = (distribution[type] || 0) + Number(revenue.value);
@@ -250,9 +260,8 @@ class DashboardService {
       return Object.entries(distribution).map(([type, value]) => ({
         name: type,
         value: value,
-        percentage: 0 // Será calculado no frontend
+        percentage: 0, // Será calculado no frontend
       }));
-
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Erro ao buscar distribuição:', error);
@@ -269,14 +278,16 @@ class DashboardService {
     try {
       let query = supabase
         .from('bookings')
-        .select(`
+        .select(
+          `
           id,
           service_type,
           service_value,
           date,
           professional:professionals(name),
           unit:units(name)
-        `)
+        `
+        )
         .order('date', { ascending: false });
 
       if (unitId) {
@@ -287,15 +298,16 @@ class DashboardService {
 
       if (error) throw error;
 
-      return data?.map(booking => ({
-        id: booking.id,
-        service: booking.service_type,
-        value: Number(booking.service_value),
-        date: booking.date,
-        professional: booking.professional?.name || 'N/A',
-        unit: booking.unit?.name || 'N/A'
-      })) || [];
-
+      return (
+        data?.map(booking => ({
+          id: booking.id,
+          service: booking.service_type,
+          value: Number(booking.service_value),
+          date: booking.date,
+          professional: booking.professional?.name || 'N/A',
+          unit: booking.unit?.name || 'N/A',
+        })) || []
+      );
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Erro ao buscar agendamentos:', error);

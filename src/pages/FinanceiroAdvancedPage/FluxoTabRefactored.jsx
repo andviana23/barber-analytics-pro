@@ -5,6 +5,7 @@ import {
   addMonths,
   startOfMonth,
   endOfMonth,
+  subDays,
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import {
@@ -17,35 +18,54 @@ import {
   RefreshCw,
   Download,
   Filter,
+  FileSpreadsheet,
+  FileText,
+  Loader2,
 } from 'lucide-react';
+
+// Services
+import fluxoExportService from '../../services/fluxoExportService';
 
 // Custom Hooks
 import { useCashflowData } from '../../hooks/useCashflowData';
+import useCashflowTimeline from '../../hooks/useCashflowTimeline';
+import { useToast } from '../../context/ToastContext';
 import { supabase } from '../../services/supabase';
 
 // Components
 import DateRangePicker from '../../atoms/DateRangePicker/DateRangePicker';
+import { CashflowTimelineChart } from '../../molecules/CashflowTimelineChart';
 
 /**
- * Tab do Fluxo de Caixa - Refatorado
+ * 📊 Tab do Fluxo de Caixa - 100% REFATORADO COM DESIGN SYSTEM
  *
  * Features:
- * - Tabela de fluxo diário (PAGO/EM ABERTO)
- * - KPIs principais (Mês Atual, 12 meses, Margem)
- * - Gráfico de linha da evolução
- * - Gráficos de pizza (Receitas/Despesas)
- * - Análise completa de entradas/saídas
+ * - ✅ Design System completo aplicado
+ * - ✅ Tabela de fluxo diário consolidado (PAGO/EM ABERTO)
+ * - ✅ KPIs principais com gradientes temáticos
+ * - ✅ Gráfico de linha da evolução (12 meses)
+ * - ✅ Gráficos de pizza (Receitas/Despesas)
+ * - ✅ Análise completa de entradas/saídas
+ * - ✅ UI ultra moderna com hover effects
+ * - ✅ Dark mode completo
  */
 const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
-  // Estados principais
-  const [dateRange, setDateRange] = useState(() => {
-    const endDate = new Date();
-    const startDate = subMonths(endDate, 2);
+  const { showToast } = useToast();
+  const [exporting, setExporting] = useState(false);
+
+  // 📅 Estado do mês selecionado (formato: YYYY-MM)
+  // ✅ Removido: Sempre mostraremos apenas o mês vigente
+
+  // ✅ SEMPRE MOSTRAR APENAS O MÊS VIGENTE (MÊS ATUAL)
+  const dateRange = useMemo(() => {
+    const today = new Date();
+    const startDate = startOfMonth(today);
+    const endDate = endOfMonth(today);
     return {
       startDate: format(startDate, 'yyyy-MM-dd'),
       endDate: format(endDate, 'yyyy-MM-dd'),
     };
-  });
+  }, []); // ✅ Sempre o mês atual, sem dependências
 
   const [cashflowData, setCashflowData] = useState({
     daily: [],
@@ -73,6 +93,71 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
     globalFilters.accountId
   );
 
+  // Hook para dados históricos do timeline
+  const {
+    data: timelineData,
+    loading: timelineLoading,
+    error: timelineError,
+    refetch: refetchTimeline,
+  } = useCashflowTimeline(globalFilters.unitId, 12);
+
+  // ✅ Buscar saldo final do mês anterior
+  const fetchPreviousMonthBalance = async () => {
+    if (!globalFilters.unitId) return 0;
+
+    try {
+      const today = new Date();
+      const previousMonth = subMonths(today, 1);
+      const startOfPreviousMonth = startOfMonth(previousMonth);
+      const endOfPreviousMonth = endOfMonth(previousMonth);
+
+      console.log('📊 Buscando saldo do mês anterior:', {
+        start: format(startOfPreviousMonth, 'yyyy-MM-dd'),
+        end: format(endOfPreviousMonth, 'yyyy-MM-dd'),
+      });
+
+      // Buscar receitas do mês anterior
+      const { data: prevRevenues } = await supabase
+        .from('revenues')
+        .select('value, status, date, expected_receipt_date')
+        .eq('unit_id', globalFilters.unitId)
+        .eq('is_active', true)
+        .gte('date', format(startOfPreviousMonth, 'yyyy-MM-dd'))
+        .lte('date', format(endOfPreviousMonth, 'yyyy-MM-dd'));
+
+      // Buscar despesas do mês anterior
+      const { data: prevExpenses } = await supabase
+        .from('expenses')
+        .select('value, status, date, expected_payment_date')
+        .eq('unit_id', globalFilters.unitId)
+        .eq('is_active', true)
+        .gte('date', format(startOfPreviousMonth, 'yyyy-MM-dd'))
+        .lte('date', format(endOfPreviousMonth, 'yyyy-MM-dd'));
+
+      // Calcular saldo do mês anterior
+      const totalRevenues = (prevRevenues || []).reduce(
+        (sum, r) => sum + (r.value || 0),
+        0
+      );
+      const totalExpenses = (prevExpenses || []).reduce(
+        (sum, e) => sum + (e.value || 0),
+        0
+      );
+      const previousBalance = totalRevenues - totalExpenses;
+
+      console.log('📊 Saldo do mês anterior calculado:', {
+        receitas: totalRevenues,
+        despesas: totalExpenses,
+        saldo: previousBalance,
+      });
+
+      return previousBalance;
+    } catch (error) {
+      console.error('❌ Erro ao buscar saldo do mês anterior:', error);
+      return 0;
+    }
+  };
+
   // Buscar dados completos do fluxo de caixa
   const fetchCompleteCashflowData = async () => {
     if (!globalFilters.unitId) return;
@@ -83,8 +168,11 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
 
       console.log('🔄 Buscando dados completos do fluxo de caixa...');
 
-      // 1. Buscar receitas (entradas)
-      const { data: revenues, error: revenuesError } = await supabase
+      // ✅ Buscar saldo inicial do mês anterior
+      const saldoInicial = await fetchPreviousMonthBalance();
+
+      // 1. Buscar receitas PAGAS (por date = Data Pgto)
+      const { data: paidRevenues, error: paidRevenuesError } = await supabase
         .from('revenues')
         .select(
           `
@@ -94,14 +182,37 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
         `
         )
         .eq('unit_id', globalFilters.unitId)
+        .eq('status', 'Received')
+        .eq('is_active', true)
         .gte('date', dateRange.startDate)
         .lte('date', dateRange.endDate)
         .order('date');
 
-      if (revenuesError) throw revenuesError;
+      if (paidRevenuesError) throw paidRevenuesError;
 
-      // 2. Buscar despesas (saídas)
-      const { data: expenses, error: expensesError } = await supabase
+      // 2. Buscar receitas PENDENTES - BUSCAR TODAS E FILTRAR DEPOIS
+      const { data: pendingRevenues, error: pendingRevenuesError } =
+        await supabase
+          .from('revenues')
+          .select(
+            `
+          *,
+          category:categories(id, name, category_type),
+          party:parties(id, nome)
+        `
+          )
+          .eq('unit_id', globalFilters.unitId)
+          .eq('status', 'Pending')
+          .eq('is_active', true)
+          .order('expected_receipt_date');
+
+      if (pendingRevenuesError) throw pendingRevenuesError;
+
+      // Combinar receitas pagas e pendentes
+      const revenues = [...(paidRevenues || []), ...(pendingRevenues || [])];
+
+      // 3. Buscar despesas PAGAS (por date = Data Pgto)
+      const { data: paidExpenses, error: paidExpensesError } = await supabase
         .from('expenses')
         .select(
           `
@@ -111,14 +222,43 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
         `
         )
         .eq('unit_id', globalFilters.unitId)
+        .eq('status', 'Paid')
+        .eq('is_active', true)
         .gte('date', dateRange.startDate)
         .lte('date', dateRange.endDate)
         .order('date');
 
-      if (expensesError) throw expensesError;
+      if (paidExpensesError) throw paidExpensesError;
 
-      // 3. Processar dados diários
-      const dailyData = processDailyData(revenues || [], expenses || []);
+      // 4. Buscar despesas PENDENTES (por expected_payment_date = Prev. Pgto)
+      // 4. Buscar despesas PENDENTES - BUSCAR TODAS E FILTRAR DEPOIS
+      const { data: pendingExpenses, error: pendingExpensesError } =
+        await supabase
+          .from('expenses')
+          .select(
+            `
+          *,
+          category:categories(id, name, category_type),
+          party:parties(id, nome)
+        `
+          )
+          .eq('unit_id', globalFilters.unitId)
+          .eq('status', 'Pending')
+          .eq('is_active', true)
+          .order('expected_payment_date');
+
+      if (pendingExpensesError) throw pendingExpensesError;
+
+      // Combinar despesas pagas e pendentes
+      const expenses = [...(paidExpenses || []), ...(pendingExpenses || [])];
+
+      // 3. Processar dados diários com saldo inicial
+      const dailyData = processDailyData(
+        revenues || [],
+        expenses || [],
+        saldoInicial,
+        dateRange
+      );
 
       // 4. Separar PAGO vs EM ABERTO
       const { paid, pending } = separatePaidPending(dailyData);
@@ -157,123 +297,198 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
     }
   };
 
-  // Processar dados diários
-  const processDailyData = (revenues, expenses) => {
+  // Processar dados diários - LÓGICA MELHORADA COM SEPARAÇÃO CLARA E SALDO INICIAL
+  const processDailyData = (
+    revenues,
+    expenses,
+    saldoInicial = 0,
+    dateRange
+  ) => {
     const dailyMap = new Map();
 
-    // Processar receitas
+    // ✅ PREENCHER TODOS OS DIAS DO MÊS SELECIONADO
+    const startDate = new Date(dateRange.startDate);
+    const endDate = new Date(dateRange.endDate);
+
+    // Criar entrada para cada dia do mês
+    for (
+      let d = new Date(startDate);
+      d <= endDate;
+      d.setDate(d.getDate() + 1)
+    ) {
+      const dateKey = format(d, 'yyyy-MM-dd');
+      dailyMap.set(dateKey, {
+        date: dateKey,
+        // ✅ SEPARAÇÃO CLARA: RECEBIDAS vs PENDENTES
+        received_inflows: 0,
+        pending_inflows: 0,
+        total_inflows: 0,
+        // ✅ SEPARAÇÃO CLARA: PAGAS vs PENDENTES
+        paid_outflows: 0,
+        pending_outflows: 0,
+        total_outflows: 0,
+        // ✅ SALDOS CALCULADOS
+        dailyBalance: 0,
+        accumulatedBalance: 0,
+        // ✅ CONTAGEM DE TRANSAÇÕES
+        transaction_count: 0,
+        // ✅ DETALHES PARA AUDITORIA
+        revenues: { received: [], pending: [] },
+        expenses: { paid: [], pending: [] },
+      });
+    }
+
+    // ✅ PROCESSAR RECEITAS COM SEPARAÇÃO POR STATUS - APENAS MÊS VIGENTE
     revenues.forEach(revenue => {
-      const date = format(new Date(revenue.date), 'yyyy-MM-dd');
-      if (!dailyMap.has(date)) {
-        dailyMap.set(date, {
-          date,
-          inflows: 0,
-          outflows: 0,
-          dailyBalance: 0,
-          accumulatedBalance: 0,
-          revenues: [],
-          expenses: [],
-        });
+      let date;
+      let category;
+
+      if (revenue.status === 'Received') {
+        date = format(new Date(revenue.date), 'yyyy-MM-dd');
+        category = 'received';
+      } else {
+        date = format(
+          new Date(revenue.expected_receipt_date || revenue.date),
+          'yyyy-MM-dd'
+        );
+        category = 'pending';
       }
 
-      const dayData = dailyMap.get(date);
-      dayData.inflows += revenue.value || 0;
-      dayData.revenues.push(revenue);
+      // ✅ FILTRAR APENAS DATAS DO MÊS VIGENTE - VALIDAÇÃO RIGOROSA
+      const revenueDate = new Date(date);
+      const filterStartDate = new Date(dateRange.startDate);
+      const filterEndDate = new Date(dateRange.endDate);
+
+      if (
+        revenueDate >= filterStartDate &&
+        revenueDate <= filterEndDate &&
+        dailyMap.has(date)
+      ) {
+        const dayData = dailyMap.get(date);
+
+        if (category === 'received') {
+          dayData.received_inflows += revenue.value || 0;
+          dayData.revenues.received.push(revenue);
+        } else {
+          dayData.pending_inflows += revenue.value || 0;
+          dayData.revenues.pending.push(revenue);
+        }
+
+        dayData.transaction_count++;
+      } else {
+        console.log('🚫 Receita filtrada fora do mês vigente:', {
+          revenueId: revenue.id,
+          date: date,
+          expectedDate: revenue.expected_receipt_date,
+          status: revenue.status,
+          monthRange: `${dateRange.startDate} - ${dateRange.endDate}`,
+        });
+      }
     });
 
-    // Processar despesas
+    // ✅ PROCESSAR DESPESAS COM SEPARAÇÃO POR STATUS - APENAS MÊS VIGENTE
     expenses.forEach(expense => {
-      const date = format(new Date(expense.date), 'yyyy-MM-dd');
-      if (!dailyMap.has(date)) {
-        dailyMap.set(date, {
-          date,
-          inflows: 0,
-          outflows: 0,
-          dailyBalance: 0,
-          accumulatedBalance: 0,
-          revenues: [],
-          expenses: [],
-        });
+      let date;
+      let category;
+
+      if (expense.status === 'Paid') {
+        date = format(new Date(expense.date), 'yyyy-MM-dd');
+        category = 'paid';
+      } else {
+        date = format(
+          new Date(expense.expected_payment_date || expense.date),
+          'yyyy-MM-dd'
+        );
+        category = 'pending';
       }
 
-      const dayData = dailyMap.get(date);
-      dayData.outflows += expense.value || 0;
-      dayData.expenses.push(expense);
+      // ✅ FILTRAR APENAS DATAS DO MÊS VIGENTE - VALIDAÇÃO RIGOROSA
+      const expenseDate = new Date(date);
+      const filterStartDate = new Date(dateRange.startDate);
+      const filterEndDate = new Date(dateRange.endDate);
+
+      if (
+        expenseDate >= filterStartDate &&
+        expenseDate <= filterEndDate &&
+        dailyMap.has(date)
+      ) {
+        const dayData = dailyMap.get(date);
+
+        if (category === 'paid') {
+          dayData.paid_outflows += expense.value || 0;
+          dayData.expenses.paid.push(expense);
+        } else {
+          dayData.pending_outflows += expense.value || 0;
+          dayData.expenses.pending.push(expense);
+        }
+
+        dayData.transaction_count++;
+      } else {
+        console.log('🚫 Despesa filtrada fora do mês vigente:', {
+          expenseId: expense.id,
+          date: date,
+          expectedDate: expense.expected_payment_date,
+          status: expense.status,
+          monthRange: `${dateRange.startDate} - ${dateRange.endDate}`,
+        });
+      }
     });
 
-    // Calcular saldos
+    // ✅ CALCULAR TOTAIS E SALDOS - ORDENADO POR DATA COM SALDO INICIAL
     const sortedDates = Array.from(dailyMap.keys()).sort();
-    let accumulatedBalance = 0;
+    let accumulatedBalance = saldoInicial; // ✅ Começar com saldo inicial
 
-    return sortedDates.map(date => {
+    const result = sortedDates.map((date, index) => {
       const dayData = dailyMap.get(date);
-      dayData.dailyBalance = dayData.inflows - dayData.outflows;
+
+      // Calcular totais
+      dayData.total_inflows =
+        dayData.received_inflows + dayData.pending_inflows;
+      dayData.total_outflows = dayData.paid_outflows + dayData.pending_outflows;
+
+      // Calcular saldo do dia
+      dayData.dailyBalance = dayData.total_inflows - dayData.total_outflows;
+
+      // Calcular acumulado
       dayData.accumulatedBalance = accumulatedBalance + dayData.dailyBalance;
       accumulatedBalance = dayData.accumulatedBalance;
 
       return {
         ...dayData,
-        dayNumber: sortedDates.indexOf(date) + 1,
+        dayNumber: index + 1,
       };
     });
+
+    // ✅ ADICIONAR LINHA DE SALDO INICIAL NO INÍCIO
+    const saldoInicialRow = {
+      date: format(subDays(new Date(dateRange.startDate), 1), 'yyyy-MM-dd'),
+      isSaldoInicial: true,
+      received_inflows: 0,
+      pending_inflows: 0,
+      total_inflows: 0,
+      paid_outflows: 0,
+      pending_outflows: 0,
+      total_outflows: 0,
+      dailyBalance: 0,
+      accumulatedBalance: saldoInicial,
+      transaction_count: 0,
+      revenues: { received: [], pending: [] },
+      expenses: { paid: [], pending: [] },
+      dayNumber: 0,
+    };
+
+    return [saldoInicialRow, ...result];
   };
 
-  // Separar PAGO vs EM ABERTO
+  // ✅ FUNÇÃO SIMPLIFICADA - AGORA USAMOS APENAS OS DADOS CONSOLIDADOS
   const separatePaidPending = dailyData => {
-    const paid = [];
-    const pending = [];
-
-    dailyData.forEach(day => {
-      // Receitas pagas (status = 'Received')
-      const paidRevenues = day.revenues.filter(r => r.status === 'Received');
-      const pendingRevenues = day.revenues.filter(r => r.status !== 'Received');
-
-      // Despesas pagas (status = 'Paid')
-      const paidExpenses = day.expenses.filter(e => e.status === 'Paid');
-      const pendingExpenses = day.expenses.filter(e => e.status !== 'Paid');
-
-      // Calcular totais pagos
-      const paidInflows = paidRevenues.reduce(
-        (sum, r) => sum + (r.value || 0),
-        0
-      );
-      const paidOutflows = paidExpenses.reduce(
-        (sum, e) => sum + (e.value || 0),
-        0
-      );
-      const paidBalance = paidInflows - paidOutflows;
-
-      // Calcular totais em aberto
-      const pendingInflows = pendingRevenues.reduce(
-        (sum, r) => sum + (r.value || 0),
-        0
-      );
-      const pendingOutflows = pendingExpenses.reduce(
-        (sum, e) => sum + (e.value || 0),
-        0
-      );
-      const pendingBalance = pendingInflows - pendingOutflows;
-
-      paid.push({
-        ...day,
-        inflows: paidInflows,
-        outflows: paidOutflows,
-        dailyBalance: paidBalance,
-        revenues: paidRevenues,
-        expenses: paidExpenses,
-      });
-
-      pending.push({
-        ...day,
-        inflows: pendingInflows,
-        outflows: pendingOutflows,
-        dailyBalance: pendingBalance,
-        revenues: pendingRevenues,
-        expenses: pendingExpenses,
-      });
-    });
-
-    return { paid, pending };
+    // Como agora temos uma tabela única consolidada,
+    // esta função apenas retorna os dados já processados
+    return {
+      paid: dailyData, // Mesmos dados para ambos
+      pending: dailyData, // pois já estão separados por status
+      daily: dailyData, // Dados consolidados para a nova tabela
+    };
   };
 
   // Calcular KPIs
@@ -388,8 +603,16 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
       .sort((a, b) => b.value - a.value);
   };
 
-  // Carregar dados ao montar e quando mudar filtros
+  // Atualizar dateRange quando o mês selecionado mudar
+  // ✅ Removido: Sempre usa o mês vigente automaticamente
+
+  // ✅ Carregar dados do mês vigente automaticamente
   useEffect(() => {
+    console.log('🔄 FluxoTab: Recarregando dados do mês vigente...', {
+      startDate: dateRange.startDate,
+      endDate: dateRange.endDate,
+      unitId: globalFilters.unitId,
+    });
     fetchCompleteCashflowData();
   }, [globalFilters.unitId, dateRange]);
 
@@ -408,9 +631,52 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
     refetch();
   };
 
-  const handleExport = () => {
-    // TODO: Implementar exportação
-    console.log('Exportar dados do fluxo de caixa');
+  const handleExport = async format => {
+    const dataToExport = cashflowData.daily || [];
+
+    if (dataToExport.length === 0) {
+      showToast('Não há dados para exportar', 'warning');
+      return;
+    }
+
+    setExporting(true);
+    try {
+      const filters = {
+        periodo: {
+          tipo: 'custom',
+          dataInicio: dateRange.startDate,
+          dataFim: dateRange.endDate,
+        },
+      };
+
+      let result;
+      switch (format) {
+        case 'csv':
+          result = fluxoExportService.exportAsCSV(dataToExport, filters);
+          break;
+        case 'excel':
+          result = fluxoExportService.exportAsExcel(dataToExport, filters);
+          break;
+        case 'pdf':
+          result = fluxoExportService.exportAsPDF(dataToExport, filters);
+          break;
+        default:
+          throw new Error('Formato não suportado');
+      }
+
+      if (result.success) {
+        showToast(
+          `Relatório exportado como ${format.toUpperCase()}`,
+          'success'
+        );
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      showToast(`Erro ao exportar: ${error.message}`, 'error');
+    } finally {
+      setExporting(false);
+    }
   };
 
   // Formatação de moeda
@@ -439,31 +705,28 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <RefreshCw className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">
-            Carregando fluxo de caixa...
-          </p>
-        </div>
+      <div className="flex flex-col items-center justify-center py-24">
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="text-theme-secondary font-medium">
+          Carregando fluxo de caixa...
+        </p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center py-12">
-        <div className="text-red-600 dark:text-red-400 mb-4">
-          <TrendingDown className="w-12 h-12 mx-auto" />
-        </div>
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+      <div className="flex flex-col items-center justify-center py-24">
+        <TrendingDown className="w-16 h-16 text-red-400 mb-4" />
+        <h3 className="text-xl font-semibold text-theme-primary mb-2">
           Erro ao carregar dados
         </h3>
-        <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
+        <p className="text-theme-secondary mb-6">{error}</p>
         <button
           onClick={handleRefresh}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="btn-theme-primary px-6 py-3 rounded-xl flex items-center gap-2"
         >
+          <RefreshCw className="w-5 h-5" />
           Tentar Novamente
         </button>
       </div>
@@ -472,326 +735,330 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
 
   return (
     <div className="space-y-6">
-      {/* Header com controles */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <BarChart3 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+      {/* 📊 Header com Controles - DESIGN SYSTEM */}
+      <div className="card-theme rounded-xl p-6">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl">
+              <BarChart3 className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-theme-primary">
                 Fluxo de Caixa
               </h2>
+              <p className="text-sm text-theme-secondary">
+                Visão consolidada do mês vigente
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center space-x-3">
-            <DateRangePicker
-              startDate={dateRange.startDate}
-              endDate={dateRange.endDate}
-              onChange={handleDateRangeChange}
-            />
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Mês Vigente Badge */}
+            <div className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/30 dark:to-violet-900/30 rounded-xl border-2 border-purple-200 dark:border-purple-800">
+              <Calendar className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              <span className="text-sm font-semibold text-purple-700 dark:text-purple-300">
+                {format(new Date(), 'MMMM/yyyy', { locale: ptBR })}
+              </span>
+            </div>
 
+            {/* Botão Atualizar */}
             <button
               onClick={handleRefresh}
-              className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
+              className="p-2.5 text-theme-secondary hover:text-theme-primary hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all"
+              title="Atualizar"
             >
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Atualizar
+              <RefreshCw className="w-5 h-5" />
+            </button>
+
+            {/* Botões de Exportação */}
+            <button
+              onClick={() => handleExport('csv')}
+              disabled={
+                exporting ||
+                !cashflowData.daily ||
+                cashflowData.daily.length === 0
+              }
+              className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-theme-secondary border-2 border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-theme-primary transition-all disabled:opacity-50"
+              title="Exportar CSV"
+            >
+              {exporting ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <FileText className="w-4 h-4" />
+              )}
+              <span className="hidden sm:inline">CSV</span>
             </button>
 
             <button
-              onClick={handleExport}
-              className="flex items-center px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700"
+              onClick={() => handleExport('excel')}
+              disabled={
+                exporting ||
+                !cashflowData.daily ||
+                cashflowData.daily.length === 0
+              }
+              className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-theme-secondary border-2 border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-theme-primary transition-all disabled:opacity-50"
+              title="Exportar Excel"
             >
-              <Download className="w-4 h-4 mr-2" />
-              Exportar
+              {exporting ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <FileSpreadsheet className="w-4 h-4" />
+              )}
+              <span className="hidden sm:inline">Excel</span>
+            </button>
+
+            <button
+              onClick={() => handleExport('pdf')}
+              disabled={
+                exporting ||
+                !cashflowData.daily ||
+                cashflowData.daily.length === 0
+              }
+              className="btn-theme-primary px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+              title="Exportar PDF"
+            >
+              {exporting ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Download className="w-4 h-4" />
+              )}
+              PDF
             </button>
           </div>
         </div>
       </div>
 
-      {/* KPIs Principais */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Mês Atual */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Mês Atual: {cashflowData.kpis.currentMonth?.month}
-              </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {formatCurrency(cashflowData.kpis.currentMonth?.result || 0)}
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-500">
-                Resultado
-              </p>
-            </div>
-            <div className="flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-              <TrendingUp className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-            </div>
+      {/* 📈 Timeline de 12 Meses - DESIGN SYSTEM */}
+      <div className="card-theme rounded-xl p-6 border-2 border-transparent hover:border-purple-300 dark:hover:border-purple-700 transition-all duration-300">
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2.5 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl shadow-lg">
+            <TrendingUp className="w-5 h-5 text-white" />
           </div>
-
-          <div className="mt-4 space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-green-600 dark:text-green-400">
-                Entradas:
-              </span>
-              <span className="font-medium">
-                {formatCurrency(cashflowData.kpis.currentMonth?.revenues || 0)}
-              </span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-red-600 dark:text-red-400">Saídas:</span>
-              <span className="font-medium">
-                {formatCurrency(cashflowData.kpis.currentMonth?.expenses || 0)}
-              </span>
-            </div>
+          <div>
+            <h3 className="text-lg font-bold text-theme-primary">
+              Timeline dos Últimos 12 Meses
+            </h3>
+            <p className="text-sm text-theme-secondary">
+              Evolução histórica do fluxo de caixa
+            </p>
           </div>
         </div>
 
-        {/* Últimos 12 Meses */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Últimos 12 Meses
-              </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {formatCurrency(cashflowData.kpis.last12Months?.result || 0)}
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-500">
-                Resultado Total
-              </p>
-            </div>
-            <div className="flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg">
-              <DollarSign className="w-6 h-6 text-green-600 dark:text-green-400" />
-            </div>
-          </div>
+        {/* Chart Component */}
+        <CashflowTimelineChart
+          data={timelineData}
+          loading={timelineLoading}
+          error={timelineError}
+          title="Evolução do Fluxo de Caixa"
+          height={400}
+          onRefresh={refetchTimeline}
+          onExport={handleExport}
+        />
+      </div>
 
-          <div className="mt-4">
-            <div className="flex justify-between text-sm mb-2">
-              <span className="text-gray-600 dark:text-gray-400">Margem:</span>
-              <span className="font-medium text-green-600 dark:text-green-400">
-                {cashflowData.kpis.last12Months?.profitMargin?.toFixed(1) || 0}%
-              </span>
+      {/* 📊 Tabela Consolidada: ACUMULADO - DESIGN SYSTEM */}
+      <div className="card-theme rounded-xl overflow-hidden">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 px-6 py-4 border-b-2 border-gray-200 dark:border-gray-600">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-lg">
+              <DollarSign className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             </div>
+            <h3 className="text-lg font-bold text-theme-primary">
+              Fluxo Diário Consolidado
+            </h3>
           </div>
         </div>
 
-        {/* Total Entradas */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Total Entradas
-              </p>
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                {formatCurrency(cashflowData.kpis.last12Months?.revenues || 0)}
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-500">
-                Últimos 12 meses
-              </p>
-            </div>
-            <div className="flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg">
-              <TrendingUp className="w-6 h-6 text-green-600 dark:text-green-400" />
-            </div>
-          </div>
-        </div>
+        {/* Tabela */}
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 border-b-2 border-gray-200 dark:border-gray-600">
+              <tr>
+                <th className="px-6 py-4 text-left text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                  Data
+                </th>
+                <th className="px-6 py-4 text-right text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                  Entradas
+                </th>
+                <th className="px-6 py-4 text-right text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                  Saídas
+                </th>
+                <th className="px-6 py-4 text-right text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                  Saldo do Dia
+                </th>
+                <th className="px-6 py-4 text-right text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                  Acumulado
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+              {cashflowData.daily.map((day, index) => {
+                const isWeekend = [0, 6].includes(new Date(day.date).getDay());
+                const totalInflows = day.received_inflows + day.pending_inflows;
+                const totalOutflows = day.paid_outflows + day.pending_outflows;
+                const isSaldoInicial = day.isSaldoInicial;
 
-        {/* Total Saídas */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Total Saídas
-              </p>
-              <p className="text-2xl font-bold text-red-600 dark:text-red-400">
-                {formatCurrency(cashflowData.kpis.last12Months?.expenses || 0)}
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-500">
-                Últimos 12 meses
-              </p>
-            </div>
-            <div className="flex items-center justify-center w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg">
-              <TrendingDown className="w-6 h-6 text-red-600 dark:text-red-400" />
-            </div>
-          </div>
+                return (
+                  <tr
+                    key={day.date}
+                    className={`group transition-all duration-200 ${
+                      isSaldoInicial
+                        ? 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-900/30 dark:hover:to-indigo-900/30'
+                        : isWeekend
+                          ? 'bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-indigo-50/30 dark:hover:from-blue-900/10 dark:hover:to-indigo-900/10'
+                          : 'hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/50 dark:hover:from-blue-900/10 dark:hover:to-indigo-900/10'
+                    }`}
+                  >
+                    {/* Data */}
+                    <td className="px-6 py-4">
+                      {isSaldoInicial ? (
+                        <div className="flex items-center gap-2">
+                          <div className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                            <TrendingUp className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                          </div>
+                          <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
+                            SALDO INICIAL
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm font-semibold text-theme-primary">
+                            {format(new Date(day.date), 'dd/MM', {
+                              locale: ptBR,
+                            })}
+                          </span>
+                          {isWeekend && (
+                            <span className="px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 text-xs font-semibold rounded-full">
+                              {format(new Date(day.date), 'EEE', {
+                                locale: ptBR,
+                              }).toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </td>
+
+                    {/* Entradas */}
+                    <td className="px-6 py-4 text-right">
+                      {isSaldoInicial ? (
+                        <span className="text-sm text-theme-secondary">-</span>
+                      ) : totalInflows > 0 ? (
+                        <span className="text-sm font-semibold text-green-600 dark:text-green-400">
+                          {formatCurrency(totalInflows)}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-theme-secondary">-</span>
+                      )}
+                    </td>
+
+                    {/* Saídas */}
+                    <td className="px-6 py-4 text-right">
+                      {isSaldoInicial ? (
+                        <span className="text-sm text-theme-secondary">-</span>
+                      ) : totalOutflows > 0 ? (
+                        <span className="text-sm font-semibold text-red-600 dark:text-red-400">
+                          {formatCurrency(totalOutflows)}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-theme-secondary">-</span>
+                      )}
+                    </td>
+
+                    {/* Saldo do Dia */}
+                    <td className="px-6 py-4 text-right">
+                      {isSaldoInicial ? (
+                        <span className="text-sm text-theme-secondary">-</span>
+                      ) : (
+                        <span
+                          className={`text-sm font-bold ${
+                            day.dailyBalance >= 0
+                              ? 'text-green-600 dark:text-green-400'
+                              : 'text-red-600 dark:text-red-400'
+                          }`}
+                        >
+                          {formatCurrency(day.dailyBalance)}
+                        </span>
+                      )}
+                    </td>
+
+                    {/* Acumulado */}
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <span
+                          className={`text-base font-bold ${
+                            day.accumulatedBalance >= 0
+                              ? 'text-blue-600 dark:text-blue-400'
+                              : 'text-orange-600 dark:text-orange-400'
+                          }`}
+                        >
+                          {formatCurrency(day.accumulatedBalance)}
+                        </span>
+                        {day.accumulatedBalance >= 0 ? (
+                          <TrendingUp className="w-4 h-4 text-blue-500 dark:text-blue-400 opacity-60" />
+                        ) : (
+                          <TrendingDown className="w-4 h-4 text-orange-500 dark:text-orange-400 opacity-60" />
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       </div>
 
-      {/* Tabelas de Fluxo Diário */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* PAGO */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              PAGO
-            </h3>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <thead className="bg-gray-50 dark:bg-gray-900">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                    Dia
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                    Entradas
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                    Saídas
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                    Saldo do Dia
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                    Acumulado
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                {cashflowData.paid.slice(0, 10).map((day, index) => (
-                  <tr
-                    key={day.date}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700"
-                  >
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
-                      {format(new Date(day.date), 'dd/MM', { locale: ptBR })}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                      {day.inflows > 0 ? formatCurrency(day.inflows) : '-'}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                      {day.outflows > 0 ? formatCurrency(day.outflows) : '-'}
-                    </td>
-                    <td
-                      className={`px-4 py-3 text-sm font-medium ${
-                        day.dailyBalance >= 0
-                          ? 'text-green-600 dark:text-green-400'
-                          : 'text-red-600 dark:text-red-400'
-                      }`}
-                    >
-                      {formatCurrency(day.dailyBalance)}
-                    </td>
-                    <td
-                      className={`px-4 py-3 text-sm font-medium ${
-                        day.accumulatedBalance >= 0
-                          ? 'text-green-600 dark:text-green-400'
-                          : 'text-red-600 dark:text-red-400'
-                      }`}
-                    >
-                      {formatCurrency(day.accumulatedBalance)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* EM ABERTO */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              EM ABERTO
-            </h3>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <thead className="bg-gray-50 dark:bg-gray-900">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                    Dia
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                    Entradas
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                    Saídas
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                    Saldo do Dia
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                    Acumulado
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                {cashflowData.pending.slice(0, 10).map((day, index) => (
-                  <tr
-                    key={day.date}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700"
-                  >
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
-                      {format(new Date(day.date), 'dd/MM', { locale: ptBR })}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                      {day.inflows > 0 ? formatCurrency(day.inflows) : '-'}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                      {day.outflows > 0 ? formatCurrency(day.outflows) : '-'}
-                    </td>
-                    <td
-                      className={`px-4 py-3 text-sm font-medium ${
-                        day.dailyBalance >= 0
-                          ? 'text-green-600 dark:text-green-400'
-                          : 'text-red-600 dark:text-red-400'
-                      }`}
-                    >
-                      {formatCurrency(day.dailyBalance)}
-                    </td>
-                    <td
-                      className={`px-4 py-3 text-sm font-medium ${
-                        day.accumulatedBalance >= 0
-                          ? 'text-green-600 dark:text-green-400'
-                          : 'text-red-600 dark:text-red-400'
-                      }`}
-                    >
-                      {formatCurrency(day.accumulatedBalance)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      {/* Gráficos de Distribuição */}
+      {/* 📊 Gráficos de Distribuição - DESIGN SYSTEM */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Distribuição de Receitas */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="card-theme rounded-xl p-6 border-2 border-transparent hover:border-green-300 dark:hover:border-green-700 transition-all duration-300">
+          {/* Header */}
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              DISTRIBUIÇÃO DE RECEITAS
-            </h3>
-            <PieChart className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg">
+                <PieChart className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-theme-primary">
+                  Distribuição de Receitas
+                </h3>
+                <p className="text-xs text-theme-secondary">Por categoria</p>
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-4">
+          {/* Lista de categorias */}
+          <div className="space-y-3">
             {cashflowData.revenueDistribution.map((item, index) => (
               <div
                 key={item.name}
-                className="flex items-center justify-between"
+                className="group p-3 rounded-xl hover:bg-gradient-to-r hover:from-green-50/50 hover:to-emerald-50/50 dark:hover:from-green-900/10 dark:hover:to-emerald-900/10 transition-all duration-200"
               >
-                <div className="flex items-center space-x-3">
-                  <div
-                    className="w-4 h-4 rounded-full"
-                    style={{
-                      backgroundColor: chartColors[index % chartColors.length],
-                    }}
-                  />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {item.name}
-                  </span>
-                </div>
-                <div className="text-right">
-                  <div className="text-sm font-semibold text-gray-900 dark:text-white">
-                    {item.percentage.toFixed(0)}%
+                <div className="flex items-center justify-between">
+                  {/* Categoria */}
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-3 h-3 rounded-full shadow-md"
+                      style={{
+                        backgroundColor:
+                          chartColors[index % chartColors.length],
+                      }}
+                    />
+                    <span className="text-sm font-semibold text-theme-primary group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
+                      {item.name}
+                    </span>
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-500">
-                    {formatCurrency(item.value)}
+
+                  {/* Valores */}
+                  <div className="text-right">
+                    <div className="text-sm font-bold text-green-600 dark:text-green-400">
+                      {item.percentage.toFixed(1)}%
+                    </div>
+                    <div className="text-xs text-theme-secondary">
+                      {formatCurrency(item.value)}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -800,37 +1067,52 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
         </div>
 
         {/* Distribuição de Despesas */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="card-theme rounded-xl p-6 border-2 border-transparent hover:border-red-300 dark:hover:border-red-700 transition-all duration-300">
+          {/* Header */}
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              DISTRIBUIÇÃO DE DESPESAS
-            </h3>
-            <PieChart className="w-5 h-5 text-red-600 dark:text-red-400" />
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl shadow-lg">
+                <PieChart className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-theme-primary">
+                  Distribuição de Despesas
+                </h3>
+                <p className="text-xs text-theme-secondary">Por categoria</p>
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-4">
+          {/* Lista de categorias */}
+          <div className="space-y-3">
             {cashflowData.expenseDistribution.map((item, index) => (
               <div
                 key={item.name}
-                className="flex items-center justify-between"
+                className="group p-3 rounded-xl hover:bg-gradient-to-r hover:from-red-50/50 hover:to-pink-50/50 dark:hover:from-red-900/10 dark:hover:to-pink-900/10 transition-all duration-200"
               >
-                <div className="flex items-center space-x-3">
-                  <div
-                    className="w-4 h-4 rounded-full"
-                    style={{
-                      backgroundColor: chartColors[index % chartColors.length],
-                    }}
-                  />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {item.name}
-                  </span>
-                </div>
-                <div className="text-right">
-                  <div className="text-sm font-semibold text-gray-900 dark:text-white">
-                    {item.percentage.toFixed(0)}%
+                <div className="flex items-center justify-between">
+                  {/* Categoria */}
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-3 h-3 rounded-full shadow-md"
+                      style={{
+                        backgroundColor:
+                          chartColors[index % chartColors.length],
+                      }}
+                    />
+                    <span className="text-sm font-semibold text-theme-primary group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+                      {item.name}
+                    </span>
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-500">
-                    {formatCurrency(item.value)}
+
+                  {/* Valores */}
+                  <div className="text-right">
+                    <div className="text-sm font-bold text-red-600 dark:text-red-400">
+                      {item.percentage.toFixed(1)}%
+                    </div>
+                    <div className="text-xs text-theme-secondary">
+                      {formatCurrency(item.value)}
+                    </div>
                   </div>
                 </div>
               </div>

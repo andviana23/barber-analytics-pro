@@ -9,6 +9,7 @@ import useBankAccounts from '../../hooks/useBankAccounts';
 import ConciliacaoPanel from '../../organisms/ConciliacaoPanel/ConciliacaoPanel';
 import ImportStatementModal from '../../templates/ImportStatementModal';
 import ManualReconciliationModal from '../../templates/ManualReconciliationModal';
+import ImportExpensesFromOFXModal from '../../templates/ImportExpensesFromOFXModal';
 
 /**
  * Tab de Conciliação Bancária
@@ -23,6 +24,7 @@ const ConciliacaoTab = ({ globalFilters }) => {
   // Estado local
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
+  const [isImportExpensesOFXModalOpen, setIsImportExpensesOFXModalOpen] = useState(false);
 
   // Hooks para dados
   const {
@@ -62,6 +64,13 @@ const ConciliacaoTab = ({ globalFilters }) => {
     setIsImportModalOpen(false);
     refetchMatches();
   }, [refetchMatches]);
+
+  const handleImportExpensesOFXSuccess = useCallback((report) => {
+    setIsImportExpensesOFXModalOpen(false);
+    refetchMatches();
+    refetchStatements();
+    console.log('✅ Importação OFX concluída:', report);
+  }, [refetchMatches, refetchStatements]);
 
   const handleImport = useCallback(
     (payload) => importStatements(payload),
@@ -114,6 +123,12 @@ const ConciliacaoTab = ({ globalFilters }) => {
               className="px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               Importar Extrato
+            </button>
+            <button
+              onClick={() => setIsImportExpensesOFXModalOpen(true)}
+              className="px-4 py-2 text-sm font-medium text-white bg-purple-600 dark:bg-purple-500 rounded-md hover:bg-purple-700 dark:hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              Importar Despesas (OFX)
             </button>
             <button
               onClick={() => setIsManualModalOpen(true)}
@@ -198,6 +213,16 @@ const ConciliacaoTab = ({ globalFilters }) => {
         onSuccess={handleManualReconciliationSuccess}
         accountId={globalFilters.accountId}
         unreconciled={unreconciled}
+      />
+
+      {/* Modal de importação de despesas OFX */}
+      <ImportExpensesFromOFXModal
+        isOpen={isImportExpensesOFXModalOpen}
+        onClose={() => setIsImportExpensesOFXModalOpen(false)}
+        onSuccess={handleImportExpensesOFXSuccess}
+        availableAccounts={availableAccounts}
+        defaultAccountId={globalFilters.accountId}
+        unitId={globalFilters.unitId}
       />
 
       {/* Status de loading overlay - Dark Mode */}

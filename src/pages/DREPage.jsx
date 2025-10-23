@@ -11,6 +11,7 @@ import { useDRE } from '../hooks/useDRE';
 import { Button } from '../atoms/Button';
 import { Card } from '../atoms/Card';
 import { EmptyState } from '../atoms/EmptyState';
+import DREDynamicView from '../components/finance/DREDynamicView';
 import {
   FileText,
   Download,
@@ -20,6 +21,7 @@ import {
   DollarSign,
   BarChart3,
   Loader2,
+  FileSpreadsheet,
 } from 'lucide-react';
 
 /**
@@ -37,6 +39,8 @@ export const DREPage = () => {
     updatePeriod,
     updateCustomDates,
     exportDRE,
+    exportDREAsCSV,
+    exportDREAsPDF,
     hasData,
     isEmpty,
   } = useDRE({ autoLoad: true });
@@ -71,7 +75,7 @@ export const DREPage = () => {
           Período
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
           <button
             onClick={() => {
               updatePeriod('month');
@@ -79,13 +83,39 @@ export const DREPage = () => {
             }}
             className={`p-4 rounded-lg border-2 transition-all ${
               period === 'month'
-                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                ? 'border-primary bg-primary/10 dark:bg-primary/20'
+                : 'border-light-border dark:border-dark-border hover:border-primary/50'
             }`}
           >
-            <div className="font-medium">Mês Atual</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="font-medium text-text-light-primary dark:text-text-dark-primary">
+              Mês Atual
+            </div>
+            <div className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
               {new Date().toLocaleDateString('pt-BR', {
+                month: 'long',
+                year: 'numeric',
+              })}
+            </div>
+          </button>
+
+          <button
+            onClick={() => {
+              updatePeriod('previous-month');
+              loadDRE({ period: 'previous-month' });
+            }}
+            className={`p-4 rounded-lg border-2 transition-all ${
+              period === 'previous-month'
+                ? 'border-primary bg-primary/10 dark:bg-primary/20'
+                : 'border-light-border dark:border-dark-border hover:border-primary/50'
+            }`}
+          >
+            <div className="font-medium text-text-light-primary dark:text-text-dark-primary">
+              Mês Anterior
+            </div>
+            <div className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
+              {new Date(
+                new Date().setMonth(new Date().getMonth() - 1)
+              ).toLocaleDateString('pt-BR', {
                 month: 'long',
                 year: 'numeric',
               })}
@@ -99,12 +129,14 @@ export const DREPage = () => {
             }}
             className={`p-4 rounded-lg border-2 transition-all ${
               period === 'year'
-                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                ? 'border-primary bg-primary/10 dark:bg-primary/20'
+                : 'border-light-border dark:border-dark-border hover:border-primary/50'
             }`}
           >
-            <div className="font-medium">Ano Atual</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="font-medium text-text-light-primary dark:text-text-dark-primary">
+              Ano Atual
+            </div>
+            <div className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
               {new Date().getFullYear()}
             </div>
           </button>
@@ -116,21 +148,23 @@ export const DREPage = () => {
             }}
             className={`p-4 rounded-lg border-2 transition-all ${
               period === 'custom'
-                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                ? 'border-primary bg-primary/10 dark:bg-primary/20'
+                : 'border-light-border dark:border-dark-border hover:border-primary/50'
             }`}
           >
-            <div className="font-medium">Período Customizado</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="font-medium text-text-light-primary dark:text-text-dark-primary">
+              Período Customizado
+            </div>
+            <div className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
               Escolha as datas
             </div>
           </button>
         </div>
 
         {period === 'custom' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-light-surface dark:bg-dark-surface rounded-lg border border-light-border dark:border-dark-border">
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium mb-2 text-text-light-primary dark:text-text-dark-primary">
                 Data Inicial
               </label>
               <input
@@ -142,11 +176,11 @@ export const DREPage = () => {
                     startDate: e.target.value,
                   })
                 }
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
+                className="input-theme"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium mb-2 text-text-light-primary dark:text-text-dark-primary">
                 Data Final
               </label>
               <input
@@ -155,7 +189,7 @@ export const DREPage = () => {
                 onChange={e =>
                   updateCustomDates({ ...customDates, endDate: e.target.value })
                 }
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
+                className="input-theme"
               />
             </div>
             <div className="md:col-span-2">
@@ -293,16 +327,56 @@ export const DREPage = () => {
                 Período:{' '}
                 {new Date(dre.periodo.inicio).toLocaleDateString('pt-BR')} até{' '}
                 {new Date(dre.periodo.fim).toLocaleDateString('pt-BR')}
+                {dre.periodo.dias && ` (${dre.periodo.dias} dias)`}
               </p>
+              {dre.metadata?.calculation_timestamp && (
+                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                  Gerado em:{' '}
+                  {new Date(dre.metadata.calculation_timestamp).toLocaleString(
+                    'pt-BR'
+                  )}
+                  {dre.metadata?.regime && (
+                    <span className="ml-2 px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded text-xs font-medium">
+                      Regime: {dre.metadata.regime}
+                    </span>
+                  )}
+                  {dre.metadata?.versao && (
+                    <span className="ml-1 text-gray-400">
+                      v{dre.metadata.versao}
+                    </span>
+                  )}
+                </p>
+              )}
             </div>
-            <Button
-              onClick={exportDRE}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Download className="w-4 h-4" />
-              Exportar TXT
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={exportDRE}
+                variant="outline"
+                className="flex items-center gap-2"
+                title="Exportar como TXT"
+              >
+                <FileText className="w-4 h-4" />
+                TXT
+              </Button>
+              <Button
+                onClick={exportDREAsCSV}
+                variant="outline"
+                className="flex items-center gap-2"
+                title="Exportar como CSV"
+              >
+                <FileSpreadsheet className="w-4 h-4" />
+                CSV
+              </Button>
+              <Button
+                onClick={exportDREAsPDF}
+                variant="outline"
+                className="flex items-center gap-2"
+                title="Exportar como PDF"
+              >
+                <FileText className="w-4 h-4" />
+                PDF
+              </Button>
+            </div>
           </div>
 
           <div className="space-y-1">
@@ -518,6 +592,27 @@ export const DREPage = () => {
         </div>
       </div>
 
+      {/* 📌 Badge informativa sobre Regime de Competência */}
+      <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+        <div className="flex items-start gap-3">
+          <div className="flex-shrink-0 w-8 h-8 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center">
+            <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">
+              📊 Regime de Competência Ativo
+            </h3>
+            <p className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
+              Este DRE utiliza o <strong>regime de competência</strong>,
+              considerando a data em que a receita/despesa foi gerada (data de
+              competência), independente do pagamento efetivo. Quando a data de
+              competência não está disponível, o sistema utiliza a data de
+              pagamento/recebimento como fallback.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {renderFilters()}
 
       {loading && (
@@ -549,7 +644,7 @@ export const DREPage = () => {
       {!loading && !error && hasData && !isEmpty && (
         <>
           {renderIndicators()}
-          {renderDRE()}
+          <DREDynamicView dreData={dre} isLoading={loading} />
         </>
       )}
 

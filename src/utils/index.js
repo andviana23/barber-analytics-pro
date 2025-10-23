@@ -2,6 +2,7 @@
 // Exporta todas as utilitárias do sistema
 
 export * from './exportUtils';
+export * from './formatters';
 export * from './animations.jsx';
 export * from './accessibility.jsx';
 export * from './performance.jsx';

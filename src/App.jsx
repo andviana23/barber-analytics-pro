@@ -37,7 +37,10 @@ import UnitsPage from './pages/UnitsPage/UnitsPage';
 import RelatoriosPage from './pages/RelatoriosPage/RelatoriosPage';
 import PaymentMethodsPage from './pages/PaymentMethodsPage/PaymentMethodsPage';
 import SuppliersPage from './pages/SuppliersPage/SuppliersPage';
+import ClientsPage from './pages/ClientsPage'; // ✅ Clients page import
+import ProductsPage from './pages/ProductsPage/ProductsPage'; // ✅ Products page import
 import { DREPage } from './pages/DREPage';
+import { BankAccountsPage } from './pages/BankAccountsPage'; // ✅ Bank accounts page import
 
 import './styles/index.css';
 
@@ -128,7 +131,7 @@ function App() {
                   path="/professionals"
                   element={
                     <ReceptionistRoute>
-                      <ProtectedRoute>
+                      <ProtectedRoute roles={['admin']}>
                         <Layout activeMenuItem="professionals">
                           <ProfessionalsPage />
                         </Layout>
@@ -141,7 +144,7 @@ function App() {
                   path="/units"
                   element={
                     <ReceptionistRoute>
-                      <ProtectedRoute>
+                      <ProtectedRoute roles={['admin']}>
                         <Layout activeMenuItem="units">
                           <UnitsPage />
                         </Layout>
@@ -176,7 +179,7 @@ function App() {
                   path="/reports"
                   element={
                     <ReceptionistRoute>
-                      <ProtectedRoute>
+                      <ProtectedRoute roles={['admin']}>
                         <Layout activeMenuItem="reports">
                           <RelatoriosPage />
                         </Layout>
@@ -214,7 +217,7 @@ function App() {
                   path="/cadastros/formas-pagamento"
                   element={
                     <ReceptionistRoute>
-                      <ProtectedRoute roles={['admin', 'gerente']}>
+                      <ProtectedRoute roles={['admin']}>
                         <PaymentMethodsPage />
                       </ProtectedRoute>
                     </ReceptionistRoute>
@@ -227,6 +230,41 @@ function App() {
                     <ReceptionistRoute>
                       <ProtectedRoute roles={['admin', 'gerente']}>
                         <SuppliersPage />
+                      </ProtectedRoute>
+                    </ReceptionistRoute>
+                  }
+                />
+
+                <Route
+                  path="/cadastros/clientes"
+                  element={
+                    <ReceptionistRoute>
+                      <ProtectedRoute roles={['admin', 'gerente']}>
+                        <ClientsPage />
+                      </ProtectedRoute>
+                    </ReceptionistRoute>
+                  }
+                />
+
+                <Route
+                  path="/cadastros/produtos"
+                  element={
+                    <ReceptionistRoute>
+                      <ProtectedRoute roles={['admin']}>
+                        <ProductsPage />
+                      </ProtectedRoute>
+                    </ReceptionistRoute>
+                  }
+                />
+
+                <Route
+                  path="/financeiro/contas-bancarias"
+                  element={
+                    <ReceptionistRoute>
+                      <ProtectedRoute roles={['admin']}>
+                        <Layout activeMenuItem="financial">
+                          <BankAccountsPage />
+                        </Layout>
                       </ProtectedRoute>
                     </ReceptionistRoute>
                   }
@@ -275,7 +313,7 @@ function App() {
                 <Route
                   path="/settings"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute roles={['admin']}>
                       <Layout activeMenuItem="settings">
                         <div className="text-center py-12">
                           <h2 className="text-2xl font-bold text-text-light-primary dark:text-text-dark-primary mb-4">

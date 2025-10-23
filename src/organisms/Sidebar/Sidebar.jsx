@@ -101,6 +101,18 @@ const menuGroups = [
             path: '/cadastros/fornecedores',
           },
           {
+            id: 'clients',
+            label: 'Clientes',
+            icon: Users,
+            path: '/cadastros/clientes',
+          },
+          {
+            id: 'products',
+            label: 'Produtos',
+            icon: Package,
+            path: '/cadastros/produtos',
+          },
+          {
             id: 'categories',
             label: 'Categorias',
             icon: Tags,
@@ -143,8 +155,29 @@ const bottomMenuItems = [
 
 export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
   const navigate = useNavigate();
-  const { signOut, isAdmin, receptionistStatus } = useAuth();
+  const { signOut, isAdmin, receptionistStatus, gerenteStatus, adminStatus } =
+    useAuth();
   const [openSubmenu, setOpenSubmenu] = useState(null);
+
+  // Lista de itens bloqueados para gerente
+  const gerenteBlockedItems = [
+    'payment-methods',
+    'products',
+    'professionals',
+    'units',
+    'settings',
+    'user-management',
+    'reports',
+  ];
+  const gerenteBlockedPaths = [
+    '/cadastros/formas-pagamento',
+    '/cadastros/produtos',
+    '/professionals',
+    '/units',
+    '/settings',
+    '/user-management',
+    '/reports',
+  ];
 
   // Filtrar grupos do menu baseado nas permissões do usuário
   const filteredMenuGroups = menuGroups
@@ -154,6 +187,33 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
         // Se for Recepcionista, mostrar apenas "Lista da Vez"
         if (receptionistStatus) {
           return item.id === 'queue';
+        }
+
+        // Se for Gerente, bloquear itens específicos
+        if (gerenteStatus && !adminStatus) {
+          // Bloquear itens principais bloqueados
+          if (gerenteBlockedItems.includes(item.id)) {
+            return false;
+          }
+
+          // Bloquear pelo path
+          if (item.path && gerenteBlockedPaths.includes(item.path)) {
+            return false;
+          }
+
+          // Se tem submenu, filtrar os subitens
+          if (item.hasSubmenu && item.submenu) {
+            item.submenu = item.submenu.filter(subItem => {
+              return (
+                !gerenteBlockedItems.includes(subItem.id) &&
+                !gerenteBlockedPaths.includes(subItem.path)
+              );
+            });
+            // Se não sobrou nenhum subitem, ocultar o item pai
+            if (item.submenu.length === 0) {
+              return false;
+            }
+          }
         }
 
         // Lógica normal para outros papéis
@@ -243,12 +303,12 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
             </button>
           </div>
 
-          {/* Unit selector - Topo */}
-          <div className="px-4 py-2.5 border-b border-light-border dark:border-dark-border">
-            <label className="block text-[10px] text-gray-500 dark:text-gray-500 mb-1 font-medium">
+          {/* Unit selector - Topo - PRINCIPAL DO SISTEMA */}
+          <div className="px-4 py-3 border-b border-light-border dark:border-dark-border bg-gradient-to-r from-primary/5 to-transparent">
+            <label className="block text-[10px] text-gray-400 dark:text-gray-400 mb-1.5 font-semibold uppercase tracking-wider">
               Unidade:
             </label>
-            <UnitSelector className="w-full bg-transparent border-none p-0 text-[11px] text-gray-300 focus:outline-none" />
+            <UnitSelector className="w-full" />
           </div>
 
           {/* Navigation */}

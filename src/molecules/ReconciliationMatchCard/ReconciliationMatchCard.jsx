@@ -339,7 +339,7 @@ const ReconciliationMatchCard = ({
               <div className="space-y-1 text-gray-600">
                 <div>ID: {bank_statement?.id?.slice(0, 16)}...</div>
                 <div>Tipo: {bank_statement?.type || 'N/A'}</div>
-                <div>Hash: {bank_statement?.hash_unique?.slice(0, 16)}...</div>
+                <div>Hash: {bank_statement?.source_hash?.slice(0, 16)}...</div>
                 {bank_statement?.bank_account && (
                   <div>Conta: {bank_statement.bank_account}</div>
                 )}
@@ -469,7 +469,7 @@ ReconciliationMatchCard.propTypes = {
       description: PropTypes.string,
       type: PropTypes.string,
       balance_after: PropTypes.number,
-      hash_unique: PropTypes.string,
+      source_hash: PropTypes.string,
       bank_account: PropTypes.string,
     }),
     internal_transaction: PropTypes.shape({
@@ -538,7 +538,7 @@ export const ReconciliationMatchCardPreview = () => {
         description: 'PIX RECEBIDO João Silva',
         type: 'credit',
         balance_after: 2450.0,
-        hash_unique: 'abc123def456',
+        source_hash: 'abc123def456',
         bank_account: 'Itaú CC 12345-6',
       },
       internal_transaction: {
@@ -573,7 +573,7 @@ export const ReconciliationMatchCardPreview = () => {
         description: 'TED DISTRIBUIDORA ALPHA LTDA',
         type: 'debit',
         balance_after: 1950.0,
-        hash_unique: 'def456ghi789',
+        source_hash: 'def456ghi789',
         bank_account: 'Itaú CC 12345-6',
       },
       internal_transaction: {
@@ -608,7 +608,7 @@ export const ReconciliationMatchCardPreview = () => {
         description: 'DEBITO AUTOMATICO ENERGIA',
         type: 'debit',
         balance_after: 1860.1,
-        hash_unique: 'ghi789jkl012',
+        source_hash: 'ghi789jkl012',
         bank_account: 'Itaú CC 12345-6',
       },
       internal_transaction: {

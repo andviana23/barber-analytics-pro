@@ -1,70 +1,65 @@
 {
-    "$schema": "https://schemas.cursor.sh/config/v1.json",
-    "version": 1,
-    "context": [
-      "README.md",
-      "ARCHITECTURE.md",
-      "DATABASE_SCHEMA.md",
-      "FINANCIAL_MODULE.md",
-      "src/services/",
-      "src/repositories/",
-      "src/dtos/",
-      "src/hooks/",
-      "src/organisms/",
-      "src/pages/"
-    ],
-    "rules": [
-      {
-        "name": "Padrões de Desenvolvimento & Qualidade de Código",
-        "description": "Seguir rigorosamente os princípios de Clean Architecture, DDD e SOLID. ESLint + Prettier obrigatórios; PRs quebram se houver erro de lint.",
-        "alwaysApply": true
-      },
-      {
-        "name": "Idioma padrão",
-        "description": "Sempre responder em português claro e direto, mantendo tom técnico e didático.",
-        "alwaysApply": true
-      },
-      {
-        "name": "Padrão de commits",
-        "description": "Commits devem seguir o formato conventional commits (ex: feat:, fix:, chore:, refactor:, docs:).",
-        "alwaysApply": true
-      },
-      {
-        "name": "Testes obrigatórios",
-        "description": "Todo novo módulo precisa de testes unitários e integração (Jest).",
-        "alwaysApply": true
-      }
-    ],
-    "prompts": [
-      {
-        "name": "review_system",
-        "prompt": "Analise a arquitetura do projeto Barber-Analytics-Pro conforme Clean Architecture + DDD e proponha melhorias sem quebrar a separação de camadas."
-      },
-      {
-        "name": "create_module",
-        "prompt": "Crie um novo módulo seguindo o padrão do projeto (DTO, Repository, Service, Hook e Componentes). Respeite o padrão de nomenclatura e camadas conforme o ARCHITECTURE.md."
-      },
-      {
-        "name": "generate_sql",
-        "prompt": "Crie scripts SQL compatíveis com Supabase/PostgreSQL 17, aplicando RLS e funções automáticas conforme o DATABASE_SCHEMA.md."
-      },
-      {
-        "name": "fix_bug",
-        "prompt": "Analise logs e corrija bugs sem alterar a estrutura modular. Documente o problema em TROUBLESHOOTING.md e explique o impacto no sistema."
-      },
-      {
-        "name": "document_feature",
-        "prompt": "Crie documentação técnica em Markdown descrevendo o novo módulo, endpoints, camadas envolvidas e relação com as tabelas do banco."
-      }
-    ],
-    "mcpServers": {
-      "@pgsql": {
-        "enabled": true,
-        "connection": "postgresql://<seu_usuario>:<sua_senha>@<seu_host>:5432/<seu_banco>"
-      },
-      "filesystem": { "enabled": true },
-      "supabase-mcp": { "enabled": true },
-      "sentry-mcp": { "enabled": false }
+  "$schema": "https://schemas.cursor.sh/config/v1.json",
+  "version": 1,
+  "context": [
+    "README.md",
+    "ARCHITECTURE.md",
+    "DATABASE_SCHEMA.md",
+    "FINANCIAL_MODULE.md",
+    "src/services/",
+    "src/repositories/",
+    "src/dtos/",
+    "src/hooks/",
+    "src/organisms/",
+    "src/pages/"
+  ],
+  "rules": [
+    {
+      "name": "Padrões de Desenvolvimento & Qualidade de Código",
+      "description": "Seguir rigorosamente os princípios de Clean Architecture, DDD e SOLID. ESLint + Prettier obrigatórios; PRs quebram se houver erro de lint.",
+      "alwaysApply": true
+    },
+    {
+      "name": "Idioma padrão",
+      "description": "Sempre responder em português claro e direto, mantendo tom técnico e didático.",
+      "alwaysApply": true
+    },
+    {
+      "name": "Padrão de commits",
+      "description": "Commits devem seguir o formato conventional commits (ex: feat:, fix:, chore:, refactor:, docs:).",
+      "alwaysApply": true
+    },
+    {
+      "name": "Testes obrigatórios",
+      "description": "Todo novo módulo precisa de testes unitários e integração (Jest).",
+      "alwaysApply": true
     }
+  ],
+  "prompts": [
+    {
+      "name": "review_system",
+      "prompt": "Analise a arquitetura do projeto Barber-Analytics-Pro conforme Clean Architecture + DDD e proponha melhorias sem quebrar a separação de camadas."
+    },
+    {
+      "name": "create_module",
+      "prompt": "Crie um novo módulo seguindo o padrão do projeto (DTO, Repository, Service, Hook e Componentes). Respeite o padrão de nomenclatura e camadas conforme o ARCHITECTURE.md."
+    },
+    {
+      "name": "generate_sql",
+      "prompt": "Crie scripts SQL compatíveis com Supabase/PostgreSQL 17, aplicando RLS e funções automáticas conforme o DATABASE_SCHEMA.md."
+    },
+    {
+      "name": "fix_bug",
+      "prompt": "Analise logs e corrija bugs sem alterar a estrutura modular. Documente o problema em TROUBLESHOOTING.md e explique o impacto no sistema."
+    }
+  ],
+  "mcpServers": {
+    "@pgsql": {
+      "enabled": true,
+      "connection": "postgresql://<seu_usuario>:<sua_senha>@<seu_host>:5432/<seu_banco>"
+    },
+    "filesystem": { "enabled": true },
+    "supabase-mcp": { "enabled": true },
+    "sentry-mcp": { "enabled": false }
   }
-  
+}

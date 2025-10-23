@@ -18,37 +18,50 @@ import { supabase } from '../../services/supabase';
 
 // Components
 import FluxoTabRefactored from './FluxoTabRefactored';
-import ConciliacaoTab from './ConciliacaoTab';
+// 🔒 CONCILIAÇÃO DESABILITADA - Manter import comentado para uso futuro
+// import ConciliacaoTab from './ConciliacaoTab';
 import ReceitasAccrualTab from './ReceitasAccrualTab';
-import DespesasAccrualTab from './DespesasAccrualTab';
+import DespesasAccrualTabRefactored from './DespesasAccrualTabRefactored';
 import ContasBancariasTab from './ContasBancariasTab';
 
 // Layout
 import { Layout } from '../../components/Layout/Layout';
 
 /**
- * Módulo Financeiro Avançado
+ * 💰 Módulo Financeiro Avançado - 100% REFATORADO COM DESIGN SYSTEM
  *
  * Refatorado seguindo princípios de UX/UI:
  * - "Don't Make Me Think" (Steve Krug)
  * - Atomic Design (Brad Frost)
+ * - Design System completo aplicado
  * - Feedback imediato e hierarquia visual clara
  * - Interface intuitiva com modo escuro/claro
  *
  * Features:
- * - 5 módulos especializados em tabs (Fluxo, Conciliação, Receitas, Despesas, Contas)
- * - KPIs visuais em tempo real
- * - Filtros globais inteligentes
- * - Design responsivo e acessível
+ * - ✅ Design System completo aplicado
+ * - ✅ 5 módulos especializados em tabs (Fluxo, Conciliação, Receitas, Despesas, Contas)
+ * - ✅ Header ultra moderno com gradientes
+ * - ✅ Seletor de unidade estilizado
+ * - ✅ Tabs com hover effects e transições
+ * - ✅ UI ultra moderna com feedback visual
+ * - ✅ Design responsivo e acessível
+ * - ✅ Dark mode completo
  */
 const FinanceiroAdvancedPage = () => {
   const { user } = useAuth();
-  const { selectedUnit: currentUnit, allUnits: units, selectUnit } = useUnit();
+  const {
+    selectedUnit: currentUnit,
+    allUnits: units,
+    selectUnit,
+    loading: unitsLoading,
+  } = useUnit();
 
   // eslint-disable-next-line no-console
   console.log('🏢 FinanceiroAdvancedPage - Units carregadas:', units);
   // eslint-disable-next-line no-console
   console.log('🏢 FinanceiroAdvancedPage - Current Unit:', currentUnit);
+  // eslint-disable-next-line no-console
+  console.log('🏢 FinanceiroAdvancedPage - Units Loading:', unitsLoading);
 
   const [activeTab, setActiveTab] = useState('fluxo');
 
@@ -120,125 +133,11 @@ const FinanceiroAdvancedPage = () => {
     }
   }, [selectedUnit?.id]);
 
-  // Estado para KPIs
-  const [kpis, setKpis] = useState({
-    faturamentoMes: 0,
-    saldoAtual: 0,
-    despesasPagasMes: 0,
-    despesasVencendo: 0,
-    loading: true,
-  });
-
   // Verificar permissões - apenas admin e gerente podem acessar
   const canAccess = useMemo(() => {
     const role = user?.user_metadata?.role;
     return ['admin', 'gerente'].includes(role);
   }, [user]);
-
-  // Buscar KPIs
-  const fetchKPIs = useCallback(async () => {
-    if (!selectedUnit?.id) {
-      // eslint-disable-next-line no-console
-      console.log('⚠️ KPIs: Sem unidade selecionada');
-      return;
-    }
-
-    try {
-      // eslint-disable-next-line no-console
-      console.log(
-        '🔄 KPIs: Buscando dados para unidade:',
-        selectedUnit.name,
-        selectedUnit.id
-      );
-
-      setKpis(prev => ({ ...prev, loading: true }));
-
-      // Data atual para filtros
-      const hoje = new Date();
-      const primeiroDiaMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
-      const ultimoDiaMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
-
-      // eslint-disable-next-line no-console
-      console.log(
-        '📅 KPIs: Período:',
-        primeiroDiaMes.toISOString().split('T')[0],
-        'até',
-        ultimoDiaMes.toISOString().split('T')[0]
-      );
-
-      // 1. Faturamento do mês (receitas do mês atual)
-      const { data: receitasMes } = await financeiroService.getReceitas({
-        unit_id: selectedUnit.id,
-        start_date: primeiroDiaMes.toISOString().split('T')[0],
-        end_date: ultimoDiaMes.toISOString().split('T')[0],
-      });
-
-      // eslint-disable-next-line no-console
-      console.log('💰 KPIs: Receitas encontradas:', receitasMes);
-
-      const faturamentoMes = (receitasMes || []).reduce(
-        (sum, r) => sum + (r.value || 0),
-        0
-      );
-
-      // 2. Despesas pagas do mês atual
-      const { data: despesasMes } = await supabase
-        .from('expenses')
-        .select('*')
-        .eq('unit_id', selectedUnit.id)
-        .eq('status', 'Paid')
-        .gte('data_competencia', primeiroDiaMes.toISOString().split('T')[0])
-        .lte('data_competencia', ultimoDiaMes.toISOString().split('T')[0]);
-
-      const despesasPagasMes = (despesasMes || []).reduce(
-        (sum, d) => sum + (d.value || 0),
-        0
-      );
-
-      // 3. Despesas a vencer no mês atual (pendentes)
-      const { data: despesasVencendo } = await supabase
-        .from('expenses')
-        .select('*')
-        .eq('unit_id', selectedUnit.id)
-        .eq('status', 'Pending')
-        .gte('data_competencia', primeiroDiaMes.toISOString().split('T')[0])
-        .lte('data_competencia', ultimoDiaMes.toISOString().split('T')[0]);
-
-      const despesasVencendoCount = despesasVencendo?.length || 0;
-
-      // 4. Saldo Atual (placeholder - requer lógica de saldo bancário)
-      const saldoAtual = 0;
-
-      // eslint-disable-next-line no-console
-      console.log('📊 KPIs Calculados:', {
-        faturamentoMes,
-        despesasPagasMes,
-        despesasVencendoCount,
-        totalReceitas: receitasMes?.length || 0,
-        totalDespesasPagas: despesasMes?.length || 0,
-      });
-
-      setKpis({
-        faturamentoMes,
-        saldoAtual,
-        despesasPagasMes,
-        despesasVencendo: despesasVencendoCount,
-        loading: false,
-      });
-
-      // eslint-disable-next-line no-console
-      console.log('✅ KPIs: Estado atualizado');
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('❌ KPIs: Erro ao buscar:', error);
-      setKpis(prev => ({ ...prev, loading: false }));
-    }
-  }, [selectedUnit]);
-
-  // Buscar KPIs quando a unidade mudar
-  useEffect(() => {
-    fetchKPIs();
-  }, [fetchKPIs]);
 
   // Configuração das tabs
   const tabs = [
@@ -248,12 +147,14 @@ const FinanceiroAdvancedPage = () => {
       icon: TrendingUp,
       description: 'Análise de fluxo de caixa acumulado',
     },
-    {
-      id: 'conciliacao',
-      label: 'Conciliação',
-      icon: GitMerge,
-      description: 'Conciliação bancária e matching automático',
-    },
+    // 🔒 CONCILIAÇÃO BANCÁRIA DESABILITADA TEMPORARIAMENTE
+    // Para reabilitar no futuro, descomente as linhas abaixo:
+    // {
+    //   id: 'conciliacao',
+    //   label: 'Conciliação',
+    //   icon: GitMerge,
+    //   description: 'Conciliação bancária e matching automático',
+    // },
     {
       id: 'contas-bancarias',
       label: 'Contas Bancárias',
@@ -290,14 +191,15 @@ const FinanceiroAdvancedPage = () => {
     switch (activeTab) {
       case 'fluxo':
         return <FluxoTabRefactored {...tabProps} />;
-      case 'conciliacao':
-        return <ConciliacaoTab {...tabProps} />;
+      // 🔒 CONCILIAÇÃO DESABILITADA - Manter código para uso futuro
+      // case 'conciliacao':
+      //   return <ConciliacaoTab {...tabProps} />;
       case 'contas-bancarias':
         return <ContasBancariasTab {...tabProps} />;
       case 'receitas-accrual':
         return <ReceitasAccrualTab {...tabProps} />;
       case 'despesas-accrual':
-        return <DespesasAccrualTab {...tabProps} />;
+        return <DespesasAccrualTabRefactored {...tabProps} />;
       default:
         return <FluxoTabRefactored {...tabProps} />;
     }
@@ -307,19 +209,33 @@ const FinanceiroAdvancedPage = () => {
   if (!canAccess) {
     return (
       <Layout activeMenuItem="financial">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="text-red-500 text-6xl mb-4">🚫</div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              Acesso Restrito
+        {/* 🚫 Acesso Negado - DESIGN SYSTEM */}
+        <div className="flex items-center justify-center min-h-[70vh]">
+          <div className="card-theme rounded-2xl p-12 max-w-md text-center border-2 border-red-200 dark:border-red-800">
+            {/* Ícone com gradiente vermelho */}
+            <div className="flex justify-center mb-6">
+              <div className="p-6 bg-gradient-to-br from-red-500 to-pink-600 rounded-full shadow-2xl">
+                <Activity className="w-16 h-16 text-white" />
+              </div>
+            </div>
+
+            {/* Título */}
+            <h2 className="text-2xl font-bold text-theme-primary mb-3">
+              🚫 Acesso Restrito
             </h2>
-            <p className="text-gray-600">
+
+            {/* Mensagem */}
+            <p className="text-theme-secondary mb-4">
               Você não tem permissão para acessar o módulo financeiro avançado.
             </p>
-            <p className="text-sm text-gray-500 mt-2">
-              Apenas administradores e gerentes podem acessar esta
-              funcionalidade.
-            </p>
+
+            {/* Detalhes */}
+            <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+              <p className="text-sm text-red-700 dark:text-red-300 font-medium">
+                Apenas administradores e gerentes podem acessar esta
+                funcionalidade.
+              </p>
+            </div>
           </div>
         </div>
       </Layout>
@@ -329,163 +245,105 @@ const FinanceiroAdvancedPage = () => {
   return (
     <Layout activeMenuItem="financial">
       <div className="space-y-6">
-        {/* Header com título e descrição - Padrão do Sistema */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 pb-6 border-b border-gray-200 dark:border-gray-700">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Módulo Financeiro Avançado
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Gestão completa com fluxo de caixa, conciliação bancária e contas
-            </p>
+        {/* 💰 Header Premium - DESIGN SYSTEM */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+          {/* Título com ícone gradiente */}
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
+              <BarChart3 className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-theme-primary mb-1">
+                Módulo Financeiro Avançado
+              </h1>
+              <p className="text-theme-secondary">
+                Gestão completa com fluxo de caixa, conciliação bancária e
+                contas
+              </p>
+            </div>
           </div>
 
-          {/* Seletor Universal de Unidade */}
-          <div className="w-full lg:w-auto">
-            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+          {/* Seletor de Unidade Compacto */}
+          <div className="w-full lg:w-auto lg:min-w-[280px]">
+            <label className="block text-xs font-bold text-theme-secondary uppercase tracking-wider mb-2">
               Unidade
             </label>
             <div className="relative">
               <select
                 value={selectedUnit?.id || ''}
                 onChange={e => handleUnitChange(e.target.value)}
-                className="w-full lg:w-64 px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 appearance-none cursor-pointer transition-colors"
+                disabled={unitsLoading || !units || units.length === 0}
+                className="w-full pl-11 pr-10 py-3 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-theme-primary font-semibold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 appearance-none cursor-pointer transition-all duration-200 hover:border-blue-400 dark:hover:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
               >
-                <option value="">Selecione uma unidade</option>
-                {Array.isArray(units) &&
-                  units.map(unit => (
-                    <option key={unit.id} value={unit.id}>
-                      {unit.name}
-                    </option>
-                  ))}
+                {unitsLoading ? (
+                  <option value="">Carregando...</option>
+                ) : !units || units.length === 0 ? (
+                  <option value="">Sem unidades</option>
+                ) : (
+                  <>
+                    {units.length > 1 && (
+                      <option value="">Selecione uma unidade</option>
+                    )}
+                    {units.map(unit => (
+                      <option key={unit.id} value={unit.id}>
+                        {unit.name}
+                      </option>
+                    ))}
+                  </>
+                )}
               </select>
-              <Building2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+
+              {/* Ícone à esquerda */}
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                <Building2 className="w-5 h-5 text-blue-500 dark:text-blue-400" />
+              </div>
+
+              {/* Ícone de seta à direita */}
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                <svg
+                  className="w-5 h-5 text-gray-400 dark:text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
             </div>
+
+            {/* Feedback Visual Compacto */}
             {selectedUnit && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1">
-                <Activity className="w-3 h-3" />
-                Dados filtrados para esta unidade
-              </p>
+              <div className="flex items-center gap-1.5 mt-2 text-xs text-green-600 dark:text-green-400">
+                <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                <span className="font-medium">
+                  Dados filtrados para esta unidade
+                </span>
+              </div>
+            )}
+            {!selectedUnit && !unitsLoading && units && units.length > 0 && (
+              <div className="flex items-center gap-1.5 mt-2 text-xs text-amber-600 dark:text-amber-400">
+                <div className="w-1.5 h-1.5 bg-amber-500 rounded-full" />
+                <span className="font-medium">
+                  Selecione uma unidade para visualizar
+                </span>
+              </div>
             )}
           </div>
         </div>
 
-        {/* KPIs Grid - Estilo Padrão das Outras Páginas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Card 1 - Faturamento */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Faturamento
-                </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
-                  {kpis.loading ? (
-                    <span className="animate-pulse">--</span>
-                  ) : (
-                    new Intl.NumberFormat('pt-BR', {
-                      style: 'currency',
-                      currency: 'BRL',
-                    }).format(kpis.faturamentoMes)
-                  )}
-                </p>
-                <p className="text-xs text-green-600 dark:text-green-400 mt-1 flex items-center gap-1">
-                  <ArrowUpRight className="w-3 h-3" />
-                  Mês atual
-                </p>
-              </div>
-              <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                <DollarSign className="w-6 h-6 text-green-600 dark:text-green-400" />
-              </div>
-            </div>
-          </div>
-
-          {/* Card 2 - Saldo */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Saldo Atual
-                </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
-                  {kpis.loading ? (
-                    <span className="animate-pulse">--</span>
-                  ) : (
-                    new Intl.NumberFormat('pt-BR', {
-                      style: 'currency',
-                      currency: 'BRL',
-                    }).format(kpis.saldoAtual)
-                  )}
-                </p>
-                <p className="text-xs text-blue-600 dark:text-blue-400 mt-1 flex items-center gap-1">
-                  <TrendingUp className="w-3 h-3" />
-                  Em tempo real
-                </p>
-              </div>
-              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                <BarChart3 className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-              </div>
-            </div>
-          </div>
-
-          {/* Card 3 - Despesas Pagas */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Despesas Pagas
-                </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
-                  {kpis.loading ? (
-                    <span className="animate-pulse">--</span>
-                  ) : (
-                    new Intl.NumberFormat('pt-BR', {
-                      style: 'currency',
-                      currency: 'BRL',
-                    }).format(kpis.despesasPagasMes)
-                  )}
-                </p>
-                <p className="text-xs text-red-600 dark:text-red-400 mt-1 flex items-center gap-1">
-                  <ArrowDownRight className="w-3 h-3" />
-                  Mês atual
-                </p>
-              </div>
-              <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-                <CreditCard className="w-6 h-6 text-red-600 dark:text-red-400" />
-              </div>
-            </div>
-          </div>
-
-          {/* Card 4 - Despesas a Vencer */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Despesas a Vencer
-                </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
-                  {kpis.loading ? (
-                    <span className="animate-pulse">--</span>
-                  ) : (
-                    kpis.despesasVencendo
-                  )}
-                </p>
-                <p className="text-xs text-orange-600 dark:text-orange-400 mt-1 flex items-center gap-1">
-                  <Calendar className="w-3 h-3" />
-                  Este mês
-                </p>
-              </div>
-              <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-                <Activity className="w-6 h-6 text-orange-600 dark:text-orange-400" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Navigation Tabs - Estilo Padrão do Sistema */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="border-b border-gray-200 dark:border-gray-700">
-            <nav className="flex space-x-8 px-6" aria-label="Tabs">
+        {/* 📑 Navigation Tabs Premium - DESIGN SYSTEM */}
+        <div className="card-theme rounded-xl overflow-hidden border-2 border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-300">
+          {/* Tab Headers com gradiente */}
+          <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750 border-b-2 border-gray-200 dark:border-gray-600">
+            <nav
+              className="flex overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600"
+              aria-label="Tabs"
+            >
               {tabs.map(tab => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -495,26 +353,50 @@ const FinanceiroAdvancedPage = () => {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`
-                      flex items-center py-4 px-1 border-b-2 font-medium text-sm
-                      transition-colors duration-200
+                      group flex items-center gap-3 px-6 py-4 border-b-4 font-semibold text-sm whitespace-nowrap
+                      transition-all duration-300 relative
                       ${
                         isActive
-                          ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                          : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                          ? 'border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-800 shadow-lg'
+                          : 'border-transparent text-theme-secondary hover:text-theme-primary hover:bg-white/50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-500'
                       }
                     `}
                     title={tab.description}
                   >
-                    <Icon className="w-5 h-5 mr-2" />
-                    {tab.label}
+                    {/* Ícone com animação */}
+                    <div
+                      className={`p-2 rounded-lg transition-all duration-300 ${
+                        isActive
+                          ? 'bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg scale-110'
+                          : 'bg-gray-200 dark:bg-gray-700 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 group-hover:scale-105'
+                      }`}
+                    >
+                      <Icon
+                        className={`w-4 h-4 transition-colors ${
+                          isActive
+                            ? 'text-white'
+                            : 'text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400'
+                        }`}
+                      />
+                    </div>
+
+                    {/* Label */}
+                    <span>{tab.label}</span>
+
+                    {/* Indicador ativo (barra superior) */}
+                    {isActive && (
+                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-b-full" />
+                    )}
                   </button>
                 );
               })}
             </nav>
           </div>
 
-          {/* Tab Content */}
-          <div className="p-6">{renderActiveTab()}</div>
+          {/* Tab Content com padding premium */}
+          <div className="p-6 bg-gradient-to-b from-transparent to-gray-50/30 dark:to-gray-800/30">
+            {renderActiveTab()}
+          </div>
         </div>
       </div>
     </Layout>

@@ -57,6 +57,13 @@ export const useDRE = (options = {}) => {
    */
   const loadDRE = useCallback(
     async (overrideOptions = {}) => {
+      // eslint-disable-next-line no-console
+      console.log('🔍 loadDRE chamado:', {
+        overrideOptions,
+        period,
+        selectedUnit,
+      });
+
       if (!selectedUnit) {
         setError(new Error('Nenhuma unidade selecionada'));
         showToast('Selecione uma unidade para visualizar o DRE', 'warning');
@@ -72,19 +79,39 @@ export const useDRE = (options = {}) => {
 
         // Determinar qual método chamar baseado no período
         const currentPeriod = overrideOptions.period || period;
+        // eslint-disable-next-line no-console
+        console.log('📊 Período selecionado:', currentPeriod);
 
         switch (currentPeriod) {
           case 'month':
+            // eslint-disable-next-line no-console
+            console.log('📅 Calculando DRE do mês atual...');
             result = await dreService.calculateCurrentMonthDRE(unitId);
             break;
 
-          case 'year':
+          case 'previous-month': {
+            // eslint-disable-next-line no-console
+            console.log('📅 Calculando DRE do mês anterior...');
+            const previousMonth = new Date();
+            previousMonth.setMonth(previousMonth.getMonth() - 1);
+            const year = previousMonth.getFullYear();
+            const month = previousMonth.getMonth() + 1; // getMonth() retorna 0-11
+            result = await dreService.calculateMonthDRE(unitId, year, month);
+            break;
+          }
+
+          case 'year': {
             const currentYear = new Date().getFullYear();
+            // eslint-disable-next-line no-console
+            console.log('📅 Calculando DRE do ano:', currentYear);
             result = await dreService.calculateYearDRE(unitId, currentYear);
             break;
+          }
 
-          case 'custom':
+          case 'custom': {
             const dates = overrideOptions.customDates || customDates;
+            // eslint-disable-next-line no-console
+            console.log('📅 Calculando DRE customizado:', dates);
             if (!dates.startDate || !dates.endDate) {
               throw new Error('Informe as datas inicial e final');
             }
@@ -94,10 +121,14 @@ export const useDRE = (options = {}) => {
               endDate: dates.endDate,
             });
             break;
+          }
 
           default:
             throw new Error(`Período inválido: ${currentPeriod}`);
         }
+
+        // eslint-disable-next-line no-console
+        console.log('✅ Resultado do DRE:', result);
 
         if (result.error) {
           throw result.error;
@@ -106,9 +137,13 @@ export const useDRE = (options = {}) => {
         setDre(result.data);
         showToast('DRE calculado com sucesso', 'success');
       } catch (err) {
-        console.error('Erro ao carregar DRE:', err);
+        // eslint-disable-next-line no-console
+        console.error('❌ Erro ao carregar DRE:', err);
         setError(err);
-        showToast(err.message || 'Erro ao calcular DRE', 'error');
+
+        // Mensagens de erro mais específicas
+        const errorMessage = err.message || 'Erro ao calcular DRE';
+        showToast(errorMessage, 'error');
       } finally {
         setLoading(false);
       }
@@ -143,9 +178,12 @@ export const useDRE = (options = {}) => {
         setDre(result.data);
         showToast(`DRE de ${month}/${year} calculado com sucesso`, 'success');
       } catch (err) {
+        // eslint-disable-next-line no-console
         console.error('Erro ao carregar DRE do mês:', err);
         setError(err);
-        showToast(err.message || 'Erro ao calcular DRE', 'error');
+
+        const errorMessage = err.message || 'Erro ao calcular DRE';
+        showToast(errorMessage, 'error');
       } finally {
         setLoading(false);
       }
@@ -183,9 +221,12 @@ export const useDRE = (options = {}) => {
         setComparisonMode(true);
         showToast('Comparação realizada com sucesso', 'success');
       } catch (err) {
+        // eslint-disable-next-line no-console
         console.error('Erro ao comparar períodos:', err);
         setError(err);
-        showToast(err.message || 'Erro ao comparar períodos', 'error');
+
+        const errorMessage = err.message || 'Erro ao comparar períodos';
+        showToast(errorMessage, 'error');
       } finally {
         setLoading(false);
       }
@@ -219,11 +260,85 @@ export const useDRE = (options = {}) => {
       showToast('DRE exportado com sucesso', 'success');
       return text;
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error('Erro ao exportar DRE:', err);
       showToast('Erro ao exportar DRE', 'error');
       return null;
     }
   }, [dre, selectedUnit, showToast]);
+
+  /**
+   * Exporta o DRE como CSV
+   */
+  const exportDREAsCSV = useCallback(() => {
+    if (!dre) {
+      showToast('Nenhum DRE para exportar', 'warning');
+      return null;
+    }
+
+    try {
+      const csv = dreService.exportAsCSV(dre);
+
+      // Criar arquivo e fazer download
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `DRE_${selectedUnit?.name || 'export'}_${dre.periodo.inicio}_${dre.periodo.fim}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      showToast('DRE exportado como CSV com sucesso', 'success');
+      return csv;
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Erro ao exportar DRE como CSV:', err);
+      showToast('Erro ao exportar DRE', 'error');
+      return null;
+    }
+  }, [dre, selectedUnit, showToast]);
+
+  /**
+   * Exporta o DRE como PDF (via HTML)
+   */
+  const exportDREAsPDF = useCallback(() => {
+    if (!dre) {
+      showToast('Nenhum DRE para exportar', 'warning');
+      return null;
+    }
+
+    try {
+      const html = dreService.exportAsHTML(dre);
+
+      // Abrir em nova janela para impressão/salvar como PDF
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(html);
+        printWindow.document.close();
+
+        // Aguardar carregamento e imprimir
+        printWindow.onload = () => {
+          printWindow.print();
+        };
+
+        showToast('Abrindo visualização para impressão/PDF', 'success');
+      } else {
+        showToast(
+          'Bloqueador de pop-ups ativo. Permita pop-ups para exportar',
+          'warning'
+        );
+      }
+
+      return html;
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Erro ao exportar DRE como PDF:', err);
+      showToast('Erro ao exportar DRE', 'error');
+      return null;
+    }
+  }, [dre, showToast]);
 
   /**
    * Limpa o DRE atual
@@ -266,7 +381,8 @@ export const useDRE = (options = {}) => {
     if (autoLoad && selectedUnit) {
       loadDRE();
     }
-  }, [selectedUnit, autoLoad]); // Removido loadDRE para evitar loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedUnit, autoLoad]); // loadDRE não incluído para evitar loop infinito
 
   // Retornar estado e métodos
   return {
@@ -293,6 +409,8 @@ export const useDRE = (options = {}) => {
 
     // Utilidades
     exportDRE,
+    exportDREAsCSV,
+    exportDREAsPDF,
     clearDRE,
 
     // Informações derivadas

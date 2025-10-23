@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { 
-  User, 
-  Mail, 
-  Shield, 
-  Camera, 
-  Save, 
-  Lock, 
+import {
+  User,
+  Mail,
+  Shield,
+  Camera,
+  Save,
+  Lock,
   CheckCircle,
   AlertCircle,
   Eye,
@@ -13,7 +13,7 @@ import {
   Building2,
   Calendar,
   DollarSign,
-  Scissors
+  Scissors,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -24,18 +24,18 @@ export function UserProfilePage() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  
+
   const [profileData, setProfileData] = useState({
     name: user?.user_metadata?.full_name || user?.user_metadata?.name || '',
     email: user?.email || '',
     phone: user?.user_metadata?.phone || '',
-    avatar_url: user?.user_metadata?.avatar_url || ''
+    avatar_url: user?.user_metadata?.avatar_url || '',
   });
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
 
   const [errors, setErrors] = useState({});
@@ -43,15 +43,17 @@ export function UserProfilePage() {
 
   // Simular dados do perfil profissional (será integrado com Supabase depois)
   const professionalData = {
-    role: user?.user_metadata?.role || 'barbeiro',
+    role: user?.user_metadata?.role || 'usuario',
     unit: user?.user_metadata?.unit || 'Mangabeiras',
     commission: user?.user_metadata?.commission || '40%',
-    joinDate: user?.created_at ? new Date(user.created_at).toLocaleDateString('pt-BR') : 'N/A',
+    joinDate: user?.created_at
+      ? new Date(user.created_at).toLocaleDateString('pt-BR')
+      : 'N/A',
     totalServices: 156,
-    monthlyRevenue: 'R$ 4.500,00'
+    monthlyRevenue: 'R$ 4.500,00',
   };
 
-  const handleProfileUpdate = async (e) => {
+  const handleProfileUpdate = async e => {
     e.preventDefault();
     setLoading(true);
     setErrors({});
@@ -62,8 +64,8 @@ export function UserProfilePage() {
         data: {
           full_name: profileData.name,
           phone: profileData.phone,
-          avatar_url: profileData.avatar_url
-        }
+          avatar_url: profileData.avatar_url,
+        },
       });
 
       if (error) {
@@ -79,7 +81,7 @@ export function UserProfilePage() {
     }
   };
 
-  const handlePasswordChange = async (e) => {
+  const handlePasswordChange = async e => {
     e.preventDefault();
     setLoading(true);
     setErrors({});
@@ -100,14 +102,18 @@ export function UserProfilePage() {
 
     try {
       const { error } = await updatePassword(passwordData.newPassword);
-      
+
       if (error) {
         throw error;
       }
 
       setSuccess('Senha alterada com sucesso!');
       setShowPasswordForm(false);
-      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
       setTimeout(() => setSuccess(''), 3000);
     } catch (error) {
       setErrors({ general: error.message });
@@ -116,37 +122,49 @@ export function UserProfilePage() {
     }
   };
 
-  const getRoleBadge = (role) => {
+  const getRoleBadge = role => {
     const roleConfig = {
-      admin: { 
-        label: 'Administrador', 
+      admin: {
+        label: 'Administrador',
         color: 'bg-danger/10 text-danger border-danger/20',
-        icon: Shield
+        icon: Shield,
       },
-      gerente: { 
-        label: 'Gerente', 
+      gerente: {
+        label: 'Gerente',
         color: 'bg-warning/10 text-warning border-warning/20',
-        icon: Building2
+        icon: Building2,
       },
-      barbeiro: { 
-        label: 'Barbeiro', 
+      barbeiro: {
+        label: 'Barbeiro',
         color: 'bg-success/10 text-success border-success/20',
-        icon: Scissors
-      }
+        icon: Scissors,
+      },
+      recepcionista: {
+        label: 'Recepcionista',
+        color: 'bg-info/10 text-info border-info/20',
+        icon: User,
+      },
+      usuario: {
+        label: 'Usuário',
+        color: 'bg-gray-500/10 text-gray-500 border-gray-500/20',
+        icon: User,
+      },
     };
-    
-    const config = roleConfig[role] || roleConfig.barbeiro;
+
+    const config = roleConfig[role] || roleConfig.usuario;
     const IconComponent = config.icon;
-    
+
     return (
-      <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium border ${config.color}`}>
+      <span
+        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium border ${config.color}`}
+      >
         <IconComponent size={14} />
         {config.label}
       </span>
     );
   };
 
-  const getInitials = (name) => {
+  const getInitials = name => {
     return name
       .split(' ')
       .map(word => word.charAt(0))
@@ -289,7 +307,9 @@ export function UserProfilePage() {
                   <input
                     type="text"
                     value={profileData.name}
-                    onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
+                    onChange={e =>
+                      setProfileData({ ...profileData, name: e.target.value })
+                    }
                     placeholder="Seu nome completo"
                     className="w-full pl-10 pr-4 py-3 bg-light-bg dark:bg-dark-bg border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-300 text-text-light-primary dark:text-text-dark-primary placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary"
                     required
@@ -324,15 +344,17 @@ export function UserProfilePage() {
                 <input
                   type="tel"
                   value={profileData.phone}
-                  onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+                  onChange={e =>
+                    setProfileData({ ...profileData, phone: e.target.value })
+                  }
                   placeholder="(31) 99999-9999"
                   className="w-full px-4 py-3 bg-light-bg dark:bg-dark-bg border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-300 text-text-light-primary dark:text-text-dark-primary placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary"
                 />
               </div>
 
               <div className="flex justify-end pt-4">
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={loading}
                   className="flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-600 text-white rounded-lg font-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -375,16 +397,23 @@ export function UserProfilePage() {
                       <Lock className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary" />
                     </div>
                     <input
-                      type={showCurrentPassword ? "text" : "password"}
+                      type={showCurrentPassword ? 'text' : 'password'}
                       value={passwordData.currentPassword}
-                      onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                      onChange={e =>
+                        setPasswordData({
+                          ...passwordData,
+                          currentPassword: e.target.value,
+                        })
+                      }
                       placeholder="Digite sua senha atual"
                       className="w-full pl-10 pr-12 py-3 bg-light-bg dark:bg-dark-bg border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-300 text-text-light-primary dark:text-text-dark-primary placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary"
                       required
                     />
                     <button
                       type="button"
-                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      onClick={() =>
+                        setShowCurrentPassword(!showCurrentPassword)
+                      }
                       className="absolute inset-y-0 right-0 pr-3 flex items-center"
                     >
                       {showCurrentPassword ? (
@@ -405,13 +434,18 @@ export function UserProfilePage() {
                       <Lock className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary" />
                     </div>
                     <input
-                      type={showNewPassword ? "text" : "password"}
+                      type={showNewPassword ? 'text' : 'password'}
                       value={passwordData.newPassword}
-                      onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                      onChange={e =>
+                        setPasswordData({
+                          ...passwordData,
+                          newPassword: e.target.value,
+                        })
+                      }
                       placeholder="Digite a nova senha"
                       className={`w-full pl-10 pr-12 py-3 bg-light-bg dark:bg-dark-bg border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-300 text-text-light-primary dark:text-text-dark-primary placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary ${
-                        errors.newPassword 
-                          ? 'border-danger' 
+                        errors.newPassword
+                          ? 'border-danger'
                           : 'border-light-border dark:border-dark-border'
                       }`}
                       required
@@ -429,7 +463,9 @@ export function UserProfilePage() {
                     </button>
                   </div>
                   {errors.newPassword && (
-                    <p className="text-sm text-danger mt-1">{errors.newPassword}</p>
+                    <p className="text-sm text-danger mt-1">
+                      {errors.newPassword}
+                    </p>
                   )}
                 </div>
 
@@ -442,20 +478,27 @@ export function UserProfilePage() {
                       <Lock className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary" />
                     </div>
                     <input
-                      type={showConfirmPassword ? "text" : "password"}
+                      type={showConfirmPassword ? 'text' : 'password'}
                       value={passwordData.confirmPassword}
-                      onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                      onChange={e =>
+                        setPasswordData({
+                          ...passwordData,
+                          confirmPassword: e.target.value,
+                        })
+                      }
                       placeholder="Confirme a nova senha"
                       className={`w-full pl-10 pr-12 py-3 bg-light-bg dark:bg-dark-bg border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-300 text-text-light-primary dark:text-text-dark-primary placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary ${
-                        errors.confirmPassword 
-                          ? 'border-danger' 
+                        errors.confirmPassword
+                          ? 'border-danger'
                           : 'border-light-border dark:border-dark-border'
                       }`}
                       required
                     />
                     <button
                       type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                       className="absolute inset-y-0 right-0 pr-3 flex items-center"
                     >
                       {showConfirmPassword ? (
@@ -466,7 +509,9 @@ export function UserProfilePage() {
                     </button>
                   </div>
                   {errors.confirmPassword && (
-                    <p className="text-sm text-danger mt-1">{errors.confirmPassword}</p>
+                    <p className="text-sm text-danger mt-1">
+                      {errors.confirmPassword}
+                    </p>
                   )}
                 </div>
 
@@ -475,15 +520,19 @@ export function UserProfilePage() {
                     type="button"
                     onClick={() => {
                       setShowPasswordForm(false);
-                      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+                      setPasswordData({
+                        currentPassword: '',
+                        newPassword: '',
+                        confirmPassword: '',
+                      });
                       setErrors({});
                     }}
                     className="px-4 py-2 border border-light-border dark:border-dark-border text-text-light-primary dark:text-text-dark-primary rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition-colors duration-300"
                   >
                     Cancelar
                   </button>
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     disabled={loading}
                     className="flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-600 text-white rounded-lg font-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >

@@ -21,6 +21,9 @@ import {
 // Date formatting imports removed - not used in current implementation
 
 import { StatusBadge } from '../atoms/StatusBadge';
+import { AutoMatchStep } from '../organisms';
+import { BankFileParser } from '../services/bankFileParser';
+import { autoCategorizeBankStatement } from '../services/autoCategorization';
 
 /**
  * Modal para importação de extratos bancários com parsing de CSV
@@ -52,6 +55,8 @@ const ImportStatementModal = ({
   const [previewData, setPreviewData] = useState([]);
   const [validationErrors, setValidationErrors] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [enableAutoMatch, setEnableAutoMatch] = useState(true); // Controla se auto-match será executado
+  const [autoMatchCompleted, setAutoMatchCompleted] = useState(false); // Controla se auto-match foi concluído
 
   // Referências
   const fileInputRef = useRef(null);
@@ -109,12 +114,11 @@ const ImportStatementModal = ({
     { value: '|', label: 'Pipe (|)' },
   ];
 
-  // Opções de formato de data
-  const dateFormatOptions = [
-    { value: 'dd/MM/yyyy', label: 'DD/MM/AAAA (31/12/2024)' },
-    { value: 'MM/dd/yyyy', label: 'MM/DD/AAAA (12/31/2024)' },
-    { value: 'yyyy-MM-dd', label: 'AAAA-MM-DD (2024-12-31)' },
-    { value: 'dd-MM-yyyy', label: 'DD-MM-AAAA (31-12-2024)' },
+  // Opções de encoding
+  const encodingOptions = [
+    { value: 'UTF-8', label: 'UTF-8 (Recomendado)' },
+    { value: 'ISO-8859-1', label: 'ISO-8859-1 (Latin-1)' },
+    { value: 'Windows-1252', label: 'Windows-1252' },
   ];
 
   // Opções de tratamento de duplicatas
@@ -227,6 +231,97 @@ const ImportStatementModal = ({
     [importSettings]
   );
 
+  // ✅ FIX: Função para ler conteúdo real do arquivo
+  const readFileContent = useCallback(
+    file => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = event => {
+          try {
+            const content = event.target.result;
+            resolve(content);
+          } catch (error) {
+            reject(new Error('Erro ao ler arquivo: ' + error.message));
+          }
+        };
+
+        reader.onerror = () => {
+          reject(
+            new Error(
+              'Erro ao ler arquivo. Verifique se o arquivo não está corrompido.'
+            )
+          );
+        };
+
+        // Tentar diferentes encodings
+        if (importSettings.encoding === 'UTF-8') {
+          reader.readAsText(file, 'UTF-8');
+        } else if (importSettings.encoding === 'ISO-8859-1') {
+          reader.readAsText(file, 'ISO-8859-1');
+        } else {
+          reader.readAsText(file);
+        }
+      });
+    },
+    [importSettings.encoding]
+  );
+
+  // ✅ FIX: Função para auto-mapear colunas baseado nos headers
+  const autoMapColumns = useCallback(headers => {
+    const mapping = {};
+
+    headers.forEach(header => {
+      const lowerHeader = header.toLowerCase().trim();
+
+      // Mapeamento inteligente de colunas
+      if (lowerHeader.includes('data') || lowerHeader.includes('date')) {
+        mapping.data = header;
+      }
+      if (
+        lowerHeader.includes('valor') ||
+        lowerHeader.includes('value') ||
+        lowerHeader.includes('amount')
+      ) {
+        mapping.valor = header;
+      }
+      if (
+        lowerHeader.includes('desc') ||
+        lowerHeader.includes('histórico') ||
+        lowerHeader.includes('description')
+      ) {
+        mapping.descricao = header;
+      }
+      if (
+        lowerHeader.includes('tipo') ||
+        lowerHeader.includes('type') ||
+        lowerHeader.includes('debit') ||
+        lowerHeader.includes('credit')
+      ) {
+        mapping.tipo = header;
+      }
+      if (
+        lowerHeader.includes('doc') ||
+        lowerHeader.includes('número') ||
+        lowerHeader.includes('number')
+      ) {
+        mapping.documento = header;
+      }
+      if (lowerHeader.includes('saldo') || lowerHeader.includes('balance')) {
+        mapping.saldo = header;
+      }
+      if (
+        lowerHeader.includes('obs') ||
+        lowerHeader.includes('note') ||
+        lowerHeader.includes('comment')
+      ) {
+        mapping.observacoes = header;
+      }
+    });
+
+    return mapping;
+  }, []);
+
   // Função para upload e parsing do arquivo
   const handleFileUpload = useCallback(
     async selectedFile => {
@@ -239,43 +334,103 @@ const ImportStatementModal = ({
       setFile(selectedFile);
       setValidationErrors([]);
 
-      // Simular leitura do arquivo
       try {
-        // Em uma implementação real, você usaria FileReader
-        const mockCsvContent = `Data,Descrição,Valor,Tipo,Documento
-01/12/2024,"Transferência recebida",1500.00,C,TED123456
-02/12/2024,"Pagamento conta luz",-85.50,D,BOL789123
-03/12/2024,"Depósito em dinheiro",200.00,C,DEP456789
-05/12/2024,"Saque no caixa eletrônico",-100.00,D,SAQ987654
-08/12/2024,"Compra no cartão débito",-45.30,D,CDB321987`;
+        // Detectar formato do arquivo
+        const fileExtension = selectedFile.name.split('.').pop().toLowerCase();
 
-        const result = parseCSVContent(mockCsvContent);
+        // ✅ FIX: Ler conteúdo real do arquivo
+        const fileContent = await readFileContent(selectedFile);
+
+        let result;
+
+        // Se for OFX, usar o BankFileParser
+        if (fileExtension === 'ofx') {
+          const parser = new BankFileParser();
+          const transactions = await parser.parseOFX(fileContent);
+
+          // Converter transações OFX para formato esperado pelo modal
+          // ✅ AUTO-CATEGORIZAÇÃO: Sugerir categoria baseada na descrição (ASYNC)
+
+          // eslint-disable-next-line no-console
+          console.log(
+            `[ImportStatementModal] 🤖 Iniciando auto-categorização de ${transactions.length} transações...`
+          );
+
+          const ofxRows = await Promise.all(
+            transactions.map(async (t, index) => {
+              const transactionType = t.type === 'credit' ? 'Credit' : 'Debit';
+              const suggestedCategory = await autoCategorizeBankStatement(
+                t.description,
+                transactionType
+              );
+
+              // Log das primeiras 3 para debug
+              if (index < 3) {
+                // eslint-disable-next-line no-console
+                console.log(
+                  `[ImportStatementModal] 📝 Transação ${index + 1}:`,
+                  {
+                    descricao: t.description.substring(0, 50),
+                    tipo: transactionType,
+                    categoriaSugerida: suggestedCategory,
+                  }
+                );
+              }
+
+              return {
+                data: t.date,
+                descricao: t.description,
+                valor: t.amount,
+                tipo: t.type === 'credit' ? 'C' : 'D',
+                documento: t.document || t.fitid || '',
+                categoria: suggestedCategory, // ✅ Categoria sugerida automaticamente
+              };
+            })
+          );
+
+          // eslint-disable-next-line no-console
+          console.log(
+            `[ImportStatementModal] ✅ Auto-categorização concluída!`
+          );
+
+          result = {
+            headers: [
+              'data',
+              'descricao',
+              'valor',
+              'tipo',
+              'documento',
+              'categoria',
+            ],
+            rows: ofxRows,
+            sample: ofxRows.slice(0, 10), // Preview das primeiras 10 linhas
+          };
+
+          // Auto-mapear para OFX (já vem estruturado)
+          setColumnMapping({
+            data: 'data',
+            descricao: 'descricao',
+            valor: 'valor',
+            tipo: 'tipo',
+            documento: 'documento',
+            categoria: 'categoria', // ✅ Mapear categoria
+          });
+        } else {
+          // CSV/TXT: usar parser existente
+          result = parseCSVContent(fileContent);
+
+          // Auto-mapear colunas baseado nos headers reais
+          const autoMapping = autoMapColumns(result.headers);
+          setColumnMapping(autoMapping);
+        }
+
         setParseResult(result);
-
-        // Auto-mapear colunas óbvias
-        const autoMapping = {};
-        result.headers.forEach(header => {
-          const lowerHeader = header.toLowerCase();
-          if (lowerHeader.includes('data')) autoMapping.data = header;
-          if (lowerHeader.includes('valor') || lowerHeader.includes('value'))
-            autoMapping.valor = header;
-          if (lowerHeader.includes('desc') || lowerHeader.includes('histórico'))
-            autoMapping.descricao = header;
-          if (lowerHeader.includes('tipo') || lowerHeader.includes('type'))
-            autoMapping.tipo = header;
-          if (lowerHeader.includes('doc') || lowerHeader.includes('número'))
-            autoMapping.documento = header;
-          if (lowerHeader.includes('saldo') || lowerHeader.includes('balance'))
-            autoMapping.saldo = header;
-        });
-
-        setColumnMapping(autoMapping);
         setCurrentStep(2);
       } catch (error) {
         setValidationErrors([error.message || 'Erro ao processar arquivo']);
       }
     },
-    [validateFile, parseCSVContent]
+    [validateFile, parseCSVContent, readFileContent, autoMapColumns]
   );
 
   // Função para validar mapeamento
@@ -325,6 +480,7 @@ const ImportStatementModal = ({
             row[columnMapping.saldo]?.replace(/[^\d,-]/g, '').replace(',', '.')
           ) || null,
         observacoes: row[columnMapping.observacoes] || '',
+        categoria: row[columnMapping.categoria] || 'Despesas sem Identificação', // ✅ Categoria sugerida
         status: 'pendente',
         _original: row,
       };
@@ -355,7 +511,7 @@ const ImportStatementModal = ({
     });
   }, [parseResult, columnMapping]);
 
-  // Função para avançar para preview
+  // Função para avançar para preview ou auto-match
   const handleProceedToPreview = useCallback(() => {
     const errors = validateMapping();
     if (errors.length > 0) {
@@ -366,8 +522,10 @@ const ImportStatementModal = ({
     const preview = generatePreview();
     setPreviewData(preview);
     setValidationErrors([]);
-    setCurrentStep(3);
-  }, [validateMapping, generatePreview]);
+
+    // Se auto-match está habilitado, vai para step 2.5, senão vai direto para step 3
+    setCurrentStep(enableAutoMatch ? 2.5 : 3);
+  }, [validateMapping, generatePreview, enableAutoMatch]);
 
   // Função para resetar modal
   const resetModal = useCallback(() => {
@@ -378,6 +536,8 @@ const ImportStatementModal = ({
     setSelectedAccount('');
     setPreviewData([]);
     setValidationErrors([]);
+    setEnableAutoMatch(true);
+    setAutoMatchCompleted(false);
     setImportSettings({
       skipFirstRow: true,
       dateFormat: 'dd/MM/yyyy',
@@ -458,12 +618,14 @@ const ImportStatementModal = ({
                 Importar Extrato Bancário
               </h2>
               <p className="text-sm text-gray-500">
-                Passo {currentStep} de 3 -{' '}
+                Passo {currentStep} de {enableAutoMatch ? '4' : '3'} -{' '}
                 {currentStep === 1
                   ? 'Upload do Arquivo'
                   : currentStep === 2
                     ? 'Mapeamento de Colunas'
-                    : 'Preview e Confirmação'}
+                    : currentStep === 2.5
+                      ? 'Auto-Match de Reconciliação'
+                      : 'Preview e Confirmação'}
               </p>
             </div>
           </div>
@@ -479,10 +641,13 @@ const ImportStatementModal = ({
         {/* Progress Bar */}
         <div className="px-6 py-3 bg-gray-50 border-b border-gray-200">
           <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center space-x-8">
+            <div className="flex items-center space-x-6">
               {[
                 { step: 1, title: 'Upload', icon: Upload },
                 { step: 2, title: 'Mapeamento', icon: MapPin },
+                ...(enableAutoMatch
+                  ? [{ step: 2.5, title: 'Auto-Match', icon: RefreshCw }]
+                  : []),
                 { step: 3, title: 'Preview', icon: Eye },
               ].map(({ step, title }) => (
                 <div
@@ -501,10 +666,12 @@ const ImportStatementModal = ({
                     {currentStep > step ? (
                       <CheckCircle className="w-4 h-4" />
                     ) : (
-                      <span className="text-xs font-medium">{step}</span>
+                      <span className="text-xs font-medium">
+                        {step === 2.5 ? '★' : step}
+                      </span>
                     )}
                   </div>
-                  <span className="font-medium">{title}</span>
+                  <span className="font-medium text-xs">{title}</span>
                 </div>
               ))}
             </div>
@@ -535,7 +702,7 @@ const ImportStatementModal = ({
               </div>
 
               {/* Configurações de Import */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Delimitador
@@ -573,6 +740,28 @@ const ImportStatementModal = ({
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     {dateFormatOptions.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Encoding
+                  </label>
+                  <select
+                    value={importSettings.encoding}
+                    onChange={e =>
+                      setImportSettings(prev => ({
+                        ...prev,
+                        encoding: e.target.value,
+                      }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    {encodingOptions.map(option => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
@@ -822,6 +1011,29 @@ const ImportStatementModal = ({
             </div>
           )}
 
+          {/* Step 2.5: Auto-Match de Reconciliação */}
+          {currentStep === 2.5 && enableAutoMatch && (
+            <div className="p-6">
+              <AutoMatchStep
+                accountId={selectedAccount}
+                statements={previewData}
+                onMatchesConfirmed={confirmedCount => {
+                  setAutoMatchCompleted(true);
+                  setCurrentStep(3);
+                  if (confirmedCount > 0) {
+                    // toast.success() já foi chamado pelo AutoMatchStep
+                  }
+                }}
+                onSkip={() => {
+                  setCurrentStep(3);
+                  setEnableAutoMatch(false);
+                }}
+                tolerance={0.01}
+                dateTolerance={2}
+              />
+            </div>
+          )}
+
           {currentStep === 3 && previewData.length > 0 && (
             <div className="p-6 space-y-6">
               {/* Summary */}
@@ -979,8 +1191,24 @@ const ImportStatementModal = ({
             {currentStep > 1 && (
               <button
                 type="button"
-                onClick={() => setCurrentStep(currentStep - 1)}
+                onClick={() => {
+                  // Se está no step 2.5, volta para step 2
+                  // Se está no step 3 e auto-match foi executado, volta para step 2.5
+                  // Caso contrário, volta um step
+                  if (currentStep === 2.5) {
+                    setCurrentStep(2);
+                  } else if (
+                    currentStep === 3 &&
+                    enableAutoMatch &&
+                    !autoMatchCompleted
+                  ) {
+                    setCurrentStep(2.5);
+                  } else {
+                    setCurrentStep(currentStep === 3 ? 2 : currentStep - 1);
+                  }
+                }}
                 className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                data-testid="btn-back"
               >
                 Voltar
               </button>
@@ -1006,14 +1234,28 @@ const ImportStatementModal = ({
             )}
 
             {currentStep === 2 && (
-              <button
-                type="button"
-                onClick={handleProceedToPreview}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-              >
-                Gerar Preview
-                <ArrowRight className="w-4 h-4" />
-              </button>
+              <>
+                {/* Checkbox para habilitar/desabilitar auto-match */}
+                <label className="flex items-center gap-2 text-sm text-gray-700 mr-2">
+                  <input
+                    type="checkbox"
+                    checked={enableAutoMatch}
+                    onChange={e => setEnableAutoMatch(e.target.checked)}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span>Executar auto-match de reconciliação</span>
+                </label>
+
+                <button
+                  type="button"
+                  onClick={handleProceedToPreview}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                  data-testid="btn-proceed-from-mapping"
+                >
+                  {enableAutoMatch ? 'Executar Auto-Match' : 'Gerar Preview'}
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </>
             )}
 
             {currentStep === 3 && (

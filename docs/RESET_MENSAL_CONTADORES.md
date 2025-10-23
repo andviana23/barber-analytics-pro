@@ -1,96 +1,80 @@
-# RESET MENSAL DOS CONTADORES - DOCUMENTAÇÃO
+# 🔁 Reset Mensal dos Contadores
 
-> **Atualizado em:** 2024-10-17 via Supabase MCP
-
-## ✅ IMPLEMENTAÇÃO CONCLUÍDA
-
-O sistema de reset dos contadores foi modificado para executar **no último dia do mês às 23:59**, conforme solicitado.
-
-> **Nota:** Este documento refere-se ao sistema de fila de atendimento que pode não estar mais ativo no sistema atual.
-
-## 🔄 FUNCIONAMENTO
-
-### Automático (Trigger)
-- **Quando**: Último dia do mês às 23:59
-- **O que faz**: Zera todos os contadores de `total_atendimentos` na tabela `fila_atendimento`
-- **Log**: Cria registro no `historico_atendimentos` para auditoria
-
-### Manual (Função)
-Para executar o reset manualmente (ex: final de mês antecipado):
-
-```sql
-SELECT execute_monthly_reset();
-```
-
-## 🗓️ LÓGICA DE DATA
-
-O trigger verifica:
-1. **Se é o último dia do mês**: `DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month' - INTERVAL '1 day' = CURRENT_DATE`
-2. **Se são 23:59**: `EXTRACT(HOUR FROM NOW()) = 23 AND EXTRACT(MINUTE FROM NOW()) = 59`
-
-## 📊 EXEMPLO DE USO
-
-**Antes do Reset:**
-```
-Mangabeiras:
-- João Silva: 5 atendimentos
-- Pedro Santos: 8 atendimentos  
-- Carlos Oliveira: 12 atendimentos
-
-Nova Lima:
-- Marcos Lima: 3 atendimentos
-- Rafael Costa: 15 atendimentos
-- Diego Ferreira: 7 atendimentos
-```
-
-**Após Reset (último dia do mês às 23:59):**
-```
-Todas as unidades:
-- Todos barbeiros: 0 atendimentos
-- Novo ciclo mensal iniciado
-```
-
-## 🔍 AUDITORIA
-
-Cada reset gera um log no histórico:
-- **Tipo Serviço**: "Reset Mensal"
-- **Status**: "concluido"  
-- **Observações**: "Reset automático dos contadores mensais - DD/MM/YYYY HH:mm"
-- **Data/Hora**: Timestamp da execução
-
-## ⚠️ CONSIDERAÇÕES IMPORTANTES
-
-1. **Backup**: O sistema mantém histórico completo antes do reset
-2. **Não afeta histórico**: Apenas zera contadores da fila atual
-3. **Relatórios**: Dados históricos permanecem para relatórios mensais
-4. **Execução única**: Só executa uma vez por mês no horário correto
-
-## 🛠️ MANUTENÇÃO
-
-Para administradores do sistema:
-
-```sql
--- Verificar próximo reset (último dia do mês)
-SELECT DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month' - INTERVAL '1 day' as proximo_reset;
-
--- Verificar último reset executado
-SELECT * FROM historico_atendimentos 
-WHERE tipo_servico = 'Reset Mensal' 
-ORDER BY created_at DESC LIMIT 10;
-
--- Executar reset manual (se necessário)
-SELECT execute_monthly_reset();
-```
-
-## ✅ STATUS
-
-- ✅ **Trigger automático**: Configurado e testado
-- ✅ **Função manual**: Disponível e testada  
-- ✅ **Logging**: Auditoria completa implementada
-- ✅ **Testes**: Validado com dados reais
+> **Execução automática da rotação mensal da Lista da Vez, garantindo histórico e auditoria completos.**
+>
+> **Atualizado em:** 2025-10-22  
+> **Autor:** Codex (IA)
 
 ---
 
-**Data de Implementação**: 12/10/2025  
-**Testado em**: Supabase - PostgreSQL  
-**Status**: PRODUÇÃO
+## 🎯 Objetivo
+
+Resetar os contadores da Lista da Vez no **último dia de cada mês às 23:59**, salvando o histórico dos barbeiros e garantindo o início de um novo ciclo de atendimento em todas as unidades.
+
+---
+
+## 🧱 Componentes Envolvidos
+
+- 🗃️ Tabelas: `barbers_turn_list`, `barbers_turn_history`
+- 🧠 Função SQL: `fn_monthly_reset_turn_list()`
+- 🛰️ Edge Function: `supabase/functions/monthly-reset/index.ts`
+- 🛡️ Policies RLS: garantem execução segura por unidade
+
+---
+
+## ⚙️ Funcionamento
+
+1. **Agendamento** — Supabase Function é disparada via cron (último dia às 23:59) ou manualmente com chave de serviço.  
+2. **Execução** — `fn_monthly_reset_turn_list()` percorre todas as unidades, salva histórico (`barbers_turn_history`) e zera pontuações.  
+3. **Reordenação** — posição redefinida considerando data de cadastro.  
+4. **Auditoria** — logs gerados no console da Edge Function (ação `monthly_reset_executed`).
+
+---
+
+## 🛰️ Edge Function `monthly-reset`
+
+- **Headers esperados:** `Authorization` ou `apikey` com chave `SERVICE_ROLE`.  
+- **Variáveis:** `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ENVIRONMENT`.  
+- **Fluxo de resposta:**
+  ```json
+  {
+    "success": true,
+    "message": "Reset mensal executado com sucesso",
+    "data": { ... },
+    "timestamp": "2025-09-30T23:59:59.000Z"
+  }
+  ```
+
+---
+
+## 🧾 Execução Manual (SQL)
+
+```sql
+-- Reset manual (caso necessite rodar fora do agendamento)
+SELECT fn_monthly_reset_turn_list();
+
+-- Verificar histórico recente
+SELECT *
+  FROM barbers_turn_history
+ ORDER BY created_at DESC
+ LIMIT 10;
+```
+
+---
+
+## 🔍 Monitoramento
+
+- 📜 Verificar logs da função no dashboard Supabase (função `monthly-reset`).
+- 🧪 Recomenda-se executar em ambiente de staging antes de produção.
+- 🛎️ Configurar alertas (ex.: Slack/Webhook) consumindo os logs ou respostas da função.
+
+---
+
+## ✅ Checklist de Saúde
+
+- [✅] Função SQL `fn_monthly_reset_turn_list` migrada e versionada.  
+- [✅] Edge Function deployada com variáveis seguras.  
+- [✅] Cron configurado (ou workflow externo agendado).  
+- [⚠️] Validar logs após cada execução mensal.  
+- [⚠️] Manter script manual para contingência.
+

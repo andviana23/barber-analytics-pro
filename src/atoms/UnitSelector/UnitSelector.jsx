@@ -22,25 +22,23 @@ const UnitSelector = ({ className = '' }) => {
     hasMultipleUnits,
   } = useUnit();
 
-  // Debug para verificar estado
-  console.log('🔍 UnitSelector Debug:', {
-    receptionistStatus,
-    hasMultipleUnits,
-    allUnitsCount: allUnits.length,
-    loading,
-    error,
-    selectedUnit: selectedUnit?.name,
-  });
+  // Debug desabilitado - descomentar se necessário
+  // console.log('🔍 UnitSelector Debug:', {
+  //   receptionistStatus,
+  //   hasMultipleUnits,
+  //   allUnitsCount: allUnits.length,
+  //   loading,
+  //   error,
+  //   selectedUnit: selectedUnit?.name,
+  // });
 
-  // Recepcionista sempre vê o seletor (acesso a todas as unidades)
-  // Outros usuários só veem se houver múltiplas unidades
+  // ✅ SEMPRE MOSTRAR O SELETOR - É o componente principal do sistema
   if (!user) {
     return null;
   }
 
-  if (!receptionistStatus && !hasMultipleUnits) {
-    return null;
-  }
+  // ❌ REMOVIDO: Verificação de múltiplas unidades
+  // O seletor deve sempre aparecer para dar contexto ao usuário
 
   if (loading) {
     return (
@@ -70,33 +68,43 @@ const UnitSelector = ({ className = '' }) => {
   };
 
   return (
-    <div className={`flex flex-col gap-1 ${className}`}>
+    <div className={`flex flex-col gap-1.5 ${className}`}>
       <select
         id="unit-select"
         value={selectedUnit?.id || 'all'}
         onChange={e => handleUnitChange(e.target.value)}
         className="
-          w-full px-3 py-2 text-sm
+          w-full px-3 py-2.5 text-sm font-medium
           bg-white dark:bg-gray-800
-          border border-gray-300 dark:border-gray-600
+          border-2 border-primary/20 dark:border-primary/30
           rounded-lg shadow-sm
           text-gray-900 dark:text-gray-100
           focus:ring-2 focus:ring-primary focus:border-primary
-          transition-colors duration-200
+          hover:border-primary/40 dark:hover:border-primary/50
+          transition-all duration-200
+          cursor-pointer
         "
       >
-        <option value="all">Todas as Unidades</option>
+        <option value="all">📍 Todas as Unidades</option>
         {allUnits.map(unit => (
           <option key={unit.id} value={unit.id}>
-            {unit.name}
+            🏢 {unit.name}
           </option>
         ))}
       </select>
 
       {/* Indicador da seleção atual */}
-      <div className="text-xs text-gray-500 dark:text-gray-400 ml-0">
-        Visualizando:{' '}
-        <span className="font-medium">{getSelectedUnitName()}</span>
+      <div className="text-[10px] text-gray-500 dark:text-gray-400 px-1">
+        {selectedUnit ? (
+          <span className="flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+            <span className="font-medium text-primary">
+              {selectedUnit.name}
+            </span>
+          </span>
+        ) : (
+          <span className="text-gray-400">Visualizando todas</span>
+        )}
       </div>
     </div>
   );

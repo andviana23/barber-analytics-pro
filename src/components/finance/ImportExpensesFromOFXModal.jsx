@@ -1,0 +1,722 @@
+import React, { useState, useCallback } from 'react';
+import {
+  X,
+  Upload,
+  FileText,
+  CheckCircle,
+  AlertCircle,
+  Loader2,
+  ChevronRight,
+} from 'lucide-react';
+import { useToast } from '../../context/ToastContext';
+import { useUnit } from '../../context/UnitContext';
+import { supabase } from '../../services/supabase';
+import ImportExpensesFromOFXService from '../../services/importExpensesFromOFX';
+import categoriesService from '../../services/categoriesService';
+import { PartiesService } from '../../services/partiesService';
+
+/**
+ * Modal de Importação de Despesas via OFX
+ *
+ * Fluxo de 4 etapas:
+ * 1. Upload e validação do arquivo OFX
+ * 2. Preview/Revisão das despesas (só DEBIT)
+ * 3. Processamento e importação
+ * 4. Resultado da importação
+ *
+ * Design baseado no padrão do sistema com dark mode
+ */
+const ImportExpensesFromOFXModal = ({ isOpen, onClose, onSuccess }) => {
+  const { showSuccess, showError } = useToast();
+  const { selectedUnit } = useUnit();
+
+  // Estados
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const [parsedData, setParsedData] = useState(null);
+  const [previewData, setPreviewData] = useState([]); // Preview das despesas antes de importar
+  const [selectedRows, setSelectedRows] = useState([]); // Linhas selecionadas para importar
+  const [importResult, setImportResult] = useState(null);
+
+  const steps = [
+    { id: 1, title: 'Upload', icon: Upload },
+    { id: 2, title: 'Revisão', icon: FileText },
+    { id: 3, title: 'Processando', icon: Loader2 },
+    { id: 4, title: 'Concluído', icon: CheckCircle },
+  ];
+
+  /**
+   * Handler para upload de arquivo
+   */
+  const handleFileUpload = useCallback(
+    async event => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // Validar extensão
+      if (!file.name.toLowerCase().endsWith('.ofx')) {
+        showError(
+          'Arquivo inválido',
+          'Por favor, selecione um arquivo OFX válido.'
+        );
+        return;
+      }
+
+      // Validar tamanho (máx 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        showError('Arquivo muito grande', 'O arquivo deve ter no máximo 5MB.');
+        return;
+      }
+
+      setUploadedFile(file);
+      setIsLoading(true);
+
+      try {
+        // Processar arquivo OFX
+        const { data, error } =
+          await ImportExpensesFromOFXService.readOFXFile(file);
+
+        if (error) {
+          throw new Error(error);
+        }
+
+        if (!data || data.length === 0) {
+          throw new Error('Nenhuma transação encontrada no arquivo OFX');
+        }
+
+        // ✅ FILTRAR APENAS DEBIT (DESPESAS/SAÍDAS)
+        const allTransactions = data.transactions || data;
+        const debitOnly = allTransactions.filter(t => t.type === 'DEBIT');
+        const creditCount = allTransactions.length - debitOnly.length;
+
+        console.log('📊 Total transações:', allTransactions.length);
+        console.log('✅ DEBIT (despesas):', debitOnly.length);
+        console.log('❌ CREDIT (ignorados):', creditCount);
+
+        if (debitOnly.length === 0) {
+          throw new Error(
+            `Nenhuma despesa (DEBIT) encontrada no arquivo OFX.\n${allTransactions.length} transação(ões) de crédito foram ignoradas.`
+          );
+        }
+
+        // Preparar preview com categoria padrão
+        setParsedData({ ...data, transactions: debitOnly });
+
+        // Adicionar categoria padrão "Despesas sem Identificação" para todas as transações
+        const dataWithDefaultCategory = debitOnly.map(transaction => ({
+          ...transaction,
+          suggestedCategory: 'Despesas sem Identificação', // Categoria padrão
+        }));
+
+        setPreviewData(dataWithDefaultCategory);
+        setSelectedRows(dataWithDefaultCategory.map((_, idx) => idx)); // Selecionar todos
+        setCurrentStep(2); // Ir para revisão
+
+        showSuccess(
+          'Arquivo processado!',
+          `${debitOnly.length} despesa(s) encontrada(s)${creditCount > 0 ? ` (${creditCount} crédito(s) ignorado(s))` : ''}`
+        );
+      } catch (error) {
+        console.error('❌ Erro ao processar arquivo:', error);
+        showError('Erro no processamento', error.message);
+        setUploadedFile(null);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [showError, selectedUnit]
+  );
+
+  /**
+   * Importar apenas as linhas selecionadas
+   */
+  const handleConfirmImport = async () => {
+    // Filtrar apenas as linhas selecionadas
+    const selectedData = previewData.filter((_, idx) =>
+      selectedRows.includes(idx)
+    );
+
+    if (selectedData.length === 0) {
+      showError(
+        'Nenhuma despesa selecionada',
+        'Selecione pelo menos uma despesa para importar.'
+      );
+      return;
+    }
+
+    setCurrentStep(3); // Ir para processamento
+    await importData(selectedData);
+  };
+
+  /**
+   * Importar dados processados
+   */
+  const importData = async data => {
+    if (!selectedUnit?.id) {
+      showError('Erro', 'Nenhuma unidade selecionada');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      // Buscar primeira conta bancária da unidade
+      const { data: bankAccounts } = await supabase
+        .from('bank_accounts')
+        .select('id')
+        .eq('unit_id', selectedUnit.id)
+        .eq('is_active', true)
+        .limit(1);
+
+      if (!bankAccounts || bankAccounts.length === 0) {
+        throw new Error(
+          'Nenhuma conta bancária encontrada. Por favor, cadastre uma conta bancária antes de importar despesas.'
+        );
+      }
+
+      const context = {
+        unitId: selectedUnit.id,
+        bankAccountId: bankAccounts[0].id,
+      };
+
+      // Validar transações
+      const validation =
+        ImportExpensesFromOFXService.validateTransactions(data);
+
+      if (!validation.isValid) {
+        throw new Error(`Arquivo inválido: ${validation.errors.join(', ')}`);
+      }
+
+      // Normalizar dados
+      const normalized = ImportExpensesFromOFXService.normalizeData(
+        data.transactions || data,
+        context
+      );
+
+      if (normalized.errors.length > 0) {
+        console.warn('⚠️ Erros de normalização:', normalized.errors);
+      }
+
+      // 🔍 Buscar categoria "Despesas sem Identificação"
+      const { data: expenseCategories } =
+        await categoriesService.getExpenseCategories();
+
+      const defaultCategory = expenseCategories?.find(
+        cat => cat.name === 'Despesas sem Identificação'
+      );
+
+      if (!defaultCategory) {
+        console.warn(
+          '⚠️ Categoria "Despesas sem Identificação" não encontrada! As despesas serão importadas sem categoria.'
+        );
+      } else {
+        console.log(
+          '✅ Categoria padrão encontrada:',
+          defaultCategory.name,
+          '(ID:',
+          defaultCategory.id,
+          ')'
+        );
+      }
+
+      // 🏪 Buscar fornecedores existentes usando o método correto
+      const { data: suppliers } = await PartiesService.getParties({
+        unitId: selectedUnit.id,
+        tipo: 'Fornecedor',
+        isActive: true,
+      });
+
+      console.log('📋 Categorias carregadas:', expenseCategories?.length || 0);
+      console.log('🏪 Fornecedores carregados:', suppliers?.length || 0);
+
+      // Atribuir categoria padrão a todas as despesas normalizadas
+      const normalizedWithCategory = normalized.normalized.map(record => ({
+        ...record,
+        expense: {
+          ...record.expense,
+          category_id: defaultCategory?.id || null, // Categoria padrão
+        },
+      }));
+
+      console.log(
+        `🏷️ Atribuindo categoria "${defaultCategory?.name || 'NENHUMA'}" para ${normalizedWithCategory.length} despesas`
+      );
+
+      // Enriquecer dados (detectar fornecedores - categoria já definida)
+      const enriched = await ImportExpensesFromOFXService.enrichData(
+        normalizedWithCategory,
+        {
+          unitId: selectedUnit.id,
+          categories: expenseCategories || [],
+          suppliers: suppliers || [],
+        }
+      );
+
+      // Inserir registros
+      const results = await ImportExpensesFromOFXService.insertApprovedRecords(
+        enriched,
+        context
+      );
+
+      // Gerar relatório
+      const report = ImportExpensesFromOFXService.generateReport(
+        results,
+        enriched
+      );
+
+      setImportResult(report);
+      setCurrentStep(4); // Etapa 4: Resultado
+
+      if (report.sucesso > 0) {
+        showSuccess(
+          'Importação concluída!',
+          `${report.sucesso} despesas importadas com sucesso.`
+        );
+        onSuccess?.(report);
+      }
+    } catch (error) {
+      console.error('❌ Erro na importação:', error);
+      showError('Erro na importação', error.message);
+      setCurrentStep(1);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /**
+   * Resetar modal
+   */
+  const handleClose = () => {
+    setCurrentStep(1);
+    setUploadedFile(null);
+    setParsedData(null);
+    setImportResult(null);
+    setIsLoading(false);
+    onClose();
+  };
+
+  /**
+   * Renderizar conteúdo da etapa
+   */
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="space-y-6">
+            {/* Upload Area */}
+            <div className="text-center">
+              <div className="mx-auto w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-4">
+                <Upload className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                Importar Despesas do Extrato OFX
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Selecione o arquivo OFX exportado do seu banco
+              </p>
+            </div>
+
+            {/* File Input */}
+            <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors">
+              <input
+                type="file"
+                accept=".ofx"
+                onChange={handleFileUpload}
+                className="hidden"
+                id="ofx-file-input"
+                disabled={isLoading}
+              />
+              <label
+                htmlFor="ofx-file-input"
+                className="cursor-pointer flex flex-col items-center"
+              >
+                <FileText className="w-12 h-12 text-gray-400 dark:text-gray-500 mb-3" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Clique para selecionar o arquivo
+                </span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  Formato: .ofx (máx. 5MB)
+                </span>
+              </label>
+            </div>
+
+            {/* Info Card */}
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2 flex items-center">
+                <AlertCircle className="w-4 h-4 mr-2" />
+                Informações Importantes
+              </h4>
+              <ul className="text-xs text-blue-800 dark:text-blue-200 space-y-1">
+                <li>• Apenas transações de débito (saídas) serão importadas</li>
+                <li>
+                  • Categorias serão atribuídas automaticamente quando possível
+                </li>
+                <li>• Duplicatas serão ignoradas automaticamente</li>
+                <li>• Todas as despesas serão criadas com status "Pendente"</li>
+              </ul>
+            </div>
+          </div>
+        );
+
+      case 2:
+        // PREVIEW/REVISÃO DAS DESPESAS
+        return (
+          <div className="space-y-4">
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                📋 Revisão das Despesas
+              </h4>
+              <p className="text-xs text-blue-800 dark:text-blue-200">
+                {previewData.length} despesa(s) encontrada(s) (apenas DEBIT).
+                Revise antes de importar.
+              </p>
+            </div>
+
+            {/* Tabela de Preview */}
+            <div className="max-h-96 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-100 dark:bg-gray-800 sticky top-0">
+                  <tr>
+                    <th className="p-2 text-left">
+                      <input
+                        type="checkbox"
+                        checked={selectedRows.length === previewData.length}
+                        onChange={e => {
+                          if (e.target.checked) {
+                            setSelectedRows(previewData.map((_, idx) => idx));
+                          } else {
+                            setSelectedRows([]);
+                          }
+                        }}
+                        className="rounded"
+                      />
+                    </th>
+                    <th className="p-2 text-left text-gray-700 dark:text-gray-300">
+                      Data
+                    </th>
+                    <th className="p-2 text-left text-gray-700 dark:text-gray-300">
+                      Descrição
+                    </th>
+                    <th className="p-2 text-right text-gray-700 dark:text-gray-300">
+                      Valor
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {previewData.map((transaction, idx) => (
+                    <tr
+                      key={idx}
+                      className={`border-t border-gray-200 dark:border-gray-700 ${
+                        selectedRows.includes(idx)
+                          ? 'bg-blue-50 dark:bg-blue-900/10'
+                          : ''
+                      }`}
+                    >
+                      <td className="p-2">
+                        <input
+                          type="checkbox"
+                          checked={selectedRows.includes(idx)}
+                          onChange={() => {
+                            if (selectedRows.includes(idx)) {
+                              setSelectedRows(
+                                selectedRows.filter(i => i !== idx)
+                              );
+                            } else {
+                              setSelectedRows([...selectedRows, idx]);
+                            }
+                          }}
+                          className="rounded"
+                        />
+                      </td>
+                      <td className="p-2 text-gray-900 dark:text-gray-100">
+                        {new Date(
+                          transaction.transaction_date
+                        ).toLocaleDateString('pt-BR')}
+                      </td>
+                      <td className="p-2 text-gray-900 dark:text-gray-100 max-w-xs truncate">
+                        {transaction.description}
+                      </td>
+                      <td className="p-2 text-right font-semibold text-red-600 dark:text-red-400">
+                        R$ {Number(transaction.amount).toFixed(2)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Botões de Ação */}
+            <div className="flex justify-between items-center pt-4">
+              <button
+                onClick={() => {
+                  setCurrentStep(1);
+                  setPreviewData([]);
+                  setSelectedRows([]);
+                }}
+                className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+              >
+                Voltar
+              </button>
+              <button
+                onClick={handleConfirmImport}
+                disabled={selectedRows.length === 0}
+                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors"
+              >
+                Importar {selectedRows.length} despesa(s)
+              </button>
+            </div>
+          </div>
+        );
+
+      case 3:
+        // PROCESSAMENTO
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <div className="mx-auto w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-4">
+                <Loader2 className="w-8 h-8 text-blue-600 dark:text-blue-400 animate-spin" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                Importando Despesas
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Aguarde enquanto cadastramos as despesas...
+              </p>
+            </div>
+          </div>
+        );
+
+      case 4:
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <div
+                className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
+                  importResult?.sucesso > 0
+                    ? 'bg-green-100 dark:bg-green-900/30'
+                    : 'bg-red-100 dark:bg-red-900/30'
+                }`}
+              >
+                {importResult?.sucesso > 0 ? (
+                  <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
+                ) : (
+                  <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-400" />
+                )}
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                {importResult?.sucesso > 0
+                  ? 'Importação Concluída!'
+                  : 'Importação com Erros'}
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {importResult?.sucesso > 0
+                  ? 'As despesas foram importadas com sucesso'
+                  : 'Ocorreram erros durante a importação'}
+              </p>
+            </div>
+
+            {/* Resumo */}
+            {importResult && (
+              <div className="space-y-3">
+                {/* Sucessos */}
+                {importResult.sucesso > 0 && (
+                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-green-900 dark:text-green-100">
+                        ✅ Despesas Importadas
+                      </span>
+                      <span className="text-lg font-bold text-green-600 dark:text-green-400">
+                        {importResult.sucesso}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Duplicatas */}
+                {importResult.duplicatas > 0 && (
+                  <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-yellow-900 dark:text-yellow-100">
+                        ⚠️ Duplicatas Ignoradas
+                      </span>
+                      <span className="text-lg font-bold text-yellow-600 dark:text-yellow-400">
+                        {importResult.duplicatas}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Erros */}
+                {importResult.erros > 0 && (
+                  <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-red-900 dark:text-red-100">
+                        ❌ Erros de Validação
+                      </span>
+                      <span className="text-lg font-bold text-red-600 dark:text-red-400">
+                        {importResult.erros}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Total Processado */}
+                <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      📊 Total Processado
+                    </span>
+                    <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                      {importResult.total}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Detalhes dos Erros (se houver) */}
+            {importResult?.errorsList && importResult.errorsList.length > 0 && (
+              <div className="mt-6 space-y-3">
+                <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                  📋 Detalhes dos Erros:
+                </h4>
+                <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-lg p-4 max-h-48 overflow-y-auto">
+                  <div className="space-y-3">
+                    {importResult.errorsList.map((error, idx) => (
+                      <div
+                        key={idx}
+                        className="text-sm border-l-4 border-red-500 pl-3 py-2"
+                      >
+                        <div className="flex items-start gap-2">
+                          <span className="font-semibold text-red-700 dark:text-red-400 min-w-[60px]">
+                            Linha {error.line}:
+                          </span>
+                          <span className="text-red-900 dark:text-red-200">
+                            {error.error}
+                          </span>
+                        </div>
+                        {error.details && (
+                          <div className="mt-1 ml-[68px] text-xs text-red-600 dark:text-red-400">
+                            {error.details}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+              Importar Despesas - OFX
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              {steps[currentStep - 1]?.title}
+            </p>
+          </div>
+          <button
+            onClick={handleClose}
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+            disabled={isLoading && currentStep === 2}
+          >
+            <X className="h-6 w-6" />
+          </button>
+        </div>
+
+        {/* Progress Steps */}
+        <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between">
+            {steps.map((step, index) => {
+              const Icon = step.icon;
+              const isActive = currentStep === step.id;
+              const isCompleted = currentStep > step.id;
+
+              return (
+                <React.Fragment key={step.id}>
+                  <div className="flex items-center">
+                    <div
+                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                        isActive
+                          ? 'bg-blue-600 dark:bg-blue-500 text-white'
+                          : isCompleted
+                            ? 'bg-green-600 dark:bg-green-500 text-white'
+                            : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
+                      }`}
+                    >
+                      {isCompleted ? (
+                        <CheckCircle className="w-5 h-5" />
+                      ) : (
+                        <Icon
+                          className={`w-5 h-5 ${isActive && step.id === 2 ? 'animate-spin' : ''}`}
+                        />
+                      )}
+                    </div>
+                    <span
+                      className={`ml-2 text-sm font-medium ${
+                        isActive || isCompleted
+                          ? 'text-gray-900 dark:text-gray-100'
+                          : 'text-gray-500 dark:text-gray-400'
+                      }`}
+                    >
+                      {step.title}
+                    </span>
+                  </div>
+                  {index < steps.length - 1 && (
+                    <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-600 mx-2" />
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Content */}
+        <div
+          className="p-6 overflow-y-auto"
+          style={{ maxHeight: 'calc(90vh - 200px)' }}
+        >
+          {renderStepContent()}
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+          {currentStep === 3 && (
+            <button
+              onClick={handleClose}
+              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+            >
+              Fechar
+            </button>
+          )}
+
+          {currentStep === 1 && (
+            <button
+              onClick={handleClose}
+              className="px-6 py-2.5 bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white font-medium rounded-lg transition-colors"
+            >
+              Cancelar
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ImportExpensesFromOFXModal;

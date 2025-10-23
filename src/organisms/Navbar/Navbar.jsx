@@ -2,7 +2,16 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ThemeToggleCompact } from '../../atoms/ThemeToggle';
 import { useAuth } from '../../context/AuthContext';
-import { Menu, Bell, Search, User, ChevronDown, Settings, LogOut, UserCircle } from 'lucide-react';
+import {
+  Menu,
+  Bell,
+  Search,
+  User,
+  ChevronDown,
+  Settings,
+  LogOut,
+  UserCircle,
+} from 'lucide-react';
 
 export function Navbar({ onMenuToggle }) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -12,7 +21,7 @@ export function Navbar({ onMenuToggle }) {
 
   // Fechar menu quando clicar fora
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = event => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
         setIsUserMenuOpen(false);
       }
@@ -37,13 +46,17 @@ export function Navbar({ onMenuToggle }) {
   };
 
   const getUserRole = () => {
-    const role = user?.user_metadata?.role || 'barber';
+    const role = user?.user_metadata?.role || 'barbeiro';
     const roles = {
       admin: 'Administrador',
-      manager: 'Gerente', 
-      barber: 'Barbeiro'
+      gerente: 'Gerente',
+      manager: 'Gerente',
+      barbeiro: 'Barbeiro',
+      barber: 'Barbeiro',
+      recepcionista: 'Recepcionista',
+      receptionist: 'Recepcionista',
     };
-    return roles[role] || 'Barbeiro';
+    return roles[role] || 'Usuário';
   };
 
   return (
@@ -107,15 +120,15 @@ export function Navbar({ onMenuToggle }) {
 
             {/* User menu */}
             <div className="relative" ref={userMenuRef}>
-              <button 
+              <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                 className="flex items-center gap-2 p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-dark-bg transition-colors duration-300"
               >
                 <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
                   {user?.user_metadata?.avatar_url ? (
-                    <img 
-                      src={user.user_metadata.avatar_url} 
-                      alt="Avatar" 
+                    <img
+                      src={user.user_metadata.avatar_url}
+                      alt="Avatar"
                       className="w-full h-full rounded-full object-cover"
                     />
                   ) : (
@@ -147,7 +160,7 @@ export function Navbar({ onMenuToggle }) {
                       {getUserRole()}
                     </span>
                   </div>
-                  
+
                   <div className="py-2">
                     <button
                       onClick={handleProfileClick}
@@ -156,7 +169,7 @@ export function Navbar({ onMenuToggle }) {
                       <UserCircle className="h-4 w-4" />
                       Meu Perfil
                     </button>
-                    
+
                     <button
                       onClick={() => {
                         navigate('/settings');
@@ -168,7 +181,7 @@ export function Navbar({ onMenuToggle }) {
                       Configurações
                     </button>
                   </div>
-                  
+
                   <div className="border-t border-light-border dark:border-dark-border py-2">
                     <button
                       onClick={handleSignOut}

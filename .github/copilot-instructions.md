@@ -1,156 +1,203 @@
-# Barber Analytics Pro - AI Development Guide
+# 🧠 Copilot Instructions — Barber Analytics Pro
 
-## Architecture Overview
+## 🎯 Contexto do Projeto
 
-**Barber Analytics Pro** is a React-based barbershop management system with real-time features, built on Supabase PostgreSQL with Row-Level Security (RLS).
+Você está colaborando no desenvolvimento do sistema **Barber Analytics Pro** — um sistema completo de gestão para barbearias premium, desenvolvido por **Andrey Viana**, com arquitetura limpa, modular e escalável.
 
-### Core Stack
-- **Frontend**: React 19 + Vite + Tailwind CSS + Atomic Design
-- **Backend**: Supabase (PostgreSQL + Auth + Realtime + Edge Functions)
-- **Charts**: Recharts for KPI dashboards
-- **Icons**: Lucide React
-- **Deployment**: Vercel
+O sistema é **React 19 + Vite + TailwindCSS** no frontend, com **Supabase (PostgreSQL + Auth + Realtime + Edge Functions)** no backend.  
+Adota **Clean Architecture**, **Domain-Driven Design (DDD)** e **Atomic Design**.
 
-## Project Structure Patterns
+---
 
-### Atomic Design Implementation
-```
+## 🏗️ Arquitetura Geral
+
+### 📁 Estrutura de Pastas
+
 src/
-├── atoms/          # Basic components (Button, Input, Card)
-├── molecules/      # Composed components (KPICard, ChartComponent)
-├── organisms/      # Complex components (Navbar, Sidebar)
-├── templates/      # Page layouts
-├── pages/          # Route components with business logic
-├── context/        # React Contexts (Auth, Theme, Unit, Toast)
-├── services/       # Supabase integration + business logic
-├── hooks/          # Custom React hooks for data fetching
-└── utils/          # Helper functions and constants
+├── atoms/ # Componentes básicos (Button, Input, Card)
+├── molecules/ # Composições simples (KPICard, Modal, Chart)
+├── organisms/ # Estruturas complexas (Navbar, Sidebar, Dashboard)
+├── templates/ # Layouts de página
+├── pages/ # Páginas com lógica de negócio
+├── services/ # Lógica de negócios e integração Supabase
+├── repositories/ # Acesso a dados (CRUD)
+├── hooks/ # Custom hooks reativos
+├── dtos/ # Data Transfer Objects (validação)
+└── utils/ # Funções auxiliares e formatação
+
+markdown
+Copiar código
+
+---
+
+## ⚙️ Padrões e Convenções
+
+### 🔸 Arquitetura
+
+- Cada módulo segue: **Repository → Service → DTO → Hook → Page**
+- **Repository** acessa o Supabase diretamente
+- **Service** contém regras de negócio e validações
+- **DTOs** validam e transformam dados
+- **Hooks** controlam estado e side effects
+- **Pages** conectam componentes e UI
+
+### 🔸 Código e Organização
+
+- Componentes: **PascalCase**
+- Funções/variáveis: **camelCase**
+- Imports organizados: libs externas → internos → locais
+- Funções async sempre retornam `{ data, error }`
+- Evitar lógica de negócio em componentes React
+- **Soft delete** (`is_active = false`) em vez de exclusão direta
+- **RLS** (Row Level Security) ativo em todas as tabelas
+
+### 🔸 Boas práticas
+
+- Usar `React.memo` para componentes de lista
+- Hooks com cache e `refetch`
+- Manter consistência visual com Tailwind
+- Criar componentes reutilizáveis antes de duplicar código
+
+---
+
+## 💰 Módulo Financeiro
+
+- Baseado em `FINANCIAL_MODULE.md`
+- Segue arquitetura: **Repository + Service + DTO**
+- Entidades: `revenues`, `expenses`, `parties`, `bank_accounts`, `payment_methods`
+- Cálculos automáticos (lucro líquido, margem, fluxo) em views SQL
+- Processos de conciliação via `source_hash`
+- Deduplicação e validações no `Service Layer`
+
+---
+
+## 🧾 Importação de Extratos Bancários
+
+- Lê arquivos Excel/CSV, normaliza dados e identifica créditos
+- Detecta profissional, cliente e forma de pagamento automaticamente
+- Deduplicação via `source_hash`
+- Revisão manual antes da gravação final
+- Serviços principais:
+  - `readExcelFile()`, `normalizeData()`, `enrichData()`, `insertApprovedRecords()`
+
+---
+
+## 💈 Lista da Vez
+
+- Gerencia ordem de atendimento por unidade
+- Reset automático mensal via **Edge Function (Supabase)** às 23:59
+- Histórico mensal completo
+- Funções SQL documentadas em `LISTA_DA_VEZ_MODULE.md`
+- Componentes principais:
+  - `ListaDaVezPage.jsx`, `useListaDaVez.js`, `listaDaVezService.js`
+
+---
+
+## 🧮 DRE e Relatórios
+
+- Geração de DRE via função `fn_calculate_dre()` (Supabase)
+- Visualização de KPIs em `KPICard`, `FinancialDashboard`, `CashflowChart`
+- Página de relatórios central: `RelatoriosPage.jsx`
+
+---
+
+## 🔐 Autenticação e Permissões
+
+- Hook: `useAuth()`
+- Roles: `barbeiro`, `gerente`, `admin`
+- RLS Policies aplicadas em todas as tabelas
+- Controle de UI baseado em `user_metadata.role`
+
+Exemplo de policy:
+
+```sql
+CREATE POLICY "view_own_unit"
+ON revenues
+FOR SELECT USING (
+  unit_id IN (SELECT unit_id FROM professionals WHERE user_id = auth.uid())
+);
+🧠 Regras para o Copilot Chat
+✅ Quando escrever código:
+Seguir Clean Architecture
+
+Não acessar o Supabase direto do componente React
+
+Retornar { data, error } em funções async
+
+Usar DTOs para validar inputs
+
+Aplicar máscaras e formatações (formatCurrency, formatDate)
+
+Usar toast.success() e toast.error() para feedback
+
+Hooks devem incluir loading, error, refetch
+
+✅ Quando criar novos módulos:
+Nomear seguindo o padrão:
+
+nomeService.js
+
+useNome.js
+
+NomePage.jsx
+
+Incluir DTO de criação e resposta
+
+Adicionar RLS policy no banco, se aplicável
+
+✅ Quando gerar SQL:
+Seguir snake_case
+
+Incluir CHECK, DEFAULT e timestamps (created_at, updated_at)
+
+Usar is_active e RLS sempre
+
+💡 Estilo de Resposta Esperado do Copilot
+Explicar brevemente a decisão arquitetural
+
+Código limpo, comentado e consistente
+
+Mostrar paths reais (src/services/..., src/pages/...)
+
+Evitar respostas genéricas ou fora da estrutura do projeto
+
+Manter o padrão Enterprise + Clean Code
+
+🧩 Checklist de Criação de Features
+Repository
+
+Service
+
+DTO
+
+Hook
+
+Componentes (Atomic)
+
+Page
+
+Testes
+
+Atualizar Documentação
+
+📈 Resultado Esperado
+O Copilot deve:
+
+Entender toda a arquitetura do Barber Analytics Pro
+
+Manter consistência nos padrões
+
+Criar código funcional e modular
+
+Integrar automaticamente com os padrões existentes
+
+Seguir Clean Architecture + DDD + Atomic Design
+
+Evitar redundância e manter alta legibilidade
+
+✨ Autor & Contexto
+Autor: Andrey Viana
+Projeto: Barber Analytics Pro
+Estilo: Enterprise, Clean Code, Atomic, Multi-tenant, Supabase-first
+Meta: Sistema de gestão de barbearia completo, modular e escalável.
 ```
-
-### Service Layer Pattern
-All business logic lives in `src/services/`:
-- **Convention**: `[feature]Service.js` exports object with methods
-- **Pattern**: Each service method returns `{ data, error }` for consistent error handling
-- **Example**: `profissionaisService.getProfissionais()`, `unitsService.createUnit()`
-- **Integration**: Services use Supabase client directly, no additional abstraction
-
-### Context Architecture
-Multiple contexts work together:
-```javascript
-// In App.jsx - nested providers
-<ThemeProvider>
-  <ToastProvider>
-    <AuthProvider>
-      <UnitProvider>
-        {/* app content */}
-      </UnitProvider>
-    </AuthProvider>
-  </ToastProvider>
-</ThemeProvider>
-```
-
-## Key Development Patterns
-
-### Authentication & Permissions
-- Use `useAuth()` hook for authentication state
-- Three permission levels: `barbeiro`, `gerente`, `admin`
-- RLS policies enforce data access at database level
-- Frontend components adapt UI based on `user.user_metadata.role`
-
-### Data Fetching with Custom Hooks
-```javascript
-// Standard pattern for data hooks
-const { data, loading, error, refetch } = useCustomHook(params);
-
-// Example implementation in hooks/
-export const useProfissionais = (unidadeId) => {
-  const [state, setState] = useState({ data: [], loading: true, error: null });
-  // ... hook implementation with caching
-};
-```
-
-### Route Protection
-- `<ProtectedRoute>`: Requires authentication
-- `<RoleProtectedRoute requiredRole="admin">`: Requires specific role
-- `<PublicRoute>`: Only accessible when NOT authenticated
-
-### Modal & CRUD Patterns
-- Modal components follow naming: `Create[Entity]Modal`, `Edit[Entity]Modal`, `Delete[Entity]Modal`
-- Each modal includes validation, loading states, and toast notifications
-- Soft delete pattern: Set `is_active = false` instead of hard delete
-
-## Supabase Integration
-
-### Environment Setup
-Required `.env.local` variables:
-```
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
-```
-
-### Database Conventions
-- All tables use UUID primary keys with `gen_random_uuid()`
-- Snake_case naming: `unidades`, `profissionais`, `created_at`
-- RLS enabled on all tables with policies for each role
-- Views prefixed with `vw_`: `vw_dashboard_expenses`, `vw_monthly_dre`
-
-### Realtime Features
-- Queue management uses Supabase Realtime subscriptions
-- Pattern: Subscribe in `useEffect`, cleanup on unmount
-- Example in `useFilaRealtime.js` hook
-
-## Development Workflows
-
-### Adding New Features
-1. **Service Layer**: Create `[feature]Service.js` with CRUD methods
-2. **Custom Hook**: Create `use[Feature].js` for state management
-3. **Components**: Build atomic → molecular → organism components
-4. **Page Integration**: Add to routing in `App.jsx`
-5. **Permissions**: Update RLS policies in database
-
-### Testing Pattern
-- Manual testing with custom test suites (see `test-fase-*.js`)
-- No unit tests currently - focus on integration testing
-- Each feature includes validation script with comprehensive checks
-
-### Code Style
-- **Imports**: Group by source (React, libraries, internal)
-- **Component Structure**: Props, state, effects, handlers, render
-- **Naming**: PascalCase components, camelCase functions/variables
-- **Comments**: JSDoc for service methods, inline for complex logic
-
-### Performance Considerations
-- Components use `React.memo` when appropriate
-- Hooks implement caching with TTL patterns
-- Database queries optimized with proper indexes
-- Bundle splitting at route level
-
-## Database Schema Highlights
-
-### Core Tables
-- `unidades` (units): Business locations
-- `profissionais` (professionals): Staff members linked to units
-- `receitas` (revenues): Income tracking by category
-- `despesas` (expenses): Expense tracking by category
-- `fila_atendimento` (service_queue): Real-time queue management
-
-### Key Relationships
-- Users → Professionals → Units (many-to-one)
-- Professionals → Queue entries (one-to-many)
-- Units → Financial records (one-to-many)
-
-## Common Gotchas
-
-- **RLS Policies**: Always test with different user roles
-- **Realtime Subscriptions**: Remember to unsubscribe in cleanup
-- **Service Methods**: Always handle both success and error cases
-- **Context Updates**: State changes trigger re-renders in all consumers
-- **Portuguese Locale**: Use `pt-BR` for date/currency formatting
-
-## Current Status (85% Complete)
-
-**Completed**: Authentication, Dashboard, Financial module, Queue management, Reports, Professional management, Units management
-**In Progress**: Settings page, Advanced features
-**Next**: External integrations, notifications, performance optimization
-
-This codebase follows enterprise patterns with strong separation of concerns, comprehensive error handling, and scalable architecture suitable for multi-tenant barbershop management.
