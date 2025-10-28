@@ -1,16 +1,28 @@
 /**
  * DateRangePicker.jsx
- * 
+ *
  * Seletor de período com presets e data customizada
  * Presets: Hoje, Esta semana, Este mês, Últimos 30 dias, Personalizado
- * 
+ *
  * Autor: Sistema Barber Analytics Pro
  * Data: 2024
  */
 
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { format, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subDays, addDays, parseISO, isValid } from 'date-fns';
+import {
+  format,
+  startOfDay,
+  endOfDay,
+  startOfWeek,
+  endOfWeek,
+  startOfMonth,
+  endOfMonth,
+  subDays,
+  addDays,
+  parseISO,
+  isValid,
+} from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Calendar, ChevronDown, X } from 'lucide-react';
 
@@ -21,7 +33,7 @@ const DateRangePicker = ({
   placeholder = 'Selecione o período',
   className = '',
   disabled = false,
-  clearable = true
+  clearable = true,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState(null);
@@ -35,8 +47,8 @@ const DateRangePicker = ({
       label: 'Hoje',
       getValue: () => ({
         startDate: startOfDay(new Date()),
-        endDate: endOfDay(new Date())
-      })
+        endDate: endOfDay(new Date()),
+      }),
     },
     {
       id: 'yesterday',
@@ -45,17 +57,17 @@ const DateRangePicker = ({
         const yesterday = subDays(new Date(), 1);
         return {
           startDate: startOfDay(yesterday),
-          endDate: endOfDay(yesterday)
+          endDate: endOfDay(yesterday),
         };
-      }
+      },
     },
     {
       id: 'thisWeek',
       label: 'Esta semana',
       getValue: () => ({
         startDate: startOfWeek(new Date(), { locale: ptBR }),
-        endDate: endOfWeek(new Date(), { locale: ptBR })
-      })
+        endDate: endOfWeek(new Date(), { locale: ptBR }),
+      }),
     },
     {
       id: 'lastWeek',
@@ -64,17 +76,17 @@ const DateRangePicker = ({
         const lastWeek = subDays(new Date(), 7);
         return {
           startDate: startOfWeek(lastWeek, { locale: ptBR }),
-          endDate: endOfWeek(lastWeek, { locale: ptBR })
+          endDate: endOfWeek(lastWeek, { locale: ptBR }),
         };
-      }
+      },
     },
     {
       id: 'thisMonth',
       label: 'Este mês',
       getValue: () => ({
         startDate: startOfMonth(new Date()),
-        endDate: endOfMonth(new Date())
-      })
+        endDate: endOfMonth(new Date()),
+      }),
     },
     {
       id: 'lastMonth',
@@ -83,26 +95,26 @@ const DateRangePicker = ({
         const lastMonth = subDays(startOfMonth(new Date()), 1);
         return {
           startDate: startOfMonth(lastMonth),
-          endDate: endOfMonth(lastMonth)
+          endDate: endOfMonth(lastMonth),
         };
-      }
+      },
     },
     {
       id: 'last30Days',
       label: 'Últimos 30 dias',
       getValue: () => ({
         startDate: startOfDay(subDays(new Date(), 29)),
-        endDate: endOfDay(new Date())
-      })
+        endDate: endOfDay(new Date()),
+      }),
     },
     {
       id: 'last90Days',
       label: 'Últimos 90 dias',
       getValue: () => ({
         startDate: startOfDay(subDays(new Date(), 89)),
-        endDate: endOfDay(new Date())
-      })
-    }
+        endDate: endOfDay(new Date()),
+      }),
+    },
   ];
 
   // Detectar preset ativo baseado no valor atual
@@ -110,7 +122,7 @@ const DateRangePicker = ({
     if (value?.startDate && value?.endDate) {
       const currentStart = new Date(value.startDate).getTime();
       const currentEnd = new Date(value.endDate).getTime();
-      
+
       const matchingPreset = datePresets.find(preset => {
         const presetValue = preset.getValue();
         return (
@@ -118,9 +130,9 @@ const DateRangePicker = ({
           presetValue.endDate.getTime() === currentEnd
         );
       });
-      
+
       setSelectedPreset(matchingPreset?.id || 'custom');
-      
+
       // Se é customizado, preencher campos
       if (!matchingPreset) {
         setCustomStartDate(format(new Date(value.startDate), 'yyyy-MM-dd'));
@@ -132,7 +144,7 @@ const DateRangePicker = ({
   }, [value]);
 
   // Aplicar preset selecionado
-  const handlePresetSelect = (presetId) => {
+  const handlePresetSelect = presetId => {
     const preset = datePresets.find(p => p.id === presetId);
     if (preset) {
       const range = preset.getValue();
@@ -155,13 +167,13 @@ const DateRangePicker = ({
     setSelectedPreset('custom');
     onChange({
       startDate: startOfDay(startDate),
-      endDate: endOfDay(endDate)
+      endDate: endOfDay(endDate),
     });
     setIsOpen(false);
   };
 
   // Limpar seleção
-  const handleClear = (e) => {
+  const handleClear = e => {
     e.stopPropagation();
     setSelectedPreset(null);
     setCustomStartDate('');
@@ -181,13 +193,17 @@ const DateRangePicker = ({
     }
 
     // Formato customizado
-    const startStr = format(new Date(value.startDate), 'dd/MM/yyyy', { locale: ptBR });
-    const endStr = format(new Date(value.endDate), 'dd/MM/yyyy', { locale: ptBR });
-    
+    const startStr = format(new Date(value.startDate), 'dd/MM/yyyy', {
+      locale: ptBR,
+    });
+    const endStr = format(new Date(value.endDate), 'dd/MM/yyyy', {
+      locale: ptBR,
+    });
+
     if (startStr === endStr) {
       return startStr;
     }
-    
+
     return `${startStr} - ${endStr}`;
   };
 
@@ -207,7 +223,7 @@ const DateRangePicker = ({
         onClick={() => !disabled && setIsOpen(!isOpen)}
         role="button"
         tabIndex={disabled ? -1 : 0}
-        onKeyDown={(e) => {
+        onKeyDown={e => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             !disabled && setIsOpen(!isOpen);
@@ -220,12 +236,12 @@ const DateRangePicker = ({
           <Calendar className="w-4 h-4 mr-2 text-gray-400" />
           <span className="truncate">{formatDisplayValue()}</span>
         </div>
-        
+
         <div className="flex items-center ml-2">
           {clearable && value && (
             <button
               type="button"
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
                 handleClear(e);
               }}
@@ -235,7 +251,7 @@ const DateRangePicker = ({
               <X className="w-3 h-3 text-gray-400" />
             </button>
           )}
-          <ChevronDown 
+          <ChevronDown
             className={`w-4 h-4 ml-1 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           />
         </div>
@@ -252,16 +268,17 @@ const DateRangePicker = ({
                   Períodos Rápidos
                 </h4>
                 <div className="grid grid-cols-2 gap-2">
-                  {datePresets.map((preset) => (
+                  {datePresets.map(preset => (
                     <button
                       key={preset.id}
                       type="button"
                       onClick={() => handlePresetSelect(preset.id)}
                       className={`
                         px-3 py-2 text-xs rounded-md text-left transition-colors
-                        ${selectedPreset === preset.id
-                          ? 'bg-blue-100 text-blue-700 border border-blue-200'
-                          : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-transparent'
+                        ${
+                          selectedPreset === preset.id
+                            ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                            : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-transparent'
                         }
                       `}
                     >
@@ -282,7 +299,7 @@ const DateRangePicker = ({
               <h4 className="text-sm font-medium text-gray-700 mb-3">
                 Período Personalizado
               </h4>
-              
+
               <div className="space-y-3">
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1">
@@ -291,11 +308,11 @@ const DateRangePicker = ({
                   <input
                     type="date"
                     value={customStartDate}
-                    onChange={(e) => setCustomStartDate(e.target.value)}
+                    onChange={e => setCustomStartDate(e.target.value)}
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1">
                     Data Final
@@ -303,11 +320,11 @@ const DateRangePicker = ({
                   <input
                     type="date"
                     value={customEndDate}
-                    onChange={(e) => setCustomEndDate(e.target.value)}
+                    onChange={e => setCustomEndDate(e.target.value)}
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-                
+
                 <div className="flex justify-between pt-2">
                   <button
                     type="button"
@@ -316,7 +333,7 @@ const DateRangePicker = ({
                   >
                     Cancelar
                   </button>
-                  
+
                   <button
                     type="button"
                     onClick={handleCustomDateApply}
@@ -334,10 +351,7 @@ const DateRangePicker = ({
 
       {/* Overlay */}
       {isOpen && (
-        <div 
-          className="fixed inset-0 z-40"
-          onClick={() => setIsOpen(false)}
-        />
+        <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
       )}
     </div>
   );
@@ -348,39 +362,45 @@ DateRangePicker.propTypes = {
    * Valor atual do range selecionado
    */
   value: PropTypes.shape({
-    startDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
-    endDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)])
+    startDate: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.instanceOf(Date),
+    ]),
+    endDate: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.instanceOf(Date),
+    ]),
   }),
-  
+
   /**
    * Callback quando o valor muda
    */
   onChange: PropTypes.func.isRequired,
-  
+
   /**
    * Mostrar presets rápidos
    */
   presets: PropTypes.bool,
-  
+
   /**
    * Placeholder quando nenhum valor selecionado
    */
   placeholder: PropTypes.string,
-  
+
   /**
    * Classes CSS adicionais
    */
   className: PropTypes.string,
-  
+
   /**
    * Componente desabilitado
    */
   disabled: PropTypes.bool,
-  
+
   /**
    * Permite limpar seleção
    */
-  clearable: PropTypes.bool
+  clearable: PropTypes.bool,
 };
 
 // Componente de preview para demonstração
@@ -390,7 +410,7 @@ export const DateRangePickerPreview = () => {
   return (
     <div className="space-y-4 p-4 max-w-md">
       <h3 className="text-lg font-semibold">DateRangePicker Preview</h3>
-      
+
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Selecione um período:
@@ -404,14 +424,19 @@ export const DateRangePickerPreview = () => {
 
       {selectedRange && (
         <div className="mt-4 p-3 bg-gray-50 rounded-md">
-          <h4 className="text-sm font-medium text-gray-700 mb-2">Valor selecionado:</h4>
+          <h4 className="text-sm font-medium text-gray-700 mb-2">
+            Valor selecionado:
+          </h4>
           <pre className="text-xs text-gray-600">
             {JSON.stringify(
               {
-                startDate: format(new Date(selectedRange.startDate), 'yyyy-MM-dd'),
-                endDate: format(new Date(selectedRange.endDate), 'yyyy-MM-dd')
-              }, 
-              null, 
+                startDate: format(
+                  new Date(selectedRange.startDate),
+                  'yyyy-MM-dd'
+                ),
+                endDate: format(new Date(selectedRange.endDate), 'yyyy-MM-dd'),
+              },
+              null,
               2
             )}
           </pre>

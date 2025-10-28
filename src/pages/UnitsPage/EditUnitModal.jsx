@@ -1,6 +1,6 @@
 /**
  * EDIT UNIT MODAL
- * 
+ *
  * Modal para edição de unidade existente
  */
 
@@ -9,12 +9,7 @@ import { Button, Input } from '../../atoms';
 import { useUnits } from '../../hooks';
 
 // Icons
-import {
-  X,
-  Building2,
-  Check,
-  AlertTriangle
-} from 'lucide-react';
+import { X, Building2, Check, AlertTriangle } from 'lucide-react';
 
 const EditUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
   const { updateUnit, updating } = useUnits(false);
@@ -22,7 +17,7 @@ const EditUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
   // Estado do formulário
   const [formData, setFormData] = useState({
     name: '',
-    status: true
+    status: true,
   });
 
   const [errors, setErrors] = useState({});
@@ -34,7 +29,7 @@ const EditUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
     if (unit && isOpen) {
       setFormData({
         name: unit.name || '',
-        status: unit.status !== false
+        status: unit.status !== false,
       });
       setErrors({});
       setTouched({});
@@ -45,9 +40,8 @@ const EditUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
   // Verificar mudanças
   useEffect(() => {
     if (unit) {
-      const changed = 
-        formData.name !== unit.name ||
-        formData.status !== unit.status;
+      const changed =
+        formData.name !== unit.name || formData.status !== unit.status;
       setHasChanges(changed);
     }
   }, [formData, unit]);
@@ -69,29 +63,29 @@ const EditUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
   };
 
   // Handlers
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
 
     // Limpar erro do campo ao digitar
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
-        [name]: ''
+        [name]: '',
       }));
     }
   };
 
-  const handleInputBlur = (field) => {
+  const handleInputBlur = field => {
     setTouched(prev => ({ ...prev, [field]: true }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     if (!hasChanges) {
       onClose();
       return;
@@ -99,7 +93,9 @@ const EditUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
 
     // Marcar todos os campos como touched
     const allFields = Object.keys(formData);
-    setTouched(allFields.reduce((acc, field) => ({ ...acc, [field]: true }), {}));
+    setTouched(
+      allFields.reduce((acc, field) => ({ ...acc, [field]: true }), {})
+    );
 
     if (!validateForm()) {
       return;
@@ -108,7 +104,7 @@ const EditUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
     try {
       await updateUnit(unit.id, {
         name: formData.name.trim(),
-        status: formData.status
+        status: formData.status,
       });
 
       onSuccess();
@@ -164,7 +160,10 @@ const EditUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Nome da Unidade */}
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
                 Nome da Unidade *
               </label>
               <Input
@@ -219,10 +218,15 @@ const EditUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
                     </p>
                     <ul className="text-amber-700 dark:text-amber-400 space-y-1">
                       {formData.name !== unit.name && (
-                        <li>• Nome: "{unit.name}" → "{formData.name}"</li>
+                        <li>
+                          • Nome: "{unit.name}" → "{formData.name}"
+                        </li>
                       )}
                       {formData.status !== unit.status && (
-                        <li>• Status: {unit.status ? 'Ativa' : 'Inativa'} → {formData.status ? 'Ativa' : 'Inativa'}</li>
+                        <li>
+                          • Status: {unit.status ? 'Ativa' : 'Inativa'} →{' '}
+                          {formData.status ? 'Ativa' : 'Inativa'}
+                        </li>
                       )}
                     </ul>
                   </div>
@@ -240,12 +244,12 @@ const EditUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
                   <span className="font-medium">ID:</span> {unit.id}
                 </div>
                 <div>
-                  <span className="font-medium">Criada em:</span> {' '}
+                  <span className="font-medium">Criada em:</span>{' '}
                   {new Date(unit.created_at).toLocaleDateString('pt-BR')}
                 </div>
                 {unit.updated_at && unit.updated_at !== unit.created_at && (
                   <div>
-                    <span className="font-medium">Última atualização:</span> {' '}
+                    <span className="font-medium">Última atualização:</span>{' '}
                     {new Date(unit.updated_at).toLocaleDateString('pt-BR')}
                   </div>
                 )}
@@ -262,7 +266,7 @@ const EditUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
               >
                 Cancelar
               </Button>
-              
+
               <Button
                 type="submit"
                 variant="primary"

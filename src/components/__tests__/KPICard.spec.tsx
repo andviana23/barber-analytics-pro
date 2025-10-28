@@ -12,26 +12,61 @@ import { FinancialFixtures, DateHelpers } from '@tests/__fixtures__/financial';
 // Mock dos ícones Lucide - mocks conditionals por className
 vi.mock('lucide-react', () => ({
   DollarSign: ({ size, className, ...props }: any) => (
-    <div data-testid="dollar-icon" data-size={size} className={className} {...props} />
+    <div
+      data-testid="dollar-icon"
+      data-size={size}
+      className={className}
+      {...props}
+    />
   ),
   TrendingUp: ({ size, className, ...props }: any) => {
-    const testId = className?.includes('h-4 w-4') ? 'trending-up-icon' : 'main-trending-up-icon';
-    return <div data-testid={testId} data-size={size} className={className} {...props} />;
+    const testId = className?.includes('h-4 w-4')
+      ? 'trending-up-icon'
+      : 'main-trending-up-icon';
+    return (
+      <div
+        data-testid={testId}
+        data-size={size}
+        className={className}
+        {...props}
+      />
+    );
   },
   TrendingDown: ({ size, className, ...props }: any) => {
-    const testId = className?.includes('h-4 w-4') ? 'trending-down-icon' : 'main-trending-down-icon';
-    return <div data-testid={testId} data-size={size} className={className} {...props} />;
+    const testId = className?.includes('h-4 w-4')
+      ? 'trending-down-icon'
+      : 'main-trending-down-icon';
+    return (
+      <div
+        data-testid={testId}
+        data-size={size}
+        className={className}
+        {...props}
+      />
+    );
   },
   Minus: ({ size, className, ...props }: any) => (
-    <div data-testid="minus-icon" data-size={size} className={className} {...props} />
+    <div
+      data-testid="minus-icon"
+      data-size={size}
+      className={className}
+      {...props}
+    />
   ),
   AlertTriangle: ({ size, className, ...props }: any) => (
-    <div data-testid="error-icon" data-size={size} className={className} {...props} />
+    <div
+      data-testid="error-icon"
+      data-size={size}
+      className={className}
+      {...props}
+    />
   ),
 }));
 
 // Mock de ícone simples para testes
-const MockIcon = () => <div data-testid="dollar-icon" data-size="24" aria-hidden="true" />;
+const MockIcon = () => (
+  <div data-testid="dollar-icon" data-size="24" aria-hidden="true" />
+);
 
 describe('KPICard', () => {
   const defaultProps = {
@@ -42,7 +77,7 @@ describe('KPICard', () => {
     trend: 'up',
     icon: MockIcon,
     color: 'text-blue-600',
-    loading: false
+    loading: false,
   };
 
   it('deve renderizar KPI básico corretamente', () => {
@@ -62,8 +97,8 @@ describe('KPICard', () => {
       trend: {
         value: 15.5,
         type: 'positive',
-        period: 'vs mês anterior'
-      }
+        period: 'vs mês anterior',
+      },
     };
 
     // Act
@@ -82,8 +117,8 @@ describe('KPICard', () => {
       trend: {
         value: -8.2,
         type: 'negative',
-        period: 'vs mês anterior'
-      }
+        period: 'vs mês anterior',
+      },
     };
 
     // Act
@@ -102,8 +137,8 @@ describe('KPICard', () => {
       trend: {
         value: 0,
         type: 'neutral',
-        period: 'vs mês anterior'
-      }
+        period: 'vs mês anterior',
+      },
     };
 
     // Act
@@ -120,7 +155,7 @@ describe('KPICard', () => {
       title: 'Despesas Totais',
       value: 8500,
       icon: 'DollarSign',
-      color: 'red'
+      color: 'red',
     };
 
     // Act
@@ -135,7 +170,9 @@ describe('KPICard', () => {
 
   it('deve aplicar classes CSS corretas por cor', () => {
     // Act
-    const { rerender, container } = render(<KPICard {...defaultProps} color="blue" />);
+    const { rerender, container } = render(
+      <KPICard {...defaultProps} color="blue" />
+    );
 
     // Assert - Verificar se contém classes relacionadas a azul
     let cardElement = container.firstChild;
@@ -167,7 +204,7 @@ describe('KPICard', () => {
     // Arrange
     const props = {
       ...defaultProps,
-      loading: true
+      loading: true,
     };
 
     // Act
@@ -182,7 +219,7 @@ describe('KPICard', () => {
     // Arrange
     const props = {
       ...defaultProps,
-      error: 'Erro ao carregar dados'
+      error: 'Erro ao carregar dados',
     };
 
     // Act
@@ -211,7 +248,7 @@ describe('KPICard', () => {
       const props = {
         ...defaultProps,
         value: -5000,
-        title: 'Prejuízo'
+        title: 'Prejuízo',
       };
 
       render(<KPICard {...props} />);
@@ -225,8 +262,8 @@ describe('KPICard', () => {
         trend: {
           value: 150.75,
           type: 'positive',
-          period: 'vs ano anterior'
-        }
+          period: 'vs ano anterior',
+        },
       };
 
       render(<KPICard {...props} />);
@@ -235,7 +272,9 @@ describe('KPICard', () => {
     });
 
     it('deve aceitar diferentes tipos de ícones', () => {
-      const { rerender } = render(<KPICard {...defaultProps} icon="TrendingUp" />);
+      const { rerender } = render(
+        <KPICard {...defaultProps} icon="TrendingUp" />
+      );
       expect(screen.getByTestId('main-trending-up-icon')).toBeInTheDocument();
 
       rerender(<KPICard {...defaultProps} icon="TrendingDown" />);
@@ -265,7 +304,7 @@ describe('KPICard', () => {
       const mockClick = vi.fn();
       const props = {
         ...defaultProps,
-        onClick: mockClick
+        onClick: mockClick,
       };
 
       render(<KPICard {...props} />);
@@ -280,7 +319,7 @@ describe('KPICard', () => {
       const mockClick = vi.fn();
       const props = {
         ...defaultProps,
-        onClick: mockClick
+        onClick: mockClick,
       };
 
       const { container } = render(<KPICard {...props} />);

@@ -1,9 +1,9 @@
 /**
  * PartySelector.jsx
- * 
+ *
  * Select com search para clientes/fornecedores
  * Integração com partiesService para busca de parties por unidade
- * 
+ *
  * Autor: Sistema Barber Analytics Pro
  * Data: 2024
  */
@@ -24,14 +24,14 @@ const PartySelector = ({
   disabled = false,
   clearable = true,
   allowCreate = false,
-  onCreateNew
+  onCreateNew,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [parties, setParties] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedParty, setSelectedParty] = useState(null);
-  
+
   const searchRef = useRef(null);
   const containerRef = useRef(null);
   const { addToast } = useToast();
@@ -55,8 +55,11 @@ const PartySelector = ({
 
   // Fechar dropdown ao clicar fora
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (containerRef.current && !containerRef.current.contains(event.target)) {
+    const handleClickOutside = event => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target)
+      ) {
         setIsOpen(false);
         setSearchTerm('');
       }
@@ -104,7 +107,7 @@ const PartySelector = ({
   // Filtrar parties baseado no termo de busca
   const filteredParties = parties.filter(party => {
     if (!searchTerm) return true;
-    
+
     const searchLower = searchTerm.toLowerCase();
     return (
       party.nome.toLowerCase().includes(searchLower) ||
@@ -114,7 +117,7 @@ const PartySelector = ({
   });
 
   // Selecionar party
-  const handleSelectParty = (party) => {
+  const handleSelectParty = party => {
     setSelectedParty(party);
     onChange(party.id);
     setIsOpen(false);
@@ -122,7 +125,7 @@ const PartySelector = ({
   };
 
   // Limpar seleção
-  const handleClear = (e) => {
+  const handleClear = e => {
     e.stopPropagation();
     setSelectedParty(null);
     onChange(null);
@@ -149,9 +152,9 @@ const PartySelector = ({
   };
 
   // Formatar exibição do party
-  const formatPartyDisplay = (party) => {
+  const formatPartyDisplay = party => {
     if (!party) return '';
-    
+
     let display = party.nome;
     if (party.cpf_cnpj) {
       display += ` (${party.cpf_cnpj})`;
@@ -160,10 +163,12 @@ const PartySelector = ({
   };
 
   // Ícone baseado no tipo
-  const getPartyIcon = (partyTipo) => {
-    return partyTipo === 'cliente' 
-      ? <User className="w-4 h-4 text-blue-500" />
-      : <Building className="w-4 h-4 text-green-500" />;
+  const getPartyIcon = partyTipo => {
+    return partyTipo === 'cliente' ? (
+      <User className="w-4 h-4 text-blue-500" />
+    ) : (
+      <Building className="w-4 h-4 text-green-500" />
+    );
   };
 
   const containerClasses = `relative ${className}`;
@@ -189,7 +194,7 @@ const PartySelector = ({
             {selectedParty ? formatPartyDisplay(selectedParty) : placeholder}
           </span>
         </div>
-        
+
         <div className="flex items-center ml-2 flex-shrink-0">
           {clearable && selectedParty && (
             <button
@@ -201,7 +206,7 @@ const PartySelector = ({
               <X className="w-3 h-3 text-gray-400" />
             </button>
           )}
-          <ChevronDown 
+          <ChevronDown
             className={`w-4 h-4 ml-1 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           />
         </div>
@@ -218,7 +223,7 @@ const PartySelector = ({
                 ref={searchRef}
                 type="text"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
                 placeholder="Buscar por nome, CPF/CNPJ ou email..."
                 className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -233,7 +238,7 @@ const PartySelector = ({
               </div>
             ) : filteredParties.length > 0 ? (
               <>
-                {filteredParties.map((party) => (
+                {filteredParties.map(party => (
                   <button
                     key={party.id}
                     type="button"
@@ -245,9 +250,7 @@ const PartySelector = ({
                   >
                     {getPartyIcon(party.tipo)}
                     <div className="ml-2 flex-1 min-w-0">
-                      <div className="font-medium truncate">
-                        {party.nome}
-                      </div>
+                      <div className="font-medium truncate">{party.nome}</div>
                       {party.cpf_cnpj && (
                         <div className="text-xs text-gray-500 truncate">
                           {party.cpf_cnpj} • {party.tipo}
@@ -265,9 +268,11 @@ const PartySelector = ({
             ) : (
               <div className="p-3">
                 <div className="text-sm text-gray-500 text-center">
-                  {searchTerm ? 'Nenhum resultado encontrado' : 'Nenhum cliente/fornecedor cadastrado'}
+                  {searchTerm
+                    ? 'Nenhum resultado encontrado'
+                    : 'Nenhum cliente/fornecedor cadastrado'}
                 </div>
-                
+
                 {/* Opção para criar novo */}
                 {allowCreate && searchTerm && (
                   <button
@@ -307,51 +312,51 @@ PartySelector.propTypes = {
    * ID do party selecionado
    */
   value: PropTypes.string,
-  
+
   /**
    * Callback quando seleção muda
    */
   onChange: PropTypes.func.isRequired,
-  
+
   /**
    * ID da unidade para filtrar parties
    */
   unitId: PropTypes.string.isRequired,
-  
+
   /**
    * Tipo de party a exibir
    */
   tipo: PropTypes.oneOf(['cliente', 'fornecedor', 'all']),
-  
+
   /**
    * Placeholder quando nenhum valor selecionado
    */
   placeholder: PropTypes.string,
-  
+
   /**
    * Classes CSS adicionais
    */
   className: PropTypes.string,
-  
+
   /**
    * Componente desabilitado
    */
   disabled: PropTypes.bool,
-  
+
   /**
    * Permite limpar seleção
    */
   clearable: PropTypes.bool,
-  
+
   /**
    * Permite criar novo party
    */
   allowCreate: PropTypes.bool,
-  
+
   /**
    * Callback para criar novo party
    */
-  onCreateNew: PropTypes.func
+  onCreateNew: PropTypes.func,
 };
 
 // Componente de preview para demonstração
@@ -363,14 +368,14 @@ export const PartySelectorPreview = () => {
   // Mock unitId - em produção viria do contexto
   const mockUnitId = 'unit-1';
 
-  const handleCreateNew = (searchTerm) => {
+  const handleCreateNew = searchTerm => {
     alert(`Criar novo com termo: "${searchTerm}"`);
   };
 
   return (
     <div className="space-y-6 p-4 max-w-md">
       <h3 className="text-lg font-semibold">PartySelector Preview</h3>
-      
+
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Apenas Clientes:
@@ -428,7 +433,9 @@ export const PartySelectorPreview = () => {
 
       {/* Display dos valores selecionados */}
       <div className="mt-6 p-3 bg-gray-50 rounded-md">
-        <h4 className="text-sm font-medium text-gray-700 mb-2">Valores selecionados:</h4>
+        <h4 className="text-sm font-medium text-gray-700 mb-2">
+          Valores selecionados:
+        </h4>
         <div className="text-xs space-y-1">
           <div>Cliente: {selectedClient || 'nenhum'}</div>
           <div>Fornecedor: {selectedSupplier || 'nenhum'}</div>

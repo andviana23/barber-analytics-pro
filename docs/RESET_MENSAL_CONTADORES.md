@@ -24,17 +24,17 @@ Resetar os contadores da Lista da Vez no **último dia de cada mês às 23:59**,
 
 ## ⚙️ Funcionamento
 
-1. **Agendamento** — Supabase Function é disparada via cron (último dia às 23:59) ou manualmente com chave de serviço.  
-2. **Execução** — `fn_monthly_reset_turn_list()` percorre todas as unidades, salva histórico (`barbers_turn_history`) e zera pontuações.  
-3. **Reordenação** — posição redefinida considerando data de cadastro.  
+1. **Agendamento** — Supabase Function é disparada via cron (último dia às 23:59) ou manualmente com chave de serviço.
+2. **Execução** — `fn_monthly_reset_turn_list()` percorre todas as unidades, salva histórico (`barbers_turn_history`) e zera pontuações.
+3. **Reordenação** — posição redefinida considerando data de cadastro.
 4. **Auditoria** — logs gerados no console da Edge Function (ação `monthly_reset_executed`).
 
 ---
 
 ## 🛰️ Edge Function `monthly-reset`
 
-- **Headers esperados:** `Authorization` ou `apikey` com chave `SERVICE_ROLE`.  
-- **Variáveis:** `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ENVIRONMENT`.  
+- **Headers esperados:** `Authorization` ou `apikey` com chave `SERVICE_ROLE`.
+- **Variáveis:** `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ENVIRONMENT`.
 - **Fluxo de resposta:**
   ```json
   {
@@ -72,9 +72,8 @@ SELECT *
 
 ## ✅ Checklist de Saúde
 
-- [✅] Função SQL `fn_monthly_reset_turn_list` migrada e versionada.  
-- [✅] Edge Function deployada com variáveis seguras.  
-- [✅] Cron configurado (ou workflow externo agendado).  
-- [⚠️] Validar logs após cada execução mensal.  
+- [✅] Função SQL `fn_monthly_reset_turn_list` migrada e versionada.
+- [✅] Edge Function deployada com variáveis seguras.
+- [✅] Cron configurado (ou workflow externo agendado).
+- [⚠️] Validar logs após cada execução mensal.
 - [⚠️] Manter script manual para contingência.
-

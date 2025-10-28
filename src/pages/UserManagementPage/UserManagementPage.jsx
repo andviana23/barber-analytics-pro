@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../../services/supabase';
 import auditService from '../../services/auditService';
 import { Card } from '../../atoms';
+import { User, DollarSign, X } from 'lucide-react';
+import CommissionsTable from '../../molecules/CommissionsTable';
+import { useProfessionalCommissions } from '../../hooks/useProfessionalCommissions';
 
 const UserManagementPage = () => {
   const [users, setUsers] = useState([]);
@@ -17,10 +20,11 @@ const UserManagementPage = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
+
         // Buscar usuários do auth.users
-        const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
-        
+        const { data: authUsers, error: authError } =
+          await supabase.auth.admin.listUsers();
+
         if (authError) throw authError;
 
         // Buscar profissionais
@@ -42,12 +46,11 @@ const UserManagementPage = () => {
         setUsers(authUsers?.users || []);
         setProfessionals(profData || []);
         setUnits(unitsData || []);
-        
+
         // Log da visualização da página
         auditService.logPageView('user-management', {
-          total_users: authUsers?.users?.length || 0
+          total_users: authUsers?.users?.length || 0,
         });
-
       } catch (err) {
         setError(err.message);
         auditService.logError('user-management-fetch', err);
@@ -60,7 +63,7 @@ const UserManagementPage = () => {
   }, []);
 
   // Função para criar/atualizar profissional
-  const handleSaveProfessional = async (formData) => {
+  const handleSaveProfessional = async formData => {
     try {
       setLoading(true);
 
@@ -73,13 +76,18 @@ const UserManagementPage = () => {
             role: formData.role,
             unit_id: formData.unit_id,
             commission_rate: formData.commission_rate,
-            is_active: formData.is_active
+            is_active: formData.is_active,
           })
           .eq('id', selectedUser.id);
 
         if (error) throw error;
 
-        auditService.logUpdate('professionals', selectedUser.id, selectedUser, formData);
+        auditService.logUpdate(
+          'professionals',
+          selectedUser.id,
+          selectedUser,
+          formData
+        );
       } else {
         // Criar novo
         const { data, error } = await supabase
@@ -90,7 +98,7 @@ const UserManagementPage = () => {
             role: formData.role,
             unit_id: formData.unit_id,
             commission_rate: formData.commission_rate || 0,
-            is_active: true
+            is_active: true,
           })
           .select()
           .single();
@@ -102,7 +110,6 @@ const UserManagementPage = () => {
 
       // Recarregar dados
       window.location.reload();
-      
     } catch (err) {
       setError(err.message);
       auditService.logError('save-professional', err);
@@ -112,7 +119,7 @@ const UserManagementPage = () => {
   };
 
   // Função para excluir profissional
-  const handleDeleteProfessional = async (professionalId) => {
+  const handleDeleteProfessional = async professionalId => {
     if (!window.confirm('Tem certeza que deseja excluir este profissional?')) {
       return;
     }
@@ -133,7 +140,6 @@ const UserManagementPage = () => {
 
       // Remover da lista local
       setProfessionals(professionals.filter(p => p.id !== professionalId));
-
     } catch (err) {
       setError(err.message);
       auditService.logError('delete-professional', err);
@@ -155,16 +161,19 @@ const UserManagementPage = () => {
 
       if (error) throw error;
 
-      auditService.logUpdate('professionals', userId, 
-        { is_active: currentStatus }, 
+      auditService.logUpdate(
+        'professionals',
+        userId,
+        { is_active: currentStatus },
         { is_active: !currentStatus }
       );
 
       // Atualizar lista local
-      setProfessionals(professionals.map(p => 
-        p.user_id === userId ? { ...p, is_active: !currentStatus } : p
-      ));
-
+      setProfessionals(
+        professionals.map(p =>
+          p.user_id === userId ? { ...p, is_active: !currentStatus } : p
+        )
+      );
     } catch (err) {
       setError(err.message);
       auditService.logError('toggle-user-status', err);
@@ -193,7 +202,7 @@ const UserManagementPage = () => {
             Gerencie usuários, profissionais e permissões do sistema
           </p>
         </div>
-        
+
         <button
           onClick={() => {
             setSelectedUser(null);
@@ -220,14 +229,16 @@ const UserManagementPage = () => {
           </h3>
           <p className="text-2xl font-bold text-blue-600">{users.length}</p>
         </Card>
-        
+
         <Card className="p-4">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             Profissionais
           </h3>
-          <p className="text-2xl font-bold text-green-600">{professionals.length}</p>
+          <p className="text-2xl font-bold text-green-600">
+            {professionals.length}
+          </p>
         </Card>
-        
+
         <Card className="p-4">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             Ativos
@@ -236,7 +247,7 @@ const UserManagementPage = () => {
             {professionals.filter(p => p.is_active).length}
           </p>
         </Card>
-        
+
         <Card className="p-4">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             Administradores
@@ -252,7 +263,7 @@ const UserManagementPage = () => {
         <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
           Lista de Profissionais
         </h2>
-        
+
         <div className="overflow-x-auto">
           <table className="min-w-full table-auto">
             <thead>
@@ -278,17 +289,24 @@ const UserManagementPage = () => {
               </tr>
             </thead>
             <tbody>
-              {professionals.map((professional) => (
-                <tr key={professional.id} className="border-b border-gray-100 dark:border-gray-800">
+              {professionals.map(professional => (
+                <tr
+                  key={professional.id}
+                  className="border-b border-gray-100 dark:border-gray-800"
+                >
                   <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
                     {professional.name}
                   </td>
                   <td className="px-4 py-3 text-sm">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      professional.role === 'admin' ? 'bg-purple-100 text-purple-800' :
-                      professional.role === 'gerente' ? 'bg-blue-100 text-blue-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        professional.role === 'admin'
+                          ? 'bg-purple-100 text-purple-800'
+                          : professional.role === 'gerente'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
                       {professional.role}
                     </span>
                   </td>
@@ -299,9 +317,13 @@ const UserManagementPage = () => {
                     {professional.commission_rate}%
                   </td>
                   <td className="px-4 py-3 text-sm">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      professional.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        professional.is_active
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}
+                    >
                       {professional.is_active ? 'Ativo' : 'Inativo'}
                     </span>
                   </td>
@@ -315,18 +337,23 @@ const UserManagementPage = () => {
                     >
                       Editar
                     </button>
-                    
+
                     <button
-                      onClick={() => handleToggleUserStatus(professional.user_id, professional.is_active)}
+                      onClick={() =>
+                        handleToggleUserStatus(
+                          professional.user_id,
+                          professional.is_active
+                        )
+                      }
                       className={`font-medium ${
-                        professional.is_active 
-                          ? 'text-red-600 hover:text-red-800' 
+                        professional.is_active
+                          ? 'text-red-600 hover:text-red-800'
                           : 'text-green-600 hover:text-green-800'
                       }`}
                     >
                       {professional.is_active ? 'Desativar' : 'Ativar'}
                     </button>
-                    
+
                     <button
                       onClick={() => handleDeleteProfessional(professional.id)}
                       className="text-red-600 hover:text-red-800 font-medium"
@@ -338,7 +365,7 @@ const UserManagementPage = () => {
               ))}
             </tbody>
           </table>
-          
+
           {professionals.length === 0 && (
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">
               Nenhum profissional encontrado
@@ -367,34 +394,91 @@ const UserManagementPage = () => {
 
 // Componente Modal para criar/editar usuários
 const UserModal = ({ user, units, users, professionals, onSave, onClose }) => {
+  const [activeTab, setActiveTab] = useState('basic'); // 'basic' ou 'commissions'
   const [formData, setFormData] = useState({
     user_id: user?.user_id || '',
     name: user?.name || '',
     role: user?.role || 'barbeiro',
     unit_id: user?.unit_id || '',
     commission_rate: user?.commission_rate || 0,
-    is_active: user?.is_active !== undefined ? user.is_active : true
+    is_active: user?.is_active !== undefined ? user.is_active : true,
   });
 
-  const handleSubmit = (e) => {
+  // Hook para comissões do profissional (apenas para edição)
+  const {
+    commissions,
+    loading: commissionsLoading,
+    error: commissionsError,
+    fetchCommissions,
+    saveCommission,
+  } = useProfessionalCommissions(user?.id, user?.unit_id);
+
+  // Carregar comissões quando a aba for ativada
+  React.useEffect(() => {
+    if (activeTab === 'commissions' && user?.id && user?.unit_id) {
+      fetchCommissions();
+    }
+  }, [activeTab, user?.id, user?.unit_id, fetchCommissions]);
+
+  const handleSubmit = e => {
     e.preventDefault();
     onSave(formData);
     onClose();
   };
 
   // Filtrar usuários que já não são profissionais
-  const availableUsers = users.filter(u => 
-    !professionals.some(p => p.user_id === u.id) || u.id === user?.user_id
+  const availableUsers = users.filter(
+    u => !professionals.some(p => p.user_id === u.id) || u.id === user?.user_id
   );
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
-        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-          {user ? 'Editar Profissional' : 'Novo Profissional'}
-        </h3>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            {user ? 'Editar Profissional' : 'Novo Profissional'}
+          </h3>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <X size={24} />
+          </button>
+        </div>
+
+        {/* Navegação por abas - apenas para edição */}
+        {user && (
+          <div className="flex border-b border-gray-200 mb-6">
+            <button
+              type="button"
+              onClick={() => setActiveTab('basic')}
+              className={`flex items-center px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'basic'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <User size={16} className="mr-2" />
+              Informações Básicas
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('commissions')}
+              className={`flex items-center px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'commissions'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <DollarSign size={16} className="mr-2" />
+              Comissões por Serviço
+            </button>
+          </div>
+        )}
+
+        {/* Conteúdo das abas */}
+        {activeTab === 'basic' && (
+          <form onSubmit={handleSubmit} className="space-y-4">
           {/* Seleção de usuário (apenas para novo) */}
           {!user && (
             <div>
@@ -403,7 +487,9 @@ const UserModal = ({ user, units, users, professionals, onSave, onClose }) => {
               </label>
               <select
                 value={formData.user_id}
-                onChange={(e) => setFormData({ ...formData, user_id: e.target.value })}
+                onChange={e =>
+                  setFormData({ ...formData, user_id: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               >
@@ -416,7 +502,7 @@ const UserModal = ({ user, units, users, professionals, onSave, onClose }) => {
               </select>
             </div>
           )}
-          
+
           {/* Nome */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -425,12 +511,12 @@ const UserModal = ({ user, units, users, professionals, onSave, onClose }) => {
             <input
               type="text"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={e => setFormData({ ...formData, name: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
-          
+
           {/* Perfil/Role */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -438,7 +524,7 @@ const UserModal = ({ user, units, users, professionals, onSave, onClose }) => {
             </label>
             <select
               value={formData.role}
-              onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+              onChange={e => setFormData({ ...formData, role: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="barbeiro">Barbeiro</option>
@@ -446,7 +532,7 @@ const UserModal = ({ user, units, users, professionals, onSave, onClose }) => {
               <option value="admin">Administrador</option>
             </select>
           </div>
-          
+
           {/* Unidade */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -454,7 +540,9 @@ const UserModal = ({ user, units, users, professionals, onSave, onClose }) => {
             </label>
             <select
               value={formData.unit_id}
-              onChange={(e) => setFormData({ ...formData, unit_id: e.target.value })}
+              onChange={e =>
+                setFormData({ ...formData, unit_id: e.target.value })
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Selecione uma unidade</option>
@@ -465,7 +553,7 @@ const UserModal = ({ user, units, users, professionals, onSave, onClose }) => {
               ))}
             </select>
           </div>
-          
+
           {/* Comissão */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -477,11 +565,16 @@ const UserModal = ({ user, units, users, professionals, onSave, onClose }) => {
               max="100"
               step="0.01"
               value={formData.commission_rate}
-              onChange={(e) => setFormData({ ...formData, commission_rate: parseFloat(e.target.value) || 0 })}
+              onChange={e =>
+                setFormData({
+                  ...formData,
+                  commission_rate: parseFloat(e.target.value) || 0,
+                })
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          
+
           {/* Status (apenas para edição) */}
           {user && (
             <div>
@@ -489,7 +582,9 @@ const UserModal = ({ user, units, users, professionals, onSave, onClose }) => {
                 <input
                   type="checkbox"
                   checked={formData.is_active}
-                  onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                  onChange={e =>
+                    setFormData({ ...formData, is_active: e.target.checked })
+                  }
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -498,24 +593,47 @@ const UserModal = ({ user, units, users, professionals, onSave, onClose }) => {
               </label>
             </div>
           )}
-          
-          {/* Botões */}
-          <div className="flex space-x-3 pt-4">
-            <button
-              type="submit"
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-            >
-              {user ? 'Atualizar' : 'Criar'}
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
-            >
-              Cancelar
-            </button>
+
+            {/* Botões */}
+            <div className="flex space-x-3 pt-4">
+              <button
+                type="submit"
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                {user ? 'Atualizar' : 'Criar'}
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* Aba de Comissões */}
+        {activeTab === 'commissions' && user && (
+          <div className="space-y-4">
+            {commissionsLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              </div>
+            ) : commissionsError ? (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                {commissionsError}
+              </div>
+            ) : (
+              <CommissionsTable
+                commissions={commissions}
+                onSaveCommission={saveCommission}
+                professionalId={user.id}
+                unitId={user.unit_id}
+              />
+            )}
           </div>
-        </form>
+        )}
       </div>
     </div>
   );

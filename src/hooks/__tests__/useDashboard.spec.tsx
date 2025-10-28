@@ -23,12 +23,12 @@ vi.mock('../../services/dashboardService', () => ({
 let mockAuth = {
   user: {
     id: 'user-123',
-    user_metadata: { role: 'admin' }
-  }
+    user_metadata: { role: 'admin' },
+  },
 };
 
 vi.mock('../../context/AuthContext', () => ({
-  useAuth: () => mockAuth
+  useAuth: () => mockAuth,
 }));
 
 describe('useRevenueDistribution', () => {
@@ -54,10 +54,12 @@ describe('useRevenueDistribution', () => {
     const mockDistribution = [
       { category: 'Cortes', value: 1500, label: 'Serviços de Corte' },
       { category: 'Produtos', value: 800, label: 'Venda de Produtos' },
-      { category: 'Outros', value: 200, label: 'Outros Serviços' }
+      { category: 'Outros', value: 200, label: 'Outros Serviços' },
     ];
 
-    mockDashboardService.getRevenueDistribution.mockResolvedValue(mockDistribution);
+    mockDashboardService.getRevenueDistribution.mockResolvedValue(
+      mockDistribution
+    );
 
     // Act
     const { result } = renderHook(() => useRevenueDistribution('unit-123'));
@@ -77,13 +79,13 @@ describe('useRevenueDistribution', () => {
       category: 'Cortes',
       value: 1500,
       label: 'Serviços de Corte',
-      percentage: (1500 / expectedTotal) * 100 // 60%
+      percentage: (1500 / expectedTotal) * 100, // 60%
     });
     expect(result.current.distribution[1]).toEqual({
       category: 'Produtos',
       value: 800,
       label: 'Venda de Produtos',
-      percentage: (800 / expectedTotal) * 100 // 32%
+      percentage: (800 / expectedTotal) * 100, // 32%
     });
   });
 
@@ -111,10 +113,12 @@ describe('useRevenueDistribution', () => {
     // Arrange
     const mockDistribution = [
       { category: 'Cortes', value: 0, label: 'Serviços de Corte' },
-      { category: 'Produtos', value: 0, label: 'Venda de Produtos' }
+      { category: 'Produtos', value: 0, label: 'Venda de Produtos' },
     ];
 
-    mockDashboardService.getRevenueDistribution.mockResolvedValue(mockDistribution);
+    mockDashboardService.getRevenueDistribution.mockResolvedValue(
+      mockDistribution
+    );
 
     // Act
     const { result } = renderHook(() => useRevenueDistribution('unit-123'));
@@ -142,8 +146,12 @@ describe('useRevenueDistribution', () => {
       await new Promise(resolve => setTimeout(resolve, 0));
     });
 
-    expect(mockDashboardService.getRevenueDistribution).toHaveBeenCalledTimes(1);
-    expect(mockDashboardService.getRevenueDistribution).toHaveBeenCalledWith('unit-123');
+    expect(mockDashboardService.getRevenueDistribution).toHaveBeenCalledTimes(
+      1
+    );
+    expect(mockDashboardService.getRevenueDistribution).toHaveBeenCalledWith(
+      'unit-123'
+    );
 
     // Act - Mudar unitId
     rerender({ unitId: 'unit-456' });
@@ -153,17 +161,23 @@ describe('useRevenueDistribution', () => {
     });
 
     // Assert
-    expect(mockDashboardService.getRevenueDistribution).toHaveBeenCalledTimes(2);
-    expect(mockDashboardService.getRevenueDistribution).toHaveBeenLastCalledWith('unit-456');
+    expect(mockDashboardService.getRevenueDistribution).toHaveBeenCalledTimes(
+      2
+    );
+    expect(
+      mockDashboardService.getRevenueDistribution
+    ).toHaveBeenLastCalledWith('unit-456');
   });
 
   it('deve funcionar com unitId null (todas as unidades)', async () => {
     // Arrange
     const mockDistribution = [
-      { category: 'Total', value: 5000, label: 'Todas as Unidades' }
+      { category: 'Total', value: 5000, label: 'Todas as Unidades' },
     ];
 
-    mockDashboardService.getRevenueDistribution.mockResolvedValue(mockDistribution);
+    mockDashboardService.getRevenueDistribution.mockResolvedValue(
+      mockDistribution
+    );
 
     // Act
     const { result } = renderHook(() => useRevenueDistribution());
@@ -173,7 +187,9 @@ describe('useRevenueDistribution', () => {
     });
 
     // Assert
-    expect(mockDashboardService.getRevenueDistribution).toHaveBeenCalledWith(null);
+    expect(mockDashboardService.getRevenueDistribution).toHaveBeenCalledWith(
+      null
+    );
     expect(result.current.distribution).toHaveLength(1);
     expect(result.current.distribution[0].percentage).toBe(100);
   });
@@ -195,7 +211,7 @@ describe('useRevenueDistribution', () => {
       // Restaurar usuário para outros testes
       mockAuth.user = {
         id: 'user-123',
-        user_metadata: { role: 'admin' }
+        user_metadata: { role: 'admin' },
       };
     });
 
@@ -217,10 +233,12 @@ describe('useRevenueDistribution', () => {
       const mockDistribution = [
         { category: 'A', value: 33.33, label: 'Categoria A' },
         { category: 'B', value: 33.33, label: 'Categoria B' },
-        { category: 'C', value: 33.34, label: 'Categoria C' }
+        { category: 'C', value: 33.34, label: 'Categoria C' },
       ];
 
-      mockDashboardService.getRevenueDistribution.mockResolvedValue(mockDistribution);
+      mockDashboardService.getRevenueDistribution.mockResolvedValue(
+        mockDistribution
+      );
 
       const { result } = renderHook(() => useRevenueDistribution('unit-123'));
 
@@ -230,7 +248,7 @@ describe('useRevenueDistribution', () => {
 
       const total = 33.33 + 33.33 + 33.34;
       expect(result.current.distribution[0].percentage).toBeCloseTo(
-        (33.33 / total) * 100, 
+        (33.33 / total) * 100,
         2
       );
     });
@@ -239,10 +257,12 @@ describe('useRevenueDistribution', () => {
       const mockDistribution = [
         { category: 'A', value: null, label: 'Categoria A' },
         { category: 'B', value: undefined, label: 'Categoria B' },
-        { category: 'C', value: 'invalid', label: 'Categoria C' }
+        { category: 'C', value: 'invalid', label: 'Categoria C' },
       ];
 
-      mockDashboardService.getRevenueDistribution.mockResolvedValue(mockDistribution);
+      mockDashboardService.getRevenueDistribution.mockResolvedValue(
+        mockDistribution
+      );
 
       const { result } = renderHook(() => useRevenueDistribution('unit-123'));
 

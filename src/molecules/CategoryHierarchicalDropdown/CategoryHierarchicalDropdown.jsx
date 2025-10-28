@@ -66,11 +66,7 @@ const CategoryHierarchicalDropdown = ({
    */
   const renderOptions = useMemo(() => {
     if (!isValidCategoriesFormat) {
-      return (
-        <option disabled>
-          Erro: formato de categorias inválido
-        </option>
-      );
+      return <option disabled>Erro: formato de categorias inválido</option>;
     }
 
     const options = [];
@@ -164,7 +160,9 @@ const CategoryHierarchicalDropdown = ({
           aria-label={label || 'Categoria'}
           aria-required={required}
           aria-invalid={!!error}
-          aria-describedby={error ? 'error-message' : helperText ? 'helper-text' : undefined}
+          aria-describedby={
+            error ? 'error-message' : helperText ? 'helper-text' : undefined
+          }
         >
           {/* Placeholder Option */}
           <option value="" disabled={required}>

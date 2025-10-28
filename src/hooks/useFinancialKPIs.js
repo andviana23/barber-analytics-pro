@@ -10,7 +10,7 @@ const calculateTrends = (current, previous) => {
     if (!previousValue || previousValue === 0) {
       return {
         growth: currentValue > 0 ? 100 : 0,
-        direction: currentValue > 0 ? 'up' : 'stable'
+        direction: currentValue > 0 ? 'up' : 'stable',
       };
     }
 
@@ -24,7 +24,7 @@ const calculateTrends = (current, previous) => {
 
     return {
       growth: roundedGrowth,
-      direction
+      direction,
     };
   };
 
@@ -54,12 +54,20 @@ const calculateTrends = (current, previous) => {
   };
 
   // Adicionar margin_improvement se ambos períodos tiverem profit_margin
-  if (current.profit_margin !== undefined && previous.profit_margin !== undefined) {
-    result.margin_improvement = Math.round(((current.profit_margin - previous.profit_margin) * 100) * 10) / 10;
+  if (
+    current.profit_margin !== undefined &&
+    previous.profit_margin !== undefined
+  ) {
+    result.margin_improvement =
+      Math.round((current.profit_margin - previous.profit_margin) * 100 * 10) /
+      10;
   }
 
   // Adicionar overdue_change se ambos períodos tiverem overdue_revenue
-  if (current.overdue_revenue !== undefined && previous.overdue_revenue !== undefined) {
+  if (
+    current.overdue_revenue !== undefined &&
+    previous.overdue_revenue !== undefined
+  ) {
     result.overdue_change = current.overdue_revenue - previous.overdue_revenue;
   }
 
@@ -69,7 +77,7 @@ const calculateTrends = (current, previous) => {
 /**
  * Helper para calcular período anterior
  */
-const getPreviousPeriod = (currentPeriod) => {
+const getPreviousPeriod = currentPeriod => {
   if (!currentPeriod || typeof currentPeriod !== 'string') {
     const now = new Date();
     const prev = new Date(now);
@@ -141,9 +149,8 @@ export const useFinancialKPIs = (unitId, currentPeriod) => {
       setData({
         current: currentData,
         previous: previousData,
-        trends
+        trends,
       });
-
     } catch (err) {
       setError(err.message || 'Erro ao buscar KPIs financeiros');
       setData(undefined);
@@ -161,7 +168,7 @@ export const useFinancialKPIs = (unitId, currentPeriod) => {
     isLoading,
     loading: isLoading, // Mantido para compatibilidade
     error,
-    refetch: fetchKPIs
+    refetch: fetchKPIs,
   };
 };
 

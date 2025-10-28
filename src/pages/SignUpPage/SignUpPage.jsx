@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 
 export function SignUpPage() {
   const { signUp } = useAuth();
-  
+
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -19,11 +19,11 @@ export function SignUpPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
     // Limpar erro quando usuário começar a digitar
     if (error) setError('');
@@ -61,9 +61,9 @@ export function SignUpPage() {
     return true;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setIsLoading(true);
@@ -77,7 +77,7 @@ export function SignUpPage() {
           full_name: formData.fullName,
         }
       );
-      
+
       if (authError) {
         setError(authError.message || 'Erro ao criar conta. Tente novamente.');
         return;
@@ -86,7 +86,6 @@ export function SignUpPage() {
       if (data?.user) {
         setSuccess(true);
       }
-      
     } catch {
       setError('Erro ao criar conta. Tente novamente.');
     } finally {
@@ -141,8 +140,8 @@ export function SignUpPage() {
           <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Full Name Field */}
             <div>
-              <label 
-                htmlFor="fullName" 
+              <label
+                htmlFor="fullName"
                 className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2"
               >
                 Nome Completo
@@ -167,8 +166,8 @@ export function SignUpPage() {
 
             {/* Email Field */}
             <div>
-              <label 
-                htmlFor="email" 
+              <label
+                htmlFor="email"
                 className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2"
               >
                 Email
@@ -193,8 +192,8 @@ export function SignUpPage() {
 
             {/* Password Field */}
             <div>
-              <label 
-                htmlFor="password" 
+              <label
+                htmlFor="password"
                 className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2"
               >
                 Senha
@@ -230,8 +229,8 @@ export function SignUpPage() {
 
             {/* Confirm Password Field */}
             <div>
-              <label 
-                htmlFor="confirmPassword" 
+              <label
+                htmlFor="confirmPassword"
                 className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2"
               >
                 Confirmar Senha
@@ -310,11 +309,17 @@ export function SignUpPage() {
         <div className="text-center">
           <p className="text-xs text-text-light-secondary dark:text-text-dark-secondary">
             Ao criar uma conta, você concorda com nossos{' '}
-            <Link to="/terms" className="text-primary hover:text-primary-600 transition-colors duration-300">
+            <Link
+              to="/terms"
+              className="text-primary hover:text-primary-600 transition-colors duration-300"
+            >
               Termos de Uso
             </Link>{' '}
             e{' '}
-            <Link to="/privacy" className="text-primary hover:text-primary-600 transition-colors duration-300">
+            <Link
+              to="/privacy"
+              className="text-primary hover:text-primary-600 transition-colors duration-300"
+            >
               Política de Privacidade
             </Link>
           </p>

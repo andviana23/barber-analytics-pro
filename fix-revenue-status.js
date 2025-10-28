@@ -166,4 +166,3 @@ analyzeAndFixRevenueStatus()
     console.error('\n❌ Erro ao executar script:', error);
     process.exit(1);
   });
-

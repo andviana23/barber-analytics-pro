@@ -335,4 +335,3 @@ CreateClientModal.propTypes = {
 };
 
 export default CreateClientModal;
-

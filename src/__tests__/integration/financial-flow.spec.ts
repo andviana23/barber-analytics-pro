@@ -4,7 +4,10 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { FinancialFixtures, DateHelpers } from '../../../tests/__fixtures__/financial';
+import {
+  FinancialFixtures,
+  DateHelpers,
+} from '../../../tests/__fixtures__/financial';
 
 // Simulação de fluxo completo de receita
 describe('Fluxo Financeiro Completo', () => {
@@ -27,7 +30,7 @@ describe('Fluxo Financeiro Completo', () => {
       const receivedRevenue = {
         ...newRevenue,
         status: 'received',
-        settlement_date: DateHelpers.today()
+        settlement_date: DateHelpers.today(),
       };
 
       // Assert - Validar transição de status
@@ -59,7 +62,7 @@ describe('Fluxo Financeiro Completo', () => {
       expect(totalReceived).toBe(380); // 100 + 200 + 80
       expect(totalPending).toBe(150);
       expect(totalGeneral).toBe(530);
-      
+
       // Validar percentuais
       const receivedPercentage = (totalReceived / totalGeneral) * 100;
       expect(receivedPercentage).toBeCloseTo(71.7, 1); // ~71.7%
@@ -68,17 +71,17 @@ describe('Fluxo Financeiro Completo', () => {
     it('deve processar diferentes formas de pagamento', () => {
       // Arrange - Receitas com diferentes formas de pagamento
       const revenues = [
-        FinancialFixtures.makeServiceRevenue(100, { 
+        FinancialFixtures.makeServiceRevenue(100, {
           payment_method: 'dinheiro',
-          status: 'received' 
+          status: 'received',
         }),
-        FinancialFixtures.makeServiceRevenue(200, { 
+        FinancialFixtures.makeServiceRevenue(200, {
           payment_method: 'cartao_credito',
-          status: 'received' 
+          status: 'received',
         }),
-        FinancialFixtures.makeServiceRevenue(150, { 
+        FinancialFixtures.makeServiceRevenue(150, {
           payment_method: 'pix',
-          status: 'received' 
+          status: 'received',
         }),
       ];
 
@@ -112,15 +115,15 @@ describe('Fluxo Financeiro Completo', () => {
       const revenues = [
         FinancialFixtures.makeServiceRevenue(100, {
           created_at: '2025-01-01T10:00:00Z',
-          status: 'received'
+          status: 'received',
         }),
         FinancialFixtures.makeServiceRevenue(200, {
-          created_at: '2025-01-01T15:00:00Z', 
-          status: 'received'
+          created_at: '2025-01-01T15:00:00Z',
+          status: 'received',
         }),
         FinancialFixtures.makeServiceRevenue(150, {
           created_at: '2025-01-02T10:00:00Z',
-          status: 'received'
+          status: 'received',
         }),
       ];
 
@@ -151,12 +154,17 @@ describe('Fluxo Financeiro Completo', () => {
       ];
 
       // Act - Calcular métricas
-      const totalRevenue = dailyRevenues.reduce((sum, day) => sum + day.total, 0);
+      const totalRevenue = dailyRevenues.reduce(
+        (sum, day) => sum + day.total,
+        0
+      );
       const averageDaily = totalRevenue / dailyRevenues.length;
-      
+
       // Calcular tendência simples (últimos 3 dias vs primeiros 3 dias)
-      const firstPeriod = dailyRevenues.slice(0, 3).reduce((sum, day) => sum + day.total, 0) / 3;
-      const lastPeriod = dailyRevenues.slice(-3).reduce((sum, day) => sum + day.total, 0) / 3;
+      const firstPeriod =
+        dailyRevenues.slice(0, 3).reduce((sum, day) => sum + day.total, 0) / 3;
+      const lastPeriod =
+        dailyRevenues.slice(-3).reduce((sum, day) => sum + day.total, 0) / 3;
       const trendPercentage = ((lastPeriod - firstPeriod) / firstPeriod) * 100;
 
       // Assert
@@ -173,7 +181,7 @@ describe('Fluxo Financeiro Completo', () => {
         unit_id: 'unit-123',
         professional_id: 'prof-456',
         payment_method: 'dinheiro',
-        category: 'servicos'
+        category: 'servicos',
       });
 
       // Assert - Campos obrigatórios
@@ -183,7 +191,7 @@ describe('Fluxo Financeiro Completo', () => {
       expect(validRevenue.category).toBe('servicos');
       expect(validRevenue.value).toBe(100);
       // Note: is_active não é gerado por padrão nos fixtures
-      
+
       // Campos gerados automaticamente
       expect(validRevenue.id).toMatch(/^rev-[a-z0-9]+$/); // Formato correto
       expect(validRevenue.created_at).toBeDefined();
@@ -200,8 +208,10 @@ describe('Fluxo Financeiro Completo', () => {
       ];
 
       statusTransitions.forEach(({ from, to, valid }) => {
-        const revenue = FinancialFixtures.makeServiceRevenue(100, { status: from });
-        
+        const revenue = FinancialFixtures.makeServiceRevenue(100, {
+          status: from,
+        });
+
         // Simular validação de transição
         const canTransition = (currentStatus, newStatus) => {
           if (currentStatus === 'pending') {
@@ -226,7 +236,7 @@ describe('Fluxo Financeiro Completo', () => {
       ];
 
       testCases.forEach(({ amount, valid, description }) => {
-        const isValidAmount = (value) => {
+        const isValidAmount = value => {
           return typeof value === 'number' && value > 0 && isFinite(value);
         };
 
@@ -238,10 +248,16 @@ describe('Fluxo Financeiro Completo', () => {
   describe('Performance e otimização', () => {
     it('deve lidar com grandes volumes de dados', () => {
       // Arrange - Simular 1000 receitas
-      const largeDataset = Array.from({ length: 1000 }, (_, i) => 
-        FinancialFixtures.makeServiceRevenue(Math.floor(Math.random() * 500) + 50, {
-          created_at: DateHelpers.addDays(new Date(), -Math.floor(Math.random() * 365)).toISOString()
-        })
+      const largeDataset = Array.from({ length: 1000 }, (_, i) =>
+        FinancialFixtures.makeServiceRevenue(
+          Math.floor(Math.random() * 500) + 50,
+          {
+            created_at: DateHelpers.addDays(
+              new Date(),
+              -Math.floor(Math.random() * 365)
+            ).toISOString(),
+          }
+        )
       );
 
       // Act - Operações que devem ser rápidas
@@ -265,7 +281,7 @@ describe('Fluxo Financeiro Completo', () => {
 
     it('deve implementar paginação eficiente', () => {
       // Arrange - Dataset paginado
-      const fullDataset = Array.from({ length: 100 }, (_, i) => 
+      const fullDataset = Array.from({ length: 100 }, (_, i) =>
         FinancialFixtures.makeServiceRevenue(100 + i)
       );
 
@@ -273,7 +289,7 @@ describe('Fluxo Financeiro Completo', () => {
       const totalPages = Math.ceil(fullDataset.length / pageSize);
 
       // Act - Simular paginação
-      const getPage = (pageNumber) => {
+      const getPage = pageNumber => {
         const startIndex = (pageNumber - 1) * pageSize;
         return {
           data: fullDataset.slice(startIndex, startIndex + pageSize),

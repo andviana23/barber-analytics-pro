@@ -1,6 +1,6 @@
 /**
  * DELETE UNIT MODAL
- * 
+ *
  * Modal de confirmação para exclusão de unidade
  */
 
@@ -9,12 +9,7 @@ import { Button } from '../../atoms';
 import { useUnits } from '../../hooks';
 
 // Icons
-import {
-  X,
-  AlertTriangle,
-  Trash2,
-  Shield
-} from 'lucide-react';
+import { X, AlertTriangle, Trash2, Shield } from 'lucide-react';
 
 const DeleteUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
   const { deleteUnit, deleting, checkDependencies } = useUnits(false);
@@ -41,7 +36,11 @@ const DeleteUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
       const deps = await checkDependencies(unit.id);
       setDependencies(deps);
     } catch (error) {
-      setDependencies({ hasDependencies: false, dependencies: [], unitName: unit.name });
+      setDependencies({
+        hasDependencies: false,
+        dependencies: [],
+        unitName: unit.name,
+      });
     } finally {
       setLoadingDependencies(false);
     }
@@ -56,7 +55,7 @@ const DeleteUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
     }
   }, [confirmText, unit]);
 
-  const handleConfirmChange = (e) => {
+  const handleConfirmChange = e => {
     setConfirmText(e.target.value);
   };
 
@@ -157,7 +156,8 @@ const DeleteUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
                           ))}
                         </ul>
                         <p className="text-amber-800 dark:text-amber-300 font-medium mt-3">
-                          A unidade será marcada como inativa, preservando o histórico.
+                          A unidade será marcada como inativa, preservando o
+                          histórico.
                         </p>
                       </div>
                     </div>
@@ -168,7 +168,8 @@ const DeleteUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
                       <AlertTriangle className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5 mr-3" />
                       <div className="text-sm">
                         <p className="text-green-800 dark:text-green-300">
-                          Esta unidade não possui dados vinculados e pode ser excluída com segurança.
+                          Esta unidade não possui dados vinculados e pode ser
+                          excluída com segurança.
                         </p>
                       </div>
                     </div>
@@ -188,7 +189,9 @@ const DeleteUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
                 </div>
                 <div>
                   <span className="font-medium">Status:</span>{' '}
-                  <span className={unit.status ? 'text-green-600' : 'text-red-600'}>
+                  <span
+                    className={unit.status ? 'text-green-600' : 'text-red-600'}
+                  >
                     {unit.status ? 'Ativa' : 'Inativa'}
                   </span>
                 </div>
@@ -202,7 +205,8 @@ const DeleteUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
             {/* Confirmação */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Para confirmar, digite o nome da unidade: <span className="font-bold">{unit.name}</span>
+                Para confirmar, digite o nome da unidade:{' '}
+                <span className="font-bold">{unit.name}</span>
               </label>
               <input
                 type="text"
@@ -243,7 +247,7 @@ const DeleteUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
             >
               Cancelar
             </Button>
-            
+
             <Button
               type="button"
               variant="danger"

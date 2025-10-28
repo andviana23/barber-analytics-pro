@@ -17,21 +17,21 @@ export function DeleteConfirmModal({ professional, onClose, onConfirm }) {
   const handleConfirm = async () => {
     try {
       setLoading(true);
-      
+
       await onConfirm();
-      
+
       showToast({
         type: 'success',
         message: 'Profissional removido',
-        description: `${professional.name} foi removido da equipe.`
+        description: `${professional.name} foi removido da equipe.`,
       });
-      
+
       onClose();
     } catch (error) {
       showToast({
         type: 'error',
         message: 'Erro ao remover profissional',
-        description: error.message
+        description: error.message,
       });
     } finally {
       setLoading(false);
@@ -53,18 +53,17 @@ export function DeleteConfirmModal({ professional, onClose, onConfirm }) {
               </h2>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            icon={X}
-            onClick={onClose}
-          />
+          <Button variant="ghost" size="sm" icon={X} onClick={onClose} />
         </div>
 
         {/* Conteúdo */}
         <div className="p-6">
           <p className="text-text-light-secondary dark:text-text-dark-secondary mb-4">
-            Tem certeza de que deseja remover <strong className="text-text-light-primary dark:text-text-dark-primary">{professional.name}</strong> da equipe?
+            Tem certeza de que deseja remover{' '}
+            <strong className="text-text-light-primary dark:text-text-dark-primary">
+              {professional.name}
+            </strong>{' '}
+            da equipe?
           </p>
 
           <div className="bg-warning/10 border border-warning/20 rounded-lg p-4 mb-6">

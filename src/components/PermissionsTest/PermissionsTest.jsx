@@ -27,33 +27,33 @@ const PermissionsTest = () => {
       setError(null);
 
       // Testar função get_user_role()
-      const { data: roleData, error: roleError } = await supabase
-        .rpc('get_user_role');
-      
+      const { data: roleData, error: roleError } =
+        await supabase.rpc('get_user_role');
+
       if (roleError) throw roleError;
       setUserRole(roleData);
 
       // Testar função is_admin()
-      const { data: adminData, error: adminError } = await supabase
-        .rpc('is_admin');
-      
+      const { data: adminData, error: adminError } =
+        await supabase.rpc('is_admin');
+
       if (adminError) throw adminError;
       setIsAdmin(adminData);
 
       // Testar função is_manager_or_admin()
-      const { data: managerData, error: managerError } = await supabase
-        .rpc('is_manager_or_admin');
-      
+      const { data: managerData, error: managerError } = await supabase.rpc(
+        'is_manager_or_admin'
+      );
+
       if (managerError) throw managerError;
       setIsManagerOrAdmin(managerData);
 
       // Testar função get_user_unit_id()
-      const { data: unitData, error: unitError } = await supabase
-        .rpc('get_user_unit_id');
-      
+      const { data: unitData, error: unitError } =
+        await supabase.rpc('get_user_unit_id');
+
       if (unitError) throw unitError;
       setUserUnitId(unitData);
-
     } catch (err) {
       console.error('Erro ao testar permissões:', err);
       setError(err.message);
@@ -81,7 +81,9 @@ const PermissionsTest = () => {
         <h3 className="text-lg font-semibold text-blue-800 mb-2">
           🔄 Testando Permissões...
         </h3>
-        <p className="text-blue-700">Aguarde enquanto testamos as funções de permissão.</p>
+        <p className="text-blue-700">
+          Aguarde enquanto testamos as funções de permissão.
+        </p>
       </div>
     );
   }
@@ -108,7 +110,7 @@ const PermissionsTest = () => {
       <h3 className="text-lg font-semibold text-green-800 mb-4">
         ✅ Teste de Permissões - Sistema Funcionando
       </h3>
-      
+
       <div className="space-y-3">
         <div className="flex justify-between items-center">
           <span className="font-medium text-gray-700">ID do Usuário:</span>
@@ -116,45 +118,51 @@ const PermissionsTest = () => {
             {user.id}
           </span>
         </div>
-        
+
         <div className="flex justify-between items-center">
           <span className="font-medium text-gray-700">Email:</span>
           <span className="text-sm font-mono bg-gray-100 px-2 py-1 rounded">
             {user.email}
           </span>
         </div>
-        
+
         <div className="flex justify-between items-center">
           <span className="font-medium text-gray-700">Perfil (Role):</span>
-          <span className={`text-sm font-semibold px-3 py-1 rounded-full ${
-            userRole === 'admin' 
-              ? 'bg-purple-100 text-purple-800'
-              : userRole === 'manager'
-              ? 'bg-blue-100 text-blue-800'
-              : 'bg-gray-100 text-gray-800'
-          }`}>
+          <span
+            className={`text-sm font-semibold px-3 py-1 rounded-full ${
+              userRole === 'admin'
+                ? 'bg-purple-100 text-purple-800'
+                : userRole === 'manager'
+                  ? 'bg-blue-100 text-blue-800'
+                  : 'bg-gray-100 text-gray-800'
+            }`}
+          >
             {userRole || 'barber'}
           </span>
         </div>
-        
+
         <div className="flex justify-between items-center">
           <span className="font-medium text-gray-700">É Admin:</span>
-          <span className={`text-sm font-semibold ${
-            isAdmin ? 'text-green-600' : 'text-gray-600'
-          }`}>
+          <span
+            className={`text-sm font-semibold ${
+              isAdmin ? 'text-green-600' : 'text-gray-600'
+            }`}
+          >
             {isAdmin ? '✅ Sim' : '❌ Não'}
           </span>
         </div>
-        
+
         <div className="flex justify-between items-center">
           <span className="font-medium text-gray-700">É Manager ou Admin:</span>
-          <span className={`text-sm font-semibold ${
-            isManagerOrAdmin ? 'text-green-600' : 'text-gray-600'
-          }`}>
+          <span
+            className={`text-sm font-semibold ${
+              isManagerOrAdmin ? 'text-green-600' : 'text-gray-600'
+            }`}
+          >
             {isManagerOrAdmin ? '✅ Sim' : '❌ Não'}
           </span>
         </div>
-        
+
         <div className="flex justify-between items-center">
           <span className="font-medium text-gray-700">ID da Unidade:</span>
           <span className="text-sm font-mono bg-gray-100 px-2 py-1 rounded">

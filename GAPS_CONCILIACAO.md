@@ -10,29 +10,29 @@
 
 ### ✅ O que JÁ EXISTE (67% completo)
 
-| Componente | Status | Localização |
-|------------|--------|-------------|
-| **Serviços** | | |
-| ReconciliationService | ✅ EXISTE | [src/services/reconciliationService.js](src/services/reconciliationService.js) |
-| BankStatementsService | ✅ EXISTE | [src/services/bankStatementsService.js](src/services/bankStatementsService.js) |
-| BankAccountsService | ✅ EXISTE | [src/services/bankAccountsService.js](src/services/bankAccountsService.js) |
-| **Hooks** | | |
-| useReconciliationMatches | ✅ EXISTE | [src/hooks/useReconciliationMatches.js](src/hooks/useReconciliationMatches.js) |
-| useBankStatements | ✅ EXISTE | [src/hooks/useBankStatements.js](src/hooks/useBankStatements.js) |
-| useBankAccounts | ✅ EXISTE | [src/hooks/useBankAccounts.js](src/hooks/useBankAccounts.js) |
-| **Páginas** | | |
-| FinanceiroAdvancedPage | ✅ EXISTE | [src/pages/FinanceiroAdvancedPage/FinanceiroAdvancedPage.jsx](src/pages/FinanceiroAdvancedPage/FinanceiroAdvancedPage.jsx) |
-| ConciliacaoTab | ✅ EXISTE | [src/pages/FinanceiroAdvancedPage/ConciliacaoTab.jsx](src/pages/FinanceiroAdvancedPage/ConciliacaoTab.jsx:219) |
-| **Organisms** | | |
-| ConciliacaoPanel | ✅ EXISTE | [src/organisms/ConciliacaoPanel/ConciliacaoPanel.jsx](src/organisms/ConciliacaoPanel/ConciliacaoPanel.jsx:1013) |
-| **Molecules** | | |
-| ReconciliationMatchCard | ✅ EXISTE | [src/molecules/ReconciliationMatchCard/ReconciliationMatchCard.jsx](src/molecules/ReconciliationMatchCard/ReconciliationMatchCard.jsx:671) |
-| **Templates** | | |
-| ImportStatementModal | ✅ EXISTE | [src/templates/ImportStatementModal.jsx](src/templates/ImportStatementModal.jsx:1164) |
-| ManualReconciliationModal | ✅ EXISTE | [src/templates/ManualReconciliationModal.jsx](src/templates/ManualReconciliationModal.jsx:1074) |
-| **Atoms** | | |
-| StatusBadge | ✅ EXISTE | [src/atoms/StatusBadge/StatusBadge.jsx](src/atoms/StatusBadge/StatusBadge.jsx) |
-| DateRangePicker | ✅ EXISTE | [src/atoms/DateRangePicker/DateRangePicker.jsx](src/atoms/DateRangePicker/DateRangePicker.jsx) |
+| Componente                | Status    | Localização                                                                                                                                |
+| ------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Serviços**              |           |                                                                                                                                            |
+| ReconciliationService     | ✅ EXISTE | [src/services/reconciliationService.js](src/services/reconciliationService.js)                                                             |
+| BankStatementsService     | ✅ EXISTE | [src/services/bankStatementsService.js](src/services/bankStatementsService.js)                                                             |
+| BankAccountsService       | ✅ EXISTE | [src/services/bankAccountsService.js](src/services/bankAccountsService.js)                                                                 |
+| **Hooks**                 |           |                                                                                                                                            |
+| useReconciliationMatches  | ✅ EXISTE | [src/hooks/useReconciliationMatches.js](src/hooks/useReconciliationMatches.js)                                                             |
+| useBankStatements         | ✅ EXISTE | [src/hooks/useBankStatements.js](src/hooks/useBankStatements.js)                                                                           |
+| useBankAccounts           | ✅ EXISTE | [src/hooks/useBankAccounts.js](src/hooks/useBankAccounts.js)                                                                               |
+| **Páginas**               |           |                                                                                                                                            |
+| FinanceiroAdvancedPage    | ✅ EXISTE | [src/pages/FinanceiroAdvancedPage/FinanceiroAdvancedPage.jsx](src/pages/FinanceiroAdvancedPage/FinanceiroAdvancedPage.jsx)                 |
+| ConciliacaoTab            | ✅ EXISTE | [src/pages/FinanceiroAdvancedPage/ConciliacaoTab.jsx](src/pages/FinanceiroAdvancedPage/ConciliacaoTab.jsx:219)                             |
+| **Organisms**             |           |                                                                                                                                            |
+| ConciliacaoPanel          | ✅ EXISTE | [src/organisms/ConciliacaoPanel/ConciliacaoPanel.jsx](src/organisms/ConciliacaoPanel/ConciliacaoPanel.jsx:1013)                            |
+| **Molecules**             |           |                                                                                                                                            |
+| ReconciliationMatchCard   | ✅ EXISTE | [src/molecules/ReconciliationMatchCard/ReconciliationMatchCard.jsx](src/molecules/ReconciliationMatchCard/ReconciliationMatchCard.jsx:671) |
+| **Templates**             |           |                                                                                                                                            |
+| ImportStatementModal      | ✅ EXISTE | [src/templates/ImportStatementModal.jsx](src/templates/ImportStatementModal.jsx:1164)                                                      |
+| ManualReconciliationModal | ✅ EXISTE | [src/templates/ManualReconciliationModal.jsx](src/templates/ManualReconciliationModal.jsx:1074)                                            |
+| **Atoms**                 |           |                                                                                                                                            |
+| StatusBadge               | ✅ EXISTE | [src/atoms/StatusBadge/StatusBadge.jsx](src/atoms/StatusBadge/StatusBadge.jsx)                                                             |
+| DateRangePicker           | ✅ EXISTE | [src/atoms/DateRangePicker/DateRangePicker.jsx](src/atoms/DateRangePicker/DateRangePicker.jsx)                                             |
 
 ---
 
@@ -43,6 +43,7 @@
 #### 1.1 Tabelas Principais
 
 **❌ `bank_accounts` - NÃO EXISTE**
+
 ```sql
 CREATE TABLE bank_accounts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -113,6 +114,7 @@ USING (
 ```
 
 **❌ `bank_statements` - NÃO EXISTE**
+
 ```sql
 CREATE TABLE bank_statements (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -203,6 +205,7 @@ USING (
 ```
 
 **❌ `reconciliations` - NÃO EXISTE**
+
 ```sql
 CREATE TABLE reconciliations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -293,6 +296,7 @@ USING (
 #### 1.2 Triggers e Functions
 
 **❌ Trigger para atualizar `updated_at`**
+
 ```sql
 -- Function genérica para atualizar updated_at
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -321,6 +325,7 @@ CREATE TRIGGER update_reconciliations_updated_at
 ```
 
 **❌ Trigger para sincronizar status de extrato**
+
 ```sql
 CREATE OR REPLACE FUNCTION sync_bank_statement_reconciliation_status()
 RETURNS TRIGGER AS $$
@@ -354,6 +359,7 @@ CREATE TRIGGER trigger_sync_bank_statement_status
 ```
 
 **❌ Function para gerar hash único de extrato**
+
 ```sql
 CREATE OR REPLACE FUNCTION generate_statement_hash(
   p_account_id UUID,
@@ -376,6 +382,7 @@ $$ LANGUAGE plpgsql IMMUTABLE;
 #### 1.3 Views
 
 **❌ `vw_reconciliation_summary` - NÃO EXISTE**
+
 ```sql
 CREATE OR REPLACE VIEW vw_reconciliation_summary AS
 SELECT
@@ -421,6 +428,7 @@ ORDER BY period DESC, ba.bank_name;
 **❌ `src/services/index.js` - Faltam exports**
 
 Arquivo atual:
+
 ```javascript
 export * from './supabase';
 export { default as auditService } from './auditService';
@@ -434,6 +442,7 @@ export { default as unitsService } from './unitsService';
 ```
 
 **Adicionar:**
+
 ```javascript
 export { default as bankStatementsService } from './bankStatementsService';
 export { ReconciliationService } from './reconciliationService';
@@ -448,6 +457,7 @@ export { ReconciliationService } from './reconciliationService';
 Os serviços já existem, mas é necessário **validar**:
 
 ✅ `bankStatementsService.js` - [src/services/bankStatementsService.js](src/services/bankStatementsService.js:15533)
+
 - ✅ `getStatements(filters)`
 - ✅ `getUnreconciledStatements(accountId)`
 - ✅ `getStatementById(id)`
@@ -455,6 +465,7 @@ Os serviços já existem, mas é necessário **validar**:
 - ⚠️ **VERIFICAR:** Se métodos estão usando nomes corretos de tabelas/colunas
 
 ✅ `bankAccountsService.js` - [src/services/bankAccountsService.js](src/services/bankAccountsService.js:12616)
+
 - ✅ `getBankAccounts(unitId, includeInactive)`
 - ✅ `createBankAccount(data)`
 - ✅ `updateBankAccount(id, data)`
@@ -462,6 +473,7 @@ Os serviços já existem, mas é necessário **validar**:
 - ⚠️ **VERIFICAR:** Se métodos estão usando nomes corretos de tabelas/colunas
 
 ✅ `reconciliationService.js` - [src/services/reconciliationService.js](src/services/reconciliationService.js:36254)
+
 - ✅ `getReconciliations(filters)`
 - ✅ `getMatches(accountId)`
 - ✅ `autoMatch(params)`
@@ -477,6 +489,7 @@ Os serviços já existem, mas é necessário **validar**:
 **❌ Nenhum teste implementado**
 
 Arquivos de teste que devem ser criados:
+
 - `src/services/__tests__/reconciliationService.spec.js`
 - `src/hooks/__tests__/useReconciliationMatches.spec.js`
 - `src/components/__tests__/ReconciliationMatchCard.spec.jsx`
@@ -488,6 +501,7 @@ Arquivos de teste que devem ser criados:
 **❌ Manual do usuário não existe**
 
 Criar:
+
 - `docs/manual-conciliacao.md` - Manual de uso da conciliação
 - Screenshots e GIFs explicativos
 - Vídeo tutorial (opcional)
@@ -503,6 +517,7 @@ Criar:
 **Responsável:** Backend/DBA
 
 **Tarefas:**
+
 1. [ ] Criar arquivo `db/migrations/create_bank_accounts.sql`
 2. [ ] Criar arquivo `db/migrations/create_bank_statements.sql`
 3. [ ] Criar arquivo `db/migrations/create_reconciliations.sql`
@@ -513,6 +528,7 @@ Criar:
 8. [ ] Testar triggers
 
 **Script de execução:**
+
 ```bash
 # No Supabase SQL Editor, executar em ordem:
 # 1. create_bank_accounts.sql
@@ -529,6 +545,7 @@ Criar:
 **Responsável:** Backend
 
 **Tarefas:**
+
 1. [ ] Abrir `src/services/bankStatementsService.js`
 2. [ ] Verificar se queries usam `bank_statements` (não `receitas` ou `despesas`)
 3. [ ] Validar campos: `bank_account_id`, `transaction_date`, `amount`, `type`
@@ -548,6 +565,7 @@ Criar:
 **Responsável:** Frontend
 
 **Tarefas:**
+
 1. [ ] Editar `src/services/index.js`
 2. [ ] Adicionar exports de `bankStatementsService` e `ReconciliationService`
 3. [ ] Validar imports em componentes
@@ -559,6 +577,7 @@ Criar:
 **Responsável:** QA/Dev
 
 **Tarefas:**
+
 1. [ ] Acessar página `FinanceiroAdvancedPage`
 2. [ ] Selecionar unidade
 3. [ ] Ir para tab "Conciliação"
@@ -577,6 +596,7 @@ Criar:
 **Responsável:** Tech Writer/Dev
 
 **Tarefas:**
+
 1. [ ] Criar `docs/manual-conciliacao.md`
 2. [ ] Screenshots de cada etapa
 3. [ ] Vídeo tutorial (5-10 min)
@@ -587,6 +607,7 @@ Criar:
 ## 📋 Checklist de Ativação
 
 ### Pré-requisitos
+
 - [ ] Tabela `units` existe e está populada
 - [ ] Tabela `revenues` existe e tem dados
 - [ ] Tabela `expenses` existe e tem dados
@@ -594,6 +615,7 @@ Criar:
 - [ ] Auth (Supabase) está funcionando
 
 ### Banco de Dados
+
 - [ ] Tabela `bank_accounts` criada
 - [ ] Tabela `bank_statements` criada
 - [ ] Tabela `reconciliations` criada
@@ -603,12 +625,14 @@ Criar:
 - [ ] Índices criados
 
 ### Serviços
+
 - [ ] `bankAccountsService` validado
 - [ ] `bankStatementsService` validado
 - [ ] `reconciliationService` validado
 - [ ] Exports adicionados em `index.js`
 
 ### Frontend
+
 - [ ] ConciliacaoTab carrega sem erros
 - [ ] ConciliacaoPanel renderiza
 - [ ] Filtros funcionam
@@ -619,6 +643,7 @@ Criar:
 - [ ] Estatísticas são exibidas corretamente
 
 ### Testes
+
 - [ ] Teste de importação de CSV
 - [ ] Teste de auto-matching
 - [ ] Teste de confirmação
@@ -627,6 +652,7 @@ Criar:
 - [ ] Teste de estatísticas
 
 ### Documentação
+
 - [ ] Manual do usuário criado
 - [ ] Screenshots adicionados
 - [ ] Vídeo tutorial gravado (opcional)
@@ -637,6 +663,7 @@ Criar:
 ## 🚀 Comandos Rápidos
 
 ### Criar migrations
+
 ```bash
 # Criar arquivos de migration
 touch db/migrations/001_create_bank_accounts.sql
@@ -647,12 +674,14 @@ touch db/migrations/005_create_views.sql
 ```
 
 ### Executar no Supabase
+
 ```sql
 -- Copiar e colar no Supabase SQL Editor
 -- Executar um por vez para verificar erros
 ```
 
 ### Testar serviços no console
+
 ```javascript
 // No DevTools Console
 import { bankAccountsService } from './services';
@@ -664,7 +693,7 @@ const account = await bankAccountsService.createBankAccount({
   account_type: 'Corrente',
   agency: '1234',
   account_number: '56789-0',
-  nickname: 'Conta Principal'
+  nickname: 'Conta Principal',
 });
 
 console.log('Conta criada:', account);
@@ -675,11 +704,13 @@ console.log('Conta criada:', account);
 ## 🎓 Recursos Adicionais
 
 ### Tutoriais Recomendados
+
 - [Supabase RLS Policies](https://supabase.com/docs/guides/auth/row-level-security)
 - [PostgreSQL Triggers](https://www.postgresql.org/docs/current/plpgsql-trigger.html)
 - [Testing React Hooks](https://react-hooks-testing-library.com/)
 
 ### Ferramentas Úteis
+
 - [Supabase Dashboard](https://app.supabase.com/)
 - [Postman](https://www.postman.com/) - Para testar APIs
 - [DB Diagram](https://dbdiagram.io/) - Para visualizar ERD

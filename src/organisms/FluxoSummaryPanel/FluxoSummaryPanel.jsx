@@ -30,7 +30,7 @@ import {
 import { format, addDays } from 'date-fns';
 import { CashflowChartCard } from '../../molecules/CashflowChartCard';
 import DateRangePicker from '../../atoms/DateRangePicker';
-import StatusBadge from '../../atoms/StatusBadge';
+import { StatusBadge } from '../../atoms/StatusBadge';
 
 const FluxoSummaryPanel = ({
   // Dados financeiros

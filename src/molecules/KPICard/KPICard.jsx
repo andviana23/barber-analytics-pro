@@ -1,9 +1,15 @@
 import React from 'react';
-import { TrendingUp, TrendingDown, DollarSign, Minus, AlertTriangle } from 'lucide-react';
+import {
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  Minus,
+  AlertTriangle,
+} from 'lucide-react';
 
 /**
  * Componente de card para exibir KPIs
- * @param {object} props 
+ * @param {object} props
  * @param {string} props.title - Título do KPI
  * @param {string|number} props.value - Valor principal
  * @param {string} props.subtitle - Subtítulo opcional
@@ -25,15 +31,15 @@ const KPICard = ({
   color = 'blue',
   loading = false,
   error = false,
-  onClick
+  onClick,
 }) => {
   // Mapear nomes de ícones para componentes
   const iconComponents = {
-    'DollarSign': DollarSign,
-    'TrendingUp': TrendingUp,
-    'TrendingDown': TrendingDown,
-    'Minus': Minus,
-    'AlertTriangle': AlertTriangle
+    DollarSign: DollarSign,
+    TrendingUp: TrendingUp,
+    TrendingDown: TrendingDown,
+    Minus: Minus,
+    AlertTriangle: AlertTriangle,
   };
 
   // Renderizar o ícone
@@ -44,25 +50,36 @@ const KPICard = ({
     } else {
       IconComponent = Icon || DollarSign;
     }
-    return <IconComponent className="h-5 w-5" data-testid={getIconTestId()} data-size="24" aria-hidden="true" />;
+    return (
+      <IconComponent
+        className="h-5 w-5"
+        data-testid={getIconTestId()}
+        data-size="24"
+        aria-hidden="true"
+      />
+    );
   };
 
-  const formatValue = (val) => {
+  const formatValue = val => {
     if (loading || error) return '---';
     if (typeof val === 'number') {
-      if (title?.toLowerCase().includes('receita') || 
-          title?.toLowerCase().includes('faturamento') ||
-          title?.toLowerCase().includes('lucro') ||
-          title?.toLowerCase().includes('ticket') ||
-          title?.toLowerCase().includes('prejuízo') ||
-          title?.toLowerCase().includes('despesa')) {
+      if (
+        title?.toLowerCase().includes('receita') ||
+        title?.toLowerCase().includes('faturamento') ||
+        title?.toLowerCase().includes('lucro') ||
+        title?.toLowerCase().includes('ticket') ||
+        title?.toLowerCase().includes('prejuízo') ||
+        title?.toLowerCase().includes('despesa')
+      ) {
         return new Intl.NumberFormat('pt-BR', {
           style: 'currency',
-          currency: 'BRL'
+          currency: 'BRL',
         }).format(val);
       }
-      if (title?.toLowerCase().includes('margem') ||
-          title?.toLowerCase().includes('%')) {
+      if (
+        title?.toLowerCase().includes('margem') ||
+        title?.toLowerCase().includes('%')
+      ) {
         return `${val.toFixed(1)}%`;
       }
       return val.toLocaleString('pt-BR');
@@ -71,12 +88,16 @@ const KPICard = ({
   };
 
   // Normalizar dados de trend
-  const normalizedTrend = typeof trend === 'object' ? trend : { value: change, type: trend, period: null };
-  const trendValue = normalizedTrend.value !== undefined ? normalizedTrend.value : change;
+  const normalizedTrend =
+    typeof trend === 'object'
+      ? trend
+      : { value: change, type: trend, period: null };
+  const trendValue =
+    normalizedTrend.value !== undefined ? normalizedTrend.value : change;
   const trendType = normalizedTrend.type || trend;
   const trendPeriod = normalizedTrend.period;
 
-  const formatChange = (val) => {
+  const formatChange = val => {
     if (val === undefined || val === null || loading) return null;
     const sign = val > 0 ? '+' : '';
     return `${sign}${val.toFixed(1).replace('.', ',')}%`;
@@ -84,16 +105,24 @@ const KPICard = ({
 
   const getTrendColor = () => {
     if (loading || !trendValue) return 'text-gray-500';
-    if (trendType === 'positive' || trendType === 'up' || trendValue > 0) return 'text-green-600';
-    if (trendType === 'negative' || trendType === 'down' || trendValue < 0) return 'text-red-600';
+    if (trendType === 'positive' || trendType === 'up' || trendValue > 0)
+      return 'text-green-600';
+    if (trendType === 'negative' || trendType === 'down' || trendValue < 0)
+      return 'text-red-600';
     return 'text-gray-500';
   };
 
   const renderTrendIcon = () => {
-    if (loading || (trendValue === undefined && trendValue === null)) return null;
-    if (trendType === 'positive' || trendType === 'up' || trendValue > 0) return <TrendingUp className="h-4 w-4" data-testid="trending-up-icon" />;
-    if (trendType === 'negative' || trendType === 'down' || trendValue < 0) return <TrendingDown className="h-4 w-4" data-testid="trending-down-icon" />;
-    if (trendType === 'neutral' || trendValue === 0) return <Minus className="h-4 w-4" data-testid="minus-icon" />;
+    if (loading || (trendValue === undefined && trendValue === null))
+      return null;
+    if (trendType === 'positive' || trendType === 'up' || trendValue > 0)
+      return <TrendingUp className="h-4 w-4" data-testid="trending-up-icon" />;
+    if (trendType === 'negative' || trendType === 'down' || trendValue < 0)
+      return (
+        <TrendingDown className="h-4 w-4" data-testid="trending-down-icon" />
+      );
+    if (trendType === 'neutral' || trendValue === 0)
+      return <Minus className="h-4 w-4" data-testid="minus-icon" />;
     return null;
   };
 
@@ -103,7 +132,7 @@ const KPICard = ({
       blue: 'border-blue-200 text-blue-600',
       green: 'border-green-200 text-green-600',
       red: 'border-red-200 text-red-600',
-      yellow: 'border-yellow-200 text-yellow-600'
+      yellow: 'border-yellow-200 text-yellow-600',
     };
     return colorMap[color] || colorMap.blue;
   };
@@ -112,11 +141,11 @@ const KPICard = ({
   const getIconTestId = () => {
     if (typeof Icon === 'string') {
       const testIdMap = {
-        'DollarSign': 'dollar-icon',
-        'TrendingUp': 'main-trending-up-icon',
-        'TrendingDown': 'main-trending-down-icon',
-        'Minus': 'main-minus-icon',
-        'AlertTriangle': 'error-icon'
+        DollarSign: 'dollar-icon',
+        TrendingUp: 'main-trending-up-icon',
+        TrendingDown: 'main-trending-down-icon',
+        Minus: 'main-minus-icon',
+        AlertTriangle: 'error-icon',
       };
       return testIdMap[Icon] || 'dollar-icon';
     }
@@ -126,7 +155,10 @@ const KPICard = ({
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 animate-pulse" data-testid="kpi-loading-skeleton">
+      <div
+        className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 animate-pulse"
+        data-testid="kpi-loading-skeleton"
+      >
         <div className="flex items-center justify-between mb-4">
           <div className="p-2 rounded-lg bg-gray-200 dark:bg-gray-700">
             <div className="h-5 w-5 bg-gray-300 dark:bg-gray-600 rounded"></div>
@@ -162,19 +194,23 @@ const KPICard = ({
   const clickableClasses = onClick ? 'cursor-pointer' : '';
 
   return (
-    <div 
+    <div
       className={`${baseClasses} ${clickableClasses}`}
       onClick={onClick}
       role="article"
       tabIndex={onClick ? 0 : undefined}
-      onKeyDown={onClick ? (e) => e.key === 'Enter' && onClick(e) : undefined}
+      onKeyDown={onClick ? e => e.key === 'Enter' && onClick(e) : undefined}
     >
       <div className="flex items-center justify-between mb-4">
-        <div className={`p-2 rounded-lg bg-gray-50 dark:bg-gray-700 ${getColorClasses()}`}>
+        <div
+          className={`p-2 rounded-lg bg-gray-50 dark:bg-gray-700 ${getColorClasses()}`}
+        >
           {renderIcon()}
         </div>
-        {(trendValue !== undefined && trendValue !== null) && (
-          <span className={`text-sm font-medium flex items-center gap-1 ${getTrendColor()}`}>
+        {trendValue !== undefined && trendValue !== null && (
+          <span
+            className={`text-sm font-medium flex items-center gap-1 ${getTrendColor()}`}
+          >
             {renderTrendIcon()}
             {formatChange(trendValue)}
           </span>

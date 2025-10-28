@@ -1,36 +1,33 @@
 /**
  * UNITS COMPARISON COMPONENT
- * 
+ *
  * Componente para comparação visual entre unidades
  */
 
 import React from 'react';
 import { Card } from '../../atoms';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer, 
-  PieChart, 
-  Pie, 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
   Cell,
-  Legend
+  Legend,
 } from 'recharts';
 
 // Icons
-import {
-  ChartBarIcon,
-  Building2
-} from 'lucide-react';
+import { ChartBarIcon, Building2 } from 'lucide-react';
 
 const UnitsComparison = ({ units = [], loading = false }) => {
-  const formatCurrency = (value) => {
+  const formatCurrency = value => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
-      currency: 'BRL'
+      currency: 'BRL',
     }).format(value || 0);
   };
 
@@ -42,7 +39,7 @@ const UnitsComparison = ({ units = [], loading = false }) => {
       faturamento: unit.stats.financial?.monthlyRevenue || 0,
       lucro: unit.stats.financial?.profit || 0,
       atendimentos: unit.stats.attendances?.count || 0,
-      profissionais: unit.stats.professionals?.total || 0
+      profissionais: unit.stats.professionals?.total || 0,
     }));
 
   // Dados para gráfico de pizza (distribuição de faturamento)
@@ -51,17 +48,25 @@ const UnitsComparison = ({ units = [], loading = false }) => {
     .map(unit => ({
       name: unit.name,
       value: unit.stats.financial.monthlyRevenue,
-      percentage: 0 // Será calculado depois
+      percentage: 0, // Será calculado depois
     }));
 
   // Calcular percentuais para o gráfico de pizza
   const totalRevenue = pieChartData.reduce((sum, unit) => sum + unit.value, 0);
   pieChartData.forEach(unit => {
-    unit.percentage = totalRevenue > 0 ? ((unit.value / totalRevenue) * 100).toFixed(1) : 0;
+    unit.percentage =
+      totalRevenue > 0 ? ((unit.value / totalRevenue) * 100).toFixed(1) : 0;
   });
 
   // Cores para os gráficos
-  const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4'];
+  const colors = [
+    '#3B82F6',
+    '#10B981',
+    '#F59E0B',
+    '#EF4444',
+    '#8B5CF6',
+    '#06B6D4',
+  ];
 
   // Custom tooltip para valores monetários
   const CustomTooltip = ({ active, payload, label }) => {
@@ -71,10 +76,9 @@ const UnitsComparison = ({ units = [], loading = false }) => {
           <p className="font-medium text-gray-900 dark:text-white">{label}</p>
           {payload.map((entry, index) => (
             <p key={index} className="text-sm" style={{ color: entry.color }}>
-              {entry.name === 'faturamento' || entry.name === 'lucro' 
+              {entry.name === 'faturamento' || entry.name === 'lucro'
                 ? `${entry.name}: ${formatCurrency(entry.value)}`
-                : `${entry.name}: ${entry.value}`
-              }
+                : `${entry.name}: ${entry.value}`}
             </p>
           ))}
         </div>
@@ -84,7 +88,15 @@ const UnitsComparison = ({ units = [], loading = false }) => {
   };
 
   // Custom label para gráfico de pizza
-  const PieCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name }) => {
+  const PieCustomLabel = ({
+    cx,
+    cy,
+    midAngle,
+    innerRadius,
+    outerRadius,
+    percent,
+    name,
+  }) => {
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
@@ -93,11 +105,11 @@ const UnitsComparison = ({ units = [], loading = false }) => {
     if (percent < 0.05) return null; // Não mostrar labels para fatias muito pequenas
 
     return (
-      <text 
-        x={x} 
-        y={y} 
-        fill="white" 
-        textAnchor={x > cx ? 'start' : 'end'} 
+      <text
+        x={x}
+        y={y}
+        fill="white"
+        textAnchor={x > cx ? 'start' : 'end'}
         dominantBaseline="central"
         fontSize="12"
         fontWeight="bold"
@@ -147,32 +159,39 @@ const UnitsComparison = ({ units = [], loading = false }) => {
 
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={barChartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.3} />
-              <XAxis 
-                dataKey="name" 
+            <BarChart
+              data={barChartData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="#374151"
+                opacity={0.3}
+              />
+              <XAxis
+                dataKey="name"
                 stroke="#6B7280"
                 fontSize={12}
                 angle={-45}
                 textAnchor="end"
                 height={80}
               />
-              <YAxis 
+              <YAxis
                 stroke="#6B7280"
                 fontSize={12}
-                tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`}
+                tickFormatter={value => `R$ ${(value / 1000).toFixed(0)}k`}
               />
               <Tooltip content={<CustomTooltip />} />
               <Legend />
-              <Bar 
-                dataKey="faturamento" 
-                name="Faturamento" 
+              <Bar
+                dataKey="faturamento"
+                name="Faturamento"
                 fill="#10B981"
                 radius={[2, 2, 0, 0]}
               />
-              <Bar 
-                dataKey="lucro" 
-                name="Lucro" 
+              <Bar
+                dataKey="lucro"
+                name="Lucro"
                 fill="#3B82F6"
                 radius={[2, 2, 0, 0]}
               />
@@ -209,12 +228,15 @@ const UnitsComparison = ({ units = [], loading = false }) => {
                     dataKey="value"
                   >
                     {pieChartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={colors[index % colors.length]}
+                      />
                     ))}
                   </Pie>
-                  <Tooltip 
-                    formatter={(value) => [formatCurrency(value), 'Faturamento']}
-                    labelFormatter={(label) => `Unidade: ${label}`}
+                  <Tooltip
+                    formatter={value => [formatCurrency(value), 'Faturamento']}
+                    labelFormatter={label => `Unidade: ${label}`}
                   />
                   <Legend />
                 </PieChart>
@@ -240,10 +262,17 @@ const UnitsComparison = ({ units = [], loading = false }) => {
 
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={barChartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.3} />
-                <XAxis 
-                  dataKey="name" 
+              <BarChart
+                data={barChartData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#374151"
+                  opacity={0.3}
+                />
+                <XAxis
+                  dataKey="name"
                   stroke="#6B7280"
                   fontSize={12}
                   angle={-45}
@@ -253,15 +282,15 @@ const UnitsComparison = ({ units = [], loading = false }) => {
                 <YAxis stroke="#6B7280" fontSize={12} />
                 <Tooltip />
                 <Legend />
-                <Bar 
-                  dataKey="atendimentos" 
-                  name="Atendimentos" 
+                <Bar
+                  dataKey="atendimentos"
+                  name="Atendimentos"
                   fill="#F59E0B"
                   radius={[2, 2, 0, 0]}
                 />
-                <Bar 
-                  dataKey="profissionais" 
-                  name="Profissionais" 
+                <Bar
+                  dataKey="profissionais"
+                  name="Profissionais"
                   fill="#8B5CF6"
                   radius={[2, 2, 0, 0]}
                 />
@@ -308,7 +337,12 @@ const UnitsComparison = ({ units = [], loading = false }) => {
             </thead>
             <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
               {barChartData.map((unit, index) => (
-                <tr key={unit.name} className={index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800' : ''}>
+                <tr
+                  key={unit.name}
+                  className={
+                    index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800' : ''
+                  }
+                >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <Building2 className="h-5 w-5 text-gray-400 mr-2" />
@@ -320,9 +354,11 @@ const UnitsComparison = ({ units = [], loading = false }) => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">
                     {formatCurrency(unit.faturamento)}
                   </td>
-                  <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${
-                    unit.lucro >= 0 ? 'text-green-600' : 'text-red-600'
-                  }`}>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${
+                      unit.lucro >= 0 ? 'text-green-600' : 'text-red-600'
+                    }`}
+                  >
                     {formatCurrency(unit.lucro)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600 font-medium">
@@ -332,10 +368,9 @@ const UnitsComparison = ({ units = [], loading = false }) => {
                     {unit.profissionais}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                    {unit.profissionais > 0 
+                    {unit.profissionais > 0
                       ? `${(unit.faturamento / unit.profissionais / 1000).toFixed(1)}k/prof`
-                      : 'N/A'
-                    }
+                      : 'N/A'}
                   </td>
                 </tr>
               ))}

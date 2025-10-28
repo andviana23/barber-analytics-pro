@@ -15,7 +15,7 @@ class FilaService {
   async getFilaOrdenada(unidadeId) {
     try {
       const { data, error } = await supabase.rpc('get_fila_ordenada', {
-        p_unidade_id: unidadeId
+        p_unidade_id: unidadeId,
       });
 
       if (error) {
@@ -38,11 +38,11 @@ class FilaService {
   async entrarNaFila(barbeiroId, unidadeId) {
     try {
       const { data: userId } = await supabase.auth.getUser();
-      
+
       const { data, error } = await supabase.rpc('entrar_na_fila', {
         p_barbeiro_id: barbeiroId,
         p_unidade_id: unidadeId,
-        p_user_id: userId?.user?.id || null
+        p_user_id: userId?.user?.id || null,
       });
 
       if (error) {
@@ -66,7 +66,7 @@ class FilaService {
     try {
       const { data, error } = await supabase.rpc('pausar_barbeiro', {
         p_barbeiro_id: barbeiroId,
-        p_unidade_id: unidadeId
+        p_unidade_id: unidadeId,
       });
 
       if (error) {
@@ -90,12 +90,12 @@ class FilaService {
   async iniciarAtendimento(barbeiroId, unidadeId, tipoServico = null) {
     try {
       const { data: userId } = await supabase.auth.getUser();
-      
+
       const { data, error } = await supabase.rpc('iniciar_atendimento', {
         p_barbeiro_id: barbeiroId,
         p_unidade_id: unidadeId,
         p_tipo_servico: tipoServico,
-        p_user_id: userId?.user?.id || null
+        p_user_id: userId?.user?.id || null,
       });
 
       if (error) {
@@ -116,12 +116,16 @@ class FilaService {
    * @param {string} observacoes - Observações (opcional)
    * @returns {Promise<boolean>} Sucesso da operação
    */
-  async finalizarAtendimento(historicoId, valorServico = null, observacoes = null) {
+  async finalizarAtendimento(
+    historicoId,
+    valorServico = null,
+    observacoes = null
+  ) {
     try {
       const { data, error } = await supabase.rpc('finalizar_atendimento', {
         p_historico_id: historicoId,
         p_valor_servico: valorServico,
-        p_observacoes: observacoes
+        p_observacoes: observacoes,
       });
 
       if (error) {
@@ -145,7 +149,7 @@ class FilaService {
     try {
       const { data, error } = await supabase.rpc('pular_barbeiro', {
         p_barbeiro_id: barbeiroId,
-        p_unidade_id: unidadeId
+        p_unidade_id: unidadeId,
       });
 
       if (error) {
@@ -169,11 +173,13 @@ class FilaService {
     try {
       const { data: historico, error } = await supabase
         .from('historico_atendimentos')
-        .select(`
+        .select(
+          `
           *,
           barbeiro:professionals(name),
           unidade:units(name)
-        `)
+        `
+        )
         .eq('barbeiro_id', barbeiroId)
         .eq('data_atendimento', data)
         .order('hora_inicio', { ascending: true });
@@ -222,13 +228,18 @@ class FilaService {
 
       // Calcular estatísticas
       const totalBarbeiros = fila?.length || 0;
-      const barbeirosAtivos = fila?.filter(b => b.status === 'active').length || 0;
-      const barbeirosAtendendo = fila?.filter(b => b.status === 'attending').length || 0;
+      const barbeirosAtivos =
+        fila?.filter(b => b.status === 'active').length || 0;
+      const barbeirosAtendendo =
+        fila?.filter(b => b.status === 'attending').length || 0;
       const totalAtendimentos = historico?.length || 0;
-      const valorTotal = historico?.reduce((sum, h) => sum + (h.valor_servico || 0), 0) || 0;
-      const tempoMedio = historico?.length > 0 
-        ? historico.reduce((sum, h) => sum + (h.duracao_minutos || 0), 0) / historico.length 
-        : 0;
+      const valorTotal =
+        historico?.reduce((sum, h) => sum + (h.valor_servico || 0), 0) || 0;
+      const tempoMedio =
+        historico?.length > 0
+          ? historico.reduce((sum, h) => sum + (h.duracao_minutos || 0), 0) /
+            historico.length
+          : 0;
 
       return {
         totalBarbeiros,
@@ -237,7 +248,7 @@ class FilaService {
         totalAtendimentos,
         valorTotal,
         tempoMedio: Math.round(tempoMedio),
-        ticketMedio: totalAtendimentos > 0 ? valorTotal / totalAtendimentos : 0
+        ticketMedio: totalAtendimentos > 0 ? valorTotal / totalAtendimentos : 0,
       };
     } catch (error) {
       console.error('Erro no getEstatisticasDiarias:', error);
@@ -278,9 +289,9 @@ class FilaService {
             event: '*', // INSERT, UPDATE, DELETE
             schema: 'public',
             table: 'fila_atendimento',
-            filter: `unidade_id=eq.${unidadeId}`
+            filter: `unidade_id=eq.${unidadeId}`,
           },
-          (payload) => {
+          payload => {
             console.log('Mudança na fila detectada:', payload);
             callback(payload);
           }
@@ -289,11 +300,11 @@ class FilaService {
           'postgres_changes',
           {
             event: '*',
-            schema: 'public', 
+            schema: 'public',
             table: 'historico_atendimentos',
-            filter: `unidade_id=eq.${unidadeId}`
+            filter: `unidade_id=eq.${unidadeId}`,
           },
-          (payload) => {
+          payload => {
             console.log('Mudança no histórico detectada:', payload);
             callback(payload);
           }

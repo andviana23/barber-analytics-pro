@@ -787,6 +787,161 @@ class FinanceiroService {
       };
     }
   }
+
+  /**
+   * FASE 6: Criar receita a partir de uma comanda (order)
+   *
+   * Método especializado para integração com o módulo de comandas.
+   * Gera receita automaticamente quando uma comanda é fechada.
+   *
+   * @param {Object} orderData - Dados da comanda
+   * @param {string} orderData.orderId - ID da comanda (UUID)
+   * @param {number} orderData.totalAmount - Valor total da comanda
+   * @param {string} orderData.clientId - ID do cliente (party_id)
+   * @param {string} orderData.professionalId - ID do profissional
+   * @param {string} orderData.unitId - ID da unidade
+   * @param {string} orderData.userId - ID do usuário que fechou
+   * @param {string} orderData.paymentMethodId - ID da forma de pagamento
+   * @param {string} orderData.accountId - ID da conta bancária
+   * @param {string} orderData.date - Data da comanda (YYYY-MM-DD)
+   * @param {string} orderData.observations - Observações opcionais
+   * @returns {Promise<{data: RevenueResponseDTO|null, error: string|null}>}
+   */
+  async createReceitaFromOrder(orderData) {
+    try {
+      // eslint-disable-next-line no-console
+      console.log(
+        '💰 Service: Criando receita a partir da comanda:',
+        orderData.orderId
+      );
+
+      // Validar dados obrigatórios
+      if (!orderData.orderId || !orderData.totalAmount) {
+        return {
+          data: null,
+          error: 'ID da comanda e valor total são obrigatórios',
+        };
+      }
+
+      // Montar dados da receita
+      const receitaData = {
+        // Campos obrigatórios
+        type: 'Service', // Tipo: serviço prestado
+        value: orderData.totalAmount,
+        date: orderData.date || new Date().toISOString().split('T')[0],
+
+        // Rastreamento de origem (FASE 6)
+        source_type: 'order',
+        source_id: orderData.orderId,
+        source: `Comanda #${orderData.orderId.substring(0, 8)}`, // Título descritivo
+
+        // Relacionamentos
+        unit_id: orderData.unitId,
+        party_id: orderData.clientId,
+        professional_id: orderData.professionalId,
+        user_id: orderData.userId,
+        payment_method_id: orderData.paymentMethodId,
+        account_id: orderData.accountId,
+
+        // Status e datas
+        status: 'Received', // Comanda fechada = receita recebida
+        expected_receipt_date:
+          orderData.date || new Date().toISOString().split('T')[0],
+        actual_receipt_date:
+          orderData.date || new Date().toISOString().split('T')[0],
+
+        // Valores financeiros (sem taxas por padrão)
+        gross_amount: orderData.totalAmount,
+        net_amount: orderData.totalAmount,
+        fees: 0,
+
+        // Observações
+        observations:
+          orderData.observations ||
+          `Receita gerada automaticamente da comanda ${orderData.orderId}`,
+      };
+
+      // eslint-disable-next-line no-console
+      console.log('💰 Service: Dados da receita preparados:', receitaData);
+
+      // Criar receita usando o método padrão
+      const result = await this.createReceita(receitaData);
+
+      if (result.error) {
+        // eslint-disable-next-line no-console
+        console.error(
+          '❌ Service: Erro ao criar receita da comanda:',
+          result.error
+        );
+        return result;
+      }
+
+      // eslint-disable-next-line no-console
+      console.log('✅ Service: Receita criada com sucesso:', result.data?.id);
+
+      return result;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(
+        '❌ Service: Erro inesperado ao criar receita da comanda:',
+        error
+      );
+      return {
+        data: null,
+        error: error.message || 'Erro ao criar receita da comanda',
+      };
+    }
+  }
+
+  /**
+   * FASE 6: Buscar receitas por origem
+   *
+   * Permite filtrar receitas por tipo de origem (comandas, assinaturas, manual)
+   *
+   * @param {string} sourceType - Tipo de origem: 'order', 'subscription', 'manual'
+   * @param {Object} filters - Filtros adicionais (opcional)
+   * @returns {Promise<{data: RevenueResponseDTO[], error: string|null, count: number}>}
+   */
+  async getReceitasBySource(sourceType, filters = {}) {
+    try {
+      // eslint-disable-next-line no-console
+      console.log('🔍 Service: Buscando receitas por origem:', sourceType);
+
+      // Validar tipo de origem
+      const validTypes = ['order', 'subscription', 'manual'];
+      if (!validTypes.includes(sourceType)) {
+        return {
+          data: [],
+          error: `Tipo de origem inválido. Use: ${validTypes.join(', ')}`,
+          count: 0,
+        };
+      }
+
+      // Adicionar filtro de source_type
+      const enhancedFilters = {
+        ...filters,
+        source_type: sourceType,
+      };
+
+      // Buscar receitas usando o método padrão
+      const result = await this.getReceitas(enhancedFilters);
+
+      // eslint-disable-next-line no-console
+      console.log(
+        `✅ Service: ${result.count} receitas encontradas do tipo ${sourceType}`
+      );
+
+      return result;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('❌ Service: Erro ao buscar receitas por origem:', error);
+      return {
+        data: [],
+        error: error.message,
+        count: 0,
+      };
+    }
+  }
 }
 
 export default new FinanceiroService();

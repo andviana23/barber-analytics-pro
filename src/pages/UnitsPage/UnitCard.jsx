@@ -1,6 +1,6 @@
 /**
  * UNIT CARD COMPONENT
- * 
+ *
  * Card individual para exibir informações de uma unidade
  */
 
@@ -18,15 +18,10 @@ import {
   XCircle,
   BarChart3,
   Users,
-  DollarSign
+  DollarSign,
 } from 'lucide-react';
 
-const UnitCard = ({ 
-  unit, 
-  onEdit, 
-  onDelete, 
-  canViewStats = false 
-}) => {
+const UnitCard = ({ unit, onEdit, onDelete, canViewStats = false }) => {
   const [stats, setStats] = useState(null);
   const [loadingStats, setLoadingStats] = useState(false);
   const { getUnitStats, toggleUnitStatus, updating } = useUnits(false);
@@ -59,30 +54,36 @@ const UnitCard = ({
     }
   };
 
-  const formatCurrency = (value) => {
+  const formatCurrency = value => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
-      currency: 'BRL'
+      currency: 'BRL',
     }).format(value || 0);
   };
 
   return (
-    <Card className={`p-6 transition-all duration-200 hover:shadow-lg ${
-      !unit.status ? 'opacity-60 bg-gray-50 dark:bg-gray-800' : ''
-    }`}>
+    <Card
+      className={`p-6 transition-all duration-200 hover:shadow-lg ${
+        !unit.status ? 'opacity-60 bg-gray-50 dark:bg-gray-800' : ''
+      }`}
+    >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center">
-          <div className={`p-3 rounded-lg ${
-            unit.status 
-              ? 'bg-blue-100 dark:bg-blue-900/30' 
-              : 'bg-gray-100 dark:bg-gray-700'
-          }`}>
-            <Building2 className={`h-6 w-6 ${
-              unit.status 
-                ? 'text-blue-600 dark:text-blue-400' 
-                : 'text-gray-400'
-            }`} />
+          <div
+            className={`p-3 rounded-lg ${
+              unit.status
+                ? 'bg-blue-100 dark:bg-blue-900/30'
+                : 'bg-gray-100 dark:bg-gray-700'
+            }`}
+          >
+            <Building2
+              className={`h-6 w-6 ${
+                unit.status
+                  ? 'text-blue-600 dark:text-blue-400'
+                  : 'text-gray-400'
+              }`}
+            />
           </div>
           <div className="ml-3">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -94,11 +95,13 @@ const UnitCard = ({
               ) : (
                 <XCircle className="h-4 w-4 text-red-500 mr-1" />
               )}
-              <span className={`text-sm ${
-                unit.status 
-                  ? 'text-green-600 dark:text-green-400' 
-                  : 'text-red-600 dark:text-red-400'
-              }`}>
+              <span
+                className={`text-sm ${
+                  unit.status
+                    ? 'text-green-600 dark:text-green-400'
+                    : 'text-red-600 dark:text-red-400'
+                }`}
+              >
                 {unit.status ? 'Ativa' : 'Inativa'}
               </span>
             </div>
@@ -201,7 +204,9 @@ const UnitCard = ({
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => {/* Implementar visualização detalhada */}}
+              onClick={() => {
+                /* Implementar visualização detalhada */
+              }}
               className="text-xs"
             >
               <Eye className="h-4 w-4 mr-1" />

@@ -8,20 +8,19 @@ import { Crown, Medal, Award, User } from 'lucide-react';
  * @param {string} props.title - Título do ranking
  * @param {boolean} props.loading - Estado de carregamento
  */
-const RankingProfissionais = ({ 
-  data = [], 
-  title = "Ranking de Profissionais",
-  loading = false 
+const RankingProfissionais = ({
+  data = [],
+  title = 'Ranking de Profissionais',
+  loading = false,
 }) => {
-  
-  const formatCurrency = (value) => {
+  const formatCurrency = value => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
-      currency: 'BRL'
+      currency: 'BRL',
     }).format(value);
   };
 
-  const getRankIcon = (position) => {
+  const getRankIcon = position => {
     switch (position) {
       case 1:
         return <Crown className="h-5 w-5 text-yellow-500" />;
@@ -34,13 +33,13 @@ const RankingProfissionais = ({
     }
   };
 
-  const getRankBadge = (position) => {
+  const getRankBadge = position => {
     const badges = {
       1: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      2: 'bg-gray-100 text-gray-800 border-gray-200', 
-      3: 'bg-amber-100 text-amber-800 border-amber-200'
+      2: 'bg-gray-100 text-gray-800 border-gray-200',
+      3: 'bg-amber-100 text-amber-800 border-amber-200',
     };
-    
+
     return badges[position] || 'bg-blue-100 text-blue-800 border-blue-200';
   };
 
@@ -83,23 +82,23 @@ const RankingProfissionais = ({
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
         {title}
       </h3>
-      
+
       <div className="space-y-4">
         {data.map((professional, index) => {
           const position = index + 1;
-          
+
           return (
             <div
               key={professional.id || index}
               className={`flex items-center gap-4 p-3 rounded-lg transition-colors ${
-                position <= 3 
-                  ? 'bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-800' 
+                position <= 3
+                  ? 'bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-800'
                   : 'bg-gray-50 dark:bg-gray-700'
               }`}
             >
               {/* Posição e ícone */}
               <div className="flex items-center gap-2 min-w-0">
-                <span 
+                <span
                   className={`inline-flex items-center justify-center w-8 h-8 text-sm font-bold border rounded-full ${getRankBadge(position)}`}
                 >
                   {position}
@@ -119,13 +118,15 @@ const RankingProfissionais = ({
                     </span>
                   )}
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4 mt-2 text-sm text-gray-600 dark:text-gray-400">
                   <div>
-                    <span className="font-medium">Atendimentos:</span> {professional.attendances || 0}
+                    <span className="font-medium">Atendimentos:</span>{' '}
+                    {professional.attendances || 0}
                   </div>
                   <div>
-                    <span className="font-medium">Ticket Médio:</span> {formatCurrency(professional.averageTicket || 0)}
+                    <span className="font-medium">Ticket Médio:</span>{' '}
+                    {formatCurrency(professional.averageTicket || 0)}
                   </div>
                 </div>
               </div>

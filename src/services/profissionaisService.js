@@ -212,6 +212,15 @@ export class ProfissionaisService {
    */
   static async updateProfissional(id, updates) {
     try {
+      // 🐛 DEBUG: Log dos dados recebidos
+      console.log('🔧 ProfissionaisService.updateProfissional chamado');
+      console.log('🆔 ID:', id);
+      console.log('📤 Updates recebidos:', updates);
+      console.log('🏢 unit_id (tipo):', typeof updates.unit_id);
+      console.log('🏢 unit_id (valor):', updates.unit_id);
+      console.log('🏢 unit_id === null:', updates.unit_id === null);
+      console.log('🏢 unit_id === "":', updates.unit_id === '');
+
       const { data, error } = await supabase
         .from('professionals')
         .update({
@@ -227,9 +236,15 @@ export class ProfissionaisService {
         )
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Erro do Supabase:', error);
+        throw error;
+      }
+
+      console.log('✅ Profissional atualizado com sucesso:', data);
       return data;
     } catch (error) {
+      console.error('❌ Exceção em updateProfissional:', error);
       throw new Error(`Erro ao atualizar profissional: ${error.message}`);
     }
   }

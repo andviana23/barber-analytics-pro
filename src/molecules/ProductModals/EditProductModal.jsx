@@ -567,4 +567,3 @@ EditProductModal.propTypes = {
 };
 
 export default EditProductModal;
-

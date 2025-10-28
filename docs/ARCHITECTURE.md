@@ -11,4 +11,3 @@
 
 - 🔗 Documento vigente: [`ARQUITETURA.md`](ARQUITETURA.md)
 - 📁 Conteúdo original preservado no histórico de versionamento Git
-

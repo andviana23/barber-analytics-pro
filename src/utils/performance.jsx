@@ -2,66 +2,70 @@ import React, { lazy, Suspense, memo, useCallback, useMemo } from 'react';
 import { LoadingSpinner } from '../components/LoadingComponents';
 
 // HOC para lazy loading com loading state personalizado
-export function withLazyLoading(Component, fallback = <LoadingSpinner fullScreen />) {
+export function withLazyLoading(
+  Component,
+  fallback = <LoadingSpinner fullScreen />
+) {
   const LazyComponent = lazy(() => Promise.resolve({ default: Component }));
-  
-  const WrappedComponent = memo((props) => (
+
+  const WrappedComponent = memo(props => (
     <Suspense fallback={fallback}>
       <LazyComponent {...props} />
     </Suspense>
   ));
-  
+
   WrappedComponent.displayName = `LazyLoaded(${Component.displayName || Component.name})`;
-  
+
   return WrappedComponent;
 }
 
 // Hook para performance de listas grandes
-export function useVirtualization(items, itemHeight = 50, containerHeight = 400) {
+export function useVirtualization(
+  items,
+  itemHeight = 50,
+  containerHeight = 400
+) {
   const [scrollTop, setScrollTop] = React.useState(0);
-  
+
   const visibleItems = useMemo(() => {
     const startIndex = Math.floor(scrollTop / itemHeight);
     const endIndex = Math.min(
       startIndex + Math.ceil(containerHeight / itemHeight) + 1,
       items.length
     );
-    
+
     return {
       startIndex,
       endIndex,
       visibleItems: items.slice(startIndex, endIndex),
       totalHeight: items.length * itemHeight,
-      offsetY: startIndex * itemHeight
+      offsetY: startIndex * itemHeight,
     };
   }, [items, itemHeight, containerHeight, scrollTop]);
-  
-  const handleScroll = useCallback((e) => {
+
+  const handleScroll = useCallback(e => {
     setScrollTop(e.target.scrollTop);
   }, []);
-  
+
   return {
     ...visibleItems,
-    handleScroll
+    handleScroll,
   };
 }
 
 // Componente de lista virtualizada para performance
-export function VirtualizedList({ 
-  items, 
-  renderItem, 
-  itemHeight = 50, 
+export function VirtualizedList({
+  items,
+  renderItem,
+  itemHeight = 50,
   containerHeight = 400,
-  className = '' 
+  className = '',
 }) {
-  const { startIndex, visibleItems, totalHeight, offsetY, handleScroll } = useVirtualization(
-    items, 
-    itemHeight, 
-    containerHeight
-  );
+  const { startIndex, visibleItems, totalHeight, offsetY, handleScroll } =
+    useVirtualization(items, itemHeight, containerHeight);
 
   return (
-    <div 
+    <div
       className={`overflow-auto ${className}`}
       style={{ height: containerHeight }}
       onScroll={handleScroll}
@@ -111,14 +115,17 @@ export function useThrottle(callback, delay = 100) {
     callbackRef.current = callback;
   }, [callback]);
 
-  return React.useCallback((...args) => {
-    if (throttleRef.current) return;
+  return React.useCallback(
+    (...args) => {
+      if (throttleRef.current) return;
 
-    throttleRef.current = setTimeout(() => {
-      callbackRef.current(...args);
-      throttleRef.current = null;
-    }, delay);
-  }, [delay]);
+      throttleRef.current = setTimeout(() => {
+        callbackRef.current(...args);
+        throttleRef.current = null;
+      }, delay);
+    },
+    [delay]
+  );
 }
 
 // Hook para intersection observer (lazy loading de imagens/componentes)
@@ -134,7 +141,7 @@ export function useIntersectionObserver(options = {}) {
       {
         threshold: 0.1,
         rootMargin: '50px',
-        ...options
+        ...options,
       }
     );
 
@@ -147,12 +154,12 @@ export function useIntersectionObserver(options = {}) {
 }
 
 // Componente para lazy loading de imagens
-export function LazyImage({ 
-  src, 
-  alt, 
+export function LazyImage({
+  src,
+  alt,
   placeholder = '/placeholder.jpg',
   className = '',
-  ...props 
+  ...props
 }) {
   const [imgRef, isIntersecting] = useIntersectionObserver();
   const [isLoaded, setIsLoaded] = React.useState(false);
@@ -184,7 +191,9 @@ export function LazyImage({
         />
       )}
       {!isIntersecting && (
-        <div className={`bg-gray-200 dark:bg-gray-700 animate-pulse ${className}`} />
+        <div
+          className={`bg-gray-200 dark:bg-gray-700 animate-pulse ${className}`}
+        />
       )}
     </div>
   );
@@ -196,12 +205,12 @@ export function measurePerformance(fn, label = 'Operation') {
     const startTime = performance.now();
     const result = fn(...args);
     const endTime = performance.now();
-    
+
     if (import.meta.env.DEV) {
       // eslint-disable-next-line no-console
       console.debug(`${label} took ${endTime - startTime} milliseconds`);
     }
-    
+
     return result;
   };
 }
@@ -211,7 +220,7 @@ export function usePerformanceMonitor(componentName) {
   React.useEffect(() => {
     if (import.meta.env.DEV) {
       const startTime = performance.now();
-      
+
       return () => {
         const endTime = performance.now();
         // eslint-disable-next-line no-console
@@ -223,18 +232,19 @@ export function usePerformanceMonitor(componentName) {
 
 // Wrapper para componentes com monitoramento de performance
 export function withPerformanceMonitoring(Component, componentName) {
-  const PerformanceWrappedComponent = memo((props) => {
+  const PerformanceWrappedComponent = memo(props => {
     usePerformanceMonitor(componentName);
     return <Component {...props} />;
   });
-  
+
   PerformanceWrappedComponent.displayName = `WithPerformance(${Component.displayName || Component.name})`;
-  
+
   return PerformanceWrappedComponent;
 }
 
 // Hook para cache de dados com TTL
-export function useDataCache(key, fetcher, ttl = 5 * 60 * 1000) { // 5 minutos default
+export function useDataCache(key, fetcher, ttl = 5 * 60 * 1000) {
+  // 5 minutos default
   const [data, setData] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
@@ -242,7 +252,7 @@ export function useDataCache(key, fetcher, ttl = 5 * 60 * 1000) { // 5 minutos d
 
   const fetchData = useCallback(async () => {
     const cached = cacheRef.current.get(key);
-    
+
     // Verificar cache válido
     if (cached && Date.now() - cached.timestamp < ttl) {
       setData(cached.data);
@@ -253,13 +263,13 @@ export function useDataCache(key, fetcher, ttl = 5 * 60 * 1000) { // 5 minutos d
       setLoading(true);
       setError(null);
       const result = await fetcher();
-      
+
       // Armazenar no cache
       cacheRef.current.set(key, {
         data: result,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
-      
+
       setData(result);
     } catch (err) {
       setError(err);
@@ -307,7 +317,7 @@ export function usePerformanceMetrics() {
 
   React.useEffect(() => {
     if ('performance' in window) {
-      const observer = new PerformanceObserver((list) => {
+      const observer = new PerformanceObserver(list => {
         const entries = list.getEntries();
         const newMetrics = {};
 
@@ -326,11 +336,11 @@ export function usePerformanceMetrics() {
     }
   }, []);
 
-  const startMeasure = useCallback((name) => {
+  const startMeasure = useCallback(name => {
     performance.mark(`${name}-start`);
   }, []);
 
-  const endMeasure = useCallback((name) => {
+  const endMeasure = useCallback(name => {
     performance.mark(`${name}-end`);
     performance.measure(name, `${name}-start`, `${name}-end`);
   }, []);
@@ -351,5 +361,5 @@ export default {
   withPerformanceMonitoring,
   useDataCache,
   ResourcePreloader,
-  usePerformanceMetrics
+  usePerformanceMetrics,
 };

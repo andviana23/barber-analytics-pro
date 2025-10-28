@@ -45,12 +45,12 @@ supabase/
 
 ## 🧬 Camadas e Responsabilidades
 
-| Camada | Responsabilidades | Artefatos principais |
-|--------|-------------------|-----------------------|
-| 🎨 UI | Renderização, roteamento, captura de eventos | `src/pages`, `src/atoms`, `src/molecules`, `src/organisms`, `src/templates` |
-| 🤖 Application | Orquestra fluxos de negócio, aplica DTOs, coordena contextos | `src/services`, `src/hooks`, `src/context` |
-| 🧠 Domain | Contratos, validação, whitelists/blacklists, normalização de status | `src/dtos`, helpers específicos |
-| 🗄️ Infrastructure | Persistência via Supabase (CRUD, RPC, views) | `src/repositories`, `src/services/supabase.js`, `supabase/functions`, `supabase/migrations` |
+| Camada            | Responsabilidades                                                   | Artefatos principais                                                                        |
+| ----------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| 🎨 UI             | Renderização, roteamento, captura de eventos                        | `src/pages`, `src/atoms`, `src/molecules`, `src/organisms`, `src/templates`                 |
+| 🤖 Application    | Orquestra fluxos de negócio, aplica DTOs, coordena contextos        | `src/services`, `src/hooks`, `src/context`                                                  |
+| 🧠 Domain         | Contratos, validação, whitelists/blacklists, normalização de status | `src/dtos`, helpers específicos                                                             |
+| 🗄️ Infrastructure | Persistência via Supabase (CRUD, RPC, views)                        | `src/repositories`, `src/services/supabase.js`, `supabase/functions`, `supabase/migrations` |
 
 ### Fluxos
 
@@ -92,4 +92,3 @@ supabase/
 - [`docs/CONTRATOS.md`](CONTRATOS.md) — DTOs, repositories e RPCs.
 - `supabase/migrations/*.sql` — esquema oficial do banco.
 - `supabase/functions/monthly-reset/index.ts` — Edge Function em Deno.
-

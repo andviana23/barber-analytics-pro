@@ -161,4 +161,3 @@ Transformar os cards estáticos do fluxo de caixa em um gráfico de linha do tem
 **Data:** 2025-01-17  
 **Versão:** 1.0  
 **Status:** ✅ Completo e Funcional
-

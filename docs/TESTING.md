@@ -41,17 +41,21 @@ npx playwright test   # suíte E2E (Playwright)
 ## 🔍 Escopo por Camada
 
 ### 1. DTOs (`src/dtos/*`)
+
 - [✅] Validar whitelists/blacklists e mensagens Zod.
 - [✅] Garantir normalização de status e valores padrão.
 
 ### 2. Services (`src/services/*`)
+
 - [✅] Mockar `repositories`/Supabase para isolar regras de negócio.
 - [⚠️] Expandir cobertura para criação de receitas/despesas, agregações (DRE, fluxo de caixa) e conciliação.
 
 ### 3. Hooks & UI (`src/hooks/*`, `src/components/*`)
+
 - [⚠️] Cobrir renderização, estados de loading/erro e integração com contextos (Auth, Theme, Unit, Toast) usando Testing Library.
 
 ### 4. E2E (Playwright)
+
 - [✅] `npx playwright install` executado.
 - [✅] `playwright.config.ts` criado + pasta `e2e/` com suites base.
 - [✅] Cenários mapeados: login, fluxo financeiro, conciliação e Lista da Vez (marcados como `skip` até captura de seletores reais).
@@ -60,7 +64,6 @@ npx playwright test   # suíte E2E (Playwright)
 
 ## 📌 Próximos Passos
 
-1. Popular fixtures de dados para destravar implementação real dos testes E2E.  
-2. Integrar Playwright e Vitest ao pipeline de CI (GitHub Actions).  
+1. Popular fixtures de dados para destravar implementação real dos testes E2E.
+2. Integrar Playwright e Vitest ao pipeline de CI (GitHub Actions).
 3. Adicionar mocks de Supabase Auth/Realtime para cenários offline e testes de hooks.
-

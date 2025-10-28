@@ -17,7 +17,7 @@ export default function useFilaRealtime(unidadeId) {
   // Função para carregar dados da fila
   const loadFila = useCallback(async () => {
     if (!unidadeId) return;
-    
+
     try {
       setError(null);
       const data = await filaService.getFilaOrdenada(unidadeId);
@@ -32,12 +32,15 @@ export default function useFilaRealtime(unidadeId) {
   }, [unidadeId]);
 
   // Função de callback para mudanças em tempo real
-  const handleRealtimeChange = useCallback((payload) => {
-    console.log('Mudança detectada via Realtime:', payload);
-    
-    // Recarregar dados quando houver mudanças
-    loadFila();
-  }, [loadFila]);
+  const handleRealtimeChange = useCallback(
+    payload => {
+      console.log('Mudança detectada via Realtime:', payload);
+
+      // Recarregar dados quando houver mudanças
+      loadFila();
+    },
+    [loadFila]
+  );
 
   // Configurar conexão realtime
   useEffect(() => {
@@ -49,7 +52,10 @@ export default function useFilaRealtime(unidadeId) {
 
       // Configurar listener realtime
       try {
-        channel = filaService.setupRealtimeListener(unidadeId, handleRealtimeChange);
+        channel = filaService.setupRealtimeListener(
+          unidadeId,
+          handleRealtimeChange
+        );
         setConnected(true);
       } catch (err) {
         console.error('Erro ao configurar Realtime:', err);
@@ -81,67 +87,90 @@ export default function useFilaRealtime(unidadeId) {
   }, [loadFila]);
 
   // Métodos de ação da fila
-  const entrarNaFila = useCallback(async (barbeiroId) => {
-    try {
-      await filaService.entrarNaFila(barbeiroId, unidadeId);
-      // Os dados serão atualizados via realtime ou refresh manual
-      if (!connected) {
-        await loadFila();
+  const entrarNaFila = useCallback(
+    async barbeiroId => {
+      try {
+        await filaService.entrarNaFila(barbeiroId, unidadeId);
+        // Os dados serão atualizados via realtime ou refresh manual
+        if (!connected) {
+          await loadFila();
+        }
+      } catch (err) {
+        setError(err.message);
+        throw err;
       }
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    }
-  }, [unidadeId, connected, loadFila]);
+    },
+    [unidadeId, connected, loadFila]
+  );
 
-  const pausarBarbeiro = useCallback(async (barbeiroId) => {
-    try {
-      await filaService.pausarBarbeiro(barbeiroId, unidadeId);
-      if (!connected) {
-        await loadFila();
+  const pausarBarbeiro = useCallback(
+    async barbeiroId => {
+      try {
+        await filaService.pausarBarbeiro(barbeiroId, unidadeId);
+        if (!connected) {
+          await loadFila();
+        }
+      } catch (err) {
+        setError(err.message);
+        throw err;
       }
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    }
-  }, [unidadeId, connected, loadFila]);
+    },
+    [unidadeId, connected, loadFila]
+  );
 
-  const iniciarAtendimento = useCallback(async (barbeiroId, tipoServico) => {
-    try {
-      const historicoId = await filaService.iniciarAtendimento(barbeiroId, unidadeId, tipoServico);
-      if (!connected) {
-        await loadFila();
+  const iniciarAtendimento = useCallback(
+    async (barbeiroId, tipoServico) => {
+      try {
+        const historicoId = await filaService.iniciarAtendimento(
+          barbeiroId,
+          unidadeId,
+          tipoServico
+        );
+        if (!connected) {
+          await loadFila();
+        }
+        return historicoId;
+      } catch (err) {
+        setError(err.message);
+        throw err;
       }
-      return historicoId;
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    }
-  }, [unidadeId, connected, loadFila]);
+    },
+    [unidadeId, connected, loadFila]
+  );
 
-  const finalizarAtendimento = useCallback(async (historicoId, valorServico, observacoes) => {
-    try {
-      await filaService.finalizarAtendimento(historicoId, valorServico, observacoes);
-      if (!connected) {
-        await loadFila();
+  const finalizarAtendimento = useCallback(
+    async (historicoId, valorServico, observacoes) => {
+      try {
+        await filaService.finalizarAtendimento(
+          historicoId,
+          valorServico,
+          observacoes
+        );
+        if (!connected) {
+          await loadFila();
+        }
+      } catch (err) {
+        setError(err.message);
+        throw err;
       }
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    }
-  }, [connected, loadFila]);
+    },
+    [connected, loadFila]
+  );
 
-  const pularBarbeiro = useCallback(async (barbeiroId) => {
-    try {
-      await filaService.pularBarbeiro(barbeiroId, unidadeId);
-      if (!connected) {
-        await loadFila();
+  const pularBarbeiro = useCallback(
+    async barbeiroId => {
+      try {
+        await filaService.pularBarbeiro(barbeiroId, unidadeId);
+        if (!connected) {
+          await loadFila();
+        }
+      } catch (err) {
+        setError(err.message);
+        throw err;
       }
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    }
-  }, [unidadeId, connected, loadFila]);
+    },
+    [unidadeId, connected, loadFila]
+  );
 
   return {
     // Estado
@@ -150,7 +179,7 @@ export default function useFilaRealtime(unidadeId) {
     error,
     connected,
     lastUpdate,
-    
+
     // Ações
     refresh,
     entrarNaFila,
@@ -158,8 +187,8 @@ export default function useFilaRealtime(unidadeId) {
     iniciarAtendimento,
     finalizarAtendimento,
     pularBarbeiro,
-    
+
     // Utilitários
-    clearError: () => setError(null)
+    clearError: () => setError(null),
   };
 }

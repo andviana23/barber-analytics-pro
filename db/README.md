@@ -5,13 +5,13 @@ This folder contains SQL scripts to inspect the current schema and create robust
 How to run
 
 - With VS Code SQLTools (PostgreSQL):
-  1) Open the SQL file (for example: `db/sql/01-schema-snapshot.sql`).
-  2) Ensure your SQLTools connection to Supabase is selected.
-  3) Execute the file. Review the results in the Results panel.
+  1. Open the SQL file (for example: `db/sql/01-schema-snapshot.sql`).
+  2. Ensure your SQLTools connection to Supabase is selected.
+  3. Execute the file. Review the results in the Results panel.
 
 - With Supabase SQL Editor:
-  1) Open the SQL Editor in your project.
-  2) Paste the content of the file and run it.
+  1. Open the SQL Editor in your project.
+  2. Paste the content of the file and run it.
 
 Files
 

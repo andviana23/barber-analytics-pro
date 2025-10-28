@@ -4,7 +4,9 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const baseURL =
-  process.env.E2E_BASE_URL || process.env.VITE_APP_URL || 'http://localhost:5173';
+  process.env.E2E_BASE_URL ||
+  process.env.VITE_APP_URL ||
+  'http://localhost:5173';
 
 export default defineConfig({
   testDir: './e2e',
@@ -14,7 +16,10 @@ export default defineConfig({
   },
   fullyParallel: false,
   retries: process.env.CI ? 1 : 0,
-  reporter: [['list'], ['html', { outputFolder: 'playwright-report', open: 'never' }]],
+  reporter: [
+    ['list'],
+    ['html', { outputFolder: 'playwright-report', open: 'never' }],
+  ],
   use: {
     baseURL,
     trace: 'on-first-retry',

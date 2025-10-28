@@ -1,10 +1,10 @@
 /**
  * bankFileParser.js
- * 
+ *
  * Parser para arquivos bancários brasileiros.
  * Suporte aos principais bancos: Itaú, Bradesco, Banco do Brasil, Santander.
  * Formatos: CSV, OFX, TXT e formatos proprietários.
- * 
+ *
  * Autor: Sistema Barber Analytics Pro
  * Data: 2024
  */
@@ -30,15 +30,17 @@ export class BankFileParser {
             description: 'Descrição',
             amount: 'Valor',
             document: 'Documento',
-            balance: 'Saldo'
-          }
+            balance: 'Saldo',
+          },
         },
         patterns: {
-          creditPattern: /^(DEPOSITO|CREDITO|TED RECEBIDA|PIX RECEBIDO|TRANSFERENCIA RECEBIDA)/i,
-          debitPattern: /^(DEBITO|SAQUE|TED ENVIADA|PIX ENVIADO|TRANSFERENCIA ENVIADA|PAGAMENTO)/i
-        }
+          creditPattern:
+            /^(DEPOSITO|CREDITO|TED RECEBIDA|PIX RECEBIDO|TRANSFERENCIA RECEBIDA)/i,
+          debitPattern:
+            /^(DEBITO|SAQUE|TED ENVIADA|PIX ENVIADO|TRANSFERENCIA ENVIADA|PAGAMENTO)/i,
+        },
       },
-      
+
       bradesco: {
         name: 'Bradesco',
         code: '237',
@@ -53,15 +55,15 @@ export class BankFileParser {
             description: 'Histórico',
             amount: 'Valor R$',
             document: 'Documento',
-            balance: 'Saldo R$'
-          }
+            balance: 'Saldo R$',
+          },
         },
         patterns: {
           creditPattern: /^(CREDITO|DEPOSITO|RECEBIMENTO|TED REC|PIX REC)/i,
-          debitPattern: /^(DEBITO|SAQUE|PAGAMENTO|TED ENV|PIX ENV)/i
-        }
+          debitPattern: /^(DEBITO|SAQUE|PAGAMENTO|TED ENV|PIX ENV)/i,
+        },
       },
-      
+
       bb: {
         name: 'Banco do Brasil',
         code: '001',
@@ -76,15 +78,16 @@ export class BankFileParser {
             description: 'Descrição',
             amount: 'Valor',
             document: 'Nr documento',
-            balance: 'Saldo'
-          }
+            balance: 'Saldo',
+          },
         },
         patterns: {
-          creditPattern: /^(CREDITO|DEPOSITO|TED CREDITO|PIX ENTRADA|RECEBIMENTO)/i,
-          debitPattern: /^(DEBITO|SAQUE|TED DEBITO|PIX SAIDA|PAGAMENTO)/i
-        }
+          creditPattern:
+            /^(CREDITO|DEPOSITO|TED CREDITO|PIX ENTRADA|RECEBIMENTO)/i,
+          debitPattern: /^(DEBITO|SAQUE|TED DEBITO|PIX SAIDA|PAGAMENTO)/i,
+        },
       },
-      
+
       santander: {
         name: 'Santander',
         code: '033',
@@ -99,14 +102,15 @@ export class BankFileParser {
             description: 'Descrição',
             amount: 'Valor',
             document: 'Documento',
-            balance: 'Saldo'
-          }
+            balance: 'Saldo',
+          },
         },
         patterns: {
-          creditPattern: /^(CREDITO|DEPOSITO|TED ENTRADA|PIX RECEBIDO|RECEBIMENTO)/i,
-          debitPattern: /^(DEBITO|SAQUE|TED SAIDA|PIX ENVIADO|PAGAMENTO)/i
-        }
-      }
+          creditPattern:
+            /^(CREDITO|DEPOSITO|TED ENTRADA|PIX RECEBIDO|RECEBIMENTO)/i,
+          debitPattern: /^(DEBITO|SAQUE|TED SAIDA|PIX ENVIADO|PAGAMENTO)/i,
+        },
+      },
     };
 
     // Configurações gerais
@@ -115,12 +119,12 @@ export class BankFileParser {
       supportedEncodings: ['utf8', 'latin1', 'iso-8859-1'],
       dateFormats: [
         'DD/MM/YYYY',
-        'DD-MM-YYYY', 
+        'DD-MM-YYYY',
         'YYYY-MM-DD',
         'YYYY/MM/DD',
         'DD/MM/YY',
-        'DD-MM-YY'
-      ]
+        'DD-MM-YY',
+      ],
     };
   }
 
@@ -135,13 +139,19 @@ export class BankFileParser {
     const normalizedFilename = filename.toLowerCase();
 
     // Detectar por nome do arquivo
-    if (normalizedFilename.includes('itau') || normalizedFilename.includes('itaú')) {
+    if (
+      normalizedFilename.includes('itau') ||
+      normalizedFilename.includes('itaú')
+    ) {
       return { bank: 'itau', confidence: 0.8 };
     }
     if (normalizedFilename.includes('bradesco')) {
       return { bank: 'bradesco', confidence: 0.8 };
     }
-    if (normalizedFilename.includes('bb') || normalizedFilename.includes('bancobrasil')) {
+    if (
+      normalizedFilename.includes('bb') ||
+      normalizedFilename.includes('bancobrasil')
+    ) {
       return { bank: 'bb', confidence: 0.8 };
     }
     if (normalizedFilename.includes('santander')) {
@@ -150,36 +160,18 @@ export class BankFileParser {
 
     // Detectar por conteúdo
     const bankSignatures = {
-      itau: [
-        'itau unibanco',
-        'banco itau',
-        'ag:',
-        'conta corrente:'
-      ],
-      bradesco: [
-        'banco bradesco',
-        'bradesco s.a',
-        'ag.:',
-        'conta:'
-      ],
-      bb: [
-        'banco do brasil',
-        'bb.com.br',
-        'agencia:',
-        'conta corrente:'
-      ],
-      santander: [
-        'santander',
-        'banco santander',
-        'ag.:',
-        'c/c:'
-      ]
+      itau: ['itau unibanco', 'banco itau', 'ag:', 'conta corrente:'],
+      bradesco: ['banco bradesco', 'bradesco s.a', 'ag.:', 'conta:'],
+      bb: ['banco do brasil', 'bb.com.br', 'agencia:', 'conta corrente:'],
+      santander: ['santander', 'banco santander', 'ag.:', 'c/c:'],
     };
 
     for (const [bankCode, signatures] of Object.entries(bankSignatures)) {
-      const matches = signatures.filter(sig => normalizedContent.includes(sig)).length;
+      const matches = signatures.filter(sig =>
+        normalizedContent.includes(sig)
+      ).length;
       if (matches >= 2) {
-        return { bank: bankCode, confidence: 0.6 + (matches * 0.1) };
+        return { bank: bankCode, confidence: 0.6 + matches * 0.1 };
       }
     }
 
@@ -194,27 +186,30 @@ export class BankFileParser {
    */
   detectFormat(content, filename = '') {
     const extension = filename.split('.').pop()?.toLowerCase();
-    
+
     // Por extensão
     if (['csv', 'txt', 'ofx', 'xlsx'].includes(extension)) {
       return extension;
     }
 
     // Por conteúdo
-    if (content.trim().startsWith('<OFX>') || content.includes('<BANKMSGSRSV1>')) {
+    if (
+      content.trim().startsWith('<OFX>') ||
+      content.includes('<BANKMSGSRSV1>')
+    ) {
       return 'ofx';
     }
 
     // Verificar se é CSV/TXT
     const lines = content.split('\n').slice(0, 5);
     const csvDelimiters = [',', ';', '\t'];
-    
+
     for (const delimiter of csvDelimiters) {
       const hasConsistentColumns = lines.every(line => {
         const columns = line.split(delimiter);
         return columns.length > 1;
       });
-      
+
       if (hasConsistentColumns) {
         return 'csv';
       }
@@ -233,7 +228,7 @@ export class BankFileParser {
     try {
       // Ler conteúdo do arquivo
       let content, filename;
-      
+
       if (typeof file === 'string') {
         content = file;
         filename = options.filename || '';
@@ -248,14 +243,16 @@ export class BankFileParser {
       }
 
       // Auto-detectar banco e formato se não fornecidos
-      const bankDetection = options.bank ? 
-        { bank: options.bank, confidence: 1.0 } : 
-        this.detectBank(content, filename);
+      const bankDetection = options.bank
+        ? { bank: options.bank, confidence: 1.0 }
+        : this.detectBank(content, filename);
 
       const format = options.format || this.detectFormat(content, filename);
 
       if (!bankDetection.bank) {
-        throw new Error('Não foi possível detectar o banco. Especifique manualmente.');
+        throw new Error(
+          'Não foi possível detectar o banco. Especifique manualmente.'
+        );
       }
 
       const bankConfig = this.bankConfigs[bankDetection.bank];
@@ -265,7 +262,7 @@ export class BankFileParser {
 
       // Parse baseado no formato
       let transactions = [];
-      
+
       switch (format) {
         case 'csv':
           transactions = await this.parseCSV(content, bankConfig, options);
@@ -291,15 +288,14 @@ export class BankFileParser {
         metadata: {
           filename: filename,
           parseDate: new Date().toISOString(),
-          encoding: options.encoding || 'utf8'
-        }
+          encoding: options.encoding || 'utf8',
+        },
       };
-
     } catch (error) {
       return {
         success: false,
         error: error.message,
-        transactions: []
+        transactions: [],
       };
     }
   }
@@ -314,7 +310,7 @@ export class BankFileParser {
   async parseCSV(content, bankConfig, options = {}) {
     const config = { ...bankConfig.csvConfig, ...options.csvConfig };
     const lines = content.split('\n').filter(line => line.trim());
-    
+
     if (lines.length === 0) {
       throw new Error('Arquivo CSV vazio.');
     }
@@ -336,9 +332,10 @@ export class BankFileParser {
       // Mapear colunas
       const columnMapping = {};
       Object.entries(config.columns).forEach(([key, expectedName]) => {
-        const columnIndex = headers.findIndex(h => 
-          h.toLowerCase().includes(expectedName.toLowerCase()) ||
-          expectedName.toLowerCase().includes(h.toLowerCase())
+        const columnIndex = headers.findIndex(
+          h =>
+            h.toLowerCase().includes(expectedName.toLowerCase()) ||
+            expectedName.toLowerCase().includes(h.toLowerCase())
         );
         if (columnIndex >= 0) {
           columnMapping[key] = columnIndex;
@@ -356,8 +353,12 @@ export class BankFileParser {
 
       try {
         const columns = this.parseCSVLine(line, config.delimiter);
-        const transaction = this.parseCSVTransaction(columns, config, bankConfig);
-        
+        const transaction = this.parseCSVTransaction(
+          columns,
+          config,
+          bankConfig
+        );
+
         if (transaction) {
           transactions.push(transaction);
         }
@@ -382,7 +383,7 @@ export class BankFileParser {
 
     for (let i = 0; i < line.length; i++) {
       const char = line[i];
-      
+
       if (char === '"' && !inQuotes) {
         inQuotes = true;
       } else if (char === '"' && inQuotes) {
@@ -394,7 +395,7 @@ export class BankFileParser {
         current += char;
       }
     }
-    
+
     columns.push(current.trim());
     return columns;
   }
@@ -435,7 +436,7 @@ export class BankFileParser {
         description: 1,
         amount: 2,
         document: 3,
-        balance: 4
+        balance: 4,
       };
     }
 
@@ -474,21 +475,25 @@ export class BankFileParser {
     // Determinar tipo (crédito/débito)
     if (transaction.description && transaction.amount !== undefined) {
       transaction.type = this.determineTransactionType(
-        transaction.description, 
-        transaction.amount, 
+        transaction.description,
+        transaction.amount,
         bankConfig.patterns
       );
     }
 
     // Validar transação
-    if (!transaction.date || !transaction.description || transaction.amount === undefined) {
+    if (
+      !transaction.date ||
+      !transaction.description ||
+      transaction.amount === undefined
+    ) {
       return null;
     }
 
     // Adicionar metadados
     transaction.id = this.generateTransactionId(transaction);
     transaction.rawData = columns;
-    
+
     return transaction;
   }
 
@@ -501,7 +506,7 @@ export class BankFileParser {
    */
   async parseOFX(content) {
     const transactions = [];
-    
+
     // Regex para extrair transações OFX
     const transactionRegex = /<STMTTRN>(.*?)<\/STMTTRN>/gs;
     const matches = content.match(transactionRegex);
@@ -541,8 +546,10 @@ export class BankFileParser {
       date: this.parseOFXDate(extractTag(transactionXml, 'DTPOSTED')),
       amount: parseFloat(extractTag(transactionXml, 'TRNAMT')),
       fitid: extractTag(transactionXml, 'FITID'),
-      description: extractTag(transactionXml, 'MEMO') || extractTag(transactionXml, 'NAME'),
-      document: extractTag(transactionXml, 'CHECKNUM')
+      description:
+        extractTag(transactionXml, 'MEMO') ||
+        extractTag(transactionXml, 'NAME'),
+      document: extractTag(transactionXml, 'CHECKNUM'),
     };
 
     // Determinar tipo de transação
@@ -562,7 +569,7 @@ export class BankFileParser {
    */
   parseOFXDate(dateStr) {
     if (!dateStr) return null;
-    
+
     const cleaned = dateStr.replace(/[^\d]/g, '');
     if (cleaned.length >= 8) {
       const year = cleaned.substring(0, 4);
@@ -570,7 +577,7 @@ export class BankFileParser {
       const day = cleaned.substring(6, 8);
       return `${year}-${month}-${day}`;
     }
-    
+
     return null;
   }
 
@@ -608,7 +615,7 @@ export class BankFileParser {
   parseTXTLine(line, bankConfig) {
     // Implementação básica - pode ser customizada por banco
     const parts = line.split(/\s+/);
-    
+
     if (parts.length < 3) {
       return null;
     }
@@ -616,7 +623,7 @@ export class BankFileParser {
     const transaction = {
       date: this.parseDate(parts[0]),
       description: parts.slice(1, -1).join(' '),
-      amount: this.parseAmount(parts[parts.length - 1])
+      amount: this.parseAmount(parts[parts.length - 1]),
     };
 
     if (!transaction.date || transaction.amount === undefined) {
@@ -630,7 +637,7 @@ export class BankFileParser {
     );
 
     transaction.id = this.generateTransactionId(transaction);
-    
+
     return transaction;
   }
 
@@ -645,10 +652,12 @@ export class BankFileParser {
 
     // Limpar string
     const cleaned = dateStr.replace(/[^\d/-]/g, '');
-    
+
     // Tentar formatos comuns
-    const formats = expectedFormat ? [expectedFormat, ...this.config.dateFormats] : this.config.dateFormats;
-    
+    const formats = expectedFormat
+      ? [expectedFormat, ...this.config.dateFormats]
+      : this.config.dateFormats;
+
     for (const format of formats) {
       try {
         const parsed = this.parseDateWithFormat(cleaned, format);
@@ -674,7 +683,7 @@ export class BankFileParser {
       'YYYY-MM-DD': /^(\d{4})-(\d{2})-(\d{2})$/,
       'YYYY/MM/DD': /^(\d{4})\/(\d{2})\/(\d{2})$/,
       'DD/MM/YY': /^(\d{2})\/(\d{2})\/(\d{2})$/,
-      'DD-MM-YY': /^(\d{2})-(\d{2})-(\d{2})$/
+      'DD-MM-YY': /^(\d{2})-(\d{2})-(\d{2})$/,
     };
 
     const regex = formatRegexes[format];
@@ -703,7 +712,11 @@ export class BankFileParser {
 
     // Validar data
     const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-    if (date.getFullYear() == year && date.getMonth() == month - 1 && date.getDate() == day) {
+    if (
+      date.getFullYear() == year &&
+      date.getMonth() == month - 1 &&
+      date.getDate() == day
+    ) {
       return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
     }
 
@@ -720,7 +733,7 @@ export class BankFileParser {
 
     // Remover caracteres não numéricos exceto vírgula, ponto e sinal
     let cleaned = amountStr.toString().replace(/[^\d,.\-+]/g, '');
-    
+
     // Tratar formatos brasileiros (vírgula como decimal)
     if (cleaned.includes(',') && cleaned.includes('.')) {
       // Formato: 1.234,56
@@ -729,7 +742,7 @@ export class BankFileParser {
       // Verificar se vírgula é separador decimal ou de milhares
       const commaIndex = cleaned.lastIndexOf(',');
       const afterComma = cleaned.substring(commaIndex + 1);
-      
+
       if (afterComma.length <= 2) {
         // Vírgula como decimal
         cleaned = cleaned.replace(',', '.');
@@ -776,7 +789,9 @@ export class BankFileParser {
    */
   generateTransactionId(transaction) {
     const data = `${transaction.date || ''}_${transaction.amount || ''}_${(transaction.description || '').substring(0, 20)}`;
-    return btoa(data).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
+    return btoa(data)
+      .replace(/[^a-zA-Z0-9]/g, '')
+      .substring(0, 16);
   }
 
   /**
@@ -798,11 +813,11 @@ export class BankFileParser {
     } catch {
       // ✅ Fallback: tentar encodings comuns para bancos brasileiros
       const fallbackEncodings = ['utf8', 'latin1', 'windows-1252'];
-      
+
       for (const encoding of fallbackEncodings) {
         try {
           const content = await this.readFileWithEncoding(file, encoding);
-          
+
           // ✅ Validar se o conteúdo parece correto (sem caracteres corrompidos)
           if (this.isValidTextContent(content)) {
             return content;
@@ -811,7 +826,7 @@ export class BankFileParser {
           continue; // Tentar próximo encoding
         }
       }
-      
+
       // ✅ Se nenhum encoding funcionou, usar UTF-8 como último recurso
       return this.readFileWithEncoding(file, 'utf8');
     }
@@ -824,15 +839,15 @@ export class BankFileParser {
    * @private
    */
   async detectFileEncoding(file) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const reader = new FileReader();
-      
-      reader.onload = (event) => {
+
+      reader.onload = event => {
         const buffer = new Uint8Array(event.target.result);
         const encoding = this.detectEncodingFromBOM(buffer);
         resolve(encoding);
       };
-      
+
       // Ler apenas os primeiros 1024 bytes para detectar BOM
       const slice = file.slice(0, 1024);
       reader.readAsArrayBuffer(slice);
@@ -847,21 +862,25 @@ export class BankFileParser {
    */
   detectEncodingFromBOM(buffer) {
     // ✅ UTF-8 BOM
-    if (buffer.length >= 3 && 
-        buffer[0] === 0xEF && buffer[1] === 0xBB && buffer[2] === 0xBF) {
+    if (
+      buffer.length >= 3 &&
+      buffer[0] === 0xef &&
+      buffer[1] === 0xbb &&
+      buffer[2] === 0xbf
+    ) {
       return 'utf8';
     }
-    
+
     // ✅ UTF-16 Little Endian BOM
-    if (buffer.length >= 2 && buffer[0] === 0xFF && buffer[1] === 0xFE) {
+    if (buffer.length >= 2 && buffer[0] === 0xff && buffer[1] === 0xfe) {
       return 'utf16le';
     }
-    
-    // ✅ UTF-16 Big Endian BOM  
-    if (buffer.length >= 2 && buffer[0] === 0xFE && buffer[1] === 0xFF) {
+
+    // ✅ UTF-16 Big Endian BOM
+    if (buffer.length >= 2 && buffer[0] === 0xfe && buffer[1] === 0xff) {
       return 'utf16be';
     }
-    
+
     // ✅ Heurística para bancos brasileiros
     // Verificar se tem caracteres típicos de Latin1 (acentos)
     let hasLatinChars = false;
@@ -872,12 +891,12 @@ export class BankFileParser {
         break;
       }
     }
-    
+
     // ✅ Se tem caracteres latinos, provavelmente é Latin1 (comum no Bradesco)
     if (hasLatinChars) {
       return 'latin1';
     }
-    
+
     // ✅ Default para UTF-8 (comum no Itaú, BB, Santander)
     return 'utf8';
   }
@@ -892,15 +911,19 @@ export class BankFileParser {
   readFileWithEncoding(file, encoding) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      
-      reader.onload = (event) => {
+
+      reader.onload = event => {
         resolve(event.target.result);
       };
-      
-      reader.onerror = (error) => {
-        reject(new Error(`Erro ao ler arquivo com encoding ${encoding}: ${error.message}`));
+
+      reader.onerror = error => {
+        reject(
+          new Error(
+            `Erro ao ler arquivo com encoding ${encoding}: ${error.message}`
+          )
+        );
       };
-      
+
       reader.readAsText(file, encoding);
     });
   }
@@ -918,16 +941,16 @@ export class BankFileParser {
     if (invalidChars.test(content)) {
       return false;
     }
-    
+
     // ✅ Verificar se não tem muitos caracteres de substituição (�)
     const replacementChars = (content.match(/�/g) || []).length;
     const totalChars = content.length;
-    
+
     // Se mais de 1% são caracteres de substituição, provavelmente encoding errado
-    if (totalChars > 0 && (replacementChars / totalChars) > 0.01) {
+    if (totalChars > 0 && replacementChars / totalChars > 0.01) {
       return false;
     }
-    
+
     // ✅ Conteúdo parece válido
     return true;
   }
@@ -950,8 +973,8 @@ export class BankFileParser {
         debitsCount: 0,
         totalCredits: 0,
         totalDebits: 0,
-        dateRange: { start: null, end: null }
-      }
+        dateRange: { start: null, end: null },
+      },
     };
 
     const dates = [];
@@ -967,7 +990,10 @@ export class BankFileParser {
         dates.push(new Date(transaction.date));
       }
 
-      if (!transaction.description || transaction.description.trim().length === 0) {
+      if (
+        !transaction.description ||
+        transaction.description.trim().length === 0
+      ) {
         validation.errors.push(`Transação ${index + 1}: Descrição vazia`);
         isValid = false;
       }
@@ -980,7 +1006,7 @@ export class BankFileParser {
       // Atualizar estatísticas
       if (isValid) {
         validation.statistics.validTransactions++;
-        
+
         if (transaction.type === 'credit') {
           validation.statistics.creditsCount++;
           validation.statistics.totalCredits += Math.abs(transaction.amount);
@@ -996,14 +1022,20 @@ export class BankFileParser {
     // Calcular range de datas
     if (dates.length > 0) {
       dates.sort((a, b) => a - b);
-      validation.statistics.dateRange.start = dates[0].toISOString().split('T')[0];
-      validation.statistics.dateRange.end = dates[dates.length - 1].toISOString().split('T')[0];
+      validation.statistics.dateRange.start = dates[0]
+        .toISOString()
+        .split('T')[0];
+      validation.statistics.dateRange.end = dates[dates.length - 1]
+        .toISOString()
+        .split('T')[0];
     }
 
     // Marcar como inválido se há muitos erros
     if (validation.errors.length > transactions.length * 0.1) {
       validation.isValid = false;
-      validation.warnings.push('Muitos erros encontrados. Verifique o formato do arquivo.');
+      validation.warnings.push(
+        'Muitos erros encontrados. Verifique o formato do arquivo.'
+      );
     }
 
     return validation;
@@ -1018,7 +1050,7 @@ export class BankFileParser {
       banks: Object.keys(this.bankConfigs),
       formats: ['csv', 'ofx', 'txt', 'xlsx'],
       encodings: this.config.supportedEncodings,
-      dateFormats: this.config.dateFormats
+      dateFormats: this.config.dateFormats,
     };
   }
 }

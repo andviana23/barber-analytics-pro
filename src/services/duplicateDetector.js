@@ -1,10 +1,10 @@
 /**
  * duplicateDetector.js
- * 
+ *
  * Detector de duplicatas usando hash MD5 de campos-chave.
  * Prevenção de inserções duplicadas com validação inteligente.
  * Hash baseado em: date, amount, description, party_id, account_id.
- * 
+ *
  * Autor: Sistema Barber Analytics Pro
  * Data: 2024
  */
@@ -22,28 +22,28 @@ export class DuplicateDetector {
       hashFields: {
         primary: ['date', 'amount', 'description'],
         secondary: ['party_id', 'account_id', 'unit_id'],
-        optional: ['document', 'category', 'type']
+        optional: ['document', 'category', 'type'],
       },
-      
+
       // Tolerâncias para matching
       tolerance: {
-        amount: 0.01,           // R$ 0,01 de diferença
-        date: 0,                // 0 dias de diferença (exato)
-        description: 0.9        // 90% de similaridade
+        amount: 0.01, // R$ 0,01 de diferença
+        date: 0, // 0 dias de diferença (exato)
+        description: 0.9, // 90% de similaridade
       },
-      
+
       // Configurações de cache
       cache: {
         enabled: true,
-        ttl: 10 * 60 * 1000,   // 10 minutos
-        maxSize: 1000          // Máximo 1000 entradas
+        ttl: 10 * 60 * 1000, // 10 minutos
+        maxSize: 1000, // Máximo 1000 entradas
       },
-      
+
       // Configurações de batch processing
       batch: {
-        size: 100,             // Processar 100 por vez
-        delay: 100             // 100ms entre batches
-      }
+        size: 100, // Processar 100 por vez
+        delay: 100, // 100ms entre batches
+      },
     };
 
     // Cache interno
@@ -65,7 +65,7 @@ export class DuplicateDetector {
       // Extrair campos primários
       fields.primary.forEach(field => {
         let value = transaction[field];
-        
+
         // Normalizar valores
         if (field === 'date' && value) {
           // Normalizar data para YYYY-MM-DD
@@ -78,7 +78,7 @@ export class DuplicateDetector {
           // Normalizar descrição
           value = this.normalizeString(value);
         }
-        
+
         hashData[field] = value || '';
       });
 
@@ -102,7 +102,6 @@ export class DuplicateDetector {
 
       // Gerar hash MD5
       return CryptoJS.MD5(hashString).toString();
-
     } catch (error) {
       throw new Error(`Erro ao gerar hash: ${error.message}`);
     }
@@ -118,7 +117,7 @@ export class DuplicateDetector {
   async checkDuplicate(transaction, existingTransactions, options = {}) {
     try {
       const newHash = this.generateHash(transaction, options);
-      
+
       // Verificar cache primeiro
       const cacheKey = `dup_${newHash}`;
       if (this.config.cache.enabled && this.hashCache.has(cacheKey)) {
@@ -135,7 +134,7 @@ export class DuplicateDetector {
       for (const existing of existingTransactions) {
         // Hash exato
         const existingHash = this.generateHash(existing, options);
-        
+
         if (newHash === existingHash) {
           duplicates.push({
             id: existing.id,
@@ -143,21 +142,25 @@ export class DuplicateDetector {
             confidence: 1.0,
             hash: existingHash,
             matchedFields: this.getMatchedFields(transaction, existing),
-            transaction: existing
+            transaction: existing,
           });
           continue;
         }
 
         // Verificação de similaridade
-        const similarity = await this.calculateSimilarity(transaction, existing, options);
-        
+        const similarity = await this.calculateSimilarity(
+          transaction,
+          existing,
+          options
+        );
+
         if (similarity.score >= (options.similarityThreshold || 0.85)) {
           similarities.push({
             id: existing.id,
             type: 'similar',
             confidence: similarity.score,
             details: similarity.details,
-            transaction: existing
+            transaction: existing,
           });
         }
       }
@@ -168,9 +171,13 @@ export class DuplicateDetector {
         hash: newHash,
         exactMatches: duplicates,
         similarMatches: similarities,
-        confidence: duplicates.length > 0 ? 1.0 : 
-                   similarities.length > 0 ? Math.max(...similarities.map(s => s.confidence)) : 0,
-        checkedAt: new Date().toISOString()
+        confidence:
+          duplicates.length > 0
+            ? 1.0
+            : similarities.length > 0
+              ? Math.max(...similarities.map(s => s.confidence))
+              : 0,
+        checkedAt: new Date().toISOString(),
       };
 
       // Armazenar no cache
@@ -178,18 +185,17 @@ export class DuplicateDetector {
         this.manageCacheSize();
         this.hashCache.set(cacheKey, {
           result: result,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         });
       }
 
       return result;
-
     } catch (error) {
       return {
         isDuplicate: false,
         isSimilar: false,
         error: error.message,
-        checkedAt: new Date().toISOString()
+        checkedAt: new Date().toISOString(),
       };
     }
   }
@@ -201,14 +207,18 @@ export class DuplicateDetector {
    * @param {Object} options - Opções de verificação
    * @returns {Array} Resultados da verificação
    */
-  async checkBatchDuplicates(newTransactions, existingTransactions, options = {}) {
+  async checkBatchDuplicates(
+    newTransactions,
+    existingTransactions,
+    options = {}
+  ) {
     const results = [];
     const batchSize = options.batchSize || this.config.batch.size;
-    
+
     // Processar em batches para performance
     for (let i = 0; i < newTransactions.length; i += batchSize) {
       const batch = newTransactions.slice(i, i + batchSize);
-      
+
       const batchPromises = batch.map(transaction =>
         this.checkDuplicate(transaction, existingTransactions, options)
       );
@@ -217,8 +227,13 @@ export class DuplicateDetector {
       results.push(...batchResults);
 
       // Delay entre batches se configurado
-      if (this.config.batch.delay > 0 && i + batchSize < newTransactions.length) {
-        await new Promise(resolve => setTimeout(resolve, this.config.batch.delay));
+      if (
+        this.config.batch.delay > 0 &&
+        i + batchSize < newTransactions.length
+      ) {
+        await new Promise(resolve =>
+          setTimeout(resolve, this.config.batch.delay)
+        );
       }
     }
 
@@ -234,7 +249,7 @@ export class DuplicateDetector {
    */
   async calculateSimilarity(transaction1, transaction2, options = {}) {
     const cacheKey = `sim_${transaction1.id || 'new'}_${transaction2.id}`;
-    
+
     // Verificar cache
     if (this.config.cache.enabled && this.similarityCache.has(cacheKey)) {
       const cached = this.similarityCache.get(cacheKey);
@@ -248,21 +263,27 @@ export class DuplicateDetector {
       amount: 0,
       description: 0,
       party: 0,
-      account: 0
+      account: 0,
     };
 
     const details = {};
 
     // 1. Score de data
     if (transaction1.date && transaction2.date) {
-      const dateSimilarity = this.calculateDateSimilarity(transaction1.date, transaction2.date);
+      const dateSimilarity = this.calculateDateSimilarity(
+        transaction1.date,
+        transaction2.date
+      );
       scores.date = dateSimilarity.score;
       details.date = dateSimilarity;
     }
 
     // 2. Score de valor
     if (transaction1.amount && transaction2.amount) {
-      const amountSimilarity = this.calculateAmountSimilarity(transaction1.amount, transaction2.amount);
+      const amountSimilarity = this.calculateAmountSimilarity(
+        transaction1.amount,
+        transaction2.amount
+      );
       scores.amount = amountSimilarity.score;
       details.amount = amountSimilarity;
     }
@@ -270,7 +291,7 @@ export class DuplicateDetector {
     // 3. Score de descrição
     if (transaction1.description && transaction2.description) {
       const descSimilarity = this.calculateStringSimilarity(
-        transaction1.description, 
+        transaction1.description,
         transaction2.description
       );
       scores.description = descSimilarity;
@@ -285,7 +306,8 @@ export class DuplicateDetector {
 
     // 5. Score de conta
     if (transaction1.account_id && transaction2.account_id) {
-      scores.account = transaction1.account_id === transaction2.account_id ? 1.0 : 0;
+      scores.account =
+        transaction1.account_id === transaction2.account_id ? 1.0 : 0;
       details.account = { match: scores.account === 1.0 };
     }
 
@@ -294,19 +316,19 @@ export class DuplicateDetector {
       date: 0.25,
       amount: 0.35,
       description: 0.25,
-      party: 0.10,
-      account: 0.05
+      party: 0.1,
+      account: 0.05,
     };
 
     const totalScore = Object.keys(scores).reduce((sum, key) => {
-      return sum + (scores[key] * (weights[key] || 0));
+      return sum + scores[key] * (weights[key] || 0);
     }, 0);
 
     const result = {
       score: Math.round(totalScore * 100) / 100,
       scores: scores,
       details: details,
-      calculatedAt: new Date().toISOString()
+      calculatedAt: new Date().toISOString(),
     };
 
     // Armazenar no cache
@@ -314,7 +336,7 @@ export class DuplicateDetector {
       this.manageCacheSize();
       this.similarityCache.set(cacheKey, {
         result: result,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
     }
 
@@ -330,7 +352,7 @@ export class DuplicateDetector {
   calculateDateSimilarity(date1, date2) {
     const d1 = new Date(date1);
     const d2 = new Date(date2);
-    
+
     const diffTime = Math.abs(d1.getTime() - d2.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
@@ -344,7 +366,7 @@ export class DuplicateDetector {
       return { score: 0, daysDifference: diffDays, exact: false };
     }
 
-    const score = Math.max(0, 1 - (diffDays / maxDays));
+    const score = Math.max(0, 1 - diffDays / maxDays);
     return { score: score, daysDifference: diffDays, exact: false };
   }
 
@@ -367,11 +389,12 @@ export class DuplicateDetector {
     const maxAmount = Math.max(abs1, abs2);
     const percentDiff = difference / maxAmount;
 
-    if (percentDiff > 0.1) { // Mais de 10% de diferença = score 0
+    if (percentDiff > 0.1) {
+      // Mais de 10% de diferença = score 0
       return { score: 0, difference: difference, exact: false };
     }
 
-    const score = Math.max(0, 1 - (percentDiff / 0.1));
+    const score = Math.max(0, 1 - percentDiff / 0.1);
     return { score: score, difference: difference, exact: false };
   }
 
@@ -424,7 +447,7 @@ export class DuplicateDetector {
 
     const maxLength = Math.max(len1, len2);
     const similarity = (maxLength - matrix[len2][len1]) / maxLength;
-    
+
     return Math.max(0, similarity);
   }
 
@@ -437,9 +460,9 @@ export class DuplicateDetector {
     return str
       .toLowerCase()
       .trim()
-      .replace(/\s+/g, ' ')           // Múltiplos espaços -> um espaço
-      .replace(/[^\w\s]/g, '')       // Remove pontuação
-      .replace(/\d+/g, '#');         // Números -> #
+      .replace(/\s+/g, ' ') // Múltiplos espaços -> um espaço
+      .replace(/[^\w\s]/g, '') // Remove pontuação
+      .replace(/\d+/g, '#'); // Números -> #
   }
 
   /**
@@ -451,22 +474,31 @@ export class DuplicateDetector {
   getMatchedFields(transaction1, transaction2) {
     const matchedFields = [];
     const fieldsToCheck = [
-      'date', 'amount', 'description', 'party_id', 
-      'account_id', 'unit_id', 'category', 'type'
+      'date',
+      'amount',
+      'description',
+      'party_id',
+      'account_id',
+      'unit_id',
+      'category',
+      'type',
     ];
 
     fieldsToCheck.forEach(field => {
       let match = false;
-      
+
       if (field === 'amount') {
-        const diff = Math.abs((transaction1[field] || 0) - (transaction2[field] || 0));
+        const diff = Math.abs(
+          (transaction1[field] || 0) - (transaction2[field] || 0)
+        );
         match = diff <= this.config.tolerance.amount;
       } else if (field === 'date') {
-        match = new Date(transaction1[field]).toDateString() === 
-                new Date(transaction2[field]).toDateString();
+        match =
+          new Date(transaction1[field]).toDateString() ===
+          new Date(transaction2[field]).toDateString();
       } else if (field === 'description') {
         const similarity = this.calculateStringSimilarity(
-          transaction1[field] || '', 
+          transaction1[field] || '',
           transaction2[field] || ''
         );
         match = similarity >= this.config.tolerance.description;
@@ -490,16 +522,22 @@ export class DuplicateDetector {
       // Remover entradas mais antigas
       const entries = Array.from(this.hashCache.entries());
       entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
-      
-      const toRemove = entries.slice(0, Math.floor(this.config.cache.maxSize * 0.2));
+
+      const toRemove = entries.slice(
+        0,
+        Math.floor(this.config.cache.maxSize * 0.2)
+      );
       toRemove.forEach(([key]) => this.hashCache.delete(key));
     }
 
     if (this.similarityCache.size > this.config.cache.maxSize) {
       const entries = Array.from(this.similarityCache.entries());
       entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
-      
-      const toRemove = entries.slice(0, Math.floor(this.config.cache.maxSize * 0.2));
+
+      const toRemove = entries.slice(
+        0,
+        Math.floor(this.config.cache.maxSize * 0.2)
+      );
       toRemove.forEach(([key]) => this.similarityCache.delete(key));
     }
   }
@@ -517,34 +555,38 @@ export class DuplicateDetector {
 
     for (const transaction of transactions) {
       const hash = this.generateHash(transaction, options);
-      
+
       if (processedHashes.has(hash)) {
         duplicates.push({
           transaction: transaction,
           hash: hash,
-          reason: 'duplicate_hash'
+          reason: 'duplicate_hash',
         });
       } else {
         // Verificar similaridade com transações únicas existentes
         if (options.checkSimilarity) {
           let isDuplicate = false;
-          
+
           for (const uniqueTransaction of unique) {
-            const similarity = await this.calculateSimilarity(transaction, uniqueTransaction, options);
-            
+            const similarity = await this.calculateSimilarity(
+              transaction,
+              uniqueTransaction,
+              options
+            );
+
             if (similarity.score >= (options.similarityThreshold || 0.9)) {
               duplicates.push({
                 transaction: transaction,
                 hash: hash,
                 similarTo: uniqueTransaction,
                 similarity: similarity,
-                reason: 'similar_transaction'
+                reason: 'similar_transaction',
               });
               isDuplicate = true;
               break;
             }
           }
-          
+
           if (!isDuplicate) {
             unique.push(transaction);
             processedHashes.add(hash);
@@ -562,7 +604,7 @@ export class DuplicateDetector {
       duplicates: duplicates.length,
       uniqueTransactions: unique,
       duplicateTransactions: duplicates,
-      removalRate: duplicates.length / transactions.length
+      removalRate: duplicates.length / transactions.length,
     };
   }
 
@@ -582,14 +624,14 @@ export class DuplicateDetector {
     return {
       hashCache: {
         size: this.hashCache.size,
-        maxSize: this.config.cache.maxSize
+        maxSize: this.config.cache.maxSize,
       },
       similarityCache: {
         size: this.similarityCache.size,
-        maxSize: this.config.cache.maxSize
+        maxSize: this.config.cache.maxSize,
       },
       enabled: this.config.cache.enabled,
-      ttl: this.config.cache.ttl
+      ttl: this.config.cache.ttl,
     };
   }
 
@@ -603,16 +645,16 @@ export class DuplicateDetector {
       ...newConfig,
       hashFields: {
         ...this.config.hashFields,
-        ...(newConfig.hashFields || {})
+        ...(newConfig.hashFields || {}),
       },
       tolerance: {
         ...this.config.tolerance,
-        ...(newConfig.tolerance || {})
+        ...(newConfig.tolerance || {}),
       },
       cache: {
         ...this.config.cache,
-        ...(newConfig.cache || {})
-      }
+        ...(newConfig.cache || {}),
+      },
     };
 
     // Limpar cache se configurações mudaram

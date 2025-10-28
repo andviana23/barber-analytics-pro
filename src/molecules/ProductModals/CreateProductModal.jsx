@@ -578,4 +578,3 @@ CreateProductModal.propTypes = {
 };
 
 export default CreateProductModal;
-

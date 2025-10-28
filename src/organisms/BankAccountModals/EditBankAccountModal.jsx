@@ -1,6 +1,6 @@
 /**
  * EDIT BANK ACCOUNT MODAL
- * 
+ *
  * Modal para edição de conta bancária existente
  */
 
@@ -18,10 +18,15 @@ import {
   Building,
   MapPin,
   Hash,
-  DollarSign
+  DollarSign,
 } from 'lucide-react';
 
-const EditBankAccountModal = ({ isOpen, onClose, onSuccess, account = null }) => {
+const EditBankAccountModal = ({
+  isOpen,
+  onClose,
+  onSuccess,
+  account = null,
+}) => {
   const { updateBankAccount, loading, checkAccountExists } = useBankAccounts();
   const { units } = useUnits();
   const { showSuccess, showError } = useToast();
@@ -34,7 +39,7 @@ const EditBankAccountModal = ({ isOpen, onClose, onSuccess, account = null }) =>
     account_number: '',
     unit_id: '',
     initial_balance: 0,
-    is_active: true
+    is_active: true,
   });
 
   const [errors, setErrors] = useState({});
@@ -51,7 +56,7 @@ const EditBankAccountModal = ({ isOpen, onClose, onSuccess, account = null }) =>
         account_number: account.account_number || '',
         unit_id: account.unit_id || '',
         initial_balance: account.initial_balance || 0,
-        is_active: account.is_active !== undefined ? account.is_active : true
+        is_active: account.is_active !== undefined ? account.is_active : true,
       });
     }
   }, [account]);
@@ -87,7 +92,8 @@ const EditBankAccountModal = ({ isOpen, onClose, onSuccess, account = null }) =>
     if (!formData.account_number.trim()) {
       newErrors.account_number = 'Número da conta é obrigatório';
     } else if (!/^[\d-]+$/.test(formData.account_number.trim())) {
-      newErrors.account_number = 'Número da conta deve conter apenas números e hífen';
+      newErrors.account_number =
+        'Número da conta deve conter apenas números e hífen';
     }
 
     // Unidade
@@ -101,7 +107,13 @@ const EditBankAccountModal = ({ isOpen, onClose, onSuccess, account = null }) =>
     }
 
     // Verificar se a conta já existe (excluindo a atual)
-    if (!newErrors.bank && !newErrors.agency && !newErrors.account_number && !newErrors.unit_id && account) {
+    if (
+      !newErrors.bank &&
+      !newErrors.agency &&
+      !newErrors.account_number &&
+      !newErrors.unit_id &&
+      account
+    ) {
       try {
         setChecking(true);
         const exists = await checkAccountExists(
@@ -111,9 +123,10 @@ const EditBankAccountModal = ({ isOpen, onClose, onSuccess, account = null }) =>
           formData.unit_id,
           account.id // Excluir a conta atual da verificação
         );
-        
+
         if (exists) {
-          newErrors.account_number = 'Esta conta já existe para a unidade selecionada';
+          newErrors.account_number =
+            'Esta conta já existe para a unidade selecionada';
         }
       } catch {
         // Erro ao verificar será ignorado para não bloquear o formulário
@@ -127,37 +140,37 @@ const EditBankAccountModal = ({ isOpen, onClose, onSuccess, account = null }) =>
   };
 
   // Handlers
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
-    
+
     // Limpar erro do campo atual
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
-        [name]: ''
+        [name]: '',
       }));
     }
   };
 
-  const handleBlur = (field) => {
+  const handleBlur = field => {
     setTouched(prev => ({ ...prev, [field]: true }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     if (!account) return;
-    
+
     const isValid = await validateForm();
     if (!isValid) return;
 
     try {
       const updatedAccount = await updateBankAccount(account.id, formData);
-      
+
       showSuccess(
         'Conta bancária atualizada',
         `A conta ${formData.name} foi atualizada com sucesso.`
@@ -165,20 +178,17 @@ const EditBankAccountModal = ({ isOpen, onClose, onSuccess, account = null }) =>
 
       setErrors({});
       setTouched({});
-      
+
       onSuccess?.(updatedAccount);
       onClose();
     } catch (error) {
-      showError(
-        'Erro ao atualizar conta',
-        error.message
-      );
+      showError('Erro ao atualizar conta', error.message);
     }
   };
 
   const handleClose = () => {
     if (loading) return;
-    
+
     setErrors({});
     setTouched({});
     onClose();
@@ -190,11 +200,10 @@ const EditBankAccountModal = ({ isOpen, onClose, onSuccess, account = null }) =>
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Overlay */}
       <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" />
-      
+
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
         <div className="relative w-full max-w-lg transform rounded-lg bg-white dark:bg-gray-800 shadow-xl transition-all">
-          
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3">
@@ -210,7 +219,7 @@ const EditBankAccountModal = ({ isOpen, onClose, onSuccess, account = null }) =>
                 </p>
               </div>
             </div>
-            
+
             <Button
               variant="ghost"
               size="sm"
@@ -224,7 +233,6 @@ const EditBankAccountModal = ({ isOpen, onClose, onSuccess, account = null }) =>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
-            
             {/* Nome da conta */}
             <div>
               <Input
@@ -273,7 +281,7 @@ const EditBankAccountModal = ({ isOpen, onClose, onSuccess, account = null }) =>
                   required
                 />
               </div>
-              
+
               <div>
                 <Input
                   label="Número da Conta"
@@ -305,9 +313,10 @@ const EditBankAccountModal = ({ isOpen, onClose, onSuccess, account = null }) =>
                   w-full px-3 py-2 border rounded-md shadow-sm
                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
                   disabled:bg-gray-50 disabled:text-gray-500
-                  ${touched.unit_id && errors.unit_id
-                    ? 'border-red-300 bg-red-50' 
-                    : 'border-gray-300 dark:border-gray-600'
+                  ${
+                    touched.unit_id && errors.unit_id
+                      ? 'border-red-300 bg-red-50'
+                      : 'border-gray-300 dark:border-gray-600'
                   }
                   bg-white dark:bg-gray-700 text-gray-900 dark:text-white
                 `}
@@ -356,7 +365,10 @@ const EditBankAccountModal = ({ isOpen, onClose, onSuccess, account = null }) =>
                 disabled={loading}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
-              <label htmlFor="is_active" className="text-sm font-medium text-gray-900 dark:text-white">
+              <label
+                htmlFor="is_active"
+                className="text-sm font-medium text-gray-900 dark:text-white"
+              >
                 Conta ativa
               </label>
               <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -383,7 +395,7 @@ const EditBankAccountModal = ({ isOpen, onClose, onSuccess, account = null }) =>
               >
                 Cancelar
               </Button>
-              
+
               <Button
                 type="submit"
                 disabled={loading || checking}

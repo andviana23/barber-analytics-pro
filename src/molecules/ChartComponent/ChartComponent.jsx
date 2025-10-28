@@ -14,7 +14,7 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from 'recharts';
 
 /**
@@ -33,12 +33,18 @@ const ChartComponent = ({
   title,
   height = 300,
   config = {},
-  loading = false
+  loading = false,
 }) => {
   // Cores padrão para os gráficos
   const colors = [
-    '#3b82f6', '#10b981', '#f59e0b', '#ef4444', 
-    '#8b5cf6', '#06b6d4', '#84cc16', '#f97316'
+    '#3b82f6',
+    '#10b981',
+    '#f59e0b',
+    '#ef4444',
+    '#8b5cf6',
+    '#06b6d4',
+    '#84cc16',
+    '#f97316',
   ];
 
   // Configurações padrão por tipo de gráfico
@@ -48,43 +54,43 @@ const ChartComponent = ({
       lines: [
         { dataKey: 'revenues', name: 'Receitas', stroke: colors[0] },
         { dataKey: 'expenses', name: 'Despesas', stroke: colors[3] },
-        { dataKey: 'profit', name: 'Lucro', stroke: colors[1] }
-      ]
+        { dataKey: 'profit', name: 'Lucro', stroke: colors[1] },
+      ],
     },
     area: {
       xDataKey: 'month',
       areas: [
         { dataKey: 'revenues', name: 'Receitas', fill: colors[0] },
-        { dataKey: 'expenses', name: 'Despesas', fill: colors[3] }
-      ]
+        { dataKey: 'expenses', name: 'Despesas', fill: colors[3] },
+      ],
     },
     bar: {
       xDataKey: 'name',
-      bars: [
-        { dataKey: 'value', name: 'Valor', fill: colors[0] }
-      ]
+      bars: [{ dataKey: 'value', name: 'Valor', fill: colors[0] }],
     },
     pie: {
       dataKey: 'value',
-      nameKey: 'name'
-    }
+      nameKey: 'name',
+    },
   };
 
   const chartConfig = { ...defaultConfigs[type], ...config };
 
-  const formatCurrency = (value) => {
+  const formatCurrency = value => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
-      minimumFractionDigits: 0
+      minimumFractionDigits: 0,
     }).format(value);
   };
 
   const formatTooltip = (value, name) => {
     if (typeof value === 'number') {
-      if (name?.toLowerCase().includes('receita') || 
-          name?.toLowerCase().includes('despesa') ||
-          name?.toLowerCase().includes('lucro')) {
+      if (
+        name?.toLowerCase().includes('receita') ||
+        name?.toLowerCase().includes('despesa') ||
+        name?.toLowerCase().includes('lucro')
+      ) {
         return formatCurrency(value);
       }
     }
@@ -93,7 +99,7 @@ const ChartComponent = ({
 
   if (loading) {
     return (
-      <div 
+      <div
         className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 animate-pulse"
         style={{ height: height + 100 }}
       >
@@ -111,20 +117,20 @@ const ChartComponent = ({
         return (
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-            <XAxis 
+            <XAxis
               dataKey={chartConfig.xDataKey}
               className="text-sm text-gray-600 dark:text-gray-400"
             />
-            <YAxis 
+            <YAxis
               className="text-sm text-gray-600 dark:text-gray-400"
               tickFormatter={formatCurrency}
             />
-            <Tooltip 
+            <Tooltip
               formatter={formatTooltip}
               contentStyle={{
                 backgroundColor: 'white',
                 border: '1px solid #e5e7eb',
-                borderRadius: '8px'
+                borderRadius: '8px',
               }}
             />
             <Legend />
@@ -147,20 +153,20 @@ const ChartComponent = ({
         return (
           <AreaChart data={data}>
             <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-            <XAxis 
+            <XAxis
               dataKey={chartConfig.xDataKey}
               className="text-sm text-gray-600 dark:text-gray-400"
             />
-            <YAxis 
+            <YAxis
               className="text-sm text-gray-600 dark:text-gray-400"
               tickFormatter={formatCurrency}
             />
-            <Tooltip 
+            <Tooltip
               formatter={formatTooltip}
               contentStyle={{
                 backgroundColor: 'white',
                 border: '1px solid #e5e7eb',
-                borderRadius: '8px'
+                borderRadius: '8px',
               }}
             />
             <Legend />
@@ -183,20 +189,20 @@ const ChartComponent = ({
         return (
           <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-            <XAxis 
+            <XAxis
               dataKey={chartConfig.xDataKey}
               className="text-sm text-gray-600 dark:text-gray-400"
             />
-            <YAxis 
+            <YAxis
               className="text-sm text-gray-600 dark:text-gray-400"
               tickFormatter={formatCurrency}
             />
-            <Tooltip 
+            <Tooltip
               formatter={formatTooltip}
               contentStyle={{
                 backgroundColor: 'white',
                 border: '1px solid #e5e7eb',
-                borderRadius: '8px'
+                borderRadius: '8px',
               }}
             />
             <Legend />
@@ -220,13 +226,18 @@ const ChartComponent = ({
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+              label={({ name, percent }) =>
+                `${name} ${(percent * 100).toFixed(0)}%`
+              }
               outerRadius={80}
               fill="#8884d8"
               dataKey={chartConfig.dataKey}
             >
               {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                <Cell
+                  key={`cell-${index}`}
+                  fill={colors[index % colors.length]}
+                />
               ))}
             </Pie>
             <Tooltip formatter={formatTooltip} />

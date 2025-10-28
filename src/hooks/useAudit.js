@@ -10,66 +10,84 @@ export const useAudit = () => {
   const { user } = useAuth();
 
   // Log de visualização de página
-  const logPageView = useCallback((page, metadata = {}) => {
-    if (!user) return;
-    
-    return auditService.logPageView(page, {
-      ...metadata,
-      user_id: user.id,
-      timestamp: new Date().toISOString()
-    });
-  }, [user]);
+  const logPageView = useCallback(
+    (page, metadata = {}) => {
+      if (!user) return;
+
+      return auditService.logPageView(page, {
+        ...metadata,
+        user_id: user.id,
+        timestamp: new Date().toISOString(),
+      });
+    },
+    [user]
+  );
 
   // Log de ações CRUD
-  const logCreate = useCallback((table, recordId, data = {}) => {
-    if (!user) return;
-    
-    return auditService.logCreate(table, recordId, {
-      ...data,
-      created_by: user.id,
-      timestamp: new Date().toISOString()
-    });
-  }, [user]);
+  const logCreate = useCallback(
+    (table, recordId, data = {}) => {
+      if (!user) return;
 
-  const logUpdate = useCallback((table, recordId, oldData = {}, newData = {}) => {
-    if (!user) return;
-    
-    return auditService.logUpdate(table, recordId, oldData, {
-      ...newData,
-      updated_by: user.id,
-      timestamp: new Date().toISOString()
-    });
-  }, [user]);
+      return auditService.logCreate(table, recordId, {
+        ...data,
+        created_by: user.id,
+        timestamp: new Date().toISOString(),
+      });
+    },
+    [user]
+  );
 
-  const logDelete = useCallback((table, recordId, data = {}) => {
-    if (!user) return;
-    
-    return auditService.logDelete(table, recordId, {
-      ...data,
-      deleted_by: user.id,
-      timestamp: new Date().toISOString()
-    });
-  }, [user]);
+  const logUpdate = useCallback(
+    (table, recordId, oldData = {}, newData = {}) => {
+      if (!user) return;
+
+      return auditService.logUpdate(table, recordId, oldData, {
+        ...newData,
+        updated_by: user.id,
+        timestamp: new Date().toISOString(),
+      });
+    },
+    [user]
+  );
+
+  const logDelete = useCallback(
+    (table, recordId, data = {}) => {
+      if (!user) return;
+
+      return auditService.logDelete(table, recordId, {
+        ...data,
+        deleted_by: user.id,
+        timestamp: new Date().toISOString(),
+      });
+    },
+    [user]
+  );
 
   // Log de erro
-  const logError = useCallback((operation, error) => {
-    return auditService.logError(operation, {
-      ...error,
-      user_id: user?.id,
-      timestamp: new Date().toISOString()
-    });
-  }, [user]);
+  const logError = useCallback(
+    (operation, error) => {
+      return auditService.logError(operation, {
+        ...error,
+        user_id: user?.id,
+        timestamp: new Date().toISOString(),
+      });
+    },
+    [user]
+  );
 
   // Log de ação personalizada
-  const logAction = useCallback((action, resource = null, details = {}) => {
-    if (!user) return;
-    
-    return auditService.logAction(action, resource, {
-      ...details,
-      user_id: user.id,
-      timestamp: new Date().toISOString()
-    });
-  }, [user]);
+  const logAction = useCallback(
+    (action, resource = null, details = {}) => {
+      if (!user) return;
+
+      return auditService.logAction(action, resource, {
+        ...details,
+        user_id: user.id,
+        timestamp: new Date().toISOString(),
+      });
+    },
+    [user]
+  );
 
   // Buscar logs (apenas para admins/gerentes)
   const getLogs = useCallback((filters = {}, page = 1, limit = 50) => {
@@ -89,13 +107,13 @@ export const useAudit = () => {
     logDelete,
     logError,
     logAction,
-    
+
     // Consultas (para admins)
     getLogs,
     getLogStats,
-    
+
     // Estado
-    isAuthenticated: !!user
+    isAuthenticated: !!user,
   };
 };
 

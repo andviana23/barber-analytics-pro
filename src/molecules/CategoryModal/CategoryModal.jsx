@@ -165,15 +165,15 @@ const CategoryModal = ({ isOpen, onClose, onSave, category = null }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full shadow-xl">
+      <div className="bg-light-surface dark:bg-dark-surface rounded-lg max-w-md w-full shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+        <div className="flex items-center justify-between p-6 border-b border-light-border dark:border-dark-border">
+          <h2 className="text-xl font-bold text-theme-primary">
             {category ? 'Editar' : 'Nova'} Categoria
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            className="text-text-light-secondary dark:text-text-dark-secondary hover:text-theme-primary transition-colors"
             disabled={isSaving}
           >
             <X className="h-5 w-5" />
@@ -184,7 +184,7 @@ const CategoryModal = ({ isOpen, onClose, onSave, category = null }) => {
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Nome */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-theme-primary mb-2">
               <div className="flex items-center gap-2">
                 <FolderTree className="h-4 w-4" />
                 Nome da Categoria *
@@ -195,15 +195,15 @@ const CategoryModal = ({ isOpen, onClose, onSave, category = null }) => {
               value={formData.name}
               onChange={e => handleChange('name', e.target.value)}
               placeholder="Ex: Corte de Cabelo, Aluguel..."
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+              className={`input-theme ${
                 errors.name
-                  ? 'border-red-500'
-                  : 'border-gray-300 dark:border-gray-600'
+                  ? 'border-feedback-light-error dark:border-feedback-dark-error'
+                  : ''
               }`}
               disabled={isSaving}
             />
             {errors.name && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+              <p className="mt-1 text-sm text-feedback-light-error dark:text-feedback-dark-error flex items-center gap-1">
                 <AlertCircle className="h-3 w-3" />
                 {errors.name}
               </p>
@@ -212,7 +212,7 @@ const CategoryModal = ({ isOpen, onClose, onSave, category = null }) => {
 
           {/* Tipo */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-theme-primary mb-2">
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-4 w-4" />
                 Tipo *
@@ -221,10 +221,10 @@ const CategoryModal = ({ isOpen, onClose, onSave, category = null }) => {
             <select
               value={formData.category_type}
               onChange={e => handleChange('category_type', e.target.value)}
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+              className={`input-theme ${
                 errors.category_type
-                  ? 'border-red-500'
-                  : 'border-gray-300 dark:border-gray-600'
+                  ? 'border-feedback-light-error dark:border-feedback-dark-error'
+                  : ''
               }`}
               disabled={isSaving || !!category} // Não pode alterar tipo ao editar
             >
@@ -232,12 +232,12 @@ const CategoryModal = ({ isOpen, onClose, onSave, category = null }) => {
               <option value="Expense">Despesa</option>
             </select>
             {category && (
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-theme-secondary">
                 Não é possível alterar o tipo de uma categoria existente
               </p>
             )}
             {errors.category_type && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+              <p className="mt-1 text-sm text-feedback-light-error dark:text-feedback-dark-error flex items-center gap-1">
                 <AlertCircle className="h-3 w-3" />
                 {errors.category_type}
               </p>
@@ -246,7 +246,7 @@ const CategoryModal = ({ isOpen, onClose, onSave, category = null }) => {
 
           {/* Categoria Pai (opcional) */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-theme-primary mb-2">
               <div className="flex items-center gap-2">
                 <FolderTree className="h-4 w-4" />
                 Categoria Pai (opcional)
@@ -255,7 +255,7 @@ const CategoryModal = ({ isOpen, onClose, onSave, category = null }) => {
             <select
               value={formData.parent_id}
               onChange={e => handleChange('parent_id', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              className="input-theme"
               disabled={isSaving}
             >
               <option value="">Categoria Principal (sem pai)</option>
@@ -265,14 +265,14 @@ const CategoryModal = ({ isOpen, onClose, onSave, category = null }) => {
                 </option>
               ))}
             </select>
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <p className="mt-1 text-xs text-theme-secondary">
               Categorias pai servem para agrupar subcategorias relacionadas
             </p>
           </div>
 
           {/* Descrição */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-theme-primary mb-2">
               <div className="flex items-center gap-2">
                 <FileText className="h-4 w-4" />
                 Descrição (opcional)
@@ -283,15 +283,15 @@ const CategoryModal = ({ isOpen, onClose, onSave, category = null }) => {
               onChange={e => handleChange('description', e.target.value)}
               placeholder="Descreva o propósito desta categoria..."
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white resize-none"
+              className="input-theme resize-none"
               disabled={isSaving}
             />
           </div>
 
           {/* Erro de submit */}
           {errors.submit && (
-            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
+            <div className="p-3 bg-feedback-light-error/10 dark:bg-feedback-dark-error/20 border border-feedback-light-error/20 dark:border-feedback-dark-error/50 rounded-lg">
+              <p className="text-sm text-feedback-light-error dark:text-feedback-dark-error flex items-center gap-2">
                 <AlertCircle className="h-4 w-4" />
                 {errors.submit}
               </p>
@@ -303,14 +303,14 @@ const CategoryModal = ({ isOpen, onClose, onSave, category = null }) => {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="flex-1 px-4 py-2 border border-light-border dark:border-dark-border text-theme-primary rounded-lg hover:bg-light-bg dark:hover:bg-dark-hover transition-colors"
               disabled={isSaving}
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               disabled={isSaving}
             >
               {isSaving ? (

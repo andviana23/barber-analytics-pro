@@ -8,7 +8,11 @@ import { useAuth } from '../context/AuthContext';
  * @param {Date} startDate - Data de início
  * @param {Date} endDate - Data de fim
  */
-export const useDashboardKPIs = (unitId = null, startDate = null, endDate = null) => {
+export const useDashboardKPIs = (
+  unitId = null,
+  startDate = null,
+  endDate = null
+) => {
   const [kpis, setKpis] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,8 +22,12 @@ export const useDashboardKPIs = (unitId = null, startDate = null, endDate = null
     try {
       setLoading(true);
       setError(null);
-      
-      const data = await dashboardService.getFinancialKPIs(unitId, startDate, endDate);
+
+      const data = await dashboardService.getFinancialKPIs(
+        unitId,
+        startDate,
+        endDate
+      );
       setKpis(data);
     } catch (err) {
       setError(err.message);
@@ -42,7 +50,7 @@ export const useDashboardKPIs = (unitId = null, startDate = null, endDate = null
     kpis,
     loading,
     error,
-    refetch
+    refetch,
   };
 };
 
@@ -61,8 +69,11 @@ export const useMonthlyEvolution = (unitId = null, months = 12) => {
     try {
       setLoading(true);
       setError(null);
-      
-      const evolution = await dashboardService.getMonthlyEvolution(unitId, months);
+
+      const evolution = await dashboardService.getMonthlyEvolution(
+        unitId,
+        months
+      );
       setData(evolution);
     } catch (err) {
       setError(err.message);
@@ -81,7 +92,7 @@ export const useMonthlyEvolution = (unitId = null, months = 12) => {
     data,
     loading,
     error,
-    refetch: fetchData
+    refetch: fetchData,
   };
 };
 
@@ -100,8 +111,11 @@ export const useRankingProfissionais = (unitId = null, limit = 10) => {
     try {
       setLoading(true);
       setError(null);
-      
-      const data = await dashboardService.getProfessionalsRanking(unitId, limit);
+
+      const data = await dashboardService.getProfessionalsRanking(
+        unitId,
+        limit
+      );
       setRanking(data);
     } catch (err) {
       setError(err.message);
@@ -120,7 +134,7 @@ export const useRankingProfissionais = (unitId = null, limit = 10) => {
     ranking,
     loading,
     error,
-    refetch: fetchRanking
+    refetch: fetchRanking,
   };
 };
 
@@ -137,7 +151,7 @@ export const useComparativoUnidades = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const data = await dashboardService.getUnitsComparison();
       setComparison(data);
     } catch (err) {
@@ -157,7 +171,7 @@ export const useComparativoUnidades = () => {
     comparison,
     loading,
     error,
-    refetch: fetchComparison
+    refetch: fetchComparison,
   };
 };
 
@@ -175,16 +189,16 @@ export const useRevenueDistribution = (unitId = null) => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const data = await dashboardService.getRevenueDistribution(unitId);
-      
+
       // Calcular percentuais
       const total = data.reduce((sum, item) => sum + item.value, 0);
       const withPercentages = data.map(item => ({
         ...item,
-        percentage: total > 0 ? (item.value / total) * 100 : 0
+        percentage: total > 0 ? (item.value / total) * 100 : 0,
       }));
-      
+
       setDistribution(withPercentages);
     } catch (err) {
       setError(err.message);
@@ -203,7 +217,7 @@ export const useRevenueDistribution = (unitId = null) => {
     distribution,
     loading,
     error,
-    refetch: fetchDistribution
+    refetch: fetchDistribution,
   };
 };
 
@@ -222,7 +236,7 @@ export const useRecentBookings = (unitId = null, limit = 10) => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const data = await dashboardService.getRecentBookings(unitId, limit);
       setBookings(data);
     } catch (err) {
@@ -242,7 +256,7 @@ export const useRecentBookings = (unitId = null, limit = 10) => {
     bookings,
     loading,
     error,
-    refetch: fetchBookings
+    refetch: fetchBookings,
   };
 };
 
@@ -252,5 +266,5 @@ export default {
   useRankingProfissionais,
   useComparativoUnidades,
   useRevenueDistribution,
-  useRecentBookings
+  useRecentBookings,
 };

@@ -1,0 +1,262 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+import { CommissionBadge } from '../molecules';
+import { KPICard } from '../molecules';
+import { formatCurrency } from '../utils/formatters';
+
+/**
+ * CommissionSummaryCard - Resumo de comissões
+ *
+ * Organism que exibe resumo de comissões por profissional com KPIs e ranking.
+ * Usado em dashboards e relatórios financeiros.
+ *
+ * @component
+ * @example
+ * ```jsx
+ * <CommissionSummaryCard
+ *   commissions={commissionsData}
+ *   period="month"
+ *   loading={isLoading}
+ * />
+ * ```
+ */
+const CommissionSummaryCard = ({
+  commissions = [],
+  totalCommissions = 0,
+  period = 'month',
+  loading = false,
+  onViewDetails,
+  className = '',
+}) => {
+  const periodLabels = {
+    day: 'Hoje',
+    week: 'Esta Semana',
+    month: 'Este Mês',
+    year: 'Este Ano',
+  };
+
+  const sortedCommissions = [...commissions].sort(
+    (a, b) => b.total_commission - a.total_commission
+  );
+  const topProfessionals = sortedCommissions.slice(0, 5);
+
+  const averageCommission =
+    commissions.length > 0 ? totalCommissions / commissions.length : 0;
+
+  const maxCommission =
+    commissions.length > 0
+      ? Math.max(...commissions.map(c => c.total_commission))
+      : 0;
+
+  if (loading) {
+    return (
+      <div
+        className={`bg-white dark:bg-dark-surface rounded-lg border border-light-border dark:border-dark-border p-6 ${className}`}
+      >
+        <div className="text-center py-8">
+          <div className="inline-block w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin mb-3" />
+          <p className="text-theme-secondary">Carregando comissões...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`bg-white dark:bg-dark-surface rounded-lg border border-light-border dark:border-dark-border overflow-hidden ${className}`}
+    >
+      {/* Header */}
+      <div className="px-6 py-4 border-b border-light-border dark:border-dark-border bg-light-surface/50 dark:bg-dark-hover/50">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-theme-primary">
+              Resumo de Comissões
+            </h3>
+            <p className="text-sm text-theme-secondary mt-1">
+              {periodLabels[period]}
+            </p>
+          </div>
+          {onViewDetails && (
+            <button
+              onClick={onViewDetails}
+              className="text-primary hover:text-primary-dark font-medium text-sm inline-flex items-center gap-1"
+            >
+              Ver detalhes
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* KPIs */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 border-b border-light-border dark:border-dark-border">
+        <div className="text-center">
+          <p className="text-sm text-theme-secondary mb-2">
+            Total de Comissões
+          </p>
+          <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+            {formatCurrency(totalCommissions)}
+          </p>
+        </div>
+        <div className="text-center">
+          <p className="text-sm text-theme-secondary mb-2">
+            Média por Profissional
+          </p>
+          <p className="text-2xl font-bold text-theme-primary">
+            {formatCurrency(averageCommission)}
+          </p>
+        </div>
+        <div className="text-center">
+          <p className="text-sm text-theme-secondary mb-2">Maior Comissão</p>
+          <p className="text-2xl font-bold text-primary">
+            {formatCurrency(maxCommission)}
+          </p>
+        </div>
+      </div>
+
+      {/* Ranking */}
+      {topProfessionals.length === 0 ? (
+        <div className="p-12 text-center">
+          <svg
+            className="w-16 h-16 mx-auto text-theme-secondary/50 mb-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+            />
+          </svg>
+          <h3 className="text-lg font-semibold text-theme-primary mb-2">
+            Nenhuma comissão registrada
+          </h3>
+          <p className="text-theme-secondary">
+            Não há comissões para o período selecionado.
+          </p>
+        </div>
+      ) : (
+        <div className="p-6">
+          <h4 className="text-sm font-semibold text-theme-secondary uppercase tracking-wider mb-4">
+            Top 5 Profissionais
+          </h4>
+          <div className="space-y-3">
+            {topProfessionals.map((professional, index) => {
+              const percentage =
+                maxCommission > 0
+                  ? (professional.total_commission / maxCommission) * 100
+                  : 0;
+
+              const medals = ['🥇', '🥈', '🥉'];
+              const medal = index < 3 ? medals[index] : null;
+
+              return (
+                <div key={professional.professional_id} className="space-y-2">
+                  {/* Professional Info */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      {/* Position */}
+                      <div className="w-8 h-8 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center text-sm flex-shrink-0">
+                        {medal || `${index + 1}º`}
+                      </div>
+
+                      {/* Avatar & Name */}
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 text-primary font-semibold flex items-center justify-center flex-shrink-0">
+                          {professional.professional_name
+                            ?.charAt(0)
+                            ?.toUpperCase() || '?'}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-theme-primary truncate">
+                            {professional.professional_name}
+                          </p>
+                          <p className="text-xs text-theme-secondary">
+                            {professional.services_count || 0}{' '}
+                            {professional.services_count === 1
+                              ? 'serviço'
+                              : 'serviços'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Commission Badge */}
+                    <CommissionBadge
+                      percentage={
+                        professional.average_commission_percentage || 0
+                      }
+                      baseValue={professional.total_sales || 0}
+                      showPercentage={false}
+                      showValue={true}
+                      size="md"
+                      variant="success"
+                    />
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="relative h-2 bg-light-surface dark:bg-dark-hover rounded-full overflow-hidden">
+                    <div
+                      className="absolute inset-y-0 left-0 bg-gradient-to-r from-green-500 to-green-600 rounded-full transition-all duration-500"
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* View All Button */}
+          {commissions.length > 5 && onViewDetails && (
+            <button
+              onClick={onViewDetails}
+              className="w-full mt-4 px-4 py-2.5 border border-light-border dark:border-dark-border rounded-lg text-sm font-medium text-theme-primary hover:bg-light-surface dark:hover:bg-dark-hover transition-colors"
+            >
+              Ver todos os profissionais ({commissions.length})
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+CommissionSummaryCard.propTypes = {
+  /** Lista de comissões por profissional */
+  commissions: PropTypes.arrayOf(
+    PropTypes.shape({
+      professional_id: PropTypes.string.isRequired,
+      professional_name: PropTypes.string.isRequired,
+      total_commission: PropTypes.number.isRequired,
+      total_sales: PropTypes.number,
+      services_count: PropTypes.number,
+      average_commission_percentage: PropTypes.number,
+    })
+  ),
+  /** Total de comissões do período */
+  totalCommissions: PropTypes.number,
+  /** Período do resumo */
+  period: PropTypes.oneOf(['day', 'week', 'month', 'year']),
+  /** Estado de carregamento */
+  loading: PropTypes.bool,
+  /** Callback para ver detalhes */
+  onViewDetails: PropTypes.func,
+  /** Classes CSS adicionais */
+  className: PropTypes.string,
+};
+
+export default CommissionSummaryCard;

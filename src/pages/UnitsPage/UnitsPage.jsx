@@ -1,6 +1,6 @@
 /**
  * UNITS PAGE - REFATORADA 100%
- * 
+ *
  * Página moderna de gerenciamento de unidades
  * Features:
  * - Visualização em cards, estatísticas e comparação
@@ -27,17 +27,17 @@ import UnitsComparison from './UnitsComparison';
 import UnitsStats from './UnitsStats';
 
 // Icons
-import { 
-  Plus, 
-  Building2, 
-  CheckCircle, 
+import {
+  Plus,
+  Building2,
+  CheckCircle,
   XCircle,
   BarChart3,
   Settings,
   Filter,
   RefreshCw,
   TrendingUp,
-  Search
+  Search,
 } from 'lucide-react';
 
 const UnitsPage = () => {
@@ -50,7 +50,7 @@ const UnitsPage = () => {
     loading,
     error,
     refresh,
-    getUnitsComparison
+    getUnitsComparison,
   } = useUnits();
 
   // ==================== STATE ====================
@@ -59,12 +59,12 @@ const UnitsPage = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState(null);
-  
+
   // Visualização
   const [showInactive, setShowInactive] = useState(false);
   const [view, setView] = useState('cards'); // cards, stats, comparison
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   // Comparação de unidades
   const [comparison, setComparison] = useState([]);
   const [loadingComparison, setLoadingComparison] = useState(false);
@@ -74,7 +74,7 @@ const UnitsPage = () => {
   const canEdit = hasPermission('admin');
   const canDelete = hasPermission('admin');
   const canViewStats = hasPermission(['admin', 'gerente']);
-  
+
   // Debug de permissões (temporário)
   useEffect(() => {
     if (!loading) {
@@ -83,7 +83,7 @@ const UnitsPage = () => {
         canCreate,
         canEdit,
         canDelete,
-        canViewStats
+        canViewStats,
       });
     }
   }, [canCreate, canEdit, canDelete, canViewStats, loading]);
@@ -123,7 +123,7 @@ const UnitsPage = () => {
   /**
    * Abrir modal de edição
    */
-  const handleEdit = useCallback((unit) => {
+  const handleEdit = useCallback(unit => {
     setSelectedUnit(unit);
     setShowEditModal(true);
   }, []);
@@ -131,7 +131,7 @@ const UnitsPage = () => {
   /**
    * Abrir modal de exclusão
    */
-  const handleDelete = useCallback((unit) => {
+  const handleDelete = useCallback(unit => {
     setSelectedUnit(unit);
     setShowDeleteModal(true);
   }, []);
@@ -167,15 +167,15 @@ const UnitsPage = () => {
    */
   const displayUnits = useCallback(() => {
     let filtered = showInactive ? units : activeUnits;
-    
+
     // Aplicar filtro de busca se houver termo
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(unit => 
+      filtered = filtered.filter(unit =>
         unit.name.toLowerCase().includes(term)
       );
     }
-    
+
     return filtered;
   }, [units, activeUnits, showInactive, searchTerm])();
 
@@ -203,21 +203,28 @@ const UnitsPage = () => {
             <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full mb-6">
               <Building2 className="h-10 w-10 text-gray-400" />
             </div>
-            
+
             <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-              {searchTerm ? 'Nenhuma unidade encontrada' : showInactive ? 'Nenhuma unidade cadastrada' : 'Nenhuma unidade ativa'}
+              {searchTerm
+                ? 'Nenhuma unidade encontrada'
+                : showInactive
+                  ? 'Nenhuma unidade cadastrada'
+                  : 'Nenhuma unidade ativa'}
             </h3>
-            
+
             <p className="text-gray-600 dark:text-gray-400 mb-8">
               {searchTerm ? (
-                <>Nenhuma unidade corresponde à busca &ldquo;<strong>{searchTerm}</strong>&rdquo;. Tente outro termo.</>
+                <>
+                  Nenhuma unidade corresponde à busca &ldquo;
+                  <strong>{searchTerm}</strong>&rdquo;. Tente outro termo.
+                </>
               ) : showInactive ? (
                 'Comece criando sua primeira unidade para gerenciar sua rede de barbearias.'
               ) : (
                 'Não há unidades ativas no momento. Verifique as unidades inativas ou crie uma nova.'
               )}
             </p>
-            
+
             {canCreate && !searchTerm && (
               <button
                 onClick={handleCreate}
@@ -235,7 +242,7 @@ const UnitsPage = () => {
     // Grid de Unidades
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {displayUnits.map((unit) => (
+        {displayUnits.map(unit => (
           <UnitCard
             key={unit.id}
             unit={unit}
@@ -264,7 +271,8 @@ const UnitsPage = () => {
                   Unidades
                 </h1>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {stats.total} {stats.total === 1 ? 'unidade' : 'unidades'} cadastradas
+                  {stats.total} {stats.total === 1 ? 'unidade' : 'unidades'}{' '}
+                  cadastradas
                 </p>
               </div>
             </div>
@@ -277,7 +285,9 @@ const UnitsPage = () => {
                 className="inline-flex items-center justify-center px-4 py-2.5 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-medium rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Atualizar lista"
               >
-                <RefreshCw className={`h-5 w-5 ${loading ? 'animate-spin' : ''}`} />
+                <RefreshCw
+                  className={`h-5 w-5 ${loading ? 'animate-spin' : ''}`}
+                />
               </button>
 
               {/* BOTÃO SEMPRE VISÍVEL - SEM VERIFICAÇÃO DE PERMISSÃO */}
@@ -285,7 +295,11 @@ const UnitsPage = () => {
                 onClick={handleCreate}
                 disabled={loading || !canCreate}
                 className="inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold text-lg rounded-xl shadow-2xl hover:shadow-blue-500/50 transform hover:scale-105 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 disabled:transform-none"
-                title={canCreate ? "Criar nova unidade" : "Apenas administradores podem criar unidades"}
+                title={
+                  canCreate
+                    ? 'Criar nova unidade'
+                    : 'Apenas administradores podem criar unidades'
+                }
               >
                 <Plus className="h-6 w-6 mr-2" />
                 Nova Unidade
@@ -311,7 +325,7 @@ const UnitsPage = () => {
               type="text"
               placeholder="Buscar unidades..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             />
           </div>
@@ -321,7 +335,7 @@ const UnitsPage = () => {
             <Filter className="h-5 w-5 text-gray-400" />
             <select
               value={showInactive ? 'all' : 'active'}
-              onChange={(e) => setShowInactive(e.target.value === 'all')}
+              onChange={e => setShowInactive(e.target.value === 'all')}
               className="bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 dark:text-gray-200 cursor-pointer"
             >
               <option value="active">Apenas Ativas ({stats.active})</option>
@@ -394,7 +408,7 @@ const UnitsPage = () => {
             trend={{
               value: stats.activePercentage,
               isPositive: true,
-              period: 'Operacionais'
+              period: 'Operacionais',
             }}
             loading={loading}
           />
@@ -408,7 +422,7 @@ const UnitsPage = () => {
             trend={{
               value: 100 - stats.activePercentage,
               isPositive: false,
-              period: 'Desativadas'
+              period: 'Desativadas',
             }}
             loading={loading}
           />

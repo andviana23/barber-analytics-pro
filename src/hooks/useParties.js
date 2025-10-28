@@ -4,7 +4,7 @@ import { useToast } from '../context/ToastContext';
 
 /**
  * Custom hook para gerenciar parties (clientes e fornecedores)
- * 
+ *
  * @param {string} unitId - ID da unidade
  * @param {string} tipo - Tipo de party ('Cliente', 'Fornecedor', 'All')
  * @returns {Object} { parties, loading, error, refetch, createParty, updateParty, deleteParty, getPartyById }
@@ -13,7 +13,7 @@ export const useParties = (unitId, tipo = 'All') => {
   const [state, setState] = useState({
     parties: [],
     loading: true,
-    error: null
+    error: null,
   });
 
   const { addToast } = useToast();
@@ -26,206 +26,220 @@ export const useParties = (unitId, tipo = 'All') => {
   }, []);
 
   // Função para buscar parties
-  const fetchParties = useCallback(async (showLoading = true) => {
-    if (!unitId) {
-      setState(prev => ({ ...prev, parties: [], loading: false }));
-      return;
-    }
-
-    // Cancelar requisição anterior se existir
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-    
-    abortControllerRef.current = new AbortController();
-    const cacheKey = getCacheKey(unitId, tipo);
-
-    // Verificar cache (TTL: 120 segundos)
-    const cachedData = cacheRef.current.get(cacheKey);
-    if (cachedData && Date.now() - cachedData.timestamp < 120000) {
-      setState(prev => ({
-        ...prev,
-        parties: cachedData.data,
-        loading: false,
-        error: null
-      }));
-      return;
-    }
-
-    if (showLoading) {
-      setState(prev => ({ ...prev, loading: true, error: null }));
-    }
-
-    try {
-      const tipoParam = tipo === 'All' ? null : tipo;
-      const filters = { unitId };
-      if (tipoParam) {
-        filters.tipo = tipoParam;
+  const fetchParties = useCallback(
+    async (showLoading = true) => {
+      if (!unitId) {
+        setState(prev => ({ ...prev, parties: [], loading: false }));
+        return;
       }
 
-      const { data, error } = await partiesService.getParties(filters);
+      // Cancelar requisição anterior se existir
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
 
-      if (error) throw error;
+      abortControllerRef.current = new AbortController();
+      const cacheKey = getCacheKey(unitId, tipo);
 
-      // Armazenar no cache
-      cacheRef.current.set(cacheKey, {
-        data: data || [],
-        timestamp: Date.now()
-      });
-
-      setState(prev => ({
-        ...prev,
-        parties: data || [],
-        loading: false,
-        error: null
-      }));
-
-    } catch (err) {
-      if (err.name !== 'AbortError') {
+      // Verificar cache (TTL: 120 segundos)
+      const cachedData = cacheRef.current.get(cacheKey);
+      if (cachedData && Date.now() - cachedData.timestamp < 120000) {
         setState(prev => ({
           ...prev,
+          parties: cachedData.data,
           loading: false,
-          error: err.message || 'Erro ao carregar parties'
+          error: null,
         }));
-        
-        addToast({
-          type: 'error',
-          title: 'Erro ao carregar parties',
-          message: 'Não foi possível carregar clientes e fornecedores'
-        });
+        return;
       }
-    }
-  }, [unitId, tipo, getCacheKey, addToast]);
+
+      if (showLoading) {
+        setState(prev => ({ ...prev, loading: true, error: null }));
+      }
+
+      try {
+        const tipoParam = tipo === 'All' ? null : tipo;
+        const filters = { unitId };
+        if (tipoParam) {
+          filters.tipo = tipoParam;
+        }
+
+        const { data, error } = await partiesService.getParties(filters);
+
+        if (error) throw error;
+
+        // Armazenar no cache
+        cacheRef.current.set(cacheKey, {
+          data: data || [],
+          timestamp: Date.now(),
+        });
+
+        setState(prev => ({
+          ...prev,
+          parties: data || [],
+          loading: false,
+          error: null,
+        }));
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          setState(prev => ({
+            ...prev,
+            loading: false,
+            error: err.message || 'Erro ao carregar parties',
+          }));
+
+          addToast({
+            type: 'error',
+            title: 'Erro ao carregar parties',
+            message: 'Não foi possível carregar clientes e fornecedores',
+          });
+        }
+      }
+    },
+    [unitId, tipo, getCacheKey, addToast]
+  );
 
   // Função para buscar party por ID
-  const getPartyById = useCallback(async (partyId) => {
-    try {
-      const { data, error } = await partiesService.getPartyById(partyId);
-      
-      if (error) throw error;
+  const getPartyById = useCallback(
+    async partyId => {
+      try {
+        const { data, error } = await partiesService.getPartyById(partyId);
 
-      return { success: true, data };
+        if (error) throw error;
 
-    } catch (err) {
-      addToast({
-        type: 'error',
-        title: 'Erro ao buscar party',
-        message: 'Não foi possível encontrar os dados do cliente/fornecedor'
-      });
-      
-      return { success: false, error: err.message };
-    }
-  }, [addToast]);
+        return { success: true, data };
+      } catch (err) {
+        addToast({
+          type: 'error',
+          title: 'Erro ao buscar party',
+          message: 'Não foi possível encontrar os dados do cliente/fornecedor',
+        });
+
+        return { success: false, error: err.message };
+      }
+    },
+    [addToast]
+  );
 
   // Função para criar novo party
-  const createParty = useCallback(async (partyData) => {
-    try {
-      const { data, error } = await partiesService.createParty({
-        ...partyData,
-        unit_id: unitId
-      });
-      
-      if (error) throw error;
+  const createParty = useCallback(
+    async partyData => {
+      try {
+        const { data, error } = await partiesService.createParty({
+          ...partyData,
+          unit_id: unitId,
+        });
 
-      // Adicionar novo party ao estado local
-      setState(prev => ({
-        ...prev,
-        parties: [...prev.parties, data]
-      }));
+        if (error) throw error;
 
-      // Limpar cache para forçar recarregamento em outras instâncias
-      cacheRef.current.clear();
+        // Adicionar novo party ao estado local
+        setState(prev => ({
+          ...prev,
+          parties: [...prev.parties, data],
+        }));
 
-      addToast({
-        type: 'success',
-        title: 'Party criado',
-        message: `${partyData.tipo} criado com sucesso`
-      });
+        // Limpar cache para forçar recarregamento em outras instâncias
+        cacheRef.current.clear();
 
-      return { success: true, data };
+        addToast({
+          type: 'success',
+          title: 'Party criado',
+          message: `${partyData.tipo} criado com sucesso`,
+        });
 
-    } catch (err) {
-      addToast({
-        type: 'error',
-        title: 'Erro ao criar party',
-        message: err.message || 'Não foi possível criar o cliente/fornecedor'
-      });
-      
-      return { success: false, error: err.message };
-    }
-  }, [unitId, addToast]);
+        return { success: true, data };
+      } catch (err) {
+        addToast({
+          type: 'error',
+          title: 'Erro ao criar party',
+          message: err.message || 'Não foi possível criar o cliente/fornecedor',
+        });
+
+        return { success: false, error: err.message };
+      }
+    },
+    [unitId, addToast]
+  );
 
   // Função para atualizar party
-  const updateParty = useCallback(async (partyId, partyData) => {
-    try {
-      const { data, error } = await partiesService.updateParty(partyId, partyData);
-      
-      if (error) throw error;
+  const updateParty = useCallback(
+    async (partyId, partyData) => {
+      try {
+        const { data, error } = await partiesService.updateParty(
+          partyId,
+          partyData
+        );
 
-      // Atualizar party no estado local
-      setState(prev => ({
-        ...prev,
-        parties: prev.parties.map(party => 
-          party.id === partyId ? { ...party, ...data } : party
-        )
-      }));
+        if (error) throw error;
 
-      // Limpar cache para forçar recarregamento
-      cacheRef.current.clear();
+        // Atualizar party no estado local
+        setState(prev => ({
+          ...prev,
+          parties: prev.parties.map(party =>
+            party.id === partyId ? { ...party, ...data } : party
+          ),
+        }));
 
-      addToast({
-        type: 'success',
-        title: 'Party atualizado',
-        message: 'Dados atualizados com sucesso'
-      });
+        // Limpar cache para forçar recarregamento
+        cacheRef.current.clear();
 
-      return { success: true, data };
+        addToast({
+          type: 'success',
+          title: 'Party atualizado',
+          message: 'Dados atualizados com sucesso',
+        });
 
-    } catch (err) {
-      addToast({
-        type: 'error',
-        title: 'Erro ao atualizar party',
-        message: err.message || 'Não foi possível atualizar os dados'
-      });
-      
-      return { success: false, error: err.message };
-    }
-  }, [addToast]);
+        return { success: true, data };
+      } catch (err) {
+        addToast({
+          type: 'error',
+          title: 'Erro ao atualizar party',
+          message: err.message || 'Não foi possível atualizar os dados',
+        });
+
+        return { success: false, error: err.message };
+      }
+    },
+    [addToast]
+  );
 
   // Função para deletar party (soft delete)
-  const deleteParty = useCallback(async (partyId) => {
-    try {
-      const { error } = await partiesService.deleteParty(partyId);
-      
-      if (error) throw error;
+  const deleteParty = useCallback(
+    async partyId => {
+      try {
+        const { error } = await partiesService.deleteParty(partyId);
 
-      // Remover party do estado local
-      setState(prev => ({
-        ...prev,
-        parties: prev.parties.filter(party => party.id !== partyId)
-      }));
+        if (error) throw error;
 
-      // Limpar cache para forçar recarregamento
-      cacheRef.current.clear();
+        // Remover party do estado local
+        setState(prev => ({
+          ...prev,
+          parties: prev.parties.filter(party => party.id !== partyId),
+        }));
 
-      addToast({
-        type: 'success',
-        title: 'Party removido',
-        message: 'Cliente/Fornecedor removido com sucesso'
-      });
+        // Limpar cache para forçar recarregamento
+        cacheRef.current.clear();
 
-      return { success: true };
+        addToast({
+          type: 'success',
+          title: 'Party removido',
+          message: 'Cliente/Fornecedor removido com sucesso',
+        });
 
-    } catch (err) {
-      addToast({
-        type: 'error',
-        title: 'Erro ao remover party',
-        message: err.message || 'Não foi possível remover o cliente/fornecedor'
-      });
-      
-      return { success: false, error: err.message };
-    }
-  }, [addToast]);
+        return { success: true };
+      } catch (err) {
+        addToast({
+          type: 'error',
+          title: 'Erro ao remover party',
+          message:
+            err.message || 'Não foi possível remover o cliente/fornecedor',
+        });
+
+        return { success: false, error: err.message };
+      }
+    },
+    [addToast]
+  );
 
   // Função para refetch (limpa cache)
   const refetch = useCallback(() => {
@@ -236,7 +250,7 @@ export const useParties = (unitId, tipo = 'All') => {
   // Effect para buscar parties quando parâmetros mudarem
   useEffect(() => {
     fetchParties();
-    
+
     // Cleanup na desmontagem
     return () => {
       if (abortControllerRef.current) {
@@ -261,7 +275,7 @@ export const useParties = (unitId, tipo = 'All') => {
     createParty,
     updateParty,
     deleteParty,
-    getPartyById
+    getPartyById,
   };
 };
 

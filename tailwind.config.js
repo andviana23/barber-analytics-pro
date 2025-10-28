@@ -4,21 +4,21 @@ export default {
   darkMode: 'class', // Habilita dark mode via classe
   theme: {
     screens: {
-      'xs': '375px',     // iPhone SE, small phones
-      'sm': '640px',     // Large phones
-      'md': '768px',     // Tablets portrait
-      'lg': '1024px',    // Tablets landscape / Small desktop
-      'xl': '1280px',    // Desktop
-      '2xl': '1536px',   // Large desktop
-      '3xl': '1920px',   // Ultra wide
+      xs: '375px', // iPhone SE, small phones
+      sm: '640px', // Large phones
+      md: '768px', // Tablets portrait
+      lg: '1024px', // Tablets landscape / Small desktop
+      xl: '1280px', // Desktop
+      '2xl': '1536px', // Large desktop
+      '3xl': '1920px', // Ultra wide
     },
     extend: {
       colors: {
         // === CORES PRIMÁRIAS ===
         primary: {
-          DEFAULT: '#4DA3FF',
-          hover: '#1E8CFF',
-          light: '#E8F3FF',
+          DEFAULT: '#1E8CFF',
+          hover: '#0072E0',
+          light: '#E9F3FF',
         },
 
         // === CORES NEUTRAS - LIGHT MODE ===

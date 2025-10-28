@@ -25,13 +25,13 @@ O módulo DRE calcula automaticamente a **Demonstração do Resultado do Exercí
 
 ## 🧱 Arquitetura
 
-| Camada | Artefatos | Papel |
-|--------|-----------|-------|
-| UI | `src/pages/DREPage.jsx` | Interface e filtros de período |
-| Hooks | `src/hooks/useDRE.js` | Busca/estado do relatório com TanStack Query |
-| Services | `src/services/dreService.js` | Orquestra chamadas, normaliza respostas |
-| Domain | DTOs em `src/dtos/revenueDTO.js` / `expenseDTO.js` | Garantem consistência e labels |
-| Infra | Função SQL `fn_calculate_dre` (Supabase) | Cálculo agregado no banco |
+| Camada   | Artefatos                                          | Papel                                        |
+| -------- | -------------------------------------------------- | -------------------------------------------- |
+| UI       | `src/pages/DREPage.jsx`                            | Interface e filtros de período               |
+| Hooks    | `src/hooks/useDRE.js`                              | Busca/estado do relatório com TanStack Query |
+| Services | `src/services/dreService.js`                       | Orquestra chamadas, normaliza respostas      |
+| Domain   | DTOs em `src/dtos/revenueDTO.js` / `expenseDTO.js` | Garantem consistência e labels               |
+| Infra    | Função SQL `fn_calculate_dre` (Supabase)           | Cálculo agregado no banco                    |
 
 ---
 
@@ -67,8 +67,8 @@ SELECT fn_calculate_dre('uuid-da-unidade', '2025-01-01', '2025-01-31');
 
 ## 🎨 UI & Experiência
 
-- Tabela hierárquica com níveis recolhíveis.  
-- Destaque para Resultado Bruto e Resultado Líquido.  
+- Tabela hierárquica com níveis recolhíveis.
+- Destaque para Resultado Bruto e Resultado Líquido.
 - Possibilidade de comparar com período anterior (variação %).
 
 Componentes relevantes:
@@ -90,7 +90,6 @@ Componentes relevantes:
 
 ## 📌 Próximos Passos
 
-1. Adicionar botão de exportação em PDF/CSV com template padronizado.  
-2. Implementar histórico comparativo multi-período (colunas adicionais).  
+1. Adicionar botão de exportação em PDF/CSV com template padronizado.
+2. Implementar histórico comparativo multi-período (colunas adicionais).
 3. Automatizar testes Playwright para geração da DRE.
-

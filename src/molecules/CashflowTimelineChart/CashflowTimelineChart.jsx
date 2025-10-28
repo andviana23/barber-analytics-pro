@@ -3,7 +3,7 @@
  *
  * Gráfico de linha do tempo para fluxo de caixa
  * Substitui os cards estáticos por visualização temporal interativa
- * 
+ *
  * Autor: Sistema Barber Analytics Pro
  * Data: 2025-01-17
  */
@@ -49,7 +49,7 @@ const formatCurrency = value => {
 };
 
 // Função auxiliar para formatar datas
-const formatDateForChart = (dateString) => {
+const formatDateForChart = dateString => {
   if (!dateString) return '';
   const date = new Date(dateString);
   return format(date, 'MMM/yy', { locale: ptBR });
@@ -72,7 +72,9 @@ const CustomTooltip = ({ active, payload, label }) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span className="text-sm text-gray-600 dark:text-gray-400">Entradas:</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">
+              Entradas:
+            </span>
           </div>
           <span className="font-semibold text-green-600 dark:text-green-400">
             {formatCurrency(data.revenues)}
@@ -82,7 +84,9 @@ const CustomTooltip = ({ active, payload, label }) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-            <span className="text-sm text-gray-600 dark:text-gray-400">Saídas:</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">
+              Saídas:
+            </span>
           </div>
           <span className="font-semibold text-red-600 dark:text-red-400">
             {formatCurrency(data.expenses)}
@@ -91,23 +95,31 @@ const CustomTooltip = ({ active, payload, label }) => {
 
         <div className="border-t border-gray-200 dark:border-gray-600 pt-2 mt-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Resultado:</span>
-            <span className={`font-bold ${
-              data.result >= 0 
-                ? 'text-green-600 dark:text-green-400' 
-                : 'text-red-600 dark:text-red-400'
-            }`}>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Resultado:
+            </span>
+            <span
+              className={`font-bold ${
+                data.result >= 0
+                  ? 'text-green-600 dark:text-green-400'
+                  : 'text-red-600 dark:text-red-400'
+              }`}
+            >
               {formatCurrency(data.result)}
             </span>
           </div>
-          
+
           <div className="flex items-center justify-between mt-1">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Margem:</span>
-            <span className={`font-semibold ${
-              data.margin >= 0 
-                ? 'text-green-600 dark:text-green-400' 
-                : 'text-red-600 dark:text-red-400'
-            }`}>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Margem:
+            </span>
+            <span
+              className={`font-semibold ${
+                data.margin >= 0
+                  ? 'text-green-600 dark:text-green-400'
+                  : 'text-red-600 dark:text-red-400'
+              }`}
+            >
               {data.margin.toFixed(1)}%
             </span>
           </div>
@@ -121,13 +133,13 @@ const CashflowTimelineChart = ({
   data = [],
   loading = false,
   error = null,
-  title = "Evolução do Fluxo de Caixa",
+  title = 'Evolução do Fluxo de Caixa',
   height = 400,
   showLegend = true,
   showGrid = true,
   onRefresh = null,
   onExport = null,
-  className = "",
+  className = '',
 }) => {
   const [chartType, setChartType] = useState('area'); // 'area', 'line'
   const [timeRange, setTimeRange] = useState('12'); // '6', '12', '24'
@@ -139,7 +151,7 @@ const CashflowTimelineChart = ({
     // Filtrar dados baseado no período selecionado
     const monthsToShow = parseInt(timeRange);
     const cutoffDate = subMonths(new Date(), monthsToShow);
-    
+
     return data
       .filter(item => new Date(item.date) >= cutoffDate)
       .map(item => ({
@@ -147,7 +159,10 @@ const CashflowTimelineChart = ({
         date: item.date,
         displayDate: formatDateForChart(item.date),
         result: item.revenues - item.expenses,
-        margin: item.revenues > 0 ? ((item.revenues - item.expenses) / item.revenues) * 100 : 0,
+        margin:
+          item.revenues > 0
+            ? ((item.revenues - item.expenses) / item.revenues) * 100
+            : 0,
       }))
       .sort((a, b) => new Date(a.date) - new Date(b.date));
   }, [data, timeRange]);
@@ -165,21 +180,38 @@ const CashflowTimelineChart = ({
       };
     }
 
-    const totalRevenues = chartData.reduce((sum, item) => sum + item.revenues, 0);
-    const totalExpenses = chartData.reduce((sum, item) => sum + item.expenses, 0);
+    const totalRevenues = chartData.reduce(
+      (sum, item) => sum + item.revenues,
+      0
+    );
+    const totalExpenses = chartData.reduce(
+      (sum, item) => sum + item.expenses,
+      0
+    );
     const netResult = totalRevenues - totalExpenses;
     const avgMargin = totalRevenues > 0 ? (netResult / totalRevenues) * 100 : 0;
 
     // Calcular tendência (comparar últimos 3 meses com anteriores)
     const recentMonths = chartData.slice(-3);
     const previousMonths = chartData.slice(-6, -3);
-    
-    const recentAvg = recentMonths.reduce((sum, item) => sum + (item.revenues - item.expenses), 0) / recentMonths.length;
-    const previousAvg = previousMonths.length > 0 
-      ? previousMonths.reduce((sum, item) => sum + (item.revenues - item.expenses), 0) / previousMonths.length 
-      : recentAvg;
 
-    const trendValue = previousAvg !== 0 ? ((recentAvg - previousAvg) / Math.abs(previousAvg)) * 100 : 0;
+    const recentAvg =
+      recentMonths.reduce(
+        (sum, item) => sum + (item.revenues - item.expenses),
+        0
+      ) / recentMonths.length;
+    const previousAvg =
+      previousMonths.length > 0
+        ? previousMonths.reduce(
+            (sum, item) => sum + (item.revenues - item.expenses),
+            0
+          ) / previousMonths.length
+        : recentAvg;
+
+    const trendValue =
+      previousAvg !== 0
+        ? ((recentAvg - previousAvg) / Math.abs(previousAvg)) * 100
+        : 0;
     const trend = trendValue > 5 ? 'up' : trendValue < -5 ? 'down' : 'neutral';
 
     return {
@@ -195,11 +227,15 @@ const CashflowTimelineChart = ({
   // Estados de loading e erro
   if (loading) {
     return (
-      <div className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 ${className}`}>
+      <div
+        className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 ${className}`}
+      >
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <RefreshCw className="w-8 h-8 animate-spin text-blue-500 mx-auto mb-4" />
-            <p className="text-gray-600 dark:text-gray-400">Carregando dados do fluxo de caixa...</p>
+            <p className="text-gray-600 dark:text-gray-400">
+              Carregando dados do fluxo de caixa...
+            </p>
           </div>
         </div>
       </div>
@@ -208,12 +244,18 @@ const CashflowTimelineChart = ({
 
   if (error) {
     return (
-      <div className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 ${className}`}>
+      <div
+        className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 ${className}`}
+      >
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-4" />
-            <p className="text-red-600 dark:text-red-400 mb-2">Erro ao carregar dados</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{error}</p>
+            <p className="text-red-600 dark:text-red-400 mb-2">
+              Erro ao carregar dados
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              {error}
+            </p>
             {onRefresh && (
               <button
                 onClick={onRefresh}
@@ -229,7 +271,9 @@ const CashflowTimelineChart = ({
   }
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 ${className}`}>
+    <div
+      className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 ${className}`}
+    >
       {/* Header */}
       <div className="p-6 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between mb-4">
@@ -319,7 +363,9 @@ const CashflowTimelineChart = ({
           <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
             <div className="flex items-center gap-2 mb-1">
               <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
-              <span className="text-sm font-medium text-green-700 dark:text-green-300">Total Entradas</span>
+              <span className="text-sm font-medium text-green-700 dark:text-green-300">
+                Total Entradas
+              </span>
             </div>
             <p className="text-lg font-bold text-green-800 dark:text-green-200">
               {formatCurrency(stats.totalRevenues)}
@@ -329,61 +375,83 @@ const CashflowTimelineChart = ({
           <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3">
             <div className="flex items-center gap-2 mb-1">
               <TrendingDown className="w-4 h-4 text-red-600 dark:text-red-400" />
-              <span className="text-sm font-medium text-red-700 dark:text-red-300">Total Saídas</span>
+              <span className="text-sm font-medium text-red-700 dark:text-red-300">
+                Total Saídas
+              </span>
             </div>
             <p className="text-lg font-bold text-red-800 dark:text-red-200">
               {formatCurrency(stats.totalExpenses)}
             </p>
           </div>
 
-          <div className={`rounded-lg p-3 ${
-            stats.netResult >= 0 
-              ? 'bg-green-50 dark:bg-green-900/20' 
-              : 'bg-red-50 dark:bg-red-900/20'
-          }`}>
+          <div
+            className={`rounded-lg p-3 ${
+              stats.netResult >= 0
+                ? 'bg-green-50 dark:bg-green-900/20'
+                : 'bg-red-50 dark:bg-red-900/20'
+            }`}
+          >
             <div className="flex items-center gap-2 mb-1">
-              <DollarSign className={`w-4 h-4 ${
-                stats.netResult >= 0 
-                  ? 'text-green-600 dark:text-green-400' 
-                  : 'text-red-600 dark:text-red-400'
-              }`} />
-              <span className={`text-sm font-medium ${
-                stats.netResult >= 0 
-                  ? 'text-green-700 dark:text-green-300' 
-                  : 'text-red-700 dark:text-red-300'
-              }`}>Resultado Líquido</span>
+              <DollarSign
+                className={`w-4 h-4 ${
+                  stats.netResult >= 0
+                    ? 'text-green-600 dark:text-green-400'
+                    : 'text-red-600 dark:text-red-400'
+                }`}
+              />
+              <span
+                className={`text-sm font-medium ${
+                  stats.netResult >= 0
+                    ? 'text-green-700 dark:text-green-300'
+                    : 'text-red-700 dark:text-red-300'
+                }`}
+              >
+                Resultado Líquido
+              </span>
             </div>
-            <p className={`text-lg font-bold ${
-              stats.netResult >= 0 
-                ? 'text-green-800 dark:text-green-200' 
-                : 'text-red-800 dark:text-red-200'
-            }`}>
+            <p
+              className={`text-lg font-bold ${
+                stats.netResult >= 0
+                  ? 'text-green-800 dark:text-green-200'
+                  : 'text-red-800 dark:text-red-200'
+              }`}
+            >
               {formatCurrency(stats.netResult)}
             </p>
           </div>
 
-          <div className={`rounded-lg p-3 ${
-            stats.avgMargin >= 0 
-              ? 'bg-blue-50 dark:bg-blue-900/20' 
-              : 'bg-orange-50 dark:bg-orange-900/20'
-          }`}>
+          <div
+            className={`rounded-lg p-3 ${
+              stats.avgMargin >= 0
+                ? 'bg-blue-50 dark:bg-blue-900/20'
+                : 'bg-orange-50 dark:bg-orange-900/20'
+            }`}
+          >
             <div className="flex items-center gap-2 mb-1">
-              <Activity className={`w-4 h-4 ${
-                stats.avgMargin >= 0 
-                  ? 'text-blue-600 dark:text-blue-400' 
-                  : 'text-orange-600 dark:text-orange-400'
-              }`} />
-              <span className={`text-sm font-medium ${
-                stats.avgMargin >= 0 
-                  ? 'text-blue-700 dark:text-blue-300' 
-                  : 'text-orange-700 dark:text-orange-300'
-              }`}>Margem Média</span>
+              <Activity
+                className={`w-4 h-4 ${
+                  stats.avgMargin >= 0
+                    ? 'text-blue-600 dark:text-blue-400'
+                    : 'text-orange-600 dark:text-orange-400'
+                }`}
+              />
+              <span
+                className={`text-sm font-medium ${
+                  stats.avgMargin >= 0
+                    ? 'text-blue-700 dark:text-blue-300'
+                    : 'text-orange-700 dark:text-orange-300'
+                }`}
+              >
+                Margem Média
+              </span>
             </div>
-            <p className={`text-lg font-bold ${
-              stats.avgMargin >= 0 
-                ? 'text-blue-800 dark:text-blue-200' 
-                : 'text-orange-800 dark:text-orange-200'
-            }`}>
+            <p
+              className={`text-lg font-bold ${
+                stats.avgMargin >= 0
+                  ? 'text-blue-800 dark:text-blue-200'
+                  : 'text-orange-800 dark:text-orange-200'
+              }`}
+            >
               {stats.avgMargin.toFixed(1)}%
             </p>
           </div>
@@ -395,35 +463,50 @@ const CashflowTimelineChart = ({
         <div style={{ height: `${height}px` }}>
           <ResponsiveContainer width="100%" height="100%">
             {chartType === 'area' ? (
-              <AreaChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+              <AreaChart
+                data={chartData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+              >
                 <defs>
-                  <linearGradient id="revenuesGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                  <linearGradient
+                    id="revenuesGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                   </linearGradient>
-                  <linearGradient id="expensesGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                  <linearGradient
+                    id="expensesGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                
+
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis 
-                  dataKey="displayDate" 
+                <XAxis
+                  dataKey="displayDate"
                   stroke="#6b7280"
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
                 />
-                <YAxis 
+                <YAxis
                   stroke="#6b7280"
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`}
+                  tickFormatter={value => `R$ ${(value / 1000).toFixed(0)}k`}
                 />
                 <Tooltip content={<CustomTooltip />} />
-                
+
                 <Area
                   type="monotone"
                   dataKey="revenues"
@@ -440,28 +523,31 @@ const CashflowTimelineChart = ({
                   fill="url(#expensesGradient)"
                   name="Saídas"
                 />
-                
+
                 <ReferenceLine y={0} stroke="#6b7280" strokeDasharray="2 2" />
               </AreaChart>
             ) : (
-              <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+              <LineChart
+                data={chartData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis 
-                  dataKey="displayDate" 
+                <XAxis
+                  dataKey="displayDate"
                   stroke="#6b7280"
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
                 />
-                <YAxis 
+                <YAxis
                   stroke="#6b7280"
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`}
+                  tickFormatter={value => `R$ ${(value / 1000).toFixed(0)}k`}
                 />
                 <Tooltip content={<CustomTooltip />} />
-                
+
                 <Line
                   type="monotone"
                   dataKey="revenues"
@@ -480,7 +566,7 @@ const CashflowTimelineChart = ({
                   activeDot={{ r: 6, stroke: '#ef4444', strokeWidth: 2 }}
                   name="Saídas"
                 />
-                
+
                 <ReferenceLine y={0} stroke="#6b7280" strokeDasharray="2 2" />
               </LineChart>
             )}
@@ -492,11 +578,13 @@ const CashflowTimelineChart = ({
 };
 
 CashflowTimelineChart.propTypes = {
-  data: PropTypes.arrayOf(PropTypes.shape({
-    date: PropTypes.string.isRequired,
-    revenues: PropTypes.number.isRequired,
-    expenses: PropTypes.number.isRequired,
-  })),
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      date: PropTypes.string.isRequired,
+      revenues: PropTypes.number.isRequired,
+      expenses: PropTypes.number.isRequired,
+    })
+  ),
   loading: PropTypes.bool,
   error: PropTypes.string,
   title: PropTypes.string,

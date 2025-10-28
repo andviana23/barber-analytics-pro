@@ -28,6 +28,7 @@
 ### 1.1 Propósito
 
 O módulo de conciliação bancária é responsável por automatizar e gerenciar o processo de reconciliação entre:
+
 - **Extratos bancários** (bank_statements) - transações que ocorreram nas contas bancárias
 - **Lançamentos internos** (revenues/expenses) - receitas e despesas registradas no sistema
 
@@ -93,11 +94,13 @@ O módulo de conciliação bancária é responsável por automatizar e gerenciar
 ### 2.2 Padrões Arquiteturais Aplicados
 
 #### Clean Architecture
+
 - **Separação de camadas**: UI → Hooks → Services → Data
 - **Independência de frameworks**: Lógica de negócio isolada
 - **Inversão de dependências**: Interfaces bem definidas
 
 #### Atomic Design
+
 - **Atoms**: StatusBadge, DateRangePicker
 - **Molecules**: ReconciliationMatchCard
 - **Organisms**: ConciliacaoPanel
@@ -105,6 +108,7 @@ O módulo de conciliação bancária é responsável por automatizar e gerenciar
 - **Pages**: ConciliacaoTab
 
 #### Repository Pattern
+
 - Serviços encapsulam acesso ao banco de dados
 - Métodos específicos para cada operação
 - Tratamento centralizado de erros
@@ -145,12 +149,14 @@ src/
 ### 3.1 Descrição dos Arquivos
 
 #### **ConciliacaoTab.jsx** (219 linhas)
+
 - Componente de página principal
 - Gerencia estado global e filtros
 - Orquestra comunicação entre componentes
 - Integra modais e painel principal
 
 #### **ConciliacaoPanel.jsx** (1013 linhas)
+
 - Organism complexo para gestão de matches
 - Estatísticas e KPIs de conciliação
 - Filtros avançados (data, confiança, status)
@@ -158,6 +164,7 @@ src/
 - Ações em lote
 
 #### **ReconciliationMatchCard.jsx** (671 linhas)
+
 - Molecule para exibir um match individual
 - Score de confiança visual
 - Comparação lado-a-lado (extrato vs interno)
@@ -165,24 +172,28 @@ src/
 - Ações de aprovação/rejeição
 
 #### **ImportStatementModal.jsx** (1164 linhas)
+
 - Wizard de 3 etapas para importação
 - Upload e validação de arquivos
 - Mapeamento inteligente de colunas
 - Preview e correção de dados
 
 #### **ManualReconciliationModal.jsx** (1074 linhas)
+
 - Interface para matching manual
 - Algoritmo de cálculo de confiança
 - Similaridade de Levenshtein
 - Seleção dual de transações
 
 #### **useReconciliationMatches.js** (321 linhas)
+
 - Hook customizado para gestão de matches
 - Cache com TTL de 30 segundos
 - AbortController para cancelamento
 - Métodos: confirmMatch, rejectMatch, adjustMatch
 
 #### **reconciliationService.js** (1109 linhas)
+
 - Classe de serviço principal
 - 15+ métodos públicos
 - Algoritmo de auto-matching
@@ -195,37 +206,39 @@ src/
 ### 4.1 Tabelas Principais
 
 #### **reconciliations**
+
 Tabela central que vincula extratos bancários com lançamentos internos.
 
 ```typescript
 interface Reconciliation {
-  id: string;                    // UUID primary key
-  statement_id: string;          // FK → bank_statements.id
+  id: string; // UUID primary key
+  statement_id: string; // FK → bank_statements.id
   reference_type: 'Revenue' | 'Expense';
-  reference_id: string;          // FK → revenues.id | expenses.id
-  reconciliation_date: string;   // ISO timestamp
+  reference_id: string; // FK → revenues.id | expenses.id
+  reconciliation_date: string; // ISO timestamp
   status: 'pending' | 'confirmed' | 'Divergent' | 'rejected';
-  difference: number;            // Diferença de valor
-  notes: string;                 // Observações
-  confirmed_at?: string;         // Data de confirmação
+  difference: number; // Diferença de valor
+  notes: string; // Observações
+  confirmed_at?: string; // Data de confirmação
   created_at: string;
   updated_at: string;
 }
 ```
 
 #### **bank_statements**
+
 Transações extraídas de extratos bancários.
 
 ```typescript
 interface BankStatement {
   id: string;
-  bank_account_id: string;       // FK → bank_accounts.id
-  transaction_date: string;      // Data da transação
-  description: string;           // Descrição/histórico
-  amount: number;                // Valor (+ crédito / - débito)
+  bank_account_id: string; // FK → bank_accounts.id
+  transaction_date: string; // Data da transação
+  description: string; // Descrição/histórico
+  amount: number; // Valor (+ crédito / - débito)
   type: 'Credit' | 'Debit';
-  balance_after?: number;        // Saldo após transação
-  hash_unique: string;           // Hash para detecção de duplicatas
+  balance_after?: number; // Saldo após transação
+  hash_unique: string; // Hash para detecção de duplicatas
   status: 'pending' | 'reconciled';
   reconciled: boolean;
   created_at: string;
@@ -233,6 +246,7 @@ interface BankStatement {
 ```
 
 #### **revenues** (Receitas)
+
 ```typescript
 interface Revenue {
   id: string;
@@ -242,13 +256,14 @@ interface Revenue {
   date: string;
   actual_receipt_date?: string;
   expected_receipt_date?: string;
-  status: string;               // 'Conciliado', 'Pendente', etc.
-  party_id?: string;            // FK → parties.id
+  status: string; // 'Conciliado', 'Pendente', etc.
+  party_id?: string; // FK → parties.id
   is_active: boolean;
 }
 ```
 
 #### **expenses** (Despesas)
+
 ```typescript
 interface Expense {
   id: string;
@@ -267,6 +282,7 @@ interface Expense {
 ### 4.2 Views
 
 #### **vw_reconciliation_summary**
+
 View agregada para estatísticas de conciliação.
 
 ```sql
@@ -309,6 +325,7 @@ Classe singleton que encapsula toda a lógica de negócio.
 #### **Métodos Principais**
 
 ##### 5.1.1 `getReconciliations(filters)`
+
 Busca conciliações com filtros opcionais.
 
 ```javascript
@@ -317,11 +334,12 @@ const { data, error } = await ReconciliationService.getReconciliations({
   startDate: '2025-01-01',
   endDate: '2025-12-31',
   status: 'confirmed',
-  referenceType: 'Revenue'
+  referenceType: 'Revenue',
 });
 ```
 
 **Retorno:**
+
 ```typescript
 {
   data: Reconciliation[] | null,
@@ -330,6 +348,7 @@ const { data, error } = await ReconciliationService.getReconciliations({
 ```
 
 ##### 5.1.2 `getMatches(accountId)`
+
 Busca matches existentes para uma conta com dados completos.
 
 ```javascript
@@ -337,6 +356,7 @@ const { data, error } = await ReconciliationService.getMatches('account-uuid');
 ```
 
 **Retorno transformado:**
+
 ```typescript
 {
   id: string,
@@ -356,20 +376,22 @@ const { data, error } = await ReconciliationService.getMatches('account-uuid');
 ```
 
 ##### 5.1.3 `autoMatch(params)`
+
 Executa algoritmo de auto-matching.
 
 ```javascript
 const { data, error } = await ReconciliationService.autoMatch({
   accountId: 'uuid',
   options: {
-    daysTolerance: 2,        // Dias de diferença aceitos
-    amountTolerance: 5,      // % de tolerância no valor
-    minScore: 70             // Score mínimo (0-100)
-  }
+    daysTolerance: 2, // Dias de diferença aceitos
+    amountTolerance: 5, // % de tolerância no valor
+    minScore: 70, // Score mínimo (0-100)
+  },
 });
 ```
 
 **Retorno:**
+
 ```typescript
 {
   statement_id: string,
@@ -385,6 +407,7 @@ const { data, error } = await ReconciliationService.autoMatch({
 ```
 
 ##### 5.1.4 `confirmReconciliation(...)`
+
 Confirma uma conciliação (automática ou manual).
 
 ```javascript
@@ -403,17 +426,19 @@ await ReconciliationService.confirmReconciliation({
   statementId: 'uuid',
   referenceType: 'Revenue',
   referenceId: 'uuid',
-  difference: 0.50,
-  notes: 'Diferença de tarifas'
+  difference: 0.5,
+  notes: 'Diferença de tarifas',
 });
 ```
 
 **Efeitos colaterais:**
+
 - Atualiza `bank_statements.status` para 'reconciled'
 - Atualiza status da receita/despesa se aplicável
 - Registra timestamp de confirmação
 
 ##### 5.1.5 `rejectReconciliation(reconciliationId)`
+
 Remove vínculo de conciliação.
 
 ```javascript
@@ -421,10 +446,12 @@ await ReconciliationService.rejectReconciliation('reconciliation-uuid');
 ```
 
 **Efeitos:**
+
 - Delete da tabela `reconciliations`
 - Trigger atualiza `bank_statements.status` para 'pending'
 
 ##### 5.1.6 `manualLink(params)`
+
 Vinculação manual entre extrato e lançamento.
 
 ```javascript
@@ -432,23 +459,25 @@ await ReconciliationService.manualLink({
   statementId: 'uuid',
   referenceType: 'Expense',
   referenceId: 'uuid',
-  adjustmentAmount: 5.50,
-  notes: 'Ajuste por desconto obtido'
+  adjustmentAmount: 5.5,
+  notes: 'Ajuste por desconto obtido',
 });
 ```
 
 ##### 5.1.7 `getReconciliationStats(filters)`
+
 Estatísticas agregadas de conciliação.
 
 ```javascript
 const { data } = await ReconciliationService.getReconciliationStats({
   accountId: 'uuid',
   startDate: '2025-01-01',
-  endDate: '2025-12-31'
+  endDate: '2025-12-31',
 });
 ```
 
 **Retorno:**
+
 ```typescript
 {
   total_statements: number,
@@ -492,7 +521,8 @@ O score é composto por **3 fatores principais**:
 #### **6.3.1 Compatibilidade de Data (40 pontos máx)**
 
 ```javascript
-const daysDiff = Math.abs(statementDate - transactionDate) / (1000 * 60 * 60 * 24);
+const daysDiff =
+  Math.abs(statementDate - transactionDate) / (1000 * 60 * 60 * 24);
 
 if (daysDiff <= daysTolerance) {
   score += Math.max(0, 40 - daysDiff * 10);
@@ -507,7 +537,8 @@ if (daysDiff <= daysTolerance) {
 #### **6.3.2 Compatibilidade de Valor (40 pontos máx)**
 
 ```javascript
-const amountPercent = (amountDiff / Math.max(statementAmount, transactionAmount)) * 100;
+const amountPercent =
+  (amountDiff / Math.max(statementAmount, transactionAmount)) * 100;
 
 if (amountPercent <= amountTolerance) {
   score += Math.max(0, 40 - amountPercent * 2);
@@ -541,16 +572,17 @@ score += descriptionScore * 20;
 
 ```javascript
 function getConfidenceLevel(score) {
-  if (score >= 95) return 'Exato';     // Verde
-  if (score >= 85) return 'Alto';      // Verde claro
-  if (score >= 70) return 'Médio';     // Amarelo
-  return 'Baixo';                      // Vermelho
+  if (score >= 95) return 'Exato'; // Verde
+  if (score >= 85) return 'Alto'; // Verde claro
+  if (score >= 70) return 'Médio'; // Amarelo
+  return 'Baixo'; // Vermelho
 }
 ```
 
 ### 6.5 Prevenção de Duplicatas
 
 **Problema resolvido (BUG-005):**
+
 - Antes: Múltiplos matches para o mesmo extrato/transação
 - Solução: Sets para rastrear itens já correspondidos
 
@@ -571,9 +603,9 @@ usedTransactions.add(bestMatch.transaction_id);
 
 ```javascript
 const defaultOptions = {
-  daysTolerance: 2,           // ±2 dias
-  amountTolerance: 5,         // ±5%
-  minScore: 70                // 70/100
+  daysTolerance: 2, // ±2 dias
+  amountTolerance: 5, // ±5%
+  minScore: 70, // 70/100
 };
 ```
 
@@ -596,7 +628,7 @@ const {
   runAutoMatch,
   confirmMatch,
   rejectMatch,
-  adjustMatch
+  adjustMatch,
 } = useReconciliationMatches(accountId, options);
 ```
 
@@ -639,6 +671,7 @@ options?: {
 #### **Recursos**
 
 ##### Cache Inteligente
+
 ```javascript
 const cacheRef = useRef(new Map());
 const TTL = 30000; // 30 segundos
@@ -650,6 +683,7 @@ if (cachedData && Date.now() - cachedData.timestamp < TTL) {
 ```
 
 ##### Abort Controller
+
 ```javascript
 const abortControllerRef = useRef(null);
 
@@ -660,13 +694,14 @@ if (abortControllerRef.current) {
 ```
 
 ##### Toast Notifications
+
 ```javascript
 const toast = useToast();
 
 toast.addToast({
   type: 'success',
   title: 'Match confirmado',
-  message: 'Conciliação confirmada com sucesso'
+  message: 'Conciliação confirmada com sucesso',
 });
 ```
 
@@ -677,30 +712,34 @@ toast.addToast({
 ### 8.1 ConciliacaoTab
 
 **Responsabilidades:**
+
 - Orquestração de componentes filhos
 - Gerenciamento de estado global
 - Filtros globais (unidade, conta, período)
 - Controle de modais
 
 **Props:**
+
 ```typescript
 interface ConciliacaoTabProps {
   globalFilters: {
-    unitId: string,
-    accountId: string,
-    startDate?: string,
-    endDate?: string
-  }
+    unitId: string;
+    accountId: string;
+    startDate?: string;
+    endDate?: string;
+  };
 }
 ```
 
 **Estados internos:**
+
 ```javascript
 const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 const [isManualModalOpen, setIsManualModalOpen] = useState(false);
 ```
 
 **Fluxo de dados:**
+
 ```
 ConciliacaoTab
   ├→ useReconciliationMatches(accountId)
@@ -715,67 +754,74 @@ ConciliacaoTab
 ### 8.2 ConciliacaoPanel
 
 **Responsabilidades:**
+
 - Exibição de estatísticas
 - Filtros avançados
 - Ações em lote
 - Tabs de visualização
 
 **Props (22 props!):**
+
 ```typescript
 interface ConciliacaoPanelProps {
   // Dados
-  bankTransactions: BankTransaction[],
-  internalTransactions: InternalTransaction[],
-  reconciliationMatches: Match[],
-  selectedAccount: Account,
+  bankTransactions: BankTransaction[];
+  internalTransactions: InternalTransaction[];
+  reconciliationMatches: Match[];
+  selectedAccount: Account;
 
   // Callbacks
-  onImportStatement: () => void,
-  onExportResults: () => void,
-  onRunAutoMatch: () => void,
-  onApproveMatch: (match) => void,
-  onRejectMatch: (match) => void,
-  onCreateManualMatch: (match?) => void,
-  onDeleteMatch: (match) => void,
-  onRefreshData: () => void,
+  onImportStatement: () => void;
+  onExportResults: () => void;
+  onRunAutoMatch: () => void;
+  onApproveMatch: (match) => void;
+  onRejectMatch: (match) => void;
+  onCreateManualMatch: (match?) => void;
+  onDeleteMatch: (match) => void;
+  onRefreshData: () => void;
 
   // Filtros
-  dateRange?: { startDate, endDate },
-  onDateRangeChange?: (range) => void,
-  matchStatusFilter?: string,
-  onMatchStatusFilterChange?: (status) => void,
-  confidenceFilter?: number,
-  onConfidenceFilterChange?: (value) => void,
+  dateRange?: { startDate; endDate };
+  onDateRangeChange?: (range) => void;
+  matchStatusFilter?: string;
+  onMatchStatusFilterChange?: (status) => void;
+  confidenceFilter?: number;
+  onConfidenceFilterChange?: (value) => void;
 
   // Estados
-  loading?: boolean,
-  autoMatchRunning?: boolean,
+  loading?: boolean;
+  autoMatchRunning?: boolean;
 
   // Config
-  viewMode?: 'matches' | 'bank' | 'internal',
-  showFilters?: boolean,
-  compactMode?: boolean
+  viewMode?: 'matches' | 'bank' | 'internal';
+  showFilters?: boolean;
+  compactMode?: boolean;
 }
 ```
 
 **Estatísticas calculadas:**
+
 ```javascript
-const reconciliationStats = useMemo(() => ({
-  totalBankTransactions,
-  totalInternalTransactions,
-  totalMatches,
-  approvedMatches,
-  pendingMatches,
-  rejectedMatches,
-  autoMatches,
-  manualMatches,
-  matchedBankAmount,
-  unmatchedBankAmount,
-  reconciliationRate: (approvedMatches / totalBankTransactions) * 100
-}), [bankTransactions, internalTransactions, reconciliationMatches]);
+const reconciliationStats = useMemo(
+  () => ({
+    totalBankTransactions,
+    totalInternalTransactions,
+    totalMatches,
+    approvedMatches,
+    pendingMatches,
+    rejectedMatches,
+    autoMatches,
+    manualMatches,
+    matchedBankAmount,
+    unmatchedBankAmount,
+    reconciliationRate: (approvedMatches / totalBankTransactions) * 100,
+  }),
+  [bankTransactions, internalTransactions, reconciliationMatches]
+);
 ```
 
 **Filtros aplicados:**
+
 1. Status (matched, unmatched, pending, approved, rejected)
 2. Confiança mínima (0-100)
 3. Busca textual (descrição, referência)
@@ -783,6 +829,7 @@ const reconciliationStats = useMemo(() => ({
 5. Período (startDate-endDate)
 
 **Ordenação:**
+
 - Por confiança (desc/asc)
 - Por valor (desc/asc)
 - Por data (desc/asc)
@@ -790,6 +837,7 @@ const reconciliationStats = useMemo(() => ({
 ### 8.3 ReconciliationMatchCard
 
 **Responsabilidades:**
+
 - Exibir um match individual
 - Comparação visual (extrato vs interno)
 - Score de confiança com barra de progresso
@@ -797,19 +845,21 @@ const reconciliationStats = useMemo(() => ({
 - Ações (confirmar, rejeitar, ajustar)
 
 **Props:**
+
 ```typescript
 interface ReconciliationMatchCardProps {
-  match: Match,
-  onConfirm?: (match) => void,
-  onReject?: (match) => void,
-  onAdjust?: (match) => void,
-  onViewDetails?: (match) => void,
-  showActions?: boolean,
-  compact?: boolean
+  match: Match;
+  onConfirm?: (match) => void;
+  onReject?: (match) => void;
+  onAdjust?: (match) => void;
+  onViewDetails?: (match) => void;
+  showActions?: boolean;
+  compact?: boolean;
 }
 ```
 
 **Estrutura visual:**
+
 ```
 ┌─────────────────────────────────────────────────┐
 │ Match #abc12345              [Status] [Expand]  │
@@ -833,6 +883,7 @@ interface ReconciliationMatchCardProps {
 ```
 
 **Classificação de confiança:**
+
 ```javascript
 const getConfidenceLevel = score => {
   if (score >= 90) return { level: 'high', label: 'Alto', color: 'green' };
@@ -847,37 +898,42 @@ const getConfidenceLevel = score => {
 Wizard de 3 etapas para importação de extratos.
 
 **Etapa 1: Upload do Arquivo**
+
 - Seleção de conta bancária
 - Configurações (delimitador, encoding, formato de data)
 - Upload com drag & drop
 - Validação de formato e tamanho
 
 **Etapa 2: Mapeamento de Colunas**
+
 - Auto-mapeamento inteligente
 - Campos obrigatórios: data, valor, descrição
 - Campos opcionais: tipo, categoria, documento, saldo
 - Preview de amostra (5 linhas)
 
 **Etapa 3: Preview e Confirmação**
+
 - Tabela com todas as transações processadas
 - Validação de cada linha
 - Indicação de erros
 - Resumo (total, válidas, com erros)
 
 **Props:**
+
 ```typescript
 interface ImportStatementModalProps {
-  isOpen: boolean,
-  onClose: () => void,
-  onImport: (data) => Promise<Result>,
-  onSuccess?: (result) => void,
-  loading?: boolean,
-  availableAccounts: Account[],
-  defaultAccountId?: string
+  isOpen: boolean;
+  onClose: () => void;
+  onImport: (data) => Promise<Result>;
+  onSuccess?: (result) => void;
+  loading?: boolean;
+  availableAccounts: Account[];
+  defaultAccountId?: string;
 }
 ```
 
 **Validações:**
+
 - Tamanho máximo: 10MB
 - Formatos: CSV, TXT, OFX, QIF
 - Data obrigatória no formato dd/MM/yyyy
@@ -885,13 +941,13 @@ interface ImportStatementModalProps {
 - Descrição não vazia
 
 **Mapeamento inteligente:**
+
 ```javascript
 const autoMapColumns = headers => {
   headers.forEach(header => {
     const lower = header.toLowerCase();
 
-    if (lower.includes('data') || lower.includes('date'))
-      mapping.data = header;
+    if (lower.includes('data') || lower.includes('date')) mapping.data = header;
     if (lower.includes('valor') || lower.includes('amount'))
       mapping.valor = header;
     if (lower.includes('desc') || lower.includes('histórico'))
@@ -906,6 +962,7 @@ const autoMapColumns = headers => {
 Interface para criação manual de matches.
 
 **Recursos:**
+
 - Tabs: Matches Sugeridos | Match Manual | Não Reconciliadas
 - Algoritmo de confiança próprio
 - Cálculo de similaridade (Levenshtein)
@@ -913,21 +970,23 @@ Interface para criação manual de matches.
 - Preview do match antes de criar
 
 **Props:**
+
 ```typescript
 interface ManualReconciliationModalProps {
-  isOpen: boolean,
-  onClose: () => void,
-  onReconcile: (matchId, adjustments?) => Promise<void>,
-  onReject: (matchId, reason?) => Promise<void>,
-  onCreateMatch: (matchData) => Promise<void>,
-  bankTransactions: BankTransaction[],
-  internalTransactions: InternalTransaction[],
-  existingMatches: Match[],
-  loading?: boolean
+  isOpen: boolean;
+  onClose: () => void;
+  onReconcile: (matchId, adjustments?) => Promise<void>;
+  onReject: (matchId, reason?) => Promise<void>;
+  onCreateMatch: (matchData) => Promise<void>;
+  bankTransactions: BankTransaction[];
+  internalTransactions: InternalTransaction[];
+  existingMatches: Match[];
+  loading?: boolean;
 }
 ```
 
 **Cálculo de confiança manual:**
+
 ```javascript
 const calculateMatchConfidence = (bankTxn, internalTxn) => {
   let confidence = 0;
@@ -940,7 +999,7 @@ const calculateMatchConfidence = (bankTxn, internalTxn) => {
   }
 
   // Data próxima (25%)
-  const daysDiff = Math.abs(bankDate - internalDate) / (1000*60*60*24);
+  const daysDiff = Math.abs(bankDate - internalDate) / (1000 * 60 * 60 * 24);
   if (daysDiff === 0) {
     confidence += 25;
     factors.push({ factor: 'Mesma data', points: 25 });
@@ -968,6 +1027,7 @@ const calculateMatchConfidence = (bankTxn, internalTxn) => {
 ```
 
 **Similaridade de Levenshtein:**
+
 ```javascript
 const levenshteinDistance = (str1, str2) => {
   const matrix = Array(str2.length + 1)
@@ -1172,13 +1232,14 @@ const calculateStringSimilarity = (str1, str2) => {
 
 ```typescript
 type ReconciliationStatus =
-  | 'pending'      // Aguardando confirmação
-  | 'confirmed'    // Confirmada pelo usuário
-  | 'Divergent'    // Com diferenças significativas
-  | 'rejected';    // Rejeitada manualmente
+  | 'pending' // Aguardando confirmação
+  | 'confirmed' // Confirmada pelo usuário
+  | 'Divergent' // Com diferenças significativas
+  | 'rejected'; // Rejeitada manualmente
 ```
 
 **Transições de estado:**
+
 ```
 pending ──[confirmar]──> confirmed
    │
@@ -1191,17 +1252,19 @@ pending ──[confirmar]──> confirmed
 
 ```typescript
 type BankStatementStatus =
-  | 'pending'      // Não reconciliado
-  | 'reconciled';  // Reconciliado
+  | 'pending' // Não reconciliado
+  | 'reconciled'; // Reconciliado
 ```
 
 **Atualização automática:**
+
 - `confirmReconciliation()` → status = 'reconciled'
 - `rejectReconciliation()` → status = 'pending' (via trigger)
 
 ### 10.3 Validações
 
 #### Validações de Auto-Matching
+
 ```javascript
 // Antes de iniciar
 if (!accountId) return { error: 'Account ID obrigatório' };
@@ -1214,6 +1277,7 @@ if (score < minScore) continue; // Score abaixo do mínimo
 ```
 
 #### Validações de Confirmação
+
 ```javascript
 // Parâmetros obrigatórios
 if (!statementId || !referenceType || !referenceId) {
@@ -1237,6 +1301,7 @@ if (!reference) {
 ```
 
 #### Validações de Importação
+
 ```javascript
 // Arquivo
 if (!file) return ['Nenhum arquivo selecionado'];
@@ -1272,6 +1337,7 @@ if (!row.descricao.trim()) {
 ### 11.1 Padrões de Código
 
 #### Single Responsibility Principle (SRP)
+
 ```javascript
 // ✅ BOM - Uma responsabilidade por função
 function calculateScore(statement, transaction) { ... }
@@ -1288,6 +1354,7 @@ function processMatch(statement, transaction) {
 ```
 
 #### Don't Repeat Yourself (DRY)
+
 ```javascript
 // ✅ BOM - Reutilização via serviço
 ReconciliationService.confirmReconciliation(params);
@@ -1300,18 +1367,19 @@ async function confirmInComponent() {
 ```
 
 #### Naming Conventions
+
 ```javascript
 // Componentes: PascalCase
-ConciliacaoPanel, ReconciliationMatchCard
+(ConciliacaoPanel, ReconciliationMatchCard);
 
 // Hooks: camelCase com prefixo 'use'
-useReconciliationMatches, useBankStatements
+(useReconciliationMatches, useBankStatements);
 
 // Serviços: PascalCase (classes)
-ReconciliationService, BankStatementsService
+(ReconciliationService, BankStatementsService);
 
 // Funções: camelCase descritivo
-calculateMatchScore, getConfidenceLevel, formatCurrency
+(calculateMatchScore, getConfidenceLevel, formatCurrency);
 
 // Constantes: UPPER_SNAKE_CASE
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -1321,6 +1389,7 @@ const DEFAULT_TOLERANCE = 0.05;
 ### 11.2 Performance
 
 #### Memoização
+
 ```javascript
 // useMemo para cálculos pesados
 const reconciliationStats = useMemo(() => {
@@ -1335,6 +1404,7 @@ const handleConfirmMatch = useCallback(
 ```
 
 #### Cache com TTL
+
 ```javascript
 const cacheRef = useRef(new Map());
 const TTL = 30000; // 30 segundos
@@ -1345,7 +1415,7 @@ const getCacheKey = (accountId, options) =>
 // Armazenar
 cacheRef.current.set(cacheKey, {
   data: matches,
-  timestamp: Date.now()
+  timestamp: Date.now(),
 });
 
 // Recuperar
@@ -1356,6 +1426,7 @@ if (cached && Date.now() - cached.timestamp < TTL) {
 ```
 
 #### Abort Controller
+
 ```javascript
 const abortControllerRef = useRef(null);
 
@@ -1373,12 +1444,13 @@ await fetch(url, { signal: abortControllerRef.current.signal });
 ### 11.3 Tratamento de Erros
 
 #### Padrão de Retorno
+
 ```javascript
 // ✅ Consistente em todos os serviços
 return {
   success: boolean,
   data: T | null,
-  error: string | null
+  error: string | null,
 };
 
 // Uso
@@ -1391,6 +1463,7 @@ if (error) {
 ```
 
 #### Try-Catch
+
 ```javascript
 try {
   const result = await riskyOperation();
@@ -1399,12 +1472,13 @@ try {
   return {
     success: false,
     data: null,
-    error: err.message || 'Erro desconhecido'
+    error: err.message || 'Erro desconhecido',
   };
 }
 ```
 
 #### Validação Preventiva
+
 ```javascript
 // Validar antes de executar
 if (!accountId) {
@@ -1457,13 +1531,13 @@ ReconciliationMatchCard.propTypes = {
   onConfirm: PropTypes.func,
   onReject: PropTypes.func,
   showActions: PropTypes.bool,
-  compact: PropTypes.bool
+  compact: PropTypes.bool,
 };
 
 // Default props quando aplicável
 ReconciliationMatchCard.defaultProps = {
   showActions: true,
-  compact: false
+  compact: false,
 };
 ```
 
@@ -1474,6 +1548,7 @@ ReconciliationMatchCard.defaultProps = {
 ### 12.1 Curto Prazo
 
 **1. Testes Automatizados**
+
 ```javascript
 // Unit tests para algoritmo de matching
 describe('calculateMatchScore', () => {
@@ -1494,22 +1569,24 @@ describe('Reconciliation Flow', () => {
 ```
 
 **2. Logs e Observabilidade**
+
 ```javascript
 // Adicionar logging estruturado
 logger.info('Auto-match initiated', {
   accountId,
   options,
-  userId
+  userId,
 });
 
 logger.error('Reconciliation failed', {
   error,
   statementId,
-  referenceId
+  referenceId,
 });
 ```
 
 **3. Otimização de Queries**
+
 ```javascript
 // Índices no banco
 CREATE INDEX idx_bank_statements_account_reconciled
@@ -1528,24 +1605,28 @@ const { data } = await supabase
 ### 12.2 Médio Prazo
 
 **1. Machine Learning para Matching**
+
 - Treinar modelo com histórico de conciliações
 - Aprender padrões específicos de cada empresa
 - Melhorar score de confiança ao longo do tempo
 
 **2. Regras Customizáveis**
+
 ```javascript
 // Interface para criar regras personalizadas
 const customRule = {
   name: 'Pagamentos recorrentes',
   condition: (statement, transaction) => {
-    return statement.description.includes('RECORRENTE') &&
-           transaction.isRecurring;
+    return (
+      statement.description.includes('RECORRENTE') && transaction.isRecurring
+    );
   },
-  scoreBonus: 15
+  scoreBonus: 15,
 };
 ```
 
 **3. Exportação de Relatórios**
+
 - PDF com resumo de conciliações do período
 - Excel com detalhes de todas as transações
 - Dashboard analítico com gráficos
@@ -1553,16 +1634,19 @@ const customRule = {
 ### 12.3 Longo Prazo
 
 **1. Integração com APIs Bancárias**
+
 - Open Banking para importação automática
 - Sincronização em tempo real
 - Eliminação de uploads manuais
 
 **2. Conciliação Multi-Moeda**
+
 - Suporte a transações internacionais
 - Conversão automática de câmbio
 - Tratamento de diferenças cambiais
 
 **3. Inteligência Artificial**
+
 - Detecção automática de fraudes
 - Previsão de fluxo de caixa
 - Sugestões inteligentes de categorização
@@ -1576,19 +1660,21 @@ const customRule = {
 #### "Nenhum match encontrado"
 
 **Causas:**
+
 - Tolerância muito restritiva (minScore muito alto)
 - Diferença de datas fora do window
 - Tipos incompatíveis (receita vs débito)
 - Transações já reconciliadas
 
 **Soluções:**
+
 ```javascript
 // Reduzir minScore
 const matches = await autoMatch({
   accountId,
   options: {
-    minScore: 50  // Ao invés de 70
-  }
+    minScore: 50, // Ao invés de 70
+  },
 });
 
 // Aumentar tolerância de dias
@@ -1601,9 +1687,11 @@ const unreconciled = statements.filter(s => !s.reconciled);
 #### "Match duplicado"
 
 **Causa:**
+
 - Bug no algoritmo de prevenção de duplicatas
 
 **Solução implementada (BUG-005):**
+
 ```javascript
 // Uso de Sets para rastrear itens usados
 const usedStatements = new Set();
@@ -1617,12 +1705,14 @@ if (usedTransactions.has(transaction.id)) continue;
 #### "Erro ao importar extrato"
 
 **Causas:**
+
 - Encoding incorreto
 - Delimitador errado
 - Formato de data incompatível
 - Arquivo corrompido
 
 **Soluções:**
+
 ```javascript
 // Testar diferentes encodings
 importSettings.encoding = 'ISO-8859-1'; // Ao invés de UTF-8
@@ -1641,6 +1731,7 @@ console.log('Erros de validação:', errors);
 ### 13.2 Debug
 
 #### Habilitar logs detalhados
+
 ```javascript
 // No reconciliationService.js
 const DEBUG = true;
@@ -1654,24 +1745,26 @@ if (DEBUG) {
 ```
 
 #### Inspecionar cache
+
 ```javascript
 // No useReconciliationMatches.js
 useEffect(() => {
   console.log('Cache status:', {
     size: cacheRef.current.size,
-    keys: Array.from(cacheRef.current.keys())
+    keys: Array.from(cacheRef.current.keys()),
   });
 }, [accountId]);
 ```
 
 #### Rastrear renderizações
+
 ```javascript
 // Adicionar no componente
 useEffect(() => {
   console.log('Component rendered:', {
     matches: matches.length,
     loading,
-    error
+    error,
   });
 });
 ```

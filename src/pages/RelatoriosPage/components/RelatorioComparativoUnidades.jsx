@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart3, Download, FileText, TrendingUp } from 'lucide-react';
 import { Card, Button } from '../../../atoms';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
 } from 'recharts';
 import { exportToPDF, exportToExcel } from '../../../utils/exportUtils';
 
@@ -30,19 +30,29 @@ const RelatorioComparativoUnidades = ({ filters }) => {
           lucro: 15600,
           atendimentos: 180,
           ticketMedio: 288.89,
-          crescimento: 12.5
+          crescimento: 12.5,
         },
         novaLima: {
           receita: 48000,
           lucro: 14400,
           atendimentos: 165,
           ticketMedio: 290.91,
-          crescimento: 8.3
+          crescimento: 8.3,
         },
         comparacao: [
-          { unidade: 'Mangabeiras', receita: 52000, lucro: 15600, atendimentos: 180 },
-          { unidade: 'Nova Lima', receita: 48000, lucro: 14400, atendimentos: 165 }
-        ]
+          {
+            unidade: 'Mangabeiras',
+            receita: 52000,
+            lucro: 15600,
+            atendimentos: 180,
+          },
+          {
+            unidade: 'Nova Lima',
+            receita: 48000,
+            lucro: 14400,
+            atendimentos: 165,
+          },
+        ],
       });
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
@@ -56,7 +66,7 @@ const RelatorioComparativoUnidades = ({ filters }) => {
       `Comparativo_Unidades_${filters.periodo.mes}_${filters.periodo.ano}`,
       `Comparativo entre Unidades - ${filters.periodo.mes}/${filters.periodo.ano}`
     );
-    
+
     if (result.success) {
       alert('PDF exportado com sucesso!');
     }
@@ -66,14 +76,37 @@ const RelatorioComparativoUnidades = ({ filters }) => {
     if (!dados) return;
 
     const dadosExcel = [
-      { Métrica: 'Receita Total', Mangabeiras: dados.mangabeiras.receita, 'Nova Lima': dados.novaLima.receita },
-      { Métrica: 'Lucro Líquido', Mangabeiras: dados.mangabeiras.lucro, 'Nova Lima': dados.novaLima.lucro },
-      { Métrica: 'Total Atendimentos', Mangabeiras: dados.mangabeiras.atendimentos, 'Nova Lima': dados.novaLima.atendimentos },
-      { Métrica: 'Ticket Médio', Mangabeiras: dados.mangabeiras.ticketMedio, 'Nova Lima': dados.novaLima.ticketMedio },
-      { Métrica: 'Crescimento %', Mangabeiras: dados.mangabeiras.crescimento, 'Nova Lima': dados.novaLima.crescimento }
+      {
+        Métrica: 'Receita Total',
+        Mangabeiras: dados.mangabeiras.receita,
+        'Nova Lima': dados.novaLima.receita,
+      },
+      {
+        Métrica: 'Lucro Líquido',
+        Mangabeiras: dados.mangabeiras.lucro,
+        'Nova Lima': dados.novaLima.lucro,
+      },
+      {
+        Métrica: 'Total Atendimentos',
+        Mangabeiras: dados.mangabeiras.atendimentos,
+        'Nova Lima': dados.novaLima.atendimentos,
+      },
+      {
+        Métrica: 'Ticket Médio',
+        Mangabeiras: dados.mangabeiras.ticketMedio,
+        'Nova Lima': dados.novaLima.ticketMedio,
+      },
+      {
+        Métrica: 'Crescimento %',
+        Mangabeiras: dados.mangabeiras.crescimento,
+        'Nova Lima': dados.novaLima.crescimento,
+      },
     ];
 
-    exportToExcel(dadosExcel, `Comparativo_Unidades_${filters.periodo.mes}_${filters.periodo.ano}`);
+    exportToExcel(
+      dadosExcel,
+      `Comparativo_Unidades_${filters.periodo.mes}_${filters.periodo.ano}`
+    );
   };
 
   if (loading) {
@@ -107,10 +140,9 @@ const RelatorioComparativoUnidades = ({ filters }) => {
             Comparativo entre Unidades
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
-            {filters.periodo.tipo === 'mes' 
+            {filters.periodo.tipo === 'mes'
               ? `${filters.periodo.mes}/${filters.periodo.ano}`
-              : 'Período selecionado'
-            }
+              : 'Período selecionado'}
           </p>
         </div>
         <div className="flex space-x-2">
@@ -142,26 +174,46 @@ const RelatorioComparativoUnidades = ({ filters }) => {
           </h3>
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-gray-600 dark:text-gray-400">Receita Total</span>
-              <span className="font-semibold">R$ {dados.mangabeiras.receita.toLocaleString()}</span>
+              <span className="text-gray-600 dark:text-gray-400">
+                Receita Total
+              </span>
+              <span className="font-semibold">
+                R$ {dados.mangabeiras.receita.toLocaleString()}
+              </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600 dark:text-gray-400">Lucro Líquido</span>
-              <span className="font-semibold text-green-600">R$ {dados.mangabeiras.lucro.toLocaleString()}</span>
+              <span className="text-gray-600 dark:text-gray-400">
+                Lucro Líquido
+              </span>
+              <span className="font-semibold text-green-600">
+                R$ {dados.mangabeiras.lucro.toLocaleString()}
+              </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600 dark:text-gray-400">Atendimentos</span>
-              <span className="font-semibold">{dados.mangabeiras.atendimentos}</span>
+              <span className="text-gray-600 dark:text-gray-400">
+                Atendimentos
+              </span>
+              <span className="font-semibold">
+                {dados.mangabeiras.atendimentos}
+              </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600 dark:text-gray-400">Ticket Médio</span>
-              <span className="font-semibold">R$ {dados.mangabeiras.ticketMedio.toFixed(2)}</span>
+              <span className="text-gray-600 dark:text-gray-400">
+                Ticket Médio
+              </span>
+              <span className="font-semibold">
+                R$ {dados.mangabeiras.ticketMedio.toFixed(2)}
+              </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-600 dark:text-gray-400">Crescimento</span>
+              <span className="text-gray-600 dark:text-gray-400">
+                Crescimento
+              </span>
               <div className="flex items-center text-green-600">
                 <TrendingUp size={16} className="mr-1" />
-                <span className="font-semibold">{dados.mangabeiras.crescimento}%</span>
+                <span className="font-semibold">
+                  {dados.mangabeiras.crescimento}%
+                </span>
               </div>
             </div>
           </div>
@@ -174,26 +226,46 @@ const RelatorioComparativoUnidades = ({ filters }) => {
           </h3>
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-gray-600 dark:text-gray-400">Receita Total</span>
-              <span className="font-semibold">R$ {dados.novaLima.receita.toLocaleString()}</span>
+              <span className="text-gray-600 dark:text-gray-400">
+                Receita Total
+              </span>
+              <span className="font-semibold">
+                R$ {dados.novaLima.receita.toLocaleString()}
+              </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600 dark:text-gray-400">Lucro Líquido</span>
-              <span className="font-semibold text-green-600">R$ {dados.novaLima.lucro.toLocaleString()}</span>
+              <span className="text-gray-600 dark:text-gray-400">
+                Lucro Líquido
+              </span>
+              <span className="font-semibold text-green-600">
+                R$ {dados.novaLima.lucro.toLocaleString()}
+              </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600 dark:text-gray-400">Atendimentos</span>
-              <span className="font-semibold">{dados.novaLima.atendimentos}</span>
+              <span className="text-gray-600 dark:text-gray-400">
+                Atendimentos
+              </span>
+              <span className="font-semibold">
+                {dados.novaLima.atendimentos}
+              </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600 dark:text-gray-400">Ticket Médio</span>
-              <span className="font-semibold">R$ {dados.novaLima.ticketMedio.toFixed(2)}</span>
+              <span className="text-gray-600 dark:text-gray-400">
+                Ticket Médio
+              </span>
+              <span className="font-semibold">
+                R$ {dados.novaLima.ticketMedio.toFixed(2)}
+              </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-600 dark:text-gray-400">Crescimento</span>
+              <span className="text-gray-600 dark:text-gray-400">
+                Crescimento
+              </span>
               <div className="flex items-center text-green-600">
                 <TrendingUp size={16} className="mr-1" />
-                <span className="font-semibold">{dados.novaLima.crescimento}%</span>
+                <span className="font-semibold">
+                  {dados.novaLima.crescimento}%
+                </span>
               </div>
             </div>
           </div>
@@ -210,14 +282,18 @@ const RelatorioComparativoUnidades = ({ filters }) => {
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="unidade" />
             <YAxis />
-            <Tooltip 
+            <Tooltip
               formatter={(value, name) => [
-                name === 'receita' ? `R$ ${value.toLocaleString()}` : 
-                name === 'lucro' ? `R$ ${value.toLocaleString()}` : 
-                value,
-                name === 'receita' ? 'Receita' : 
-                name === 'lucro' ? 'Lucro' : 
-                'Atendimentos'
+                name === 'receita'
+                  ? `R$ ${value.toLocaleString()}`
+                  : name === 'lucro'
+                    ? `R$ ${value.toLocaleString()}`
+                    : value,
+                name === 'receita'
+                  ? 'Receita'
+                  : name === 'lucro'
+                    ? 'Lucro'
+                    : 'Atendimentos',
               ]}
             />
             <Bar dataKey="receita" fill="#3B82F6" name="receita" />
@@ -234,16 +310,34 @@ const RelatorioComparativoUnidades = ({ filters }) => {
         </h3>
         <div className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
           <p>
-            • <strong>Mangabeiras</strong> apresenta receita {((dados.mangabeiras.receita / dados.novaLima.receita - 1) * 100).toFixed(1)}% superior à Nova Lima
+            • <strong>Mangabeiras</strong> apresenta receita{' '}
+            {(
+              (dados.mangabeiras.receita / dados.novaLima.receita - 1) *
+              100
+            ).toFixed(1)}
+            % superior à Nova Lima
           </p>
           <p>
-            • <strong>Nova Lima</strong> tem ticket médio ligeiramente superior (R$ {(dados.novaLima.ticketMedio - dados.mangabeiras.ticketMedio).toFixed(2)} a mais)
+            • <strong>Nova Lima</strong> tem ticket médio ligeiramente superior
+            (R${' '}
+            {(
+              dados.novaLima.ticketMedio - dados.mangabeiras.ticketMedio
+            ).toFixed(2)}{' '}
+            a mais)
           </p>
           <p>
-            • Ambas as unidades apresentam crescimento positivo, com Mangabeiras liderando
+            • Ambas as unidades apresentam crescimento positivo, com Mangabeiras
+            liderando
           </p>
           <p>
-            • Total combinado: <strong>R$ {(dados.mangabeiras.receita + dados.novaLima.receita).toLocaleString()}</strong> em receita
+            • Total combinado:{' '}
+            <strong>
+              R${' '}
+              {(
+                dados.mangabeiras.receita + dados.novaLima.receita
+              ).toLocaleString()}
+            </strong>{' '}
+            em receita
           </p>
         </div>
       </Card>

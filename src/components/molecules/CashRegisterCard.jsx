@@ -1,0 +1,228 @@
+/**
+ * @file CashRegisterCard.jsx
+ * @description Componente Molecule - Card resumo do caixa
+ * @module Components/Molecules
+ * @author Andrey Viana
+ * @date 2025-10-24
+ */
+
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Calendar, DollarSign, Clock, CheckCircle } from 'lucide-react';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from '../../atoms/Card/Card';
+import { Button } from '../../atoms/Button/Button';
+import { StatusBadge } from '../../atoms/StatusBadge';
+import {
+  formatCurrency,
+  formatDate,
+  formatDateTime,
+} from '../../utils/formatters';
+
+/**
+ * Card para exibir resumo do caixa
+ * Segue padrões do Design System
+ */
+const CashRegisterCard = ({
+  cashRegister,
+  onClose,
+  onViewReport,
+  canClose = false,
+  className = '',
+}) => {
+  if (!cashRegister) {
+    return (
+      <Card className={`p-6 ${className}`}>
+        <div className="text-center text-theme-muted">
+          <p className="text-lg font-medium">Nenhum caixa aberto</p>
+          <p className="text-sm mt-2">
+            Abra um caixa para começar a registrar comandas
+          </p>
+        </div>
+      </Card>
+    );
+  }
+
+  const isOpen = cashRegister.status === 'open';
+  const openingDate = new Date(cashRegister.opening_time);
+  const closingDate = cashRegister.closing_time
+    ? new Date(cashRegister.closing_time)
+    : null;
+
+  // Calcula tempo de abertura
+  const calculateOpenTime = () => {
+    if (!isOpen) return null;
+    const now = new Date();
+    const diff = now - openingDate;
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    return `${hours}h ${minutes}min`;
+  };
+
+  const openTime = calculateOpenTime();
+
+  return (
+    <Card className={`p-6 ${className}`}>
+      {/* Header */}
+      <div className="flex items-start justify-between mb-4">
+        <div>
+          <h3 className="text-lg font-semibold text-theme-primary">
+            Caixa Atual
+          </h3>
+          <p className="text-sm text-theme-muted mt-1">
+            {cashRegister.unit?.name || 'Unidade'}
+          </p>
+        </div>
+        <StatusBadge status={cashRegister.status} size="md" />
+      </div>
+
+      {/* Informações principais */}
+      <div className="space-y-3 mb-6">
+        {/* Saldo de Abertura */}
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+            <DollarSign
+              size={20}
+              className="text-blue-600 dark:text-blue-400"
+            />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm text-theme-muted">Saldo de Abertura</p>
+            <p className="text-lg font-semibold text-theme-primary">
+              {formatCurrency(cashRegister.opening_balance || 0)}
+            </p>
+          </div>
+        </div>
+
+        {/* Data/Hora de Abertura */}
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+            <Calendar
+              size={20}
+              className="text-purple-600 dark:text-purple-400"
+            />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm text-theme-muted">Aberto em</p>
+            <p className="text-base font-medium text-theme-primary">
+              {formatDateTime(openingDate)}
+            </p>
+          </div>
+        </div>
+
+        {/* Tempo de Abertura (se aberto) */}
+        {isOpen && openTime && (
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+              <Clock size={20} className="text-green-600 dark:text-green-400" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm text-theme-muted">Tempo Aberto</p>
+              <p className="text-base font-medium text-theme-primary">
+                {openTime}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Saldo de Fechamento (se fechado) */}
+        {!isOpen && cashRegister.closing_balance !== null && (
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+              <CheckCircle
+                size={20}
+                className="text-green-600 dark:text-green-400"
+              />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm text-theme-muted">Saldo de Fechamento</p>
+              <p className="text-lg font-semibold text-theme-primary">
+                {formatCurrency(cashRegister.closing_balance)}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Data de Fechamento (se fechado) */}
+        {!isOpen && closingDate && (
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-900/30 flex items-center justify-center">
+              <Calendar
+                size={20}
+                className="text-gray-600 dark:text-gray-400"
+              />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm text-theme-muted">Fechado em</p>
+              <p className="text-base font-medium text-theme-primary">
+                {formatDateTime(closingDate)}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Observações */}
+      {cashRegister.observations && (
+        <div className="mb-6 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+          <p className="text-xs font-medium text-theme-muted mb-1">
+            Observações:
+          </p>
+          <p className="text-sm text-theme-primary">
+            {cashRegister.observations}
+          </p>
+        </div>
+      )}
+
+      {/* Ações */}
+      <div className="flex gap-3">
+        {isOpen && canClose && onClose && (
+          <Button onClick={onClose} variant="danger" className="flex-1">
+            Fechar Caixa
+          </Button>
+        )}
+
+        {onViewReport && (
+          <Button
+            onClick={onViewReport}
+            variant={isOpen ? 'secondary' : 'primary'}
+            className={isOpen ? 'flex-1' : 'w-full'}
+          >
+            Ver Relatório
+          </Button>
+        )}
+      </div>
+    </Card>
+  );
+};
+
+CashRegisterCard.propTypes = {
+  /** Dados do caixa */
+  cashRegister: PropTypes.shape({
+    id: PropTypes.string,
+    status: PropTypes.oneOf(['open', 'closed']),
+    opening_balance: PropTypes.number,
+    closing_balance: PropTypes.number,
+    opening_time: PropTypes.string,
+    closing_time: PropTypes.string,
+    observations: PropTypes.string,
+    unit: PropTypes.shape({
+      name: PropTypes.string,
+    }),
+  }),
+  /** Callback para fechar caixa */
+  onClose: PropTypes.func,
+  /** Callback para visualizar relatório */
+  onViewReport: PropTypes.func,
+  /** Se usuário pode fechar o caixa */
+  canClose: PropTypes.bool,
+  /** Classes CSS adicionais */
+  className: PropTypes.string,
+};
+
+export default CashRegisterCard;

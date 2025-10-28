@@ -221,4 +221,3 @@ const DeleteConfirmationModal = ({ expense, isOpen, onClose, onDelete }) => {
 };
 
 export default DeleteConfirmationModal;
-

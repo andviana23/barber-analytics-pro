@@ -17,17 +17,17 @@ const RelatorioPerformanceProfissionais = ({ filters }) => {
         <p className="text-gray-600 dark:text-gray-400 mb-6">
           Ranking e análise de desempenho dos barbeiros
         </p>
-        
+
         <Card className="p-6 max-w-md mx-auto">
           <Trophy className="mx-auto mb-4 text-gray-400" size={32} />
           <p className="text-gray-500 dark:text-gray-400">
             Componente em desenvolvimento...
           </p>
           <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
-            Período: {filters.periodo.tipo === 'mes' 
+            Período:{' '}
+            {filters.periodo.tipo === 'mes'
               ? `${filters.periodo.mes}/${filters.periodo.ano}`
-              : 'Período selecionado'
-            }
+              : 'Período selecionado'}
           </p>
         </Card>
       </div>

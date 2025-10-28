@@ -2,18 +2,18 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 // Componente de loading aprimorado com acessibilidade
-export function LoadingSpinner({ 
-  size = 'md', 
+export function LoadingSpinner({
+  size = 'md',
   color = 'primary',
   text = 'Carregando...',
   fullScreen = false,
-  className = '' 
+  className = '',
 }) {
   const sizeClasses = {
     sm: 'w-4 h-4',
     md: 'w-6 h-6',
     lg: 'w-8 h-8',
-    xl: 'w-12 h-12'
+    xl: 'w-12 h-12',
   };
 
   const colorClasses = {
@@ -21,7 +21,7 @@ export function LoadingSpinner({
     secondary: 'border-gray-600',
     success: 'border-green-600',
     warning: 'border-yellow-600',
-    error: 'border-red-600'
+    error: 'border-red-600',
   };
 
   const spinner = (
@@ -36,9 +36,9 @@ export function LoadingSpinner({
         transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
         aria-hidden="true"
       />
-      
+
       {/* Texto com suporte a screen reader */}
-      <div 
+      <div
         className="text-sm text-gray-600 dark:text-gray-300 font-medium"
         role="status"
         aria-live="polite"
@@ -47,9 +47,7 @@ export function LoadingSpinner({
       </div>
 
       {/* Elemento invisível para screen readers */}
-      <span className="sr-only">
-        Conteúdo carregando, aguarde por favor
-      </span>
+      <span className="sr-only">Conteúdo carregando, aguarde por favor</span>
     </div>
   );
 
@@ -83,11 +81,11 @@ export function LoadingSpinner({
 }
 
 // Skeleton loader para conteúdo
-export function SkeletonLoader({ 
-  lines = 3, 
+export function SkeletonLoader({
+  lines = 3,
   className = '',
   showAvatar = false,
-  showButton = false 
+  showButton = false,
 }) {
   return (
     <div className={`animate-pulse space-y-4 ${className}`} aria-hidden="true">
@@ -100,7 +98,7 @@ export function SkeletonLoader({
           </div>
         </div>
       )}
-      
+
       <div className="space-y-2">
         {Array.from({ length: lines }).map((_, index) => (
           <div
@@ -117,9 +115,7 @@ export function SkeletonLoader({
         <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-32" />
       )}
 
-      <span className="sr-only">
-        Conteúdo sendo carregado
-      </span>
+      <span className="sr-only">Conteúdo sendo carregado</span>
     </div>
   );
 }
@@ -127,7 +123,9 @@ export function SkeletonLoader({
 // Loading state para cards
 export function CardSkeleton({ className = '' }) {
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 ${className}`}>
+    <div
+      className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 ${className}`}
+    >
       <SkeletonLoader lines={3} showButton={true} />
     </div>
   );
@@ -136,29 +134,42 @@ export function CardSkeleton({ className = '' }) {
 // Loading state para tabelas
 export function TableSkeleton({ rows = 5, columns = 4, className = '' }) {
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden ${className}`}>
+    <div
+      className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden ${className}`}
+    >
       {/* Header */}
       <div className="border-b border-gray-200 dark:border-gray-700 p-4">
-        <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
+        <div
+          className="grid gap-4"
+          style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
+        >
           {Array.from({ length: columns }).map((_, index) => (
-            <div key={index} className="h-4 bg-gray-200 dark:bg-gray-700 rounded" />
+            <div
+              key={index}
+              className="h-4 bg-gray-200 dark:bg-gray-700 rounded"
+            />
           ))}
         </div>
       </div>
-      
+
       {/* Rows */}
       <div className="divide-y divide-gray-200 dark:divide-gray-700">
         {Array.from({ length: rows }).map((_, rowIndex) => (
           <div key={rowIndex} className="p-4">
-            <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
+            <div
+              className="grid gap-4"
+              style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
+            >
               {Array.from({ length: columns }).map((_, colIndex) => (
-                <div 
-                  key={colIndex} 
+                <div
+                  key={colIndex}
                   className={`
                     h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse
                     ${colIndex === 0 ? 'w-3/4' : 'w-full'}
                   `}
-                  style={{ animationDelay: `${(rowIndex * columns + colIndex) * 0.1}s` }}
+                  style={{
+                    animationDelay: `${(rowIndex * columns + colIndex) * 0.1}s`,
+                  }}
                 />
               ))}
             </div>
@@ -166,20 +177,18 @@ export function TableSkeleton({ rows = 5, columns = 4, className = '' }) {
         ))}
       </div>
 
-      <span className="sr-only">
-        Carregando dados da tabela
-      </span>
+      <span className="sr-only">Carregando dados da tabela</span>
     </div>
   );
 }
 
 // Progress bar com acessibilidade
-export function ProgressBar({ 
-  progress = 0, 
-  max = 100, 
+export function ProgressBar({
+  progress = 0,
+  max = 100,
   label = 'Progresso',
   showPercentage = true,
-  className = '' 
+  className = '',
 }) {
   const percentage = Math.min(100, Math.max(0, (progress / max) * 100));
 
@@ -195,8 +204,8 @@ export function ProgressBar({
           </span>
         )}
       </div>
-      
-      <div 
+
+      <div
         className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5"
         role="progressbar"
         aria-valuenow={progress}
@@ -204,7 +213,7 @@ export function ProgressBar({
         aria-valuemax={max}
         aria-label={`${label}: ${Math.round(percentage)}% concluído`}
       >
-        <motion.div 
+        <motion.div
           className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
           initial={{ width: 0 }}
           animate={{ width: `${percentage}%` }}
@@ -268,7 +277,7 @@ export function useLoadingState(initialState = false) {
     loadingMessage,
     startLoading,
     stopLoading,
-    withLoading
+    withLoading,
   };
 }
 
@@ -279,5 +288,5 @@ export default {
   TableSkeleton,
   ProgressBar,
   FormLoadingOverlay,
-  useLoadingState
+  useLoadingState,
 };

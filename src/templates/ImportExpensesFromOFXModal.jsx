@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
+import React, {
+  useState,
+  useCallback,
+  useRef,
+  useMemo,
+  useEffect,
+} from 'react';
 import PropTypes from 'prop-types';
 import {
   X,
@@ -78,7 +84,9 @@ const ImportExpensesFromOFXModal = ({
   // Filtrar contas bancárias pela unidade selecionada
   const filteredAccounts = useMemo(() => {
     if (!effectiveUnitId || !availableAccounts) return availableAccounts;
-    return availableAccounts.filter(account => account.unit_id === effectiveUnitId);
+    return availableAccounts.filter(
+      account => account.unit_id === effectiveUnitId
+    );
   }, [availableAccounts, effectiveUnitId]);
 
   // ========================================
@@ -129,9 +137,8 @@ const ImportExpensesFromOFXModal = ({
         console.log('📄 Iniciando parsing do arquivo OFX:', selectedFile.name);
 
         // 1️⃣ Ler e parsear OFX
-        const { data, error } = await ImportExpensesFromOFXService.readFile(
-          selectedFile
-        );
+        const { data, error } =
+          await ImportExpensesFromOFXService.readFile(selectedFile);
 
         if (error || !data) {
           setValidationErrors([error || 'Erro ao ler arquivo OFX']);
@@ -174,7 +181,11 @@ const ImportExpensesFromOFXModal = ({
         }
 
         setNormalizedData(normalized);
-        console.log('✅ Normalização concluída:', normalized.length, 'registros');
+        console.log(
+          '✅ Normalização concluída:',
+          normalized.length,
+          'registros'
+        );
 
         // Avançar para step 2
         setCurrentStep(2);
@@ -207,10 +218,11 @@ const ImportExpensesFromOFXModal = ({
     console.log('🔄 Aplicando categorias selecionadas...');
 
     // Aplicar categorias manuais
-    let processedData = ImportExpensesFromOFXService.applyUserCategorySelections(
-      normalizedData,
-      userCategorySelections
-    );
+    let processedData =
+      ImportExpensesFromOFXService.applyUserCategorySelections(
+        normalizedData,
+        userCategorySelections
+      );
 
     // Buscar fornecedores e categorias para enriquecimento
     const { data: suppliers } = await PartiesService.getParties({
@@ -469,7 +481,8 @@ const ImportExpensesFromOFXModal = ({
                   </option>
                   {filteredAccounts.map(account => (
                     <option key={account.id} value={account.id}>
-                      {account.nome || account.bank_name} - {account.banco || account.account_number}
+                      {account.nome || account.bank_name} -{' '}
+                      {account.banco || account.account_number}
                     </option>
                   ))}
                 </select>
@@ -528,7 +541,9 @@ const ImportExpensesFromOFXModal = ({
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                    <span>Detecta automaticamente categorias e fornecedores</span>
+                    <span>
+                      Detecta automaticamente categorias e fornecedores
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-3 h-3 mt-0.5 flex-shrink-0" />
@@ -536,7 +551,9 @@ const ImportExpensesFromOFXModal = ({
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                    <span>Marca todas as despesas como pagas automaticamente</span>
+                    <span>
+                      Marca todas as despesas como pagas automaticamente
+                    </span>
                   </li>
                 </ul>
               </div>
@@ -603,7 +620,10 @@ const ImportExpensesFromOFXModal = ({
                           {record.expense.date}
                         </td>
                         <td className="px-2 py-2 text-xs text-gray-900 dark:text-gray-100">
-                          <div className="max-w-xs truncate" title={record.expense.description}>
+                          <div
+                            className="max-w-xs truncate"
+                            title={record.expense.description}
+                          >
                             {record.expense.description}
                           </div>
                         </td>
@@ -738,7 +758,10 @@ const ImportExpensesFromOFXModal = ({
                             {record.expense.date}
                           </td>
                           <td className="px-2 py-1.5 text-xs text-gray-900 dark:text-gray-100">
-                            <div className="max-w-xs truncate" title={record.expense.description}>
+                            <div
+                              className="max-w-xs truncate"
+                              title={record.expense.description}
+                            >
                               {record.expense.description}
                             </div>
                           </td>
@@ -752,7 +775,12 @@ const ImportExpensesFromOFXModal = ({
                             </span>
                           </td>
                           <td className="px-2 py-1.5 text-xs text-gray-900 dark:text-gray-100">
-                            <div className="max-w-xs truncate" title={getCategoryName(record.expense.category_id)}>
+                            <div
+                              className="max-w-xs truncate"
+                              title={getCategoryName(
+                                record.expense.category_id
+                              )}
+                            >
                               {getCategoryName(record.expense.category_id)}
                             </div>
                           </td>

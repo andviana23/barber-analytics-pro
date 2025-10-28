@@ -1,19 +1,24 @@
 import React, { useState } from 'react';
-import { 
-  User, 
-  Play, 
-  Pause, 
-  Square, 
-  SkipForward, 
-  Clock, 
+import {
+  User,
+  Play,
+  Pause,
+  Square,
+  SkipForward,
+  Clock,
   Trophy,
-  AlertCircle 
+  AlertCircle,
 } from 'lucide-react';
 import { Button } from '../../../atoms';
 import filaService from '../../../services/filaService';
 import { useAuth } from '../../../context';
 
-export default function BarbeiroCard({ barbeiro, posicao, unidadeId, onUpdate }) {
+export default function BarbeiroCard({
+  barbeiro,
+  posicao,
+  unidadeId,
+  onUpdate,
+}) {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -31,19 +36,19 @@ export default function BarbeiroCard({ barbeiro, posicao, unidadeId, onUpdate })
         case 'entrar':
           await filaService.entrarNaFila(barbeiro.barbeiro_id, unidadeId);
           break;
-        
+
         case 'pausar':
           await filaService.pausarBarbeiro(barbeiro.barbeiro_id, unidadeId);
           break;
-        
+
         case 'iniciar':
           await filaService.iniciarAtendimento(
-            barbeiro.barbeiro_id, 
-            unidadeId, 
+            barbeiro.barbeiro_id,
+            unidadeId,
             additionalData.tipoServico
           );
           break;
-        
+
         case 'finalizar':
           await filaService.finalizarAtendimento(
             additionalData.historicoId,
@@ -51,21 +56,20 @@ export default function BarbeiroCard({ barbeiro, posicao, unidadeId, onUpdate })
             additionalData.observacoes
           );
           break;
-        
+
         case 'pular':
           if (!canManage) {
             throw new Error('Apenas gerentes/admins podem pular barbeiros');
           }
           await filaService.pularBarbeiro(barbeiro.barbeiro_id, unidadeId);
           break;
-        
+
         default:
           throw new Error(`Ação não reconhecida: ${action}`);
       }
 
       // Atualizar a lista
       await onUpdate();
-      
     } catch (err) {
       setError(err.message);
       // eslint-disable-next-line no-console
@@ -83,7 +87,7 @@ export default function BarbeiroCard({ barbeiro, posicao, unidadeId, onUpdate })
           color: 'text-green-600',
           bg: 'bg-green-50 dark:bg-green-900/20',
           border: 'border-green-200 dark:border-green-800',
-          icon: <Play className="h-4 w-4" />
+          icon: <Play className="h-4 w-4" />,
         };
       case 'attending':
         return {
@@ -91,7 +95,7 @@ export default function BarbeiroCard({ barbeiro, posicao, unidadeId, onUpdate })
           color: 'text-blue-600',
           bg: 'bg-blue-50 dark:bg-blue-900/20',
           border: 'border-blue-200 dark:border-blue-800',
-          icon: <Clock className="h-4 w-4" />
+          icon: <Clock className="h-4 w-4" />,
         };
       case 'paused':
         return {
@@ -99,7 +103,7 @@ export default function BarbeiroCard({ barbeiro, posicao, unidadeId, onUpdate })
           color: 'text-gray-600',
           bg: 'bg-gray-50 dark:bg-gray-700',
           border: 'border-gray-200 dark:border-gray-600',
-          icon: <Pause className="h-4 w-4" />
+          icon: <Pause className="h-4 w-4" />,
         };
       default:
         return {
@@ -107,14 +111,14 @@ export default function BarbeiroCard({ barbeiro, posicao, unidadeId, onUpdate })
           color: 'text-gray-600',
           bg: 'bg-gray-50 dark:bg-gray-700',
           border: 'border-gray-200 dark:border-gray-600',
-          icon: <AlertCircle className="h-4 w-4" />
+          icon: <AlertCircle className="h-4 w-4" />,
         };
     }
   };
 
   const getAvailableActions = () => {
     const actions = [];
-    
+
     switch (barbeiro.status) {
       case 'paused':
         if (isOwnCard) {
@@ -123,39 +127,39 @@ export default function BarbeiroCard({ barbeiro, posicao, unidadeId, onUpdate })
             label: 'Entrar na Fila',
             icon: <Play className="h-4 w-4" />,
             variant: 'default',
-            color: 'bg-green-600 hover:bg-green-700'
+            color: 'bg-green-600 hover:bg-green-700',
           });
         }
         break;
-        
+
       case 'active':
         if (isOwnCard) {
           actions.push({
             key: 'pausar',
             label: 'Pausar',
             icon: <Pause className="h-4 w-4" />,
-            variant: 'outline'
+            variant: 'outline',
           });
-          
+
           actions.push({
             key: 'iniciar',
             label: 'Iniciar',
             icon: <Play className="h-4 w-4" />,
             variant: 'default',
-            color: 'bg-blue-600 hover:bg-blue-700'
+            color: 'bg-blue-600 hover:bg-blue-700',
           });
         }
-        
+
         if (canManage) {
           actions.push({
             key: 'pular',
             label: 'Pular',
             icon: <SkipForward className="h-4 w-4" />,
-            variant: 'outline'
+            variant: 'outline',
           });
         }
         break;
-        
+
       case 'attending':
         if (isOwnCard) {
           actions.push({
@@ -163,12 +167,12 @@ export default function BarbeiroCard({ barbeiro, posicao, unidadeId, onUpdate })
             label: 'Finalizar',
             icon: <Square className="h-4 w-4" />,
             variant: 'default',
-            color: 'bg-green-600 hover:bg-green-700'
+            color: 'bg-green-600 hover:bg-green-700',
           });
         }
         break;
     }
-    
+
     return actions;
   };
 
@@ -176,13 +180,14 @@ export default function BarbeiroCard({ barbeiro, posicao, unidadeId, onUpdate })
   const actions = getAvailableActions();
 
   return (
-    <div className={`
+    <div
+      className={`
       relative p-4 rounded-lg border transition-all duration-200
       ${statusConfig.bg} ${statusConfig.border}
       ${barbeiro.status === 'attending' ? 'ring-2 ring-blue-200 dark:ring-blue-800' : ''}
       ${posicao === 1 && barbeiro.status === 'active' ? 'ring-2 ring-yellow-200 dark:ring-yellow-800' : ''}
-    `}>
-      
+    `}
+    >
       {/* Badge de posição */}
       <div className="absolute -top-2 -left-2 w-8 h-8 rounded-full bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 flex items-center justify-center">
         {posicao === 1 && barbeiro.status === 'active' ? (
@@ -195,7 +200,6 @@ export default function BarbeiroCard({ barbeiro, posicao, unidadeId, onUpdate })
       </div>
 
       <div className="flex items-start justify-between">
-        
         {/* Informações do barbeiro */}
         <div className="flex items-start gap-3 flex-1">
           {/* Avatar */}
@@ -209,12 +213,14 @@ export default function BarbeiroCard({ barbeiro, posicao, unidadeId, onUpdate })
               <h3 className="font-semibold text-gray-900 dark:text-white">
                 {barbeiro.barbeiro_nome}
               </h3>
-              
+
               {/* Badge de status */}
-              <span className={`
+              <span
+                className={`
                 inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium
                 ${statusConfig.color} ${statusConfig.bg} ${statusConfig.border} border
-              `}>
+              `}
+              >
                 {statusConfig.icon}
                 {statusConfig.label}
               </span>
@@ -226,7 +232,7 @@ export default function BarbeiroCard({ barbeiro, posicao, unidadeId, onUpdate })
                 <Clock className="h-3 w-3" />
                 {barbeiro.total_atendimentos} atendimento(s)
               </div>
-              
+
               <div className="flex items-center gap-1">
                 <span>•</span>
                 {barbeiro.tempo_desde_ultimo}
@@ -269,7 +275,7 @@ export default function BarbeiroCard({ barbeiro, posicao, unidadeId, onUpdate })
           🎯 Próximo da fila
         </div>
       )}
-      
+
       {/* Indicador de atendendo */}
       {barbeiro.status === 'attending' && (
         <div className="mt-3 text-xs font-medium text-blue-700 dark:text-blue-300 text-center animate-pulse">

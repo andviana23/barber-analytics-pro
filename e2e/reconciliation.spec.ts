@@ -2,7 +2,10 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Conciliação bancária', () => {
   test('importa extrato e reconcilia lançamentos', async ({ page }) => {
-    test.skip(true, 'Implementar com fixtures de extrato e seletores definidos.');
+    test.skip(
+      true,
+      'Implementar com fixtures de extrato e seletores definidos.'
+    );
 
     await page.goto('/financeiro/concilia');
 

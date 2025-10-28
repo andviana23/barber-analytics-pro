@@ -1,3 +1,11 @@
+/**
+ * @file Sidebar.jsx
+ * @description Sidebar/Navbar principal do sistema
+ * Refatorado para seguir 100% o Design System (DESIGN_SYSTEM.md)
+ * @author Barber Analytics Pro Team
+ * @date 2025-10-26
+ */
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -19,6 +27,9 @@ import {
   Package,
   Tags,
   Target,
+  Scissors,
+  FileText,
+  TrendingUp,
 } from 'lucide-react';
 
 // Estrutura hierárquica do menu organizada por grupos funcionais
@@ -54,6 +65,35 @@ const menuGroups = [
     id: 'operacao',
     title: 'OPERAÇÃO',
     items: [
+      {
+        id: 'caixa',
+        label: 'Caixa',
+        icon: DollarSign,
+        path: '/caixa',
+        badge: null,
+        roles: ['admin', 'gerente', 'recepcionista'],
+      },
+      {
+        id: 'comandas',
+        label: 'Comandas',
+        icon: FileText,
+        path: '/comandas',
+        badge: null,
+      },
+      {
+        id: 'servicos',
+        label: 'Serviços',
+        icon: Scissors,
+        path: '/servicos',
+        badge: null,
+      },
+      {
+        id: 'comissoes',
+        label: 'Comissões',
+        icon: TrendingUp,
+        path: '/comissoes',
+        badge: null,
+      },
       {
         id: 'professionals',
         label: 'Profissionais',
@@ -256,56 +296,82 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
 
   return (
     <>
-      {/* Overlay para mobile */}
+      {/* Overlay para mobile - Design System compliant */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300"
           onClick={onClose}
+          aria-label="Fechar menu"
         />
       )}
 
-      {/* Sidebar */}
-      <aside className="w-64 h-full bg-light-surface dark:bg-dark-surface border-r border-light-border dark:border-dark-border flex-shrink-0">
+      {/* Sidebar - Usando tokens do Design System */}
+      <aside
+        className={`
+          fixed lg:static inset-y-0 left-0 z-50 lg:z-auto
+          w-64 h-full 
+          bg-light-surface dark:bg-dark-surface 
+          border-r border-light-border dark:border-dark-border
+          flex-shrink-0
+          transform transition-transform duration-300 ease-in-out lg:transform-none
+          ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}
+        aria-label="Menu de navegação principal"
+      >
+        {/* Custom Scrollbar - Design System */}
         <style>{`
-          /* Custom Scrollbar - Minimalista e Elegante */
           .sidebar-scroll::-webkit-scrollbar {
             width: 6px;
           }
           .sidebar-scroll::-webkit-scrollbar-thumb {
-            background-color: rgba(197, 166, 118, 0.35);
+            background-color: rgba(77, 163, 255, 0.2);
             border-radius: 10px;
+            transition: background-color 0.2s;
+          }
+          .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(77, 163, 255, 0.4);
           }
           .sidebar-scroll::-webkit-scrollbar-track {
             background: transparent;
           }
+          
+          /* Dark mode scrollbar */
+          .dark .sidebar-scroll::-webkit-scrollbar-thumb {
+            background-color: rgba(77, 163, 255, 0.15);
+          }
+          .dark .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(77, 163, 255, 0.3);
+          }
         `}</style>
+
         <div className="flex flex-col h-full">
-          {/* Header */}
+          {/* Header Mobile - Design System Typography */}
           <div className="flex items-center justify-between p-4 border-b border-light-border dark:border-dark-border lg:hidden">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">BA</span>
+              <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary-hover rounded-lg flex items-center justify-center shadow-md">
+                <span className="text-white font-bold text-base">TB</span>
               </div>
               <div>
-                <h2 className="text-text-light-primary dark:text-text-dark-primary font-semibold">
-                  Barber Analytics
+                <h2 className="text-text-light-primary dark:text-text-dark-primary font-semibold text-sm">
+                  Gestão Trato de Barbados
                 </h2>
                 <p className="text-text-light-secondary dark:text-text-dark-secondary text-xs">
-                  Pro Dashboard
+                  Sistema de Gestão
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-dark-bg transition-colors duration-300"
+              className="p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-dark-bg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-surface"
+              aria-label="Fechar menu"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
 
-          {/* Unit selector - Topo - PRINCIPAL DO SISTEMA */}
-          <div className="px-4 py-3 border-b border-light-border dark:border-dark-border bg-gradient-to-r from-primary/5 to-transparent">
-            <label className="block text-[10px] text-gray-400 dark:text-gray-400 mb-1.5 font-semibold uppercase tracking-wider">
+          {/* Unit Selector - Design System Card Theme */}
+          <div className="px-4 py-4 border-b border-light-border dark:border-dark-border bg-primary-light dark:bg-primary/5">
+            <label className="block text-xs text-text-light-secondary dark:text-text-dark-secondary mb-2 font-medium uppercase tracking-wide">
               Unidade:
             </label>
             <UnitSelector className="w-full" />
@@ -315,12 +381,14 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
           <nav className="flex-1 p-4 overflow-y-auto sidebar-scroll">
             {filteredMenuGroups.map((group, groupIndex) => (
               <div key={group.id} className={groupIndex > 0 ? 'mt-6' : ''}>
-                {/* Título do Grupo */}
-                <div className="px-3 mb-2 mt-6">
-                  <h3 className="text-sm font-semibold tracking-wide text-gray-400 dark:text-gray-400 uppercase">
-                    {group.title}
-                  </h3>
-                </div>
+                {/* Group Title - Design System Typography */}
+                {group.title && (
+                  <div className="px-3 mb-2 mt-4 first:mt-0">
+                    <h3 className="text-xs font-semibold tracking-wider text-text-light-secondary dark:text-text-dark-secondary uppercase opacity-70">
+                      {group.title}
+                    </h3>
+                  </div>
+                )}
 
                 {/* Itens do Grupo */}
                 <div className="space-y-1">
@@ -331,74 +399,57 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
 
                     return (
                       <div key={item.id}>
-                        {/* Menu Item Principal */}
+                        {/* Menu Item Principal - Design System */}
                         <button
                           onClick={() => handleItemClick(item)}
                           aria-label={item.label}
+                          aria-current={isActive ? 'page' : undefined}
                           className={`
-                            group relative w-full h-9 flex items-center gap-2 px-2 rounded-md
-                            text-left text-xs font-medium cursor-pointer
+                            group relative w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
+                            text-left text-sm font-medium cursor-pointer
                             transition-all duration-200 ease-in-out
+                            focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-surface
                             ${
                               isActive
-                                ? 'bg-gradient-to-r from-primary/10 to-primary/5 text-primary dark:from-primary/20 dark:to-primary/10 shadow-sm'
-                                : 'text-gray-300 dark:text-gray-300 hover:bg-white/5 dark:hover:bg-white/5 hover:text-gray-100 dark:hover:text-gray-100'
+                                ? 'bg-primary/10 dark:bg-primary/15 text-primary shadow-sm'
+                                : 'text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-white/5 hover:text-text-light-primary dark:hover:text-text-dark-primary'
                             }
                           `}
                         >
-                          {/* Linha Lateral Dourada (Active State) */}
-                          {isActive && (
-                            <div
-                              className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-7 bg-[#C5A676] rounded-r-full"
-                              style={{
-                                boxShadow: '0 0 8px rgba(197, 166, 118, 0.5)',
-                              }}
-                            />
-                          )}
-
                           <Icon
-                            className={`h-4 w-4 flex-shrink-0 transition-opacity duration-200 ${
+                            className={`h-5 w-5 flex-shrink-0 transition-all duration-200 ${
                               isActive
-                                ? 'opacity-100'
-                                : 'opacity-70 group-hover:opacity-100'
+                                ? 'opacity-100 scale-110'
+                                : 'opacity-70 group-hover:opacity-100 group-hover:scale-105'
                             }`}
                           />
-                          <span className="flex-1 lg:block hidden">
-                            {item.label}
-                          </span>
+                          <span className="flex-1">{item.label}</span>
 
-                          {/* Badge */}
+                          {/* Badge - Design System */}
                           {item.badge && !item.hasSubmenu && (
-                            <span
-                              className={`
-                                px-1.5 py-0.5 text-[10px] font-semibold rounded-full
-                                transition-all duration-200
-                                ${
-                                  isActive
-                                    ? 'bg-primary text-white'
-                                    : 'bg-primary/20 text-primary group-hover:bg-primary/30'
-                                }
-                              `}
-                            >
+                            <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-primary/15 text-primary">
                               {item.badge}
                             </span>
                           )}
 
-                          {/* Ícone de submenu */}
+                          {/* Active Indicator */}
+                          {isActive && !item.hasSubmenu && (
+                            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                          )}
+
+                          {/* Submenu Chevron - Design System */}
                           {item.hasSubmenu && (
-                            <div className="text-[#C5A676]">
-                              {isSubmenuOpen ? (
-                                <ChevronDown className="h-3.5 w-3.5 flex-shrink-0 transition-transform duration-200" />
-                              ) : (
-                                <ChevronRight className="h-3.5 w-3.5 flex-shrink-0 transition-transform duration-200" />
-                              )}
-                            </div>
+                            <ChevronRight
+                              className={`h-4 w-4 flex-shrink-0 transition-transform duration-200 ${
+                                isSubmenuOpen ? 'rotate-90' : ''
+                              }`}
+                            />
                           )}
                         </button>
 
-                        {/* Submenu */}
+                        {/* Submenu - Design System */}
                         {item.hasSubmenu && isSubmenuOpen && item.submenu && (
-                          <div className="ml-5 mt-1 space-y-1 border-l border-gray-700 dark:border-gray-700 pl-2">
+                          <div className="ml-4 mt-1 mb-2 space-y-0.5 border-l-2 border-primary/20 dark:border-primary/15 pl-3">
                             {item.submenu.map(subItem => {
                               const SubIcon = subItem.icon;
                               const isSubActive = activeItem === subItem.id;
@@ -408,25 +459,29 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
                                   key={subItem.id}
                                   onClick={() => handleSubmenuClick(subItem)}
                                   aria-label={subItem.label}
+                                  aria-current={
+                                    isSubActive ? 'page' : undefined
+                                  }
                                   className={`
-                                    group relative w-full h-8 flex items-center gap-2 px-2 rounded-md
-                                    text-left text-xs font-medium cursor-pointer
+                                    group relative w-full flex items-center gap-2.5 px-3 py-2 rounded-lg
+                                    text-left text-sm font-medium cursor-pointer
                                     transition-all duration-200 ease-in-out
+                                    focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-surface
                                     ${
                                       isSubActive
-                                        ? 'bg-primary/10 text-primary dark:bg-primary/20'
-                                        : 'text-gray-300 dark:text-gray-300 hover:bg-white/5 dark:hover:bg-white/5 hover:text-gray-100 dark:hover:text-gray-100'
+                                        ? 'bg-primary/10 dark:bg-primary/15 text-primary'
+                                        : 'text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-white/5 hover:text-text-light-primary dark:hover:text-text-dark-primary'
                                     }
                                   `}
                                 >
                                   <SubIcon
-                                    className={`h-3.5 w-3.5 flex-shrink-0 transition-opacity duration-200 ${
+                                    className={`h-4 w-4 flex-shrink-0 transition-all duration-200 ${
                                       isSubActive
-                                        ? 'opacity-100'
+                                        ? 'opacity-100 scale-105'
                                         : 'opacity-70 group-hover:opacity-100'
                                     }`}
                                   />
-                                  <span className="lg:block hidden">
+                                  <span className="flex-1">
                                     {subItem.label}
                                   </span>
                                 </button>
@@ -442,8 +497,8 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
             ))}
           </nav>
 
-          {/* Bottom menu */}
-          <div className="px-4 py-3 border-t border-light-border dark:border-dark-border">
+          {/* Bottom Menu - Design System */}
+          <div className="px-3 py-4 border-t border-light-border dark:border-dark-border bg-light-bg/50 dark:bg-dark-bg/30">
             {bottomMenuItems.map(item => {
               const Icon = item.icon;
 
@@ -452,10 +507,18 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
                   key={item.id}
                   onClick={() => handleItemClick(item)}
                   aria-label={item.label}
-                  className="group w-full h-9 flex items-center gap-2 px-2 rounded-md text-left text-sm font-medium cursor-pointer text-[#e74c3c] dark:text-[#e74c3c] opacity-80 hover:opacity-100 hover:translate-x-1 transition-all duration-200"
+                  className="
+                    group w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
+                    text-left text-sm font-medium cursor-pointer
+                    text-text-light-secondary dark:text-text-dark-secondary
+                    hover:bg-red-500/10 hover:text-red-500 dark:hover:text-red-400
+                    transition-all duration-200 ease-in-out
+                    focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-dark-surface
+                  "
                 >
-                  <Icon className="h-4 w-4 flex-shrink-0" />
-                  <span className="lg:block hidden">{item.label}</span>
+                  <Icon className="h-5 w-5 flex-shrink-0 transition-all duration-200 group-hover:scale-110" />
+                  <span className="flex-1">{item.label}</span>
+                  <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                 </button>
               );
             })}

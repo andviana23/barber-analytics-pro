@@ -18,35 +18,71 @@ export const exportDREToCSV = (dreData, periodo) => {
     ['ITEM', 'VALOR (R$)', 'PERCENTUAL (%)'],
     [''],
     // Receitas
-    ['(+) RECEITA BRUTA', formatCurrency(dreData.receita_bruta), `${dreData.percentuais?.receita_bruta || 100}%`],
-    ['(-) Deduções da Receita', formatCurrency(dreData.deducoes), `${dreData.percentuais?.deducoes || 0}%`],
-    ['(=) RECEITA LÍQUIDA', formatCurrency(dreData.receita_liquida), `${dreData.percentuais?.receita_liquida || 0}%`],
+    [
+      '(+) RECEITA BRUTA',
+      formatCurrency(dreData.receita_bruta),
+      `${dreData.percentuais?.receita_bruta || 100}%`,
+    ],
+    [
+      '(-) Deduções da Receita',
+      formatCurrency(dreData.deducoes),
+      `${dreData.percentuais?.deducoes || 0}%`,
+    ],
+    [
+      '(=) RECEITA LÍQUIDA',
+      formatCurrency(dreData.receita_liquida),
+      `${dreData.percentuais?.receita_liquida || 0}%`,
+    ],
     [''],
     // Custos Variáveis
-    ['(-) Custos Variáveis', formatCurrency(dreData.custos_variaveis), `${dreData.percentuais?.custos_variaveis || 0}%`],
-    ['(=) MARGEM DE CONTRIBUIÇÃO', formatCurrency(dreData.margem_contribuicao), `${dreData.percentuais?.margem_contribuicao || 0}%`],
+    [
+      '(-) Custos Variáveis',
+      formatCurrency(dreData.custos_variaveis),
+      `${dreData.percentuais?.custos_variaveis || 0}%`,
+    ],
+    [
+      '(=) MARGEM DE CONTRIBUIÇÃO',
+      formatCurrency(dreData.margem_contribuicao),
+      `${dreData.percentuais?.margem_contribuicao || 0}%`,
+    ],
     [''],
     // Despesas Fixas
-    ['(-) Despesas Fixas', formatCurrency(dreData.despesas_fixas), `${dreData.percentuais?.despesas_fixas || 0}%`],
-    ['(=) RESULTADO OPERACIONAL', formatCurrency(dreData.resultado_operacional), `${dreData.percentuais?.resultado_operacional || 0}%`],
+    [
+      '(-) Despesas Fixas',
+      formatCurrency(dreData.despesas_fixas),
+      `${dreData.percentuais?.despesas_fixas || 0}%`,
+    ],
+    [
+      '(=) RESULTADO OPERACIONAL',
+      formatCurrency(dreData.resultado_operacional),
+      `${dreData.percentuais?.resultado_operacional || 0}%`,
+    ],
     [''],
     // Outras Receitas/Despesas
-    ['(+/-) Outras Receitas/Despesas', formatCurrency(dreData.outras_receitas_despesas || 0), `${dreData.percentuais?.outras_receitas_despesas || 0}%`],
-    ['(=) LUCRO LÍQUIDO', formatCurrency(dreData.lucro_liquido), `${dreData.percentuais?.lucro_liquido || 0}%`],
+    [
+      '(+/-) Outras Receitas/Despesas',
+      formatCurrency(dreData.outras_receitas_despesas || 0),
+      `${dreData.percentuais?.outras_receitas_despesas || 0}%`,
+    ],
+    [
+      '(=) LUCRO LÍQUIDO',
+      formatCurrency(dreData.lucro_liquido),
+      `${dreData.percentuais?.lucro_liquido || 0}%`,
+    ],
   ];
 
-  const csvContent = csvRows.map(row => 
-    row.map(field => `"${field}"`).join(',')
-  ).join('\n');
+  const csvContent = csvRows
+    .map(row => row.map(field => `"${field}"`).join(','))
+    .join('\n');
 
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
-  
+
   link.setAttribute('href', url);
   link.setAttribute('download', `DRE_${periodo.replace(/\s+/g, '_')}.csv`);
   link.style.visibility = 'hidden';
-  
+
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -60,7 +96,7 @@ export const exportReceitasToCSV = (receitas, periodo) => {
     ['RELATÓRIO DE RECEITAS'],
     [`Período: ${periodo}`],
     [''],
-    ['Data', 'Descrição', 'Categoria', 'Tipo', 'Valor', 'Unidade', 'Status']
+    ['Data', 'Descrição', 'Categoria', 'Tipo', 'Valor', 'Unidade', 'Status'],
   ];
 
   receitas.forEach(receita => {
@@ -71,7 +107,7 @@ export const exportReceitasToCSV = (receitas, periodo) => {
       receita.tipo,
       formatCurrency(receita.valor),
       receita.unit_name || 'N/A',
-      receita.status
+      receita.status,
     ]);
   });
 
@@ -80,18 +116,18 @@ export const exportReceitasToCSV = (receitas, periodo) => {
   csvRows.push(['', '', '', '', '', '', '']);
   csvRows.push(['TOTAL', '', '', '', formatCurrency(total), '', '']);
 
-  const csvContent = csvRows.map(row => 
-    row.map(field => `"${field}"`).join(',')
-  ).join('\n');
+  const csvContent = csvRows
+    .map(row => row.map(field => `"${field}"`).join(','))
+    .join('\n');
 
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
-  
+
   link.setAttribute('href', url);
   link.setAttribute('download', `Receitas_${periodo.replace(/\s+/g, '_')}.csv`);
   link.style.visibility = 'hidden';
-  
+
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -105,7 +141,7 @@ export const exportDespesasToCSV = (despesas, periodo) => {
     ['RELATÓRIO DE DESPESAS'],
     [`Período: ${periodo}`],
     [''],
-    ['Data', 'Descrição', 'Categoria', 'Tipo', 'Valor', 'Unidade', 'Status']
+    ['Data', 'Descrição', 'Categoria', 'Tipo', 'Valor', 'Unidade', 'Status'],
   ];
 
   despesas.forEach(despesa => {
@@ -116,7 +152,7 @@ export const exportDespesasToCSV = (despesas, periodo) => {
       despesa.tipo,
       formatCurrency(despesa.valor),
       despesa.unit_name || 'N/A',
-      despesa.status
+      despesa.status,
     ]);
   });
 
@@ -125,18 +161,18 @@ export const exportDespesasToCSV = (despesas, periodo) => {
   csvRows.push(['', '', '', '', '', '', '']);
   csvRows.push(['TOTAL', '', '', '', formatCurrency(total), '', '']);
 
-  const csvContent = csvRows.map(row => 
-    row.map(field => `"${field}"`).join(',')
-  ).join('\n');
+  const csvContent = csvRows
+    .map(row => row.map(field => `"${field}"`).join(','))
+    .join('\n');
 
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
-  
+
   link.setAttribute('href', url);
   link.setAttribute('download', `Despesas_${periodo.replace(/\s+/g, '_')}.csv`);
   link.style.visibility = 'hidden';
-  
+
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -289,10 +325,10 @@ export const generateHTMLReport = (dreData, receitas, despesas, periodo) => {
 /**
  * Helper para formatação de moeda
  */
-const formatCurrency = (value) => {
+const formatCurrency = value => {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
-    currency: 'BRL'
+    currency: 'BRL',
   }).format(value || 0);
 };
 
@@ -301,27 +337,29 @@ const formatCurrency = (value) => {
  */
 export const exportToCSV = (data, filename, headers) => {
   const csvRows = [headers];
-  
+
   data.forEach(row => {
     csvRows.push(row);
   });
 
-  const csvContent = csvRows.map(row => 
-    row.map(field => `"${field}"`).join(';') // Separador para Excel BR
-  ).join('\n');
+  const csvContent = csvRows
+    .map(
+      row => row.map(field => `"${field}"`).join(';') // Separador para Excel BR
+    )
+    .join('\n');
 
   const BOM = '\uFEFF'; // Byte Order Mark para UTF-8
-  const blob = new Blob([BOM + csvContent], { 
-    type: 'text/csv;charset=utf-8;' 
+  const blob = new Blob([BOM + csvContent], {
+    type: 'text/csv;charset=utf-8;',
   });
-  
+
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
-  
+
   link.setAttribute('href', url);
   link.setAttribute('download', `${filename}.csv`);
   link.style.visibility = 'hidden';
-  
+
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -330,7 +368,11 @@ export const exportToCSV = (data, filename, headers) => {
 /**
  * Exporta elemento HTML para PDF usando jsPDF e html2canvas
  */
-export const exportToPDF = async (elementId, filename, titulo = 'Relatório') => {
+export const exportToPDF = async (
+  elementId,
+  filename,
+  titulo = 'Relatório'
+) => {
   try {
     const element = document.getElementById(elementId);
     if (!element) {
@@ -342,68 +384,83 @@ export const exportToPDF = async (elementId, filename, titulo = 'Relatório') =>
       scale: 2,
       useCORS: true,
       allowTaint: true,
-      backgroundColor: '#ffffff'
+      backgroundColor: '#ffffff',
     });
 
     // Criar PDF
     const pdf = new jsPDF('p', 'mm', 'a4');
     const imgData = canvas.toDataURL('image/png');
-    
+
     // Dimensões da página A4
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
     const margin = 20;
-    
+
     // Calcular dimensões da imagem
-    const imgWidth = pageWidth - (margin * 2);
+    const imgWidth = pageWidth - margin * 2;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    
+
     // Header
     pdf.setFontSize(18);
     pdf.text('Barber Analytics Pro', margin, 20);
-    
+
     pdf.setFontSize(14);
     pdf.text(titulo, margin, 35);
-    
+
     pdf.setFontSize(10);
-    pdf.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, margin, 45);
-    
+    pdf.text(
+      `Gerado em: ${new Date().toLocaleDateString('pt-BR')}`,
+      margin,
+      45
+    );
+
     // Linha separadora
     pdf.line(margin, 50, pageWidth - margin, 50);
-    
+
     // Adicionar imagem do relatório
     let yPosition = 60;
-    
+
     if (imgHeight > pageHeight - 100) {
       // Se a imagem for muito alta, dividir em páginas
       const maxHeight = pageHeight - 100;
       let remainingHeight = imgHeight;
       let sourceY = 0;
-      
+
       while (remainingHeight > 0) {
         const currentHeight = Math.min(remainingHeight, maxHeight);
         const currentSourceHeight = (currentHeight * canvas.height) / imgHeight;
-        
+
         // Criar canvas temporário para a seção atual
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = canvas.width;
         tempCanvas.height = currentSourceHeight;
-        
+
         const tempCtx = tempCanvas.getContext('2d');
         tempCtx.drawImage(
           canvas,
-          0, sourceY,
-          canvas.width, currentSourceHeight,
-          0, 0,
-          canvas.width, currentSourceHeight
+          0,
+          sourceY,
+          canvas.width,
+          currentSourceHeight,
+          0,
+          0,
+          canvas.width,
+          currentSourceHeight
         );
-        
+
         const tempImgData = tempCanvas.toDataURL('image/png');
-        pdf.addImage(tempImgData, 'PNG', margin, yPosition, imgWidth, currentHeight);
-        
+        pdf.addImage(
+          tempImgData,
+          'PNG',
+          margin,
+          yPosition,
+          imgWidth,
+          currentHeight
+        );
+
         remainingHeight -= currentHeight;
         sourceY += currentSourceHeight;
-        
+
         if (remainingHeight > 0) {
           pdf.addPage();
           yPosition = 20;
@@ -412,7 +469,7 @@ export const exportToPDF = async (elementId, filename, titulo = 'Relatório') =>
     } else {
       pdf.addImage(imgData, 'PNG', margin, yPosition, imgWidth, imgHeight);
     }
-    
+
     // Footer
     const totalPages = pdf.internal.getNumberOfPages();
     for (let i = 1; i <= totalPages; i++) {
@@ -423,26 +480,21 @@ export const exportToPDF = async (elementId, filename, titulo = 'Relatório') =>
         pageWidth - margin - 30,
         pageHeight - 10
       );
-      pdf.text(
-        'Barber Analytics Pro © 2025',
-        margin,
-        pageHeight - 10
-      );
+      pdf.text('Barber Analytics Pro © 2025', margin, pageHeight - 10);
     }
-    
+
     // Salvar PDF
     pdf.save(`${filename}.pdf`);
-    
+
     return {
       success: true,
-      message: 'PDF exportado com sucesso!'
+      message: 'PDF exportado com sucesso!',
     };
-    
   } catch (error) {
     console.error('Erro ao exportar PDF:', error);
     return {
       success: false,
-      error: error.message
+      error: error.message,
     };
   }
 };
@@ -453,23 +505,29 @@ export const exportToPDF = async (elementId, filename, titulo = 'Relatório') =>
 export const exportToExcel = (dados, filename, abas = null) => {
   try {
     const workbook = XLSX.utils.book_new();
-    
+
     if (abas && Array.isArray(abas)) {
       // Múltiplas abas
       abas.forEach((aba, index) => {
         const worksheet = XLSX.utils.json_to_sheet(aba.dados);
-        
+
         // Configurar largura das colunas
         if (aba.colunas) {
-          worksheet['!cols'] = aba.colunas.map(col => ({ wch: col.width || 15 }));
+          worksheet['!cols'] = aba.colunas.map(col => ({
+            wch: col.width || 15,
+          }));
         }
-        
-        XLSX.utils.book_append_sheet(workbook, worksheet, aba.nome || `Aba${index + 1}`);
+
+        XLSX.utils.book_append_sheet(
+          workbook,
+          worksheet,
+          aba.nome || `Aba${index + 1}`
+        );
       });
     } else {
       // Aba única
       const worksheet = XLSX.utils.json_to_sheet(dados);
-      
+
       // Auto-ajustar largura das colunas
       const colWidths = {};
       dados.forEach(row => {
@@ -478,27 +536,26 @@ export const exportToExcel = (dados, filename, abas = null) => {
           colWidths[key] = Math.max(colWidths[key] || 10, value.length);
         });
       });
-      
+
       worksheet['!cols'] = Object.keys(colWidths).map(key => ({
-        wch: Math.min(colWidths[key] + 2, 50)
+        wch: Math.min(colWidths[key] + 2, 50),
       }));
-      
+
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Relatório');
     }
-    
+
     // Salvar arquivo
     XLSX.writeFile(workbook, `${filename}.xlsx`);
-    
+
     return {
       success: true,
-      message: 'Excel exportado com sucesso!'
+      message: 'Excel exportado com sucesso!',
     };
-    
   } catch (error) {
     console.error('Erro ao exportar Excel:', error);
     return {
       success: false,
-      error: error.message
+      error: error.message,
     };
   }
 };

@@ -13,7 +13,7 @@ import ImportExpensesFromOFXModal from '../../templates/ImportExpensesFromOFXMod
 
 /**
  * Tab de Conciliação Bancária
- * 
+ *
  * Features:
  * - ConciliacaoPanel para gerenciar matches automáticos
  * - ImportStatementModal para importação de extratos
@@ -24,7 +24,8 @@ const ConciliacaoTab = ({ globalFilters }) => {
   // Estado local
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
-  const [isImportExpensesOFXModalOpen, setIsImportExpensesOFXModalOpen] = useState(false);
+  const [isImportExpensesOFXModalOpen, setIsImportExpensesOFXModalOpen] =
+    useState(false);
 
   // Hooks para dados
   const {
@@ -34,7 +35,7 @@ const ConciliacaoTab = ({ globalFilters }) => {
     refetch: refetchMatches,
     runAutoMatch,
     confirmMatch,
-    rejectMatch
+    rejectMatch,
   } = useReconciliationMatches(globalFilters.accountId);
 
   const {
@@ -43,19 +44,19 @@ const ConciliacaoTab = ({ globalFilters }) => {
     loading: statementsLoading,
     error: statementsError,
     refetch: refetchStatements,
-    importStatements
+    importStatements,
   } = useBankStatements(globalFilters.accountId, null, null);
 
   const {
     bankAccounts: availableAccounts,
     loading: bankAccountsLoading,
-    updateFilters: updateBankAccountFilters
+    updateFilters: updateBankAccountFilters,
   } = useBankAccounts({ unitId: globalFilters.unitId, incluirInativas: false });
 
   useEffect(() => {
     updateBankAccountFilters({
       unitId: globalFilters.unitId,
-      incluirInativas: false
+      incluirInativas: false,
     });
   }, [globalFilters.unitId, updateBankAccountFilters]);
 
@@ -65,15 +66,18 @@ const ConciliacaoTab = ({ globalFilters }) => {
     refetchMatches();
   }, [refetchMatches]);
 
-  const handleImportExpensesOFXSuccess = useCallback((report) => {
-    setIsImportExpensesOFXModalOpen(false);
-    refetchMatches();
-    refetchStatements();
-    console.log('✅ Importação OFX concluída:', report);
-  }, [refetchMatches, refetchStatements]);
+  const handleImportExpensesOFXSuccess = useCallback(
+    report => {
+      setIsImportExpensesOFXModalOpen(false);
+      refetchMatches();
+      refetchStatements();
+      console.log('✅ Importação OFX concluída:', report);
+    },
+    [refetchMatches, refetchStatements]
+  );
 
   const handleImport = useCallback(
-    (payload) => importStatements(payload),
+    payload => importStatements(payload),
     [importStatements]
   );
 
@@ -113,7 +117,8 @@ const ConciliacaoTab = ({ globalFilters }) => {
               Conciliação Bancária
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              Gerencie a conciliação entre extratos bancários e lançamentos financeiros
+              Gerencie a conciliação entre extratos bancários e lançamentos
+              financeiros
             </p>
           </div>
 
@@ -150,7 +155,8 @@ const ConciliacaoTab = ({ globalFilters }) => {
         {!globalFilters.accountId && (
           <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
             <p className="text-sm text-yellow-800 dark:text-yellow-300">
-              Selecione uma conta bancária nos filtros globais para utilizar a conciliação.
+              Selecione uma conta bancária nos filtros globais para utilizar a
+              conciliação.
             </p>
           </div>
         )}
@@ -163,12 +169,14 @@ const ConciliacaoTab = ({ globalFilters }) => {
           reconciliationMatches={matches}
           bankTransactions={statements}
           internalTransactions={unreconciled}
-          selectedAccount={availableAccounts.find(acc => acc.id === globalFilters.accountId) || { id: globalFilters.accountId, nome: 'Conta Selecionada' }}
-          
+          selectedAccount={
+            availableAccounts.find(
+              acc => acc.id === globalFilters.accountId
+            ) || { id: globalFilters.accountId, nome: 'Conta Selecionada' }
+          }
           // Estados
           loading={matchesLoading || statementsLoading}
           error={matchesError || statementsError}
-          
           // Callbacks
           onApproveMatch={handleConfirmMatch}
           onRejectMatch={handleRejectMatch}
@@ -183,13 +191,15 @@ const ConciliacaoTab = ({ globalFilters }) => {
       ) : (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-12">
           <div className="text-center">
-            <div className="text-gray-400 dark:text-gray-500 text-6xl mb-4">🏦</div>
+            <div className="text-gray-400 dark:text-gray-500 text-6xl mb-4">
+              🏦
+            </div>
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
               Nenhuma conta selecionada
             </h3>
             <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
-              Para utilizar a conciliação bancária, você precisa primeiro selecionar 
-              uma conta bancária nos filtros globais da página.
+              Para utilizar a conciliação bancária, você precisa primeiro
+              selecionar uma conta bancária nos filtros globais da página.
             </p>
           </div>
         </div>
@@ -231,7 +241,9 @@ const ConciliacaoTab = ({ globalFilters }) => {
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-xl border border-gray-200 dark:border-gray-700">
             <div className="flex items-center space-x-3">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 dark:border-blue-400"></div>
-              <span className="text-gray-900 dark:text-white">Carregando dados de conciliação...</span>
+              <span className="text-gray-900 dark:text-white">
+                Carregando dados de conciliação...
+              </span>
             </div>
           </div>
         </div>

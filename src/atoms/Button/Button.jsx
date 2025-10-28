@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Loader2 } from 'lucide-react';
 
 const Button = ({
@@ -59,6 +60,86 @@ const Button = ({
       {children}
     </button>
   );
+};
+
+Button.propTypes = {
+  /** Conteúdo do botão (texto ou elementos JSX) */
+  children: PropTypes.node.isRequired,
+
+  /** Variante visual do botão */
+  variant: PropTypes.oneOf([
+    'primary',
+    'secondary',
+    'success',
+    'error',
+    'danger',
+    'warning',
+    'ghost',
+    'outline',
+  ]),
+
+  /** Tamanho do botão */
+  size: PropTypes.oneOf(['sm', 'md', 'lg', 'xl']),
+
+  /** Se o botão está desabilitado */
+  disabled: PropTypes.bool,
+
+  /** Se o botão está em estado de carregamento */
+  loading: PropTypes.bool,
+
+  /** Componente de ícone do Lucide React ou similar */
+  icon: PropTypes.elementType,
+
+  /** Classes CSS adicionais */
+  className: PropTypes.string,
+
+  /** Tipo do botão HTML */
+  type: PropTypes.oneOf(['button', 'submit', 'reset']),
+
+  /** Callback executado ao clicar no botão */
+  onClick: PropTypes.func,
+
+  /** ID do elemento HTML */
+  id: PropTypes.string,
+
+  /** Nome do botão para formulários */
+  name: PropTypes.string,
+
+  /** Valor do botão para formulários */
+  value: PropTypes.string,
+
+  /** Texto de acessibilidade */
+  'aria-label': PropTypes.string,
+
+  /** Descrição detalhada para acessibilidade */
+  'aria-describedby': PropTypes.string,
+
+  /** Indica se o botão controla um elemento expandido */
+  'aria-expanded': PropTypes.bool,
+
+  /** Indica se o botão controla um popup */
+  'aria-haspopup': PropTypes.oneOfType([
+    PropTypes.bool,
+    PropTypes.oneOf(['menu', 'listbox', 'tree', 'grid', 'dialog']),
+  ]),
+};
+
+Button.defaultProps = {
+  variant: 'primary',
+  size: 'md',
+  disabled: false,
+  loading: false,
+  icon: null,
+  className: '',
+  type: 'button',
+  onClick: undefined,
+  id: undefined,
+  name: undefined,
+  value: undefined,
+  'aria-label': undefined,
+  'aria-describedby': undefined,
+  'aria-expanded': undefined,
+  'aria-haspopup': undefined,
 };
 
 export { Button };

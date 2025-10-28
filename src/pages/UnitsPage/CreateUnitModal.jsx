@@ -1,6 +1,6 @@
 /**
  * CREATE UNIT MODAL
- * 
+ *
  * Modal para criação de nova unidade
  */
 
@@ -9,12 +9,7 @@ import { Button, Input } from '../../atoms';
 import { useUnits } from '../../hooks';
 
 // Icons
-import {
-  X,
-  Building2,
-  Check,
-  AlertTriangle
-} from 'lucide-react';
+import { X, Building2, Check, AlertTriangle } from 'lucide-react';
 
 const CreateUnitModal = ({ isOpen, onClose, onSuccess }) => {
   const { createUnit, creating } = useUnits(false);
@@ -22,7 +17,7 @@ const CreateUnitModal = ({ isOpen, onClose, onSuccess }) => {
   // Estado do formulário
   const [formData, setFormData] = useState({
     name: '',
-    status: true
+    status: true,
   });
 
   const [errors, setErrors] = useState({});
@@ -45,32 +40,34 @@ const CreateUnitModal = ({ isOpen, onClose, onSuccess }) => {
   };
 
   // Handlers
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
 
     // Limpar erro do campo ao digitar
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
-        [name]: ''
+        [name]: '',
       }));
     }
   };
 
-  const handleInputBlur = (field) => {
+  const handleInputBlur = field => {
     setTouched(prev => ({ ...prev, [field]: true }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     // Marcar todos os campos como touched
     const allFields = Object.keys(formData);
-    setTouched(allFields.reduce((acc, field) => ({ ...acc, [field]: true }), {}));
+    setTouched(
+      allFields.reduce((acc, field) => ({ ...acc, [field]: true }), {})
+    );
 
     if (!validateForm()) {
       return;
@@ -79,13 +76,13 @@ const CreateUnitModal = ({ isOpen, onClose, onSuccess }) => {
     try {
       await createUnit({
         name: formData.name.trim(),
-        status: formData.status
+        status: formData.status,
       });
 
       // Reset form
       setFormData({
         name: '',
-        status: true
+        status: true,
       });
       setErrors({});
       setTouched({});
@@ -102,11 +99,11 @@ const CreateUnitModal = ({ isOpen, onClose, onSuccess }) => {
     // Reset form
     setFormData({
       name: '',
-      status: true
+      status: true,
     });
     setErrors({});
     setTouched({});
-    
+
     onClose();
   };
 
@@ -151,7 +148,10 @@ const CreateUnitModal = ({ isOpen, onClose, onSuccess }) => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Nome da Unidade */}
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
                 Nome da Unidade *
               </label>
               <Input
@@ -204,8 +204,14 @@ const CreateUnitModal = ({ isOpen, onClose, onSuccess }) => {
                     Informações importantes:
                   </p>
                   <ul className="text-blue-700 dark:text-blue-400 space-y-1">
-                    <li>• A unidade será disponibilizada para cadastro de profissionais</li>
-                    <li>• Você poderá configurar detalhes adicionais após a criação</li>
+                    <li>
+                      • A unidade será disponibilizada para cadastro de
+                      profissionais
+                    </li>
+                    <li>
+                      • Você poderá configurar detalhes adicionais após a
+                      criação
+                    </li>
                     <li>• O nome pode ser alterado posteriormente</li>
                   </ul>
                 </div>
@@ -222,7 +228,7 @@ const CreateUnitModal = ({ isOpen, onClose, onSuccess }) => {
               >
                 Cancelar
               </Button>
-              
+
               <Button
                 type="submit"
                 variant="primary"

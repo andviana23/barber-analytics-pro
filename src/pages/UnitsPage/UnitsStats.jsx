@@ -1,6 +1,6 @@
 /**
  * UNITS STATS COMPONENT
- * 
+ *
  * Componente para exibir estatísticas detalhadas das unidades
  */
 
@@ -15,43 +15,62 @@ import {
   DollarSign,
   BarChart3,
   Trophy,
-  TrendingUp
+  TrendingUp,
 } from 'lucide-react';
 
 const UnitsStats = ({ units = [], loading = false }) => {
-  const formatCurrency = (value) => {
+  const formatCurrency = value => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
-      currency: 'BRL'
+      currency: 'BRL',
     }).format(value || 0);
   };
 
   // Calcular estatísticas globais
-  const globalStats = units.reduce((acc, unit) => {
-    if (!unit.stats) return acc;
-    
-    return {
-      totalRevenue: acc.totalRevenue + (unit.stats.financial?.monthlyRevenue || 0),
-      totalExpenses: acc.totalExpenses + (unit.stats.financial?.monthlyExpenses || 0),
-      totalProfessionals: acc.totalProfessionals + (unit.stats.professionals?.total || 0),
-      totalAttendances: acc.totalAttendances + (unit.stats.attendances?.count || 0)
-    };
-  }, { totalRevenue: 0, totalExpenses: 0, totalProfessionals: 0, totalAttendances: 0 });
+  const globalStats = units.reduce(
+    (acc, unit) => {
+      if (!unit.stats) return acc;
+
+      return {
+        totalRevenue:
+          acc.totalRevenue + (unit.stats.financial?.monthlyRevenue || 0),
+        totalExpenses:
+          acc.totalExpenses + (unit.stats.financial?.monthlyExpenses || 0),
+        totalProfessionals:
+          acc.totalProfessionals + (unit.stats.professionals?.total || 0),
+        totalAttendances:
+          acc.totalAttendances + (unit.stats.attendances?.count || 0),
+      };
+    },
+    {
+      totalRevenue: 0,
+      totalExpenses: 0,
+      totalProfessionals: 0,
+      totalAttendances: 0,
+    }
+  );
 
   const globalProfit = globalStats.totalRevenue - globalStats.totalExpenses;
-  const averageTicket = globalStats.totalAttendances > 0 
-    ? globalStats.totalRevenue / globalStats.totalAttendances 
-    : 0;
+  const averageTicket =
+    globalStats.totalAttendances > 0
+      ? globalStats.totalRevenue / globalStats.totalAttendances
+      : 0;
 
   // Encontrar melhor unidade por diferentes métricas
   const topUnitByRevenue = units.reduce((best, unit) => {
     if (!unit.stats || !best.stats) return unit.stats ? unit : best;
-    return (unit.stats.financial?.monthlyRevenue || 0) > (best.stats.financial?.monthlyRevenue || 0) ? unit : best;
+    return (unit.stats.financial?.monthlyRevenue || 0) >
+      (best.stats.financial?.monthlyRevenue || 0)
+      ? unit
+      : best;
   }, units[0]);
 
   const topUnitByAttendances = units.reduce((best, unit) => {
     if (!unit.stats || !best.stats) return unit.stats ? unit : best;
-    return (unit.stats.attendances?.count || 0) > (best.stats.attendances?.count || 0) ? unit : best;
+    return (unit.stats.attendances?.count || 0) >
+      (best.stats.attendances?.count || 0)
+      ? unit
+      : best;
   }, units[0]);
 
   if (loading) {
@@ -100,9 +119,10 @@ const UnitsStats = ({ units = [], loading = false }) => {
             value={formatCurrency(globalProfit)}
             icon={<TrendingUp className="h-6 w-6" />}
             trend={{ value: 0, isPositive: globalProfit >= 0 }}
-            className={`${globalProfit >= 0 
-              ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800' 
-              : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+            className={`${
+              globalProfit >= 0
+                ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
+                : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
             }`}
           />
 
@@ -146,10 +166,13 @@ const UnitsStats = ({ units = [], loading = false }) => {
                 </div>
                 <div className="text-right">
                   <div className="text-2xl font-bold text-green-600">
-                    {formatCurrency(topUnitByRevenue.stats.financial.monthlyRevenue)}
+                    {formatCurrency(
+                      topUnitByRevenue.stats.financial.monthlyRevenue
+                    )}
                   </div>
                   <div className="text-sm text-green-700 dark:text-green-300">
-                    Lucro: {formatCurrency(topUnitByRevenue.stats.financial.profit)}
+                    Lucro:{' '}
+                    {formatCurrency(topUnitByRevenue.stats.financial.profit)}
                   </div>
                 </div>
               </div>
@@ -175,7 +198,10 @@ const UnitsStats = ({ units = [], loading = false }) => {
                     {topUnitByAttendances.stats.attendances.count}
                   </div>
                   <div className="text-sm text-blue-700 dark:text-blue-300">
-                    Ticket: {formatCurrency(topUnitByAttendances.stats.attendances.averageTicket)}
+                    Ticket:{' '}
+                    {formatCurrency(
+                      topUnitByAttendances.stats.attendances.averageTicket
+                    )}
                   </div>
                 </div>
               </div>
@@ -190,7 +216,7 @@ const UnitsStats = ({ units = [], loading = false }) => {
           Desempenho por Unidade
         </h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {units.map((unit) => (
+          {units.map(unit => (
             <Card key={unit.id} className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
@@ -204,11 +230,13 @@ const UnitsStats = ({ units = [], loading = false }) => {
                     </p>
                   </div>
                 </div>
-                <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  unit.status 
-                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                    : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                }`}>
+                <div
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    unit.status
+                      ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                      : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                  }`}
+                >
                   {unit.status ? 'Ativa' : 'Inativa'}
                 </div>
               </div>
@@ -237,9 +265,13 @@ const UnitsStats = ({ units = [], loading = false }) => {
                     <div className="text-sm text-gray-600 dark:text-gray-400">
                       Lucro
                     </div>
-                    <div className={`text-lg font-semibold ${
-                      unit.stats.financial.profit >= 0 ? 'text-green-600' : 'text-red-600'
-                    }`}>
+                    <div
+                      className={`text-lg font-semibold ${
+                        unit.stats.financial.profit >= 0
+                          ? 'text-green-600'
+                          : 'text-red-600'
+                      }`}
+                    >
                       {formatCurrency(unit.stats.financial.profit)}
                     </div>
                   </div>

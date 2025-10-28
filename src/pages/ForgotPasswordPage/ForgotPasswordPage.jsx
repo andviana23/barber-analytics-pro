@@ -5,13 +5,13 @@ import { useAuth } from '../../context/AuthContext';
 
 export function ForgotPasswordPage() {
   const { resetPassword } = useAuth();
-  
+
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     setEmail(e.target.value);
     if (error) setError('');
   };
@@ -28,9 +28,9 @@ export function ForgotPasswordPage() {
     return true;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setIsLoading(true);
@@ -38,14 +38,16 @@ export function ForgotPasswordPage() {
 
     try {
       const { error: authError } = await resetPassword(email);
-      
+
       if (authError) {
-        setError(authError.message || 'Erro ao enviar email de recuperação. Tente novamente.');
+        setError(
+          authError.message ||
+            'Erro ao enviar email de recuperação. Tente novamente.'
+        );
         return;
       }
-      
+
       setSuccess(true);
-      
     } catch {
       setError('Erro ao enviar email de recuperação. Tente novamente.');
     } finally {
@@ -65,7 +67,8 @@ export function ForgotPasswordPage() {
               Email enviado!
             </h2>
             <p className="text-text-light-secondary dark:text-text-dark-secondary mb-6">
-              Verifique sua caixa de entrada e siga as instruções para redefinir sua senha.
+              Verifique sua caixa de entrada e siga as instruções para redefinir
+              sua senha.
             </p>
             <div className="space-y-3">
               <Link
@@ -111,8 +114,8 @@ export function ForgotPasswordPage() {
           <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Email Field */}
             <div>
-              <label 
-                htmlFor="email" 
+              <label
+                htmlFor="email"
                 className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2"
               >
                 Email
@@ -178,7 +181,8 @@ export function ForgotPasswordPage() {
         <div className="bg-info/10 border border-info/20 rounded-lg p-4 text-center">
           <p className="text-info font-medium mb-2">Precisa de ajuda?</p>
           <p className="text-text-light-secondary dark:text-text-dark-secondary text-sm">
-            Se você não receber o email em alguns minutos, verifique sua pasta de spam ou entre em contato com o suporte.
+            Se você não receber o email em alguns minutos, verifique sua pasta
+            de spam ou entre em contato com o suporte.
           </p>
         </div>
       </div>

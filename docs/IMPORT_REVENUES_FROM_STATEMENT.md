@@ -28,19 +28,19 @@ Automatizar a entrada de receitas a partir de extratos bancários, reduzindo tra
 
 ## 🧱 Arquitetura
 
-| Camada | Componentes |
-|--------|-------------|
-| 🎨 UI | `ImportStatementModal`, `ImportReviewModal`, `ReconciliationMatchCard` |
-| 🤖 Services | `importRevenueFromStatement.js`, `reconciliationService.js`, `bankFileParser.js` |
-| 🧠 Domain | DTOs (`revenueDTO`, `bankStatementDTO`) + `duplicateDetector.js` |
-| 🗄️ Infra | `revenueRepository`, `bankStatementRepository`, Supabase (tabelas `revenues`, `bank_statements`) |
+| Camada      | Componentes                                                                                      |
+| ----------- | ------------------------------------------------------------------------------------------------ |
+| 🎨 UI       | `ImportStatementModal`, `ImportReviewModal`, `ReconciliationMatchCard`                           |
+| 🤖 Services | `importRevenueFromStatement.js`, `reconciliationService.js`, `bankFileParser.js`                 |
+| 🧠 Domain   | DTOs (`revenueDTO`, `bankStatementDTO`) + `duplicateDetector.js`                                 |
+| 🗄️ Infra    | `revenueRepository`, `bankStatementRepository`, Supabase (tabelas `revenues`, `bank_statements`) |
 
 ---
 
 ## 📥 Upload & Validação
 
 - Formatos aceitos: `.xlsx`, `.xls`, `.csv`, `.ofx`.
-- Colunas obrigatórias: **Data**, **Descrição**, **Valor**, **Tipo** (C/D).  
+- Colunas obrigatórias: **Data**, **Descrição**, **Valor**, **Tipo** (C/D).
 - Colunas opcionais: **Item**, **Documento**.
 - Funções chave: `readExcelFile`, `validateHeaders`, `normalizeData`.
 
@@ -49,8 +49,8 @@ const mapping = {
   date: ['Data', 'DATE', 'Data Lançamento'],
   description: ['Descrição', 'Histórico'],
   value: ['Valor', 'VALUE', 'Valor R$'],
-  type: ['Tipo', 'C/D']
-}
+  type: ['Tipo', 'C/D'],
+};
 ```
 
 ---
@@ -85,7 +85,6 @@ const mapping = {
 
 ## 📌 Próximos Passos
 
-1. Suporte a importação de débitos para automatizar despesas.  
-2. Integração com APIs bancárias para sincronização contínua.  
+1. Suporte a importação de débitos para automatizar despesas.
+2. Integração com APIs bancárias para sincronização contínua.
 3. Relatórios de auditoria (importações aprovadas, rejeitadas, pendentes).
-

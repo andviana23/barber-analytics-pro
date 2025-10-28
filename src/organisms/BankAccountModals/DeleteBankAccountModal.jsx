@@ -1,6 +1,6 @@
 /**
  * DELETE BANK ACCOUNT MODAL
- * 
+ *
  * Modal para confirmação de exclusão de conta bancária
  */
 
@@ -10,14 +10,14 @@ import { useBankAccounts } from '../../hooks';
 import { useToast } from '../../context';
 
 // Icons
-import {
-  X,
-  AlertTriangle,
-  Trash2,
-  CreditCard
-} from 'lucide-react';
+import { X, AlertTriangle, Trash2, CreditCard } from 'lucide-react';
 
-const DeleteBankAccountModal = ({ isOpen, onClose, onSuccess, account = null }) => {
+const DeleteBankAccountModal = ({
+  isOpen,
+  onClose,
+  onSuccess,
+  account = null,
+}) => {
   const { deleteBankAccount, loading } = useBankAccounts();
   const { showSuccess, showError } = useToast();
   const [confirmText, setConfirmText] = useState('');
@@ -36,7 +36,7 @@ const DeleteBankAccountModal = ({ isOpen, onClose, onSuccess, account = null }) 
 
     try {
       await deleteBankAccount(account.id);
-      
+
       showSuccess(
         'Conta bancária excluída',
         `A conta ${account.name} foi excluída com sucesso.`
@@ -46,16 +46,13 @@ const DeleteBankAccountModal = ({ isOpen, onClose, onSuccess, account = null }) 
       onSuccess?.(account);
       onClose();
     } catch (error) {
-      showError(
-        'Erro ao excluir conta',
-        error.message
-      );
+      showError('Erro ao excluir conta', error.message);
     }
   };
 
   const handleClose = () => {
     if (loading) return;
-    
+
     setConfirmText('');
     onClose();
   };
@@ -68,11 +65,10 @@ const DeleteBankAccountModal = ({ isOpen, onClose, onSuccess, account = null }) 
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Overlay */}
       <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" />
-      
+
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
         <div className="relative w-full max-w-md transform rounded-lg bg-white dark:bg-gray-800 shadow-xl transition-all">
-          
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3">
@@ -88,7 +84,7 @@ const DeleteBankAccountModal = ({ isOpen, onClose, onSuccess, account = null }) 
                 </p>
               </div>
             </div>
-            
+
             <Button
               variant="ghost"
               size="sm"
@@ -102,7 +98,6 @@ const DeleteBankAccountModal = ({ isOpen, onClose, onSuccess, account = null }) 
 
           {/* Content */}
           <div className="p-6 space-y-4">
-            
             {/* Account info */}
             <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <CreditCard className="w-5 h-5 text-gray-600 dark:text-gray-400 mt-0.5" />
@@ -129,8 +124,9 @@ const DeleteBankAccountModal = ({ isOpen, onClose, onSuccess, account = null }) 
                   Atenção!
                 </h4>
                 <p className="text-sm text-red-700 dark:text-red-300 mt-1">
-                  A conta será desativada permanentemente. Ela não aparecerá mais nas listagens,
-                  mas os dados históricos serão preservados no sistema.
+                  A conta será desativada permanentemente. Ela não aparecerá
+                  mais nas listagens, mas os dados históricos serão preservados
+                  no sistema.
                 </p>
               </div>
             </div>
@@ -138,21 +134,23 @@ const DeleteBankAccountModal = ({ isOpen, onClose, onSuccess, account = null }) 
             {/* Confirmation */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Para confirmar, digite o nome da conta: <strong>{account.name}</strong>
+                Para confirmar, digite o nome da conta:{' '}
+                <strong>{account.name}</strong>
               </label>
               <input
                 type="text"
                 value={confirmText}
-                onChange={(e) => setConfirmText(e.target.value)}
+                onChange={e => setConfirmText(e.target.value)}
                 placeholder={account.name}
                 disabled={loading}
                 className={`
                   w-full px-3 py-2 border rounded-md shadow-sm
                   focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
                   disabled:bg-gray-50 disabled:text-gray-500
-                  ${isConfirmValid 
-                    ? 'border-green-300 bg-green-50 dark:bg-green-900/20 dark:border-green-700' 
-                    : 'border-gray-300 dark:border-gray-600'
+                  ${
+                    isConfirmValid
+                      ? 'border-green-300 bg-green-50 dark:bg-green-900/20 dark:border-green-700'
+                      : 'border-gray-300 dark:border-gray-600'
                   }
                   bg-white dark:bg-gray-700 text-gray-900 dark:text-white
                 `}
@@ -175,7 +173,7 @@ const DeleteBankAccountModal = ({ isOpen, onClose, onSuccess, account = null }) 
               >
                 Cancelar
               </Button>
-              
+
               <Button
                 type="button"
                 variant="danger"

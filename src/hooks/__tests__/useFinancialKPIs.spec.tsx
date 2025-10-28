@@ -44,9 +44,7 @@ const createWrapper = () => {
   });
 
   return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
 };
 
@@ -63,7 +61,8 @@ describe('useFinancialKPIs', () => {
 
     // Mock: Período atual melhor que anterior
     mockFinanceiroService.getKPIs
-      .mockResolvedValueOnce({ // Primeira chamada - período atual
+      .mockResolvedValueOnce({
+        // Primeira chamada - período atual
         success: true,
         data: {
           current_period: {
@@ -75,7 +74,8 @@ describe('useFinancialKPIs', () => {
           },
         },
       })
-      .mockResolvedValueOnce({ // Segunda chamada - período anterior
+      .mockResolvedValueOnce({
+        // Segunda chamada - período anterior
         success: true,
         data: {
           current_period: {
@@ -127,14 +127,23 @@ describe('useFinancialKPIs', () => {
 
     // Verificar que service foi chamado duas vezes
     expect(mockFinanceiroService.getKPIs).toHaveBeenCalledTimes(2);
-    expect(mockFinanceiroService.getKPIs).toHaveBeenNthCalledWith(1, unitId, currentPeriod);
-    expect(mockFinanceiroService.getKPIs).toHaveBeenNthCalledWith(2, unitId, previousPeriod);
+    expect(mockFinanceiroService.getKPIs).toHaveBeenNthCalledWith(
+      1,
+      unitId,
+      currentPeriod
+    );
+    expect(mockFinanceiroService.getKPIs).toHaveBeenNthCalledWith(
+      2,
+      unitId,
+      previousPeriod
+    );
   });
 
   it('deve calcular trends de declínio corretamente', async () => {
     // Arrange - Período atual pior que anterior
     mockFinanceiroService.getKPIs
-      .mockResolvedValueOnce({ // Período atual
+      .mockResolvedValueOnce({
+        // Período atual
         success: true,
         data: {
           current_period: {
@@ -144,7 +153,8 @@ describe('useFinancialKPIs', () => {
           },
         },
       })
-      .mockResolvedValueOnce({ // Período anterior
+      .mockResolvedValueOnce({
+        // Período anterior
         success: true,
         data: {
           current_period: {
@@ -292,12 +302,12 @@ describe('useFinancialKPIs', () => {
     const wrapper = createWrapper();
     const { result, rerender } = renderHook(
       ({ unitId, period }) => useFinancialKPIs(unitId, period),
-      { 
+      {
         wrapper,
-        initialProps: { 
-          unitId: 'unit-123', 
-          period: '2025-01' 
-        }
+        initialProps: {
+          unitId: 'unit-123',
+          period: '2025-01',
+        },
       }
     );
 
@@ -312,7 +322,10 @@ describe('useFinancialKPIs', () => {
 
     // Assert
     await waitFor(() => {
-      expect(mockFinanceiroService.getKPIs).toHaveBeenCalledWith('unit-456', '2025-01');
+      expect(mockFinanceiroService.getKPIs).toHaveBeenCalledWith(
+        'unit-456',
+        '2025-01'
+      );
     });
   });
 

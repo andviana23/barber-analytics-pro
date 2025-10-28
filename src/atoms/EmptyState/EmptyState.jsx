@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  FileX, 
+import {
+  FileX,
   Search,
   Users,
   Calendar,
@@ -11,7 +11,7 @@ import {
   Wifi,
   AlertCircle,
   RefreshCw,
-  Plus
+  Plus,
 } from 'lucide-react';
 import { AnimatedButton } from '../../utils/animations';
 
@@ -24,28 +24,28 @@ const emptyStateIcons = {
   reports: BarChart3,
   settings: Settings,
   connection: Wifi,
-  error: AlertCircle
+  error: AlertCircle,
 };
 
 const emptyStateVariants = {
   initial: {
     opacity: 0,
-    y: 20
+    y: 20,
   },
   animate: {
     opacity: 1,
     y: 0,
     transition: {
       duration: 0.5,
-      ease: 'easeOut'
-    }
-  }
+      ease: 'easeOut',
+    },
+  },
 };
 
 const illustrationVariants = {
   initial: {
     scale: 0.8,
-    opacity: 0
+    opacity: 0,
   },
   animate: {
     scale: 1,
@@ -53,9 +53,9 @@ const illustrationVariants = {
     transition: {
       delay: 0.2,
       duration: 0.6,
-      ease: 'backOut'
-    }
-  }
+      ease: 'backOut',
+    },
+  },
 };
 
 export function EmptyState({
@@ -67,32 +67,32 @@ export function EmptyState({
   icon: CustomIcon,
   illustration,
   size = 'medium',
-  className = ''
+  className = '',
 }) {
   const Icon = CustomIcon || emptyStateIcons[type];
-  
+
   const sizeClasses = {
     small: {
       container: 'py-8 px-4',
       icon: 'w-12 h-12',
       title: 'text-lg',
       description: 'text-sm',
-      button: 'px-4 py-2 text-sm'
+      button: 'px-4 py-2 text-sm',
     },
     medium: {
       container: 'py-12 px-6',
       icon: 'w-16 h-16',
       title: 'text-xl',
       description: 'text-base',
-      button: 'px-6 py-3'
+      button: 'px-6 py-3',
     },
     large: {
       container: 'py-16 px-8',
       icon: 'w-20 h-20',
       title: 'text-2xl',
       description: 'text-lg',
-      button: 'px-8 py-4'
-    }
+      button: 'px-8 py-4',
+    },
   };
 
   const classes = sizeClasses[size];
@@ -120,26 +120,32 @@ export function EmptyState({
         {illustration ? (
           <div className="text-4xl">{illustration}</div>
         ) : (
-          <Icon className={`${classes.icon} text-text-light-secondary dark:text-text-dark-secondary`} />
+          <Icon
+            className={`${classes.icon} text-text-light-secondary dark:text-text-dark-secondary`}
+          />
         )}
       </motion.div>
 
       {/* Title */}
       {title && (
-        <h3 className={`
+        <h3
+          className={`
           font-semibold text-text-light-primary dark:text-text-dark-primary mb-2
           ${classes.title}
-        `}>
+        `}
+        >
           {title}
         </h3>
       )}
 
       {/* Description */}
       {description && (
-        <p className={`
+        <p
+          className={`
           text-text-light-secondary dark:text-text-dark-secondary mb-6 leading-relaxed
           ${classes.description}
-        `}>
+        `}
+        >
           {description}
         </p>
       )}
@@ -163,13 +169,22 @@ export function EmptyState({
 }
 
 // Estados específicos pré-configurados
-export function NoDataState({ title, description, onRefresh, onAdd, addLabel = "Adicionar" }) {
+export function NoDataState({
+  title,
+  description,
+  onRefresh,
+  onAdd,
+  addLabel = 'Adicionar',
+}) {
   return (
     <div className="space-y-4">
       <EmptyState
         type="data"
-        title={title || "Nenhum dado encontrado"}
-        description={description || "Não há informações disponíveis para exibir no momento."}
+        title={title || 'Nenhum dado encontrado'}
+        description={
+          description ||
+          'Não há informações disponíveis para exibir no momento.'
+        }
         illustration="📊"
         size="medium"
       />
@@ -211,11 +226,11 @@ export function SearchEmptyState({ query, onClear }) {
   );
 }
 
-export function ErrorState({ 
-  title = "Algo deu errado",
-  description = "Ocorreu um erro ao carregar os dados. Tente novamente.",
+export function ErrorState({
+  title = 'Algo deu errado',
+  description = 'Ocorreu um erro ao carregar os dados. Tente novamente.',
   onRetry,
-  onSupport
+  onSupport,
 }) {
   return (
     <div className="space-y-4">
@@ -249,7 +264,7 @@ export function ErrorState({
   );
 }
 
-export function LoadingState({ message = "Carregando..." }) {
+export function LoadingState({ message = 'Carregando...' }) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -258,7 +273,7 @@ export function LoadingState({ message = "Carregando..." }) {
     >
       <motion.div
         animate={{ rotate: 360 }}
-        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+        transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
         className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full mb-4"
       />
       <p className="text-text-light-secondary dark:text-text-dark-secondary text-sm">

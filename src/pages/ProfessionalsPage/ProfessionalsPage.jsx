@@ -1,9 +1,21 @@
 import React, { useState } from 'react';
 import { Card } from '../../atoms';
 import { useProfissionais } from '../../hooks/useProfissionais';
+import { EditProfessionalModal } from './components/EditProfessionalModal';
 import { useUnits } from '../../hooks/useUnits';
 import { useToast } from '../../context/ToastContext';
 import { useUnit } from '../../context/UnitContext';
+import {
+  Users,
+  UserCheck,
+  Shield,
+  Plus,
+  Edit,
+  Power,
+  Trash2,
+  Briefcase,
+  Search,
+} from 'lucide-react';
 
 /**
  * @file ProfessionalsPage.jsx
@@ -13,9 +25,8 @@ import { useUnit } from '../../context/UnitContext';
  * @date 2024-10-18
  *
  * @description
- * Página simplificada focada exclusivamente no cadastro de profissionais.
- * Remove a complexidade de gerenciamento de usuários e foca na experiência
- * de cadastro e edição de profissionais.
+ * Página refatorada seguindo Design System com tokens Zinc,
+ * UI/UX melhorada e layout em lista responsivo.
  */
 
 const ProfessionalsPage = () => {
@@ -31,13 +42,27 @@ const ProfessionalsPage = () => {
     deleteProfissional,
     totalProfissionais,
     profissionaisAtivos,
+    refresh,
   } = useProfissionais();
 
   const { units, loading: unitsLoading } = useUnits();
-
+  const [searchTerm, setSearchTerm] = useState('');
   const [selectedProfissional, setSelectedProfissional] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+
+  // ✅ Filtro por unidade selecionada + busca
+  const filteredProfissionais = profissionais.filter(p => {
+    // Filtrar pela unidade selecionada (se houver)
+    const matchesUnit = selectedUnit ? p.unit_id === selectedUnit.id : true;
+
+    // Filtrar pelo termo de busca
+    const matchesSearch = p.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    return matchesUnit && matchesSearch;
+  });
 
   // Função para abrir modal de criação
   const handleCreateProfissional = () => {
@@ -108,334 +133,298 @@ const ProfessionalsPage = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 md:p-6 space-y-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Cadastro de Profissionais
+          <h1 className="text-2xl md:text-3xl font-bold text-theme-primary">
+            Profissionais
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Gerencie os profissionais da sua barbearia
+          <p className="text-theme-secondary text-sm md:text-base mt-1">
+            Gerencie a equipe da sua barbearia
           </p>
         </div>
 
         <button
           onClick={handleCreateProfissional}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+          className="btn-theme-primary px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all"
         >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 4v16m8-8H4"
-            />
-          </svg>
-          <span>Novo Profissional</span>
+          <Plus className="w-5 h-5" />
+          <span className="font-medium">Novo Profissional</span>
         </button>
       </div>
 
       {/* Mensagem de erro */}
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          {error}
+        <div className="bg-feedback-light-error/10 dark:bg-feedback-dark-error/10 border border-feedback-light-error/30 dark:border-feedback-dark-error/30 text-feedback-light-error dark:text-feedback-dark-error px-4 py-3 rounded-lg flex items-center gap-2">
+          <svg
+            className="w-5 h-5 flex-shrink-0"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+              clipRule="evenodd"
+            />
+          </svg>
+          <span>{error}</span>
         </div>
       )}
 
       {/* Estatísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="p-4">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <svg
-                className="w-6 h-6 text-blue-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-              </svg>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Total */}
+        <div className="card-theme p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-primary-light dark:bg-primary/20 rounded-lg">
+              <Users className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                Total
-              </h3>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-theme-secondary text-sm font-medium">
+                Total de Profissionais
+              </p>
+              <p className="text-theme-primary text-2xl font-bold mt-1">
                 {totalProfissionais}
               </p>
             </div>
           </div>
-        </Card>
+        </div>
 
-        <Card className="p-4">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <svg
-                className="w-6 h-6 text-green-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
+        {/* Ativos */}
+        <div className="card-theme p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-feedback-light-success/10 dark:bg-feedback-dark-success/10 rounded-lg">
+              <UserCheck className="w-6 h-6 text-feedback-light-success dark:text-feedback-dark-success" />
             </div>
             <div>
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                Ativos
-              </h3>
-              <p className="text-2xl font-bold text-green-600">
+              <p className="text-theme-secondary text-sm font-medium">
+                Profissionais Ativos
+              </p>
+              <p className="text-2xl font-bold text-feedback-light-success dark:text-feedback-dark-success mt-1">
                 {profissionaisAtivos}
               </p>
             </div>
           </div>
-        </Card>
+        </div>
 
-        <Card className="p-4">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <svg
-                className="w-6 h-6 text-purple-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                />
-              </svg>
+        {/* Administradores */}
+        <div className="card-theme p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow sm:col-span-2 lg:col-span-1">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-primary/10 dark:bg-primary/20 rounded-lg">
+              <Shield className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              <p className="text-theme-secondary text-sm font-medium">
                 Administradores
-              </h3>
-              <p className="text-2xl font-bold text-purple-600">
+              </p>
+              <p className="text-2xl font-bold text-primary mt-1">
                 {profissionais.filter(p => p.role === 'admin').length}
               </p>
             </div>
           </div>
-        </Card>
+        </div>
       </div>
 
       {/* Lista de Profissionais */}
-      <Card className="p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            Lista de Profissionais
-          </h2>
+      <div className="card-theme rounded-xl shadow-sm overflow-hidden">
+        {/* Header da Lista com Busca */}
+        <div className="p-5 border-b border-light-border dark:border-dark-border">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <div>
+              <h2 className="text-xl font-semibold text-theme-primary">
+                Lista de Profissionais
+              </h2>
+              <p className="text-theme-secondary text-sm mt-1">
+                {filteredProfissionais.length} profissional
+                {filteredProfissionais.length !== 1 ? 'is' : ''} encontrado
+                {filteredProfissionais.length !== 1 ? 's' : ''}
+                {selectedUnit && ` em ${selectedUnit.name}`}
+              </p>
+            </div>
 
-          {profissionais.length > 0 && (
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              {profissionais.length} profissional
-              {profissionais.length !== 1 ? 'is' : ''} cadastrado
-              {profissionais.length !== 1 ? 's' : ''}
+            {/* Campo de Busca */}
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-light-secondary dark:text-text-dark-secondary" />
+              <input
+                type="text"
+                placeholder="Buscar profissional..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="input-theme w-full pl-10"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Conteúdo da Lista */}
+        <div className="p-5">
+          {filteredProfissionais.length === 0 ? (
+            <div className="text-center py-12">
+              <Users className="w-16 h-16 mx-auto text-theme-secondary mb-4" />
+              <h3 className="text-lg font-medium text-theme-primary mb-2">
+                Nenhum profissional encontrado
+              </h3>
+              <p className="text-theme-secondary">
+                {searchTerm
+                  ? 'Tente ajustar sua busca'
+                  : selectedUnit
+                    ? `Nenhum profissional cadastrado em ${selectedUnit.name}`
+                    : 'Adicione um novo profissional para começar'}
+              </p>
+            </div>
+          ) : (
+            /* Lista em formato de cards responsivos */
+            <div className="space-y-3">
+              {filteredProfissionais.map(profissional => (
+                <div
+                  key={profissional.id}
+                  className="group bg-light-bg dark:bg-dark-hover hover:bg-light-surface dark:hover:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg p-4 transition-all hover:shadow-md"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                    {/* Avatar e Info Principal */}
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary-light dark:bg-primary/20 flex items-center justify-center ring-2 ring-light-surface dark:ring-dark-surface">
+                        <span className="text-lg font-bold text-primary">
+                          {profissional.name.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-base font-semibold text-theme-primary truncate">
+                          {profissional.name}
+                        </h3>
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                          <span
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full ${
+                              profissional.role === 'admin'
+                                ? 'bg-primary/10 dark:bg-primary/20 text-primary'
+                                : profissional.role === 'gerente'
+                                  ? 'bg-primary/10 dark:bg-primary/20 text-primary'
+                                  : profissional.role === 'recepcionista'
+                                    ? 'bg-feedback-light-warning/10 dark:bg-feedback-dark-warning/10 text-feedback-light-warning dark:text-feedback-dark-warning'
+                                    : 'bg-light-bg dark:bg-dark-hover text-theme-secondary'
+                            }`}
+                          >
+                            <Briefcase className="w-3 h-3" />
+                            {profissional.role === 'admin'
+                              ? 'Admin'
+                              : profissional.role === 'gerente'
+                                ? 'Gerente'
+                                : profissional.role === 'recepcionista'
+                                  ? 'Recepcionista'
+                                  : 'Barbeiro'}
+                          </span>
+                          <span
+                            className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${
+                              profissional.is_active
+                                ? 'bg-feedback-light-success/10 dark:bg-feedback-dark-success/10 text-feedback-light-success dark:text-feedback-dark-success'
+                                : 'bg-feedback-light-error/10 dark:bg-feedback-dark-error/10 text-feedback-light-error dark:text-feedback-dark-error'
+                            }`}
+                          >
+                            {profissional.is_active ? '● Ativo' : '○ Inativo'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Informações Adicionais */}
+                    <div className="flex items-center gap-4 sm:gap-6 text-sm">
+                      <div className="text-center">
+                        <p className="text-theme-secondary text-xs font-medium">
+                          Unidade
+                        </p>
+                        <p className="text-theme-primary font-semibold mt-0.5">
+                          {profissional.unit?.name || '-'}
+                        </p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-theme-secondary text-xs font-medium">
+                          Comissão
+                        </p>
+                        <p className="text-theme-primary font-semibold mt-0.5">
+                          {profissional.commission_rate}%
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Ações */}
+                    <div className="flex items-center gap-2 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => handleEditProfissional(profissional)}
+                        className="p-2 text-primary hover:bg-primary-light dark:hover:bg-primary/20 rounded-lg transition-colors"
+                        title="Editar profissional"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleToggleStatus(profissional)}
+                        className={`p-2 rounded-lg transition-colors ${
+                          profissional.is_active
+                            ? 'text-feedback-light-warning hover:bg-feedback-light-warning/10 dark:text-feedback-dark-warning dark:hover:bg-feedback-dark-warning/10'
+                            : 'text-feedback-light-success hover:bg-feedback-light-success/10 dark:text-feedback-dark-success dark:hover:bg-feedback-dark-success/10'
+                        }`}
+                        title={profissional.is_active ? 'Desativar' : 'Ativar'}
+                      >
+                        <Power className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteProfissional(profissional)}
+                        className="p-2 text-feedback-light-error hover:bg-feedback-light-error/10 dark:text-feedback-dark-error dark:hover:bg-feedback-dark-error/10 rounded-lg transition-colors"
+                        title="Excluir profissional"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
-
-        {profissionais.length === 0 ? (
-          <div className="text-center py-12">
-            <svg
-              className="mx-auto h-12 w-12 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
-              Nenhum profissional cadastrado
-            </h3>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              Comece criando seu primeiro profissional.
-            </p>
-            <div className="mt-6">
-              <button
-                onClick={handleCreateProfissional}
-                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-              >
-                <svg
-                  className="w-4 h-4 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>
-                Novo Profissional
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <thead className="bg-gray-50 dark:bg-gray-800">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Profissional
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Perfil
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Unidade
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Comissão
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Ações
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                {profissionais.map(profissional => (
-                  <tr
-                    key={profissional.id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-800"
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10">
-                          <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                            <span className="text-sm font-medium text-blue-600 dark:text-blue-300">
-                              {profissional.name.charAt(0).toUpperCase()}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900 dark:text-white">
-                            {profissional.name}
-                          </div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
-                            ID: {profissional.id.slice(0, 8)}...
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          profissional.role === 'admin'
-                            ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
-                            : profissional.role === 'gerente'
-                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                              : profissional.role === 'recepcionista'
-                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                                : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-                        }`}
-                      >
-                        {profissional.role === 'admin'
-                          ? 'Administrador'
-                          : profissional.role === 'gerente'
-                            ? 'Gerente'
-                            : profissional.role === 'recepcionista'
-                              ? 'Recepcionista'
-                              : 'Barbeiro'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      {profissional.unit?.name || '-'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      {profissional.commission_rate}%
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          profissional.is_active
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                        }`}
-                      >
-                        {profissional.is_active ? 'Ativo' : 'Inativo'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                      <button
-                        onClick={() => handleEditProfissional(profissional)}
-                        className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
-                      >
-                        Editar
-                      </button>
-
-                      <button
-                        onClick={() => handleToggleStatus(profissional)}
-                        className={`${
-                          profissional.is_active
-                            ? 'text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300'
-                            : 'text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300'
-                        }`}
-                      >
-                        {profissional.is_active ? 'Desativar' : 'Ativar'}
-                      </button>
-
-                      <button
-                        onClick={() => handleDeleteProfissional(profissional)}
-                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                      >
-                        Excluir
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Card>
+      </div>
 
       {/* Modal de Cadastro/Edição */}
-      {isModalOpen && (
-        <ProfessionalModal
-          profissional={selectedProfissional}
-          units={units}
-          isCreating={isCreating}
-          onSave={handleSaveProfissional}
-          onClose={() => {
-            setIsModalOpen(false);
-            setSelectedProfissional(null);
-            setIsCreating(false);
-          }}
-        />
-      )}
+      {isModalOpen &&
+        (isCreating ? (
+          <ProfessionalModal
+            profissional={selectedProfissional}
+            units={units}
+            isCreating={isCreating}
+            onSave={handleSaveProfissional}
+            onClose={() => {
+              setIsModalOpen(false);
+              setSelectedProfissional(null);
+              setIsCreating(false);
+            }}
+          />
+        ) : (
+          <EditProfessionalModal
+            professional={selectedProfissional}
+            onClose={() => {
+              setIsModalOpen(false);
+              setSelectedProfissional(null);
+            }}
+            onSuccess={() => {
+              setIsModalOpen(false);
+              setSelectedProfissional(null);
+              // Recarrega a lista após edição
+              try {
+                refresh();
+              } catch (e) {
+                console.warn(
+                  'Falha ao recarregar profissionais após edição',
+                  e
+                );
+              }
+            }}
+          />
+        ))}
     </div>
   );
 };
@@ -496,18 +485,18 @@ const ProfessionalModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="card-theme rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-xl font-bold text-theme-primary">
             {isCreating ? 'Novo Profissional' : 'Editar Profissional'}
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            className="p-2 text-theme-secondary hover:text-theme-primary hover:bg-light-hover dark:hover:bg-dark-hover rounded-lg transition-colors"
           >
             <svg
-              className="w-6 h-6"
+              className="w-5 h-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -526,8 +515,11 @@ const ProfessionalModal = ({
           {/* Email (apenas para criação) */}
           {isCreating && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Email *
+              <label className="block text-sm font-medium text-theme-primary mb-2">
+                Email{' '}
+                <span className="text-feedback-light-error dark:text-feedback-dark-error">
+                  *
+                </span>
               </label>
               <input
                 type="email"
@@ -535,7 +527,7 @@ const ProfessionalModal = ({
                 onChange={e =>
                   setFormData({ ...formData, email: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                className="input-theme w-full"
                 placeholder="email@exemplo.com"
                 required
               />
@@ -545,8 +537,11 @@ const ProfessionalModal = ({
           {/* Senha (apenas para criação) */}
           {isCreating && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Senha *
+              <label className="block text-sm font-medium text-theme-primary mb-2">
+                Senha{' '}
+                <span className="text-feedback-light-error dark:text-feedback-dark-error">
+                  *
+                </span>
               </label>
               <input
                 type="password"
@@ -554,7 +549,7 @@ const ProfessionalModal = ({
                 onChange={e =>
                   setFormData({ ...formData, password: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                className="input-theme w-full"
                 placeholder="Mínimo 6 caracteres"
                 minLength={6}
                 required
@@ -564,14 +559,17 @@ const ProfessionalModal = ({
 
           {/* Nome */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Nome Completo *
+            <label className="block text-sm font-medium text-theme-primary mb-2">
+              Nome Completo{' '}
+              <span className="text-feedback-light-error dark:text-feedback-dark-error">
+                *
+              </span>
             </label>
             <input
               type="text"
               value={formData.name}
               onChange={e => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              className="input-theme w-full"
               placeholder="Nome do profissional"
               required
             />
@@ -579,13 +577,13 @@ const ProfessionalModal = ({
 
           {/* Perfil/Role */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-theme-primary mb-2">
               Perfil
             </label>
             <select
               value={formData.role}
               onChange={e => setFormData({ ...formData, role: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              className="input-theme w-full"
             >
               <option value="barbeiro">Barbeiro</option>
               <option value="gerente">Gerente</option>
@@ -596,15 +594,20 @@ const ProfessionalModal = ({
 
           {/* Unidade */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Unidade {isCreating && '*'}
+            <label className="block text-sm font-medium text-theme-primary mb-2">
+              Unidade{' '}
+              {isCreating && (
+                <span className="text-feedback-light-error dark:text-feedback-dark-error">
+                  *
+                </span>
+              )}
             </label>
             <select
               value={formData.unit_id}
               onChange={e =>
                 setFormData({ ...formData, unit_id: e.target.value })
               }
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              className="input-theme w-full"
               required={isCreating}
             >
               <option value="">Selecione uma unidade</option>
@@ -618,29 +621,31 @@ const ProfessionalModal = ({
 
           {/* Status (apenas para edição) */}
           {!isCreating && (
-            <div>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={formData.is_active}
-                  onChange={e =>
-                    setFormData({ ...formData, is_active: e.target.checked })
-                  }
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Profissional Ativo
-                </span>
+            <div className="flex items-center gap-3 p-4 bg-light-hover dark:bg-dark-hover rounded-lg border border-light-border dark:border-dark-border">
+              <input
+                type="checkbox"
+                id="is_active"
+                checked={formData.is_active}
+                onChange={e =>
+                  setFormData({ ...formData, is_active: e.target.checked })
+                }
+                className="w-4 h-4 rounded border-light-border dark:border-dark-border text-primary focus:ring-primary focus:ring-2"
+              />
+              <label
+                htmlFor="is_active"
+                className="text-sm font-medium text-theme-primary cursor-pointer"
+              >
+                Profissional Ativo
               </label>
             </div>
           )}
 
           {/* Botões */}
-          <div className="flex space-x-3 pt-4">
+          <div className="flex gap-3 pt-4">
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 btn-theme-primary px-4 py-2.5 rounded-lg font-medium shadow-sm hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Salvando...' : isCreating ? 'Criar' : 'Atualizar'}
             </button>
@@ -648,7 +653,7 @@ const ProfessionalModal = ({
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors disabled:opacity-50"
+              className="flex-1 btn-theme-secondary px-4 py-2.5 rounded-lg font-medium shadow-sm hover:shadow-md transition-all disabled:opacity-50"
             >
               Cancelar
             </button>

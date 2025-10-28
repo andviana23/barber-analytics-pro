@@ -1,7 +1,7 @@
 /**
  * NOVA FORMA DE PAGAMENTO MODAL
  * Modal para criar/editar formas de pagamento
- * 
+ *
  * Campos:
  * - Nome (ex: Cartão de Crédito, PIX, Dinheiro)
  * - Taxa (%) - Percentual descontado do valor total
@@ -9,12 +9,25 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { X, CreditCard, Percent, Calendar, Save, AlertCircle, Building2 } from 'lucide-react';
+import {
+  X,
+  CreditCard,
+  Percent,
+  Calendar,
+  Save,
+  AlertCircle,
+  Building2,
+} from 'lucide-react';
 import { useUnit } from '../../context/UnitContext';
 
-const NovaFormaPagamentoModal = ({ isOpen, onClose, onSave, paymentMethod = null }) => {
+const NovaFormaPagamentoModal = ({
+  isOpen,
+  onClose,
+  onSave,
+  paymentMethod = null,
+}) => {
   const { allUnits, selectedUnit } = useUnit();
-  
+
   const [formData, setFormData] = useState({
     name: '',
     fee_percentage: '',
@@ -83,18 +96,18 @@ const NovaFormaPagamentoModal = ({ isOpen, onClose, onSave, paymentMethod = null
   const handleChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
     // Limpar erro do campo ao digitar
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,
-        [field]: undefined
+        [field]: undefined,
       }));
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
 
     if (!validate()) {
@@ -114,7 +127,9 @@ const NovaFormaPagamentoModal = ({ isOpen, onClose, onSave, paymentMethod = null
       await onSave(dataToSave);
       onClose();
     } catch (error) {
-      setErrors({ submit: error.message || 'Erro ao salvar forma de pagamento' });
+      setErrors({
+        submit: error.message || 'Erro ao salvar forma de pagamento',
+      });
     } finally {
       setIsSaving(false);
     }
@@ -150,7 +165,7 @@ const NovaFormaPagamentoModal = ({ isOpen, onClose, onSave, paymentMethod = null
             </label>
             <select
               value={formData.unit_id}
-              onChange={(e) => handleChange('unit_id', e.target.value)}
+              onChange={e => handleChange('unit_id', e.target.value)}
               className={`
                 w-full px-4 py-2 border rounded-lg
                 bg-white dark:bg-gray-700
@@ -187,7 +202,7 @@ const NovaFormaPagamentoModal = ({ isOpen, onClose, onSave, paymentMethod = null
               type="text"
               placeholder="Ex: Cartão de Crédito, PIX, Dinheiro"
               value={formData.name}
-              onChange={(e) => handleChange('name', e.target.value)}
+              onChange={e => handleChange('name', e.target.value)}
               className={`
                 w-full px-4 py-2 border rounded-lg
                 bg-white dark:bg-gray-700
@@ -222,7 +237,7 @@ const NovaFormaPagamentoModal = ({ isOpen, onClose, onSave, paymentMethod = null
                 max="100"
                 placeholder="Ex: 2.5"
                 value={formData.fee_percentage}
-                onChange={(e) => handleChange('fee_percentage', e.target.value)}
+                onChange={e => handleChange('fee_percentage', e.target.value)}
                 className={`
                   w-full px-4 py-2 pr-10 border rounded-lg
                   bg-white dark:bg-gray-700
@@ -262,7 +277,7 @@ const NovaFormaPagamentoModal = ({ isOpen, onClose, onSave, paymentMethod = null
               min="0"
               placeholder="Ex: 30"
               value={formData.receipt_days}
-              onChange={(e) => handleChange('receipt_days', e.target.value)}
+              onChange={e => handleChange('receipt_days', e.target.value)}
               className={`
                 w-full px-4 py-2 border rounded-lg
                 bg-white dark:bg-gray-700
@@ -274,7 +289,12 @@ const NovaFormaPagamentoModal = ({ isOpen, onClose, onSave, paymentMethod = null
               `}
             />
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              Dias <strong className="text-gray-700 dark:text-gray-300">úteis</strong> até receber (segunda a sexta, exclui feriados. 0 = recebimento imediato)
+              Dias{' '}
+              <strong className="text-gray-700 dark:text-gray-300">
+                úteis
+              </strong>{' '}
+              até receber (segunda a sexta, exclui feriados. 0 = recebimento
+              imediato)
             </p>
             {errors.receipt_days && (
               <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">

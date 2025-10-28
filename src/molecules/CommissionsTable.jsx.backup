@@ -1,0 +1,199 @@
+import React, { useState } from 'react';
+import { formatCurrency } from '../utils/formatters';
+import { Edit, Check, X, AlertCircle } from 'lucide-react';
+
+/**
+ * Tabela editável de comissões por serviço
+ * Props:
+ * - commissions: [{ serviceId, serviceName, commission, price, duration }]
+ * - onSave: (serviceId, newCommission) => Promise
+ */
+export default function CommissionsTable({ commissions, onSave, loading }) {
+  const [editId, setEditId] = useState(null);
+  const [editValue, setEditValue] = useState('');
+  const [savingId, setSavingId] = useState(null);
+  const [validationError, setValidationError] = useState(null);
+
+  const handleEdit = (id, value) => {
+    setEditId(id);
+    setEditValue(value);
+    setValidationError(null);
+  };
+
+  const handleCancel = () => {
+    setEditId(null);
+    setEditValue('');
+    setValidationError(null);
+  };
+
+  const validateCommission = value => {
+    const numValue = parseFloat(value);
+
+    if (isNaN(numValue)) {
+      return 'Valor deve ser um número válido';
+    }
+
+    if (numValue < 0) {
+      return 'Comissão não pode ser negativa';
+    }
+
+    if (numValue > 100) {
+      return 'Comissão não pode ser maior que 100%';
+    }
+
+    return null;
+  };
+
+  const handleSave = async id => {
+    const error = validateCommission(editValue);
+
+    if (error) {
+      setValidationError(error);
+      return;
+    }
+
+    setSavingId(id);
+    setValidationError(null);
+
+    try {
+      await onSave(id, parseFloat(editValue));
+      setSavingId(null);
+      setEditId(null);
+      setEditValue('');
+    } catch (err) {
+      setSavingId(null);
+      setValidationError('Erro ao salvar comissão');
+    }
+  };
+
+  const handleInputChange = value => {
+    setEditValue(value);
+
+    // Limpar erro de validação quando o usuário digita
+    if (validationError) {
+      setValidationError(null);
+    }
+  };
+
+  return (
+    <div className="w-full">
+      {/* Versão Desktop - Tabela */}
+      <div className="hidden md:block overflow-x-auto rounded-lg border border-zinc-200 dark:border-zinc-800 shadow-sm">
+        <table className="w-full text-sm bg-white dark:bg-zinc-900">
+          <thead>
+            <tr className="bg-zinc-50 dark:bg-zinc-800/50 border-b border-zinc-200 dark:border-zinc-700">
+              <th className="px-4 py-3 text-left font-semibold text-zinc-900 dark:text-zinc-100">
+                Serviço
+              </th>
+              <th className="px-4 py-3 text-center font-semibold text-zinc-900 dark:text-zinc-100">
+                Comissão (%)
+              </th>
+              <th className="px-4 py-3 text-center font-semibold text-zinc-900 dark:text-zinc-100">
+                Tempo
+              </th>
+              <th className="px-4 py-3 text-center font-semibold text-zinc-900 dark:text-zinc-100">
+                Valor
+              </th>
+              <th className="px-4 py-3 text-center font-semibold text-zinc-900 dark:text-zinc-100">
+                Ações
+              </th>
+            </tr>
+          </thead>
+        <tbody>
+          {commissions.map(item => (
+            <tr
+              key={item.serviceId}
+              className="border-b border-light-border dark:border-dark-border hover:bg-light-bg/50 dark:hover:bg-dark-bg/50 transition-colors"
+            >
+              <td className="px-4 py-3 text-text-light-primary dark:text-text-dark-primary">
+                {item.serviceName}
+              </td>
+              <td className="px-4 py-3 text-center">
+                {editId === item.serviceId ? (
+                  <div className="flex flex-col items-center gap-1">
+                    <input
+                      type="number"
+                      min={0}
+                      max={100}
+                      step={0.01}
+                      value={editValue}
+                      onChange={e => handleInputChange(e.target.value)}
+                      className={`w-20 px-2 py-1 border rounded text-right bg-light-surface dark:bg-dark-surface text-text-light-primary dark:text-text-dark-primary focus:outline-none focus:ring-2 transition-colors ${
+                        validationError
+                          ? 'border-feedback-light-error dark:border-feedback-dark-error focus:ring-feedback-light-error/50 focus:border-feedback-light-error'
+                          : 'border-light-border dark:border-dark-border focus:ring-primary/50 focus:border-primary'
+                      }`}
+                      disabled={savingId === item.serviceId}
+                      autoFocus
+                      placeholder="0.00"
+                    />
+                    {validationError && (
+                      <div className="flex items-center gap-1 text-xs text-feedback-light-error dark:text-feedback-dark-error">
+                        <AlertCircle className="w-3 h-3" />
+                        <span>{validationError}</span>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <span className="text-text-light-primary dark:text-text-dark-primary font-medium">
+                    {item.currentCommission?.toFixed(2) ?? '—'}%
+                  </span>
+                )}
+              </td>
+              <td className="px-4 py-3 text-center text-text-light-secondary dark:text-text-dark-secondary">
+                {item.serviceDuration ?? '—'} min
+              </td>
+              <td className="px-4 py-3 text-center text-text-light-primary dark:text-text-dark-primary font-medium">
+                {item.servicePrice ? formatCurrency(item.servicePrice) : '—'}
+              </td>
+              <td className="px-4 py-3 text-center">
+                {editId === item.serviceId ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <button
+                      className="p-1 rounded-lg text-feedback-light-success dark:text-feedback-dark-success hover:bg-feedback-light-success/10 dark:hover:bg-feedback-dark-success/10 transition-colors disabled:opacity-50"
+                      onClick={() => handleSave(item.serviceId)}
+                      disabled={savingId === item.serviceId || validationError}
+                      title={
+                        validationError
+                          ? 'Corrija os erros antes de salvar'
+                          : 'Salvar'
+                      }
+                    >
+                      <Check className="w-4 h-4" />
+                    </button>
+                    <button
+                      className="p-1 rounded-lg text-feedback-light-error dark:text-feedback-dark-error hover:bg-feedback-light-error/10 dark:hover:bg-feedback-dark-error/10 transition-colors"
+                      onClick={handleCancel}
+                      title="Cancelar"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    className="p-1 rounded-lg text-primary hover:bg-primary/10 transition-colors"
+                    onClick={() =>
+                      handleEdit(
+                        item.serviceId,
+                        item.currentCommission?.toFixed(2) ?? ''
+                      )
+                    }
+                    title="Editar comissão"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {loading && (
+        <div className="mt-3 flex items-center justify-center gap-2 text-sm text-text-light-secondary dark:text-text-dark-secondary">
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+          Salvando alterações...
+        </div>
+      )}
+    </div>
+  );
+}

@@ -463,16 +463,20 @@ const NovaDespesaModal = ({
     if (initialData) {
       setFormData({
         fornecedor_id: initialData.fornecedor_id || initialData.party_id || '',
-        data_competencia: initialData.data_competencia || initialData.date
-          ? new Date(initialData.data_competencia || initialData.date)
-          : new Date(),
+        data_competencia:
+          initialData.data_competencia || initialData.date
+            ? new Date(initialData.data_competencia || initialData.date)
+            : new Date(),
         descricao: initialData.descricao || initialData.description || '',
         valor: (initialData.valor || initialData.value)?.toString() || '',
         categoria_id: initialData.categoria_id || initialData.category_id || '',
         parcelamento: initialData.parcelamento || 'avista',
-        data_vencimento: initialData.data_vencimento || initialData.expected_payment_date
-          ? new Date(initialData.data_vencimento || initialData.expected_payment_date)
-          : new Date(),
+        data_vencimento:
+          initialData.data_vencimento || initialData.expected_payment_date
+            ? new Date(
+                initialData.data_vencimento || initialData.expected_payment_date
+              )
+            : new Date(),
         forma_pagamento: initialData.forma_pagamento || 'pix',
         conta_id: initialData.conta_id || initialData.account_id || '',
         observacoes: initialData.observacoes || initialData.observations || '',

@@ -318,4 +318,3 @@ EditClientModal.propTypes = {
 };
 
 export default EditClientModal;
-

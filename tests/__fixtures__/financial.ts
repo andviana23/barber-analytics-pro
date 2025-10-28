@@ -19,7 +19,13 @@ export interface Revenue {
   accrual_end_date?: string;
   expected_receipt_date?: string;
   actual_receipt_date?: string;
-  status: 'Pending' | 'Scheduled' | 'Received' | 'Paid' | 'Overdue' | 'Cancelled';
+  status:
+    | 'Pending'
+    | 'Scheduled'
+    | 'Received'
+    | 'Paid'
+    | 'Overdue'
+    | 'Cancelled';
   created_at: string;
   updated_at: string;
 }
@@ -33,7 +39,13 @@ export interface Expense {
   account_id: string;
   expected_payment_date?: string;
   actual_payment_date?: string;
-  status: 'pending' | 'scheduled' | 'received' | 'paid' | 'overdue' | 'cancelled';
+  status:
+    | 'pending'
+    | 'scheduled'
+    | 'received'
+    | 'paid'
+    | 'overdue'
+    | 'cancelled';
   created_at: string;
   updated_at: string;
 }
@@ -65,7 +77,8 @@ export const DateHelpers = {
   today: () => format(new Date(), 'yyyy-MM-dd'),
   tomorrow: () => format(addDays(new Date(), 1), 'yyyy-MM-dd'),
   yesterday: () => format(subDays(new Date(), 1), 'yyyy-MM-dd'),
-  daysFromNow: (days: number) => format(addDays(new Date(), days), 'yyyy-MM-dd'),
+  daysFromNow: (days: number) =>
+    format(addDays(new Date(), days), 'yyyy-MM-dd'),
   daysAgo: (days: number) => format(subDays(new Date(), days), 'yyyy-MM-dd'),
   currentMonth: () => format(new Date(), 'yyyy-MM'),
   lastMonth: () => format(subDays(new Date(), 30), 'yyyy-MM'),
@@ -78,7 +91,7 @@ export class RevenueBuilder {
   private revenue: Partial<Revenue> = {
     id: 'rev-' + Math.random().toString(36).substr(2, 9),
     type: 'service',
-    value: 100.00,
+    value: 100.0,
     date: DateHelpers.today(),
     unit_id: 'unit-1',
     professional_id: 'prof-1',
@@ -157,7 +170,7 @@ export class ExpenseBuilder {
   private expense: Partial<Expense> = {
     id: 'exp-' + Math.random().toString(36).substr(2, 9),
     type: 'supplies',
-    value: 50.00,
+    value: 50.0,
     date: DateHelpers.today(),
     unit_id: 'unit-1',
     account_id: 'acc-1',
@@ -202,7 +215,7 @@ export class BankStatementBuilder {
     id: 'stmt-' + Math.random().toString(36).substr(2, 9),
     account_id: 'acc-1',
     transaction_date: DateHelpers.today(),
-    amount: 100.00,
+    amount: 100.0,
     description: 'TED RECEBIDA',
     bank_reference: 'REF' + Math.random().toString().substr(2, 8),
     status: 'pending',
@@ -293,53 +306,71 @@ export class ReconciliationBuilder {
 export const FinancialFixtures = {
   // Cenários de receitas
   makeServiceRevenue: (value = 150, overrides = {}) => {
-    const revenue = RevenueBuilder.create().withType('service').withValue(value).build();
+    const revenue = RevenueBuilder.create()
+      .withType('service')
+      .withValue(value)
+      .build();
     return { ...revenue, ...overrides };
   },
-  
+
   makeProductRevenue: (value = 80, overrides = {}) => {
-    const revenue = RevenueBuilder.create().withType('product').withValue(value).build();
+    const revenue = RevenueBuilder.create()
+      .withType('product')
+      .withValue(value)
+      .build();
     return { ...revenue, ...overrides };
   },
-  
-  makeOverdueRevenue: (daysOverdue = 5) => 
+
+  makeOverdueRevenue: (daysOverdue = 5) =>
     RevenueBuilder.create()
       .withStatus('Overdue')
       .withReceiptDates(DateHelpers.daysAgo(daysOverdue))
       .build(),
 
-  makeReceivedRevenue: () => 
-    RevenueBuilder.create().received().build(),
+  makeReceivedRevenue: () => RevenueBuilder.create().received().build(),
 
   // Cenários de despesas
-  makeExpense: (value = 200) => 
+  makeExpense: (value = 200) =>
     ExpenseBuilder.create().withValue(value).build(),
-    
-  makeRentExpense: (value = 2000) => 
+
+  makeRentExpense: (value = 2000) =>
     ExpenseBuilder.create().withType('rent').withValue(value).build(),
 
-  makePaidExpense: () =>
-    ExpenseBuilder.create().paid().build(),  // Cenários de conciliação
+  makePaidExpense: () => ExpenseBuilder.create().paid().build(), // Cenários de conciliação
   makeExactMatch: () => ({
     statement: BankStatementBuilder.create().withAmount(100).build(),
     revenue: RevenueBuilder.create().withValue(100).build(),
   }),
 
-  makeAmountMismatch: (tolerance = 0.50) => ({
+  makeAmountMismatch: (tolerance = 0.5) => ({
     statement: BankStatementBuilder.create().withAmount(100).build(),
-    revenue: RevenueBuilder.create().withValue(100 + tolerance).build(),
+    revenue: RevenueBuilder.create()
+      .withValue(100 + tolerance)
+      .build(),
   }),
 
   makeDateMismatch: (daysDiff = 2) => ({
-    statement: BankStatementBuilder.create().withDate(DateHelpers.today()).build(),
-    revenue: RevenueBuilder.create().withReceiptDates(DateHelpers.daysFromNow(daysDiff)).build(),
+    statement: BankStatementBuilder.create()
+      .withDate(DateHelpers.today())
+      .build(),
+    revenue: RevenueBuilder.create()
+      .withReceiptDates(DateHelpers.daysFromNow(daysDiff))
+      .build(),
   }),
 
   // Cenários de KPIs
   makeMonthlyData: (month: string) => ({
     revenues: [
-      RevenueBuilder.create().withDate(`${month}-15`).withValue(1000).received().build(),
-      RevenueBuilder.create().withDate(`${month}-20`).withValue(500).received().build(),
+      RevenueBuilder.create()
+        .withDate(`${month}-15`)
+        .withValue(1000)
+        .received()
+        .build(),
+      RevenueBuilder.create()
+        .withDate(`${month}-20`)
+        .withValue(500)
+        .received()
+        .build(),
     ],
     expenses: [
       ExpenseBuilder.create().withValue(800).paid().build(),
@@ -388,7 +419,7 @@ export const createSupabaseMock = () => {
     from: mockFrom,
     auth: {
       getSession: vi.fn().mockResolvedValue({
-        data: { session: { user: { id: 'user-1' } } }
+        data: { session: { user: { id: 'user-1' } } },
       }),
       getUser: vi.fn(),
     },

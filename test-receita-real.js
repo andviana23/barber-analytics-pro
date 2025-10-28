@@ -15,14 +15,14 @@ console.log('=====================================');
 async function testarCadastroReceita() {
   try {
     console.log('🔍 Verificando conexão com o banco...');
-    
+
     // Dados de teste realistas
     const dadosReceita = {
       type: 'service',
-      value: 150.00,
+      value: 150.0,
       date: '2025-10-16',
       source: 'Corte de cabelo + barba',
-      observations: 'Cliente preferencial - teste pós-recriação DB'
+      observations: 'Cliente preferencial - teste pós-recriação DB',
     };
 
     console.log('📝 Dados da receita:', dadosReceita);
@@ -40,27 +40,28 @@ async function testarCadastroReceita() {
       console.log('📊 Status:', resultado.data.status);
       console.log('');
       console.log('🎉 CONFIRMADO: Erro "profit field" foi ELIMINADO!');
-      
+
       return true;
     } else {
       console.log('❌ ERRO na criação da receita:');
       console.log('📝 Detalhes:', resultado.error);
-      
+
       if (resultado.error?.includes('profit')) {
-        console.log('🚨 ATENÇÃO: Erro relacionado ao campo "profit" ainda persiste!');
+        console.log(
+          '🚨 ATENÇÃO: Erro relacionado ao campo "profit" ainda persiste!'
+        );
       }
-      
+
       return false;
     }
-
   } catch (error) {
     console.log('💥 ERRO INESPERADO:');
     console.log('📝 Detalhes:', error.message);
-    
+
     if (error.message?.includes('profit')) {
       console.log('🚨 ATENÇÃO: Erro relacionado ao campo "profit" detectado!');
     }
-    
+
     return false;
   }
 }

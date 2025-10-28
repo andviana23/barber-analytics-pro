@@ -1,0 +1,470 @@
+import React, { useState, useEffect } from 'react';
+import { Scissors, Plus, Search, Lock, Edit2, Power } from 'lucide-react';
+import { Button } from '../atoms/Button/Button';
+import ServiceFormModal from '../components/templates/modals/ServiceFormModal';
+import useServices from '../hooks/useServices';
+import useUserPermissions from '../hooks/useUserPermissions';
+import { useUnit } from '../context/UnitContext';
+import { formatCurrency } from '../utils/formatters';
+import toast from 'react-hot-toast';
+
+/**
+ * ServicesPage - Página de catálogo de serviços
+ *
+ * Features:
+ * - Grid/Lista de serviços cadastrados
+ * - Informações: nome, duração, preço, comissão, status
+ * - Botão "Novo Serviço" (apenas Gerente e Admin)
+ * - Ações: editar, ativar/desativar (apenas Gerente e Admin)
+ * - Busca e filtros
+ * - Profissionais podem apenas visualizar (modo leitura)
+ * - Design System compliance
+ * - Dark mode support
+ * - Responsive layout
+ * - Toggle view (Grid / Lista)
+ *
+ * @page
+ */
+const ServicesPage = () => {
+  // Hooks
+  const { selectedUnit } = useUnit();
+  const {
+    services,
+    loading,
+    createService,
+    updateService,
+    deleteService,
+    reactivateService,
+    fetchServices,
+  } = useServices(selectedUnit?.id);
+
+  const { canManageServices, canCreateService } = useUserPermissions();
+
+  // Estado dos modais
+  const [isServiceModalVisible, setIsServiceModalVisible] = useState(false);
+  const [selectedService, setSelectedService] = useState(null);
+
+  // 🔍 Debug: Log dos serviços
+  useEffect(() => {
+    console.log('📊 ServicesPage - Estado atual:', {
+      selectedUnit: selectedUnit?.id,
+      servicesCount: services?.length,
+      services,
+      loading,
+    });
+  }, [services, selectedUnit, loading]);
+
+  // Estado dos filtros e visualização
+  const [filters, setFilters] = useState({
+    search: '',
+    status: 'all', // all, active, inactive
+  });
+
+  // Carrega serviços ao montar
+  useEffect(() => {
+    fetchServices();
+  }, []);
+
+  // Filtra serviços localmente
+  const filteredServices = services.filter(service => {
+    // Filtro de busca (nome)
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      const nameMatch = service.name?.toLowerCase().includes(searchLower);
+
+      if (!nameMatch) {
+        return false;
+      }
+    }
+
+    // Filtro de status
+    if (filters.status === 'active' && !service.active) {
+      return false;
+    }
+    if (filters.status === 'inactive' && service.active) {
+      return false;
+    }
+
+    return true;
+  });
+
+  // Estatísticas
+  const stats = {
+    total: services.length,
+    active: services.filter(s => s.active).length,
+    inactive: services.filter(s => !s.active).length,
+  };
+
+  // Handler de criação/edição
+  const handleServiceSubmit = async data => {
+    console.log('🔧 ServicesPage - handleServiceSubmit recebeu:', data);
+    try {
+      let result;
+
+      if (selectedService) {
+        // Modo edição
+        console.log('✏️ Modo edição - ID:', selectedService.id);
+        result = await updateService(selectedService.id, data);
+      } else {
+        // Modo criação
+        console.log('➕ Modo criação - Chamando createService...');
+        result = await createService(data);
+        console.log('📦 createService retornou:', result);
+      }
+
+      // Service já exibe toast de sucesso/erro
+      if (!result.error) {
+        console.log('✅ Serviço salvo com sucesso, fechando modal...');
+        setIsServiceModalVisible(false);
+        setSelectedService(null);
+        console.log('🔄 Recarregando lista de serviços...');
+        fetchServices();
+      } else {
+        console.error('❌ Erro retornado:', result.error);
+      }
+    } catch (error) {
+      console.error('💥 Exceção ao salvar serviço:', error);
+    }
+  };
+
+  // Handler de editar
+  const handleEdit = service => {
+    if (!canManageServices) {
+      toast.error('Você não tem permissão para editar serviços');
+      return;
+    }
+
+    setSelectedService(service);
+    setIsServiceModalVisible(true);
+  };
+
+  // Handler de toggle ativo/inativo
+  const handleToggleActive = async service => {
+    if (!canManageServices) {
+      toast.error('Você não tem permissão para alterar serviços');
+      return;
+    }
+
+    try {
+      let result;
+
+      if (service.active) {
+        // Desativar
+        result = await deleteService(service.id);
+      } else {
+        // Reativar
+        result = await reactivateService(service.id);
+      }
+
+      // Service já exibe toast de sucesso/erro
+      if (!result.error) {
+        fetchServices();
+      }
+    } catch (error) {
+      console.error('Erro ao alterar status:', error);
+    }
+  };
+
+  // Handler de filtros
+  const handleFilterChange = e => {
+    const { name, value } = e.target;
+    setFilters(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleClearSearch = () => {
+    setFilters(prev => ({ ...prev, search: '' }));
+  };
+
+  // Handler de nova serviço
+  const handleNewService = () => {
+    if (!canCreateService) {
+      toast.error('Você não tem permissão para criar serviços');
+      return;
+    }
+
+    setSelectedService(null);
+    setIsServiceModalVisible(true);
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+          <div>
+            <h1 className="text-3xl font-bold text-theme-primary mb-2">
+              <Scissors className="w-8 h-8 inline mr-2" />
+              Serviços
+            </h1>
+            <p className="text-theme-muted">
+              {canManageServices
+                ? 'Gerencie o catálogo de serviços e comissões'
+                : 'Visualize os serviços disponíveis'}
+            </p>
+          </div>
+
+          {canCreateService && (
+            <Button
+              variant="primary"
+              onClick={handleNewService}
+              disabled={loading}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Novo Serviço
+            </Button>
+          )}
+        </div>
+
+        {/* Barra de Busca e Filtros */}
+        <div className="card-theme p-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Busca */}
+            <div className="md:col-span-2 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-theme-muted" />
+              <input
+                type="text"
+                name="search"
+                value={filters.search}
+                onChange={handleFilterChange}
+                placeholder="Buscar serviço por nome..."
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-theme-border bg-white dark:bg-gray-800 text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Status */}
+            <div>
+              <select
+                name="status"
+                value={filters.status}
+                onChange={handleFilterChange}
+                className="w-full px-4 py-2 rounded-lg border border-theme-border bg-white dark:bg-gray-800 text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">Todos os Status</option>
+                <option value="active">Ativos</option>
+                <option value="inactive">Inativos</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Estatísticas */}
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="card-theme p-4 text-center">
+          <p className="text-sm text-theme-muted mb-1">Total</p>
+          <p className="text-2xl font-bold text-theme-primary">{stats.total}</p>
+        </div>
+        <div className="card-theme p-4 text-center">
+          <p className="text-sm text-theme-muted mb-1">Ativos</p>
+          <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+            {stats.active}
+          </p>
+        </div>
+        <div className="card-theme p-4 text-center">
+          <p className="text-sm text-theme-muted mb-1">Inativos</p>
+          <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+            {stats.inactive}
+          </p>
+        </div>
+      </div>
+
+      {/* Lista/Grid de Serviços */}
+      {loading ? (
+        <div className="card-theme text-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-theme-muted">Carregando serviços...</p>
+        </div>
+      ) : filteredServices.length === 0 ? (
+        <div className="card-theme text-center py-12">
+          <Scissors className="w-16 h-16 mx-auto mb-4 text-theme-muted" />
+          <h3 className="text-lg font-semibold text-theme-primary mb-2">
+            Nenhum serviço encontrado
+          </h3>
+          <p className="text-theme-muted mb-6">
+            {filters.search || filters.status !== 'all'
+              ? 'Tente ajustar os filtros de busca'
+              : 'Cadastre um novo serviço para começar'}
+          </p>
+
+          {canCreateService && !filters.search && filters.status === 'all' && (
+            <Button variant="primary" onClick={handleNewService}>
+              <Plus className="w-4 h-4 mr-2" />
+              Novo Serviço
+            </Button>
+          )}
+        </div>
+      ) : (
+        /* Tabela de Serviços */
+        <div className="card-theme overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 dark:bg-gray-800 border-b border-theme-border">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-muted uppercase tracking-wider">
+                    Serviço
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-theme-muted uppercase tracking-wider">
+                    Duração
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-theme-muted uppercase tracking-wider">
+                    Preço
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-theme-muted uppercase tracking-wider">
+                    Comissão
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-theme-muted uppercase tracking-wider">
+                    Status
+                  </th>
+                  {canManageServices && (
+                    <th className="px-6 py-3 text-center text-xs font-medium text-theme-muted uppercase tracking-wider">
+                      Ações
+                    </th>
+                  )}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-theme-border">
+                {filteredServices.map(service => {
+                  const commissionValue =
+                    (service.price * service.commission_percentage) / 100;
+
+                  return (
+                    <tr
+                      key={service.id}
+                      className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                    >
+                      {/* Nome do Serviço */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                            <Scissors className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                          </div>
+                          <div className="font-medium text-theme-primary">
+                            {service.name}
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Duração */}
+                      <td className="px-6 py-4 text-center">
+                        <span className="text-sm text-theme-primary font-medium">
+                          {service.duration_minutes} min
+                        </span>
+                      </td>
+
+                      {/* Preço */}
+                      <td className="px-6 py-4 text-right">
+                        <span className="text-sm font-bold text-green-600 dark:text-green-400">
+                          {formatCurrency(service.price)}
+                        </span>
+                      </td>
+
+                      {/* Comissão */}
+                      <td className="px-6 py-4 text-center">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-semibold text-purple-600 dark:text-purple-400">
+                            {service.commission_percentage}%
+                          </span>
+                          <span className="text-xs text-theme-muted">
+                            {formatCurrency(commissionValue)}
+                          </span>
+                        </div>
+                      </td>
+
+                      {/* Status */}
+                      <td className="px-6 py-4 text-center">
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${
+                            service.active || service.is_active
+                              ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200'
+                              : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300'
+                          }`}
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              service.active || service.is_active
+                                ? 'bg-green-600 dark:bg-green-400'
+                                : 'bg-gray-600 dark:bg-gray-400'
+                            }`}
+                          />
+                          {service.active || service.is_active
+                            ? 'Ativo'
+                            : 'Inativo'}
+                        </span>
+                      </td>
+
+                      {/* Ações */}
+                      {canManageServices && (
+                        <td className="px-6 py-4">
+                          <div className="flex items-center justify-center gap-2">
+                            <button
+                              onClick={() => handleEdit(service)}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
+                              title="Editar serviço"
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                              Editar
+                            </button>
+                            <button
+                              onClick={() => handleToggleActive(service)}
+                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                                service.active || service.is_active
+                                  ? 'text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40'
+                                  : 'text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/40'
+                              }`}
+                              title={
+                                service.active || service.is_active
+                                  ? 'Desativar serviço'
+                                  : 'Ativar serviço'
+                              }
+                            >
+                              <Power className="w-3.5 h-3.5" />
+                              {service.active || service.is_active
+                                ? 'Desativar'
+                                : 'Ativar'}
+                            </button>
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Aviso para profissionais */}
+      {!canManageServices && services.length > 0 && (
+        <div className="card-theme bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4 mt-6">
+          <div className="flex items-start gap-3">
+            <Lock className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+            <div>
+              <p className="text-sm text-blue-800 dark:text-blue-200 font-medium">
+                Modo somente leitura
+              </p>
+              <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                Apenas Gerentes e Administradores podem criar ou editar
+                serviços.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal */}
+      <ServiceFormModal
+        isOpen={isServiceModalVisible}
+        onClose={() => {
+          setIsServiceModalVisible(false);
+          setSelectedService(null);
+        }}
+        onSubmit={handleServiceSubmit}
+        service={selectedService}
+        unitId={selectedUnit?.id}
+      />
+    </div>
+  );
+};
+
+export default ServicesPage;

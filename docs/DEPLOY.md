@@ -15,12 +15,12 @@ O projeto é uma SPA React (Vite) que consome Supabase diretamente. O build gera
 
 ## 🔑 Variáveis de Ambiente
 
-| Contexto | Variáveis |
-|----------|-----------|
-| Frontend | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_APP_URL`, etc. |
-| Edge Function | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ENVIRONMENT` |
+| Contexto      | Variáveis                                                           |
+| ------------- | ------------------------------------------------------------------- |
+| Frontend      | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_APP_URL`, etc. |
+| Edge Function | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ENVIRONMENT`          |
 
-- 📝 Use `.env.example` como base.  
+- 📝 Use `.env.example` como base.
 - 🔒 Nunca exponha chaves `SERVICE_ROLE` no frontend.
 
 ---
@@ -36,9 +36,9 @@ npm run build   # gera dist/
 
 ## ☁️ Vercel (estático)
 
-1. Configure variáveis no dashboard (`VITE_*`).  
-2. Defina comando de build `npm run build`.  
-3. Output: `dist`.  
+1. Configure variáveis no dashboard (`VITE_*`).
+2. Defina comando de build `npm run build`.
+3. Output: `dist`.
 4. `vercel.json` já contém rewrite SPA → `index.html`.
 
 ---
@@ -51,6 +51,7 @@ npm run build   # gera dist/
    npm run build
    ```
 2. **Configuração NGINX (exemplo):**
+
    ```
    server {
        listen 80;
@@ -69,6 +70,7 @@ npm run build   # gera dist/
        }
    }
    ```
+
 3. **PM2 (opcional):** `pm2 serve dist 3000 --spa --name barber-analytics-pro`
 
 ---
@@ -97,4 +99,3 @@ npm run build   # gera dist/
 - 📄 Garanta que `.env` não seja commitado (use `.gitignore`).
 - 📦 Para múltiplos ambientes (staging/prod), configure variáveis separadamente.
 - 🧾 Registre execuções do reset mensal via logs da Edge Function.
-

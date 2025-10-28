@@ -4,7 +4,6 @@ import { supabase } from './supabase';
  * Serviço de Auditoria - Gerencia logs de acesso e ações dos usuários
  */
 class AuditService {
-  
   /**
    * Registra uma ação do usuário no sistema de auditoria
    * @param {string} action - Tipo de ação (login, logout, create, update, delete, view)
@@ -14,12 +13,19 @@ class AuditService {
    * @param {string} userAgent - User agent (opcional)
    * @param {string} sessionId - ID da sessão (opcional)
    */
-  async logAction(action, resource = null, details = null, ipAddress = null, userAgent = null, sessionId = null) {
+  async logAction(
+    action,
+    resource = null,
+    details = null,
+    ipAddress = null,
+    userAgent = null,
+    sessionId = null
+  ) {
     try {
       // Obtém informações do navegador se não fornecidas
       const finalUserAgent = userAgent || navigator.userAgent;
-      const finalIpAddress = ipAddress || await this.getClientIP();
-      
+      const finalIpAddress = ipAddress || (await this.getClientIP());
+
       // Chama a função do banco
       const { data, error } = await supabase.rpc('log_user_action', {
         p_action: action,
@@ -27,7 +33,7 @@ class AuditService {
         p_details: details,
         p_ip_address: finalIpAddress,
         p_user_agent: finalUserAgent,
-        p_session_id: sessionId
+        p_session_id: sessionId,
       });
 
       if (error) {
@@ -51,7 +57,7 @@ class AuditService {
   async logLogin(userInfo = {}) {
     return await this.logAction('login', 'auth', {
       user_role: userInfo.role,
-      login_method: userInfo.method || 'email'
+      login_method: userInfo.method || 'email',
     });
   }
 
@@ -80,7 +86,7 @@ class AuditService {
   async logCreate(table, recordId, data = {}) {
     return await this.logAction('create', `table:${table}`, {
       record_id: recordId,
-      ...data
+      ...data,
     });
   }
 
@@ -95,7 +101,7 @@ class AuditService {
     return await this.logAction('update', `table:${table}`, {
       record_id: recordId,
       old_data: oldData,
-      new_data: newData
+      new_data: newData,
     });
   }
 
@@ -108,7 +114,7 @@ class AuditService {
   async logDelete(table, recordId, data = {}) {
     return await this.logAction('delete', `table:${table}`, {
       record_id: recordId,
-      deleted_data: data
+      deleted_data: data,
     });
   }
 
@@ -121,7 +127,7 @@ class AuditService {
     return await this.logAction('error', operation, {
       error_message: error.message,
       error_code: error.code,
-      stack_trace: error.stack
+      stack_trace: error.stack,
     });
   }
 
@@ -142,19 +148,19 @@ class AuditService {
       if (filters.user_id) {
         query = query.eq('user_id', filters.user_id);
       }
-      
+
       if (filters.action) {
         query = query.eq('action', filters.action);
       }
-      
+
       if (filters.resource) {
         query = query.ilike('resource', `%${filters.resource}%`);
       }
-      
+
       if (filters.start_date) {
         query = query.gte('created_at', filters.start_date);
       }
-      
+
       if (filters.end_date) {
         query = query.lte('created_at', filters.end_date);
       }
@@ -176,7 +182,7 @@ class AuditService {
         total: count || 0,
         page,
         limit,
-        error: null
+        error: null,
       };
     } catch (error) {
       // eslint-disable-next-line no-console
@@ -192,14 +198,12 @@ class AuditService {
   async getLogStats(filters = {}) {
     try {
       // Busca contagem por ação
-      let query = supabase
-        .from('access_logs')
-        .select('action, created_at');
+      let query = supabase.from('access_logs').select('action, created_at');
 
       if (filters.start_date) {
         query = query.gte('created_at', filters.start_date);
       }
-      
+
       if (filters.end_date) {
         query = query.lte('created_at', filters.end_date);
       }

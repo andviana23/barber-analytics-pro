@@ -310,9 +310,11 @@ Fluxo especializado para importar despesas (transações DEBIT) diretamente de a
 ### 🧩 Componentes
 
 #### 1. `ImportExpensesFromOFXModal.jsx`
+
 **Template (Organism)** — Modal multi-step para importação de despesas
 
 **Props:**
+
 - `isOpen: boolean` — Controla visibilidade do modal
 - `onClose: () => void` — Callback ao fechar
 - `onSuccess: (report) => void` — Callback ao finalizar importação
@@ -321,14 +323,17 @@ Fluxo especializado para importar despesas (transações DEBIT) diretamente de a
 - `unitId: string` — ID da unidade
 
 **Steps:**
+
 1. **Upload OFX** — Seleção de conta e upload de arquivo `.ofx`
 2. **Categorização** — Tabela com dropdown hierárquico por despesa
 3. **Preview** — Resumo com estatísticas e confirmação final
 
 #### 2. `CategoryHierarchicalDropdown.jsx`
+
 **Molecule** — Dropdown com categorias hierárquicas (pai → filho)
 
 **Props:**
+
 - `categories: Array` — Árvore de categorias `[{id, name, parent_id, children}]`
 - `value: string` — ID da categoria selecionada
 - `onChange: (categoryId) => void` — Callback ao selecionar
@@ -339,6 +344,7 @@ Fluxo especializado para importar despesas (transações DEBIT) diretamente de a
 - `label: string` — Label do campo
 
 **Renderização:**
+
 - Categorias pai: **bold**, desabilitadas
 - Categorias filho: indentadas com `└─`, selecionáveis
 
@@ -388,12 +394,14 @@ sequenceDiagram
 ### 🎨 Princípios de Design Aplicados
 
 #### Usabilidade (Steve Krug, Don Norman)
+
 - **Não me faça pensar** — Fluxo linear com 3 steps numerados
 - **Feedback imediato** — Loading states, progress bar, toasts
 - **Prevenção de erros** — Validação em cada step
 - **Desfazer facilmente** — Botão "Voltar" sempre disponível
 
 #### Atomic Design (Brad Frost)
+
 - **Atoms** — Botões, inputs, badges, ícones
 - **Molecules** — `CategoryHierarchicalDropdown`, `StatusBadge`
 - **Organisms** — `ImportExpensesFromOFXModal`
@@ -401,6 +409,7 @@ sequenceDiagram
 - **Pages** — `ConciliacaoTab` integra o modal
 
 #### Clean Code (Robert C. Martin)
+
 - **Single Responsibility** — Cada método tem uma única responsabilidade
 - **Nomes semânticos** — `applyUserCategorySelections`, `markAllAsPaid`
 - **Funções pequenas** — Máximo 20-30 linhas por função
@@ -430,7 +439,7 @@ EXPENSE_CATEGORY_KEYWORDS = {
   Marketing: ['MARKETING', 'FACEBOOK', 'GOOGLE', 'ADS'],
   Manutenção: ['MANUTENCAO', 'REPARO', 'CONSERTO'],
   Transporte: ['COMBUSTIVEL', 'GASOLINA', 'UBER', 'TAXI'],
-}
+};
 ```
 
 ### 📈 Métricas de Sucesso
@@ -498,10 +507,12 @@ const report = ImportExpensesFromOFXService.generateReport(results, enriched, st
 ### 🔗 Arquivos Relacionados
 
 **Componentes:**
+
 - `src/templates/ImportExpensesFromOFXModal.jsx` — Modal principal (1200+ linhas)
 - `src/molecules/CategoryHierarchicalDropdown/CategoryHierarchicalDropdown.jsx` — Dropdown hierárquico
 
 **Services:**
+
 - `src/services/importExpensesFromOFX.js` — Lógica de importação (1100+ linhas)
   - `readOFXFile()` — Parser OFX
   - `validateTransactions()` — Filtra DEBIT
@@ -513,13 +524,16 @@ const report = ImportExpensesFromOFXService.generateReport(results, enriched, st
 - `src/services/partiesService.js` — CRUD de fornecedores
 
 **Hooks:**
+
 - `src/hooks/useCategories.js` — `useCategoryTree()` retorna árvore hierárquica
 
 **Repositórios:**
+
 - `src/repositories/expenseRepository.js` — CRUD de despesas
 - `src/repositories/bankStatementRepository.js` — CRUD de extratos
 
 **Páginas:**
+
 - `src/pages/FinanceiroAdvancedPage/ConciliacaoTab.jsx` — Integração do modal
 
 ---

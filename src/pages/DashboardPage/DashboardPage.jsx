@@ -16,12 +16,7 @@ import { UnitSelector } from '../../atoms';
 import { useUnit } from '../../context/UnitContext';
 import { supabase } from '../../services/supabase';
 import { useGoalsSummary } from '../../hooks';
-import {
-  format,
-  startOfMonth,
-  endOfMonth,
-  subMonths,
-} from 'date-fns';
+import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import {
   LineChart,
@@ -66,7 +61,10 @@ export function DashboardPage() {
         .from('revenues')
         .select('*, categories(name)')
         .eq('unit_id', selectedUnit.id)
-        .gte('data_competencia', format(startOfMonth(threeMonthsAgo), 'yyyy-MM-dd'))
+        .gte(
+          'data_competencia',
+          format(startOfMonth(threeMonthsAgo), 'yyyy-MM-dd')
+        )
         .lte('data_competencia', format(endOfMonth(currentDate), 'yyyy-MM-dd'))
         .order('data_competencia', { ascending: true });
 
@@ -89,18 +87,27 @@ export function DashboardPage() {
 
       // Agregar valores
       revenues?.forEach(rev => {
-        const monthKey = format(new Date(rev.data_competencia || rev.date), 'yyyy-MM');
+        const monthKey = format(
+          new Date(rev.data_competencia || rev.date),
+          'yyyy-MM'
+        );
         if (monthlyData[monthKey]) {
           const categoryName = rev.categories?.name?.toLowerCase() || '';
           const amount = parseFloat(rev.amount) || 0;
 
           monthlyData[monthKey].faturamentoGeral += amount;
 
-          if (categoryName.includes('assinatura') || categoryName.includes('clube')) {
+          if (
+            categoryName.includes('assinatura') ||
+            categoryName.includes('clube')
+          ) {
             monthlyData[monthKey].assinaturas += amount;
           }
 
-          if (categoryName.includes('produto') || categoryName.includes('venda')) {
+          if (
+            categoryName.includes('produto') ||
+            categoryName.includes('venda')
+          ) {
             monthlyData[monthKey].produtos += amount;
           }
         }
@@ -128,8 +135,12 @@ export function DashboardPage() {
         .eq('goal_month', currentMonthNumber)
         .eq('is_active', true);
 
-      const revenueGoal = goalsData?.find(g => g.goal_type === 'revenue_general');
-      const subscriptionGoal = goalsData?.find(g => g.goal_type === 'subscription');
+      const revenueGoal = goalsData?.find(
+        g => g.goal_type === 'revenue_general'
+      );
+      const subscriptionGoal = goalsData?.find(
+        g => g.goal_type === 'subscription'
+      );
       const productGoal = goalsData?.find(g => g.goal_type === 'product_sales');
 
       // Calcular tendência (crescimento mês anterior)
@@ -142,7 +153,10 @@ export function DashboardPage() {
         revenueGeneral: {
           current: currentData.faturamentoGeral || 0,
           target: revenueGoal?.target_value || 0,
-          trend: calcTrend(currentData.faturamentoGeral, previousData.faturamentoGeral),
+          trend: calcTrend(
+            currentData.faturamentoGeral,
+            previousData.faturamentoGeral
+          ),
           achieved: revenueGoal?.achieved_value || 0,
           percentage: revenueGoal?.progress_percentage || 0,
         },
@@ -161,7 +175,6 @@ export function DashboardPage() {
           percentage: productGoal?.progress_percentage || 0,
         },
       });
-
     } catch (error) {
       console.error('Erro ao buscar dados:', error);
     } finally {
@@ -193,7 +206,10 @@ export function DashboardPage() {
           {payload[0].payload.month}
         </p>
         {payload.map((entry, index) => (
-          <div key={index} className="flex items-center justify-between gap-4 text-sm">
+          <div
+            key={index}
+            className="flex items-center justify-between gap-4 text-sm"
+          >
             <div className="flex items-center gap-2">
               <div
                 className="w-3 h-3 rounded-full"
@@ -234,7 +250,9 @@ export function DashboardPage() {
               disabled={loading}
               className="btn-theme-primary px-5 py-3 rounded-xl flex items-center gap-2 shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
             >
-              <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`}
+              />
               Atualizar
             </button>
           </div>
@@ -433,7 +451,9 @@ const MetaCard = ({
   }
 
   return (
-    <div className={`card-theme p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 ${isAchieved ? 'border-green-300 dark:border-green-700' : 'border-light-border dark:border-dark-border'}`}>
+    <div
+      className={`card-theme p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 ${isAchieved ? 'border-green-300 dark:border-green-700' : 'border-light-border dark:border-dark-border'}`}
+    >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
@@ -468,7 +488,8 @@ const MetaCard = ({
           }).format(current)}
         </div>
         <div className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
-          Meta: {new Intl.NumberFormat('pt-BR', {
+          Meta:{' '}
+          {new Intl.NumberFormat('pt-BR', {
             style: 'currency',
             currency: 'BRL',
             minimumFractionDigits: 0,
@@ -483,7 +504,9 @@ const MetaCard = ({
           <span className="text-text-light-secondary dark:text-text-dark-secondary font-medium">
             Progresso
           </span>
-          <span className={`font-bold ${isAchieved ? 'text-green-600 dark:text-green-400' : isOnTrack ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}>
+          <span
+            className={`font-bold ${isAchieved ? 'text-green-600 dark:text-green-400' : isOnTrack ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}
+          >
             {percentage.toFixed(1)}%
           </span>
         </div>
@@ -502,7 +525,9 @@ const MetaCard = ({
         ) : (
           <ArrowDownRight className="w-4 h-4 text-red-600 dark:text-red-400" />
         )}
-        <span className={`text-sm font-semibold ${trend >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+        <span
+          className={`text-sm font-semibold ${trend >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+        >
           {Math.abs(trend).toFixed(1)}%
         </span>
         <span className="text-xs text-text-light-secondary dark:text-text-dark-secondary">
@@ -520,8 +545,14 @@ const InsightCard = ({ title, value, description, type }) => {
       case 'trend':
         return {
           icon: TrendingUp,
-          color: value >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400',
-          bgColor: value >= 0 ? 'bg-green-100 dark:bg-green-900/40' : 'bg-red-100 dark:bg-red-900/40',
+          color:
+            value >= 0
+              ? 'text-green-600 dark:text-green-400'
+              : 'text-red-600 dark:text-red-400',
+          bgColor:
+            value >= 0
+              ? 'bg-green-100 dark:bg-green-900/40'
+              : 'bg-red-100 dark:bg-red-900/40',
           format: v => `${v >= 0 ? '+' : ''}${v.toFixed(1)}%`,
         };
       case 'performance':
@@ -536,12 +567,13 @@ const InsightCard = ({ title, value, description, type }) => {
           icon: DollarSign,
           color: 'text-blue-600 dark:text-blue-400',
           bgColor: 'bg-blue-100 dark:bg-blue-900/40',
-          format: v => new Intl.NumberFormat('pt-BR', {
-            style: 'currency',
-            currency: 'BRL',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-          }).format(v),
+          format: v =>
+            new Intl.NumberFormat('pt-BR', {
+              style: 'currency',
+              currency: 'BRL',
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 0,
+            }).format(v),
         };
       default:
         return {

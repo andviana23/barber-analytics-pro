@@ -1,10 +1,10 @@
 /**
  * statusCalculator.js
- * 
+ *
  * Calculadora automática de status baseada em datas de vencimento e pagamento.
  * Integração com expected_dates e actual_dates para receitas e despesas.
  * Status: pending, overdue, paid, partially_paid, cancelled.
- * 
+ *
  * Autor: Sistema Barber Analytics Pro
  * Data: 2024
  */
@@ -18,30 +18,30 @@ export class StatusCalculator {
     this.config = {
       // Status disponíveis
       statuses: {
-        PENDING: 'pending',           // Pendente
-        OVERDUE: 'overdue',          // Vencido
-        PAID: 'paid',                // Pago
+        PENDING: 'pending', // Pendente
+        OVERDUE: 'overdue', // Vencido
+        PAID: 'paid', // Pago
         PARTIALLY_PAID: 'partially_paid', // Pago parcialmente
-        CANCELLED: 'cancelled',      // Cancelado
-        SCHEDULED: 'scheduled'       // Agendado (futuro)
+        CANCELLED: 'cancelled', // Cancelado
+        SCHEDULED: 'scheduled', // Agendado (futuro)
       },
-      
+
       // Configurações de vencimento
       overdueThreshold: {
-        days: 1,                     // Considera vencido após 1 dia
-        gracePeriod: 0               // Período de carência em dias
+        days: 1, // Considera vencido após 1 dia
+        gracePeriod: 0, // Período de carência em dias
       },
-      
+
       // Configurações de tolerância para pagamento parcial
       partialPaymentTolerance: {
-        percentage: 0.05,            // 5% de tolerância
-        minimumAmount: 1.00         // Mínimo R$ 1,00 de diferença
+        percentage: 0.05, // 5% de tolerância
+        minimumAmount: 1.0, // Mínimo R$ 1,00 de diferença
       },
-      
+
       // Configurações de agendamento
       scheduledThreshold: {
-        days: 0                     // Considera agendado se data futura
-      }
+        days: 0, // Considera agendado se data futura
+      },
     };
 
     // Cache para performance
@@ -57,9 +57,9 @@ export class StatusCalculator {
    */
   calculateStatus(transaction, options = {}) {
     try {
-      const referenceDate = options.referenceDate ? 
-        new Date(options.referenceDate) : 
-        new Date();
+      const referenceDate = options.referenceDate
+        ? new Date(options.referenceDate)
+        : new Date();
 
       // Validar dados da transação
       const validation = this.validateTransaction(transaction);
@@ -68,16 +68,19 @@ export class StatusCalculator {
           status: this.config.statuses.PENDING,
           reason: 'invalid_data',
           details: validation.errors,
-          calculatedAt: referenceDate.toISOString()
+          calculatedAt: referenceDate.toISOString(),
         };
       }
 
       // Verificar se foi cancelado
-      if (transaction.is_active === false || transaction.status === 'cancelled') {
+      if (
+        transaction.is_active === false ||
+        transaction.status === 'cancelled'
+      ) {
         return {
           status: this.config.statuses.CANCELLED,
           reason: 'manually_cancelled',
-          calculatedAt: referenceDate.toISOString()
+          calculatedAt: referenceDate.toISOString(),
         };
       }
 
@@ -86,22 +89,26 @@ export class StatusCalculator {
       const amounts = this.extractTransactionAmounts(transaction);
 
       // Calcular status baseado na lógica de negócio
-      const statusResult = this.determineStatus(dates, amounts, referenceDate, options);
+      const statusResult = this.determineStatus(
+        dates,
+        amounts,
+        referenceDate,
+        options
+      );
 
       return {
         ...statusResult,
         transactionId: transaction.id,
         calculatedAt: referenceDate.toISOString(),
         dates: dates,
-        amounts: amounts
+        amounts: amounts,
       };
-
     } catch (error) {
       return {
         status: this.config.statuses.PENDING,
         reason: 'calculation_error',
         error: error.message,
-        calculatedAt: new Date().toISOString()
+        calculatedAt: new Date().toISOString(),
       };
     }
   }
@@ -114,13 +121,13 @@ export class StatusCalculator {
    */
   calculateBatchStatus(transactions, options = {}) {
     const results = [];
-    const referenceDate = options.referenceDate ? 
-      new Date(options.referenceDate) : 
-      new Date();
+    const referenceDate = options.referenceDate
+      ? new Date(options.referenceDate)
+      : new Date();
 
     for (const transaction of transactions) {
       const cacheKey = this.generateCacheKey(transaction, referenceDate);
-      
+
       // Verificar cache
       if (this.cache.has(cacheKey) && !options.forceRecalculate) {
         const cached = this.cache.get(cacheKey);
@@ -131,15 +138,15 @@ export class StatusCalculator {
       }
 
       // Calcular status
-      const statusResult = this.calculateStatus(transaction, { 
-        ...options, 
-        referenceDate: referenceDate 
+      const statusResult = this.calculateStatus(transaction, {
+        ...options,
+        referenceDate: referenceDate,
       });
 
       // Armazenar no cache
       this.cache.set(cacheKey, {
         result: statusResult,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
 
       results.push(statusResult);
@@ -155,7 +162,7 @@ export class StatusCalculator {
    */
   validateTransaction(transaction) {
     const errors = [];
-    
+
     if (!transaction) {
       errors.push('Transação não fornecida');
       return { isValid: false, errors };
@@ -191,7 +198,7 @@ export class StatusCalculator {
 
     return {
       isValid: errors.length === 0,
-      errors: errors
+      errors: errors,
     };
   }
 
@@ -204,31 +211,45 @@ export class StatusCalculator {
     const dates = {
       // Datas principais
       transaction: transaction.date ? new Date(transaction.date) : null,
-      
+
       // Datas de competência
-      accrualStart: transaction.accrual_start_date ? new Date(transaction.accrual_start_date) : null,
-      accrualEnd: transaction.accrual_end_date ? new Date(transaction.accrual_end_date) : null,
-      
+      accrualStart: transaction.accrual_start_date
+        ? new Date(transaction.accrual_start_date)
+        : null,
+      accrualEnd: transaction.accrual_end_date
+        ? new Date(transaction.accrual_end_date)
+        : null,
+
       // Datas esperadas
-      expectedReceipt: transaction.expected_receipt_date ? new Date(transaction.expected_receipt_date) : null,
-      expectedPayment: transaction.expected_payment_date ? new Date(transaction.expected_payment_date) : null,
-      
+      expectedReceipt: transaction.expected_receipt_date
+        ? new Date(transaction.expected_receipt_date)
+        : null,
+      expectedPayment: transaction.expected_payment_date
+        ? new Date(transaction.expected_payment_date)
+        : null,
+
       // Datas reais
-      actualReceipt: transaction.actual_receipt_date ? new Date(transaction.actual_receipt_date) : null,
-      actualPayment: transaction.actual_payment_date ? new Date(transaction.actual_payment_date) : null,
-      
+      actualReceipt: transaction.actual_receipt_date
+        ? new Date(transaction.actual_receipt_date)
+        : null,
+      actualPayment: transaction.actual_payment_date
+        ? new Date(transaction.actual_payment_date)
+        : null,
+
       // Data de vencimento (calculada)
       due: null,
-      
+
       // Data de referência para cálculos
-      reference: null
+      reference: null,
     };
 
     // Determinar data de vencimento baseada no tipo de transação
     if (transaction.type === 'revenue' || transaction.expected_receipt_date) {
-      dates.due = dates.expectedReceipt || dates.transaction || dates.accrualStart;
+      dates.due =
+        dates.expectedReceipt || dates.transaction || dates.accrualStart;
     } else {
-      dates.due = dates.expectedPayment || dates.transaction || dates.accrualStart;
+      dates.due =
+        dates.expectedPayment || dates.transaction || dates.accrualStart;
     }
 
     // Data de referência para status
@@ -245,20 +266,25 @@ export class StatusCalculator {
   extractTransactionAmounts(transaction) {
     const amounts = {
       // Valor principal
-      expected: transaction.value || transaction.amount || transaction.net_amount || transaction.gross_amount || 0,
-      
+      expected:
+        transaction.value ||
+        transaction.amount ||
+        transaction.net_amount ||
+        transaction.gross_amount ||
+        0,
+
       // Valores específicos
       gross: transaction.gross_amount || 0,
       net: transaction.net_amount || 0,
       fees: transaction.fees || 0,
-      
+
       // Valores pagos/recebidos
       paid: 0,
       received: 0,
-      
+
       // Diferenças
       remaining: 0,
-      difference: 0
+      difference: 0,
     };
 
     // Calcular valor pago/recebido baseado nas datas reais
@@ -295,8 +321,8 @@ export class StatusCalculator {
           details: {
             paidAmount: amounts.paid,
             expectedAmount: amounts.expected,
-            difference: amounts.difference
-          }
+            difference: amounts.difference,
+          },
         };
       } else {
         return {
@@ -306,31 +332,35 @@ export class StatusCalculator {
           details: {
             paidAmount: amounts.paid,
             expectedAmount: amounts.expected,
-            remainingAmount: amounts.remaining
-          }
+            remainingAmount: amounts.remaining,
+          },
         };
       }
     }
 
     // 2. Verificar se está agendado (futuro)
     if (dates.reference && dates.reference > referenceDate) {
-      const daysUntilDue = Math.ceil((dates.reference - referenceDate) / (1000 * 60 * 60 * 24));
-      
+      const daysUntilDue = Math.ceil(
+        (dates.reference - referenceDate) / (1000 * 60 * 60 * 24)
+      );
+
       return {
         status: this.config.statuses.SCHEDULED,
         reason: 'future_due_date',
         dueDate: dates.reference,
         details: {
           daysUntilDue: daysUntilDue,
-          expectedAmount: amounts.expected
-        }
+          expectedAmount: amounts.expected,
+        },
       };
     }
 
     // 3. Verificar se está vencido
     if (dates.reference && this.isOverdue(dates.reference, referenceDate)) {
-      const daysOverdue = Math.ceil((referenceDate - dates.reference) / (1000 * 60 * 60 * 24));
-      
+      const daysOverdue = Math.ceil(
+        (referenceDate - dates.reference) / (1000 * 60 * 60 * 24)
+      );
+
       return {
         status: this.config.statuses.OVERDUE,
         reason: 'past_due_date',
@@ -338,8 +368,9 @@ export class StatusCalculator {
         details: {
           daysOverdue: daysOverdue,
           expectedAmount: amounts.expected,
-          gracePeriodExpired: daysOverdue > this.config.overdueThreshold.gracePeriod
-        }
+          gracePeriodExpired:
+            daysOverdue > this.config.overdueThreshold.gracePeriod,
+        },
       };
     }
 
@@ -350,8 +381,9 @@ export class StatusCalculator {
       dueDate: dates.reference,
       details: {
         expectedAmount: amounts.expected,
-        dueToday: dates.reference && this.isSameDay(dates.reference, referenceDate)
-      }
+        dueToday:
+          dates.reference && this.isSameDay(dates.reference, referenceDate),
+      },
     };
   }
 
@@ -378,7 +410,7 @@ export class StatusCalculator {
   isOverdue(dueDate, referenceDate) {
     const diffTime = referenceDate - dueDate;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     return diffDays > this.config.overdueThreshold.days;
   }
 
@@ -400,14 +432,19 @@ export class StatusCalculator {
    * @param {Object} supabaseClient - Cliente Supabase
    * @returns {Promise<Object>} Resultado da atualização
    */
-  async updateTransactionStatus(transactionId, table, statusData, supabaseClient) {
+  async updateTransactionStatus(
+    transactionId,
+    table,
+    statusData,
+    supabaseClient
+  ) {
     try {
       const { data, error } = await supabaseClient
         .from(table)
         .update({
           status: statusData.status,
           status_calculated_at: statusData.calculatedAt,
-          status_reason: statusData.reason
+          status_reason: statusData.reason,
         })
         .eq('id', transactionId)
         .select()
@@ -416,11 +453,10 @@ export class StatusCalculator {
       if (error) throw error;
 
       return { success: true, data };
-
     } catch (error) {
-      return { 
-        success: false, 
-        error: error.message 
+      return {
+        success: false,
+        error: error.message,
       };
     }
   }
@@ -435,12 +471,12 @@ export class StatusCalculator {
     const results = {
       success: 0,
       failed: 0,
-      errors: []
+      errors: [],
     };
 
     // Agrupar por tabela para eficiência
     const updatesByTable = {};
-    
+
     statusUpdates.forEach(update => {
       if (!updatesByTable[update.table]) {
         updatesByTable[update.table] = [];
@@ -452,17 +488,17 @@ export class StatusCalculator {
     for (const [table, updates] of Object.entries(updatesByTable)) {
       try {
         // Preparar dados para update em lote
-        const updatePromises = updates.map(update => 
+        const updatePromises = updates.map(update =>
           this.updateTransactionStatus(
-            update.id, 
-            table, 
-            update.statusData, 
+            update.id,
+            table,
+            update.statusData,
             supabaseClient
           )
         );
 
         const batchResults = await Promise.allSettled(updatePromises);
-        
+
         batchResults.forEach((result, index) => {
           if (result.status === 'fulfilled' && result.value.success) {
             results.success++;
@@ -471,17 +507,19 @@ export class StatusCalculator {
             results.errors.push({
               id: updates[index].id,
               table: table,
-              error: result.reason?.message || result.value?.error || 'Unknown error'
+              error:
+                result.reason?.message ||
+                result.value?.error ||
+                'Unknown error',
             });
           }
         });
-
       } catch (error) {
         results.failed += updates.length;
         results.errors.push({
           table: table,
           error: error.message,
-          count: updates.length
+          count: updates.length,
         });
       }
     }
@@ -503,18 +541,18 @@ export class StatusCalculator {
         pending: 0,
         overdue: 0,
         paid: 0,
-        scheduled: 0
+        scheduled: 0,
       },
       overdue: {
         count: 0,
         totalAmount: 0,
         averageDaysOverdue: 0,
-        maxDaysOverdue: 0
+        maxDaysOverdue: 0,
       },
       dueToday: {
         count: 0,
-        totalAmount: 0
-      }
+        totalAmount: 0,
+      },
     };
 
     // Inicializar contadores por status
@@ -532,10 +570,10 @@ export class StatusCalculator {
 
       // Contar por status
       stats.byStatus[status]++;
-      
+
       // Somar valores por status
       stats.amounts.total += amount;
-      
+
       switch (status) {
         case this.config.statuses.PENDING:
           stats.amounts.pending += amount;
@@ -544,21 +582,21 @@ export class StatusCalculator {
             stats.dueToday.totalAmount += amount;
           }
           break;
-          
+
         case this.config.statuses.OVERDUE:
           stats.amounts.overdue += amount;
           stats.overdue.count++;
           stats.overdue.totalAmount += amount;
-          
+
           const daysOverdue = result.details?.daysOverdue || 0;
           totalOverdueDays += daysOverdue;
           maxOverdue = Math.max(maxOverdue, daysOverdue);
           break;
-          
+
         case this.config.statuses.PAID:
           stats.amounts.paid += amount;
           break;
-          
+
         case this.config.statuses.SCHEDULED:
           stats.amounts.scheduled += amount;
           break;
@@ -567,7 +605,9 @@ export class StatusCalculator {
 
     // Calcular médias
     if (stats.overdue.count > 0) {
-      stats.overdue.averageDaysOverdue = Math.round(totalOverdueDays / stats.overdue.count);
+      stats.overdue.averageDaysOverdue = Math.round(
+        totalOverdueDays / stats.overdue.count
+      );
       stats.overdue.maxDaysOverdue = maxOverdue;
     }
 
@@ -582,7 +622,9 @@ export class StatusCalculator {
    */
   generateCacheKey(transaction, referenceDate) {
     const key = `${transaction.id}_${referenceDate.toDateString()}_${transaction.updated_at || ''}`;
-    return btoa(key).replace(/[^a-zA-Z0-9]/g, '').substring(0, 32);
+    return btoa(key)
+      .replace(/[^a-zA-Z0-9]/g, '')
+      .substring(0, 32);
   }
 
   /**
@@ -607,16 +649,16 @@ export class StatusCalculator {
       ...newConfig,
       statuses: {
         ...this.config.statuses,
-        ...(newConfig.statuses || {})
+        ...(newConfig.statuses || {}),
       },
       overdueThreshold: {
         ...this.config.overdueThreshold,
-        ...(newConfig.overdueThreshold || {})
+        ...(newConfig.overdueThreshold || {}),
       },
       partialPaymentTolerance: {
         ...this.config.partialPaymentTolerance,
-        ...(newConfig.partialPaymentTolerance || {})
-      }
+        ...(newConfig.partialPaymentTolerance || {}),
+      },
     };
 
     // Limpar cache após mudança de configuração

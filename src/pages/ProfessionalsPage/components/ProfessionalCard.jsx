@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  User, 
-  Mail, 
-  Building2, 
-  Percent, 
+import {
+  User,
+  Mail,
+  Building2,
+  Percent,
   Crown,
   Edit,
   Trash2,
@@ -11,7 +11,7 @@ import {
   PowerOff,
   Clock,
   Calendar,
-  DollarSign
+  DollarSign,
 } from 'lucide-react';
 
 import { Card } from '../../../atoms/Card/Card';
@@ -21,13 +21,13 @@ import { ProfissionaisService } from '../../../services/profissionaisService';
 /**
  * Card individual de profissional com suas informações e estatísticas
  */
-export function ProfessionalCard({ 
-  professional, 
-  onEdit, 
-  onDelete, 
+export function ProfessionalCard({
+  professional,
+  onEdit,
+  onDelete,
   onToggleStatus,
   canEdit = false,
-  canDelete = false 
+  canDelete = false,
 }) {
   const [stats, setStats] = useState(null);
   const [loadingStats, setLoadingStats] = useState(false);
@@ -39,7 +39,9 @@ export function ProfessionalCard({
     const loadStats = async () => {
       try {
         setLoadingStats(true);
-        const statsData = await ProfissionaisService.getProfissionalStats(professional.id);
+        const statsData = await ProfissionaisService.getProfissionalStats(
+          professional.id
+        );
         setStats(statsData);
       } catch {
         // Erro ao carregar estatísticas
@@ -56,11 +58,11 @@ export function ProfessionalCard({
   /**
    * Formata o papel do usuário para exibição
    */
-  const getRoleDisplay = (role) => {
+  const getRoleDisplay = role => {
     const roles = {
       admin: 'Administrador',
       gerente: 'Gerente',
-      barbeiro: 'Barbeiro'
+      barbeiro: 'Barbeiro',
     };
     return roles[role] || role;
   };
@@ -68,24 +70,31 @@ export function ProfessionalCard({
   /**
    * Retorna a cor do badge baseado no papel
    */
-  const getRoleColor = (role) => {
+  const getRoleColor = role => {
     const colors = {
       admin: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
       gerente: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-      barbeiro: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+      barbeiro:
+        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
     };
-    return colors[role] || 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+    return (
+      colors[role] ||
+      'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+    );
   };
 
   /**
    * Retorna o status da fila formatado
    */
-  const getQueueStatusDisplay = (status) => {
+  const getQueueStatusDisplay = status => {
     const statuses = {
       active: { label: 'Disponível', color: 'text-success' },
       paused: { label: 'Pausado', color: 'text-warning' },
       attending: { label: 'Em Atendimento', color: 'text-info' },
-      inactive: { label: 'Inativo', color: 'text-text-light-secondary dark:text-text-dark-secondary' }
+      inactive: {
+        label: 'Inativo',
+        color: 'text-text-light-secondary dark:text-text-dark-secondary',
+      },
     };
     return statuses[status] || statuses.inactive;
   };
@@ -93,9 +102,11 @@ export function ProfessionalCard({
   const queueStatus = getQueueStatusDisplay(stats?.statusFila);
 
   return (
-    <Card className={`p-6 transition-all duration-300 hover:shadow-lg ${
-      !professional.is_active ? 'opacity-60' : ''
-    }`}>
+    <Card
+      className={`p-6 transition-all duration-300 hover:shadow-lg ${
+        !professional.is_active ? 'opacity-60' : ''
+      }`}
+    >
       {/* Header do Card */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
@@ -103,15 +114,19 @@ export function ProfessionalCard({
           <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
             <User className="h-6 w-6 text-white" />
           </div>
-          
+
           {/* Nome e Status */}
           <div>
             <h3 className="font-semibold text-text-light-primary dark:text-text-dark-primary">
               {professional.name}
             </h3>
             <div className="flex items-center gap-2 mt-1">
-              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(professional.role)}`}>
-                {professional.role === 'admin' && <Crown className="h-3 w-3 mr-1" />}
+              <span
+                className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(professional.role)}`}
+              >
+                {professional.role === 'admin' && (
+                  <Crown className="h-3 w-3 mr-1" />
+                )}
                 {getRoleDisplay(professional.role)}
               </span>
               {!professional.is_active && (
@@ -133,7 +148,11 @@ export function ProfessionalCard({
                   size="sm"
                   icon={professional.is_active ? PowerOff : Power}
                   onClick={() => onToggleStatus(professional)}
-                  className={professional.is_active ? 'text-warning hover:text-warning' : 'text-success hover:text-success'}
+                  className={
+                    professional.is_active
+                      ? 'text-warning hover:text-warning'
+                      : 'text-success hover:text-success'
+                  }
                 />
                 <Button
                   variant="ghost"
@@ -192,7 +211,7 @@ export function ProfessionalCard({
           <h4 className="font-medium text-text-light-primary dark:text-text-dark-primary mb-3 text-sm">
             Performance do Mês
           </h4>
-          
+
           {loadingStats ? (
             <div className="text-center py-4">
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary mx-auto"></div>
@@ -222,7 +241,10 @@ export function ProfessionalCard({
                   </span>
                 </div>
                 <p className="font-semibold text-success">
-                  R$ {stats.faturamentoGerado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  R${' '}
+                  {stats.faturamentoGerado.toLocaleString('pt-BR', {
+                    minimumFractionDigits: 2,
+                  })}
                 </p>
               </div>
 
@@ -234,7 +256,10 @@ export function ProfessionalCard({
                   </span>
                 </div>
                 <p className="font-semibold text-info">
-                  R$ {stats.ticketMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  R${' '}
+                  {stats.ticketMedio.toLocaleString('pt-BR', {
+                    minimumFractionDigits: 2,
+                  })}
                 </p>
               </div>
 

@@ -69,7 +69,7 @@ O agente nunca deve sugerir queries diretas fora desse contexto
 
 Views, triggers e funções devem seguir o padrão:
 
-Prefixos: fn_, vw_, trg_
+Prefixos: fn*, vw*, trg\_
 
 Linguagem: plpgsql
 

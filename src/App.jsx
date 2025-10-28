@@ -41,6 +41,16 @@ import ClientsPage from './pages/ClientsPage'; // ✅ Clients page import
 import ProductsPage from './pages/ProductsPage/ProductsPage'; // ✅ Products page import
 import { DREPage } from './pages/DREPage';
 import { BankAccountsPage } from './pages/BankAccountsPage'; // ✅ Bank accounts page import
+import { DebugAuthPage } from './pages/DebugAuthPage'; // 🐛 Debug Auth page
+
+// Páginas do módulo de Caixa, Comandas e Serviços
+import CashRegisterPage from './pages/CashRegisterPage';
+import OrdersPage from './pages/OrdersPage';
+import ServicesPage from './pages/ServicesPage';
+import CommissionReportPage from './pages/CommissionReportPage';
+
+// Página de Conciliação Bancária
+import { ConciliacaoPage } from './pages/ConciliacaoPage';
 
 import './styles/index.css';
 
@@ -127,6 +137,12 @@ function App() {
                   }
                 />
 
+                {/* Alias para compatibilidade com testes E2E */}
+                <Route
+                  path="/financeiro"
+                  element={<Navigate to="/financial" replace />}
+                />
+
                 <Route
                   path="/professionals"
                   element={
@@ -162,6 +178,12 @@ function App() {
                       </Layout>
                     </ProtectedRoute>
                   }
+                />
+
+                {/* Alias para compatibilidade com testes E2E */}
+                <Route
+                  path="/lista-da-vez"
+                  element={<Navigate to="/queue" replace />}
                 />
 
                 <Route
@@ -283,6 +305,55 @@ function App() {
                   }
                 />
 
+                {/* Rotas do Módulo de Caixa, Comandas e Serviços */}
+                <Route
+                  path="/caixa"
+                  element={
+                    <ReceptionistRoute>
+                      <ProtectedRoute
+                        roles={['admin', 'gerente', 'recepcionista']}
+                      >
+                        <Layout activeMenuItem="caixa">
+                          <CashRegisterPage />
+                        </Layout>
+                      </ProtectedRoute>
+                    </ReceptionistRoute>
+                  }
+                />
+
+                <Route
+                  path="/comandas"
+                  element={
+                    <ProtectedRoute>
+                      <Layout activeMenuItem="comandas">
+                        <OrdersPage />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/servicos"
+                  element={
+                    <ProtectedRoute>
+                      <Layout activeMenuItem="servicos">
+                        <ServicesPage />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/comissoes"
+                  element={
+                    <ProtectedRoute>
+                      <Layout activeMenuItem="comissoes">
+                        <CommissionReportPage />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+
                 <Route
                   path="/profile"
                   element={
@@ -330,6 +401,16 @@ function App() {
 
                 {/* Rota de acesso negado */}
                 <Route path="/unauthorized" element={<UnauthorizedPage />} />
+
+                {/* 🐛 Rota de Debug de Autenticação */}
+                <Route
+                  path="/debug/auth"
+                  element={
+                    <ProtectedRoute>
+                      <DebugAuthPage />
+                    </ProtectedRoute>
+                  }
+                />
 
                 {/* Rota 404 - página não encontrada */}
                 <Route

@@ -75,6 +75,10 @@ export const ALLOWED_REVENUE_COLUMNS = [
   'observations', // text
   'source_hash', // varchar(255) - hash para dedupe de importações
 
+  // Rastreamento de origem (FASE 6)
+  'source_type', // VARCHAR(50) - Tipo: 'order', 'subscription', 'manual'
+  'source_id', // UUID - ID da entidade de origem
+
   // Valores financeiros
   'gross_amount', // numeric
   'net_amount', // numeric
@@ -180,6 +184,20 @@ export class CreateRevenueDTO {
      * @type {string|null}
      */
     this.source = safeData.source || null;
+
+    /**
+     * Tipo de origem da receita (FASE 6)
+     * Valores: 'order', 'subscription', 'manual'
+     * @type {string|null}
+     */
+    this.source_type = safeData.source_type || 'manual';
+
+    /**
+     * ID da entidade de origem (FASE 6)
+     * Ex: order_id, subscription_id
+     * @type {string|null}
+     */
+    this.source_id = safeData.source_id || null;
 
     /**
      * Observações adicionais
@@ -695,6 +713,10 @@ export class RevenueResponseDTO {
     this.source = dbRecord.source;
     this.observations = dbRecord.observations;
 
+    // FASE 6: Rastreamento de origem
+    this.source_type = dbRecord.source_type || 'manual';
+    this.source_id = dbRecord.source_id || null;
+
     // Relacionamentos
     this.unit_id = dbRecord.unit_id;
     this.account_id = dbRecord.account_id;
@@ -740,6 +762,8 @@ export class RevenueResponseDTO {
       date: this.date,
       source: this.source, // ✅ FIX: Adicionar campo source (título da receita)
       observations: this.observations, // ✅ FIX: Adicionar observações
+      source_type: this.source_type, // FASE 6: Tipo de origem
+      source_id: this.source_id, // FASE 6: ID da origem
       unit_id: this.unit_id,
       account_id: this.account_id,
       professional_id: this.professional_id,

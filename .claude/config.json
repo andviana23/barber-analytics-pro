@@ -1,24 +1,23 @@
 {
-    "include": [
-      "README.md",
-      "ARCHITECTURE.md",
-      "DATABASE_SCHEMA.md",
-      "FINANCIAL_MODULE.md",
-      "src/**/*"
-    ],
-    "commands": {
-      "analyze-financial": {
-        "description": "Analisa o módulo financeiro e gera insights de melhorias.",
-        "prompt": "Leia FINANCIAL_MODULE.md e sugira ajustes para performance, RLS e integração com Supabase."
-      },
-      "generate-report": {
-        "description": "Gera documentação técnica em formato .md com base no código selecionado."
-      }
+  "include": [
+    "README.md",
+    "ARCHITECTURE.md",
+    "DATABASE_SCHEMA.md",
+    "FINANCIAL_MODULE.md",
+    "src/**/*"
+  ],
+  "commands": {
+    "analyze-financial": {
+      "description": "Analisa o módulo financeiro e gera insights de melhorias.",
+      "prompt": "Leia FINANCIAL_MODULE.md e sugira ajustes para performance, RLS e integração com Supabase."
     },
-    "style": {
-      "language": "pt-BR",
-      "tone": "técnico e assertivo",
-      "format": "markdown"
+    "generate-report": {
+      "description": "Gera documentação técnica em formato .md com base no código selecionado."
     }
+  },
+  "style": {
+    "language": "pt-BR",
+    "tone": "técnico e assertivo",
+    "format": "markdown"
   }
-  
+}

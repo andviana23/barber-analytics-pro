@@ -1,6 +1,6 @@
 /**
  * Payment Methods Service
- * 
+ *
  * Serviço para gerenciar formas de pagamento (métodos de recebimento).
  * Inclui CRUD completo com soft delete pattern.
  */
@@ -9,28 +9,26 @@ import { supabase } from './supabase';
 
 /**
  * Buscar todas as formas de pagamento de uma unidade
- * 
+ *
  * @param {string} unitId - UUID da unidade
  * @param {boolean} includeInactive - Se deve incluir formas de pagamento inativas
  * @returns {Promise<{data: Array, error: Error|null}>}
  */
 export const getPaymentMethods = async (unitId, includeInactive = false) => {
   try {
-    let query = supabase
-      .from('payment_methods')
-      .select(`
+    let query = supabase.from('payment_methods').select(`
         *,
         units:unit_id (
           id,
           name
         )
       `);
-    
+
     // Filtrar por unidade se unitId for fornecido
     if (unitId) {
       query = query.eq('unit_id', unitId);
     }
-    
+
     query = query.order('name', { ascending: true });
 
     // Filtrar apenas ativos se includeInactive for false
@@ -54,11 +52,11 @@ export const getPaymentMethods = async (unitId, includeInactive = false) => {
 
 /**
  * Buscar uma forma de pagamento por ID
- * 
+ *
  * @param {string} id - UUID da forma de pagamento
  * @returns {Promise<{data: Object|null, error: Error|null}>}
  */
-export const getPaymentMethodById = async (id) => {
+export const getPaymentMethodById = async id => {
   try {
     const { data, error } = await supabase
       .from('payment_methods')
@@ -80,7 +78,7 @@ export const getPaymentMethodById = async (id) => {
 
 /**
  * Criar nova forma de pagamento
- * 
+ *
  * @param {Object} paymentMethodData - Dados da forma de pagamento
  * @param {string} paymentMethodData.unit_id - UUID da unidade
  * @param {string} paymentMethodData.name - Nome da forma de pagamento
@@ -88,7 +86,7 @@ export const getPaymentMethodById = async (id) => {
  * @param {number} paymentMethodData.receipt_days - Prazo de recebimento em dias CORRIDOS (padrão mercado financeiro)
  * @param {boolean} [paymentMethodData.is_active=true] - Se está ativa
  * @returns {Promise<{data: Object|null, error: Error|null}>}
- * 
+ *
  * @example
  * // Cartão de crédito - 30 dias corridos
  * createPaymentMethod({
@@ -98,10 +96,12 @@ export const getPaymentMethodById = async (id) => {
  *   receipt_days: 30 // Dias corridos, ajustado automaticamente para dia útil
  * })
  */
-export const createPaymentMethod = async (paymentMethodData) => {
+export const createPaymentMethod = async paymentMethodData => {
   try {
     // Obter o user_id do usuário autenticado
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     // Validações básicas
     if (!paymentMethodData.unit_id) {
@@ -112,12 +112,21 @@ export const createPaymentMethod = async (paymentMethodData) => {
       return { data: null, error: new Error('Nome é obrigatório') };
     }
 
-    if (paymentMethodData.fee_percentage < 0 || paymentMethodData.fee_percentage > 100) {
-      return { data: null, error: new Error('Taxa deve estar entre 0% e 100%') };
+    if (
+      paymentMethodData.fee_percentage < 0 ||
+      paymentMethodData.fee_percentage > 100
+    ) {
+      return {
+        data: null,
+        error: new Error('Taxa deve estar entre 0% e 100%'),
+      };
     }
 
     if (paymentMethodData.receipt_days < 0) {
-      return { data: null, error: new Error('Prazo de recebimento não pode ser negativo') };
+      return {
+        data: null,
+        error: new Error('Prazo de recebimento não pode ser negativo'),
+      };
     }
 
     // Preparar dados para inserção
@@ -126,8 +135,11 @@ export const createPaymentMethod = async (paymentMethodData) => {
       name: paymentMethodData.name.trim(),
       fee_percentage: Number(paymentMethodData.fee_percentage),
       receipt_days: Number(paymentMethodData.receipt_days),
-      is_active: paymentMethodData.is_active !== undefined ? paymentMethodData.is_active : true,
-      created_by: user?.id || null
+      is_active:
+        paymentMethodData.is_active !== undefined
+          ? paymentMethodData.is_active
+          : true,
+      created_by: user?.id || null,
     };
 
     const { data, error } = await supabase
@@ -150,7 +162,7 @@ export const createPaymentMethod = async (paymentMethodData) => {
 
 /**
  * Atualizar forma de pagamento existente
- * 
+ *
  * @param {string} id - UUID da forma de pagamento
  * @param {Object} updates - Dados a serem atualizados
  * @returns {Promise<{data: Object|null, error: Error|null}>}
@@ -162,13 +174,21 @@ export const updatePaymentMethod = async (id, updates) => {
       return { data: null, error: new Error('Nome não pode ser vazio') };
     }
 
-    if (updates.fee_percentage !== undefined && 
-        (updates.fee_percentage < 0 || updates.fee_percentage > 100)) {
-      return { data: null, error: new Error('Taxa deve estar entre 0% e 100%') };
+    if (
+      updates.fee_percentage !== undefined &&
+      (updates.fee_percentage < 0 || updates.fee_percentage > 100)
+    ) {
+      return {
+        data: null,
+        error: new Error('Taxa deve estar entre 0% e 100%'),
+      };
     }
 
     if (updates.receipt_days !== undefined && updates.receipt_days < 0) {
-      return { data: null, error: new Error('Prazo de recebimento não pode ser negativo') };
+      return {
+        data: null,
+        error: new Error('Prazo de recebimento não pode ser negativo'),
+      };
     }
 
     // Preparar dados para atualização
@@ -211,11 +231,11 @@ export const updatePaymentMethod = async (id, updates) => {
 
 /**
  * Soft delete - Desativar forma de pagamento
- * 
+ *
  * @param {string} id - UUID da forma de pagamento
  * @returns {Promise<{data: Object|null, error: Error|null}>}
  */
-export const deletePaymentMethod = async (id) => {
+export const deletePaymentMethod = async id => {
   try {
     const { data, error } = await supabase
       .from('payment_methods')
@@ -238,11 +258,11 @@ export const deletePaymentMethod = async (id) => {
 
 /**
  * Ativar forma de pagamento
- * 
+ *
  * @param {string} id - UUID da forma de pagamento
  * @returns {Promise<{data: Object|null, error: Error|null}>}
  */
-export const activatePaymentMethod = async (id) => {
+export const activatePaymentMethod = async id => {
   try {
     const { data, error } = await supabase
       .from('payment_methods')
@@ -267,11 +287,11 @@ export const activatePaymentMethod = async (id) => {
  * Hard delete - Deletar forma de pagamento permanentemente
  * ATENÇÃO: Use com cuidado! Apenas admins podem executar.
  * Recomendado usar soft delete (deletePaymentMethod) ao invés disso.
- * 
+ *
  * @param {string} id - UUID da forma de pagamento
  * @returns {Promise<{data: Object|null, error: Error|null}>}
  */
-export const hardDeletePaymentMethod = async (id) => {
+export const hardDeletePaymentMethod = async id => {
   try {
     const { data, error } = await supabase
       .from('payment_methods')
@@ -281,7 +301,10 @@ export const hardDeletePaymentMethod = async (id) => {
       .single();
 
     if (error) {
-      console.error('Erro ao deletar forma de pagamento permanentemente:', error);
+      console.error(
+        'Erro ao deletar forma de pagamento permanentemente:',
+        error
+      );
       return { data: null, error };
     }
 
@@ -294,35 +317,47 @@ export const hardDeletePaymentMethod = async (id) => {
 
 /**
  * Obter estatísticas das formas de pagamento de uma unidade
- * 
+ *
  * @param {string} unitId - UUID da unidade
  * @returns {Promise<{data: Object|null, error: Error|null}>}
  */
-export const getPaymentMethodsStats = async (unitId) => {
+export const getPaymentMethodsStats = async unitId => {
   try {
-    const { data: allMethods, error: allError } = await getPaymentMethods(unitId, true);
+    const { data: allMethods, error: allError } = await getPaymentMethods(
+      unitId,
+      true
+    );
 
     if (allError) {
       return { data: null, error: allError };
     }
 
     const activeMethods = allMethods.filter(method => method.is_active);
-    
+
     const stats = {
       total: allMethods.length,
       active: activeMethods.length,
       inactive: allMethods.length - activeMethods.length,
-      averageFee: activeMethods.length > 0
-        ? activeMethods.reduce((sum, m) => sum + Number(m.fee_percentage), 0) / activeMethods.length
-        : 0,
-      averageReceiptDays: activeMethods.length > 0
-        ? activeMethods.reduce((sum, m) => sum + Number(m.receipt_days), 0) / activeMethods.length
-        : 0
+      averageFee:
+        activeMethods.length > 0
+          ? activeMethods.reduce(
+              (sum, m) => sum + Number(m.fee_percentage),
+              0
+            ) / activeMethods.length
+          : 0,
+      averageReceiptDays:
+        activeMethods.length > 0
+          ? activeMethods.reduce((sum, m) => sum + Number(m.receipt_days), 0) /
+            activeMethods.length
+          : 0,
     };
 
     return { data: stats, error: null };
   } catch (error) {
-    console.error('Erro ao calcular estatísticas das formas de pagamento:', error);
+    console.error(
+      'Erro ao calcular estatísticas das formas de pagamento:',
+      error
+    );
     return { data: null, error };
   }
 };
@@ -335,5 +370,5 @@ export default {
   deletePaymentMethod,
   activatePaymentMethod,
   hardDeletePaymentMethod,
-  getPaymentMethodsStats
+  getPaymentMethodsStats,
 };

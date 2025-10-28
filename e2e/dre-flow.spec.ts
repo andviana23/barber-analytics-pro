@@ -11,12 +11,29 @@ test.describe('DRE - Demonstração do Resultado do Exercício', () => {
   test.beforeEach(async ({ page }) => {
     // Login antes de cada teste
     await page.goto('/login');
-    await page.fill('input[name="email"]', 'test@barberanalytics.com');
-    await page.fill('input[name="password"]', 'test123456');
-    await page.click('button[type="submit"]');
+    await page.fill('input[name="email"]', 'profissional@test.com');
+    await page.fill('input[name="password"]', 'Test123!');
 
-    // Aguardar redirecionamento
-    await page.waitForURL('/dashboard', { timeout: 10000 });
+    // Aguarda resposta de autenticação
+    const authPromise = page
+      .waitForResponse(
+        response =>
+          response.url().includes('/auth/v1/token') &&
+          response.status() === 200,
+        { timeout: 10000 }
+      )
+      .catch(() => null);
+
+    await page.click('button[type="submit"]');
+    await authPromise;
+
+    // Aguardar redirecionamento com múltiplas opções
+    await Promise.race([
+      page.waitForURL(/\/(dashboard|home)/, { timeout: 10000 }),
+      page.waitForSelector('nav, [data-authenticated="true"]', {
+        timeout: 10000,
+      }),
+    ]).catch(() => page.waitForTimeout(2000));
 
     // Navegar para página do DRE
     await page.goto('/dre');

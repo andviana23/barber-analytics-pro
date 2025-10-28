@@ -36,4 +36,3 @@ const ImportExpensesFromOFXButton = ({ onImportSuccess, className = '' }) => {
 };
 
 export default ImportExpensesFromOFXButton;
-

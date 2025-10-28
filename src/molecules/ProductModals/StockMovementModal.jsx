@@ -486,4 +486,3 @@ StockMovementModal.propTypes = {
 };
 
 export default StockMovementModal;
-

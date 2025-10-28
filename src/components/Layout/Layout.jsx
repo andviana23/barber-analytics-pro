@@ -31,9 +31,7 @@ export function Layout({ children, activeMenuItem = 'dashboard' }) {
         <Navbar onSidebarToggle={handleSidebarToggle} />
 
         {/* Main Container */}
-        <MainContainer>
-          {children}
-        </MainContainer>
+        <MainContainer>{children}</MainContainer>
       </div>
     </div>
   );

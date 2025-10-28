@@ -731,4 +731,3 @@ class ExpenseRepository {
 
 // Exportar instância única (Singleton)
 export default new ExpenseRepository();
-

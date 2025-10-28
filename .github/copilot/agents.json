@@ -1,0 +1,133 @@
+{
+  "agents": [
+    {
+      "name": "codegen",
+      "description": "🚀 Gerador de código - usa GPT-5 Codex",
+      "model": "copilot/gpt-5-codex",
+      "systemPrompt": "Você é um especialista em gerar código limpo, eficiente e bem documentado. Sempre use TypeScript quando possível e siga as melhores práticas.",
+      "triggers": [
+        "crie",
+        "gere",
+        "escreva",
+        "implemente",
+        "adicione",
+        "nova função",
+        "novo componente",
+        "criar feature"
+      ]
+    },
+    {
+      "name": "debugger",
+      "description": "🐛 Debugador - usa Claude Sonnet 4.5",
+      "model": "copilot/claude-sonnet-4.5",
+      "systemPrompt": "Você é especialista em encontrar e corrigir bugs. Analise o código cuidadosamente, identifique o problema raiz e sugira a solução mais eficiente.",
+      "triggers": [
+        "bug",
+        "erro",
+        "por que",
+        "não funciona",
+        "debug",
+        "corrija",
+        "fix",
+        "problema",
+        "está quebrando"
+      ]
+    },
+    {
+      "name": "architect",
+      "description": "🏗️ Arquiteto - usa GPT-5",
+      "model": "copilot/gpt-5",
+      "systemPrompt": "Você é um arquiteto de software experiente. Foque em design patterns, escalabilidade, manutenibilidade e melhores práticas de arquitetura.",
+      "triggers": [
+        "arquitetura",
+        "design",
+        "estrutura",
+        "padrão",
+        "pattern",
+        "como organizar",
+        "melhor abordagem",
+        "refatorar"
+      ]
+    },
+    {
+      "name": "explainer",
+      "description": "📖 Explicador - usa Claude Sonnet 4.5",
+      "model": "copilot/claude-sonnet-4.5",
+      "systemPrompt": "Você é um excelente professor de programação. Explique conceitos de forma clara, use exemplos práticos e analogias quando apropriado.",
+      "triggers": [
+        "explique",
+        "como funciona",
+        "o que faz",
+        "entenda",
+        "o que é",
+        "ensine",
+        "como usar"
+      ]
+    },
+    {
+      "name": "reviewer",
+      "description": "🔍 Code Reviewer - usa Claude Sonnet 4.5",
+      "model": "copilot/claude-sonnet-4.5",
+      "systemPrompt": "Você é um code reviewer experiente. Avalie código quanto a: bugs potenciais, performance, segurança, legibilidade e melhores práticas.",
+      "triggers": [
+        "revise",
+        "review",
+        "analise",
+        "avalie",
+        "melhore",
+        "otimize",
+        "code review"
+      ]
+    },
+    {
+      "name": "bigcontext",
+      "description": "📚 Contexto Grande - usa Gemini 2.5 Pro",
+      "model": "copilot/gemini-2.5-pro",
+      "systemPrompt": "Você tem capacidade de processar grandes volumes de código. Analise projetos inteiros, identifique padrões e sugira melhorias abrangentes.",
+      "triggers": [
+        "analise todo",
+        "revise tudo",
+        "projeto completo",
+        "documente projeto",
+        "overview",
+        "visão geral"
+      ]
+    },
+    {
+      "name": "sqlexpert",
+      "description": "🗄️ Expert SQL - usa Claude Sonnet 4.5",
+      "model": "copilot/claude-sonnet-4.5",
+      "systemPrompt": "Você é especialista em SQL, bancos de dados relacionais, Supabase e PostgreSQL. Foque em queries eficientes, indexação e otimização.",
+      "triggers": [
+        "sql",
+        "query",
+        "database",
+        "supabase",
+        "postgres",
+        "tabela",
+        "consulta"
+      ]
+    },
+    {
+      "name": "tester",
+      "description": "✅ Gerador de Testes - usa GPT-5 Codex",
+      "model": "copilot/gpt-5-codex",
+      "systemPrompt": "Você é especialista em testes. Gere testes unitários, de integração e E2E completos usando Jest, Vitest ou a framework adequada.",
+      "triggers": [
+        "teste",
+        "test",
+        "testes unitários",
+        "test coverage",
+        "jest",
+        "vitest"
+      ]
+    },
+    {
+      "name": "fast",
+      "description": "⚡ Resposta Rápida - usa Claude Haiku 4.5",
+      "model": "copilot/claude-haiku-4.5",
+      "systemPrompt": "Seja rápido e direto. Responda de forma concisa mas precisa.",
+      "triggers": ["rápido", "quick", "resumo", "em poucas palavras"]
+    }
+  ]
+}

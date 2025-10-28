@@ -23,7 +23,7 @@ export function CreateProfessionalModal({ onClose, onSuccess }) {
     unit_id: '',
     role: 'barbeiro',
     commission_rate: 0,
-    is_active: true
+    is_active: true,
   });
 
   const [errors, setErrors] = useState({});
@@ -33,7 +33,7 @@ export function CreateProfessionalModal({ onClose, onSuccess }) {
    */
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    
+
     // Limpar erro do campo se houver
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: null }));
@@ -87,9 +87,9 @@ export function CreateProfessionalModal({ onClose, onSuccess }) {
   /**
    * Submete o formulário
    */
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     try {
@@ -102,13 +102,13 @@ export function CreateProfessionalModal({ onClose, onSuccess }) {
         name: formData.name,
         role: formData.role,
         unit_id: formData.role === 'admin' ? null : formData.unit_id,
-        commission_rate: formData.commission_rate
+        commission_rate: formData.commission_rate,
       });
 
       showToast({
         type: 'success',
         message: 'Profissional criado com sucesso!',
-        description: `${formData.name} foi adicionado à equipe.`
+        description: `${formData.name} foi adicionado à equipe.`,
       });
 
       onSuccess();
@@ -116,7 +116,7 @@ export function CreateProfessionalModal({ onClose, onSuccess }) {
       showToast({
         type: 'error',
         message: 'Erro ao criar profissional',
-        description: error.message
+        description: error.message,
       });
     } finally {
       setLoading(false);
@@ -141,12 +141,7 @@ export function CreateProfessionalModal({ onClose, onSuccess }) {
               </p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            icon={X}
-            onClick={onClose}
-          />
+          <Button variant="ghost" size="sm" icon={X} onClick={onClose} />
         </div>
 
         {/* Formulário */}
@@ -162,18 +157,18 @@ export function CreateProfessionalModal({ onClose, onSuccess }) {
                   label="Nome Completo *"
                   icon={User}
                   value={formData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  onChange={e => handleInputChange('name', e.target.value)}
                   error={errors.name}
                   placeholder="Ex: João Silva"
                 />
               </div>
-              
+
               <Input
                 label="Email *"
                 type="email"
                 icon={Mail}
                 value={formData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
+                onChange={e => handleInputChange('email', e.target.value)}
                 error={errors.email}
                 placeholder="joao@example.com"
               />
@@ -182,10 +177,10 @@ export function CreateProfessionalModal({ onClose, onSuccess }) {
                 <label className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2">
                   Cargo *
                 </label>
-                <select 
+                <select
                   className="w-full px-3 py-2 rounded-lg border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-300"
                   value={formData.role}
-                  onChange={(e) => handleInputChange('role', e.target.value)}
+                  onChange={e => handleInputChange('role', e.target.value)}
                 >
                   <option value="barbeiro">Barbeiro</option>
                   <option value="gerente">Gerente</option>
@@ -211,7 +206,7 @@ export function CreateProfessionalModal({ onClose, onSuccess }) {
                   label="Senha *"
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
-                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  onChange={e => handleInputChange('password', e.target.value)}
                   error={errors.password}
                   placeholder="Mínimo 6 caracteres"
                 />
@@ -222,7 +217,9 @@ export function CreateProfessionalModal({ onClose, onSuccess }) {
                   label="Confirmar Senha *"
                   type={showPassword ? 'text' : 'password'}
                   value={formData.confirmPassword}
-                  onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                  onChange={e =>
+                    handleInputChange('confirmPassword', e.target.value)
+                  }
                   error={errors.confirmPassword}
                   placeholder="Repita a senha"
                 />
@@ -233,7 +230,7 @@ export function CreateProfessionalModal({ onClose, onSuccess }) {
                   <input
                     type="checkbox"
                     checked={showPassword}
-                    onChange={(e) => setShowPassword(e.target.checked)}
+                    onChange={e => setShowPassword(e.target.checked)}
                     className="rounded border-light-border dark:border-dark-border"
                   />
                   <Eye className="h-4 w-4" />
@@ -254,14 +251,18 @@ export function CreateProfessionalModal({ onClose, onSuccess }) {
                   <label className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2">
                     Unidade *
                   </label>
-                  <select 
+                  <select
                     className="w-full px-3 py-2 rounded-lg border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-300"
                     value={formData.unit_id}
-                    onChange={(e) => handleInputChange('unit_id', e.target.value)}
+                    onChange={e => handleInputChange('unit_id', e.target.value)}
                   >
                     <option value="">Selecione uma unidade</option>
-                    <option value="0db46613-5273-4625-a41d-b4a0dec7dfe7">Mangabeiras</option>
-                    <option value="f18050b4-0954-41c1-a1ee-d17617b95bad">Nova Lima</option>
+                    <option value="0db46613-5273-4625-a41d-b4a0dec7dfe7">
+                      Mangabeiras
+                    </option>
+                    <option value="f18050b4-0954-41c1-a1ee-d17617b95bad">
+                      Nova Lima
+                    </option>
                   </select>
                   {errors.unit_id && (
                     <p className="text-feedback-light-error dark:text-feedback-dark-error text-xs mt-1">
@@ -279,7 +280,12 @@ export function CreateProfessionalModal({ onClose, onSuccess }) {
                 max="100"
                 step="0.01"
                 value={formData.commission_rate}
-                onChange={(e) => handleInputChange('commission_rate', parseFloat(e.target.value) || 0)}
+                onChange={e =>
+                  handleInputChange(
+                    'commission_rate',
+                    parseFloat(e.target.value) || 0
+                  )
+                }
                 error={errors.commission_rate}
                 placeholder="0.00"
               />
@@ -289,10 +295,12 @@ export function CreateProfessionalModal({ onClose, onSuccess }) {
                   type="checkbox"
                   id="is_active"
                   checked={formData.is_active}
-                  onChange={(e) => handleInputChange('is_active', e.target.checked)}
+                  onChange={e =>
+                    handleInputChange('is_active', e.target.checked)
+                  }
                   className="rounded border-light-border dark:border-dark-border"
                 />
-                <label 
+                <label
                   htmlFor="is_active"
                   className="text-sm text-text-light-primary dark:text-text-dark-primary cursor-pointer"
                 >

@@ -70,4 +70,3 @@ export const useRevenueStatusValidator = (receitas, onUpdate) => {
 
   return { validateAndFixStatus };
 };
-

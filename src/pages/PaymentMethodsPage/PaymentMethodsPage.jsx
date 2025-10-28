@@ -1,7 +1,7 @@
 /**
  * PAYMENT METHODS PAGE
  * Página para gerenciamento de formas de pagamento
- * 
+ *
  * Features:
  * - Listagem de formas de pagamento
  * - Criar nova forma de pagamento
@@ -12,7 +12,19 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import { Plus, Search, CreditCard, Percent, Calendar, Edit2, Trash2, CheckCircle, XCircle, AlertCircle, Loader } from 'lucide-react';
+import {
+  Plus,
+  Search,
+  CreditCard,
+  Percent,
+  Calendar,
+  Edit2,
+  Trash2,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Loader,
+} from 'lucide-react';
 import { Layout } from '../../components/Layout/Layout';
 import { useAuth } from '../../context/AuthContext';
 import { useUnit } from '../../context/UnitContext';
@@ -31,18 +43,18 @@ const PaymentMethodsPage = () => {
   const [deletingId, setDeletingId] = useState(null);
 
   // Hook para buscar formas de pagamento
-  const { 
-    data: paymentMethods, 
-    loading, 
+  const {
+    data: paymentMethods,
+    loading,
     error,
     stats,
     createPaymentMethod,
     updatePaymentMethod,
     deletePaymentMethod,
-    activatePaymentMethod
+    activatePaymentMethod,
   } = usePaymentMethods(selectedUnit?.id, {
     includeInactive: showInactive,
-    enableRealtime: true
+    enableRealtime: true,
   });
 
   // Verificar permissões - APENAS ADMIN pode gerenciar formas de pagamento
@@ -54,7 +66,8 @@ const PaymentMethodsPage = () => {
   const filteredMethods = useMemo(() => {
     return paymentMethods.filter(method => {
       // Filtro de busca
-      const matchesSearch = searchTerm === '' || 
+      const matchesSearch =
+        searchTerm === '' ||
         method.name?.toLowerCase().includes(searchTerm.toLowerCase());
 
       // Filtro de status
@@ -72,115 +85,119 @@ const PaymentMethodsPage = () => {
     setIsModalOpen(true);
   };
 
-  const handleEdit = (method) => {
+  const handleEdit = method => {
     setSelectedMethod(method);
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (method) => {
-    if (!window.confirm(`Deseja realmente desativar a forma de pagamento "${method.name}"?`)) {
+  const handleDelete = async method => {
+    if (
+      !window.confirm(
+        `Deseja realmente desativar a forma de pagamento "${method.name}"?`
+      )
+    ) {
       return;
     }
 
     setDeletingId(method.id);
-    
+
     try {
       const { error } = await deletePaymentMethod(method.id);
-      
+
       if (error) {
         showToast({
           type: 'error',
           message: 'Erro ao desativar forma de pagamento',
-          description: error.message || 'Tente novamente mais tarde'
+          description: error.message || 'Tente novamente mais tarde',
         });
       } else {
         showToast({
           type: 'success',
-          message: 'Forma de pagamento desativada com sucesso'
+          message: 'Forma de pagamento desativada com sucesso',
         });
       }
     } catch (err) {
       showToast({
         type: 'error',
         message: 'Erro inesperado ao desativar forma de pagamento',
-        description: err.message
+        description: err.message,
       });
     } finally {
       setDeletingId(null);
     }
   };
 
-  const handleActivate = async (method) => {
+  const handleActivate = async method => {
     try {
       const { error } = await activatePaymentMethod(method.id);
-      
+
       if (error) {
         showToast({
           type: 'error',
           message: 'Erro ao ativar forma de pagamento',
-          description: error.message || 'Tente novamente mais tarde'
+          description: error.message || 'Tente novamente mais tarde',
         });
       } else {
         showToast({
           type: 'success',
-          message: 'Forma de pagamento ativada com sucesso'
+          message: 'Forma de pagamento ativada com sucesso',
         });
       }
     } catch (err) {
       showToast({
         type: 'error',
         message: 'Erro inesperado ao ativar forma de pagamento',
-        description: err.message
+        description: err.message,
       });
     }
   };
 
-  const handleSave = async (data) => {
+  const handleSave = async data => {
     try {
       let result;
-      
+
       if (selectedMethod) {
         // Editar
         result = await updatePaymentMethod(selectedMethod.id, data);
-        
+
         if (result.error) {
           showToast({
             type: 'error',
             message: 'Erro ao atualizar forma de pagamento',
-            description: result.error.message || 'Tente novamente mais tarde'
+            description: result.error.message || 'Tente novamente mais tarde',
           });
           return;
         }
-        
+
         showToast({
           type: 'success',
-          message: 'Forma de pagamento atualizada com sucesso'
+          message: 'Forma de pagamento atualizada com sucesso',
         });
       } else {
         // Criar
         result = await createPaymentMethod(data);
-        
+
         if (result.error) {
           showToast({
             type: 'error',
             message: 'Erro ao criar forma de pagamento',
-            description: result.error.message || 'Tente novamente mais tarde'
+            description: result.error.message || 'Tente novamente mais tarde',
           });
           return;
         }
-        
+
         showToast({
           type: 'success',
-          message: 'Forma de pagamento criada com sucesso'
+          message: 'Forma de pagamento criada com sucesso',
         });
       }
-      
+
       setIsModalOpen(false);
     } catch (err) {
       showToast({
         type: 'error',
         message: 'Erro inesperado ao salvar forma de pagamento',
-        description: err.message
+        description: err.message,
       });
     }
   };
@@ -238,8 +255,9 @@ const PaymentMethodsPage = () => {
                 Acesso Restrito
               </h3>
               <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
-                Apenas administradores podem criar, editar ou excluir formas de pagamento. 
-                Você pode visualizar as formas de pagamento cadastradas, mas não pode modificá-las.
+                Apenas administradores podem criar, editar ou excluir formas de
+                pagamento. Você pode visualizar as formas de pagamento
+                cadastradas, mas não pode modificá-las.
               </p>
             </div>
           </div>
@@ -266,7 +284,10 @@ const PaymentMethodsPage = () => {
               Nova Forma de Pagamento
             </button>
           ) : (
-            <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 rounded-lg cursor-not-allowed" title="Apenas administradores podem criar formas de pagamento">
+            <div
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 rounded-lg cursor-not-allowed"
+              title="Apenas administradores podem criar formas de pagamento"
+            >
               <Plus className="h-5 w-5" />
               Nova Forma de Pagamento
             </div>
@@ -278,7 +299,9 @@ const PaymentMethodsPage = () => {
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Total
+                </p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
                   {stats?.total || 0}
                 </p>
@@ -290,7 +313,9 @@ const PaymentMethodsPage = () => {
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Ativas</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Ativas
+                </p>
                 <p className="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">
                   {stats?.active || 0}
                 </p>
@@ -302,7 +327,9 @@ const PaymentMethodsPage = () => {
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Taxa Média</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Taxa Média
+                </p>
                 <p className="text-2xl font-bold text-orange-600 dark:text-orange-400 mt-1">
                   {(stats?.averageFee || 0).toFixed(2)}%
                 </p>
@@ -323,7 +350,7 @@ const PaymentMethodsPage = () => {
                   type="text"
                   placeholder="Buscar por nome..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={e => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent"
                 />
               </div>
@@ -335,7 +362,7 @@ const PaymentMethodsPage = () => {
                 <input
                   type="checkbox"
                   checked={showInactive}
-                  onChange={(e) => setShowInactive(e.target.checked)}
+                  onChange={e => setShowInactive(e.target.checked)}
                   className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
                 />
                 <span className="text-sm text-gray-700 dark:text-gray-300">
@@ -349,14 +376,20 @@ const PaymentMethodsPage = () => {
           {selectedUnit && (
             <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Exibindo formas de pagamento da unidade: <span className="font-semibold text-gray-900 dark:text-white">{selectedUnit.name}</span>
+                Exibindo formas de pagamento da unidade:{' '}
+                <span className="font-semibold text-gray-900 dark:text-white">
+                  {selectedUnit.name}
+                </span>
               </p>
             </div>
           )}
           {!selectedUnit && (
             <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Exibindo formas de pagamento de <span className="font-semibold text-gray-900 dark:text-white">todas as unidades</span>
+                Exibindo formas de pagamento de{' '}
+                <span className="font-semibold text-gray-900 dark:text-white">
+                  todas as unidades
+                </span>
               </p>
             </div>
           )}
@@ -393,13 +426,19 @@ const PaymentMethodsPage = () => {
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 {filteredMethods.length === 0 ? (
                   <tr>
-                    <td colSpan={isAdmin ? 6 : 5} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                    <td
+                      colSpan={isAdmin ? 6 : 5}
+                      className="px-6 py-8 text-center text-gray-500 dark:text-gray-400"
+                    >
                       Nenhuma forma de pagamento encontrada
                     </td>
                   </tr>
                 ) : (
-                  filteredMethods.map((method) => (
-                    <tr key={method.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                  filteredMethods.map(method => (
+                    <tr
+                      key={method.id}
+                      className="hover:bg-gray-50 dark:hover:bg-gray-700"
+                    >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <CreditCard className="h-5 w-5 text-gray-400 mr-3" />
@@ -425,7 +464,9 @@ const PaymentMethodsPage = () => {
                         <div className="flex items-center">
                           <Calendar className="h-4 w-4 text-blue-500 mr-2" />
                           <span className="text-sm text-gray-900 dark:text-white">
-                            {method.receipt_days === 0 ? 'Imediato' : `${method.receipt_days} dias`}
+                            {method.receipt_days === 0
+                              ? 'Imediato'
+                              : `${method.receipt_days} dias`}
                           </span>
                         </div>
                       </td>

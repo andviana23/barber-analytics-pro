@@ -6,7 +6,11 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import revenueRepository from '../revenueRepository';
-import { FinancialFixtures, DateHelpers, createSupabaseMock } from '../../../tests/__fixtures__/financial';
+import {
+  FinancialFixtures,
+  DateHelpers,
+  createSupabaseMock,
+} from '../../../tests/__fixtures__/financial';
 
 // Mock do Supabase usando vi.hoisted
 const mockSupabase = vi.hoisted(() => {
@@ -25,7 +29,7 @@ const mockSupabase = vi.hoisted(() => {
       delete: vi.fn(),
       then: vi.fn(),
       mockResolvedValue: vi.fn(),
-      mockImplementation: vi.fn()
+      mockImplementation: vi.fn(),
     };
 
     // Make all methods return the query for chaining
@@ -42,18 +46,20 @@ const mockSupabase = vi.hoisted(() => {
     query.delete.mockReturnValue(query);
 
     // Default resolved value
-    query.then.mockImplementation((resolve) => resolve({
-      data: [],
-      error: null,
-      count: 0
-    }));
-    
-    query.mockResolvedValue.mockImplementation((value) => {
-      query.then.mockImplementation((resolve) => resolve(value));
+    query.then.mockImplementation(resolve =>
+      resolve({
+        data: [],
+        error: null,
+        count: 0,
+      })
+    );
+
+    query.mockResolvedValue.mockImplementation(value => {
+      query.then.mockImplementation(resolve => resolve(value));
       return query;
     });
 
-    query.mockImplementation.mockImplementation((impl) => {
+    query.mockImplementation.mockImplementation(impl => {
       query.then.mockImplementation(impl);
       return query;
     });
@@ -65,7 +71,7 @@ const mockSupabase = vi.hoisted(() => {
 
   return {
     from: vi.fn(() => mockQuery),
-    _query: mockQuery  // Expose for test access
+    _query: mockQuery, // Expose for test access
   };
 });
 
@@ -83,7 +89,7 @@ describe('RevenueRepository', () => {
       // Arrange
       const revenueData = {
         type: 'service',
-        value: 150.00,
+        value: 150.0,
         date: DateHelpers.today(),
         unit_id: 'unit-123',
         professional_id: 'prof-456',
@@ -120,7 +126,7 @@ describe('RevenueRepository', () => {
       expect(mockSupabase.from().insert).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'service',
-          value: 150.00,
+          value: 150.0,
           unit_id: 'unit-123',
         })
       );
@@ -129,28 +135,38 @@ describe('RevenueRepository', () => {
     it('deve retornar erro quando Supabase falha', async () => {
       // Arrange
       const revenueData = FinancialFixtures.makeServiceRevenue(150);
-      
-      mockSupabase.from().insert().select().single.mockResolvedValue({
-        data: null,
-        error: { message: 'Connection failed', code: 'NETWORK_ERROR' },
-      });
+
+      mockSupabase
+        .from()
+        .insert()
+        .select()
+        .single.mockResolvedValue({
+          data: null,
+          error: { message: 'Connection failed', code: 'NETWORK_ERROR' },
+        });
 
       // Act
       const result = await revenueRepository.create(revenueData);
 
       // Assert
       expect(result.data).toBeNull();
-      expect(result.error).toBe('Erro de conexão. Verifique sua internet e tente novamente.');
+      expect(result.error).toBe(
+        'Erro de conexão. Verifique sua internet e tente novamente.'
+      );
     });
 
     it('deve normalizar erro de constraint violation', async () => {
       // Arrange
       const duplicateData = FinancialFixtures.makeServiceRevenue(150);
-      
-      mockSupabase.from().insert().select().single.mockResolvedValue({
-        data: null,
-        error: { code: '23505', message: 'duplicate key value' },
-      });
+
+      mockSupabase
+        .from()
+        .insert()
+        .select()
+        .single.mockResolvedValue({
+          data: null,
+          error: { code: '23505', message: 'duplicate key value' },
+        });
 
       // Act
       const result = await revenueRepository.create(duplicateData);
@@ -162,19 +178,26 @@ describe('RevenueRepository', () => {
     it('deve aplicar timeout de 10 segundos', async () => {
       // Arrange
       const revenueData = FinancialFixtures.makeServiceRevenue(150);
-      
+
       // Simular timeout
-      mockSupabase.from().insert().select().single.mockImplementation(
-        () => new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('NETWORK_TIMEOUT')), 50)
-        )
-      );
+      mockSupabase
+        .from()
+        .insert()
+        .select()
+        .single.mockImplementation(
+          () =>
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error('NETWORK_TIMEOUT')), 50)
+            )
+        );
 
       // Act
       const result = await revenueRepository.create(revenueData);
 
       // Assert
-      expect(result.error).toBe('Operação demorou muito para ser concluída. Tente novamente.');
+      expect(result.error).toBe(
+        'Operação demorou muito para ser concluída. Tente novamente.'
+      );
     });
   });
 
@@ -188,7 +211,9 @@ describe('RevenueRepository', () => {
 
       // Configure the mock to return specific data for this test
       const mockQuery = mockSupabase._query;
-      mockQuery.then = vi.fn((resolve) => resolve({ data: mockRevenues, error: null, count: 2 }));
+      mockQuery.then = vi.fn(resolve =>
+        resolve({ data: mockRevenues, error: null, count: 2 })
+      );
 
       // Act
       const result = await revenueRepository.findAll();
@@ -197,22 +222,29 @@ describe('RevenueRepository', () => {
       expect(result.data).toEqual(mockRevenues);
       expect(result.count).toBe(2);
       expect(mockSupabase.from).toHaveBeenCalledWith('revenues');
-      expect(mockSupabase.from().select).toHaveBeenCalledWith('*', { count: 'exact' });
+      expect(mockSupabase.from().select).toHaveBeenCalledWith('*', {
+        count: 'exact',
+      });
     });
 
     it('deve aplicar filtro de unit_id', async () => {
       // Arrange
       const filters = { unit_id: 'unit-123' };
-      
+
       // Configure the mock to return specific data for this test
       const mockQuery = mockSupabase._query;
-      mockQuery.then = vi.fn((resolve) => resolve({ data: [], error: null, count: 0 }));
+      mockQuery.then = vi.fn(resolve =>
+        resolve({ data: [], error: null, count: 0 })
+      );
 
       // Act
       await revenueRepository.findAll(filters);
 
       // Assert
-      expect(mockSupabase.from().select().eq).toHaveBeenCalledWith('unit_id', 'unit-123');
+      expect(mockSupabase.from().select().eq).toHaveBeenCalledWith(
+        'unit_id',
+        'unit-123'
+      );
     });
 
     it('deve aplicar filtros de intervalo de datas', async () => {
@@ -224,7 +256,9 @@ describe('RevenueRepository', () => {
 
       // Configure the mock to return specific data for this test
       const mockQuery = mockSupabase._query;
-      mockQuery.then = vi.fn((resolve) => resolve({ data: [], error: null, count: 0 }));
+      mockQuery.then = vi.fn(resolve =>
+        resolve({ data: [], error: null, count: 0 })
+      );
 
       // Act
       await revenueRepository.findAll(filters);
@@ -237,16 +271,19 @@ describe('RevenueRepository', () => {
     it('deve aplicar filtro de status', async () => {
       // Arrange
       const filters = { status: 'received' };
-      
+
       // Configure the mock to return specific data for this test
       const mockQuery = mockSupabase._query;
-      mockQuery.then = vi.fn((resolve) => resolve({ data: [], error: null }));
+      mockQuery.then = vi.fn(resolve => resolve({ data: [], error: null }));
 
       // Act
       await revenueRepository.findAll(filters);
 
       // Assert
-      expect(mockSupabase.from().select().eq).toHaveBeenCalledWith('status', 'received');
+      expect(mockSupabase.from().select().eq).toHaveBeenCalledWith(
+        'status',
+        'received'
+      );
     });
 
     it('deve aplicar múltiplos filtros simultaneamente', async () => {
@@ -260,7 +297,7 @@ describe('RevenueRepository', () => {
 
       // Configure the mock to return specific data for this test
       const mockQuery = mockSupabase._query;
-      mockQuery.then = vi.fn((resolve) => resolve({ data: [], error: null }));
+      mockQuery.then = vi.fn(resolve => resolve({ data: [], error: null }));
 
       // Act
       await revenueRepository.findAll(filters);
@@ -276,10 +313,10 @@ describe('RevenueRepository', () => {
       // Arrange
       const page = 2;
       const limit = 10;
-      
+
       // Configure the mock to return specific data for this test
       const mockQuery = mockSupabase._query;
-      mockQuery.then = vi.fn((resolve) => resolve({ data: [], error: null }));
+      mockQuery.then = vi.fn(resolve => resolve({ data: [], error: null }));
 
       // Act
       await revenueRepository.findAll({}, page, limit);
@@ -294,29 +331,33 @@ describe('RevenueRepository', () => {
       // Arrange
       // Configure the mock to return specific data for this test
       const mockQuery = mockSupabase._query;
-      mockQuery.then = vi.fn((resolve) => resolve({ data: [], error: null }));
+      mockQuery.then = vi.fn(resolve => resolve({ data: [], error: null }));
 
       // Act
       await revenueRepository.findAll();
 
       // Assert
-      expect(mockQuery.order).toHaveBeenCalledWith('created_at', { ascending: false });
+      expect(mockQuery.order).toHaveBeenCalledWith('created_at', {
+        ascending: false,
+      });
     });
 
     it('deve aplicar ordenação personalizada quando especificada', async () => {
       // O Repository real não suporta ordenação personalizada
       // Sempre aplica ordenação fixa por 'date' e 'created_at' desc
-      
+
       // Configure the mock to return specific data for this test
       const mockQuery = mockSupabase._query;
-      mockQuery.then = vi.fn((resolve) => resolve({ data: [], error: null }));
+      mockQuery.then = vi.fn(resolve => resolve({ data: [], error: null }));
 
       // Act
       await revenueRepository.findAll();
 
       // Assert
       // Repository sempre aplica ordenação fixa
-      expect(mockQuery.order).toHaveBeenCalledWith('date', { ascending: false });
+      expect(mockQuery.order).toHaveBeenCalledWith('date', {
+        ascending: false,
+      });
     });
   });
 
@@ -325,7 +366,7 @@ describe('RevenueRepository', () => {
       // Arrange
       const revenueId = 'rev-123';
       const mockRevenue = FinancialFixtures.makeServiceRevenue(150);
-      
+
       mockSupabase.from().select().eq().single.mockResolvedValue({
         data: mockRevenue,
         error: null,
@@ -336,16 +377,23 @@ describe('RevenueRepository', () => {
 
       // Assert
       expect(result.data).toEqual(mockRevenue);
-      expect(mockSupabase.from().select().eq).toHaveBeenCalledWith('id', revenueId);
+      expect(mockSupabase.from().select().eq).toHaveBeenCalledWith(
+        'id',
+        revenueId
+      );
       expect(mockSupabase.from().select().eq().single).toHaveBeenCalled();
     });
 
     it('deve retornar null quando receita não existe', async () => {
       // Arrange
-      mockSupabase.from().select().eq().single.mockResolvedValue({
-        data: null,
-        error: { code: 'PGRST116', message: 'Receita não encontrada' },
-      });
+      mockSupabase
+        .from()
+        .select()
+        .eq()
+        .single.mockResolvedValue({
+          data: null,
+          error: { code: 'PGRST116', message: 'Receita não encontrada' },
+        });
 
       // Act
       const result = await revenueRepository.findById('rev-inexistente');
@@ -381,18 +429,28 @@ describe('RevenueRepository', () => {
       // Assert
       expect(result.data).toEqual(updatedRevenue);
       expect(mockSupabase.from().update).toHaveBeenCalledWith(updateData);
-      expect(mockSupabase.from().update().eq).toHaveBeenCalledWith('id', revenueId);
+      expect(mockSupabase.from().update().eq).toHaveBeenCalledWith(
+        'id',
+        revenueId
+      );
     });
 
     it('deve retornar erro quando receita não existe para atualização', async () => {
       // Arrange
-      mockSupabase.from().update().eq().select().single.mockResolvedValue({
-        data: null,
-        error: { code: 'PGRST116', message: 'Receita não encontrada' },
-      });
+      mockSupabase
+        .from()
+        .update()
+        .eq()
+        .select()
+        .single.mockResolvedValue({
+          data: null,
+          error: { code: 'PGRST116', message: 'Receita não encontrada' },
+        });
 
       // Act
-      const result = await revenueRepository.update('rev-inexistente', { status: 'received' });
+      const result = await revenueRepository.update('rev-inexistente', {
+        status: 'received',
+      });
 
       // Assert
       expect(result.error).toContain('não encontrada');
@@ -403,10 +461,10 @@ describe('RevenueRepository', () => {
     it('deve fazer soft delete (is_active = false)', async () => {
       // Arrange
       const revenueId = 'rev-123';
-      
+
       // Configure the mock to return specific data for this test
       const mockQuery = mockSupabase._query;
-      mockQuery.then = vi.fn((resolve) => resolve({ error: null }));
+      mockQuery.then = vi.fn(resolve => resolve({ error: null }));
 
       // Act
       const result = await revenueRepository.softDelete(revenueId);
@@ -417,16 +475,19 @@ describe('RevenueRepository', () => {
         is_active: false,
         updated_at: expect.any(String),
       });
-      expect(mockSupabase.from().update().eq).toHaveBeenCalledWith('id', revenueId);
+      expect(mockSupabase.from().update().eq).toHaveBeenCalledWith(
+        'id',
+        revenueId
+      );
     });
 
     it('deve permitir hard delete quando especificado', async () => {
       // Arrange
       const revenueId = 'rev-123';
-      
+
       // Configure the mock to return specific data for this test
       const mockQuery = mockSupabase._query;
-      mockQuery.then = vi.fn((resolve) => resolve({ data: null, error: null }));
+      mockQuery.then = vi.fn(resolve => resolve({ data: null, error: null }));
 
       // Act
       const result = await revenueRepository.hardDelete(revenueId);
@@ -461,7 +522,7 @@ describe('RevenueRepository', () => {
       };
 
       const result = await revenueRepository.findAll(filters);
-      
+
       // O Repository pode falhar por outros motivos (mock não processou bem)
       expect(result.error).not.toBeNull();
     });
@@ -470,9 +531,9 @@ describe('RevenueRepository', () => {
       // Limite muito alto - O Repository real não valida limite
       const page = 1;
       const limit = 10000;
-      
+
       const result = await revenueRepository.findAll({}, page, limit);
-      
+
       // O Repository pode falhar por outros motivos (mock não processou bem)
       expect(result.error).not.toBeNull();
     });
@@ -491,12 +552,16 @@ describe('RevenueRepository', () => {
 
       // Assert
       // O Repository real pega na try/catch e retorna erro genérico
-      expect(result.error).toBe('Erro inesperado ao buscar receitas. Tente novamente.');
+      expect(result.error).toBe(
+        'Erro inesperado ao buscar receitas. Tente novamente.'
+      );
     });
 
     // ⚠️ TODO(test): Implementar testes de RLS no repository
     // Verificar se queries respeitam unit_id do usuário
-    it.todo('deve aplicar RLS filters automaticamente baseado no contexto do usuário');
+    it.todo(
+      'deve aplicar RLS filters automaticamente baseado no contexto do usuário'
+    );
 
     // ⚠️ TODO(test): Implementar cache no repository level
     it.todo('deve implementar cache para consultas frequentes');

@@ -13,36 +13,38 @@ export function useFocusManagement() {
     );
   };
 
-  const updateFocusableElements = (container) => {
+  const updateFocusableElements = container => {
     focusableElements.current = Array.from(getFocusableElements(container));
   };
 
   const focusNext = () => {
     if (focusableElements.current.length === 0) return;
-    
-    currentFocusIndex.current = (currentFocusIndex.current + 1) % focusableElements.current.length;
+
+    currentFocusIndex.current =
+      (currentFocusIndex.current + 1) % focusableElements.current.length;
     focusableElements.current[currentFocusIndex.current]?.focus();
   };
 
   const focusPrevious = () => {
     if (focusableElements.current.length === 0) return;
-    
-    currentFocusIndex.current = currentFocusIndex.current <= 0 
-      ? focusableElements.current.length - 1 
-      : currentFocusIndex.current - 1;
+
+    currentFocusIndex.current =
+      currentFocusIndex.current <= 0
+        ? focusableElements.current.length - 1
+        : currentFocusIndex.current - 1;
     focusableElements.current[currentFocusIndex.current]?.focus();
   };
 
   const focusFirst = () => {
     if (focusableElements.current.length === 0) return;
-    
+
     currentFocusIndex.current = 0;
     focusableElements.current[0]?.focus();
   };
 
   const focusLast = () => {
     if (focusableElements.current.length === 0) return;
-    
+
     currentFocusIndex.current = focusableElements.current.length - 1;
     focusableElements.current[currentFocusIndex.current]?.focus();
   };
@@ -55,7 +57,7 @@ export function useFocusManagement() {
     focusPrevious,
     focusFirst,
     focusLast,
-    getFocusableElements: getFocusableElementsArray
+    getFocusableElements: getFocusableElementsArray,
   };
 }
 
@@ -68,10 +70,11 @@ export function useKeyboardNavigation(containerRef, options = {}) {
     enableEscapeKey = true,
     onEnter = null,
     onEscape = null,
-    autoFocus = false
+    autoFocus = false,
   } = options;
 
-  const { updateFocusableElements, focusNext, focusPrevious, focusFirst } = useFocusManagement();
+  const { updateFocusableElements, focusNext, focusPrevious, focusFirst } =
+    useFocusManagement();
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -82,8 +85,14 @@ export function useKeyboardNavigation(containerRef, options = {}) {
       setTimeout(() => focusFirst(), 100);
     }
 
-    const handleKeyDown = (event) => {
-      if (!enableArrowKeys && !enableTabKey && !enableEnterKey && !enableEscapeKey) return;
+    const handleKeyDown = event => {
+      if (
+        !enableArrowKeys &&
+        !enableTabKey &&
+        !enableEnterKey &&
+        !enableEscapeKey
+      )
+        return;
 
       switch (event.key) {
         case 'ArrowDown':
@@ -123,7 +132,20 @@ export function useKeyboardNavigation(containerRef, options = {}) {
     return () => {
       container.removeEventListener('keydown', handleKeyDown);
     };
-  }, [containerRef, enableArrowKeys, enableTabKey, enableEnterKey, enableEscapeKey, onEnter, onEscape, autoFocus, updateFocusableElements, focusNext, focusPrevious, focusFirst]);
+  }, [
+    containerRef,
+    enableArrowKeys,
+    enableTabKey,
+    enableEnterKey,
+    enableEscapeKey,
+    onEnter,
+    onEscape,
+    autoFocus,
+    updateFocusableElements,
+    focusNext,
+    focusPrevious,
+    focusFirst,
+  ]);
 
   return { updateFocusableElements };
 }
@@ -139,7 +161,7 @@ export function useFocusTrap(containerRef, isActive = true) {
 
     const container = containerRef.current;
     updateFocusableElements(container);
-    
+
     const focusableElements = Array.from(
       container.querySelectorAll(
         'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
@@ -154,7 +176,7 @@ export function useFocusTrap(containerRef, isActive = true) {
     // Foco inicial no primeiro elemento
     firstElementRef.current?.focus();
 
-    const handleTabKey = (e) => {
+    const handleTabKey = e => {
       if (e.key !== 'Tab') return;
 
       // Se Shift+Tab no primeiro elemento, vai para o último
@@ -163,7 +185,10 @@ export function useFocusTrap(containerRef, isActive = true) {
         lastElementRef.current?.focus();
       }
       // Se Tab no último elemento, vai para o primeiro
-      else if (!e.shiftKey && document.activeElement === lastElementRef.current) {
+      else if (
+        !e.shiftKey &&
+        document.activeElement === lastElementRef.current
+      ) {
         e.preventDefault();
         firstElementRef.current?.focus();
       }
@@ -185,28 +210,28 @@ export function useScreenReader() {
     announcement.setAttribute('aria-atomic', 'true');
     announcement.setAttribute('class', 'sr-only');
     announcement.textContent = message;
-    
+
     document.body.appendChild(announcement);
-    
+
     // Remove o elemento após 1 segundo
     setTimeout(() => {
       document.body.removeChild(announcement);
     }, 1000);
   };
 
-  const announcePageChange = (pageTitle) => {
+  const announcePageChange = pageTitle => {
     announceToScreenReader(`Navegou para ${pageTitle}`, 'assertive');
   };
 
-  const announceAction = (action) => {
+  const announceAction = action => {
     announceToScreenReader(action, 'polite');
   };
 
-  const announceError = (error) => {
+  const announceError = error => {
     announceToScreenReader(`Erro: ${error}`, 'assertive');
   };
 
-  const announceSuccess = (message) => {
+  const announceSuccess = message => {
     announceToScreenReader(`Sucesso: ${message}`, 'polite');
   };
 
@@ -215,32 +240,34 @@ export function useScreenReader() {
     announcePageChange,
     announceAction,
     announceError,
-    announceSuccess
+    announceSuccess,
   };
 }
 
 // Componente wrapper para melhorar acessibilidade
-export function AccessibleContainer({ 
-  children, 
+export function AccessibleContainer({
+  children,
   role = 'main',
   ariaLabel,
   ariaLabelledBy,
   className = '',
   enableKeyboardNav = false,
   keyboardNavOptions = {},
-  ...props 
+  ...props
 }) {
   const containerRef = useRef(null);
 
   // Sempre chama o hook, mas passa um parâmetro para desabilitar se necessário
   useKeyboardNavigation(
-    containerRef, 
-    enableKeyboardNav ? keyboardNavOptions : { 
-      enableArrowKeys: false, 
-      enableTabKey: false, 
-      enableEnterKey: false, 
-      enableEscapeKey: false 
-    }
+    containerRef,
+    enableKeyboardNav
+      ? keyboardNavOptions
+      : {
+          enableArrowKeys: false,
+          enableTabKey: false,
+          enableEnterKey: false,
+          enableEscapeKey: false,
+        }
   );
 
   return (
@@ -259,7 +286,10 @@ export function AccessibleContainer({
 
 // Hook para skip links
 export function useSkipLinks() {
-  const addSkipLink = (targetId, linkText = 'Pular para o conteúdo principal') => {
+  const addSkipLink = (
+    targetId,
+    linkText = 'Pular para o conteúdo principal'
+  ) => {
     // Verifica se o skip link já existe
     if (document.getElementById('skip-link')) return;
 
@@ -267,9 +297,10 @@ export function useSkipLinks() {
     skipLink.id = 'skip-link';
     skipLink.href = `#${targetId}`;
     skipLink.textContent = linkText;
-    skipLink.className = 'sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:p-4 focus:bg-primary focus:text-white focus:underline';
-    
-    skipLink.addEventListener('click', (e) => {
+    skipLink.className =
+      'sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:p-4 focus:bg-primary focus:text-white focus:underline';
+
+    skipLink.addEventListener('click', e => {
       e.preventDefault();
       const target = document.getElementById(targetId);
       if (target) {
@@ -295,7 +326,7 @@ export function useSkipLinks() {
 export const contrastUtils = {
   // Calcula o contraste entre duas cores
   calculateContrast: (color1, color2) => {
-    const getLuminance = (rgb) => {
+    const getLuminance = rgb => {
       const [r, g, b] = rgb.map(c => {
         c = c / 255;
         return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
@@ -303,34 +334,36 @@ export const contrastUtils = {
       return 0.2126 * r + 0.7152 * g + 0.0722 * b;
     };
 
-    const hexToRgb = (hex) => {
+    const hexToRgb = hex => {
       const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-      return result ? [
-        parseInt(result[1], 16),
-        parseInt(result[2], 16),
-        parseInt(result[3], 16)
-      ] : null;
+      return result
+        ? [
+            parseInt(result[1], 16),
+            parseInt(result[2], 16),
+            parseInt(result[3], 16),
+          ]
+        : null;
     };
 
     const rgb1 = hexToRgb(color1);
     const rgb2 = hexToRgb(color2);
-    
+
     if (!rgb1 || !rgb2) return 0;
 
     const lum1 = getLuminance(rgb1);
     const lum2 = getLuminance(rgb2);
-    
+
     const brightest = Math.max(lum1, lum2);
     const darkest = Math.min(lum1, lum2);
-    
+
     return (brightest + 0.05) / (darkest + 0.05);
   },
 
   // Verifica se o contraste atende aos padrões WCAG
   meetsWCAGStandard: (contrast, level = 'AA') => {
     const standards = {
-      'AA': 4.5,
-      'AAA': 7
+      AA: 4.5,
+      AAA: 7,
     };
     return contrast >= standards[level];
   },
@@ -342,9 +375,9 @@ export const contrastUtils = {
     return {
       lighterOption: '#FFFFFF',
       darkerOption: '#000000',
-      targetContrast
+      targetContrast,
     };
-  }
+  },
 };
 
 // Classes CSS de utilitário para acessibilidade (para adicionar ao Tailwind)
@@ -420,5 +453,5 @@ export default {
   AccessibleContainer,
   useSkipLinks,
   contrastUtils,
-  a11yClasses
+  a11yClasses,
 };

@@ -1,6 +1,6 @@
 /**
  * CREATE BANK ACCOUNT MODAL
- * 
+ *
  * Modal para criação de nova conta bancária
  */
 
@@ -18,7 +18,7 @@ import {
   Building,
   MapPin,
   Hash,
-  DollarSign
+  DollarSign,
 } from 'lucide-react';
 
 const CreateBankAccountModal = ({ isOpen, onClose, onSuccess }) => {
@@ -33,7 +33,7 @@ const CreateBankAccountModal = ({ isOpen, onClose, onSuccess }) => {
     agency: '',
     account_number: '',
     unit_id: '',
-    initial_balance: 0
+    initial_balance: 0,
   });
 
   const [errors, setErrors] = useState({});
@@ -71,7 +71,8 @@ const CreateBankAccountModal = ({ isOpen, onClose, onSuccess }) => {
     if (!formData.account_number.trim()) {
       newErrors.account_number = 'Número da conta é obrigatório';
     } else if (!/^[\d-]+$/.test(formData.account_number.trim())) {
-      newErrors.account_number = 'Número da conta deve conter apenas números e hífen';
+      newErrors.account_number =
+        'Número da conta deve conter apenas números e hífen';
     }
 
     // Unidade
@@ -85,7 +86,12 @@ const CreateBankAccountModal = ({ isOpen, onClose, onSuccess }) => {
     }
 
     // Verificar se a conta já existe
-    if (!newErrors.bank && !newErrors.agency && !newErrors.account_number && !newErrors.unit_id) {
+    if (
+      !newErrors.bank &&
+      !newErrors.agency &&
+      !newErrors.account_number &&
+      !newErrors.unit_id
+    ) {
       try {
         setChecking(true);
         const exists = await checkAccountExists(
@@ -94,9 +100,10 @@ const CreateBankAccountModal = ({ isOpen, onClose, onSuccess }) => {
           formData.account_number.trim(),
           formData.unit_id
         );
-        
+
         if (exists) {
-          newErrors.account_number = 'Esta conta já existe para a unidade selecionada';
+          newErrors.account_number =
+            'Esta conta já existe para a unidade selecionada';
         }
       } catch {
         // Erro ao verificar será ignorado para não bloquear o formulário
@@ -110,35 +117,35 @@ const CreateBankAccountModal = ({ isOpen, onClose, onSuccess }) => {
   };
 
   // Handlers
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-    
+
     // Limpar erro do campo atual
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
-        [name]: ''
+        [name]: '',
       }));
     }
   };
 
-  const handleBlur = (field) => {
+  const handleBlur = field => {
     setTouched(prev => ({ ...prev, [field]: true }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     const isValid = await validateForm();
     if (!isValid) return;
 
     try {
       const newAccount = await createBankAccount(formData);
-      
+
       showSuccess(
         'Conta bancária criada',
         `A conta ${formData.name} foi criada com sucesso.`
@@ -151,32 +158,29 @@ const CreateBankAccountModal = ({ isOpen, onClose, onSuccess }) => {
         agency: '',
         account_number: '',
         unit_id: '',
-        initial_balance: 0
+        initial_balance: 0,
       });
-      
+
       setErrors({});
       setTouched({});
-      
+
       onSuccess?.(newAccount);
       onClose();
     } catch (error) {
-      showError(
-        'Erro ao criar conta',
-        error.message
-      );
+      showError('Erro ao criar conta', error.message);
     }
   };
 
   const handleClose = () => {
     if (loading) return;
-    
+
     setFormData({
       name: '',
       bank: '',
       agency: '',
       account_number: '',
       unit_id: '',
-      initial_balance: 0
+      initial_balance: 0,
     });
     setErrors({});
     setTouched({});
@@ -189,11 +193,10 @@ const CreateBankAccountModal = ({ isOpen, onClose, onSuccess }) => {
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Overlay */}
       <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" />
-      
+
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
         <div className="relative w-full max-w-lg transform rounded-lg bg-white dark:bg-gray-800 shadow-xl transition-all">
-          
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3">
@@ -209,7 +212,7 @@ const CreateBankAccountModal = ({ isOpen, onClose, onSuccess }) => {
                 </p>
               </div>
             </div>
-            
+
             <Button
               variant="ghost"
               size="sm"
@@ -223,7 +226,6 @@ const CreateBankAccountModal = ({ isOpen, onClose, onSuccess }) => {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
-            
             {/* Nome da conta */}
             <div>
               <Input
@@ -272,7 +274,7 @@ const CreateBankAccountModal = ({ isOpen, onClose, onSuccess }) => {
                   required
                 />
               </div>
-              
+
               <div>
                 <Input
                   label="Número da Conta"
@@ -304,9 +306,10 @@ const CreateBankAccountModal = ({ isOpen, onClose, onSuccess }) => {
                   w-full px-3 py-2 border rounded-md shadow-sm
                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
                   disabled:bg-gray-50 disabled:text-gray-500
-                  ${touched.unit_id && errors.unit_id
-                    ? 'border-red-300 bg-red-50' 
-                    : 'border-gray-300 dark:border-gray-600'
+                  ${
+                    touched.unit_id && errors.unit_id
+                      ? 'border-red-300 bg-red-50'
+                      : 'border-gray-300 dark:border-gray-600'
                   }
                   bg-white dark:bg-gray-700 text-gray-900 dark:text-white
                 `}
@@ -363,7 +366,7 @@ const CreateBankAccountModal = ({ isOpen, onClose, onSuccess }) => {
               >
                 Cancelar
               </Button>
-              
+
               <Button
                 type="submit"
                 disabled={loading || checking}

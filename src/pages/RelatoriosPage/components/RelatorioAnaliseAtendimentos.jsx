@@ -8,7 +8,10 @@ const RelatorioAnaliseAtendimentos = ({ filters }) => {
       <div className="text-center py-12">
         <div className="flex justify-center mb-4">
           <div className="p-4 bg-indigo-100 dark:bg-indigo-900 rounded-full">
-            <PieChart size={48} className="text-indigo-600 dark:text-indigo-400" />
+            <PieChart
+              size={48}
+              className="text-indigo-600 dark:text-indigo-400"
+            />
           </div>
         </div>
         <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
@@ -17,17 +20,17 @@ const RelatorioAnaliseAtendimentos = ({ filters }) => {
         <p className="text-gray-600 dark:text-gray-400 mb-6">
           Padrões e tendências dos atendimentos realizados
         </p>
-        
+
         <Card className="p-6 max-w-md mx-auto">
           <Clock className="mx-auto mb-4 text-gray-400" size={32} />
           <p className="text-gray-500 dark:text-gray-400">
             Componente em desenvolvimento...
           </p>
           <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
-            Período: {filters.periodo.tipo === 'mes' 
+            Período:{' '}
+            {filters.periodo.tipo === 'mes'
               ? `${filters.periodo.mes}/${filters.periodo.ano}`
-              : 'Período selecionado'
-            }
+              : 'Período selecionado'}
           </p>
         </Card>
       </div>
