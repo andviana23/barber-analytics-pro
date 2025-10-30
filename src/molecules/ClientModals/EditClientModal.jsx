@@ -57,12 +57,7 @@ const EditClientModal = ({
       newErrors.email = 'Email inválido';
     }
 
-    if (formData.cpf_cnpj) {
-      const cpfLimpo = formData.cpf_cnpj.replace(/\D/g, '');
-      if (cpfLimpo.length !== 11) {
-        newErrors.cpf_cnpj = 'CPF deve ter 11 dígitos';
-      }
-    }
+    // CPF/CNPJ agora é opcional - sem validação obrigatória
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -105,10 +100,6 @@ const EditClientModal = ({
     }
 
     setFormData(prev => ({ ...prev, cpf_cnpj: value }));
-
-    if (errors.cpf_cnpj) {
-      setErrors(prev => ({ ...prev, cpf_cnpj: '' }));
-    }
   };
 
   const handleSubmit = async e => {
@@ -208,7 +199,7 @@ const EditClientModal = ({
               </div>
             </div>
 
-            {/* CPF */}
+            {/* CPF - Opcional */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 CPF
@@ -221,16 +212,9 @@ const EditClientModal = ({
                   onChange={handleCpfChange}
                   placeholder="000.000.000-00"
                   maxLength={14}
-                  className={`w-full pl-10 pr-3 py-2 border ${
-                    errors.cpf_cnpj
-                      ? 'border-red-500'
-                      : 'border-gray-300 dark:border-gray-600'
-                  } rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
-              {errors.cpf_cnpj && (
-                <p className="mt-1 text-sm text-red-500">{errors.cpf_cnpj}</p>
-              )}
             </div>
 
             {/* Email */}

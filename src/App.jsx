@@ -51,6 +51,7 @@ import CommissionReportPage from './pages/CommissionReportPage';
 
 // Página de Conciliação Bancária
 import { ConciliacaoPage } from './pages/ConciliacaoPage';
+import { BarbeiroPortalPage } from './pages/BarbeiroPortal';
 
 import './styles/index.css';
 
@@ -122,6 +123,15 @@ function App() {
                         </Layout>
                       </ProtectedRoute>
                     </ReceptionistRoute>
+                  }
+                />
+
+                <Route
+                  path="/barbeiro/portal"
+                  element={
+                    <ProtectedRoute roles={['barbeiro']}>
+                      <BarbeiroPortalPage />
+                    </ProtectedRoute>
                   }
                 />
 

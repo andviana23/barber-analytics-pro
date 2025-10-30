@@ -19,7 +19,7 @@ A Lista da Vez organiza o atendimento de profissionais por unidade, atribuindo p
 - ✅ Listar barbeiros ativos por unidade com pontuação atualizada.
 - ✅ Permitir adição manual de pontos (um por vez) com logs.
 - ✅ Reordenar automaticamente conforme pontuação/data cadastro.
-- ✅ Resetar a fila no último dia do mês às 23:59 (Edge Function).
+- ✅ Resetar a fila no último dia do mês às 23:00 (Cron Job via pg_cron).
 - ✅ Registrar histórico mensal completo (`barbers_turn_history`).
 - ✅ Disponibilizar relatórios e exportações por unidade/período.
 

@@ -3,6 +3,7 @@
 
 export { CategoriesPage } from './CategoriesPage';
 export { DashboardPage } from './DashboardPage';
+export { BarbeiroPortalPage } from './BarbeiroPortal';
 export { default as GoalsPage } from './GoalsPage';
 export { LoginPage } from './LoginPage';
 export { SignUpPage } from './SignUpPage';

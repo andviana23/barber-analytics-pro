@@ -85,7 +85,7 @@ const CloseCashModal = ({
 
     if (onConfirm) {
       onConfirm({
-        closing_balance: closingBalance,
+        closingBalance: closingBalance, // ✅ camelCase para DTO
         observations: observations.trim() || null,
         difference: difference,
       });

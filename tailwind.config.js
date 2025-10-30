@@ -25,6 +25,7 @@ export default {
         light: {
           bg: '#F9FAFB',
           surface: '#FFFFFF',
+          hover: '#F3F4F6',
           border: '#E2E8F0',
         },
 
@@ -32,6 +33,7 @@ export default {
         dark: {
           bg: '#0C0F12',
           surface: '#161B22',
+          hover: '#1F2937',
           border: '#242C37',
         },
 

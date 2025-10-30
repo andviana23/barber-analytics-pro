@@ -758,40 +758,54 @@ const NovaDespesaModal = ({
               </div>
             </div>
 
-            {/* 🔁 2. Configuração de Repetição */}
-            <div className="space-y-6">
-              <div className="flex items-center justify-between pb-6 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg">
-                    <Repeat className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-semibold text-gray-900 dark:text-white">
-                      Configurações de repetição
-                    </h3>
+            {/* Toggle de Recorrência */}
+            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/10 dark:to-indigo-900/10 border-2 border-purple-200 dark:border-purple-700/50 rounded-2xl">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg">
+                  <Repeat className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                    Despesa Recorrente
+                  </h3>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                    Ativar para repetir este lançamento mensalmente
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsRecurring(!isRecurring)}
+                className={`relative inline-flex h-8 w-14 items-center rounded-full transition-all duration-300 ${
+                  isRecurring
+                    ? 'bg-gradient-to-r from-purple-500 to-purple-600'
+                    : 'bg-gray-300 dark:bg-gray-600'
+                }`}
+              >
+                <span
+                  className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform duration-300 shadow-lg ${
+                    isRecurring ? 'translate-x-7' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* 🔁 2. Configuração de Repetição - Aparece apenas quando ativada */}
+            {isRecurring && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between pb-6 border-b border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg">
+                      <Repeat className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                        Configurações de repetição
+                      </h3>
+                    </div>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setIsRecurring(!isRecurring)}
-                  className={`relative inline-flex h-8 w-14 items-center rounded-full transition-all duration-300 ${
-                    isRecurring
-                      ? 'bg-gradient-to-r from-purple-500 to-purple-600'
-                      : 'bg-gray-300 dark:bg-gray-600'
-                  }`}
-                >
-                  <span className="text-xs font-medium text-white absolute left-2">
-                    {isRecurring ? 'Repetir lançamento?' : ''}
-                  </span>
-                  <span
-                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform duration-300 shadow-lg ${
-                      isRecurring ? 'translate-x-7' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
 
-              {isRecurring && (
                 <div className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 border-2 border-purple-200 dark:border-purple-700 rounded-2xl p-6 space-y-6">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div>
@@ -809,7 +823,7 @@ const NovaDespesaModal = ({
                         className="w-full px-4 py-3 border-2 border-purple-300 dark:border-purple-600 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                       >
                         <option value="mensal-12x">
-                          Mensal - A cada 1 mês(es), 8 vez(es)
+                          Mensal - A cada 1 mês(es), 12 vez(es)
                         </option>
                         <option value="mensal-36x">
                           Mensal - A cada 1 mês(es), 36 vez(es)
@@ -865,8 +879,8 @@ const NovaDespesaModal = ({
                     </div>
                   )}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* 💳 3. Condição de Pagamento */}
             <div className="space-y-6">
@@ -881,34 +895,11 @@ const NovaDespesaModal = ({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                {/* Cobrar sempre no */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Cobrar sempre no
-                  </label>
-                  <select
-                    value={recurringConfig.cobrar_sempre_no}
-                    onChange={e =>
-                      setRecurringConfig(prev => ({
-                        ...prev,
-                        cobrar_sempre_no: parseInt(e.target.value),
-                      }))
-                    }
-                    className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                  >
-                    {dayOptions.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.value}º dia do mês
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* 1º vencimento */}
                 <div>
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    1º vencimento *
+                    Data de vencimento *
                   </label>
                   <input
                     type="date"
@@ -958,7 +949,7 @@ const NovaDespesaModal = ({
                 </div>
 
                 {/* Conta de pagamento */}
-                <div className="lg:col-span-3">
+                <div className="lg:col-span-2">
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Conta de pagamento
                   </label>

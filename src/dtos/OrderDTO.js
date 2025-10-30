@@ -4,9 +4,17 @@
  * @module DTOs/Order
  * @author Andrey Viana
  * @date 2025-10-24
+ * @updated 2025-10-28 - Adicionado suporte para novos status ENUM
  */
 
 import { z } from 'zod';
+import {
+  ORDER_STATUS,
+  isValidTransition,
+  getAllStatuses,
+  canCloseOrder,
+  canCancelOrder,
+} from '../constants/orderStatus';
 
 /**
  * Schema de validação para criação de comanda
@@ -106,9 +114,9 @@ export const orderFiltersSchema = z.object({
   clientId: z.string().uuid('ID do cliente deve ser um UUID válido').optional(),
 
   status: z
-    .enum(['open', 'closed', 'canceled'], {
+    .enum(getAllStatuses(), {
       errorMap: () => ({
-        message: 'Status deve ser "open", "closed" ou "canceled"',
+        message: `Status deve ser um dos seguintes: ${getAllStatuses().join(', ')}`,
       }),
     })
     .optional(),
@@ -150,11 +158,38 @@ export const orderResponseSchema = z.object({
   clientId: z.string().uuid(),
   professionalId: z.string().uuid(),
   cashRegisterId: z.string().uuid(),
-  status: z.enum(['open', 'closed', 'canceled']),
+  status: z.enum(getAllStatuses()),
   totalAmount: z.number().nonnegative(),
   createdAt: z.string().datetime().or(z.date()),
   closedAt: z.string().datetime().or(z.date()).nullable(),
 });
+
+/**
+ * Schema de validação para transição de status
+ *
+ * Valida mudanças de status, garantindo que apenas transições válidas sejam permitidas
+ */
+export const statusTransitionSchema = z
+  .object({
+    currentStatus: z.enum(getAllStatuses(), {
+      errorMap: () => ({
+        message: 'Status atual inválido',
+      }),
+    }),
+
+    newStatus: z.enum(getAllStatuses(), {
+      errorMap: () => ({
+        message: 'Novo status inválido',
+      }),
+    }),
+  })
+  .refine(
+    data => isValidTransition(data.currentStatus, data.newStatus),
+    data => ({
+      message: `Transição inválida: ${data.currentStatus} → ${data.newStatus}`,
+      path: ['newStatus'],
+    })
+  );
 
 /**
  * Função helper para validar dados de criação de comanda
@@ -223,4 +258,78 @@ export const validateCancelOrder = data => {
     }
     return { success: false, error: 'Erro desconhecido na validação' };
   }
+};
+
+/**
+ * Função helper para validar transição de status
+ *
+ * @param {string} currentStatus - Status atual da comanda
+ * @param {string} newStatus - Novo status desejado
+ * @returns {{ success: boolean, data?: { currentStatus: string, newStatus: string }, error?: string }}
+ *
+ * @example
+ * validateStatusTransition('OPEN', 'IN_PROGRESS')
+ * // { success: true, data: { currentStatus: 'OPEN', newStatus: 'IN_PROGRESS' } }
+ *
+ * validateStatusTransition('CLOSED', 'OPEN')
+ * // { success: false, error: 'Transição inválida: CLOSED → OPEN' }
+ */
+export const validateStatusTransition = (currentStatus, newStatus) => {
+  try {
+    const validated = statusTransitionSchema.parse({
+      currentStatus,
+      newStatus,
+    });
+    return { success: true, data: validated };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: error.errors
+          .map(e => `${e.path.join('.')}: ${e.message}`)
+          .join(', '),
+      };
+    }
+    return { success: false, error: 'Erro desconhecido na validação' };
+  }
+};
+
+/**
+ * Função helper para validar se comanda pode ser fechada
+ *
+ * @param {string} status - Status atual da comanda
+ * @returns {{ success: boolean, error?: string }}
+ *
+ * @example
+ * validateCanCloseOrder('OPEN') // { success: true }
+ * validateCanCloseOrder('CLOSED') // { success: false, error: '...' }
+ */
+export const validateCanCloseOrder = status => {
+  if (!canCloseOrder(status)) {
+    return {
+      success: false,
+      error: `Comanda com status ${status} não pode ser fechada`,
+    };
+  }
+  return { success: true };
+};
+
+/**
+ * Função helper para validar se comanda pode ser cancelada
+ *
+ * @param {string} status - Status atual da comanda
+ * @returns {{ success: boolean, error?: string }}
+ *
+ * @example
+ * validateCanCancelOrder('OPEN') // { success: true }
+ * validateCanCancelOrder('CANCELED') // { success: false, error: '...' }
+ */
+export const validateCanCancelOrder = status => {
+  if (!canCancelOrder(status)) {
+    return {
+      success: false,
+      error: `Comanda com status ${status} não pode ser cancelada`,
+    };
+  }
+  return { success: true };
 };

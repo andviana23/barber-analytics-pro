@@ -285,7 +285,7 @@ const ProfessionalsPage = () => {
               {filteredProfissionais.map(profissional => (
                 <div
                   key={profissional.id}
-                  className="group bg-light-bg dark:bg-dark-hover hover:bg-light-surface dark:hover:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg p-4 transition-all hover:shadow-md"
+                  className="group card-theme rounded-lg p-4 transition-all hover:shadow-md"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                     {/* Avatar e Info Principal */}

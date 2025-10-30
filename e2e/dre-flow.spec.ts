@@ -12,7 +12,7 @@ test.describe('DRE - Demonstração do Resultado do Exercício', () => {
     // Login antes de cada teste
     await page.goto('/login');
     await page.fill('input[name="email"]', 'profissional@test.com');
-    await page.fill('input[name="password"]', 'Test123!');
+    await page.fill('input[name="password"]', 'senha123');
 
     // Aguarda resposta de autenticação
     const authPromise = page

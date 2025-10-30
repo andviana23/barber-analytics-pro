@@ -1,12 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import { FileText, Plus, Filter, X, Search, Package } from 'lucide-react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import {
+  FileText,
+  Plus,
+  Filter,
+  X,
+  Search,
+  Package,
+  Users,
+  Phone,
+  Mail,
+  CheckCircle,
+  XCircle,
+  Info,
+  Clock,
+  ArrowUpDown,
+  ChevronLeft,
+  ChevronRight,
+  Briefcase,
+  ArrowUpRight,
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { Button } from '../atoms/Button/Button';
+import { Alert } from '../atoms/Alert/Alert';
 import OrderListItem from '../components/molecules/OrderListItem';
 import OrderModal from '../components/templates/modals/OrderModal';
 import OrderItemModal from '../components/templates/modals/OrderItemModal';
 import useOrders from '../hooks/useOrders';
 import useServices from '../hooks/useServices';
 import useUserPermissions from '../hooks/useUserPermissions';
+import { useUnit } from '../context/UnitContext';
+import { useAuth } from '../context/AuthContext';
+import { useClients } from '../hooks/useClients';
+import { useProfissionais } from '../hooks/useProfissionais';
+import { getPaymentMethods } from '../services/paymentMethodsService';
+import bankAccountsService from '../services/bankAccountsService';
 import toast from 'react-hot-toast';
 
 /**
@@ -26,30 +55,55 @@ import toast from 'react-hot-toast';
  * @page
  */
 const OrdersPage = () => {
-  // Hooks
+  const navigate = useNavigate();
+  const { selectedUnit } = useUnit();
+  const { user } = useAuth();
+
+  const unitId = selectedUnit?.id || null;
+
   const {
     orders,
-    loading,
+    loading: ordersLoading,
     createOrder,
     closeOrder,
     cancelOrder,
-    addItemToOrder,
-    removeItemFromOrder,
+    addServiceToOrder,
+    removeServiceFromOrder,
     fetchOrders,
-  } = useOrders();
+  } = useOrders(unitId);
 
-  const { activeServices, fetchActiveServices } = useServices();
+  const { activeServices, fetchActiveServices } = useServices(unitId);
   const { canCreateOrder, canCloseOrder, canCancelOrder } =
     useUserPermissions();
 
-  // Estado dos modais
+  const {
+    data: clientsData = [],
+    loading: clientsLoading,
+    error: clientsError,
+    refetch: refetchClients,
+  } = useClients(unitId, { includeInactive: true, enableCache: true });
+
+  const {
+    profissionais,
+    loading: professionalsLoading,
+    error: professionalsError,
+    updateFilters: updateProfessionalFilters,
+    refresh: refreshProfessionals,
+  } = useProfissionais();
+
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [paymentMethodsLoading, setPaymentMethodsLoading] = useState(false);
+  const [bankAccounts, setBankAccounts] = useState([]);
+  const [bankAccountsLoading, setBankAccountsLoading] = useState(false);
+  const [financialError, setFinancialError] = useState(null);
+
   const [isOrderModalVisible, setIsOrderModalVisible] = useState(false);
   const [isOrderItemModalVisible, setIsOrderItemModalVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [currentOrderId, setCurrentOrderId] = useState(null);
   const [currentOrderItems, setCurrentOrderItems] = useState([]);
+  const [itemModalProfessionalId, setItemModalProfessionalId] = useState('');
 
-  // Estado dos filtros
   const [filters, setFilters] = useState({
     status: 'all',
     search: '',
@@ -58,65 +112,430 @@ const OrdersPage = () => {
   });
   const [showFilters, setShowFilters] = useState(false);
 
-  // Carrega dados ao montar
+  const [clientsSearch, setClientsSearch] = useState('');
+  const [clientStatusFilter, setClientStatusFilter] = useState('all');
+  const [clientHistoryFilter, setClientHistoryFilter] = useState('all');
+  const [clientsPage, setClientsPage] = useState(1);
+  const clientsPerPage = 5;
+
+  const [professionalSearch, setProfessionalSearch] = useState('');
+  const [professionalStatusFilter, setProfessionalStatusFilter] =
+    useState('active');
+  const [specialtyFilter, setSpecialtyFilter] = useState('all');
+  const [availabilitySort, setAvailabilitySort] = useState('desc');
+
+  // ✅ Atualiza filtros de profissionais quando unitId muda
   useEffect(() => {
+    if (unitId) {
+      updateProfessionalFilters({ unitId });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [unitId]); // ⚠️ Apenas unitId, updateProfessionalFilters não precisa estar aqui
+
+  // ✅ Carrega comandas e serviços quando unitId muda
+  useEffect(() => {
+    if (!unitId) {
+      setSelectedOrder(null);
+      setCurrentOrderItems([]);
+      return;
+    }
+
     fetchOrders();
     fetchActiveServices();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [unitId]); // ⚠️ Apenas unitId, fetch functions não precisam estar aqui
+
+  const loadFinancialDependencies = useCallback(async () => {
+    if (!unitId) {
+      setPaymentMethods([]);
+      setBankAccounts([]);
+      return;
+    }
+
+    setFinancialError(null);
+    setPaymentMethodsLoading(true);
+    setBankAccountsLoading(true);
+
+    try {
+      const [paymentResult, accountsResult] = await Promise.all([
+        getPaymentMethods(unitId),
+        bankAccountsService.getBankAccounts(unitId),
+      ]);
+
+      if (paymentResult.error) {
+        throw paymentResult.error;
+      }
+
+      setPaymentMethods(paymentResult.data || []);
+      setBankAccounts(accountsResult || []);
+    } catch (error) {
+      const message =
+        error?.message ||
+        'Não foi possível carregar dados financeiros para esta unidade.';
+      setFinancialError(message);
+      toast.error(message);
+      setPaymentMethods([]);
+      setBankAccounts([]);
+    } finally {
+      setPaymentMethodsLoading(false);
+      setBankAccountsLoading(false);
+    }
+  }, [unitId]);
+
+  useEffect(() => {
+    loadFinancialDependencies();
+  }, [loadFinancialDependencies]);
+
+  useEffect(() => {
+    setClientsPage(1);
+  }, [clientsSearch, clientStatusFilter, clientHistoryFilter, unitId]);
+
+  const formatPhone = useCallback(value => {
+    if (!value) return '-';
+    const digits = value.replace(/\D/g, '');
+
+    if (digits.length === 11) {
+      return digits.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+    }
+
+    if (digits.length === 10) {
+      return digits.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+    }
+
+    return value;
   }, []);
 
-  // Filtra comandas localmente
-  const filteredOrders = orders.filter(order => {
-    // Filtro de status
-    if (filters.status !== 'all' && order.status !== filters.status) {
-      return false;
+  const formatDateShort = useCallback(dateValue => {
+    if (!dateValue) return '—';
+
+    try {
+      return format(new Date(dateValue), "dd 'de' MMM", { locale: ptBR });
+    } catch {
+      return '—';
+    }
+  }, []);
+
+  const getProfessionalSpecialty = useCallback(professional => {
+    return (
+      professional?.speciality ||
+      professional?.specialization ||
+      (Array.isArray(professional?.specialties) &&
+        professional.specialties[0]) ||
+      professional?.role ||
+      'Barbeiro'
+    );
+  }, []);
+
+  const getAvailabilityScore = useCallback(
+    professional => (professional?.is_active ? 1 : 0),
+    []
+  );
+
+  const selectableClients = useMemo(
+    () => (clientsData || []).filter(client => client.is_active),
+    [clientsData]
+  );
+  const activeProfessionals = useMemo(
+    () =>
+      (profissionais || []).filter(
+        professional =>
+          professional.is_active && (!unitId || professional.unit_id === unitId)
+      ),
+    [profissionais, unitId]
+  );
+
+  const modalProfessionals = useMemo(() => {
+    const currentProfessionalId =
+      selectedOrder?.professional?.id || selectedOrder?.professionalId;
+
+    if (!currentProfessionalId) {
+      return activeProfessionals;
     }
 
-    // Filtro de busca (cliente ou profissional)
-    if (filters.search) {
-      const searchLower = filters.search.toLowerCase();
-      const clientMatch = order.clientName?.toLowerCase().includes(searchLower);
-      const professionalMatch = order.professionalName
-        ?.toLowerCase()
-        .includes(searchLower);
+    const alreadyIncluded = activeProfessionals.some(
+      professional => professional.id === currentProfessionalId
+    );
 
-      if (!clientMatch && !professionalMatch) {
+    if (alreadyIncluded) {
+      return activeProfessionals;
+    }
+
+    const fallbackProfessional = {
+      id: currentProfessionalId,
+      name: selectedOrder?.professional?.name || 'Profissional inativo',
+      is_active: false,
+      unit_id: selectedOrder?.unit_id || unitId,
+      ...selectedOrder?.professional,
+    };
+
+    return [...activeProfessionals, fallbackProfessional];
+  }, [activeProfessionals, selectedOrder, unitId]);
+
+  const clientMetrics = useMemo(() => {
+    const map = new Map();
+
+    (orders || []).forEach(order => {
+      const clientId =
+        order.client?.id || order.client_id || order.clientId || null;
+
+      if (!clientId) return;
+
+      const createdAt = order.created_at || order.createdAt;
+      const metrics = map.get(clientId) || {
+        totalOrders: 0,
+        lastOrderDate: null,
+      };
+
+      metrics.totalOrders += 1;
+
+      if (createdAt) {
+        const createdDate = new Date(createdAt);
+        if (!metrics.lastOrderDate || createdDate > metrics.lastOrderDate) {
+          metrics.lastOrderDate = createdDate;
+        }
+      }
+
+      map.set(clientId, metrics);
+    });
+
+    return map;
+  }, [orders]);
+
+  const professionalMetrics = useMemo(() => {
+    const map = new Map();
+
+    (orders || []).forEach(order => {
+      const professionalId =
+        order.professional?.id ||
+        order.professional_id ||
+        order.professionalId ||
+        null;
+
+      if (!professionalId) return;
+
+      const metrics = map.get(professionalId) || {
+        totalOrders: 0,
+        openOrders: 0,
+        closedOrders: 0,
+      };
+
+      metrics.totalOrders += 1;
+
+      if (order.status === 'open') {
+        metrics.openOrders += 1;
+      }
+
+      if (order.status === 'closed') {
+        metrics.closedOrders += 1;
+      }
+
+      map.set(professionalId, metrics);
+    });
+
+    return map;
+  }, [orders]);
+
+  const filteredOrders = useMemo(() => {
+    return (orders || []).filter(order => {
+      if (filters.status !== 'all' && order.status !== filters.status) {
         return false;
       }
-    }
 
-    // Filtro de data inicial
-    if (
-      filters.startDate &&
-      new Date(order.createdAt) < new Date(filters.startDate)
-    ) {
-      return false;
-    }
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
+        const clientName = order.client?.name?.toLowerCase() || '';
+        const professionalName = order.professional?.name?.toLowerCase() || '';
 
-    // Filtro de data final
-    if (
-      filters.endDate &&
-      new Date(order.createdAt) > new Date(filters.endDate)
-    ) {
-      return false;
-    }
+        if (
+          !clientName.includes(searchLower) &&
+          !professionalName.includes(searchLower)
+        ) {
+          return false;
+        }
+      }
 
-    return true;
-  });
+      if (
+        filters.startDate &&
+        new Date(order.created_at || order.createdAt) <
+          new Date(filters.startDate)
+      ) {
+        return false;
+      }
 
-  // Handler de criação/edição de comanda
+      if (
+        filters.endDate &&
+        new Date(order.created_at || order.createdAt) >
+          new Date(filters.endDate)
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [orders, filters]);
+
+  const filteredClients = useMemo(() => {
+    const normalizedSearch = clientsSearch.trim().toLowerCase();
+
+    return (clientsData || []).filter(client => {
+      if (clientStatusFilter === 'active' && !client.is_active) {
+        return false;
+      }
+
+      if (clientStatusFilter === 'inactive' && client.is_active) {
+        return false;
+      }
+
+      const metrics = clientMetrics.get(client.id);
+
+      if (clientHistoryFilter === 'recent') {
+        if (!metrics?.lastOrderDate) {
+          return false;
+        }
+
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        if (metrics.lastOrderDate < thirtyDaysAgo) {
+          return false;
+        }
+      }
+
+      if (clientHistoryFilter === 'no-history' && metrics?.totalOrders) {
+        return false;
+      }
+
+      if (!normalizedSearch) {
+        return true;
+      }
+
+      const normalizedPhone =
+        client.telefone?.replace(/\D/g, '') ||
+        client.phone?.replace(/\D/g, '') ||
+        '';
+
+      return (
+        client.nome?.toLowerCase().includes(normalizedSearch) ||
+        client.name?.toLowerCase().includes(normalizedSearch) ||
+        client.cpf_cnpj?.includes(normalizedSearch) ||
+        normalizedPhone.includes(normalizedSearch.replace(/\D/g, '')) ||
+        client.email?.toLowerCase().includes(normalizedSearch)
+      );
+    });
+  }, [
+    clientsData,
+    clientStatusFilter,
+    clientsSearch,
+    clientHistoryFilter,
+    clientMetrics,
+  ]);
+
+  const paginatedClients = useMemo(() => {
+    const startIndex = (clientsPage - 1) * clientsPerPage;
+    return filteredClients.slice(startIndex, startIndex + clientsPerPage);
+  }, [filteredClients, clientsPage, clientsPerPage]);
+
+  const totalClientPages = Math.max(
+    1,
+    Math.ceil(filteredClients.length / clientsPerPage)
+  );
+
+  useEffect(() => {
+    setClientsPage(prev => Math.min(prev, totalClientPages));
+  }, [totalClientPages]);
+
+  const specialties = useMemo(() => {
+    const values = new Set();
+
+    (profissionais || []).forEach(professional => {
+      if (unitId && professional.unit_id !== unitId) {
+        return;
+      }
+
+      const specialty = getProfessionalSpecialty(professional);
+      if (specialty) {
+        values.add(specialty);
+      }
+    });
+
+    return Array.from(values).sort();
+  }, [profissionais, unitId, getProfessionalSpecialty]);
+
+  const filteredProfessionals = useMemo(() => {
+    const normalizedSearch = professionalSearch.trim().toLowerCase();
+
+    return (profissionais || [])
+      .filter(professional => {
+        if (unitId && professional.unit_id !== unitId) {
+          return false;
+        }
+
+        if (professionalStatusFilter === 'active' && !professional.is_active) {
+          return false;
+        }
+
+        if (professionalStatusFilter === 'inactive' && professional.is_active) {
+          return false;
+        }
+
+        if (
+          specialtyFilter !== 'all' &&
+          getProfessionalSpecialty(professional) !== specialtyFilter
+        ) {
+          return false;
+        }
+
+        if (!normalizedSearch) {
+          return true;
+        }
+
+        const speciality = getProfessionalSpecialty(professional).toLowerCase();
+
+        return (
+          professional.name?.toLowerCase().includes(normalizedSearch) ||
+          professional.role?.toLowerCase().includes(normalizedSearch) ||
+          speciality.includes(normalizedSearch)
+        );
+      })
+      .sort((a, b) => {
+        const scoreA = getAvailabilityScore(a);
+        const scoreB = getAvailabilityScore(b);
+
+        if (scoreA === scoreB) {
+          return (a.name || '').localeCompare(b.name || '');
+        }
+
+        return availabilitySort === 'asc' ? scoreA - scoreB : scoreB - scoreA;
+      });
+  }, [
+    profissionais,
+    unitId,
+    professionalStatusFilter,
+    specialtyFilter,
+    professionalSearch,
+    availabilitySort,
+    getProfessionalSpecialty,
+    getAvailabilityScore,
+  ]);
+
   const handleOrderSubmit = async ({ action, data }) => {
     try {
-      if (selectedOrder) {
-        // Modo edição - apenas fecha ou cancela
-        if (action === 'close') {
-          const result = await closeOrder(selectedOrder.id);
+      console.log('🚀 handleOrderSubmit - action:', action);
+      console.log('📦 handleOrderSubmit - data:', data);
 
-          // Service já exibe toast
-          if (!result.error) {
-            setIsOrderModalVisible(false);
-            setSelectedOrder(null);
-            setCurrentOrderItems([]);
-            fetchOrders();
+      if (selectedOrder) {
+        // EDITANDO COMANDA EXISTENTE
+        if (action === 'close') {
+          const closePayload = {
+            paymentMethodId: data.paymentMethodId,
+            accountId: data.accountId || null,
+            closedBy: user?.id || undefined,
+          };
+
+          const result = await closeOrder(selectedOrder.id, closePayload);
+
+          if (result.error) {
+            return;
           }
         } else if (action === 'cancel') {
           const result = await cancelOrder(
@@ -124,111 +543,169 @@ const OrdersPage = () => {
             'Cancelado pelo usuário'
           );
 
-          // Service já exibe toast
-          if (!result.error) {
-            setIsOrderModalVisible(false);
-            setSelectedOrder(null);
-            setCurrentOrderItems([]);
-            fetchOrders();
+          if (result.error) {
+            return;
           }
         }
       } else {
-        // Modo criação
+        // CRIANDO NOVA COMANDA
+        console.log('📝 Criando nova comanda...');
         const result = await createOrder(data);
 
         if (result.error) {
+          console.error('❌ Erro ao criar comanda:', result.error);
           return;
         }
 
-        if (action === 'close') {
-          // Cria e já fecha
-          const closeResult = await closeOrder(result.data.id);
+        const createdOrderId = result.data?.id;
+        console.log('✅ Comanda criada:', createdOrderId);
 
-          if (!closeResult.error) {
-            setIsOrderModalVisible(false);
-            setSelectedOrder(null);
-            setCurrentOrderItems([]);
-            fetchOrders();
+        // ADICIONA OS ITENS (SERVIÇOS) À COMANDA
+        if (data.items && data.items.length > 0) {
+          console.log(
+            '📦 Adicionando',
+            data.items.length,
+            'itens à comanda...'
+          );
+
+          for (const item of data.items) {
+            console.log('➕ Adicionando item:', item);
+            const itemResult = await addServiceToOrder(createdOrderId, {
+              serviceId: item.serviceId,
+              professionalId: item.professionalId || data.professionalId,
+              quantity: item.quantity || 1,
+            });
+
+            if (itemResult.error) {
+              console.error('❌ Erro ao adicionar item:', itemResult.error);
+              toast.error(`Erro ao adicionar serviço: ${item.serviceName}`);
+              // Continua adicionando os outros itens mesmo se um falhar
+            }
           }
-        } else {
-          // Service já exibiu toast de sucesso
-          setIsOrderModalVisible(false);
-          setSelectedOrder(null);
-          setCurrentOrderItems([]);
-          fetchOrders();
+
+          console.log('✅ Todos os itens foram adicionados');
+        }
+
+        // FECHA A COMANDA SE ACTION === 'CLOSE'
+        if (action === 'close' && createdOrderId) {
+          console.log('🔒 Fechando comanda...');
+          const closePayload = {
+            paymentMethodId: data.paymentMethodId,
+            accountId: data.accountId || null,
+            closedBy: user?.id || undefined,
+          };
+
+          const closeResult = await closeOrder(createdOrderId, closePayload);
+
+          if (closeResult.error) {
+            console.error('❌ Erro ao fechar comanda:', closeResult.error);
+            return;
+          }
+
+          console.log('✅ Comanda fechada com sucesso');
         }
       }
+
+      // LIMPA O ESTADO E FECHA O MODAL
+      setIsOrderModalVisible(false);
+      setSelectedOrder(null);
+      setCurrentOrderItems([]);
+      setItemModalProfessionalId('');
+
+      // ATUALIZA A LISTA
+      fetchOrders();
+      refreshProfessionals();
+      refetchClients();
     } catch (error) {
-      console.error('Erro ao processar comanda:', error);
+      console.error('❌ Erro ao processar comanda:', error);
+      toast.error('Não foi possível processar a comanda. Tente novamente.');
     }
   };
 
-  // Handler de adicionar item
-  const handleAddItemClick = orderId => {
-    setCurrentOrderId(orderId || selectedOrder?.id);
+  const handleAddItemClick = (orderId, defaultProfessionalId) => {
+    setCurrentOrderId(orderId || selectedOrder?.id || null);
+    setItemModalProfessionalId(
+      defaultProfessionalId || selectedOrder?.professionalId || ''
+    );
     setIsOrderItemModalVisible(true);
   };
 
-  // Handler de submit do item
   const handleItemSubmit = async itemData => {
     try {
-      // Se está criando nova comanda, adiciona ao estado local
+      console.log('🎯 handleItemSubmit chamado');
+      console.log('📦 itemData recebido:', itemData);
+      console.log('📋 selectedOrder:', selectedOrder);
+      console.log('📦 currentOrderItems ANTES:', currentOrderItems);
+
       if (!selectedOrder) {
-        setCurrentOrderItems(prev => [
-          ...prev,
-          { ...itemData, id: Date.now() },
-        ]);
-        toast.success('✅ Serviço adicionado à comanda');
+        // Busca o nome do profissional para exibir na tabela
+        const professional = profissionais.find(
+          p => p.id === itemModalProfessionalId
+        );
+
+        console.log('👤 Profissional encontrado:', professional);
+
+        const newItem = {
+          ...itemData,
+          id: Date.now(),
+          professionalName: professional?.name || 'Sem profissional',
+        };
+
+        console.log('➕ Novo item a ser adicionado:', newItem);
+
+        setCurrentOrderItems(prev => {
+          const updated = [...prev, newItem];
+          console.log('📦 currentOrderItems DEPOIS:', updated);
+          return updated;
+        });
+
+        toast.success('Serviço adicionado à comanda');
+        setIsOrderItemModalVisible(false);
         return;
       }
 
-      // Se está editando, adiciona no servidor
-      const result = await addItemToOrder(itemData);
+      const result = await addServiceToOrder(
+        itemData.orderId || selectedOrder.id,
+        itemData
+      );
 
-      // Service já exibe toast
       if (!result.error) {
+        toast.success('Serviço adicionado à comanda');
         fetchOrders();
-
-        // Atualiza items locais se modal estiver aberto
-        if (isOrderModalVisible) {
-          // TODO: Buscar items atualizados
-        }
       }
     } catch (error) {
-      console.error('Erro ao adicionar item:', error);
+      console.error('❌ Erro ao adicionar item:', error);
+      toast.error('Não foi possível adicionar o serviço.');
     }
   };
 
-  // Handler de remover item
   const handleRemoveItem = async itemId => {
     try {
-      // Se está criando nova comanda, remove do estado local
       if (!selectedOrder) {
         setCurrentOrderItems(prev => prev.filter(item => item.id !== itemId));
         toast.success('Serviço removido');
         return;
       }
 
-      // Se está editando, remove no servidor
-      const result = await removeItemFromOrder(itemId);
+      const result = await removeServiceFromOrder(itemId, selectedOrder.id);
 
-      // Service já exibe toast
       if (!result.error) {
+        toast.success('Serviço removido');
         fetchOrders();
       }
     } catch (error) {
       console.error('Erro ao remover item:', error);
+      toast.error('Não foi possível remover o serviço.');
     }
   };
 
-  // Handler de click na comanda
   const handleOrderClick = order => {
     setSelectedOrder(order);
     setCurrentOrderItems(order.items || []);
+    setItemModalProfessionalId(order.professionalId || '');
     setIsOrderModalVisible(true);
   };
 
-  // Handler de filtros
   const handleFilterChange = e => {
     const { name, value } = e.target;
     setFilters(prev => ({ ...prev, [name]: value }));
@@ -243,12 +720,53 @@ const OrdersPage = () => {
     });
   };
 
-  // Handler de nova comanda
   const handleNewOrder = () => {
     setSelectedOrder(null);
     setCurrentOrderItems([]);
+    setItemModalProfessionalId('');
     setIsOrderModalVisible(true);
   };
+
+  const handleViewClientHistory = clientId => {
+    navigate(`/reports?client=${clientId}`);
+  };
+
+  const handleOpenClientProfile = clientId => {
+    navigate(`/cadastros/clientes?cliente=${clientId}`);
+  };
+
+  const handleOpenProfessionalProfile = professionalId => {
+    navigate(`/professionals/${professionalId}`);
+  };
+
+  const handleOpenProfessionalAgenda = professionalId => {
+    navigate(`/queue?professional=${professionalId}`);
+  };
+
+  const toggleAvailabilitySort = () => {
+    setAvailabilitySort(prev => (prev === 'asc' ? 'desc' : 'asc'));
+  };
+
+  const showPaymentWarning =
+    !paymentMethodsLoading && !financialError && paymentMethods.length === 0;
+  const showBankWarning =
+    !bankAccountsLoading && !financialError && bankAccounts.length === 0;
+
+  if (!unitId) {
+    return (
+      <div className="container mx-auto px-4 py-8 space-y-6">
+        <div className="flex items-center gap-3">
+          <FileText className="w-8 h-8 text-theme-primary" />
+          <h1 className="text-3xl font-bold text-theme-primary">Comandas</h1>
+        </div>
+        <Alert
+          type="info"
+          title="Selecione uma unidade"
+          message="Escolha uma unidade no seletor superior para visualizar e gerenciar as comandas."
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -269,11 +787,29 @@ const OrdersPage = () => {
             <Button
               variant="primary"
               onClick={handleNewOrder}
-              disabled={loading}
+              disabled={ordersLoading}
             >
               <Plus className="w-4 h-4 mr-2" />
               Nova Comanda
             </Button>
+          )}
+        </div>
+
+        <div className="space-y-3">
+          {financialError && <Alert type="error" message={financialError} />}
+          {showPaymentWarning && (
+            <Alert
+              type="warning"
+              icon={Info}
+              message="Nenhuma forma de pagamento ativa encontrada para esta unidade. Cadastre pelo menos uma forma de pagamento antes de fechar comandas."
+            />
+          )}
+          {showBankWarning && (
+            <Alert
+              type="warning"
+              icon={Info}
+              message="Nenhuma conta bancária ativa vinculada à unidade. Cadastre uma conta para direcionar os recebimentos automáticos."
+            />
           )}
         </div>
 
@@ -369,7 +905,7 @@ const OrdersPage = () => {
 
       {/* Lista de Comandas */}
       <div className="space-y-3">
-        {loading ? (
+        {ordersLoading ? (
           <div className="card-theme text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
             <p className="text-theme-muted">Carregando comandas...</p>
@@ -405,8 +941,7 @@ const OrdersPage = () => {
               onClose={
                 canCloseOrder
                   ? () => {
-                      setSelectedOrder(order);
-                      handleOrderSubmit({ action: 'close', data: order });
+                      handleOrderClick(order);
                     }
                   : null
               }
@@ -455,6 +990,425 @@ const OrdersPage = () => {
         </div>
       )}
 
+      <div className="mt-12 grid grid-cols-1 xl:grid-cols-2 gap-6">
+        {/* Clientes */}
+        <section className="card-theme p-6 space-y-6">
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <Users className="w-5 h-5 text-theme-primary" />
+              <h2 className="text-xl font-semibold text-theme-primary">
+                Clientes da unidade
+              </h2>
+            </div>
+            <p className="text-sm text-theme-secondary">
+              {filteredClients.length}{' '}
+              {filteredClients.length === 1
+                ? 'cliente encontrado'
+                : 'clientes encontrados'}
+              {selectedUnit?.name && ` em ${selectedUnit.name}`}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+            <div className="relative lg:col-span-2">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-theme-muted" />
+              <input
+                type="text"
+                value={clientsSearch}
+                onChange={event => setClientsSearch(event.target.value)}
+                placeholder="Buscar por nome, documento ou contato"
+                className="w-full input-theme pl-10"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-theme-primary mb-1">
+                Status
+              </label>
+              <select
+                className="input-theme"
+                value={clientStatusFilter}
+                onChange={event => setClientStatusFilter(event.target.value)}
+              >
+                <option value="all">Todos</option>
+                <option value="active">Ativos</option>
+                <option value="inactive">Inativos</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-theme-primary mb-1">
+                Histórico de compras
+              </label>
+              <select
+                className="input-theme"
+                value={clientHistoryFilter}
+                onChange={event => setClientHistoryFilter(event.target.value)}
+              >
+                <option value="all">Todos</option>
+                <option value="recent">Últimos 30 dias</option>
+                <option value="no-history">Sem histórico</option>
+              </select>
+            </div>
+          </div>
+
+          {clientsError && <Alert type="error" message={clientsError} />}
+
+          {clientsLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="h-10 w-10 rounded-full border-2 border-blue-500 border-t-transparent animate-spin" />
+            </div>
+          ) : filteredClients.length === 0 ? (
+            <div className="text-center py-12 space-y-3">
+              <Users className="w-12 h-12 mx-auto text-theme-muted" />
+              <p className="text-theme-secondary">
+                Nenhum cliente encontrado com os filtros selecionados.
+              </p>
+              <Button
+                variant="secondary"
+                icon={ArrowUpRight}
+                onClick={() => navigate('/cadastros/clientes')}
+              >
+                Gerenciar clientes
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {paginatedClients.map(client => {
+                const metrics = clientMetrics.get(client.id) || {
+                  totalOrders: 0,
+                  lastOrderDate: null,
+                };
+
+                const clientName =
+                  client.nome || client.name || 'Cliente sem nome';
+                const clientPhone = client.telefone || client.phone || null;
+                const clientEmail =
+                  client.email || client.mail || client.contact_email || null;
+
+                return (
+                  <div
+                    key={client.id}
+                    className="card-theme border border-light-border dark:border-dark-border rounded-xl p-4 space-y-4"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-12 h-12 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary font-semibold">
+                          {clientName.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="space-y-1">
+                          <h3 className="text-base font-semibold text-theme-primary">
+                            {clientName}
+                          </h3>
+                          {clientEmail && (
+                            <div className="flex items-center gap-2 text-sm text-theme-secondary">
+                              <Mail className="w-4 h-4" />
+                              <span className="truncate max-w-[220px]">
+                                {clientEmail}
+                              </span>
+                            </div>
+                          )}
+                          {clientPhone && (
+                            <div className="flex items-center gap-2 text-sm text-theme-secondary">
+                              <Phone className="w-4 h-4" />
+                              <span>{formatPhone(clientPhone)}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <span
+                        className={`inline-flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-full ${
+                          client.is_active
+                            ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                            : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                        }`}
+                      >
+                        {client.is_active ? (
+                          <>
+                            <CheckCircle className="w-3 h-3" />
+                            Ativo
+                          </>
+                        ) : (
+                          <>
+                            <XCircle className="w-3 h-3" />
+                            Inativo
+                          </>
+                        )}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                      <div className="rounded-lg bg-light-hover dark:bg-dark-hover p-3">
+                        <p className="text-xs text-theme-secondary uppercase tracking-wide">
+                          Total de comandas
+                        </p>
+                        <p className="text-lg font-semibold text-theme-primary">
+                          {metrics.totalOrders || 0}
+                        </p>
+                      </div>
+                      <div className="rounded-lg bg-light-hover dark:bg-dark-hover p-3">
+                        <p className="text-xs text-theme-secondary uppercase tracking-wide">
+                          Última visita
+                        </p>
+                        <p className="text-lg font-semibold text-theme-primary">
+                          {metrics.lastOrderDate
+                            ? formatDateShort(metrics.lastOrderDate)
+                            : '—'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        icon={ArrowUpRight}
+                        onClick={() => handleViewClientHistory(client.id)}
+                      >
+                        Ver histórico
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        icon={ArrowUpRight}
+                        onClick={() => handleOpenClientProfile(client.id)}
+                      >
+                        Ver perfil
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {filteredClients.length > clientsPerPage && (
+            <div className="pt-4 border-t border-light-border dark:border-dark-border flex items-center justify-between text-sm">
+              <span className="text-theme-secondary">
+                Página {clientsPage} de {totalClientPages}
+              </span>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  icon={ChevronLeft}
+                  onClick={() => setClientsPage(prev => Math.max(1, prev - 1))}
+                  disabled={clientsPage === 1}
+                >
+                  Anterior
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  icon={ChevronRight}
+                  onClick={() =>
+                    setClientsPage(prev => Math.min(totalClientPages, prev + 1))
+                  }
+                  disabled={clientsPage === totalClientPages}
+                >
+                  Próxima
+                </Button>
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* Profissionais */}
+        <section className="card-theme p-6 space-y-6">
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <Briefcase className="w-5 h-5 text-theme-primary" />
+              <h2 className="text-xl font-semibold text-theme-primary">
+                Profissionais em destaque
+              </h2>
+            </div>
+            <p className="text-sm text-theme-secondary">
+              {filteredProfessionals.length}{' '}
+              {filteredProfessionals.length === 1
+                ? 'profissional disponível'
+                : 'profissionais disponíveis'}
+              {selectedUnit?.name && ` em ${selectedUnit.name}`}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+            <div className="relative lg:col-span-2">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-theme-muted" />
+              <input
+                type="text"
+                value={professionalSearch}
+                onChange={event => setProfessionalSearch(event.target.value)}
+                placeholder="Buscar por nome ou especialidade"
+                className="w-full input-theme pl-10"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-theme-primary mb-1">
+                Status
+              </label>
+              <select
+                className="input-theme"
+                value={professionalStatusFilter}
+                onChange={event =>
+                  setProfessionalStatusFilter(event.target.value)
+                }
+              >
+                <option value="active">Disponíveis</option>
+                <option value="inactive">Inativos</option>
+                <option value="all">Todos</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-theme-primary mb-1">
+                Especialidade
+              </label>
+              <select
+                className="input-theme"
+                value={specialtyFilter}
+                onChange={event => setSpecialtyFilter(event.target.value)}
+              >
+                <option value="all">Todas</option>
+                {specialties.map(specialty => (
+                  <option key={specialty} value={specialty}>
+                    {specialty}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex flex-col">
+              <label className="block text-sm font-medium text-theme-primary mb-1">
+                Ordenação
+              </label>
+              <Button
+                variant="secondary"
+                size="sm"
+                icon={ArrowUpDown}
+                onClick={toggleAvailabilitySort}
+              >
+                Disponibilidade {availabilitySort === 'asc' ? '↑' : '↓'}
+              </Button>
+            </div>
+          </div>
+
+          {professionalsError && (
+            <Alert type="error" message={professionalsError} />
+          )}
+
+          {professionalsLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="h-10 w-10 rounded-full border-2 border-purple-500 border-t-transparent animate-spin" />
+            </div>
+          ) : filteredProfessionals.length === 0 ? (
+            <div className="text-center py-12 space-y-3">
+              <Briefcase className="w-12 h-12 mx-auto text-theme-muted" />
+              <p className="text-theme-secondary">
+                Nenhum profissional encontrado com os filtros selecionados.
+              </p>
+              <Button
+                variant="secondary"
+                icon={ArrowUpRight}
+                onClick={() => navigate('/professionals')}
+              >
+                Gerenciar profissionais
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredProfessionals.map(professional => {
+                const metrics = professionalMetrics.get(professional.id) || {
+                  totalOrders: 0,
+                  openOrders: 0,
+                  closedOrders: 0,
+                };
+
+                const specialty = getProfessionalSpecialty(professional);
+
+                return (
+                  <div
+                    key={professional.id}
+                    className="card-theme border border-light-border dark:border-dark-border rounded-xl p-4 space-y-4"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-700 dark:text-purple-200 font-semibold">
+                          {professional.name?.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="space-y-1">
+                          <h3 className="text-base font-semibold text-theme-primary">
+                            {professional.name}
+                          </h3>
+                          <p className="flex items-center gap-2 text-sm text-theme-secondary">
+                            <Briefcase className="w-4 h-4" />
+                            {specialty}
+                          </p>
+                        </div>
+                      </div>
+                      <span
+                        className={`inline-flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-full ${
+                          professional.is_active
+                            ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                            : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                        }`}
+                      >
+                        {professional.is_active ? 'Disponível' : 'Inativo'}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                      <div className="rounded-lg bg-light-hover dark:bg-dark-hover p-3">
+                        <p className="text-xs text-theme-secondary uppercase tracking-wide">
+                          Comandas em andamento
+                        </p>
+                        <p className="text-lg font-semibold text-theme-primary">
+                          {metrics.openOrders || 0}
+                        </p>
+                      </div>
+                      <div className="rounded-lg bg-light-hover dark:bg-dark-hover p-3">
+                        <p className="text-xs text-theme-secondary uppercase tracking-wide">
+                          Comandas concluídas
+                        </p>
+                        <p className="text-lg font-semibold text-theme-primary">
+                          {metrics.closedOrders || 0}
+                        </p>
+                      </div>
+                      <div className="rounded-lg bg-light-hover dark:bg-dark-hover p-3">
+                        <p className="text-xs text-theme-secondary uppercase tracking-wide">
+                          Comissão padrão
+                        </p>
+                        <p className="text-lg font-semibold text-theme-primary">
+                          {professional.commission_rate || 0}%
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        icon={Clock}
+                        onClick={() =>
+                          handleOpenProfessionalAgenda(professional.id)
+                        }
+                      >
+                        Ver agenda
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        icon={ArrowUpRight}
+                        onClick={() =>
+                          handleOpenProfessionalProfile(professional.id)
+                        }
+                      >
+                        Ver perfil
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
+      </div>
+
       {/* Modals */}
       <OrderModal
         isOpen={isOrderModalVisible}
@@ -462,24 +1416,47 @@ const OrdersPage = () => {
           setIsOrderModalVisible(false);
           setSelectedOrder(null);
           setCurrentOrderItems([]);
+          setItemModalProfessionalId('');
         }}
         onSubmit={handleOrderSubmit}
-        onAddItem={() => handleAddItemClick()}
+        onAddItem={handleAddItemClick}
         order={selectedOrder}
-        clients={[]} // TODO: Buscar clientes do banco
-        professionals={[]} // TODO: Buscar profissionais do banco
-        items={currentOrderItems}
+        unitId={unitId}
+        clients={(() => {
+          console.log('📤 OrdersPage - Passando clientes para OrderModal:', {
+            selectableClients: selectableClients,
+            totalSelectableClients: selectableClients?.length || 0,
+            clientsData: clientsData,
+            totalClientsData: clientsData?.length || 0,
+            unitId: unitId,
+          });
+          return selectableClients;
+        })()}
+        professionals={modalProfessionals}
+        paymentMethods={paymentMethods}
+        bankAccounts={bankAccounts}
+        items={(() => {
+          console.log('📦 OrdersPage - Passando items para OrderModal:', {
+            currentOrderItems: currentOrderItems,
+            totalItems: currentOrderItems?.length || 0,
+          });
+          return currentOrderItems;
+        })()}
         onRemoveItem={handleRemoveItem}
       />
 
       <OrderItemModal
         isOpen={isOrderItemModalVisible}
-        onClose={() => setIsOrderItemModalVisible(false)}
+        onClose={() => {
+          setIsOrderItemModalVisible(false);
+          setCurrentOrderId(null);
+          setItemModalProfessionalId('');
+        }}
         onSubmit={handleItemSubmit}
         orderId={currentOrderId}
-        defaultProfessionalId={selectedOrder?.professionalId}
-        services={activeServices}
-        professionals={[]} // TODO: Buscar profissionais do banco
+        defaultProfessionalId={itemModalProfessionalId}
+        services={activeServices || []}
+        professionals={modalProfessionals}
       />
     </div>
   );

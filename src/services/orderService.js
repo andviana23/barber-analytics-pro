@@ -4,6 +4,7 @@
  * @module Services/Order
  * @author Andrey Viana
  * @date 2025-10-24
+ * @updated 2025-10-28 - Adicionado gerenciamento de status com ENUM e validações de transição
  */
 
 import orderRepository from '../repositories/orderRepository';
@@ -11,15 +12,24 @@ import cashRegisterRepository from '../repositories/cashRegisterRepository';
 import serviceRepository from '../repositories/serviceRepository';
 import financeiroService from './financeiroService'; // FASE 6: Integração com módulo financeiro
 import { getProfessionalCommissions } from './professionalCommissionService';
+import edgeFunctionService from './edgeFunctionService'; // SPRINT 4: Cálculos no backend
 import {
   validateCreateOrder,
   validateCloseOrder,
   validateCancelOrder,
+  validateStatusTransition,
+  validateCanCloseOrder,
+  validateCanCancelOrder,
 } from '../dtos/OrderDTO';
 import {
   validateAddOrderItem,
   calculateOrderTotals,
 } from '../dtos/OrderItemDTO';
+import {
+  ORDER_STATUS,
+  canEditOrder,
+  isOrderFinalized,
+} from '../constants/orderStatus';
 import { toast } from 'react-hot-toast';
 
 /**
@@ -101,9 +111,10 @@ class OrderService {
    * Adiciona um serviço à comanda
    *
    * Regras de negócio:
-   * - Comanda deve estar aberta
+   * - Comanda deve estar aberta ou em atendimento
    * - Serviço deve estar ativo
    * - Calcula comissão automaticamente
+   * - Atualiza status para IN_PROGRESS se ainda estiver OPEN
    *
    * @param {string} orderId - ID da comanda
    * @param {Object} serviceData - Dados do serviço
@@ -120,10 +131,10 @@ class OrderService {
         return { data: null, error: orderError };
       }
 
-      // Valida se comanda está aberta
-      if (order.status !== 'open') {
+      // Valida se comanda pode ser editada (OPEN ou IN_PROGRESS)
+      if (!canEditOrder(order.status)) {
         const error = new Error(
-          'Não é possível adicionar serviços a uma comanda fechada ou cancelada'
+          `Não é possível adicionar serviços a uma comanda com status ${order.status}`
         );
         toast.error(error.message);
         return { data: null, error };
@@ -145,18 +156,19 @@ class OrderService {
       }
 
       // Busca comissão personalizada do profissional para este serviço
-      const professionalId = serviceData.professionalId || order.professional_id;
-      const { data: professionalCommissions } = 
+      const professionalId =
+        serviceData.professionalId || order.professional_id;
+      const { data: professionalCommissions } =
         await getProfessionalCommissions(professionalId);
-      
+
       // Verifica se há comissão personalizada para este serviço
       const customCommission = professionalCommissions?.find(
         comm => comm.service_id === serviceData.serviceId
       );
-      
+
       // Usa comissão personalizada se existir, senão usa a padrão do serviço
-      const commissionPercentage = customCommission 
-        ? customCommission.commission_percentage 
+      const commissionPercentage = customCommission
+        ? customCommission.commission_percentage
         : service.commission_percentage;
 
       // Prepara dados do item
@@ -268,10 +280,14 @@ class OrderService {
   /**
    * Fecha uma comanda e gera receita
    *
+   * SPRINT 2: Refatorado para usar RPC fn_close_order com transação atômica
+   *
    * Regras de negócio:
-   * - Comanda deve estar aberta
+   * - Comanda deve estar em um status válido para fechamento (OPEN, IN_PROGRESS, AWAITING_PAYMENT)
    * - Deve ter pelo menos um item
-   * - Gera receita automaticamente
+   * - Gera receita automaticamente via transação atômica no backend
+   * - Atualiza status para CLOSED
+   * - ROLLBACK automático em caso de falha (0% de inconsistências)
    *
    * @param {string} orderId - ID da comanda
    * @param {Object} data - Dados de fechamento
@@ -288,7 +304,7 @@ class OrderService {
         return { data: null, error };
       }
 
-      // Busca a comanda
+      // Busca a comanda para validações prévias
       const { data: order, error: orderError } =
         await orderRepository.getOrderById(orderId);
 
@@ -297,9 +313,26 @@ class OrderService {
         return { data: null, error: orderError };
       }
 
-      // Valida se comanda está aberta
-      if (order.status !== 'open') {
-        const error = new Error('Esta comanda já está fechada ou cancelada');
+      // SPRINT 4: Validar no backend antes de fechar
+      const { data: validationResult } =
+        await edgeFunctionService.validateOrderClose(
+          orderId,
+          validation.data.paymentMethodId,
+          validation.data.accountId
+        );
+
+      if (validationResult && !validationResult.valid) {
+        // Erros já foram exibidos como toast pelo edgeFunctionService
+        return {
+          data: null,
+          error: new Error('Validação de fechamento falhou'),
+        };
+      }
+
+      // Valida se comanda pode ser fechada
+      const canCloseValidation = validateCanCloseOrder(order.status);
+      if (!canCloseValidation.success) {
+        const error = new Error(canCloseValidation.error);
         toast.error(error.message);
         return { data: null, error };
       }
@@ -313,11 +346,13 @@ class OrderService {
         return { data: null, error };
       }
 
-      // Fecha a comanda e gera receita
+      // ⚛️ TRANSAÇÃO ATÔMICA: Fecha comanda + Cria receita no backend
+      // Se qualquer operação falhar, o PostgreSQL faz ROLLBACK automático
       const result = await orderRepository.closeOrder(
         orderId,
         validation.data.paymentMethodId,
-        validation.data.accountId
+        validation.data.accountId,
+        validation.data.userId
       );
 
       if (result.error) {
@@ -325,69 +360,33 @@ class OrderService {
         return result;
       }
 
-      const totals = calculateOrderTotals(order.items);
-
-      // FASE 6: Integrar com módulo financeiro
-      // Criar receita automaticamente a partir da comanda
-      const revenueData = {
-        orderId,
-        totalAmount: totals.totalAmount,
-        clientId: order.client_id,
-        professionalId: order.professional_id,
-        unitId: order.unit_id,
-        userId: order.user_id || validation.data.userId,
-        paymentMethodId: validation.data.paymentMethodId,
-        accountId: validation.data.accountId,
-        date: new Date().toISOString().split('T')[0],
-        observations: `Receita gerada automaticamente da comanda. Itens: ${order.items.length}, Comissão total: R$ ${totals.totalCommission.toFixed(2)}`,
-      };
-
-      // eslint-disable-next-line no-console
-      console.log('💰 [OrderService] Criando receita da comanda:', revenueData);
-
-      const revenueResult =
-        await financeiroService.createReceitaFromOrder(revenueData);
-
-      if (revenueResult.error) {
-        // eslint-disable-next-line no-console
-        console.error(
-          '❌ [OrderService] Erro ao criar receita:',
-          revenueResult.error
-        );
-        toast.error(
-          'Comanda fechada, mas houve erro ao gerar receita. Contate o suporte.'
-        );
-
-        return {
-          data: {
-            orderId,
-            revenueId: null,
-            revenueError: revenueResult.error,
-            totals,
-          },
-          error: null, // Comanda foi fechada, apenas a receita falhou
-        };
-      }
+      // Extrai totais retornados pela função RPC
+      const totals = result.data.totals;
 
       toast.success(
-        `✅ Comanda fechada! Total: R$ ${totals.totalAmount.toFixed(2)} | Receita gerada`
+        `✅ Comanda fechada! Total: R$ ${parseFloat(totals.total_amount).toFixed(2)} | Receita gerada`
       );
 
       // Log de auditoria
       // eslint-disable-next-line no-console
-      console.info('[OrderService] Comanda fechada com receita gerada:', {
+      console.info('[OrderService] Comanda fechada com transação atômica:', {
         orderId,
-        revenueId: revenueResult.data?.id,
-        totalAmount: totals.totalAmount,
-        totalCommission: totals.totalCommission,
-        itemsCount: totals.itemsCount,
+        revenueId: result.data.revenue_id,
+        totalAmount: totals.total_amount,
+        totalCommission: totals.total_commission,
+        itemsCount: totals.items_count,
+        message: result.data.message,
       });
 
       return {
         data: {
           orderId,
-          revenueId: revenueResult.data?.id,
-          totals,
+          revenueId: result.data.revenue_id,
+          totals: {
+            totalAmount: parseFloat(totals.total_amount),
+            totalCommission: parseFloat(totals.total_commission),
+            itemsCount: parseInt(totals.items_count),
+          },
         },
         error: null,
       };
@@ -399,6 +398,11 @@ class OrderService {
 
   /**
    * Cancela uma comanda
+   *
+   * Regras de negócio:
+   * - Comanda não pode estar já cancelada
+   * - Se estiver fechada (CLOSED), remove a receita associada (estorno)
+   * - Atualiza status para CANCELED
    *
    * @param {string} orderId - ID da comanda
    * @param {string} reason - Motivo do cancelamento
@@ -424,11 +428,28 @@ class OrderService {
         return { data: null, error: orderError };
       }
 
-      // Valida se comanda está aberta
-      if (order.status !== 'open') {
-        const error = new Error('Esta comanda já está fechada ou cancelada');
+      // Valida se comanda pode ser cancelada
+      const canCancelValidation = validateCanCancelOrder(order.status);
+      if (!canCancelValidation.success) {
+        const error = new Error(canCancelValidation.error);
         toast.error(error.message);
         return { data: null, error };
+      }
+
+      // Se comanda estava CLOSED, remove a receita associada (estorno)
+      if (order.status === ORDER_STATUS.CLOSED) {
+        // eslint-disable-next-line no-console
+        console.log('[OrderService] Removendo receita da comanda cancelada');
+
+        const deleteRevenueResult =
+          await financeiroService.deleteReceitaBySource('order', orderId);
+
+        if (deleteRevenueResult.error) {
+          toast.error(
+            'Erro ao remover receita. Cancelamento não pode prosseguir.'
+          );
+          return deleteRevenueResult;
+        }
       }
 
       // Cancela a comanda
@@ -442,14 +463,85 @@ class OrderService {
       toast.success('Comanda cancelada!');
 
       // Log de auditoria
+      // eslint-disable-next-line no-console
       console.info('[OrderService] Comanda cancelada:', {
         orderId,
         reason,
+        previousStatus: order.status,
       });
 
       return result;
     } catch (error) {
       toast.error('Erro inesperado ao cancelar comanda');
+      return { data: null, error };
+    }
+  }
+
+  /**
+   * Atualiza o status de uma comanda
+   *
+   * Regras de negócio:
+   * - Valida que a transição de status é permitida
+   * - Registra a transição no histórico
+   *
+   * @param {string} orderId - ID da comanda
+   * @param {string} newStatus - Novo status (usar constantes de ORDER_STATUS)
+   * @returns {Promise<{data: Object|null, error: Error|null}>}
+   *
+   * @example
+   * // Marcar comanda como "Em Atendimento"
+   * await orderService.updateOrderStatus(orderId, ORDER_STATUS.IN_PROGRESS)
+   *
+   * // Marcar comanda como "Aguardando Pagamento"
+   * await orderService.updateOrderStatus(orderId, ORDER_STATUS.AWAITING_PAYMENT)
+   */
+  async updateOrderStatus(orderId, newStatus) {
+    try {
+      // Busca a comanda atual
+      const { data: order, error: orderError } =
+        await orderRepository.getOrderById(orderId);
+
+      if (orderError) {
+        toast.error('Erro ao buscar comanda');
+        return { data: null, error: orderError };
+      }
+
+      // Valida a transição de status
+      const transitionValidation = validateStatusTransition(
+        order.status,
+        newStatus
+      );
+
+      if (!transitionValidation.success) {
+        const error = new Error(transitionValidation.error);
+        toast.error(error.message);
+        return { data: null, error };
+      }
+
+      // Atualiza o status
+      const result = await orderRepository.updateOrderStatus(
+        orderId,
+        newStatus
+      );
+
+      if (result.error) {
+        toast.error('Erro ao atualizar status da comanda');
+        return result;
+      }
+
+      toast.success(`Status atualizado com sucesso!`);
+
+      // Log de auditoria
+      // eslint-disable-next-line no-console
+      console.info('[OrderService] Status atualizado:', {
+        orderId,
+        from: order.status,
+        to: newStatus,
+      });
+
+      return result;
+    } catch (error) {
+      toast.error('Erro inesperado ao atualizar status');
       return { data: null, error };
     }
   }
@@ -509,24 +601,35 @@ class OrderService {
   }
 
   /**
-   * Calcula total de uma comanda
+   * Calcula totais de uma comanda (usando Edge Function)
    *
    * @param {string} orderId - ID da comanda
    * @returns {Promise<{data: Object|null, error: Error|null}>}
    */
   async calculateOrderTotal(orderId) {
     try {
-      const { data: items, error } =
-        await orderRepository.getOrderItems(orderId);
+      // SPRINT 4: Usar Edge Function para cálculos seguros
+      const { data, error } =
+        await edgeFunctionService.calculateOrderTotals(orderId);
 
       if (error) {
-        toast.error('Erro ao buscar itens da comanda');
-        return { data: null, error };
+        // Fallback: Calcular localmente se Edge Function falhar
+        // eslint-disable-next-line no-console
+        console.warn('⚠️ Edge Function falhou, usando cálculo local:', error);
+
+        const { data: items, error: itemsError } =
+          await orderRepository.getOrderItems(orderId);
+
+        if (itemsError) {
+          toast.error('Erro ao buscar itens da comanda');
+          return { data: null, error: itemsError };
+        }
+
+        const totals = calculateOrderTotals(items);
+        return { data: totals, error: null };
       }
 
-      const totals = calculateOrderTotals(items);
-
-      return { data: totals, error: null };
+      return { data, error: null };
     } catch (error) {
       toast.error('Erro inesperado ao calcular total');
       return { data: null, error };

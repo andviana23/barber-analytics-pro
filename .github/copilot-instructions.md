@@ -85,7 +85,7 @@ Copiar código
 ## 💈 Lista da Vez
 
 - Gerencia ordem de atendimento por unidade
-- Reset automático mensal via **Edge Function (Supabase)** às 23:59
+- Reset automático mensal via **Cron Job (pg_cron)** às 23:00
 - Histórico mensal completo
 - Funções SQL documentadas em `LISTA_DA_VEZ_MODULE.md`
 - Componentes principais:
@@ -116,7 +116,90 @@ ON revenues
 FOR SELECT USING (
   unit_id IN (SELECT unit_id FROM professionals WHERE user_id = auth.uid())
 );
-🧠 Regras para o Copilot Chat
+```
+
+---
+
+## 🎭 Playwright MCP - Testes E2E
+
+### 📋 Configuração
+
+- **MCP Server:** `microsoft/playwright-mcp` instalado e configurado
+- **Configuração:** `playwright.config.ts` na raiz do projeto
+- **Diretório de testes:** `./e2e`
+- **Base URL:** `http://localhost:5173` (Vite dev server)
+- **Browsers:** Chromium, Firefox, WebKit
+- **Timeout:** 60s por teste, 5s para assertions
+- **Retry:** 1x no CI, 0x em desenvolvimento local
+- **Reports:** HTML em `playwright-report/`, lista no console
+- **Artifacts:** Screenshots, vídeos e traces em `playwright-artifacts/`
+
+### 🔧 Como Usar o Playwright MCP
+
+**Para executar testes E2E via MCP:**
+
+1. **Usar ferramentas MCP do Playwright** disponíveis no chat
+2. **Navegação:** `mcp_microsoft_pla_browser_navigate`
+3. **Snapshots:** `mcp_microsoft_pla_browser_snapshot` (melhor que screenshot)
+4. **Interações:** `mcp_microsoft_pla_browser_click`, `mcp_microsoft_pla_browser_type`
+5. **Validações:** `mcp_microsoft_pla_browser_evaluate`
+
+**Padrões de teste:**
+
+```typescript
+// Exemplo de estrutura de teste E2E
+// Arquivo: e2e/orders.spec.ts
+
+import { test, expect } from '@playwright/test';
+
+test.describe('Fluxo de Comandas', () => {
+  test.beforeEach(async ({ page }) => {
+    // Login antes de cada teste
+    await page.goto('/login');
+    await page.fill('[name="email"]', 'test@barber.com');
+    await page.fill('[name="password"]', 'senha123');
+    await page.click('button[type="submit"]');
+    await expect(page).toHaveURL('/dashboard');
+  });
+
+  test('deve criar uma nova comanda', async ({ page }) => {
+    await page.goto('/comandas');
+    await page.click('button:has-text("Nova Comanda")');
+
+    // Preencher modal
+    await page.selectOption('[name="clientId"]', { index: 1 });
+    await page.click('button:has-text("Salvar")');
+
+    // Validar
+    await expect(page.locator('.toast-success')).toBeVisible();
+  });
+});
+```
+
+### ✅ Checklist de Testes E2E
+
+Ao criar testes com Playwright MCP:
+
+- [ ] Usar `snapshot()` para inspeção de acessibilidade (não screenshot)
+- [ ] Validar feedback visual (toasts, modals)
+- [ ] Testar fluxos críticos (login, criação de comanda, fechamento)
+- [ ] Validar estados de loading e erro
+- [ ] Testar em múltiplos browsers (Chromium, Firefox, WebKit)
+- [ ] Verificar acessibilidade (roles, labels, aria-\*)
+- [ ] Usar data-testid para seletores estáveis
+- [ ] Documentar cenários de teste no código
+
+### 🎯 Prioridade de Testes
+
+1. **Críticos (P0):** Login, criação/fechamento de comanda, caixa
+2. **Altos (P1):** Cadastros (clientes, serviços), relatórios
+3. **Médios (P2):** Filtros, paginação, ordenação
+4. **Baixos (P3):** Animações, tooltips, validações visuais
+
+---
+
+## 🧠 Regras para o Copilot Chat
+
 ✅ Quando escrever código:
 Seguir Clean Architecture
 
@@ -163,22 +246,16 @@ Evitar respostas genéricas ou fora da estrutura do projeto
 
 Manter o padrão Enterprise + Clean Code
 
-🧩 Checklist de Criação de Features
-Repository
+## 🧩 Checklist de Criação de Features
 
-Service
-
-DTO
-
-Hook
-
-Componentes (Atomic)
-
-Page
-
-Testes
-
-Atualizar Documentação
+- [ ] Repository
+- [ ] Service
+- [ ] DTO
+- [ ] Hook
+- [ ] Componentes (Atomic)
+- [ ] Page
+- [ ] **Testes E2E (Playwright MCP)**
+- [ ] Atualizar Documentação
 
 📈 Resultado Esperado
 O Copilot deve:
@@ -200,4 +277,7 @@ Autor: Andrey Viana
 Projeto: Barber Analytics Pro
 Estilo: Enterprise, Clean Code, Atomic, Multi-tenant, Supabase-first
 Meta: Sistema de gestão de barbearia completo, modular e escalável.
+
+```
+
 ```

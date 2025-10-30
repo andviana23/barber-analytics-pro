@@ -177,12 +177,21 @@ class CashRegisterService {
    */
   async closeCashRegister(id, data, user) {
     try {
+      console.log('🔐 [Service] closeCashRegister INICIADO', {
+        id,
+        data,
+        user,
+      });
+
       // Validação de permissão
       if (!this._hasPermission(user)) {
         const error = new Error('Usuário não tem permissão para fechar caixa');
         toast.error(error.message);
+        console.error('❌ [Service] Permissão negada', user);
         return { data: null, error };
       }
+
+      console.log('✅ [Service] Permissão validada');
 
       // Validação do DTO
       const validation = validateCloseCashRegister({
@@ -190,18 +199,27 @@ class CashRegisterService {
         closedBy: user.id,
       });
 
+      console.log('🧪 [Service] Validação DTO:', validation);
+
       if (!validation.success) {
         const error = new Error(validation.error);
         toast.error(`Dados inválidos: ${validation.error}`);
+        console.error('❌ [Service] DTO inválido:', validation.error);
         return { data: null, error };
       }
 
+      console.log('✅ [Service] Validação DTO OK');
+
       // Verifica se existem comandas abertas
+      console.log('🔍 [Service] Verificando comandas abertas...');
       const { data: openOrders, error: countError } =
         await cashRegisterRepository.countOpenOrders(id);
 
+      console.log('📊 [Service] Comandas abertas:', { openOrders, countError });
+
       if (countError) {
         toast.error('Erro ao verificar comandas abertas');
+        console.error('❌ [Service] Erro ao contar comandas:', countError);
         return { data: null, error: countError };
       }
 
@@ -210,28 +228,44 @@ class CashRegisterService {
           `Não é possível fechar o caixa. Existem ${openOrders} comanda(s) aberta(s). Feche todas as comandas antes de fechar o caixa.`
         );
         toast.error(error.message);
+        console.warn('⚠️ [Service] Comandas abertas detectadas:', openOrders);
         return { data: null, error };
       }
 
+      console.log('✅ [Service] Nenhuma comanda aberta');
+
       // Busca resumo do caixa para calcular diferença
+      console.log('📈 [Service] Buscando resumo do caixa...');
       const { data: summary, error: summaryError } =
         await cashRegisterRepository.getCashRegisterSummary(id);
 
+      console.log('📈 [Service] Resumo:', { summary, summaryError });
+
       if (summaryError) {
         toast.error('Erro ao buscar resumo do caixa');
+        console.error('❌ [Service] Erro ao buscar resumo:', summaryError);
         return { data: null, error: summaryError };
       }
 
       // Fecha o caixa
+      console.log('💾 [Service] Fechando caixa no repository...', {
+        id,
+        validationData: validation.data,
+      });
       const result = await cashRegisterRepository.closeCashRegister(
         id,
         validation.data
       );
 
+      console.log('💾 [Service] Resultado do fechamento:', result);
+
       if (result.error) {
         toast.error('Erro ao fechar caixa');
+        console.error('❌ [Service] Erro ao fechar:', result.error);
         return result;
       }
+
+      console.log('✅ [Service] Caixa fechado com sucesso!');
 
       // Calcula diferença
       const expectedBalance = summary.expected_balance || 0;

@@ -4,9 +4,11 @@
  * @module Repositories/Order
  * @author Andrey Viana
  * @date 2025-10-24
+ * @updated 2025-10-28 - Adicionado suporte para novos status ENUM
  */
 
 import { supabase } from '../services/supabase';
+import { ORDER_STATUS } from '../constants/orderStatus';
 
 /**
  * Repository para gerenciar operações de comandas no banco de dados
@@ -32,7 +34,7 @@ class OrderRepository {
           client_id: data.clientId,
           professional_id: data.professionalId,
           cash_register_id: data.cashRegisterId,
-          status: 'open',
+          status: ORDER_STATUS.OPEN,
           total_amount: 0,
         })
         .select()
@@ -137,7 +139,7 @@ class OrderRepository {
           `
           *,
           unit:units(id, name),
-          client:parties!client_id(id, name, cpf_cnpj, phone),
+          client:parties!client_id(id, nome, cpf_cnpj, telefone, email),
           professional:professionals!professional_id(id, name, role),
           cash_register:cash_registers(id, status, opening_time),
           items:order_items(
@@ -203,7 +205,7 @@ class OrderRepository {
         .select(
           `
           *,
-          client:parties!client_id(id, name),
+          client:parties!client_id(id, nome, cpf_cnpj, telefone, email),
           professional:professionals!professional_id(id, name)
         `,
           { count: 'exact' }
@@ -259,17 +261,29 @@ class OrderRepository {
    * @param {string} paymentMethodId - ID da forma de pagamento
    * @param {string} [accountId] - ID da conta bancária
    * @returns {Promise<{data: Object|null, error: Error|null}>}
+   *
+   * @note A função RPC do banco de dados já valida o status da comanda
+   * @note Status após sucesso: CLOSED
    */
-  async closeOrder(id, paymentMethodId, accountId = null) {
+  /**
+   * Fecha uma comanda usando RPC com transação atômica
+   *
+   * SPRINT 2: Atualizado para usar fn_close_order com garantia de atomicidade
+   *
+   * @param {string} id - ID da comanda
+   * @param {string} paymentMethodId - ID do método de pagamento
+   * @param {string} accountId - ID da conta de destino
+   * @param {string} userId - ID do usuário que está fechando
+   * @returns {Promise<{data: Object|null, error: Error|null}>}
+   */
+  async closeOrder(id, paymentMethodId, accountId = null, userId = null) {
     try {
-      const { data: result, error } = await supabase.rpc(
-        'fn_close_order_and_generate_revenue',
-        {
-          p_order_id: id,
-          p_payment_method_id: paymentMethodId,
-          p_account_id: accountId,
-        }
-      );
+      const { data: result, error } = await supabase.rpc('fn_close_order', {
+        p_order_id: id,
+        p_payment_method_id: paymentMethodId,
+        p_account_id: accountId,
+        p_user_id: userId,
+      });
 
       if (error) {
         console.error('[OrderRepository] Erro ao fechar comanda:', error);
@@ -296,12 +310,12 @@ class OrderRepository {
       const { data: order, error } = await supabase
         .from('orders')
         .update({
-          status: 'canceled',
+          status: ORDER_STATUS.CANCELED,
           closed_at: new Date().toISOString(),
           // Note: você pode adicionar um campo 'cancel_reason' na tabela se necessário
         })
         .eq('id', id)
-        .eq('status', 'open')
+        .neq('status', ORDER_STATUS.CANCELED) // Não pode cancelar comanda já cancelada
         .select()
         .single();
 
@@ -328,6 +342,50 @@ class OrderRepository {
   }
 
   /**
+   * Atualiza o status de uma comanda
+   *
+   * @param {string} id - ID da comanda
+   * @param {string} newStatus - Novo status (usar constantes de ORDER_STATUS)
+   * @returns {Promise<{data: Object|null, error: Error|null}>}
+   *
+   * @note Esta função NÃO valida a transição. Validar no Service antes de chamar.
+   * @example
+   * // Exemplo de uso (após validação no Service)
+   * await orderRepository.updateOrderStatus(orderId, ORDER_STATUS.IN_PROGRESS)
+   */
+  async updateOrderStatus(id, newStatus) {
+    try {
+      const { data: order, error } = await supabase
+        .from('orders')
+        .update({ status: newStatus })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        // eslint-disable-next-line no-console
+        console.error('[OrderRepository] Erro ao atualizar status:', error);
+        return { data: null, error };
+      }
+
+      if (!order) {
+        return {
+          data: null,
+          error: new Error('Comanda não encontrada'),
+        };
+      }
+
+      // eslint-disable-next-line no-console
+      console.log(`[OrderRepository] Status atualizado: ${id} → ${newStatus}`);
+      return { data: order, error: null };
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('[OrderRepository] Exceção ao atualizar status:', error);
+      return { data: null, error };
+    }
+  }
+
+  /**
    * Busca comandas de um profissional em um período
    *
    * @param {string} professionalId - ID do profissional
@@ -343,7 +401,7 @@ class OrderRepository {
         .select(
           `
           *,
-          client:parties!client_id(id, name),
+          client:parties!client_id(id, nome, cpf_cnpj, telefone, email),
           items:order_items(
             *,
             service:services(id, name)
@@ -395,7 +453,7 @@ class OrderRepository {
         .select(
           `
           *,
-          client:parties!client_id(id, name),
+          client:parties!client_id(id, nome, cpf_cnpj, telefone, email),
           professional:professionals!professional_id(id, name)
         `
         )

@@ -25,6 +25,50 @@ class CashRegisterRepository {
    */
   async openCashRegister(data) {
     try {
+      // 🔍 DEBUG: Verificar sessão antes de inserir
+      const { data: sessionData } = await supabase.auth.getSession();
+
+      // Log SEMPRE exibido
+      console.log('='.repeat(60));
+      console.log('🔐 [Repository] VERIFICAÇÃO DE SESSÃO');
+      console.log('='.repeat(60));
+      console.log('Sessão ativa:', {
+        hasSession: !!sessionData.session,
+        userId: sessionData.session?.user?.id,
+        userEmail: sessionData.session?.user?.email,
+        userRole: sessionData.session?.user?.user_metadata?.role,
+        accessToken: sessionData.session?.access_token
+          ? '✅ Presente'
+          : '❌ AUSENTE',
+        expiresAt: sessionData.session?.expires_at
+          ? new Date(sessionData.session.expires_at * 1000).toLocaleString()
+          : 'N/A',
+      });
+      console.log('Dados do caixa a inserir:', data);
+      console.log('='.repeat(60));
+
+      if (!sessionData.session) {
+        console.error(
+          '❌ [Repository] SESSÃO NÃO ENCONTRADA! Usuário não autenticado.'
+        );
+        return {
+          data: null,
+          error: new Error('Sessão expirada. Faça login novamente.'),
+        };
+      }
+
+      if (!sessionData.session.access_token) {
+        console.error('❌ [Repository] ACCESS TOKEN NÃO ENCONTRADO!');
+        return {
+          data: null,
+          error: new Error(
+            'Token de autenticação não encontrado. Faça login novamente.'
+          ),
+        };
+      }
+
+      console.log('✅ [Repository] Sessão válida, tentando INSERT...');
+
       const { data: cashRegister, error } = await supabase
         .from('cash_registers')
         .insert({
@@ -39,17 +83,20 @@ class CashRegisterRepository {
         .single();
 
       if (error) {
-        console.error('[CashRegisterRepository] Erro ao abrir caixa:', error);
+        console.error('❌ [Repository] Erro ao abrir caixa:', error);
+        console.error('Detalhes do erro:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+        });
         return { data: null, error };
       }
 
-      console.log(
-        '[CashRegisterRepository] Caixa aberto com sucesso:',
-        cashRegister.id
-      );
+      console.log('✅ [Repository] Caixa aberto com sucesso:', cashRegister.id);
       return { data: cashRegister, error: null };
     } catch (error) {
-      console.error('[CashRegisterRepository] Exceção ao abrir caixa:', error);
+      console.error('💥 [Repository] Exceção ao abrir caixa:', error);
       return { data: null, error };
     }
   }
@@ -293,7 +340,7 @@ class CashRegisterRepository {
       const { data: summary, error } = await supabase
         .from('vw_cash_register_summary')
         .select('*')
-        .eq('id', id)
+        .eq('cash_register_id', id) // ✅ Corrigido: view usa cash_register_id, não id
         .single();
 
       if (error) {

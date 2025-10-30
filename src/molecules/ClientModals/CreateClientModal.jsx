@@ -2,12 +2,14 @@
  * CREATE CLIENT MODAL
  * Modal para cadastro de novos clientes
  *
- * Campos:
- * - Nome (obrigatório)
- * - Telefone (opcional)
- * - Email (opcional)
- * - CPF (opcional)
- * - Data de Nascimento (opcional)
+ * Campos Obrigatórios:
+ * - Nome (mínimo 3 caracteres)
+ * - Telefone (mínimo 10 dígitos)
+ *
+ * Campos Opcionais:
+ * - Email (validado se preenchido)
+ * - CPF (formatação automática)
+ * - Data de Nascimento
  */
 
 import React, { useState } from 'react';
@@ -42,18 +44,18 @@ const CreateClientModal = ({ isOpen, onClose, onCreate, loading = false }) => {
       newErrors.nome = 'Nome deve ter pelo menos 3 caracteres';
     }
 
+    // Telefone é obrigatório
+    const telefoneLimpo = formData.telefone.replace(/\D/g, '');
+    if (!telefoneLimpo || telefoneLimpo.length < 10) {
+      newErrors.telefone = 'Telefone deve ter pelo menos 10 dígitos';
+    }
+
     // Validar email se fornecido
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Email inválido';
     }
 
-    // Validar CPF se fornecido (apenas formato básico)
-    if (formData.cpf_cnpj) {
-      const cpfLimpo = formData.cpf_cnpj.replace(/\D/g, '');
-      if (cpfLimpo.length !== 11) {
-        newErrors.cpf_cnpj = 'CPF deve ter 11 dígitos';
-      }
-    }
+    // CPF/CNPJ agora é opcional - sem validação obrigatória
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -87,9 +89,14 @@ const CreateClientModal = ({ isOpen, onClose, onCreate, loading = false }) => {
     }
 
     setFormData(prev => ({ ...prev, telefone: value }));
+
+    // Limpar erro ao digitar
+    if (errors.telefone) {
+      setErrors(prev => ({ ...prev, telefone: '' }));
+    }
   };
 
-  // Formatar CPF
+  // Formatar CPF (sem validação obrigatória)
   const handleCpfChange = e => {
     let value = e.target.value.replace(/\D/g, '');
 
@@ -106,10 +113,6 @@ const CreateClientModal = ({ isOpen, onClose, onCreate, loading = false }) => {
     }
 
     setFormData(prev => ({ ...prev, cpf_cnpj: value }));
-
-    if (errors.cpf_cnpj) {
-      setErrors(prev => ({ ...prev, cpf_cnpj: '' }));
-    }
   };
 
   // Submit do formulário
@@ -199,12 +202,12 @@ const CreateClientModal = ({ isOpen, onClose, onCreate, loading = false }) => {
             )}
           </div>
 
-          {/* Grid de 2 colunas para os campos opcionais */}
+          {/* Grid de 2 colunas para os campos obrigatórios */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Telefone */}
+            {/* Telefone - OBRIGATÓRIO */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Telefone
+                Telefone <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -214,12 +217,19 @@ const CreateClientModal = ({ isOpen, onClose, onCreate, loading = false }) => {
                   onChange={handlePhoneChange}
                   placeholder="(00) 00000-0000"
                   maxLength={15}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className={`w-full pl-10 pr-3 py-2 border ${
+                    errors.telefone
+                      ? 'border-red-500'
+                      : 'border-gray-300 dark:border-gray-600'
+                  } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
                 />
               </div>
+              {errors.telefone && (
+                <p className="mt-1 text-sm text-red-500">{errors.telefone}</p>
+              )}
             </div>
 
-            {/* CPF */}
+            {/* CPF - Opcional */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 CPF
@@ -232,16 +242,9 @@ const CreateClientModal = ({ isOpen, onClose, onCreate, loading = false }) => {
                   onChange={handleCpfChange}
                   placeholder="000.000.000-00"
                   maxLength={14}
-                  className={`w-full pl-10 pr-3 py-2 border ${
-                    errors.cpf_cnpj
-                      ? 'border-red-500'
-                      : 'border-gray-300 dark:border-gray-600'
-                  } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
-              {errors.cpf_cnpj && (
-                <p className="mt-1 text-sm text-red-500">{errors.cpf_cnpj}</p>
-              )}
             </div>
 
             {/* Email */}

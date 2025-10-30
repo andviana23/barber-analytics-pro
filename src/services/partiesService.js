@@ -15,18 +15,20 @@ export class PartiesService {
    */
   static async getParties(filters = {}) {
     try {
-      const { unitId, tipo, search, isActive = true } = filters;
+      const { unitId, tipo, search, isActive } = filters;
 
       if (!unitId) {
         return { data: null, error: 'Unit ID é obrigatório' };
       }
 
-      let query = supabase
-        .from('parties')
-        .select('*')
-        .eq('unit_id', unitId)
-        .eq('is_active', isActive)
-        .order('nome', { ascending: true });
+      let query = supabase.from('parties').select('*').eq('unit_id', unitId);
+
+      // Filtrar por is_active apenas se especificado
+      if (isActive !== undefined) {
+        query = query.eq('is_active', isActive);
+      }
+
+      query = query.order('nome', { ascending: true });
 
       // Filtrar por tipo se especificado
       if (tipo) {

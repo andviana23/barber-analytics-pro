@@ -11,22 +11,22 @@ import { test, expect } from '@playwright/test';
 const testUsers = {
   recepcionista: {
     email: process.env.E2E_RECEPCIONISTA_EMAIL || 'recepcionista@test.com',
-    password: process.env.E2E_RECEPCIONISTA_PASSWORD || 'Test123!',
+    password: process.env.E2E_RECEPCIONISTA_PASSWORD || 'senha123',
     role: 'recepcionista',
   },
   gerente: {
     email: process.env.E2E_GERENTE_EMAIL || 'gerente@test.com',
-    password: process.env.E2E_GERENTE_PASSWORD || 'Test123!',
+    password: process.env.E2E_GERENTE_PASSWORD || 'senha123',
     role: 'gerente',
   },
   profissional: {
     email: process.env.E2E_PROFISSIONAL_EMAIL || 'profissional@test.com',
-    password: process.env.E2E_PROFISSIONAL_PASSWORD || 'Test123!',
+    password: process.env.E2E_PROFISSIONAL_PASSWORD || 'senha123',
     role: 'profissional',
   },
   admin: {
     email: process.env.E2E_ADMIN_EMAIL || 'admin@test.com',
-    password: process.env.E2E_ADMIN_PASSWORD || 'Test123!',
+    password: process.env.E2E_ADMIN_PASSWORD || 'senha123',
     role: 'admin',
   },
 };

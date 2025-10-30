@@ -10,12 +10,12 @@ import { test, expect } from '@playwright/test';
 const testUsers = {
   recepcionista: {
     email: process.env.E2E_RECEPCIONISTA_EMAIL || 'recepcionista@test.com',
-    password: process.env.E2E_RECEPCIONISTA_PASSWORD || 'Test123!',
+    password: process.env.E2E_RECEPCIONISTA_PASSWORD || 'senha123',
     role: 'recepcionista',
   },
   profissional: {
     email: process.env.E2E_PROFISSIONAL_EMAIL || 'profissional@test.com',
-    password: process.env.E2E_PROFISSIONAL_PASSWORD || 'Test123!',
+    password: process.env.E2E_PROFISSIONAL_PASSWORD || 'senha123',
     role: 'profissional',
   },
 };

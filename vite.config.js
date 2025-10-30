@@ -21,6 +21,14 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: true,
+    // Excluir testes E2E (Playwright) do Vitest
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/e2e/**',
+      '**/.{idea,git,cache,output,temp}/**',
+      '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
+    ],
     typecheck: {
       tsconfig: './tsconfig.json',
     },
@@ -30,6 +38,7 @@ export default defineConfig({
       exclude: [
         'node_modules/',
         'src/test/',
+        'e2e/',
         '**/*.config.{js,ts}',
         '**/*.spec.{js,ts,jsx,tsx}',
         '**/*.test.{js,ts,jsx,tsx}',

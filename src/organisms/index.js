@@ -20,3 +20,8 @@ export { default as OrderItemsTable } from './OrderItemsTable';
 export { default as ServicesTable } from './ServicesTable';
 export { default as CommissionSummaryCard } from './CommissionSummaryCard';
 export { default as CashReportPanel } from './CashReportPanel';
+
+// Portal do Barbeiro
+export { BarbeiroHeader } from './BarbeiroHeader';
+export { BarbeiroBottomNav } from './BarbeiroBottomNav';
+export { BarbeiroStatsCard } from './BarbeiroStatsCard';

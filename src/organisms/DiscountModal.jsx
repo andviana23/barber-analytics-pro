@@ -1,0 +1,327 @@
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import Modal from '../molecules/Modal';
+import Button from '../atoms/Button';
+import Input from '../atoms/Input';
+import { formatCurrency } from '../utils/formatters';
+import { toast } from 'react-hot-toast';
+
+/**
+ * DiscountModal - Modal para aplicar descontos e taxas em comandas
+ *
+ * @component
+ * @example
+ * <DiscountModal
+ *   isOpen={true}
+ *   onClose={() => {}}
+ *   onApply={(data) => {}}
+ *   orderSubtotal={150.00}
+ *   adjustmentType="discount"
+ * />
+ */
+const DiscountModal = ({
+  isOpen,
+  onClose,
+  onApply,
+  orderSubtotal = 0,
+  adjustmentType = 'discount', // 'discount' ou 'fee'
+  currentDiscount = null,
+  currentFee = null,
+}) => {
+  const [valueType, setValueType] = useState('percentage'); // 'percentage' ou 'fixed'
+  const [value, setValue] = useState('');
+  const [reason, setReason] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const isDiscount = adjustmentType === 'discount';
+  const title = isDiscount ? 'Aplicar Desconto' : 'Aplicar Taxa';
+  const currentAdjustment = isDiscount ? currentDiscount : currentFee;
+
+  // Calcular o valor do ajuste em reais
+  const calculateAdjustmentAmount = () => {
+    const numValue = parseFloat(value) || 0;
+
+    if (valueType === 'percentage') {
+      const base = isDiscount
+        ? orderSubtotal
+        : orderSubtotal - calculateDiscountAmount();
+      return (base * numValue) / 100;
+    }
+
+    return numValue;
+  };
+
+  // Calcular desconto atual se existir
+  const calculateDiscountAmount = () => {
+    if (!currentDiscount) return 0;
+
+    if (currentDiscount.type === 'percentage') {
+      return (orderSubtotal * currentDiscount.value) / 100;
+    }
+
+    return currentDiscount.value;
+  };
+
+  // Calcular total final
+  const calculateFinalTotal = () => {
+    let total = orderSubtotal;
+
+    // Aplicar desconto
+    if (isDiscount) {
+      total -= calculateAdjustmentAmount();
+    } else if (currentDiscount) {
+      total -= calculateDiscountAmount();
+    }
+
+    // Aplicar taxa
+    if (!isDiscount) {
+      total += calculateAdjustmentAmount();
+    } else if (currentFee) {
+      const feeAmount =
+        currentFee.type === 'percentage'
+          ? (total * currentFee.value) / 100
+          : currentFee.value;
+      total += feeAmount;
+    }
+
+    return Math.max(0, total);
+  };
+
+  const adjustmentAmount = calculateAdjustmentAmount();
+  const finalTotal = calculateFinalTotal();
+
+  const handleSubmit = async e => {
+    e.preventDefault();
+
+    // Validações
+    if (!value || parseFloat(value) <= 0) {
+      toast.error('Informe um valor válido');
+      return;
+    }
+
+    if (valueType === 'percentage' && parseFloat(value) > 100) {
+      toast.error('O percentual não pode ser maior que 100%');
+      return;
+    }
+
+    if (!reason || reason.trim().length < 3) {
+      toast.error('Informe o motivo do ajuste (mínimo 3 caracteres)');
+      return;
+    }
+
+    if (isDiscount && adjustmentAmount > orderSubtotal) {
+      toast.error('O desconto não pode ser maior que o subtotal');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      await onApply({
+        type: valueType,
+        value: parseFloat(value),
+        reason: reason.trim(),
+        adjustmentType,
+      });
+
+      // Resetar form
+      setValue('');
+      setReason('');
+      setValueType('percentage');
+
+      toast.success(
+        isDiscount
+          ? 'Desconto aplicado com sucesso!'
+          : 'Taxa aplicada com sucesso!'
+      );
+      onClose();
+    } catch (error) {
+      toast.error(error.message || 'Erro ao aplicar ajuste');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClose = () => {
+    if (!loading) {
+      setValue('');
+      setReason('');
+      setValueType('percentage');
+      onClose();
+    }
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={handleClose} title={title} size="md">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Tipo de Ajuste */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Tipo de {isDiscount ? 'Desconto' : 'Taxa'}
+          </label>
+          <div className="flex gap-4">
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="radio"
+                name="valueType"
+                value="percentage"
+                checked={valueType === 'percentage'}
+                onChange={e => setValueType(e.target.value)}
+                className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="ml-2 text-sm text-gray-700">Percentual (%)</span>
+            </label>
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="radio"
+                name="valueType"
+                value="fixed"
+                checked={valueType === 'fixed'}
+                onChange={e => setValueType(e.target.value)}
+                className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="ml-2 text-sm text-gray-700">
+                Valor Fixo (R$)
+              </span>
+            </label>
+          </div>
+        </div>
+
+        {/* Valor */}
+        <div>
+          <Input
+            label={valueType === 'percentage' ? 'Percentual (%)' : 'Valor (R$)'}
+            type="number"
+            step={valueType === 'percentage' ? '0.01' : '0.01'}
+            min="0"
+            max={valueType === 'percentage' ? '100' : undefined}
+            value={value}
+            onChange={e => setValue(e.target.value)}
+            placeholder={valueType === 'percentage' ? 'Ex: 10' : 'Ex: 15.00'}
+            required
+          />
+        </div>
+
+        {/* Motivo */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Motivo *
+          </label>
+          <textarea
+            value={reason}
+            onChange={e => setReason(e.target.value)}
+            placeholder={`Descreva o motivo ${isDiscount ? 'do desconto' : 'da taxa'}...`}
+            rows={3}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            required
+            minLength={3}
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            Obrigatório para auditoria (mínimo 3 caracteres)
+          </p>
+        </div>
+
+        {/* Resumo de Valores */}
+        {value && parseFloat(value) > 0 && (
+          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-2">
+            <h4 className="font-medium text-gray-900 mb-3">Resumo</h4>
+
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Subtotal:</span>
+              <span className="font-medium">
+                {formatCurrency(orderSubtotal)}
+              </span>
+            </div>
+
+            {currentDiscount && isDiscount === false && (
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Desconto Atual:</span>
+                <span className="font-medium text-green-600">
+                  - {formatCurrency(calculateDiscountAmount())}
+                </span>
+              </div>
+            )}
+
+            <div
+              className={`flex justify-between text-sm font-medium ${isDiscount ? 'text-green-600' : 'text-orange-600'}`}
+            >
+              <span>
+                {isDiscount ? 'Desconto' : 'Taxa'} (
+                {valueType === 'percentage'
+                  ? `${value}%`
+                  : formatCurrency(parseFloat(value))}
+                ):
+              </span>
+              <span>
+                {isDiscount ? '-' : '+'} {formatCurrency(adjustmentAmount)}
+              </span>
+            </div>
+
+            {currentFee && isDiscount === true && (
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Taxa Atual:</span>
+                <span className="font-medium text-orange-600">
+                  +{' '}
+                  {formatCurrency(
+                    currentFee.type === 'percentage'
+                      ? ((orderSubtotal - adjustmentAmount) *
+                          currentFee.value) /
+                          100
+                      : currentFee.value
+                  )}
+                </span>
+              </div>
+            )}
+
+            <div className="pt-2 border-t border-gray-300">
+              <div className="flex justify-between text-base font-bold">
+                <span>Total Final:</span>
+                <span className="text-blue-600">
+                  {formatCurrency(finalTotal)}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Ações */}
+        <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={handleClose}
+            disabled={loading}
+          >
+            Cancelar
+          </Button>
+          <Button
+            type="submit"
+            variant="primary"
+            loading={loading}
+            disabled={!value || !reason}
+          >
+            {isDiscount ? 'Aplicar Desconto' : 'Aplicar Taxa'}
+          </Button>
+        </div>
+      </form>
+    </Modal>
+  );
+};
+
+DiscountModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onApply: PropTypes.func.isRequired,
+  orderSubtotal: PropTypes.number,
+  adjustmentType: PropTypes.oneOf(['discount', 'fee']),
+  currentDiscount: PropTypes.shape({
+    type: PropTypes.oneOf(['percentage', 'fixed']),
+    value: PropTypes.number,
+  }),
+  currentFee: PropTypes.shape({
+    type: PropTypes.oneOf(['percentage', 'fixed']),
+    value: PropTypes.number,
+  }),
+};
+
+export default DiscountModal;

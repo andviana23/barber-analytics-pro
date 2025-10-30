@@ -1,0 +1,10 @@
+# Playwright E2E Tests
+
+## Ignore test artifacts
+playwright-report/
+playwright-artifacts/
+test-results/
+
+## Ignore test videos and traces
+*.webm
+trace.zip

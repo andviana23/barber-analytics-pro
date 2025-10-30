@@ -269,6 +269,9 @@ const useOrders = (unitId, enableRealtime = true) => {
   useEffect(() => {
     if (!enableRealtime || !unitId) return;
 
+    // Carrega comandas inicialmente
+    fetchOrders();
+
     const channelName = `orders_${unitId}`;
     const channel = supabase
       .channel(channelName)
@@ -295,7 +298,8 @@ const useOrders = (unitId, enableRealtime = true) => {
         supabase.removeChannel(subscriptionRef.current);
       }
     };
-  }, [enableRealtime, unitId, fetchOrders]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enableRealtime, unitId]); // ⚠️ Removido fetchOrders das dependências
 
   return {
     // Estado

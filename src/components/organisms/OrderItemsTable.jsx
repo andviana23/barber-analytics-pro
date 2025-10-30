@@ -25,16 +25,20 @@ const OrderItemsTable = ({
 }) => {
   // Calcula totais
   const totals = items.reduce(
-    (acc, item) => ({
-      subtotal: acc.subtotal + (item.unit_price || 0) * (item.quantity || 1),
-      commission:
-        acc.commission +
-        ((item.unit_price || 0) *
-          (item.quantity || 1) *
-          (item.commission_percentage || 0)) /
-          100,
-      quantity: acc.quantity + (item.quantity || 1),
-    }),
+    (acc, item) => {
+      // ✅ Aceita tanto unit_price (snake_case) quanto unitPrice (camelCase)
+      const unitPrice = item.unit_price || item.unitPrice || 0;
+      const quantity = item.quantity || 1;
+      const commissionPercentage =
+        item.commission_percentage || item.commissionPercentage || 0;
+      const itemTotal = unitPrice * quantity;
+
+      return {
+        subtotal: acc.subtotal + itemTotal,
+        commission: acc.commission + (itemTotal * commissionPercentage) / 100,
+        quantity: acc.quantity + quantity,
+      };
+    },
     { subtotal: 0, commission: 0, quantity: 0 }
   );
 
@@ -82,9 +86,13 @@ const OrderItemsTable = ({
           </thead>
           <tbody className="divide-y divide-theme-border">
             {items.map(item => {
-              const itemTotal = (item.unit_price || 0) * (item.quantity || 1);
-              const itemCommission =
-                (itemTotal * (item.commission_percentage || 0)) / 100;
+              // ✅ Aceita ambos os formatos
+              const unitPrice = item.unit_price || item.unitPrice || 0;
+              const quantity = item.quantity || 1;
+              const commissionPercentage =
+                item.commission_percentage || item.commissionPercentage || 0;
+              const itemTotal = unitPrice * quantity;
+              const itemCommission = (itemTotal * commissionPercentage) / 100;
 
               return (
                 <tr
@@ -93,7 +101,7 @@ const OrderItemsTable = ({
                 >
                   <td className="px-4 py-3">
                     <p className="text-sm font-medium text-theme-primary">
-                      {item.service?.name || 'Serviço'}
+                      {item.service?.name || item.serviceName || 'Serviço'}
                     </p>
                     {item.service?.duration_minutes && (
                       <p className="text-xs text-theme-muted">
@@ -105,18 +113,20 @@ const OrderItemsTable = ({
                     <div className="flex items-center gap-2">
                       <User size={14} className="text-theme-muted" />
                       <span className="text-sm text-theme-primary">
-                        {item.professional?.name || 'N/A'}
+                        {item.professional?.name ||
+                          item.professionalName ||
+                          'Sem profissional'}
                       </span>
                     </div>
                   </td>
                   <td className="px-4 py-3 text-center">
                     <span className="text-sm font-semibold text-theme-primary">
-                      {item.quantity || 1}
+                      {quantity}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
                     <span className="text-sm text-theme-primary">
-                      {formatCurrency(item.unit_price || 0)}
+                      {formatCurrency(unitPrice)}
                     </span>
                   </td>
                   {showCommission && (
@@ -126,7 +136,7 @@ const OrderItemsTable = ({
                           {formatCurrency(itemCommission)}
                         </p>
                         <p className="text-xs text-theme-muted">
-                          {item.commission_percentage || 0}%
+                          {commissionPercentage}%
                         </p>
                       </div>
                     </td>
@@ -159,19 +169,25 @@ const OrderItemsTable = ({
       {/* Cards Mobile */}
       <div className="md:hidden divide-y divide-theme-border">
         {items.map(item => {
-          const itemTotal = (item.unit_price || 0) * (item.quantity || 1);
-          const itemCommission =
-            (itemTotal * (item.commission_percentage || 0)) / 100;
+          // ✅ Aceita ambos os formatos
+          const unitPrice = item.unit_price || item.unitPrice || 0;
+          const quantity = item.quantity || 1;
+          const commissionPercentage =
+            item.commission_percentage || item.commissionPercentage || 0;
+          const itemTotal = unitPrice * quantity;
+          const itemCommission = (itemTotal * commissionPercentage) / 100;
 
           return (
             <div key={item.id} className="p-4">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-semibold text-theme-primary truncate">
-                    {item.service?.name || 'Serviço'}
+                    {item.service?.name || item.serviceName || 'Serviço'}
                   </h4>
                   <p className="text-xs text-theme-muted mt-1">
-                    {item.professional?.name || 'N/A'}
+                    {item.professional?.name ||
+                      item.professionalName ||
+                      'Sem profissional'}
                   </p>
                 </div>
                 {canEdit && onRemoveItem && (
@@ -190,13 +206,13 @@ const OrderItemsTable = ({
                 <div>
                   <span className="text-theme-muted">Quantidade:</span>
                   <span className="ml-1 font-semibold text-theme-primary">
-                    {item.quantity || 1}
+                    {quantity}
                   </span>
                 </div>
                 <div className="text-right">
                   <span className="text-theme-muted">Preço Unit.:</span>
                   <span className="ml-1 font-semibold text-theme-primary">
-                    {formatCurrency(item.unit_price || 0)}
+                    {formatCurrency(unitPrice)}
                   </span>
                 </div>
                 {showCommission && (
@@ -204,7 +220,7 @@ const OrderItemsTable = ({
                     <div>
                       <span className="text-theme-muted">Comissão:</span>
                       <span className="ml-1 font-semibold text-purple-600 dark:text-purple-400">
-                        {item.commission_percentage || 0}%
+                        {commissionPercentage}%
                       </span>
                     </div>
                     <div className="text-right">

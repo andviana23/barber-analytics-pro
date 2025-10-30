@@ -81,13 +81,20 @@ export const useClients = (unitId, options = {}) => {
       }
 
       try {
+        // 🔧 FIX: Se includeInactive = true, busca TODOS os clientes (não filtra por is_active)
+        // Se includeInactive = false, busca apenas ativos (isActive: true)
         const { data, error } = await partiesService.getParties({
           unitId,
           tipo: 'Cliente',
-          isActive: !includeInactive,
+          ...(includeInactive ? {} : { isActive: true }), // Só filtra se NÃO incluir inativos
         });
 
         if (error) throw new Error(error);
+
+        // 🔍 DEBUG: Log para verificar dados recebidos (pode ser removido depois)
+        if (data?.length > 0) {
+          console.log('✅ useClients - Clientes carregados:', data.length);
+        }
 
         // Armazenar no cache
         if (enableCache) {
