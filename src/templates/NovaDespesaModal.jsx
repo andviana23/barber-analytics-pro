@@ -168,7 +168,7 @@ const NovaDespesaModal = ({
   }, []);
   const [formData, setFormData] = useState({
     fornecedor_id: '',
-    data_competencia: new Date(),
+    data_competencia: null, // Forçar seleção manual da data correta
     descricao: '',
     valor: '',
     categoria_id: '',
@@ -464,19 +464,45 @@ const NovaDespesaModal = ({
 
       console.log('💾 Salvando despesa:', expenseData);
 
-      // Inserir despesa
-      const { data: expense, error: expenseError } = await supabase
-        .from('expenses')
-        .insert(expenseData)
-        .select()
-        .single();
+      let expense;
 
-      if (expenseError) {
-        console.error('❌ Erro ao inserir despesa:', expenseError);
-        throw expenseError;
+      // ✅ CORREÇÃO DO BUG: Verificar se está editando ou criando
+      if (isEditing && initialData?.id) {
+        // 🔄 MODO EDIÇÃO: Atualizar despesa existente
+        console.log('🔄 Atualizando despesa existente, ID:', initialData.id);
+
+        const { data: updatedExpense, error: expenseError } = await supabase
+          .from('expenses')
+          .update(expenseData)
+          .eq('id', initialData.id)
+          .select()
+          .single();
+
+        if (expenseError) {
+          console.error('❌ Erro ao atualizar despesa:', expenseError);
+          throw expenseError;
+        }
+
+        expense = updatedExpense;
+        console.log('✅ Despesa atualizada:', expense);
+      } else {
+        // ➕ MODO CRIAÇÃO: Inserir nova despesa
+        console.log('➕ Criando nova despesa');
+
+        const { data: newExpense, error: expenseError } = await supabase
+          .from('expenses')
+          .insert(expenseData)
+          .select()
+          .single();
+
+        if (expenseError) {
+          console.error('❌ Erro ao inserir despesa:', expenseError);
+          throw expenseError;
+        }
+
+        expense = newExpense;
+        console.log('✅ Despesa criada:', expense);
       }
-
-      console.log('✅ Despesa salva:', expense);
 
       // Se for recorrente, criar configuração de recorrência
       if (isRecurring && expense) {
@@ -499,10 +525,12 @@ const NovaDespesaModal = ({
 
       addToast({
         type: 'success',
-        title: 'Despesa salva!',
-        message: isRecurring
-          ? 'Despesa recorrente criada com sucesso.'
-          : 'Despesa única salva com sucesso.',
+        title: isEditing ? 'Despesa atualizada!' : 'Despesa salva!',
+        message: isEditing
+          ? 'As alterações foram salvas com sucesso.'
+          : isRecurring
+            ? 'Despesa recorrente criada com sucesso.'
+            : 'Despesa única salva com sucesso.',
       });
 
       onSave(expense);
@@ -527,6 +555,8 @@ const NovaDespesaModal = ({
     onClose,
     addToast,
     getTotalParcels,
+    isEditing,
+    initialData,
   ]);
 
   const handleClose = useCallback(() => {

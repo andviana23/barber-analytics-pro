@@ -73,9 +73,12 @@ class DREService {
         p_end_date: endDate,
       });
 
+      // eslint-disable-next-line no-console
+      console.log('🔍 DRE Service - Raw SQL Response:', { data, error });
+
       if (error) {
         // eslint-disable-next-line no-console
-        console.error('Erro ao calcular DRE:', error);
+        console.error('❌ Erro ao calcular DRE:', error);
 
         // Mensagens de erro mais amigáveis
         let errorMessage = 'Erro ao calcular DRE';
@@ -110,10 +113,13 @@ class DREService {
       // Enriquecer dados com informações adicionais
       const enrichedData = this._enrichDREData(data);
 
+      // eslint-disable-next-line no-console
+      console.log('✅ DRE Service - Enriched Data:', enrichedData);
+
       return { data: enrichedData, error: null };
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error('Erro inesperado ao calcular DRE:', error);
+      console.error('❌ Erro inesperado ao calcular DRE:', error);
       return {
         data: null,
         error: error instanceof Error ? error : new Error('Erro desconhecido'),
@@ -676,109 +682,111 @@ class DREService {
    * @private
    */
   _enrichDREData(data) {
-    // Verificar se é a estrutura nova (com sucesso) ou antiga
-    if (data.sucesso) {
-      // Estrutura nova da função SQL v3.0.0 - Mapeamento para compatibilidade
+    // eslint-disable-next-line no-console
+    console.log('🔧 _enrichDREData - Input:', {
+      hasMetadata: !!data.metadata,
+      versao: data.metadata?.versao,
+      keys: Object.keys(data || {}).slice(0, 10),
+    });
+
+    // Verificar se é a estrutura nova (v3.0.1+) com metadata.versao
+    if (data.metadata?.versao?.includes('3.0')) {
+      // eslint-disable-next-line no-console
+      console.log('✅ Usando estrutura v3.0.1-HOTFIX');
+
+      // Estrutura SQL v3.0.1-HOTFIX - Mapeamento para compatibilidade
       return {
         periodo: data.periodo,
-        unit_id: data.unit_id,
 
-        // Receita Bruta - mapeamento
+        // Receita Bruta - extrair total do objeto
         receita_bruta: {
-          total: data.receita_bruta,
-          receita_servico: {
-            total: 0, // A função SQL v3.0.0 não detalha serviços
-            assinatura: 0,
-            avulso: 0,
-          },
-          receita_produtos: {
-            total: 0,
-            cosmeticos: 0,
-          },
+          total: data.receita_bruta?.total || 0,
+          categorias: data.receita_bruta?.categorias || [],
         },
 
-        // Custos Operacionais
+        // Receitas estruturadas para compatibilidade
+        receitas: {
+          total: data.receita_bruta?.total || 0,
+          categorias: data.receita_bruta?.categorias || [],
+        },
+
+        // Deduções
+        deducoes: {
+          total: data.deducoes?.total || 0,
+          categorias: data.deducoes?.categorias || [],
+        },
+
+        // Receita Líquida
+        receita_liquida: data.receita_liquida || 0,
+
+        // Custos Operacionais - extrair total e categorias do objeto
         custos_operacionais: {
-          total: data.custos_operacionais,
-          bebidas_cortesias: 0,
-          bonificacoes_metas: 0,
-          comissoes: 0,
-          limpeza_lavanderia: 0,
-          produtos_uso_interno: 0,
+          total: data.custos_operacionais?.total || 0,
+          categorias: data.custos_operacionais?.categorias || [],
         },
 
-        // Despesas Administrativas
+        // Despesas Administrativas - extrair total e categorias do objeto
         despesas_administrativas: {
-          total: data.despesas_fixas,
-          aluguel_condominio: 0,
-          contabilidade: 0,
-          contas_fixas: 0,
-          encargos_beneficios: 0,
-          manutencao_seguros: 0,
-          marketing_comercial: 0,
-          salarios_prolabore: 0,
-          sistemas: 0,
+          total: data.despesas_administrativas?.total || 0,
+          categorias: data.despesas_administrativas?.categorias || [],
         },
 
-        // Impostos
+        // Despesas estruturadas para compatibilidade com componente
+        despesas: {
+          total:
+            (data.custos_operacionais?.total || 0) +
+            (data.despesas_administrativas?.total || 0),
+          categorias: [
+            ...(data.custos_operacionais?.categorias || []),
+            ...(data.despesas_administrativas?.categorias || []),
+          ],
+        },
+
+        // Impostos - extrair total e categorias do objeto
         impostos: {
-          total: data.impostos,
-          simples_nacional: data.impostos,
+          total: data.impostos?.total || 0,
+          categorias: data.impostos?.categorias || [],
+        },
+
+        // Resultado Financeiro
+        resultado_financeiro: {
+          receitas: data.resultado_financeiro?.receitas || 0,
+          despesas: data.resultado_financeiro?.despesas || 0,
+          total: data.resultado_financeiro?.total || 0,
         },
 
         // Resultados Principais
-        margem_contribuicao: data.margem_contribuicao,
-        ebit: data.ebit,
-        ebitda: data.ebitda,
-        lucro_liquido: data.lucro_liquido,
-        receita_liquida: data.receita_liquida,
+        margem_contribuicao: data.margem_contribuicao || 0,
+        ebitda: data.ebitda || 0,
+        ebit: data.ebit || 0,
+        lucro_liquido: data.lucro_liquido || 0,
 
-        // Indicadores/Percentuais - mapeamento
-        indicadores: {
-          margem_contribuicao_percentual:
-            data.percentuais?.margem_contribuicao || 0,
-          margem_ebit_percentual: data.percentuais?.margem_liquida || 0, // EBIT
-          margem_liquida_percentual: data.percentuais?.margem_liquida || 0,
-          custo_operacional_percentual:
-            data.percentuais?.custos_operacionais || 0,
-          despesa_administrativa_percentual:
-            data.percentuais?.despesas_fixas || 0,
+        // Indicadores/Percentuais
+        indicadores: data.indicadores || {
+          margem_contribuicao_percentual: 0,
+          margem_ebitda_percentual: 0,
+          margem_ebit_percentual: 0,
+          margem_liquida_percentual: 0,
         },
-
-        // Dados detalhados (para DREDynamicView)
-        receitas_detalhadas: data.receitas_detalhadas || [],
-        custos_detalhados: data.custos_detalhados || [],
-        despesas_detalhadas: data.despesas_detalhadas || [],
-        impostos_detalhados: data.impostos_detalhados || [],
-        deducoes: data.deducoes || 0,
-        deducoes_detalhadas: data.deducoes_detalhadas || [],
-
-        // Financeiro
-        receitas_financeiras: data.receitas_financeiras || 0,
-        despesas_financeiras: data.despesas_financeiras || 0,
-        resultado_financeiro: data.resultado_financeiro || 0,
-
-        // Percentuais completos
-        percentuais: data.percentuais || {},
 
         // Metadata
         metadata: data.metadata || {
-          regime: 'COMPETÊNCIA',
-          versao: '3.0.0',
+          regime: 'competencia',
+          versao: '3.0.1-HOTFIX',
           calculation_timestamp: new Date().toISOString(),
         },
 
         // Campos computados
         _computed: {
-          has_data:
-            data.receita_bruta > 0 ||
-            data.custos_operacionais > 0 ||
-            data.despesas_fixas > 0,
-          is_profitable: data.lucro_liquido > 0,
+          has_data: (data.receita_bruta?.total || 0) > 0,
+          is_profitable: (data.lucro_liquido || 0) > 0,
           periodo_label: this._formatPeriodLabel(data.periodo),
         },
       };
     }
+
+    // eslint-disable-next-line no-console
+    console.log('⚠️ Usando estrutura antiga (fallback)');
 
     // Estrutura antiga - manter compatibilidade
     return {

@@ -253,34 +253,9 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
   };
 
   const handleDelete = expense => {
+    console.log('🗑️ handleDelete chamado para despesa:', expense);
     setSelectedExpenseForAction(expense);
     setIsDeleteModalOpen(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    try {
-      const { error } = await supabase
-        .from('expenses')
-        .update({ is_active: false })
-        .eq('id', selectedExpenseForAction.id);
-
-      if (error) throw error;
-
-      showToast({
-        type: 'success',
-        message: 'Despesa excluída',
-        description: 'A despesa foi removida com sucesso.',
-      });
-
-      fetchExpenses();
-      setIsDeleteModalOpen(false);
-    } catch (error) {
-      showToast({
-        type: 'error',
-        message: 'Erro ao excluir',
-        description: error.message,
-      });
-    }
   };
 
   // ✨ Dar Baixa Rápida - Marca despesa como paga
@@ -514,7 +489,8 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
 
                           showToast({
                             type: 'success',
-                            message: `${selectedExpenses.length} despesa${selectedExpenses.length !== 1 ? 's' : ''} excluída${selectedExpenses.length !== 1 ? 's' : ''} com sucesso!`,
+                            message: 'Despesas excluídas',
+                            description: `${selectedExpenses.length} despesa${selectedExpenses.length !== 1 ? 's' : ''} excluída${selectedExpenses.length !== 1 ? 's' : ''} com sucesso!`,
                           });
 
                           setSelectedExpenses([]);
@@ -524,7 +500,9 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
                           showToast({
                             type: 'error',
                             message: 'Erro ao excluir despesas',
-                            description: error.message,
+                            description:
+                              error.message ||
+                              'Não foi possível excluir as despesas.',
                           });
                         }
                       }
@@ -764,14 +742,18 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
 
       {isDeleteModalOpen && selectedExpenseForAction && (
         <DeleteConfirmationModal
+          expense={selectedExpenseForAction}
           isOpen={isDeleteModalOpen}
           onClose={() => {
             setIsDeleteModalOpen(false);
             setSelectedExpenseForAction(null);
           }}
-          onConfirm={handleDeleteConfirm}
-          title="Excluir Despesa"
-          message={`Tem certeza que deseja excluir a despesa "${selectedExpenseForAction.description}"?`}
+          onDelete={() => {
+            // Callback chamado após exclusão bem-sucedida
+            setIsDeleteModalOpen(false);
+            setSelectedExpenseForAction(null);
+            fetchExpenses();
+          }}
         />
       )}
 

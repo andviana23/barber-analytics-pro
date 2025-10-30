@@ -516,10 +516,14 @@ const RelatoriosPage = () => {
             endDate = endOfMonth(now);
         }
 
+        // Garantir que as datas estão corretas (sem problemas de timezone)
+        const formattedStartDate = format(startDate, 'yyyy-MM-dd');
+        const formattedEndDate = format(endDate, 'yyyy-MM-dd');
+
         const { data, error } = await supabase.rpc('fn_calculate_dre_dynamic', {
           p_unit_id: unitId,
-          p_start_date: format(startDate, 'yyyy-MM-dd'),
-          p_end_date: format(endDate, 'yyyy-MM-dd'),
+          p_start_date: formattedStartDate,
+          p_end_date: formattedEndDate,
         });
 
         if (error) throw error;
@@ -527,15 +531,22 @@ const RelatoriosPage = () => {
         setDreData(data);
 
         // Também atualizar reportData para as métricas rápidas
-        if (data && data.sucesso) {
+        if (data && (data.sucesso || data.metadata)) {
+          // Extrair valores com segurança (sempre acessar .total primeiro)
+          const receitaTotal = Number(data.receita_bruta?.total ?? 0);
+          const custosOp = Number(data.custos_operacionais?.total ?? 0);
+          const despesasAdm = Number(data.despesas_administrativas?.total ?? 0);
+          const impostos = Number(data.impostos?.total ?? 0);
+          const despesasTotal = custosOp + despesasAdm + impostos;
+
           setReportData({
-            receitaTotal: data.receita_bruta || 0,
-            despesasTotal:
-              (data.custos_operacionais || 0) +
-              (data.despesas_fixas || 0) +
-              (data.impostos || 0),
+            receitaTotal,
+            despesasTotal,
             lucroLiquido: data.lucro_liquido || 0,
-            margemPercentual: data.percentuais?.margem_liquida || 0,
+            margemPercentual:
+              data.indicadores?.margem_liquida_percentual ||
+              data.percentuais?.margem_liquida ||
+              0,
             dados: data,
           });
         }

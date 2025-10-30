@@ -44,19 +44,28 @@ const RelatorioDREMensal = ({ filters }) => {
     setError(null);
 
     try {
-      const { data, error: dreError } = await dreService.getDREMensal(
-        filters.periodo.mes,
+      const { data, error: dreError } = await dreService.calculateMonthDRE(
+        selectedUnit.id,
         filters.periodo.ano,
-        selectedUnit.id
+        filters.periodo.mes
       );
 
       if (dreError) {
-        throw new Error(dreError);
+        throw new Error(dreError.message || dreError);
       }
+
+      console.log('📊 DRE Data recebida:', data);
+      console.log('📊 Estrutura:', {
+        temReceitas: !!data?.receitas,
+        temReceitaBruta: !!data?.receita_bruta,
+        temDespesas: !!data?.despesas,
+        keys: Object.keys(data || {}),
+      });
 
       setDadosDRE(data);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Erro ao carregar DRE');
+      console.error('Erro ao carregar DRE:', err);
     } finally {
       setLoading(false);
     }
@@ -130,41 +139,86 @@ const RelatorioDREMensal = ({ filters }) => {
     );
   }
 
-  // Calcular estrutura do DRE
-  const receitaBruta = dadosDRE.receitas.total;
-  const categoriasReceitas = dadosDRE.receitas.categorias || [];
+  // Verificar se tem a estrutura esperada
+  if (!dadosDRE.receitas && !dadosDRE.receita_bruta) {
+    console.error('❌ Estrutura de DRE inválida:', dadosDRE);
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <AlertCircle className="w-16 h-16 text-warning mb-4" />
+        <h3 className="text-xl font-semibold text-text-light-primary dark:text-text-dark-primary mb-2">
+          Estrutura de dados inválida
+        </h3>
+        <p className="text-text-light-secondary dark:text-text-dark-secondary mb-6 text-center max-w-md">
+          Os dados do DRE estão em um formato não reconhecido. Verifique o
+          console para mais detalhes.
+        </p>
+        <button
+          onClick={carregarDadosDRE}
+          className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-600 transition-all duration-200 font-medium"
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
+  }
 
-  const deducoes = 0;
-  const receitaLiquida = receitaBruta - deducoes;
+  // Calcular estrutura do DRE - com fallback para múltiplas estruturas
+  const receitaBruta =
+    dadosDRE.receitas?.total || dadosDRE.receita_bruta?.total || 0;
+  const categoriasReceitas =
+    dadosDRE.receitas?.categorias || dadosDRE.receita_bruta?.categorias || [];
 
-  const categoriasCustosVariaveis = dadosDRE.despesas.categorias.filter(
-    cat =>
-      cat.name.toLowerCase().includes('custo') ||
-      cat.name.toLowerCase().includes('variável') ||
-      cat.name.toLowerCase().includes('variavel')
-  );
+  const deducoes = dadosDRE.deducoes?.total || 0;
+  const receitaLiquida = dadosDRE.receita_liquida || receitaBruta - deducoes;
+
+  // Buscar categorias de despesas - aceitar múltiplas estruturas
+  const todasCategoriasDespesas = dadosDRE.despesas?.categorias || [
+    ...(dadosDRE.custos_operacionais?.categorias || []),
+    ...(dadosDRE.despesas_administrativas?.categorias || []),
+  ];
+
+  const categoriasCustosVariaveis = todasCategoriasDespesas.filter(cat => {
+    const nome = cat.categoria_nome || cat.name || '';
+    const pai = cat.categoria_pai || cat.parent || '';
+    return (
+      nome.toLowerCase().includes('custo') ||
+      nome.toLowerCase().includes('variável') ||
+      nome.toLowerCase().includes('variavel') ||
+      nome.toLowerCase().includes('operacion') ||
+      pai.toLowerCase().includes('operacion')
+    );
+  });
+
   const custosVariaveis = categoriasCustosVariaveis.reduce(
-    (sum, cat) => sum + cat.value,
+    (sum, cat) => sum + (cat.valor || cat.value || 0),
     0
   );
 
-  const margemContribuicao = receitaLiquida - custosVariaveis;
+  const margemContribuicao =
+    dadosDRE.margem_contribuicao || receitaLiquida - custosVariaveis;
 
-  const categoriasDespesasOperacionais = dadosDRE.despesas.categorias.filter(
-    cat =>
-      cat.name.toLowerCase().includes('operacional') ||
-      cat.name.toLowerCase().includes('administrativa') ||
-      cat.name.toLowerCase().includes('vendas') ||
-      cat.name.toLowerCase().includes('fixa')
-  );
+  const categoriasDespesasOperacionais = todasCategoriasDespesas.filter(cat => {
+    const nome = cat.categoria_nome || cat.name || '';
+    const pai = cat.categoria_pai || cat.parent || '';
+    return (
+      nome.toLowerCase().includes('administrativa') ||
+      nome.toLowerCase().includes('fixa') ||
+      pai.toLowerCase().includes('administrativa') ||
+      pai.toLowerCase().includes('fixa')
+    );
+  });
+
   const despesasOperacionais = categoriasDespesasOperacionais.reduce(
-    (sum, cat) => sum + cat.value,
+    (sum, cat) => sum + (cat.valor || cat.value || 0),
     0
   );
 
-  const resultadoOperacional = margemContribuicao - despesasOperacionais;
+  const resultadoOperacional =
+    dadosDRE.ebit || margemContribuicao - despesasOperacionais;
 
-  const lucroLiquido = resultadoOperacional;
+  const impostos = dadosDRE.impostos?.total || 0;
+  const lucroLiquido =
+    dadosDRE.lucro_liquido || resultadoOperacional - impostos;
 
   // Calcular margens
   const margemContribuicaoPct =
@@ -236,19 +290,23 @@ const RelatorioDREMensal = ({ filters }) => {
             {/* Categorias de Receita */}
             {expandedSections.receitas && categoriasReceitas.length > 0 && (
               <div className="bg-emerald-50/30 dark:bg-emerald-900/5 border-t border-emerald-100 dark:border-emerald-900/20">
-                {categoriasReceitas.map(categoria => (
+                {categoriasReceitas.map((categoria, idx) => (
                   <div
-                    key={categoria.id}
+                    key={categoria.categoria_id || categoria.id || idx}
                     className="border-b border-emerald-100/50 dark:border-emerald-900/10 last:border-b-0"
                   >
                     <div className="px-8 py-3 pl-20 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-colors">
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                           <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                          {categoria.name}
+                          {categoria.categoria_nome ||
+                            categoria.name ||
+                            'Sem nome'}
                         </span>
                         <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
-                          {formatarMoeda(categoria.value)}
+                          {formatarMoeda(
+                            categoria.valor || categoria.value || 0
+                          )}
                         </span>
                       </div>
                     </div>
@@ -257,18 +315,18 @@ const RelatorioDREMensal = ({ filters }) => {
                     {categoria.subcategorias &&
                       categoria.subcategorias.length > 0 && (
                         <div className="bg-emerald-50/50 dark:bg-emerald-900/5">
-                          {categoria.subcategorias.map(sub => (
+                          {categoria.subcategorias.map((sub, subIdx) => (
                             <div
-                              key={sub.id}
+                              key={sub.id || subIdx}
                               className="px-8 py-2 pl-28 hover:bg-emerald-100/50 dark:hover:bg-emerald-900/10 transition-colors"
                             >
                               <div className="flex items-center justify-between">
                                 <span className="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-2">
                                   <span className="text-emerald-400">└─</span>
-                                  {sub.name}
+                                  {sub.name || 'Sem nome'}
                                 </span>
                                 <span className="text-xs font-semibold text-emerald-500 dark:text-emerald-400">
-                                  {formatarMoeda(sub.value)}
+                                  {formatarMoeda(sub.value || 0)}
                                 </span>
                               </div>
                             </div>
@@ -324,19 +382,23 @@ const RelatorioDREMensal = ({ filters }) => {
               {/* Categorias de Custos */}
               {expandedSections.custosVariaveis && (
                 <div className="bg-red-50/30 dark:bg-red-900/5 border-t border-red-100 dark:border-red-900/20">
-                  {categoriasCustosVariaveis.map(categoria => (
+                  {categoriasCustosVariaveis.map((categoria, idx) => (
                     <div
-                      key={categoria.id}
+                      key={categoria.categoria_id || categoria.id || idx}
                       className="border-b border-red-100/50 dark:border-red-900/10 last:border-b-0"
                     >
                       <div className="px-8 py-3 pl-20 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors">
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-red-500"></span>
-                            {categoria.name}
+                            {categoria.categoria_nome ||
+                              categoria.name ||
+                              'Sem nome'}
                           </span>
                           <span className="text-sm font-bold text-red-600 dark:text-red-400">
-                            {formatarMoeda(categoria.value)}
+                            {formatarMoeda(
+                              categoria.valor || categoria.value || 0
+                            )}
                           </span>
                         </div>
                       </div>
@@ -345,18 +407,18 @@ const RelatorioDREMensal = ({ filters }) => {
                       {categoria.subcategorias &&
                         categoria.subcategorias.length > 0 && (
                           <div className="bg-red-50/50 dark:bg-red-900/5">
-                            {categoria.subcategorias.map(sub => (
+                            {categoria.subcategorias.map((sub, subIdx) => (
                               <div
-                                key={sub.id}
+                                key={sub.id || subIdx}
                                 className="px-8 py-2 pl-28 hover:bg-red-100/50 dark:hover:bg-red-900/10 transition-colors"
                               >
                                 <div className="flex items-center justify-between">
                                   <span className="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-2">
                                     <span className="text-red-400">└─</span>
-                                    {sub.name}
+                                    {sub.name || 'Sem nome'}
                                   </span>
                                   <span className="text-xs font-semibold text-red-500 dark:text-red-400">
-                                    {formatarMoeda(sub.value)}
+                                    {formatarMoeda(sub.value || 0)}
                                   </span>
                                 </div>
                               </div>
@@ -413,19 +475,23 @@ const RelatorioDREMensal = ({ filters }) => {
               {/* Categorias de Despesas */}
               {expandedSections.despesasOperacionais && (
                 <div className="bg-orange-50/30 dark:bg-orange-900/5 border-t border-orange-100 dark:border-orange-900/20">
-                  {categoriasDespesasOperacionais.map(categoria => (
+                  {categoriasDespesasOperacionais.map((categoria, idx) => (
                     <div
-                      key={categoria.id}
+                      key={categoria.categoria_id || categoria.id || idx}
                       className="border-b border-orange-100/50 dark:border-orange-900/10 last:border-b-0"
                     >
                       <div className="px-8 py-3 pl-20 hover:bg-orange-50 dark:hover:bg-orange-900/10 transition-colors">
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-orange-500"></span>
-                            {categoria.name}
+                            {categoria.categoria_nome ||
+                              categoria.name ||
+                              'Sem nome'}
                           </span>
                           <span className="text-sm font-bold text-orange-600 dark:text-orange-400">
-                            {formatarMoeda(categoria.value)}
+                            {formatarMoeda(
+                              categoria.valor || categoria.value || 0
+                            )}
                           </span>
                         </div>
                       </div>
@@ -434,18 +500,18 @@ const RelatorioDREMensal = ({ filters }) => {
                       {categoria.subcategorias &&
                         categoria.subcategorias.length > 0 && (
                           <div className="bg-orange-50/50 dark:bg-orange-900/5">
-                            {categoria.subcategorias.map(sub => (
+                            {categoria.subcategorias.map((sub, subIdx) => (
                               <div
-                                key={sub.id}
+                                key={sub.id || subIdx}
                                 className="px-8 py-2 pl-28 hover:bg-orange-100/50 dark:hover:bg-orange-900/10 transition-colors"
                               >
                                 <div className="flex items-center justify-between">
                                   <span className="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-2">
                                     <span className="text-orange-400">└─</span>
-                                    {sub.name}
+                                    {sub.name || 'Sem nome'}
                                   </span>
                                   <span className="text-xs font-semibold text-orange-500 dark:text-orange-400">
-                                    {formatarMoeda(sub.value)}
+                                    {formatarMoeda(sub.value || 0)}
                                   </span>
                                 </div>
                               </div>
