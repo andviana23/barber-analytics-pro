@@ -374,6 +374,42 @@ const DespesasAccrualTab = ({ globalFilters }) => {
     }
   };
 
+  // ✨ Dar Baixa Rápida (sem modal) - Marca como pago na data atual
+  const darBaixaRapida = async expense => {
+    if (!expense) return;
+
+    try {
+      const hoje = new Date().toISOString().split('T')[0];
+
+      // Atualizar status para Paid e registrar data de pagamento
+      const { error } = await supabase
+        .from('expenses')
+        .update({
+          status: 'Paid',
+          actual_payment_date: hoje,
+          payment_date: hoje,
+        })
+        .eq('id', expense.id);
+
+      if (error) throw error;
+
+      showToast({
+        type: 'success',
+        message: 'Baixa realizada com sucesso!',
+        description: `Despesa "${expense.description}" marcada como paga.`,
+      });
+
+      fetchExpenses();
+    } catch (error) {
+      console.error('❌ Erro ao dar baixa:', error);
+      showToast({
+        type: 'error',
+        message: 'Erro ao dar baixa',
+        description: error.message,
+      });
+    }
+  };
+
   // Mudar status da despesa
   const changeStatus = async (expenseId, newStatus) => {
     try {
@@ -658,6 +694,21 @@ const DespesasAccrualTab = ({ globalFilters }) => {
                                 <Eye className="w-4 h-4 mr-3" />
                                 Ver Detalhes
                               </button>
+
+                              {/* Botão Dar Baixa - Só aparece se status != Paid */}
+                              {expense.status !== 'Paid' && (
+                                <button
+                                  onClick={() => {
+                                    darBaixaRapida(expense);
+                                    setExpenseActionsOpen(null);
+                                  }}
+                                  className="flex items-center w-full px-4 py-2.5 text-sm text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors font-medium"
+                                >
+                                  <CheckCircle className="w-4 h-4 mr-3" />
+                                  Dar Baixa
+                                </button>
+                              )}
+
                               <button
                                 onClick={() => {
                                   openEditModal(expense);

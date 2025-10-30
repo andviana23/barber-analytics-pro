@@ -72,6 +72,22 @@ export default {
       transitionDuration: {
         300: '300ms',
       },
+
+      animation: {
+        fadeIn: 'fadeIn 0.2s ease-out',
+        slideIn: 'slideIn 0.3s ease-out',
+      },
+
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'scale(0.95)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        slideIn: {
+          '0%': { opacity: '0', transform: 'translateY(-10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+      },
     },
   },
   plugins: [],

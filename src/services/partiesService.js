@@ -162,6 +162,64 @@ export class PartiesService {
   }
 
   /**
+   * Cria um fornecedor rapidamente apenas com o nome
+   * Para uso em fluxos ágeis (ex: modal de despesa)
+   * CPF/CNPJ é gerado automaticamente (temporário)
+   *
+   * @param {string} unitId - ID da unidade
+   * @param {string} nome - Nome do fornecedor
+   * @returns {Object} { data: Party|null, error: string|null }
+   */
+  static async createQuickSupplier(unitId, nome) {
+    try {
+      if (!unitId) {
+        return { data: null, error: 'Unit ID é obrigatório' };
+      }
+
+      if (!nome || nome.trim().length < 2) {
+        return { data: null, error: 'Nome deve ter pelo menos 2 caracteres' };
+      }
+
+      // Gerar CPF/CNPJ temporário único baseado em timestamp
+      // Formato: 99999999999999 (14 dígitos numéricos - limite do campo)
+      // Prefixo 99 indica temporário, seguido de 12 dígitos do timestamp
+      const timestamp = Date.now().toString().slice(-12); // Últimos 12 dígitos
+      const tempCpfCnpj = `99${timestamp}`; // Total: 14 caracteres
+
+      const insertData = {
+        unit_id: unitId,
+        nome: nome.trim(),
+        tipo: 'Fornecedor',
+        cpf_cnpj: tempCpfCnpj, // CPF/CNPJ temporário (14 dígitos)
+        email: null,
+        telefone: null,
+        endereco: null,
+        is_active: true,
+      };
+
+      const { data, error } = await supabase
+        .from('parties')
+        .insert(insertData)
+        .select()
+        .single();
+
+      if (error) {
+        // Retornar erro detalhado para debugging
+        const errorMsg = error.message || 'Erro desconhecido';
+        const errorCode = error.code || 'N/A';
+        const errorDetails = error.details || error.hint || 'Sem detalhes';
+
+        return {
+          data: null,
+          error: `Falha ao criar fornecedor: ${errorMsg} (código: ${errorCode}, detalhes: ${errorDetails})`,
+        };
+      }
+
+      return { data, error: null };
+    } catch (err) {
+      return { data: null, error: `Erro inesperado: ${err.message}` };
+    }
+  } /**
    * Atualiza uma party existente
    * @param {string} id - ID da party
    * @param {Object} updateData - Dados para atualização

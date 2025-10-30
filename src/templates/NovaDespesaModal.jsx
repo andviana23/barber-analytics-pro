@@ -25,6 +25,7 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { supabase } from '../services/supabase';
+import { partiesService } from '../services/partiesService';
 import { useToast } from '../context/ToastContext';
 import {
   X,
@@ -320,6 +321,68 @@ const NovaDespesaModal = ({
     [errors]
   );
 
+  // ✨ Criação rápida de fornecedor (apenas nome)
+  const handleQuickCreateSupplier = useCallback(
+    async supplierName => {
+      if (!supplierName || !supplierName.trim()) {
+        addToast({
+          type: 'error',
+          title: 'Nome obrigatório',
+          message: 'Digite o nome do fornecedor para continuar.',
+        });
+        return;
+      }
+
+      try {
+        setLoadingData(true);
+
+        const { data: newSupplier, error } =
+          await partiesService.createQuickSupplier(unidadeId, supplierName);
+
+        if (error) {
+          addToast({
+            type: 'error',
+            title: 'Erro ao criar fornecedor',
+            message: error,
+          });
+          return;
+        }
+
+        // Atualizar lista de fornecedores
+        setSuppliers(prev => [...prev, newSupplier]);
+
+        // Auto-selecionar o novo fornecedor
+        setFormData(prev => ({
+          ...prev,
+          fornecedor_id: newSupplier.id,
+        }));
+
+        // Limpar erro de validação se existir
+        if (errors.fornecedor_id) {
+          setErrors(prev => ({
+            ...prev,
+            fornecedor_id: null,
+          }));
+        }
+
+        addToast({
+          type: 'success',
+          title: 'Fornecedor criado',
+          message: `${newSupplier.nome} foi adicionado com sucesso!`,
+        });
+      } catch (err) {
+        addToast({
+          type: 'error',
+          title: 'Erro inesperado',
+          message: err.message || 'Não foi possível criar o fornecedor.',
+        });
+      } finally {
+        setLoadingData(false);
+      }
+    },
+    [unidadeId, errors.fornecedor_id, addToast]
+  );
+
   const validateForm = useCallback(() => {
     const newErrors = {};
 
@@ -365,29 +428,38 @@ const NovaDespesaModal = ({
   const handleSave = useCallback(async () => {
     if (!validateForm()) {
       console.log('❌ Validação falhou');
+      addToast({
+        type: 'warning',
+        title: 'Campos obrigatórios',
+        message: 'Preencha todos os campos obrigatórios para continuar.',
+      });
       return;
     }
 
     try {
       setSaving(true);
 
-      // Preparar dados da despesa
+      // Preparar dados da despesa conforme schema REAL do banco
       const expenseData = {
-        type: 'other', // Tipo padrão do ENUM expense_type
+        type: 'other', // Enum obrigatório: rent, salary, supplies, utilities, other
         unit_id: unidadeId,
         party_id: formData.fornecedor_id || null,
         account_id: formData.conta_id || null,
         category_id: formData.categoria_id || null,
-        description: formData.descricao,
+        description: formData.descricao.trim(),
         value: parseFloat(formData.valor),
-        date: formData.data_competencia,
-        data_competencia: formData.data_competencia,
+        date: formData.data_competencia, // Data de emissão (obrigatória)
+        data_competencia: formData.data_competencia, // Data de competência contábil
+        expected_payment_date: formData.data_vencimento, // Data de vencimento
+        actual_payment_date:
+          formData.status === 'pago' ? formData.data_vencimento : null,
         forma_pagamento: formData.forma_pagamento || null,
         parcelamento: formData.parcelamento || null,
-        expected_payment_date: formData.data_vencimento || null,
         status: formData.status === 'pago' ? 'Paid' : 'Pending',
+        is_active: true,
         observations: formData.observacoes || null,
-        anexos: formData.anexos || [],
+        anexos:
+          formData.anexos && formData.anexos.length > 0 ? formData.anexos : [],
       };
 
       console.log('💾 Salvando despesa:', expenseData);
@@ -434,6 +506,7 @@ const NovaDespesaModal = ({
       });
 
       onSave(expense);
+      onClose(); // Fechar modal após salvar
     } catch (error) {
       console.error('Erro ao salvar despesa:', error);
       addToast({
@@ -444,7 +517,17 @@ const NovaDespesaModal = ({
     } finally {
       setSaving(false);
     }
-  }, [formData, unidadeId, isRecurring, recurringConfig, validateForm, onSave]);
+  }, [
+    formData,
+    unidadeId,
+    isRecurring,
+    recurringConfig,
+    validateForm,
+    onSave,
+    onClose,
+    addToast,
+    getTotalParcels,
+  ]);
 
   const handleClose = useCallback(() => {
     if (isDirty) {
@@ -577,6 +660,7 @@ const NovaDespesaModal = ({
                       tipo="fornecedor"
                       placeholder="Buscar ou criar fornecedor..."
                       allowCreate={true}
+                      onCreateNew={handleQuickCreateSupplier}
                     />
                   </div>
                   {errors.fornecedor_id && (

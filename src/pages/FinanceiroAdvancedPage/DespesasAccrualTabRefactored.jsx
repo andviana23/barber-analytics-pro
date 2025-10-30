@@ -60,8 +60,12 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isPaymentDateModalOpen, setIsPaymentDateModalOpen] = useState(false);
   const [selectedExpenseForAction, setSelectedExpenseForAction] =
     useState(null);
+  const [selectedPaymentDate, setSelectedPaymentDate] = useState(
+    format(new Date(), 'yyyy-MM-dd')
+  );
 
   // Filtros compactos
   const [filters, setFilters] = useState({
@@ -274,6 +278,46 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
       showToast({
         type: 'error',
         message: 'Erro ao excluir',
+        description: error.message,
+      });
+    }
+  };
+
+  // ✨ Dar Baixa Rápida - Marca despesa como paga
+  const handleDarBaixa = async expense => {
+    setSelectedExpenseForAction(expense);
+    setIsPaymentDateModalOpen(true);
+  };
+
+  // Confirmar baixa com data selecionada
+  const handleConfirmDarBaixa = async () => {
+    if (!selectedPaymentDate || !selectedExpenseForAction) return;
+
+    try {
+      const { error } = await supabase
+        .from('expenses')
+        .update({
+          status: 'Paid',
+          actual_payment_date: selectedPaymentDate,
+        })
+        .eq('id', selectedExpenseForAction.id);
+
+      if (error) throw error;
+
+      showToast({
+        type: 'success',
+        message: 'Baixa realizada!',
+        description: `Despesa "${selectedExpenseForAction.description}" marcada como paga.`,
+      });
+
+      setIsPaymentDateModalOpen(false);
+      setSelectedPaymentDate(null);
+      setSelectedExpenseForAction(null);
+      fetchExpenses();
+    } catch (error) {
+      showToast({
+        type: 'error',
+        message: 'Erro ao dar baixa',
         description: error.message,
       });
     }
@@ -652,6 +696,18 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
                         >
                           <Eye className="w-4 h-4" />
                         </button>
+
+                        {/* Botão Dar Baixa - Só aparece se status != Paid */}
+                        {expense.status !== 'Paid' && (
+                          <button
+                            onClick={() => handleDarBaixa(expense)}
+                            className="p-2 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-all duration-200"
+                            title="Dar Baixa"
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                          </button>
+                        )}
+
                         <button
                           onClick={() => handleEdit(expense)}
                           className="p-2 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-all duration-200"
@@ -717,6 +773,108 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
           title="Excluir Despesa"
           message={`Tem certeza que deseja excluir a despesa "${selectedExpenseForAction.description}"?`}
         />
+      )}
+
+      {/* Modal de Seleção de Data de Pagamento */}
+      {isPaymentDateModalOpen && selectedExpenseForAction && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-md w-full p-6 space-y-4">
+            {/* Header */}
+            <div className="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
+                  <CheckCircle className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Dar Baixa na Despesa
+                  </h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {selectedExpenseForAction.description}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsPaymentDateModalOpen(false);
+                  setSelectedExpenseForAction(null);
+                  setSelectedPaymentDate(format(new Date(), 'yyyy-MM-dd'));
+                }}
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Data do Pagamento *
+                </label>
+                <input
+                  type="date"
+                  value={selectedPaymentDate}
+                  onChange={e => setSelectedPaymentDate(e.target.value)}
+                  max={format(new Date(), 'yyyy-MM-dd')} // Não permite datas futuras
+                  min={format(startOfMonth(new Date()), 'yyyy-MM-dd')} // Apenas no mês atual
+                  className="w-full px-4 py-3 text-sm border-2 border-gray-300 dark:border-gray-600 rounded-lg 
+                    focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent
+                    bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                    transition-all duration-200"
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  ⚠️ A data deve ser hoje ou anterior, dentro do mês atual.
+                </p>
+              </div>
+
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+                <div className="flex gap-3">
+                  <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-blue-800 dark:text-blue-300">
+                    <p className="font-medium mb-1">Atenção:</p>
+                    <p>
+                      Ao confirmar, a despesa será marcada como{' '}
+                      <strong>PAGA</strong> e refletirá em todos os relatórios
+                      financeiros.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex gap-3 pt-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsPaymentDateModalOpen(false);
+                  setSelectedExpenseForAction(null);
+                  setSelectedPaymentDate(format(new Date(), 'yyyy-MM-dd'));
+                }}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 
+                  bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 
+                  rounded-lg transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDarBaixa}
+                disabled={!selectedPaymentDate}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-white
+                  bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700
+                  rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed
+                  shadow-md hover:shadow-lg
+                  flex items-center justify-center gap-2"
+              >
+                <CheckCircle className="w-4 h-4" />
+                Confirmar Baixa
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
