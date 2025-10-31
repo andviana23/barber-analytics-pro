@@ -18,27 +18,27 @@ jobs:
   audit:
     name: Design System Audit
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Run Design System Audit
         id: audit
         run: |
           npm run audit:design-system
           echo "AUDIT_PASSED=$?" >> $GITHUB_ENV
         continue-on-error: true
-      
+
       - name: Upload audit report
         if: always()
         uses: actions/upload-artifact@v4
@@ -48,14 +48,14 @@ jobs:
             reports/design-system-audit.json
             reports/design-system-audit.md
           retention-days: 30
-      
+
       - name: Comment PR with violations summary
         if: always() && github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            
+
             try {
               const reportPath = 'reports/design-system-audit.md';
               if (!fs.existsSync(reportPath)) {
@@ -83,31 +83,31 @@ jobs:
   lint:
     name: ESLint - Design System Rules
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Run ESLint
         run: npm run lint
         continue-on-error: false
-      
+
       - name: Comment PR on lint failure
         if: failure() && github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
             const comment = '## ❌ ESLint - Violações de Design System Detectadas\n\nO ESLint detectou violações que bloqueiam o merge.\n\n### Como corrigir:\n\n1. Execute `npm run lint` localmente\n2. Use `npm run migrate:dry-run` para preview\n3. Aplique correções com `npm run migrate:design-system --backup`\n\n### Regras:\n- barber-design-system/no-hardcoded-colors (error)\n- barber-design-system/prefer-theme-classes (warn)\n- barber-design-system/no-inline-hex-colors (error)\n\nConsulte: eslint-plugin-barber-design-system/README.md';
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -119,39 +119,46 @@ jobs:
     name: Conformance Threshold Check
     runs-on: ubuntu-latest
     needs: [audit]
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Check conformance threshold
         run: |
           npm run audit:design-system
-          
+
           # Extrair conformidade do relatório JSON
           CONFORMANCE=$(node -e "
             const fs = require('fs');
             const report = JSON.parse(fs.readFileSync('reports/design-system-audit.json', 'utf8'));
-            const filesWithViolations = report.violations ? Object.values(report.violations).reduce((sum, cat) => sum + (cat.files?.length || 0), 0) : 0;
+            // Coletar arquivos únicos com violações (evitar duplicação entre categorias)
+            const uniqueFiles = new Set();
+            if (report.violations) {
+              Object.values(report.violations).forEach(cat => {
+                (cat.files || []).forEach(file => uniqueFiles.add(file.file));
+              });
+            }
+            const filesWithViolations = uniqueFiles.size;
             const totalFiles = report.totalFiles || 0;
             const conformance = totalFiles > 0 ? ((totalFiles - filesWithViolations) / totalFiles * 100).toFixed(2) : 0;
             console.log(conformance);
           ")
-          
+
           echo "Conformidade atual: ${CONFORMANCE}%"
-          
+
           # Threshold: 65% (não degradar)
           THRESHOLD=65
-          
+
           if (( $(echo "$CONFORMANCE < $THRESHOLD" | bc -l) )); then
             echo "❌ Conformidade abaixo do threshold: ${CONFORMANCE}% < ${THRESHOLD}%"
             exit 1
