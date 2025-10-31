@@ -2,6 +2,7 @@ import js from '@eslint/js';
 import globals from 'globals';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
+import barberDesignSystem from './eslint-plugin-barber-design-system/index.js';
 
 export default [
   js.configs.recommended,
@@ -20,6 +21,7 @@ export default [
     plugins: {
       react,
       'react-hooks': reactHooks,
+      'barber-design-system': barberDesignSystem,
     },
     rules: {
       ...react.configs.recommended.rules,
@@ -29,6 +31,20 @@ export default [
       'react/prop-types': 'off',
       'no-unused-vars': 'warn',
       'no-console': 'warn',
+
+      // Design System Rules (CRÍTICO - bloqueia merge em CI/CD)
+      'barber-design-system/no-hardcoded-colors': 'error',
+      'barber-design-system/prefer-theme-classes': 'warn',
+      'barber-design-system/no-inline-hex-colors': 'error',
+    },
+  },
+  {
+    // Exceções: arquivos de scripts/tooling não precisam seguir Design System
+    files: ['scripts/**/*.js', 'eslint-plugin-barber-design-system/**/*.js'],
+    rules: {
+      'barber-design-system/no-hardcoded-colors': 'off',
+      'barber-design-system/prefer-theme-classes': 'off',
+      'barber-design-system/no-inline-hex-colors': 'off',
     },
   },
 ];

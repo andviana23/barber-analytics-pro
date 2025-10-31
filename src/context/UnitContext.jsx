@@ -36,27 +36,34 @@ export const UnitProvider = ({ children }) => {
       setError(null);
 
       console.log('🔄 UnitContext - Chamando unitsService.getUnits...');
-      const units = await unitsService.getUnits(false); // Apenas ativas
+      const { data, error } = await unitsService.getUnits({
+        includeInactive: false,
+      });
+
+      if (error) {
+        throw error;
+      }
+
       console.log(
         '📍 UnitContext - Unidades carregadas:',
-        units?.length || 0,
-        units
+        data?.length || 0,
+        data
       );
-      setAllUnits(units || []);
+      setAllUnits(data || []);
 
       // Se não há unidade selecionada, verificar localStorage
       if (!selectedUnit) {
         const savedUnitId = localStorage.getItem(SELECTED_UNIT_KEY);
 
         if (savedUnitId && savedUnitId !== 'all') {
-          const savedUnit = units.find(unit => unit.id === savedUnitId);
+          const savedUnit = (data || []).find(unit => unit.id === savedUnitId);
           if (savedUnit) {
             setSelectedUnit(savedUnit);
           }
         }
       }
 
-      return units;
+      return data || [];
     } catch (err) {
       console.error('❌ UnitContext - Erro ao carregar unidades:', err);
       setError(err.message || 'Erro ao carregar unidades');

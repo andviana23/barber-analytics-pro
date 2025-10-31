@@ -1,386 +1,342 @@
-/**
- * @file professionalService.js
- * @description Serviço para gerenciamento de profissionais
- * @module Services/Professional
- * @author Barber Analytics Pro Team
- * @date 2025-10-22
- *
- * Funcionalidades:
- * - Listar profissionais por unidade
- * - Buscar profissional específico
- * - Filtros e ordenação
- * - Estatísticas de profissionais
- */
+import { professionalRepository } from '../repositories/professionalRepository';
+import {
+  ProfessionalFiltersDTO,
+  ProfessionalSearchDTO,
+  ProfessionalStatsParamsDTO,
+  ProfessionalPeriodDTO,
+  isValidUuid,
+} from '../dtos/professionalDTO';
 
-import { supabase } from './supabase';
+const buildError = message => ({ message });
+
+const toNumber = value => {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : 0;
+};
+
+const aggregateRevenueMetrics = revenues => {
+  const base = {
+    totalRevenue: 0,
+    receivedRevenue: 0,
+    pendingRevenue: 0,
+    serviceRevenue: 0,
+    productRevenue: 0,
+    transactionCount: revenues.length,
+  };
+
+  revenues.forEach(revenue => {
+    const value = toNumber(revenue.value);
+    base.totalRevenue += value;
+
+    const status = String(revenue.status || '').toLowerCase();
+    if (status === 'received') {
+      base.receivedRevenue += value;
+    }
+    if (status === 'pending') {
+      base.pendingRevenue += value;
+    }
+
+    const type = String(revenue.type || '').toLowerCase();
+    if (type === 'service') {
+      base.serviceRevenue += value;
+    }
+    if (type === 'product') {
+      base.productRevenue += value;
+    }
+  });
+
+  const averageTicket =
+    base.transactionCount > 0 ? base.totalRevenue / base.transactionCount : 0;
+
+  return {
+    totalRevenue: base.totalRevenue,
+    receivedRevenue: base.receivedRevenue,
+    pendingRevenue: base.pendingRevenue,
+    serviceRevenue: base.serviceRevenue,
+    productRevenue: base.productRevenue,
+    transactionCount: base.transactionCount,
+    averageTicket,
+  };
+};
 
 class ProfessionalService {
-  /**
-   * Lista todos os profissionais
-   * @param {Object} filters - Filtros opcionais
-   * @param {string} filters.unitId - ID da unidade
-   * @param {boolean} filters.activeOnly - Apenas profissionais ativos
-   * @returns {Promise<{data: Array, error: null|Object}>}
-   */
   async listProfessionals(filters = {}) {
     try {
-      let query = supabase
-        .from('professionals')
-        .select(
-          `
-          id,
-          name,
-          role,
-          commission_rate,
-          is_active,
-          created_at,
-          unit_id,
-          units:unit_id (
-            id,
-            name
-          )
-        `
-        )
-        .order('name', { ascending: true });
+      const filtersDTO = new ProfessionalFiltersDTO(filters);
 
-      // Aplicar filtros
-      if (filters.unitId) {
-        query = query.eq('unit_id', filters.unitId);
+      if (!filtersDTO.isValid()) {
+        return {
+          data: null,
+          error: buildError(filtersDTO.getErrorMessage()),
+        };
       }
 
-      if (filters.activeOnly !== false) {
-        query = query.eq('is_active', true);
-      }
-
-      const { data, error } = await query;
+      const { data, error } = await professionalRepository.findByFilters(
+        filtersDTO.toRepositoryFilters()
+      );
 
       if (error) {
-        console.error(
-          '❌ professionalService.listProfessionals - Erro:',
-          error
-        );
         return { data: null, error };
       }
 
-      console.log(
-        '✅ professionalService.listProfessionals - Sucesso:',
-        data?.length || 0,
-        'profissionais'
-      );
       return { data: data || [], error: null };
     } catch (error) {
-      console.error('Erro ao listar profissionais:', error);
       return {
         data: null,
-        error: { message: 'Falha ao carregar profissionais: ' + error.message },
+        error: buildError(`Falha ao carregar profissionais: ${error.message}`),
       };
     }
   }
 
-  /**
-   * Busca profissional por ID
-   * @param {string} professionalId - ID do profissional
-   * @returns {Promise<{data: Object|null, error: null|Object}>}
-   */
   async getProfessionalById(professionalId) {
+    if (!isValidUuid(professionalId)) {
+      return { data: null, error: buildError('ID do profissional inválido') };
+    }
+
     try {
-      const { data, error } = await supabase
-        .from('professionals')
-        .select(
-          `
-          *,
-          units:unit_id (
-            id,
-            name
-          )
-        `
-        )
-        .eq('id', professionalId)
-        .single();
+      const { data, error } =
+        await professionalRepository.findById(professionalId);
 
       if (error) {
-        console.error(
-          '❌ professionalService.getProfessionalById - Erro:',
-          error
-        );
         return { data: null, error };
       }
 
       return { data, error: null };
     } catch (error) {
-      console.error('Erro ao buscar profissional:', error);
       return {
         data: null,
-        error: { message: 'Profissional não encontrado: ' + error.message },
+        error: buildError(`Profissional não encontrado: ${error.message}`),
       };
     }
   }
 
-  /**
-   * Lista profissionais de uma unidade específica
-   * @param {string} unitId - ID da unidade
-   * @param {boolean} activeOnly - Apenas ativos
-   * @returns {Promise<{data: Array, error: null|Object}>}
-   */
   async getProfessionalsByUnit(unitId, activeOnly = true) {
     return this.listProfessionals({ unitId, activeOnly });
   }
 
-  /**
-   * Busca profissionais por nome ou role
-   * @param {string} searchTerm - Termo de busca
-   * @param {string} unitId - ID da unidade (opcional)
-   * @returns {Promise<{data: Array, error: null|Object}>}
-   */
   async searchProfessionals(searchTerm, unitId = null) {
-    try {
-      let query = supabase
-        .from('professionals')
-        .select(
-          `
-          id,
-          name,
-          role,
-          commission_rate,
-          is_active,
-          unit_id,
-          units:unit_id (
-            id,
-            name
-          )
-        `
-        )
-        .eq('is_active', true)
-        .or(`name.ilike.%${searchTerm}%,role.ilike.%${searchTerm}%`);
+    if (!searchTerm || String(searchTerm).trim().length === 0) {
+      return this.listProfessionals({ unitId, activeOnly: true });
+    }
 
-      if (unitId) {
-        query = query.eq('unit_id', unitId);
+    try {
+      const searchDTO = new ProfessionalSearchDTO({
+        search: searchTerm,
+        unitId,
+      });
+
+      if (!searchDTO.isValid()) {
+        return {
+          data: null,
+          error: buildError(searchDTO.getErrorMessage()),
+        };
       }
 
-      const { data, error } = await query;
+      const { data, error } = await professionalRepository.search(
+        searchDTO.toRepositoryParams()
+      );
 
       if (error) {
-        console.error(
-          '❌ professionalService.searchProfessionals - Erro:',
-          error
-        );
         return { data: null, error };
       }
 
       return { data: data || [], error: null };
     } catch (error) {
-      console.error('Erro ao buscar profissionais:', error);
       return {
         data: null,
-        error: { message: 'Falha na busca: ' + error.message },
+        error: buildError(`Falha na busca: ${error.message}`),
       };
     }
   }
 
-  /**
-   * Obtém estatísticas de um profissional em um período
-   * @param {string} professionalId - ID do profissional
-   * @param {string} startDate - Data início (YYYY-MM-DD)
-   * @param {string} endDate - Data fim (YYYY-MM-DD)
-   * @returns {Promise<{data: Object|null, error: null|Object}>}
-   */
   async getProfessionalStats(professionalId, startDate, endDate) {
+    const statsDTO = new ProfessionalStatsParamsDTO({
+      professionalId,
+      startDate,
+      endDate,
+    });
+
+    if (!statsDTO.isValid()) {
+      return {
+        data: null,
+        error: buildError(statsDTO.getErrorMessage()),
+      };
+    }
+
+    const params = statsDTO.toParams();
+
     try {
-      // Buscar receitas do profissional
-      const { data: revenues, error: revenuesError } = await supabase
-        .from('revenues')
-        .select('value, type, status, date')
-        .eq('professional_id', professionalId)
-        .gte('date', startDate)
-        .lte('date', endDate)
-        .eq('is_active', true);
+      const { data: revenues, error } =
+        await professionalRepository.getRevenuesForProfessional(params);
 
-      if (revenuesError) throw revenuesError;
+      if (error) {
+        return { data: null, error };
+      }
 
-      // Calcular estatísticas
-      const totalRevenue =
-        revenues?.reduce((sum, r) => sum + parseFloat(r.value || 0), 0) || 0;
-      const receivedRevenue =
-        revenues
-          ?.filter(r => r.status === 'Received')
-          .reduce((sum, r) => sum + parseFloat(r.value || 0), 0) || 0;
-      const pendingRevenue =
-        revenues
-          ?.filter(r => r.status === 'Pending')
-          .reduce((sum, r) => sum + parseFloat(r.value || 0), 0) || 0;
-
-      const serviceRevenue =
-        revenues
-          ?.filter(r => r.type === 'service')
-          .reduce((sum, r) => sum + parseFloat(r.value || 0), 0) || 0;
-      const productRevenue =
-        revenues
-          ?.filter(r => r.type === 'product')
-          .reduce((sum, r) => sum + parseFloat(r.value || 0), 0) || 0;
+      const metrics = aggregateRevenueMetrics(revenues || []);
 
       return {
         data: {
-          professionalId,
-          period: { startDate, endDate },
-          totalRevenue,
-          receivedRevenue,
-          pendingRevenue,
-          serviceRevenue,
-          productRevenue,
-          transactionCount: revenues?.length || 0,
-          averageTicket:
-            revenues?.length > 0 ? totalRevenue / revenues.length : 0,
+          professionalId: params.professionalId,
+          period: {
+            startDate: params.startDate,
+            endDate: params.endDate,
+          },
+          ...metrics,
         },
         error: null,
       };
     } catch (error) {
-      console.error('Erro ao buscar estatísticas do profissional:', error);
       return {
         data: null,
-        error: { message: 'Falha ao calcular estatísticas: ' + error.message },
+        error: buildError(`Falha ao calcular estatísticas: ${error.message}`),
       };
     }
   }
 
-  /**
-   * Lista profissionais com suas estatísticas
-   * @param {string} unitId - ID da unidade
-   * @param {string} startDate - Data início
-   * @param {string} endDate - Data fim
-   * @returns {Promise<{data: Array, error: null|Object}>}
-   */
   async getProfessionalsWithStats(unitId, startDate, endDate) {
+    const periodDTO = new ProfessionalPeriodDTO({ startDate, endDate });
+
+    if (!periodDTO.isValid()) {
+      return {
+        data: null,
+        error: buildError(periodDTO.getErrorMessage()),
+      };
+    }
+
+    const period = periodDTO.toParams();
+    const filtersDTO = new ProfessionalFiltersDTO({
+      unitId,
+      activeOnly: true,
+    });
+
+    if (!filtersDTO.isValid()) {
+      return {
+        data: null,
+        error: buildError(filtersDTO.getErrorMessage()),
+      };
+    }
+
     try {
-      // Buscar profissionais
-      const { data: professionals, error: proError } =
-        await this.getProfessionalsByUnit(unitId);
+      const { data: professionals, error } =
+        await professionalRepository.findByFilters(
+          filtersDTO.toRepositoryFilters()
+        );
 
-      if (proError) return { data: null, error: proError };
+      if (error) {
+        return { data: null, error };
+      }
 
-      // Buscar estatísticas de cada profissional
       const professionalsWithStats = await Promise.all(
-        professionals.map(async prof => {
-          const { data: stats } = await this.getProfessionalStats(
-            prof.id,
-            startDate,
-            endDate
-          );
+        (professionals || []).map(async professional => {
+          const { data: revenues, error: revenuesError } =
+            await professionalRepository.getRevenuesForProfessional({
+              professionalId: professional.id,
+              ...period,
+            });
+
+          if (revenuesError) {
+            throw revenuesError;
+          }
+
+          const metrics = aggregateRevenueMetrics(revenues || []);
 
           return {
-            ...prof,
-            stats: stats || {
-              totalRevenue: 0,
-              receivedRevenue: 0,
-              pendingRevenue: 0,
-              transactionCount: 0,
-              averageTicket: 0,
+            ...professional,
+            stats: {
+              professionalId: professional.id,
+              period,
+              ...metrics,
             },
           };
         })
       );
 
-      // Ordenar por receita total (maior para menor)
       professionalsWithStats.sort(
         (a, b) => (b.stats?.totalRevenue || 0) - (a.stats?.totalRevenue || 0)
       );
 
       return { data: professionalsWithStats, error: null };
     } catch (error) {
-      console.error('Erro ao buscar profissionais com estatísticas:', error);
       return {
         data: null,
-        error: { message: 'Falha ao carregar dados: ' + error.message },
+        error: error?.message
+          ? error
+          : buildError(`Falha ao carregar dados: ${error}`),
       };
     }
   }
 
-  /**
-   * Obtém ranking de profissionais por receita
-   * @param {string} unitId - ID da unidade (opcional)
-   * @param {string} startDate - Data início
-   * @param {string} endDate - Data fim
-   * @param {number} limit - Limite de resultados
-   * @returns {Promise<{data: Array, error: null|Object}>}
-   */
   async getProfessionalsRanking(unitId = null, startDate, endDate, limit = 10) {
-    try {
-      const { data: professionalsWithStats, error } = unitId
-        ? await this.getProfessionalsWithStats(unitId, startDate, endDate)
-        : await this.getProfessionalsWithStats(null, startDate, endDate);
+    const periodDTO = new ProfessionalPeriodDTO({ startDate, endDate });
 
-      if (error) return { data: null, error };
-
-      // Adicionar posição no ranking
-      const ranking = professionalsWithStats
-        .slice(0, limit)
-        .map((prof, index) => ({
-          ...prof,
-          ranking: {
-            position: index + 1,
-            percentageOfTotal: 0, // Será calculado depois se necessário
-          },
-        }));
-
-      return { data: ranking, error: null };
-    } catch (error) {
-      console.error('Erro ao gerar ranking de profissionais:', error);
+    if (!periodDTO.isValid()) {
       return {
         data: null,
-        error: { message: 'Falha ao gerar ranking: ' + error.message },
+        error: buildError(periodDTO.getErrorMessage()),
       };
     }
+
+    const safeLimit = (() => {
+      const parsed = Number(limit);
+      if (!Number.isFinite(parsed) || parsed <= 0) return 10;
+      return Math.min(Math.floor(parsed), 50);
+    })();
+
+    const { data, error } = await this.getProfessionalsWithStats(
+      unitId,
+      periodDTO.startDate,
+      periodDTO.endDate
+    );
+
+    if (error) {
+      return { data: null, error };
+    }
+
+    const professionalsWithStats = data || [];
+
+    const ranking = professionalsWithStats
+      .slice(0, safeLimit)
+      .map((prof, index) => ({
+        ...prof,
+        ranking: {
+          position: index + 1,
+          percentageOfTotal: 0,
+        },
+      }));
+
+    return { data: ranking, error: null };
   }
 
-  /**
-   * Obtém contagem de profissionais por unidade
-   * @returns {Promise<{data: Array, error: null|Object}>}
-   */
   async getProfessionalsCountByUnit() {
-    try {
-      const { data, error } = await supabase
-        .from('professionals')
-        .select('unit_id, units:unit_id(name)')
-        .eq('is_active', true);
+    const { data, error } = await professionalRepository.countActiveByUnit();
 
-      if (error) {
-        console.error(
-          '❌ professionalService.getProfessionalsCountByUnit - Erro:',
-          error
-        );
-        return { data: null, error };
+    if (error) {
+      return { data: null, error };
+    }
+
+    const grouped = (data || []).reduce((acc, prof) => {
+      const unitId = prof.unit_id;
+      const unitName = prof.units?.name || 'Sem unidade';
+
+      if (!acc[unitId]) {
+        acc[unitId] = {
+          unitId,
+          unitName,
+          count: 0,
+        };
       }
 
-      // Agrupar por unidade
-      const grouped = data.reduce((acc, prof) => {
-        const unitId = prof.unit_id;
-        const unitName = prof.units?.name || 'Sem unidade';
+      acc[unitId].count += 1;
+      return acc;
+    }, {});
 
-        if (!acc[unitId]) {
-          acc[unitId] = {
-            unitId,
-            unitName,
-            count: 0,
-          };
-        }
+    const result = Object.values(grouped).sort((a, b) => b.count - a.count);
 
-        acc[unitId].count++;
-        return acc;
-      }, {});
-
-      const result = Object.values(grouped).sort((a, b) => b.count - a.count);
-
-      return { data: result, error: null };
-    } catch (error) {
-      console.error('Erro ao contar profissionais por unidade:', error);
-      return {
-        data: null,
-        error: { message: 'Falha ao contar profissionais: ' + error.message },
-      };
-    }
+    return { data: result, error: null };
   }
 }
 
-// Instância singleton
 const professionalService = new ProfessionalService();
 
 export default professionalService;

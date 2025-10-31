@@ -247,7 +247,12 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
   // 📥 Buscar unidades
   const fetchUnits = useCallback(async () => {
     try {
-      const data = await unitsService.getUnits();
+      const { data, error } = await unitsService.getUnits();
+
+      if (error) {
+        throw error;
+      }
+
       setUnits(data || []);
     } catch (err) {
       console.error('❌ Erro ao buscar unidades:', err);

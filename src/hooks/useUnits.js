@@ -48,15 +48,22 @@ export const useUnits = (initialLoad = true) => {
         setLoading(true);
         setError(null);
 
-        const data = await unitsService.getUnits(includeInactiveUnits);
+        const { data, error } = await unitsService.getUnits({
+          includeInactive: includeInactiveUnits,
+        });
 
-        setUnits(data);
+        if (error) {
+          throw error;
+        }
+
+        setUnits(data || []);
         setLastFetch(now);
         setIncludeInactive(includeInactiveUnits);
 
-        return data;
+        return data || [];
       } catch (err) {
-        const errorMessage = err.message || 'Erro ao carregar unidades';
+        const errorMessage =
+          err.message || err?.details || 'Erro ao carregar unidades';
         setError(errorMessage);
         showToast({
           type: 'error',
@@ -84,8 +91,12 @@ export const useUnits = (initialLoad = true) => {
         }
 
         // Buscar no servidor
-        const unit = await unitsService.getUnitById(id);
-        return unit;
+        const { data, error } = await unitsService.getUnitById(id);
+        if (error) {
+          throw error;
+        }
+
+        return data;
       } catch (err) {
         const errorMessage = err.message || 'Erro ao buscar unidade';
         setError(errorMessage);
@@ -104,7 +115,13 @@ export const useUnits = (initialLoad = true) => {
         setCreating(true);
         setError(null);
 
-        const newUnit = await unitsService.createUnit(unitData);
+        const { data, error } = await unitsService.createUnit(unitData);
+
+        if (error) {
+          throw error;
+        }
+
+        const newUnit = data;
 
         // Atualizar cache local
         setUnits(prevUnits => [newUnit, ...prevUnits]);
@@ -136,7 +153,13 @@ export const useUnits = (initialLoad = true) => {
         setUpdating(true);
         setError(null);
 
-        const updatedUnit = await unitsService.updateUnit(id, updateData);
+        const { data, error } = await unitsService.updateUnit(id, updateData);
+
+        if (error) {
+          throw error;
+        }
+
+        const updatedUnit = data;
 
         // Atualizar cache local
         setUnits(prevUnits =>
@@ -173,7 +196,13 @@ export const useUnits = (initialLoad = true) => {
         setUpdating(true);
         setError(null);
 
-        const updatedUnit = await unitsService.toggleUnitStatus(id);
+        const { data, error } = await unitsService.toggleUnitStatus(id);
+
+        if (error) {
+          throw error;
+        }
+
+        const updatedUnit = data;
 
         // Atualizar cache local
         setUnits(prevUnits =>
@@ -212,7 +241,11 @@ export const useUnits = (initialLoad = true) => {
         setDeleting(true);
         setError(null);
 
-        await unitsService.deleteUnit(id);
+        const { error } = await unitsService.deleteUnit(id);
+
+        if (error) {
+          throw error;
+        }
 
         // Remover do cache local ou atualizar se soft delete
         await loadUnits(true, includeInactive);
@@ -243,10 +276,20 @@ export const useUnits = (initialLoad = true) => {
    */
   const checkDependencies = useCallback(async id => {
     try {
-      const dependencies = await unitsService.checkUnitDependencies(id);
-      return dependencies;
+      const { data, error } = await unitsService.checkUnitDependencies(id);
+
+      if (error) {
+        throw error;
+      }
+
+      return data;
     } catch (err) {
-      return { hasDependencies: false, dependencies: [], unitName: 'Unidade' };
+      const fallbackName = err?.unitName || 'Unidade';
+      return {
+        hasDependencies: false,
+        dependencies: [],
+        unitName: fallbackName,
+      };
     }
   }, []);
 
@@ -256,8 +299,17 @@ export const useUnits = (initialLoad = true) => {
   const getUnitStats = useCallback(
     async (unitId, month = null, year = null) => {
       try {
-        const stats = await unitsService.getUnitStats(unitId, month, year);
-        return stats;
+        const { data, error } = await unitsService.getUnitStats(
+          unitId,
+          month,
+          year
+        );
+
+        if (error) {
+          throw error;
+        }
+
+        return data;
       } catch (err) {
         const errorMessage = err.message || 'Erro ao buscar estatísticas';
         setError(errorMessage);
@@ -273,8 +325,16 @@ export const useUnits = (initialLoad = true) => {
   const getUnitsComparison = useCallback(async (month = null, year = null) => {
     try {
       setLoading(true);
-      const comparison = await unitsService.getUnitsComparison(month, year);
-      return comparison;
+      const { data, error } = await unitsService.getUnitsComparison(
+        month,
+        year
+      );
+
+      if (error) {
+        throw error;
+      }
+
+      return data;
     } catch (err) {
       const errorMessage = err.message || 'Erro ao gerar comparativo';
       setError(errorMessage);
@@ -291,8 +351,17 @@ export const useUnits = (initialLoad = true) => {
     async (metric = 'revenue', month = null, year = null) => {
       try {
         setLoading(true);
-        const ranking = await unitsService.getUnitsRanking(metric, month, year);
-        return ranking;
+        const { data, error } = await unitsService.getUnitsRanking(
+          metric,
+          month,
+          year
+        );
+
+        if (error) {
+          throw error;
+        }
+
+        return data;
       } catch (err) {
         const errorMessage = err.message || 'Erro ao gerar ranking';
         setError(errorMessage);
@@ -310,8 +379,13 @@ export const useUnits = (initialLoad = true) => {
   const getUnitEvolution = useCallback(async unitId => {
     try {
       setLoading(true);
-      const evolution = await unitsService.getUnitEvolution(unitId);
-      return evolution;
+      const { data, error } = await unitsService.getUnitEvolution(unitId);
+
+      if (error) {
+        throw error;
+      }
+
+      return data;
     } catch (err) {
       const errorMessage = err.message || 'Erro ao buscar evolução';
       setError(errorMessage);

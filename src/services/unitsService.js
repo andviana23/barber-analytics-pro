@@ -1,523 +1,684 @@
 /**
  * UNITS SERVICE
- * Serviço para gerenciamento de unidades
- *
- * Funcionalidades:
- * - CRUD completo de unidades
- * - Estatísticas por unidade
- * - Comparativos entre unidades
- * - Gestão de status (ativa/inativa)
+ * Serviço responsável por orquestrar regras de negócio das unidades usando DTOs e repositories
  */
 
 import { supabase } from './supabase';
+import { unitsRepository } from '../repositories/unitsRepository';
+import { professionalRepository } from '../repositories/professionalRepository';
+import {
+  UnitFiltersDTO,
+  UnitIdentifierDTO,
+  CreateUnitDTO,
+  UpdateUnitDTO,
+  UnitStatsParamsDTO,
+  UnitsPeriodDTO,
+  UnitsRankingParamsDTO,
+  UnitEvolutionParamsDTO,
+  UnitResponseDTO,
+  isValidUuid,
+} from '../dtos/unitsDTO';
+
+const buildError = message => ({ message });
+
+const toNumber = value => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const toUnitResponse = record =>
+  record ? new UnitResponseDTO(record).toObject() : null;
+
+const aggregateRevenueMetrics = (revenues = []) => {
+  const base = {
+    totalRevenue: 0,
+    receivedRevenue: 0,
+    pendingRevenue: 0,
+    serviceRevenue: 0,
+    productRevenue: 0,
+    transactionCount: revenues.length,
+  };
+
+  revenues.forEach(revenue => {
+    const value = toNumber(revenue.value);
+    base.totalRevenue += value;
+
+    const status = String(revenue.status || '').toLowerCase();
+    if (status === 'received') {
+      base.receivedRevenue += value;
+    }
+    if (status === 'pending') {
+      base.pendingRevenue += value;
+    }
+
+    const type = String(revenue.type || '').toLowerCase();
+    if (type === 'service') {
+      base.serviceRevenue += value;
+    }
+    if (type === 'product') {
+      base.productRevenue += value;
+    }
+  });
+
+  const averageTicket =
+    base.transactionCount > 0 ? base.totalRevenue / base.transactionCount : 0;
+
+  return {
+    ...base,
+    averageTicket,
+  };
+};
+
+const aggregateExpenseTotal = (expenses = []) =>
+  expenses.reduce((sum, expense) => sum + toNumber(expense.value), 0);
+
+const aggregateAttendanceMetrics = (attendances = []) => {
+  if (!Array.isArray(attendances) || attendances.length === 0) {
+    return {
+      count: 0,
+      revenue: 0,
+      averageTicket: 0,
+      averageDuration: 0,
+    };
+  }
+
+  const totals = attendances.reduce(
+    (acc, attendance) => {
+      acc.count += 1;
+      acc.revenue += toNumber(attendance.valor_servico);
+      acc.duration += toNumber(attendance.duracao_minutos);
+      return acc;
+    },
+    { count: 0, revenue: 0, duration: 0 }
+  );
+
+  return {
+    count: totals.count,
+    revenue: totals.revenue,
+    averageTicket: totals.count > 0 ? totals.revenue / totals.count : 0,
+    averageDuration: totals.count > 0 ? totals.duration / totals.count : 0,
+  };
+};
+
+const calculatePerformanceMetrics = (
+  totalRevenue,
+  attendancesCount,
+  professionalsCount
+) => {
+  if (!professionalsCount || professionalsCount <= 0) {
+    return {
+      revenuePerProfessional: 0,
+      attendancesPerProfessional: 0,
+    };
+  }
+
+  return {
+    revenuePerProfessional: totalRevenue / professionalsCount,
+    attendancesPerProfessional: attendancesCount / professionalsCount,
+  };
+};
 
 class UnitsService {
-  /**
-   * Listar todas as unidades
-   * @param {boolean} incluirInativas - Se deve incluir unidades inativas
-   * @returns {Promise<Array>} Lista de unidades
-   */
-  async getUnits(incluirInativas = false) {
+  resolveIncludeInactiveFlag(param) {
+    if (typeof param === 'boolean') {
+      return param;
+    }
+
+    if (
+      param &&
+      typeof param === 'object' &&
+      param.includeInactive !== undefined
+    ) {
+      return Boolean(param.includeInactive);
+    }
+
+    return false;
+  }
+
+  async resolveCurrentUserId(fallbackId) {
+    if (fallbackId && isValidUuid(fallbackId)) {
+      return { data: fallbackId, error: null };
+    }
+
     try {
-      let query = supabase
-        .from('units')
-        .select('*')
-        .order('name', { ascending: true });
-
-      if (!incluirInativas) {
-        query = query.eq('status', true);
-      }
-
-      const { data, error } = await query;
+      const { data, error } = await supabase.auth.getUser();
 
       if (error) {
-        console.error('❌ unitsService.getUnits - Erro:', error);
-        throw error;
+        return { data: null, error };
       }
 
-      console.log(
-        '✅ unitsService.getUnits - Sucesso:',
-        data?.length || 0,
-        'unidades'
+      const userId = data?.user?.id;
+
+      if (!userId) {
+        return { data: null, error: buildError('Usuário não autenticado') };
+      }
+
+      return { data: userId, error: null };
+    } catch (error) {
+      return { data: null, error: buildError(error.message) };
+    }
+  }
+
+  async getUnits(params = {}) {
+    const includeInactive = this.resolveIncludeInactiveFlag(params);
+    const filtersDTO = new UnitFiltersDTO({ includeInactive });
+
+    if (!filtersDTO.isValid()) {
+      return {
+        data: null,
+        error: buildError(filtersDTO.getErrorMessage()),
+      };
+    }
+
+    try {
+      const { data, error } = await unitsRepository.findAll(
+        filtersDTO.toRepositoryFilters()
       );
-      return data || [];
-    } catch (error) {
-      console.error('Erro ao buscar unidades:', error);
-      throw new Error('Falha ao carregar unidades: ' + error.message);
-    }
-  }
 
-  /**
-   * Buscar unidade por ID
-   * @param {string} id - ID da unidade
-   * @returns {Promise<Object>} Dados da unidade
-   */
-  async getUnitById(id) {
-    try {
-      const { data, error } = await supabase
-        .from('units')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (error) throw error;
-      return data;
-    } catch (error) {
-      console.error('Erro ao buscar unidade:', error);
-      throw new Error('Unidade não encontrada: ' + error.message);
-    }
-  }
-
-  /**
-   * Criar nova unidade
-   * @param {Object} unitData - Dados da unidade
-   * @returns {Promise<Object>} Unidade criada
-   */
-  async createUnit(unitData) {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        throw new Error('Usuário não autenticado');
+      if (error) {
+        return { data: null, error };
       }
 
-      const newUnit = {
-        name: unitData.name,
-        status: unitData.status !== false, // Default true se não especificado
-        user_id: user.id,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
+      const units = (data || []).map(toUnitResponse);
 
-      const { data, error } = await supabase
-        .from('units')
-        .insert([newUnit])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      return data;
+      return { data: units, error: null };
     } catch (error) {
-      console.error('Erro ao criar unidade:', error);
-      throw new Error('Falha ao criar unidade: ' + error.message);
+      return {
+        data: null,
+        error: buildError(`Falha ao carregar unidades: ${error.message}`),
+      };
     }
   }
 
-  /**
-   * Atualizar unidade existente
-   * @param {string} id - ID da unidade
-   * @param {Object} updateData - Dados para atualizar
-   * @returns {Promise<Object>} Unidade atualizada
-   */
-  async updateUnit(id, updateData) {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+  async getUnitById(unitId) {
+    const idDTO = new UnitIdentifierDTO(unitId);
 
-      if (!user) {
-        throw new Error('Usuário não autenticado');
+    if (!idDTO.isValid()) {
+      return { data: null, error: buildError(idDTO.getErrorMessage()) };
+    }
+
+    try {
+      const { data, error } = await unitsRepository.findById(idDTO.value());
+
+      if (error) {
+        return { data: null, error };
       }
 
-      const updatePayload = {
-        ...updateData,
-        updated_at: new Date().toISOString(),
+      if (!data) {
+        return {
+          data: null,
+          error: buildError('Unidade não encontrada'),
+        };
+      }
+
+      return { data: toUnitResponse(data), error: null };
+    } catch (error) {
+      return {
+        data: null,
+        error: buildError(`Unidade não encontrada: ${error.message}`),
       };
-
-      const { data, error } = await supabase
-        .from('units')
-        .update(updatePayload)
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      return data;
-    } catch (error) {
-      console.error('Erro ao atualizar unidade:', error);
-      throw new Error('Falha ao atualizar unidade: ' + error.message);
     }
   }
 
-  /**
-   * Alternar status da unidade (ativa/inativa)
-   * @param {string} id - ID da unidade
-   * @returns {Promise<Object>} Unidade com status atualizado
-   */
-  async toggleUnitStatus(id) {
-    try {
-      // Buscar status atual
-      const currentUnit = await this.getUnitById(id);
-      const newStatus = !currentUnit.status;
+  async createUnit(unitData = {}) {
+    const createDTO = new CreateUnitDTO(unitData);
 
-      return await this.updateUnit(id, { status: newStatus });
+    if (!createDTO.isValid()) {
+      return {
+        data: null,
+        error: buildError(createDTO.getErrorMessage()),
+      };
+    }
+
+    const payload = createDTO.toDatabase();
+
+    if (!payload.user_id) {
+      const { data: userId, error: userError } =
+        await this.resolveCurrentUserId();
+
+      if (userError) {
+        return { data: null, error: userError };
+      }
+
+      payload.user_id = userId;
+    }
+
+    try {
+      const { data, error } = await unitsRepository.create(payload);
+
+      if (error) {
+        return { data: null, error };
+      }
+
+      return { data: toUnitResponse(data), error: null };
     } catch (error) {
-      console.error('Erro ao alterar status da unidade:', error);
-      throw new Error('Falha ao alterar status: ' + error.message);
+      return {
+        data: null,
+        error: buildError(`Falha ao criar unidade: ${error.message}`),
+      };
     }
   }
 
-  /**
-   * Deletar unidade (soft delete)
-   * @param {string} id - ID da unidade
-   * @returns {Promise<boolean>} Sucesso da operação
-   */
-  async deleteUnit(id) {
-    try {
-      // Verificar se há dados vinculados
-      const dependentData = await this.checkUnitDependencies(id);
+  async updateUnit(unitId, updates = {}) {
+    const idDTO = new UnitIdentifierDTO(unitId);
 
-      if (dependentData.hasDependencies) {
-        throw new Error(
-          `Unidade possui dados vinculados: ${dependentData.dependencies.join(', ')}`
+    if (!idDTO.isValid()) {
+      return { data: null, error: buildError(idDTO.getErrorMessage()) };
+    }
+
+    const updateDTO = new UpdateUnitDTO(updates);
+
+    if (!updateDTO.isValid()) {
+      return {
+        data: null,
+        error: buildError(updateDTO.getErrorMessage()),
+      };
+    }
+
+    const payload = updateDTO.toDatabase();
+
+    try {
+      const { data, error } = await unitsRepository.update(
+        idDTO.value(),
+        payload
+      );
+
+      if (error) {
+        return { data: null, error };
+      }
+
+      return { data: toUnitResponse(data), error: null };
+    } catch (error) {
+      return {
+        data: null,
+        error: buildError(`Falha ao atualizar unidade: ${error.message}`),
+      };
+    }
+  }
+
+  async toggleUnitStatus(unitId) {
+    const currentUnit = await this.getUnitById(unitId);
+
+    if (currentUnit.error) {
+      return currentUnit;
+    }
+
+    const nextStatus = !currentUnit.data.is_active;
+
+    return this.updateUnit(unitId, { is_active: nextStatus });
+  }
+
+  async deleteUnit(unitId) {
+    const dependenciesResult = await this.checkUnitDependencies(unitId);
+
+    if (dependenciesResult.error) {
+      return dependenciesResult;
+    }
+
+    const { hasDependencies, dependencies, unitName } = dependenciesResult.data;
+
+    if (hasDependencies) {
+      return {
+        data: null,
+        error: buildError(
+          `Unidade possui dados vinculados: ${dependencies.join(', ')}`
+        ),
+      };
+    }
+
+    const updateResult = await this.updateUnit(unitId, {
+      is_active: false,
+      name: `[EXCLUÍDA] ${unitName}`,
+    });
+
+    if (updateResult.error) {
+      return updateResult;
+    }
+
+    return { data: true, error: null };
+  }
+
+  async checkUnitDependencies(unitId) {
+    const idDTO = new UnitIdentifierDTO(unitId);
+
+    if (!idDTO.isValid()) {
+      return { data: null, error: buildError(idDTO.getErrorMessage()) };
+    }
+
+    try {
+      const [unitResult, professionalsResult, revenuesResult, expensesResult] =
+        await Promise.all([
+          unitsRepository.findById(idDTO.value()),
+          professionalRepository.findByFilters({
+            unitId: idDTO.value(),
+            isActive: true,
+            includeUnits: false,
+          }),
+          unitsRepository.hasRevenues(idDTO.value()),
+          unitsRepository.hasActiveExpenses(idDTO.value()),
+        ]);
+
+      const dependencies = [];
+
+      if (professionalsResult.error) {
+        return { data: null, error: professionalsResult.error };
+      }
+
+      if ((professionalsResult.data || []).length > 0) {
+        dependencies.push(
+          `${(professionalsResult.data || []).length} profissionais ativos`
         );
       }
 
-      // Soft delete - marcar como inativa
-      await this.updateUnit(id, {
-        status: false,
-        name: `[EXCLUÍDA] ${dependentData.unitName}`,
-      });
-
-      return true;
-    } catch (error) {
-      console.error('Erro ao excluir unidade:', error);
-      throw new Error('Falha ao excluir unidade: ' + error.message);
-    }
-  }
-
-  /**
-   * Verificar dependências da unidade
-   * @param {string} unitId - ID da unidade
-   * @returns {Promise<Object>} Informações sobre dependências
-   */
-  async checkUnitDependencies(unitId) {
-    try {
-      const dependencies = [];
-
-      // Verificar profissionais
-      const { data: professionals } = await supabase
-        .from('professionals')
-        .select('id')
-        .eq('unit_id', unitId)
-        .eq('is_active', true);
-
-      if (professionals && professionals.length > 0) {
-        dependencies.push(`${professionals.length} profissionais ativos`);
+      if (revenuesResult.error) {
+        return { data: null, error: revenuesResult.error };
       }
 
-      // Verificar receitas
-      const { data: revenues } = await supabase
-        .from('revenues')
-        .select('id')
-        .eq('unit_id', unitId)
-        .limit(1);
-
-      if (revenues && revenues.length > 0) {
+      if (revenuesResult.data) {
         dependencies.push('registros financeiros');
       }
 
-      // Verificar despesas
-      const { data: expenses } = await supabase
-        .from('expenses')
-        .select('id')
-        .eq('unit_id', unitId)
-        .eq('is_active', true) // ✅ FIX: Filtrar apenas despesas ativas
-        .limit(1);
+      if (expensesResult.error) {
+        return { data: null, error: expensesResult.error };
+      }
 
-      if (expenses && expenses.length > 0) {
+      if (expensesResult.data) {
         dependencies.push('registros de despesas');
       }
 
-      // Buscar nome da unidade
-      const unit = await this.getUnitById(unitId);
+      const unitName = unitResult?.data?.name || 'Unidade';
 
       return {
-        hasDependencies: dependencies.length > 0,
-        dependencies,
-        unitName: unit.name,
+        data: {
+          hasDependencies: dependencies.length > 0,
+          dependencies,
+          unitName,
+        },
+        error: null,
       };
     } catch (error) {
-      console.error('Erro ao verificar dependências:', error);
-      return { hasDependencies: false, dependencies: [], unitName: 'Unidade' };
+      return {
+        data: {
+          hasDependencies: false,
+          dependencies: [],
+          unitName: 'Unidade',
+        },
+        error: buildError(`Falha ao verificar dependências: ${error.message}`),
+      };
     }
   }
 
-  /**
-   * Obter estatísticas da unidade
-   * @param {string} unitId - ID da unidade
-   * @param {number} mes - Mês (1-12)
-   * @param {number} ano - Ano
-   * @returns {Promise<Object>} Estatísticas da unidade
-   */
-  async getUnitStats(unitId, mes = null, ano = null) {
-    try {
-      const currentDate = new Date();
-      const targetMonth = mes || currentDate.getMonth() + 1;
-      const targetYear = ano || currentDate.getFullYear();
+  async getUnitStats(unitId, month = null, year = null) {
+    const statsDTO = new UnitStatsParamsDTO({ unitId, month, year });
 
-      // Profissionais ativos na unidade
-      const { data: professionalsData } = await supabase
-        .from('professionals')
-        .select('id, name, role')
-        .eq('unit_id', unitId)
-        .eq('is_active', true);
-
-      const professionalsCount = professionalsData
-        ? professionalsData.length
-        : 0;
-
-      // Faturamento do mês
-      const { data: revenuesData } = await supabase
-        .from('revenues')
-        .select('value')
-        .eq('unit_id', unitId)
-        .gte('date', `${targetYear}-${String(targetMonth).padStart(2, '0')}-01`)
-        .lt(
-          'date',
-          `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}-01`
-        );
-
-      const monthlyRevenue =
-        revenuesData?.reduce(
-          (sum, rev) => sum + (parseFloat(rev.value) || 0),
-          0
-        ) || 0;
-
-      // Despesas do mês
-      const { data: expensesData } = await supabase
-        .from('expenses')
-        .select('value')
-        .eq('unit_id', unitId)
-        .eq('is_active', true) // ✅ FIX: Filtrar apenas despesas ativas
-        .gte('date', `${targetYear}-${String(targetMonth).padStart(2, '0')}-01`)
-        .lt(
-          'date',
-          `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}-01`
-        );
-
-      const monthlyExpenses =
-        expensesData?.reduce(
-          (sum, exp) => sum + (parseFloat(exp.value) || 0),
-          0
-        ) || 0;
-
-      // Atendimentos do mês (via histórico_atendimentos)
-      const { data: attendancesData } = await supabase
-        .from('historico_atendimentos')
-        .select('valor_servico, duracao_minutos')
-        .eq('unidade_id', unitId)
-        .eq('status', 'concluido')
-        .gte(
-          'data_atendimento',
-          `${targetYear}-${String(targetMonth).padStart(2, '0')}-01`
-        )
-        .lt(
-          'data_atendimento',
-          `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}-01`
-        );
-
-      const attendancesCount = attendancesData ? attendancesData.length : 0;
-      const attendancesRevenue =
-        attendancesData?.reduce(
-          (sum, att) => sum + (parseFloat(att.valor_servico) || 0),
-          0
-        ) || 0;
-      const averageDuration =
-        attendancesData?.length > 0
-          ? attendancesData.reduce(
-              (sum, att) => sum + (parseFloat(att.duracao_minutos) || 0),
-              0
-            ) / attendancesData.length
-          : 0;
-
-      // Ticket médio
-      const averageTicket =
-        attendancesCount > 0 ? attendancesRevenue / attendancesCount : 0;
-
-      // Lucro
-      const profit = monthlyRevenue - monthlyExpenses;
-
+    if (!statsDTO.isValid()) {
       return {
-        unitId,
-        month: targetMonth,
-        year: targetYear,
-        professionals: {
-          total: professionalsCount,
-          list: professionalsData || [],
-        },
-        financial: {
-          monthlyRevenue,
-          monthlyExpenses,
-          profit,
-          profitMargin:
-            monthlyRevenue > 0 ? (profit / monthlyRevenue) * 100 : 0,
-        },
-        attendances: {
-          count: attendancesCount,
-          revenue: attendancesRevenue,
-          averageTicket,
-          averageDuration,
-        },
-        performance: {
-          revenuePerProfessional:
-            professionalsCount > 0 ? monthlyRevenue / professionalsCount : 0,
-          attendancesPerProfessional:
-            professionalsCount > 0 ? attendancesCount / professionalsCount : 0,
-        },
+        data: null,
+        error: buildError(statsDTO.getErrorMessage()),
       };
-    } catch (error) {
-      console.error('Erro ao buscar estatísticas da unidade:', error);
-      throw new Error('Falha ao calcular estatísticas: ' + error.message);
     }
-  }
 
-  /**
-   * Obter comparativo entre unidades
-   * @param {number} mes - Mês (1-12)
-   * @param {number} ano - Ano
-   * @returns {Promise<Array>} Comparativo entre unidades
-   */
-  async getUnitsComparison(mes = null, ano = null) {
+    const params = statsDTO.toRepositoryParams();
+
     try {
-      const units = await this.getUnits();
-      const comparisons = [];
+      const [
+        unitResult,
+        professionalsResult,
+        revenuesResult,
+        expensesResult,
+        attendancesResult,
+      ] = await Promise.all([
+        unitsRepository.findById(params.unitId),
+        professionalRepository.findByFilters({
+          unitId: params.unitId,
+          isActive: true,
+          includeUnits: false,
+        }),
+        unitsRepository.listRevenuesByPeriod(params),
+        unitsRepository.listExpensesByPeriod(params),
+        unitsRepository.listAttendancesByPeriod(params),
+      ]);
 
-      for (const unit of units) {
-        const stats = await this.getUnitStats(unit.id, mes, ano);
-        comparisons.push({
-          ...unit,
-          stats,
-        });
+      if (unitResult.error) {
+        return { data: null, error: unitResult.error };
       }
 
-      // Ordenar por faturamento (maior para menor)
-      comparisons.sort(
-        (a, b) =>
-          b.stats.financial.monthlyRevenue - a.stats.financial.monthlyRevenue
+      if (professionalsResult.error) {
+        return { data: null, error: professionalsResult.error };
+      }
+
+      if (revenuesResult.error) {
+        return { data: null, error: revenuesResult.error };
+      }
+
+      if (expensesResult.error) {
+        return { data: null, error: expensesResult.error };
+      }
+
+      if (attendancesResult.error) {
+        return { data: null, error: attendancesResult.error };
+      }
+
+      const professionalsList = (professionalsResult.data || []).map(
+        professional => ({
+          id: professional.id,
+          name: professional.name,
+          role: professional.role,
+        })
       );
 
-      return comparisons;
+      const professionalsCount = professionalsList.length;
+
+      const revenueMetrics = aggregateRevenueMetrics(revenuesResult.data || []);
+
+      const monthlyExpenses = aggregateExpenseTotal(expensesResult.data || []);
+      const profit = revenueMetrics.totalRevenue - monthlyExpenses;
+      const profitMargin =
+        revenueMetrics.totalRevenue > 0
+          ? (profit / revenueMetrics.totalRevenue) * 100
+          : 0;
+
+      const attendanceMetrics = aggregateAttendanceMetrics(
+        attendancesResult.data || []
+      );
+
+      const performanceMetrics = calculatePerformanceMetrics(
+        revenueMetrics.totalRevenue,
+        attendanceMetrics.count,
+        professionalsCount
+      );
+
+      return {
+        data: {
+          unit: toUnitResponse(unitResult.data),
+          unitId: params.unitId,
+          month: params.month,
+          year: params.year,
+          professionals: {
+            total: professionalsCount,
+            list: professionalsList,
+          },
+          financial: {
+            monthlyRevenue: revenueMetrics.totalRevenue,
+            receivedRevenue: revenueMetrics.receivedRevenue,
+            pendingRevenue: revenueMetrics.pendingRevenue,
+            serviceRevenue: revenueMetrics.serviceRevenue,
+            productRevenue: revenueMetrics.productRevenue,
+            transactionCount: revenueMetrics.transactionCount,
+            averageTicket: revenueMetrics.averageTicket,
+            monthlyExpenses,
+            profit,
+            profitMargin,
+          },
+          attendances: attendanceMetrics,
+          performance: performanceMetrics,
+        },
+        error: null,
+      };
     } catch (error) {
-      console.error('Erro ao gerar comparativo:', error);
-      throw new Error('Falha ao gerar comparativo: ' + error.message);
+      return {
+        data: null,
+        error: buildError(`Falha ao calcular estatísticas: ${error.message}`),
+      };
     }
   }
 
-  /**
-   * Obter ranking de unidades por performance
-   * @param {string} metric - Métrica para ranking (revenue, profit, attendances)
-   * @param {number} mes - Mês (1-12)
-   * @param {number} ano - Ano
-   * @returns {Promise<Array>} Ranking de unidades
-   */
-  async getUnitsRanking(metric = 'revenue', mes = null, ano = null) {
+  async getUnitsComparison(month = null, year = null) {
+    const periodDTO = new UnitsPeriodDTO({ month, year });
+
+    if (!periodDTO.isValid()) {
+      return {
+        data: null,
+        error: buildError(periodDTO.getErrorMessage()),
+      };
+    }
+
+    const { month: targetMonth, year: targetYear } = periodDTO;
+
+    const unitsResult = await this.getUnits({ includeInactive: false });
+
+    if (unitsResult.error) {
+      return unitsResult;
+    }
+
     try {
-      const comparison = await this.getUnitsComparison(mes, ano);
+      const statsResults = await Promise.all(
+        (unitsResult.data || []).map(unit =>
+          this.getUnitStats(unit.id, targetMonth, targetYear)
+        )
+      );
 
-      let sortedUnits = [...comparison];
-
-      switch (metric) {
-        case 'profit':
-          sortedUnits.sort(
-            (a, b) => b.stats.financial.profit - a.stats.financial.profit
-          );
-          break;
-        case 'attendances':
-          sortedUnits.sort(
-            (a, b) => b.stats.attendances.count - a.stats.attendances.count
-          );
-          break;
-        case 'efficiency':
-          sortedUnits.sort(
-            (a, b) =>
-              b.stats.performance.revenuePerProfessional -
-              a.stats.performance.revenuePerProfessional
-          );
-          break;
-        case 'revenue':
-        default:
-          // Já ordenado por receita no getUnitsComparison
-          break;
+      for (const result of statsResults) {
+        if (result.error) {
+          return result;
+        }
       }
 
-      return sortedUnits.map((unit, index) => ({
-        ...unit,
-        ranking: {
-          position: index + 1,
-          metric,
-          value: this.getRankingValue(unit.stats, metric),
-        },
+      const comparison = statsResults.map(result => ({
+        ...result.data.unit,
+        stats: result.data,
       }));
+
+      comparison.sort(
+        (a, b) =>
+          (b.stats?.financial?.monthlyRevenue || 0) -
+          (a.stats?.financial?.monthlyRevenue || 0)
+      );
+
+      return { data: comparison, error: null };
     } catch (error) {
-      console.error('Erro ao gerar ranking:', error);
-      throw new Error('Falha ao gerar ranking: ' + error.message);
+      return {
+        data: null,
+        error: buildError(`Falha ao gerar comparativo: ${error.message}`),
+      };
     }
   }
 
-  /**
-   * Obter valor da métrica para ranking
-   * @param {Object} stats - Estatísticas da unidade
-   * @param {string} metric - Métrica desejada
-   * @returns {number} Valor da métrica
-   */
+  async getUnitsRanking(metric = 'revenue', month = null, year = null) {
+    const rankingDTO = new UnitsRankingParamsDTO({ metric, month, year });
+
+    if (!rankingDTO.isValid()) {
+      return {
+        data: null,
+        error: buildError(rankingDTO.getErrorMessage()),
+      };
+    }
+
+    const { month: targetMonth, year: targetYear } = rankingDTO;
+
+    const comparisonResult = await this.getUnitsComparison(
+      targetMonth,
+      targetYear
+    );
+
+    if (comparisonResult.error) {
+      return comparisonResult;
+    }
+
+    const units = comparisonResult.data || [];
+
+    const sortedUnits = [...units].sort((a, b) => {
+      const valueA = this.getRankingValue(a.stats, rankingDTO.metric);
+      const valueB = this.getRankingValue(b.stats, rankingDTO.metric);
+      return valueB - valueA;
+    });
+
+    const ranking = sortedUnits.map((unit, index) => ({
+      ...unit,
+      ranking: {
+        position: index + 1,
+        metric: rankingDTO.metric,
+        value: this.getRankingValue(unit.stats, rankingDTO.metric),
+      },
+    }));
+
+    return { data: ranking, error: null };
+  }
+
   getRankingValue(stats, metric) {
+    if (!stats) return 0;
+
     switch (metric) {
       case 'profit':
-        return stats.financial.profit;
+        return stats.financial?.profit || 0;
       case 'attendances':
-        return stats.attendances.count;
+        return stats.attendances?.count || 0;
       case 'efficiency':
-        return stats.performance.revenuePerProfessional;
+        return stats.performance?.revenuePerProfessional || 0;
       case 'revenue':
       default:
-        return stats.financial.monthlyRevenue;
+        return stats.financial?.monthlyRevenue || 0;
     }
   }
 
-  /**
-   * Obter evolução mensal da unidade (últimos 6 meses)
-   * @param {string} unitId - ID da unidade
-   * @returns {Promise<Array>} Dados de evolução
-   */
   async getUnitEvolution(unitId) {
+    const idDTO = new UnitEvolutionParamsDTO(unitId);
+
+    if (!idDTO.isValid()) {
+      return {
+        data: null,
+        error: buildError(idDTO.getErrorMessage()),
+      };
+    }
+
     try {
       const evolution = [];
       const currentDate = new Date();
 
-      // Buscar dados dos últimos 6 meses
-      for (let i = 5; i >= 0; i--) {
+      for (let i = 5; i >= 0; i -= 1) {
         const date = new Date(
           currentDate.getFullYear(),
           currentDate.getMonth() - i,
           1
         );
+
         const month = date.getMonth() + 1;
         const year = date.getFullYear();
 
-        const stats = await this.getUnitStats(unitId, month, year);
+        const statsResult = await this.getUnitStats(idDTO.value(), month, year);
+
+        if (statsResult.error) {
+          return statsResult;
+        }
 
         evolution.push({
           month: `${String(month).padStart(2, '0')}/${year}`,
           monthNumber: month,
-          year: year,
-          ...stats,
+          year,
+          stats: statsResult.data,
         });
       }
 
-      return evolution;
+      return { data: evolution, error: null };
     } catch (error) {
-      console.error('Erro ao buscar evolução da unidade:', error);
-      throw new Error('Falha ao buscar evolução: ' + error.message);
+      return {
+        data: null,
+        error: buildError(`Falha ao buscar evolução: ${error.message}`),
+      };
     }
   }
 }
 
-// Instância singleton do serviço
 const unitsService = new UnitsService();
 
 export default unitsService;

@@ -22,7 +22,7 @@ class ServiceRepository {
    * @param {number} data.durationMinutes - Duração em minutos
    * @param {number} data.price - Preço do serviço
    * @param {number} data.commissionPercentage - Percentual de comissão
-   * @param {boolean} [data.active=true] - Se o serviço está ativo
+   * @param {boolean} [data.isActive=true] - Se o serviço está ativo
    * @returns {Promise<{data: Object|null, error: Error|null}>}
    */
   async createService(data) {
@@ -35,7 +35,7 @@ class ServiceRepository {
           duration_minutes: data.durationMinutes,
           price: data.price,
           commission_percentage: data.commissionPercentage,
-          active: data.active !== undefined ? data.active : true,
+          is_active: data.isActive !== undefined ? data.isActive : true,
         })
         .select()
         .single();
@@ -77,7 +77,7 @@ class ServiceRepository {
       if (data.commissionPercentage !== undefined) {
         updateData.commission_percentage = data.commissionPercentage;
       }
-      if (data.active !== undefined) updateData.active = data.active;
+      if (data.isActive !== undefined) updateData.is_active = data.isActive;
 
       const { data: service, error } = await supabase
         .from('services')
@@ -110,7 +110,7 @@ class ServiceRepository {
       const { data: service, error } = await supabase
         .from('services')
         .update({
-          active: false,
+          is_active: false,
           updated_at: new Date().toISOString(),
         })
         .eq('id', id)
@@ -194,7 +194,7 @@ class ServiceRepository {
         .eq('unit_id', unitId);
 
       if (activeOnly) {
-        query = query.eq('active', true);
+        query = query.eq('is_active', true);
       }
 
       if (searchTerm) {
@@ -239,7 +239,7 @@ class ServiceRepository {
         .from('services')
         .select('id, name, duration_minutes, price, commission_percentage')
         .eq('unit_id', unitId)
-        .eq('active', true)
+        .eq('is_active', true)
         .order('name', { ascending: true });
 
       if (error) {
@@ -370,7 +370,7 @@ class ServiceRepository {
       const { data: service, error } = await supabase
         .from('services')
         .update({
-          active: true,
+          is_active: true,
           updated_at: new Date().toISOString(),
         })
         .eq('id', id)

@@ -32,7 +32,7 @@ const BankAccountCard = ({
     name: account.name,
     initial_balance: account.initial_balance,
     current_balance: account.current_balance,
-    saldo_disponivel: account.saldo_disponivel,
+    available_balance: account.available_balance,
     allData: account,
   });
 
@@ -200,7 +200,7 @@ const BankAccountCard = ({
                   Saldo Disponível
                 </span>
                 <span className="font-bold text-lg text-primary">
-                  {formatCurrency(account.saldo_disponivel || 0)}
+                  {formatCurrency(account.available_balance || 0)}
                 </span>
               </div>
             </div>

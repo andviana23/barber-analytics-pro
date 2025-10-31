@@ -5,7 +5,13 @@
  * Inclui CRUD completo com soft delete pattern.
  */
 
-import { supabase } from './supabase';
+// Service agora usa repository e DTOs; acesso direto ao Supabase removido daqui
+import { paymentMethodsRepository } from '../repositories/paymentMethodsRepository';
+import {
+  CreatePaymentMethodDTO,
+  UpdatePaymentMethodDTO,
+  PaymentMethodResponseDTO,
+} from '../dtos/paymentMethodDTO';
 
 /**
  * Buscar todas as formas de pagamento de uma unidade
@@ -16,36 +22,20 @@ import { supabase } from './supabase';
  */
 export const getPaymentMethods = async (unitId, includeInactive = false) => {
   try {
-    let query = supabase.from('payment_methods').select(`
-        *,
-        units:unit_id (
-          id,
-          name
-        )
-      `);
-
-    // Filtrar por unidade se unitId for fornecido
-    if (unitId) {
-      query = query.eq('unit_id', unitId);
-    }
-
-    query = query.order('name', { ascending: true });
-
-    // Filtrar apenas ativos se includeInactive for false
-    if (!includeInactive) {
-      query = query.eq('is_active', true);
-    }
-
-    const { data, error } = await query;
+    const { data, error } = await paymentMethodsRepository.findAll({
+      unitId,
+      includeInactive,
+    });
 
     if (error) {
-      console.error('Erro ao buscar formas de pagamento:', error);
       return { data: null, error };
     }
 
-    return { data, error: null };
+    const mapped = (data || []).map(row =>
+      new PaymentMethodResponseDTO(row).toObject()
+    );
+    return { data: mapped, error: null };
   } catch (error) {
-    console.error('Erro inesperado ao buscar formas de pagamento:', error);
     return { data: null, error };
   }
 };
@@ -58,20 +48,17 @@ export const getPaymentMethods = async (unitId, includeInactive = false) => {
  */
 export const getPaymentMethodById = async id => {
   try {
-    const { data, error } = await supabase
-      .from('payment_methods')
-      .select('*')
-      .eq('id', id)
-      .single();
+    const { data, error } = await paymentMethodsRepository.findById(id);
 
     if (error) {
-      console.error('Erro ao buscar forma de pagamento:', error);
       return { data: null, error };
     }
 
-    return { data, error: null };
+    return {
+      data: data ? new PaymentMethodResponseDTO(data).toObject() : null,
+      error: null,
+    };
   } catch (error) {
-    console.error('Erro inesperado ao buscar forma de pagamento:', error);
     return { data: null, error };
   }
 };
@@ -98,64 +85,24 @@ export const getPaymentMethodById = async id => {
  */
 export const createPaymentMethod = async paymentMethodData => {
   try {
-    // Obter o user_id do usuário autenticado
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    // Validações básicas
-    if (!paymentMethodData.unit_id) {
-      return { data: null, error: new Error('unit_id é obrigatório') };
+    const dto = new CreatePaymentMethodDTO(paymentMethodData);
+    if (!dto.isValid()) {
+      return { data: null, error: new Error(dto.getErrors().join(' | ')) };
     }
 
-    if (!paymentMethodData.name || paymentMethodData.name.trim() === '') {
-      return { data: null, error: new Error('Nome é obrigatório') };
-    }
-
-    if (
-      paymentMethodData.fee_percentage < 0 ||
-      paymentMethodData.fee_percentage > 100
-    ) {
-      return {
-        data: null,
-        error: new Error('Taxa deve estar entre 0% e 100%'),
-      };
-    }
-
-    if (paymentMethodData.receipt_days < 0) {
-      return {
-        data: null,
-        error: new Error('Prazo de recebimento não pode ser negativo'),
-      };
-    }
-
-    // Preparar dados para inserção
-    const insertData = {
-      unit_id: paymentMethodData.unit_id,
-      name: paymentMethodData.name.trim(),
-      fee_percentage: Number(paymentMethodData.fee_percentage),
-      receipt_days: Number(paymentMethodData.receipt_days),
-      is_active:
-        paymentMethodData.is_active !== undefined
-          ? paymentMethodData.is_active
-          : true,
-      created_by: user?.id || null,
-    };
-
-    const { data, error } = await supabase
-      .from('payment_methods')
-      .insert([insertData])
-      .select()
-      .single();
+    const { data, error } = await paymentMethodsRepository.create(
+      dto.toDatabase()
+    );
 
     if (error) {
-      console.error('Erro ao criar forma de pagamento:', error);
       return { data: null, error };
     }
 
-    return { data, error: null };
+    return {
+      data: data ? new PaymentMethodResponseDTO(data).toObject() : null,
+      error: null,
+    };
   } catch (error) {
-    console.error('Erro inesperado ao criar forma de pagamento:', error);
     return { data: null, error };
   }
 };
@@ -169,62 +116,25 @@ export const createPaymentMethod = async paymentMethodData => {
  */
 export const updatePaymentMethod = async (id, updates) => {
   try {
-    // Validações básicas
-    if (updates.name !== undefined && updates.name.trim() === '') {
-      return { data: null, error: new Error('Nome não pode ser vazio') };
+    const dto = new UpdatePaymentMethodDTO(updates);
+    if (!dto.isValid()) {
+      return { data: null, error: new Error(dto.getErrors().join(' | ')) };
     }
 
-    if (
-      updates.fee_percentage !== undefined &&
-      (updates.fee_percentage < 0 || updates.fee_percentage > 100)
-    ) {
-      return {
-        data: null,
-        error: new Error('Taxa deve estar entre 0% e 100%'),
-      };
-    }
-
-    if (updates.receipt_days !== undefined && updates.receipt_days < 0) {
-      return {
-        data: null,
-        error: new Error('Prazo de recebimento não pode ser negativo'),
-      };
-    }
-
-    // Preparar dados para atualização
-    const updateData = {};
-
-    if (updates.name !== undefined) {
-      updateData.name = updates.name.trim();
-    }
-
-    if (updates.fee_percentage !== undefined) {
-      updateData.fee_percentage = Number(updates.fee_percentage);
-    }
-
-    if (updates.receipt_days !== undefined) {
-      updateData.receipt_days = Number(updates.receipt_days);
-    }
-
-    if (updates.is_active !== undefined) {
-      updateData.is_active = updates.is_active;
-    }
-
-    const { data, error } = await supabase
-      .from('payment_methods')
-      .update(updateData)
-      .eq('id', id)
-      .select()
-      .single();
+    const { data, error } = await paymentMethodsRepository.update(
+      id,
+      dto.toDatabase()
+    );
 
     if (error) {
-      console.error('Erro ao atualizar forma de pagamento:', error);
       return { data: null, error };
     }
 
-    return { data, error: null };
+    return {
+      data: data ? new PaymentMethodResponseDTO(data).toObject() : null,
+      error: null,
+    };
   } catch (error) {
-    console.error('Erro inesperado ao atualizar forma de pagamento:', error);
     return { data: null, error };
   }
 };
@@ -237,21 +147,17 @@ export const updatePaymentMethod = async (id, updates) => {
  */
 export const deletePaymentMethod = async id => {
   try {
-    const { data, error } = await supabase
-      .from('payment_methods')
-      .update({ is_active: false })
-      .eq('id', id)
-      .select()
-      .single();
+    const { data, error } = await paymentMethodsRepository.softDelete(id);
 
     if (error) {
-      console.error('Erro ao desativar forma de pagamento:', error);
       return { data: null, error };
     }
 
-    return { data, error: null };
+    return {
+      data: data ? new PaymentMethodResponseDTO(data).toObject() : null,
+      error: null,
+    };
   } catch (error) {
-    console.error('Erro inesperado ao desativar forma de pagamento:', error);
     return { data: null, error };
   }
 };
@@ -264,21 +170,17 @@ export const deletePaymentMethod = async id => {
  */
 export const activatePaymentMethod = async id => {
   try {
-    const { data, error } = await supabase
-      .from('payment_methods')
-      .update({ is_active: true })
-      .eq('id', id)
-      .select()
-      .single();
+    const { data, error } = await paymentMethodsRepository.activate(id);
 
     if (error) {
-      console.error('Erro ao ativar forma de pagamento:', error);
       return { data: null, error };
     }
 
-    return { data, error: null };
+    return {
+      data: data ? new PaymentMethodResponseDTO(data).toObject() : null,
+      error: null,
+    };
   } catch (error) {
-    console.error('Erro inesperado ao ativar forma de pagamento:', error);
     return { data: null, error };
   }
 };
@@ -293,24 +195,17 @@ export const activatePaymentMethod = async id => {
  */
 export const hardDeletePaymentMethod = async id => {
   try {
-    const { data, error } = await supabase
-      .from('payment_methods')
-      .delete()
-      .eq('id', id)
-      .select()
-      .single();
+    const { data, error } = await paymentMethodsRepository.hardDelete(id);
 
     if (error) {
-      console.error(
-        'Erro ao deletar forma de pagamento permanentemente:',
-        error
-      );
       return { data: null, error };
     }
 
-    return { data, error: null };
+    return {
+      data: data ? new PaymentMethodResponseDTO(data).toObject() : null,
+      error: null,
+    };
   } catch (error) {
-    console.error('Erro inesperado ao deletar forma de pagamento:', error);
     return { data: null, error };
   }
 };
@@ -354,10 +249,6 @@ export const getPaymentMethodsStats = async unitId => {
 
     return { data: stats, error: null };
   } catch (error) {
-    console.error(
-      'Erro ao calcular estatísticas das formas de pagamento:',
-      error
-    );
     return { data: null, error };
   }
 };

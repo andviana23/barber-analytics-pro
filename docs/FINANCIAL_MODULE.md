@@ -550,9 +550,295 @@ const report = ImportExpensesFromOFXService.generateReport(results, enriched, st
 
 ---
 
-## 📚 Documentação Relacionada
+## � Histórico de Padronizações (SQL-08 e SQL-09)
+
+### SQL-08: Padronização `services.active` → `services.is_active`
+
+**Data:** 31 de outubro de 2025  
+**Objetivo:** Unificar nomenclatura de colunas booleanas de status
+
+#### Alterações no Banco de Dados
+
+```sql
+-- Renomear coluna
+ALTER TABLE services RENAME COLUMN active TO is_active;
+
+-- Adicionar documentação
+COMMENT ON COLUMN services.is_active IS
+  'Indica se o serviço está ativo e disponível para uso. Soft delete pattern.';
+```
+
+#### Alterações no Código
+
+**Repository (`src/repositories/serviceRepository.js`):**
+
+- ✅ `createService()` — Propriedade `data.active` → `data.isActive`
+- ✅ `updateService()` — Propriedade `data.active` → `data.isActive`
+- ✅ `deleteService()` — Soft delete usa `is_active: false`
+- ✅ `listServices()` — Filtro `activeOnly` consulta `is_active`
+- ✅ `getActiveServices()` — Query usa `.eq('is_active', true)`
+- ✅ `reactivateService()` — Atualiza `is_active: true`
+
+**Impacto:**
+
+- ✅ Consistência com padrão do projeto (`is_active`, `is_paid`, `is_reconciled`)
+- ✅ Melhor legibilidade do código
+- ✅ Compatível com conventions do Clean Architecture
+
+---
+
+### SQL-09: Padronização `bank_accounts.saldo_disponivel` → `bank_accounts.available_balance`
+
+**Data:** 31 de outubro de 2025  
+**Objetivo:** Unificar nomenclatura em inglês e documentar diferença semântica
+
+#### Decisão Arquitetural: MANTER AMBAS AS COLUNAS
+
+Após análise técnica, decidiu-se **MANTER** tanto `current_balance` quanto `available_balance` devido a **propósitos de negócio distintos**:
+
+| Coluna              | Fórmula                                                     | Uso                                  |
+| ------------------- | ----------------------------------------------------------- | ------------------------------------ |
+| `current_balance`   | `initial_balance + receitas_confirmadas - despesas_pagas`   | Saldo **real** da conta (já efetivo) |
+| `available_balance` | `current_balance - receitas_pendentes - despesas_pendentes` | Saldo **projetado** (após clearing)  |
+
+**Exemplo Real:**
+
+```
+Conta Mangabeiras:
+  • current_balance = R$ 24.890,99 (saldo real/confirmado)
+  • available_balance = R$ 21.539,30 (projetado após compensação)
+  • Diferença: R$ 3.351,69 (pendências a compensar)
+
+Conta Nova Lima:
+  • current_balance = -R$ 601,89
+  • available_balance = -R$ 19.942,28
+  • Diferença: R$ 19.340,39 (pendências a compensar)
+```
+
+#### Alterações no Banco de Dados
+
+```sql
+-- 1. Renomear coluna
+ALTER TABLE bank_accounts
+  RENAME COLUMN saldo_disponivel TO available_balance;
+
+-- 2. Adicionar comentários explicativos
+COMMENT ON COLUMN bank_accounts.current_balance IS
+  'Saldo atual/real da conta: initial_balance + receitas_confirmadas - despesas_pagas. Considera apenas status Received/Paid.';
+
+COMMENT ON COLUMN bank_accounts.available_balance IS
+  'Saldo disponível projetado: current_balance - receitas_pendentes - despesas_pendentes. Desconta valores com status Pending.';
+
+-- 3. Atualizar trigger functions
+CREATE OR REPLACE FUNCTION trigger_recalculate_account_balance_on_revenue()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (TG_OP = 'INSERT' OR
+        OLD.status IS DISTINCT FROM NEW.status OR
+        OLD.value IS DISTINCT FROM NEW.value OR
+        OLD.account_id IS DISTINCT FROM NEW.account_id) THEN
+
+        IF TG_OP = 'UPDATE' AND OLD.account_id IS DISTINCT FROM NEW.account_id THEN
+            UPDATE bank_accounts
+            SET current_balance = calculate_account_current_balance(OLD.account_id),
+                available_balance = calculate_account_available_balance(OLD.account_id),
+                updated_at = NOW()
+            WHERE id = OLD.account_id;
+        END IF;
+
+        IF NEW.account_id IS NOT NULL THEN
+            UPDATE bank_accounts
+            SET current_balance = calculate_account_current_balance(NEW.account_id),
+                available_balance = calculate_account_available_balance(NEW.account_id),
+                updated_at = NOW()
+            WHERE id = NEW.account_id;
+        END IF;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- 4. Atualizar view
+DROP VIEW IF EXISTS vw_bank_accounts_with_balances;
+
+CREATE VIEW vw_bank_accounts_with_balances AS
+SELECT
+    ba.id,
+    ba.unit_id,
+    ba.name,
+    ba.bank_name,
+    ba.account_number,
+    ba.agency,
+    ba.nickname,
+    ba.initial_balance,
+    ba.current_balance,
+    ba.available_balance,  -- ✅ Sem alias saldo_disponivel
+    ba.is_active,
+    ba.created_at,
+    ba.updated_at,
+
+    COALESCE(
+        (SELECT SUM(value) FROM revenues
+         WHERE account_id = ba.id AND status IN ('Received', 'Paid') AND is_active = true),
+        0
+    ) AS total_revenues,
+
+    COALESCE(
+        (SELECT SUM(value) FROM expenses
+         WHERE account_id = ba.id AND status = 'Paid' AND is_active = true),
+        0
+    ) AS total_expenses,
+
+    COALESCE(
+        (SELECT SUM(value) FROM revenues
+         WHERE account_id = ba.id AND status = 'Pending' AND is_active = true),
+        0
+    ) AS pending_revenues,
+
+    COALESCE(
+        (SELECT SUM(value) FROM expenses
+         WHERE account_id = ba.id AND status = 'Pending' AND is_active = true),
+        0
+    ) AS pending_expenses,
+
+    (SELECT created_at FROM bank_account_balance_logs
+     WHERE account_id = ba.id
+     ORDER BY created_at DESC LIMIT 1) AS last_balance_change
+
+FROM bank_accounts ba;
+```
+
+#### Alterações no Código
+
+**Service (`src/services/bankAccountsService.js`):**
+
+```javascript
+// Antes
+.update({
+  current_balance: currentBalance,
+  saldo_disponivel: availableBalance,
+  updated_at: new Date().toISOString(),
+})
+
+// Depois
+.update({
+  current_balance: currentBalance,
+  available_balance: availableBalance,
+  updated_at: new Date().toISOString(),
+})
+```
+
+**Frontend Components:**
+
+1. `src/pages/FinanceiroAdvancedPage/ContasBancariasTab.jsx`
+   - ✅ Linha 179: `account.saldo_disponivel` → `account.available_balance`
+   - ✅ Linha 275: Debug log atualizado
+   - ✅ Linha 442: Display de saldo disponível
+
+2. `src/pages/BankAccountsPage/BankAccountsPage.jsx`
+   - ✅ Linha 409: Display de saldo disponível
+
+3. `src/molecules/BankAccountCard/BankAccountCard.jsx`
+   - ✅ Linha 35: Debug log
+   - ✅ Linha 203: Display de saldo disponível
+
+#### Funções SQL Relacionadas
+
+```sql
+-- Calcula saldo atual (confirmado)
+CREATE FUNCTION calculate_account_current_balance(p_account_id UUID)
+RETURNS DECIMAL(15, 2) AS $$
+DECLARE
+    v_initial_balance DECIMAL(15, 2);
+    v_revenues DECIMAL(15, 2);
+    v_expenses DECIMAL(15, 2);
+BEGIN
+    SELECT initial_balance INTO v_initial_balance
+    FROM bank_accounts WHERE id = p_account_id;
+
+    SELECT COALESCE(SUM(value), 0) INTO v_revenues
+    FROM revenues
+    WHERE account_id = p_account_id
+      AND status IN ('Received', 'Paid')
+      AND is_active = true;
+
+    SELECT COALESCE(SUM(value), 0) INTO v_expenses
+    FROM expenses
+    WHERE account_id = p_account_id
+      AND status = 'Paid'
+      AND is_active = true;
+
+    RETURN COALESCE(v_initial_balance, 0) + v_revenues - v_expenses;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Calcula saldo disponível (projetado)
+CREATE FUNCTION calculate_account_available_balance(p_account_id UUID)
+RETURNS DECIMAL(15, 2) AS $$
+DECLARE
+    v_current_balance DECIMAL(15, 2);
+    v_pending_revenues DECIMAL(15, 2);
+    v_pending_expenses DECIMAL(15, 2);
+BEGIN
+    v_current_balance := calculate_account_current_balance(p_account_id);
+
+    SELECT COALESCE(SUM(value), 0) INTO v_pending_revenues
+    FROM revenues
+    WHERE account_id = p_account_id
+      AND status = 'Pending'
+      AND is_active = true;
+
+    SELECT COALESCE(SUM(value), 0) INTO v_pending_expenses
+    FROM expenses
+    WHERE account_id = p_account_id
+      AND status = 'Pending'
+      AND is_active = true;
+
+    RETURN v_current_balance - v_pending_revenues - v_pending_expenses;
+END;
+$$ LANGUAGE plpgsql;
+```
+
+#### Triggers Automáticos
+
+Os triggers `trigger_recalculate_account_balance_on_revenue` e `trigger_recalculate_account_balance_on_expense` atualizam **automaticamente** ambos os saldos quando:
+
+- ✅ Uma receita/despesa é criada
+- ✅ O status muda (`Pending` → `Received`/`Paid`)
+- ✅ O valor é alterado
+- ✅ A conta bancária é trocada
+
+#### Impacto
+
+- ✅ Nomenclatura consistente em inglês
+- ✅ Documentação clara da diferença semântica
+- ✅ Cálculos automáticos via triggers
+- ✅ Frontend atualizado para usar `available_balance`
+- ✅ View sem aliases desnecessários
+
+#### Regras de Negócio
+
+**current_balance (Saldo Atual):**
+
+- ✅ Usado para contabilidade oficial
+- ✅ Representa dinheiro já compensado
+- ✅ Base para relatórios contábeis e DRE
+
+**available_balance (Saldo Disponível):**
+
+- ✅ Usado para projeções de fluxo de caixa
+- ✅ Alerta de saldo insuficiente considerando pendências
+- ✅ Base para dashboards operacionais
+
+---
+
+## �📚 Documentação Relacionada
 
 - [`DATABASE_SCHEMA.md`](DATABASE_SCHEMA.md) — Schema completo e RLS policies
 - [`FINANCIAL_MODULE_CHECKLIST.md`](../FINANCIAL_MODULE_CHECKLIST.md) — Checklist de implementação
 - [`RECONCILIATION_IMPLEMENTATION_REPORT.md`](../RECONCILIATION_IMPLEMENTATION_REPORT.md) — Relatório técnico de conciliação
 - [`CONTRATOS.md`](CONTRATOS.md) — DTOs e validações
+
+```
+
+```

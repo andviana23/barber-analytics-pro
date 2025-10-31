@@ -406,7 +406,9 @@ const BankAccountCard = ({
             Saldo Disponível
           </p>
           <p className="text-xl font-bold text-green-600 dark:text-green-400">
-            {showBalances ? formatCurrency(account.saldo_disponivel) : '••••••'}
+            {showBalances
+              ? formatCurrency(account.available_balance)
+              : '••••••'}
           </p>
         </div>
       </div>

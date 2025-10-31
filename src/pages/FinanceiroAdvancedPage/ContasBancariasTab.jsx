@@ -176,7 +176,7 @@ const ContasBancariasTab = ({ globalFilters }) => {
       0
     );
     const totalAvailableBalance = bankAccounts.reduce(
-      (sum, acc) => sum + (parseFloat(acc.saldo_disponivel) || 0),
+      (sum, acc) => sum + (parseFloat(acc.available_balance) || 0),
       0
     );
     const totalRevenues = bankAccounts.reduce(
@@ -272,7 +272,7 @@ const ContasBancariasTab = ({ globalFilters }) => {
     console.log('💳 Conta:', account.name, {
       initial_balance: account.initial_balance,
       current_balance: account.current_balance,
-      saldo_disponivel: account.saldo_disponivel,
+      available_balance: account.available_balance,
       total_revenues: account.total_revenues,
       total_expenses: account.total_expenses,
     });
@@ -439,7 +439,7 @@ const ContasBancariasTab = ({ globalFilters }) => {
                     Saldo Disponível
                   </p>
                   <p className="text-xl font-bold text-purple-700 dark:text-purple-300">
-                    {formatCurrency(account.saldo_disponivel || 0)}
+                    {formatCurrency(account.available_balance || 0)}
                   </p>
                 </div>
               </div>

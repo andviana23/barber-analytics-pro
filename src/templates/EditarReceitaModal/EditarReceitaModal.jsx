@@ -87,7 +87,11 @@ export const EditarReceitaModal = ({
   useEffect(() => {
     const fetchUnits = async () => {
       try {
-        const data = await unitsService.getUnits();
+        const { data, error } = await unitsService.getUnits();
+        if (error) {
+          throw error;
+        }
+
         if (data && Array.isArray(data)) {
           setUnits(data);
         }

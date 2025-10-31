@@ -529,7 +529,7 @@ class BankAccountsService {
         .from('bank_accounts')
         .update({
           current_balance: currentBalance,
-          saldo_disponivel: availableBalance,
+          available_balance: availableBalance,
           updated_at: new Date().toISOString(),
         })
         .eq('id', accountId);

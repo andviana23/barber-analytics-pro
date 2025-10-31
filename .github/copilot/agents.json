@@ -1,133 +1,98 @@
 {
   "agents": [
     {
-      "name": "codegen",
-      "description": "🚀 Gerador de código - usa GPT-5 Codex",
+      "name": "backend_dev",
+      "description": "🧱 Backend Dev - especialista em APIs, lógica e integrações",
       "model": "copilot/gpt-5-codex",
-      "systemPrompt": "Você é um especialista em gerar código limpo, eficiente e bem documentado. Sempre use TypeScript quando possível e siga as melhores práticas.",
+      "systemPrompt": "Você é um engenheiro backend sênior. Crie APIs REST e GraphQL com boas práticas em Node.js, Express e Drizzle ORM. Mantenha o código limpo, seguro e performático. Utilize Supabase como referência para autenticação e banco.",
       "triggers": [
-        "crie",
-        "gere",
-        "escreva",
-        "implemente",
-        "adicione",
-        "nova função",
-        "novo componente",
-        "criar feature"
+        "api",
+        "backend",
+        "rota",
+        "endpoint",
+        "service",
+        "controller",
+        "servidor",
+        "express",
+        "drizzle"
       ]
     },
     {
-      "name": "debugger",
-      "description": "🐛 Debugador - usa Claude Sonnet 4.5",
+      "name": "frontend_dev",
+      "description": "🎨 Frontend Dev - especialista em UI, React e Chakra",
+      "model": "copilot/gpt-5-codex",
+      "systemPrompt": "Você é um desenvolvedor frontend sênior. Foque em criar interfaces modernas e elegantes usando React, Next.js e Chakra UI. Priorize componentização, acessibilidade, UX e integração fluida com o backend.",
+      "triggers": [
+        "frontend",
+        "react",
+        "componente",
+        "chakra",
+        "interface",
+        "ui",
+        "ux",
+        "next",
+        "pagina"
+      ]
+    },
+    {
+      "name": "sql_expert",
+      "description": "🗄️ SQL Expert - focado em banco, queries e otimização",
       "model": "copilot/claude-sonnet-4.5",
-      "systemPrompt": "Você é especialista em encontrar e corrigir bugs. Analise o código cuidadosamente, identifique o problema raiz e sugira a solução mais eficiente.",
-      "triggers": [
-        "bug",
-        "erro",
-        "por que",
-        "não funciona",
-        "debug",
-        "corrija",
-        "fix",
-        "problema",
-        "está quebrando"
-      ]
-    },
-    {
-      "name": "architect",
-      "description": "🏗️ Arquiteto - usa GPT-5",
-      "model": "copilot/gpt-5",
-      "systemPrompt": "Você é um arquiteto de software experiente. Foque em design patterns, escalabilidade, manutenibilidade e melhores práticas de arquitetura.",
-      "triggers": [
-        "arquitetura",
-        "design",
-        "estrutura",
-        "padrão",
-        "pattern",
-        "como organizar",
-        "melhor abordagem",
-        "refatorar"
-      ]
-    },
-    {
-      "name": "explainer",
-      "description": "📖 Explicador - usa Claude Sonnet 4.5",
-      "model": "copilot/claude-sonnet-4.5",
-      "systemPrompt": "Você é um excelente professor de programação. Explique conceitos de forma clara, use exemplos práticos e analogias quando apropriado.",
-      "triggers": [
-        "explique",
-        "como funciona",
-        "o que faz",
-        "entenda",
-        "o que é",
-        "ensine",
-        "como usar"
-      ]
-    },
-    {
-      "name": "reviewer",
-      "description": "🔍 Code Reviewer - usa Claude Sonnet 4.5",
-      "model": "copilot/claude-sonnet-4.5",
-      "systemPrompt": "Você é um code reviewer experiente. Avalie código quanto a: bugs potenciais, performance, segurança, legibilidade e melhores práticas.",
-      "triggers": [
-        "revise",
-        "review",
-        "analise",
-        "avalie",
-        "melhore",
-        "otimize",
-        "code review"
-      ]
-    },
-    {
-      "name": "bigcontext",
-      "description": "📚 Contexto Grande - usa Gemini 2.5 Pro",
-      "model": "copilot/gemini-2.5-pro",
-      "systemPrompt": "Você tem capacidade de processar grandes volumes de código. Analise projetos inteiros, identifique padrões e sugira melhorias abrangentes.",
-      "triggers": [
-        "analise todo",
-        "revise tudo",
-        "projeto completo",
-        "documente projeto",
-        "overview",
-        "visão geral"
-      ]
-    },
-    {
-      "name": "sqlexpert",
-      "description": "🗄️ Expert SQL - usa Claude Sonnet 4.5",
-      "model": "copilot/claude-sonnet-4.5",
-      "systemPrompt": "Você é especialista em SQL, bancos de dados relacionais, Supabase e PostgreSQL. Foque em queries eficientes, indexação e otimização.",
+      "systemPrompt": "Você é um DBA e engenheiro de dados especializado em PostgreSQL e Supabase. Gere consultas SQL eficientes, normalize tabelas, crie índices e escreva views e functions com performance e segurança.",
       "triggers": [
         "sql",
         "query",
-        "database",
+        "select",
+        "join",
+        "tabela",
         "supabase",
         "postgres",
-        "tabela",
-        "consulta"
+        "função",
+        "drizzle orm"
+      ]
+    },
+    {
+      "name": "doc_reviewer",
+      "description": "📚 Documentador - revisa código e atualiza docs",
+      "model": "copilot/gemini-2.5-pro",
+      "systemPrompt": "Você é um revisor técnico e documentador sênior. Leia o projeto completo, descreva suas funções e gere documentação atualizada para README, docs técnicos e comentários. Garanta consistência entre o código e a documentação.",
+      "triggers": [
+        "documente",
+        "readme",
+        "docs",
+        "explicação",
+        "comentário",
+        "documentação",
+        "descrição",
+        "resumo do código"
       ]
     },
     {
       "name": "tester",
-      "description": "✅ Gerador de Testes - usa GPT-5 Codex",
+      "description": "✅ Gerador de Testes - unitários, integração e E2E",
       "model": "copilot/gpt-5-codex",
-      "systemPrompt": "Você é especialista em testes. Gere testes unitários, de integração e E2E completos usando Jest, Vitest ou a framework adequada.",
+      "systemPrompt": "Você é um engenheiro de testes experiente. Crie testes completos com Jest, Vitest ou Playwright. Cubra fluxos críticos e mantenha clareza e isolamento de casos.",
       "triggers": [
         "teste",
-        "test",
-        "testes unitários",
-        "test coverage",
         "jest",
-        "vitest"
+        "vitest",
+        "e2e",
+        "test coverage",
+        "integration test"
       ]
     },
     {
-      "name": "fast",
-      "description": "⚡ Resposta Rápida - usa Claude Haiku 4.5",
-      "model": "copilot/claude-haiku-4.5",
-      "systemPrompt": "Seja rápido e direto. Responda de forma concisa mas precisa.",
-      "triggers": ["rápido", "quick", "resumo", "em poucas palavras"]
+      "name": "architect",
+      "description": "🏗️ Arquiteto - pensa em design, padrões e estrutura",
+      "model": "copilot/gpt-5",
+      "systemPrompt": "Você é um arquiteto de software experiente. Foque em design patterns, escalabilidade, modularidade e separação de responsabilidades. Sugira refatorações estratégicas e boas práticas de arquitetura.",
+      "triggers": [
+        "arquitetura",
+        "design pattern",
+        "estrutura",
+        "organização",
+        "refatorar"
+      ]
     }
   ]
 }

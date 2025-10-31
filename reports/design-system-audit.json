@@ -1,0 +1,3511 @@
+{
+  "totalFiles": 367,
+  "totalViolations": 2129,
+  "violations": {
+    "inlineStyles": {
+      "total": 28,
+      "files": [
+        {
+          "file": "src\\utils\\performance.jsx",
+          "count": 3
+        },
+        {
+          "file": "src\\molecules\\OrderItemRow.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\organisms\\OrderItemsTable.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\atoms\\AnimatedComponents.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\pages\\UnitsPage\\UnitsComparison.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\pages\\ListaDaVezPage\\ListaDaVezPage.jsx",
+          "count": 3
+        },
+        {
+          "file": "src\\pages\\DashboardPage\\DashboardPage.jsx",
+          "count": 3
+        },
+        {
+          "file": "src\\molecules\\CategoryHierarchicalDropdown\\CategoryHierarchicalDropdown.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\molecules\\ChartComponent\\ChartComponent.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\molecules\\CashflowChartCard\\CashflowChartCard.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\organisms\\PalettePreview\\PalettePreview.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\organisms\\Sidebar\\Sidebar.backup.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\components\\ThemeValidator\\ThemeValidator.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\components\\finance\\ImportExpensesFromOFXModal.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\atoms\\PartySelector\\PartySelector.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\pages\\RelatoriosPage\\components\\RelatorioReceitaDespesa.jsx",
+          "count": 5
+        }
+      ],
+      "severity": "MEDIUM",
+      "description": "Estilos inline (evitar quando possível)"
+    },
+    "hardcodedColors": {
+      "total": 1854,
+      "files": [
+        {
+          "file": "src\\templates\\OrderModal.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\templates\\OrderItemModal.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\templates\\NovaDespesaModal.jsx",
+          "count": 46
+        },
+        {
+          "file": "src\\templates\\ManualReconciliationModal.jsx",
+          "count": 4
+        },
+        {
+          "file": "src\\templates\\ImportStatementModal.jsx",
+          "count": 57
+        },
+        {
+          "file": "src\\templates\\ImportExpensesFromOFXModal.jsx",
+          "count": 42
+        },
+        {
+          "file": "src\\templates\\CloseCashModal.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\pages\\ServicesPage.jsx",
+          "count": 4
+        },
+        {
+          "file": "src\\pages\\OrdersPage.jsx",
+          "count": 4
+        },
+        {
+          "file": "src\\pages\\OrderHistoryPage.jsx",
+          "count": 18
+        },
+        {
+          "file": "src\\pages\\DREPage.jsx",
+          "count": 5
+        },
+        {
+          "file": "src\\pages\\CommissionReportPage.jsx",
+          "count": 57
+        },
+        {
+          "file": "src\\pages\\CashRegisterPage.jsx",
+          "count": 4
+        },
+        {
+          "file": "src\\molecules\\ServiceSelector.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\molecules\\ProfessionalSelector.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\molecules\\CommissionsTableResponsive.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\molecules\\CommissionBadge.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\organisms\\ServicesTable.jsx",
+          "count": 7
+        },
+        {
+          "file": "src\\organisms\\OrdersTable.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\organisms\\DiscountModal.jsx",
+          "count": 13
+        },
+        {
+          "file": "src\\atoms\\Skeleton.jsx",
+          "count": 27
+        },
+        {
+          "file": "src\\templates\\NovaReceitaAccrualModal\\NovaReceitaAccrualModal.jsx",
+          "count": 20
+        },
+        {
+          "file": "src\\templates\\EditarReceitaModal\\EditarReceitaModal.jsx",
+          "count": 6
+        },
+        {
+          "file": "src\\pages\\UnitsPage\\UnitsStats.jsx",
+          "count": 14
+        },
+        {
+          "file": "src\\pages\\UnitsPage\\UnitsPage.jsx",
+          "count": 16
+        },
+        {
+          "file": "src\\pages\\UnitsPage\\UnitsComparison.jsx",
+          "count": 26
+        },
+        {
+          "file": "src\\pages\\UnitsPage\\UnitCard.jsx",
+          "count": 14
+        },
+        {
+          "file": "src\\pages\\UnitsPage\\EditUnitModal.jsx",
+          "count": 12
+        },
+        {
+          "file": "src\\pages\\UnitsPage\\DeleteUnitModal.jsx",
+          "count": 14
+        },
+        {
+          "file": "src\\pages\\UnitsPage\\CreateUnitModal.jsx",
+          "count": 9
+        },
+        {
+          "file": "src\\pages\\TurnHistoryPage\\TurnHistoryPage.jsx",
+          "count": 20
+        },
+        {
+          "file": "src\\pages\\UserManagementPage\\UserManagementPage.jsx",
+          "count": 36
+        },
+        {
+          "file": "src\\pages\\SuppliersPage\\SuppliersPageRefactored.jsx",
+          "count": 13
+        },
+        {
+          "file": "src\\pages\\SuppliersPage\\SuppliersPage.jsx",
+          "count": 35
+        },
+        {
+          "file": "src\\pages\\ProductsPage\\ProductsPage.jsx",
+          "count": 14
+        },
+        {
+          "file": "src\\pages\\RelatoriosPage\\RelatoriosPage.jsx",
+          "count": 37
+        },
+        {
+          "file": "src\\pages\\PaymentMethodsPage\\PaymentMethodsPage.jsx",
+          "count": 35
+        },
+        {
+          "file": "src\\pages\\GoalsPage\\GoalsPage.jsx",
+          "count": 55
+        },
+        {
+          "file": "src\\pages\\ListaDaVezPage\\ListaDaVezPage.jsx",
+          "count": 22
+        },
+        {
+          "file": "src\\pages\\FinanceiroAdvancedPage\\ReceitasAccrualTab.jsx",
+          "count": 17
+        },
+        {
+          "file": "src\\pages\\FinanceiroAdvancedPage\\FluxoTabRefactored.jsx",
+          "count": 7
+        },
+        {
+          "file": "src\\pages\\FinanceiroAdvancedPage\\FluxoTab.jsx",
+          "count": 21
+        },
+        {
+          "file": "src\\pages\\FinanceiroAdvancedPage\\FinanceiroAdvancedPage.jsx",
+          "count": 4
+        },
+        {
+          "file": "src\\pages\\FinanceiroAdvancedPage\\DespesasAccrualTabRefactored.jsx",
+          "count": 23
+        },
+        {
+          "file": "src\\pages\\FinanceiroAdvancedPage\\DespesasAccrualTab.jsx",
+          "count": 81
+        },
+        {
+          "file": "src\\pages\\FinanceiroAdvancedPage\\ContasBancariasTab.jsx",
+          "count": 60
+        },
+        {
+          "file": "src\\pages\\FinanceiroAdvancedPage\\ConciliacaoTab.jsx",
+          "count": 11
+        },
+        {
+          "file": "src\\pages\\DashboardPage\\DashboardPage_OLD.jsx",
+          "count": 26
+        },
+        {
+          "file": "src\\pages\\DashboardPage\\DashboardPage.jsx",
+          "count": 8
+        },
+        {
+          "file": "src\\pages\\ClientsPage\\ClientsPage.jsx",
+          "count": 42
+        },
+        {
+          "file": "src\\pages\\BankAccountsPage\\BankAccountsPage.jsx",
+          "count": 20
+        },
+        {
+          "file": "src\\molecules\\SupplierModals\\SupplierInfoModal.jsx",
+          "count": 13
+        },
+        {
+          "file": "src\\molecules\\SupplierModals\\EditSupplierModal.jsx",
+          "count": 12
+        },
+        {
+          "file": "src\\molecules\\SupplierModals\\CreateSupplierModalRefactored.jsx",
+          "count": 12
+        },
+        {
+          "file": "src\\molecules\\SupplierModals\\CreateSupplierModal.jsx",
+          "count": 18
+        },
+        {
+          "file": "src\\molecules\\ReconciliationMatchCard\\ReconciliationMatchCard.jsx",
+          "count": 24
+        },
+        {
+          "file": "src\\molecules\\ProductModals\\StockMovementModal.jsx",
+          "count": 30
+        },
+        {
+          "file": "src\\molecules\\ProductModals\\EditProductModal.jsx",
+          "count": 41
+        },
+        {
+          "file": "src\\molecules\\ProductModals\\CreateProductModal.jsx",
+          "count": 41
+        },
+        {
+          "file": "src\\molecules\\RankingProfissionais\\RankingProfissionais.jsx",
+          "count": 18
+        },
+        {
+          "file": "src\\molecules\\PieChartCard\\PieChartCard.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\molecules\\MatchTable\\MatchTable.jsx",
+          "count": 18
+        },
+        {
+          "file": "src\\molecules\\NovaFormaPagamentoModal\\NovaFormaPagamentoModal.jsx",
+          "count": 13
+        },
+        {
+          "file": "src\\molecules\\ClientModals\\EditClientModal.jsx",
+          "count": 20
+        },
+        {
+          "file": "src\\molecules\\ClientModals\\CreateClientModal.jsx",
+          "count": 19
+        },
+        {
+          "file": "src\\molecules\\KPICard\\KPICard.jsx",
+          "count": 11
+        },
+        {
+          "file": "src\\molecules\\CategoryHierarchicalDropdown\\CategoryHierarchicalDropdown.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\molecules\\ChartComponent\\ChartComponent.jsx",
+          "count": 11
+        },
+        {
+          "file": "src\\molecules\\CashflowTimelineChart\\CashflowTimelineChart.jsx",
+          "count": 16
+        },
+        {
+          "file": "src\\molecules\\CashflowChartCard\\CashflowChartCard.jsx",
+          "count": 23
+        },
+        {
+          "file": "src\\organisms\\Sidebar\\Sidebar.backup.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\organisms\\Navbar\\Navbar.jsx",
+          "count": 6
+        },
+        {
+          "file": "src\\organisms\\FluxoSummaryPanel\\FluxoSummaryPanel.jsx",
+          "count": 35
+        },
+        {
+          "file": "src\\organisms\\ConciliacaoPanel\\ConciliacaoPanel.jsx",
+          "count": 20
+        },
+        {
+          "file": "src\\organisms\\BarbeiroHeader\\BarbeiroHeader.jsx",
+          "count": 7
+        },
+        {
+          "file": "src\\organisms\\BankAccountModals\\EditInitialBalanceModal.jsx",
+          "count": 14
+        },
+        {
+          "file": "src\\organisms\\BankAccountModals\\EditBankAccountModal.jsx",
+          "count": 9
+        },
+        {
+          "file": "src\\organisms\\BankAccountModals\\DeleteBankAccountModal.jsx",
+          "count": 10
+        },
+        {
+          "file": "src\\organisms\\BankAccountModals\\CreateBankAccountModal.jsx",
+          "count": 5
+        },
+        {
+          "file": "src\\organisms\\AutoMatchStep\\AutoMatchStep.jsx",
+          "count": 17
+        },
+        {
+          "file": "src\\components\\ThemeValidator\\ThemeValidator.jsx",
+          "count": 14
+        },
+        {
+          "file": "src\\components\\molecules\\ServiceCard.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\components\\molecules\\OrderTimeline.jsx",
+          "count": 7
+        },
+        {
+          "file": "src\\components\\molecules\\OrderListItem.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\components\\molecules\\CashRegisterCard.jsx",
+          "count": 3
+        },
+        {
+          "file": "src\\components\\PermissionsTest\\PermissionsTest.jsx",
+          "count": 9
+        },
+        {
+          "file": "src\\components\\organisms\\OrderItemsTable.jsx",
+          "count": 3
+        },
+        {
+          "file": "src\\components\\organisms\\CommissionSummaryCard.jsx",
+          "count": 4
+        },
+        {
+          "file": "src\\components\\modals\\ExpenseEditModal.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\components\\modals\\DeleteConfirmationModal.jsx",
+          "count": 13
+        },
+        {
+          "file": "src\\components\\finance\\MetasCard.jsx",
+          "count": 19
+        },
+        {
+          "file": "src\\components\\finance\\ImportExpensesFromOFXModal.jsx",
+          "count": 32
+        },
+        {
+          "file": "src\\components\\finance\\DREDynamicView.jsx",
+          "count": 30
+        },
+        {
+          "file": "src\\components\\LoadingComponents\\LoadingComponents.jsx",
+          "count": 12
+        },
+        {
+          "file": "src\\components\\AuthDebugger\\AuthDebugger.jsx",
+          "count": 3
+        },
+        {
+          "file": "src\\components\\AuthDiagnostic\\AuthDiagnostic.jsx",
+          "count": 3
+        },
+        {
+          "file": "src\\atoms\\UnitSelector\\UnitSelector.jsx",
+          "count": 4
+        },
+        {
+          "file": "src\\atoms\\Tooltip\\Tooltip.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\atoms\\PeriodFilter\\PeriodFilter.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\atoms\\PartySelector\\PartySelector.jsx",
+          "count": 27
+        },
+        {
+          "file": "src\\atoms\\DateRangePicker\\DateRangePicker.jsx",
+          "count": 18
+        },
+        {
+          "file": "src\\pages\\RelatoriosPage\\components\\RelatorioReceitaDespesa.old.jsx",
+          "count": 5
+        },
+        {
+          "file": "src\\pages\\RelatoriosPage\\components\\RelatorioPerformanceProfissionais.jsx",
+          "count": 5
+        },
+        {
+          "file": "src\\pages\\RelatoriosPage\\components\\RelatorioDREMensal.old.jsx",
+          "count": 32
+        },
+        {
+          "file": "src\\pages\\RelatoriosPage\\components\\RelatorioDREMensal.jsx",
+          "count": 12
+        },
+        {
+          "file": "src\\pages\\RelatoriosPage\\components\\RelatorioComparativoUnidades.jsx",
+          "count": 21
+        },
+        {
+          "file": "src\\pages\\RelatoriosPage\\components\\RelatorioAnaliseAtendimentos.jsx",
+          "count": 5
+        },
+        {
+          "file": "src\\pages\\RelatoriosPage\\components\\RankingTable.jsx",
+          "count": 31
+        },
+        {
+          "file": "src\\pages\\RelatoriosPage\\components\\KPIDashboard.jsx",
+          "count": 9
+        },
+        {
+          "file": "src\\pages\\RelatoriosPage\\components\\FiltrosRelatorio.jsx",
+          "count": 9
+        },
+        {
+          "file": "src\\pages\\ListaDaVezPage\\components\\BarbeiroCard.jsx",
+          "count": 6
+        },
+        {
+          "file": "src\\components\\templates\\modals\\ServiceFormModal.jsx",
+          "count": 4
+        },
+        {
+          "file": "src\\components\\templates\\modals\\OrderPaymentModal.jsx",
+          "count": 9
+        },
+        {
+          "file": "src\\components\\templates\\modals\\OrderEditModal.jsx",
+          "count": 7
+        },
+        {
+          "file": "src\\components\\templates\\modals\\OpenCashModal.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\components\\templates\\modals\\CloseCashModal.jsx",
+          "count": 3
+        }
+      ],
+      "severity": "CRITICAL",
+      "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)"
+    },
+    "inlineGradients": {
+      "total": 161,
+      "files": [
+        {
+          "file": "src\\templates\\OpenCashModal.jsx",
+          "count": 3
+        },
+        {
+          "file": "src\\templates\\NovaDespesaModal.jsx",
+          "count": 10
+        },
+        {
+          "file": "src\\pages\\CommissionReportPage.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\organisms\\CommissionSummaryCard.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\organisms\\CashReportPanel.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\templates\\NovaReceitaAccrualModal\\NovaReceitaAccrualModal.jsx",
+          "count": 3
+        },
+        {
+          "file": "src\\templates\\EditarReceitaModal\\EditarReceitaModal.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\pages\\UnitsPage\\UnitsStats.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\pages\\UnitsPage\\UnitsPage.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\pages\\SuppliersPage\\SuppliersPageRefactored.jsx",
+          "count": 9
+        },
+        {
+          "file": "src\\pages\\ProductsPage\\ProductsPage.jsx",
+          "count": 8
+        },
+        {
+          "file": "src\\pages\\GoalsPage\\GoalsPage.jsx",
+          "count": 13
+        },
+        {
+          "file": "src\\pages\\LoginPage\\LoginPage.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\pages\\FinanceiroAdvancedPage\\ReceitasAccrualTab.jsx",
+          "count": 9
+        },
+        {
+          "file": "src\\pages\\FinanceiroAdvancedPage\\FluxoTabRefactored.jsx",
+          "count": 6
+        },
+        {
+          "file": "src\\pages\\FinanceiroAdvancedPage\\FinanceiroAdvancedPage.jsx",
+          "count": 5
+        },
+        {
+          "file": "src\\pages\\FinanceiroAdvancedPage\\DespesasAccrualTabRefactored.jsx",
+          "count": 9
+        },
+        {
+          "file": "src\\pages\\FinanceiroAdvancedPage\\ContasBancariasTab.jsx",
+          "count": 10
+        },
+        {
+          "file": "src\\pages\\BankAccountsPage\\BankAccountsPage.jsx",
+          "count": 5
+        },
+        {
+          "file": "src\\molecules\\SupplierModals\\SupplierInfoModal.jsx",
+          "count": 10
+        },
+        {
+          "file": "src\\molecules\\SupplierModals\\EditSupplierModal.jsx",
+          "count": 4
+        },
+        {
+          "file": "src\\molecules\\SupplierModals\\CreateSupplierModalRefactored.jsx",
+          "count": 4
+        },
+        {
+          "file": "src\\organisms\\Sidebar\\Sidebar.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\organisms\\Sidebar\\Sidebar.backup.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\organisms\\Navbar\\Navbar.jsx",
+          "count": 3
+        },
+        {
+          "file": "src\\organisms\\BarbeiroHeader\\BarbeiroHeader.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\organisms\\BankAccountModals\\EditInitialBalanceModal.jsx",
+          "count": 3
+        },
+        {
+          "file": "src\\components\\modals\\ExpenseEditModal.jsx",
+          "count": 3
+        },
+        {
+          "file": "src\\components\\modals\\ExpenseDetailsModal.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\components\\finance\\MetasCard.jsx",
+          "count": 11
+        },
+        {
+          "file": "src\\components\\finance\\DREDynamicView.jsx",
+          "count": 3
+        },
+        {
+          "file": "src\\atoms\\PartySelector\\PartySelector.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\pages\\RelatoriosPage\\components\\RelatorioDREMensal.jsx",
+          "count": 12
+        },
+        {
+          "file": "src\\pages\\RelatoriosPage\\components\\RankingTable.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\components\\templates\\modals\\OrderPaymentModal.jsx",
+          "count": 1
+        }
+      ],
+      "severity": "HIGH",
+      "description": "Gradientes inline sem tokens (bg-gradient-to-*)"
+    },
+    "missingDarkMode": {
+      "total": 83,
+      "files": [
+        {
+          "file": "src\\templates\\ManualReconciliationModal.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\templates\\ImportStatementModal.jsx",
+          "count": 16
+        },
+        {
+          "file": "src\\pages\\OrderHistoryPage.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\organisms\\DiscountModal.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\atoms\\Skeleton.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\templates\\NovaReceitaAccrualModal\\NovaReceitaAccrualModal.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\templates\\EditarReceitaModal\\EditarReceitaModal.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\pages\\UserManagementPage\\UserManagementPage.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\pages\\GoalsPage\\GoalsPage.jsx",
+          "count": 4
+        },
+        {
+          "file": "src\\pages\\FinanceiroAdvancedPage\\ReceitasAccrualTab.jsx",
+          "count": 3
+        },
+        {
+          "file": "src\\pages\\FinanceiroAdvancedPage\\DespesasAccrualTab.jsx",
+          "count": 3
+        },
+        {
+          "file": "src\\molecules\\ReconciliationMatchCard\\ReconciliationMatchCard.jsx",
+          "count": 6
+        },
+        {
+          "file": "src\\molecules\\PieChartCard\\PieChartCard.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\molecules\\CashflowChartCard\\CashflowChartCard.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\organisms\\Navbar\\Navbar.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\organisms\\ConciliacaoPanel\\ConciliacaoPanel.jsx",
+          "count": 7
+        },
+        {
+          "file": "src\\organisms\\BarbeiroHeader\\BarbeiroHeader.jsx",
+          "count": 7
+        },
+        {
+          "file": "src\\components\\molecules\\OrderTimeline.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\components\\modals\\DeleteConfirmationModal.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\components\\finance\\MetasCard.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\components\\finance\\ImportExpensesFromOFXModal.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\components\\finance\\DREDynamicView.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\components\\AuthDiagnostic\\AuthDiagnostic.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\atoms\\PartySelector\\PartySelector.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\atoms\\DateRangePicker\\DateRangePicker.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\pages\\RelatoriosPage\\components\\RelatorioDREMensal.old.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\pages\\RelatoriosPage\\components\\RelatorioDREMensal.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\pages\\RelatoriosPage\\components\\FiltrosRelatorio.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\components\\templates\\modals\\OrderPaymentModal.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\components\\templates\\modals\\OrderEditModal.jsx",
+          "count": 2
+        },
+        {
+          "file": "src\\components\\templates\\modals\\OpenCashModal.jsx",
+          "count": 1
+        },
+        {
+          "file": "src\\components\\templates\\modals\\CloseCashModal.jsx",
+          "count": 1
+        }
+      ],
+      "severity": "HIGH",
+      "description": "Elementos sem suporte a dark mode"
+    },
+    "hexColors": {
+      "total": 3,
+      "files": [
+        {
+          "file": "src\\organisms\\Sidebar\\Sidebar.backup.jsx",
+          "count": 3
+        }
+      ],
+      "severity": "CRITICAL",
+      "description": "Valores hexadecimais inline (bg-[#...], text-[#...], border-[#...])"
+    }
+  },
+  "fileDetails": [
+    {
+      "file": "src\\pages\\FinanceiroAdvancedPage\\DespesasAccrualTab.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 81,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-2 mb-2\"",
+            "className=\"w-4 h-4 text-gray-400\"",
+            "className=\"flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 3,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"flex items-center px-2 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors\"",
+            "className=\"text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-500 px-2 py-1 rounded\"",
+            "className=\"flex-1 px-4 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium\""
+          ]
+        }
+      },
+      "totalViolations": 84
+    },
+    {
+      "file": "src\\templates\\ImportStatementModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 57,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden\"",
+            "className=\"flex items-center justify-between p-6 border-b border-gray-200\"",
+            "className=\"text-xl font-semibold text-gray-900\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 16,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden\"",
+            "className=\"text-xl font-semibold text-gray-900\"",
+            "className=\"px-6 py-3 bg-gray-50 border-b border-gray-200\""
+          ]
+        }
+      },
+      "totalViolations": 73
+    },
+    {
+      "file": "src\\pages\\GoalsPage\\GoalsPage.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 55,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-100 dark:border-gray-700 w-full max-w-md shadow-2xl\"",
+            "className=\"text-2xl font-bold text-gray-900 dark:text-white mb-3\"",
+            "className=\"text-gray-600 dark:text-gray-400 mb-8 leading-relaxed\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 13,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"p-4 bg-gradient-to-br from-red-500 to-rose-500 rounded-2xl w-20 h-20 mx-auto mb-6 flex items-center justify-center shadow-lg shadow-red-500/30\"",
+            "className=\"w-full px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl hover:from-gray-700 hover:to-gray-800 transition-all font-semibold shadow-lg shadow-gray-500/30\"",
+            "className=\"mt-2 p-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-800 rounded-lg\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 4,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"p-3 bg-white/20 backdrop-blur-sm rounded-xl shadow-lg\"",
+            "className=\"px-3 py-1 bg-white/20 backdrop-blur-sm rounded-lg\"",
+            "className=\"p-2 text-white/80 hover:text-white hover:bg-white/20 rounded-xl transition-all\""
+          ]
+        }
+      },
+      "totalViolations": 72
+    },
+    {
+      "file": "src\\pages\\FinanceiroAdvancedPage\\ContasBancariasTab.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 60,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"group bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-2xl hover:border-blue-400 dark:hover:border-blue-500 transition-all duration-300 hover:-translate-y-1\"",
+            "className=\"absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-800 animate-pulse\"",
+            "className=\"text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 10,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg\"",
+            "className=\"p-4 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl border border-blue-100 dark:border-blue-800/30\"",
+            "className=\"p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl border border-green-100 dark:border-green-800/30\""
+          ]
+        }
+      },
+      "totalViolations": 70
+    },
+    {
+      "file": "src\\pages\\CommissionReportPage.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 57,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3\"",
+            "className=\"text-gray-600 dark:text-gray-400 mt-2\"",
+            "className=\"bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 1,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-6\""
+          ]
+        }
+      },
+      "totalViolations": 58
+    },
+    {
+      "file": "src\\templates\\NovaDespesaModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 46,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8 max-w-md w-full\"",
+            "className=\"text-lg font-semibold text-gray-900 dark:text-white\"",
+            "className=\"text-sm text-gray-600 dark:text-gray-400 mt-1\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 10,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg flex items-center justify-center\"",
+            "className=\"flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20\"",
+            "className=\"flex items-center justify-center w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg\""
+          ]
+        }
+      },
+      "totalViolations": 56
+    },
+    {
+      "file": "src\\templates\\ImportExpensesFromOFXModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 42,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[85vh] overflow-hidden flex flex-col\"",
+            "className=\"flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0\"",
+            "className=\"text-lg font-semibold text-gray-900 dark:text-white\""
+          ]
+        }
+      },
+      "totalViolations": 42
+    },
+    {
+      "file": "src\\pages\\ClientsPage\\ClientsPage.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 42,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"w-16 h-16 text-gray-400 mx-auto mb-4\"",
+            "className=\"text-lg font-medium text-gray-900 dark:text-white mb-2\"",
+            "className=\"text-gray-600 dark:text-gray-400\""
+          ]
+        }
+      },
+      "totalViolations": 42
+    },
+    {
+      "file": "src\\molecules\\ProductModals\\EditProductModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 41,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto\"",
+            "className=\"flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700\"",
+            "className=\"text-xl font-semibold text-gray-900 dark:text-white\""
+          ]
+        }
+      },
+      "totalViolations": 41
+    },
+    {
+      "file": "src\\molecules\\ProductModals\\CreateProductModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 41,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto\"",
+            "className=\"flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700\"",
+            "className=\"text-xl font-semibold text-gray-900 dark:text-white\""
+          ]
+        }
+      },
+      "totalViolations": 41
+    },
+    {
+      "file": "src\\pages\\UserManagementPage\\UserManagementPage.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 36,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"text-2xl font-bold text-gray-900 dark:text-white\"",
+            "className=\"text-gray-600 dark:text-gray-400\"",
+            "className=\"text-lg font-semibold text-gray-900 dark:text-white\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 1,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"flex-1 px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors\""
+          ]
+        }
+      },
+      "totalViolations": 37
+    },
+    {
+      "file": "src\\pages\\RelatoriosPage\\RelatoriosPage.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 37,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4\"",
+            "className=\"w-5 h-5 text-gray-500\"",
+            "className=\"text-lg font-semibold text-gray-900 dark:text-white\""
+          ]
+        }
+      },
+      "totalViolations": 37
+    },
+    {
+      "file": "src\\pages\\SuppliersPage\\SuppliersPage.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 35,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"w-16 h-16 mx-auto text-gray-400 mb-4\"",
+            "className=\"text-gray-600 dark:text-gray-400\"",
+            "className=\"text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3\""
+          ]
+        }
+      },
+      "totalViolations": 35
+    },
+    {
+      "file": "src\\pages\\PaymentMethodsPage\\PaymentMethodsPage.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 35,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 rounded-lg cursor-not-allowed\"",
+            "className=\"bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700\"",
+            "className=\"text-sm text-gray-600 dark:text-gray-400\""
+          ]
+        }
+      },
+      "totalViolations": 35
+    },
+    {
+      "file": "src\\organisms\\FluxoSummaryPanel\\FluxoSummaryPanel.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 35,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"text-xs text-gray-500 dark:text-gray-400 mt-1\"",
+            "className=\"text-sm text-gray-500 dark:text-gray-400 mt-1\"",
+            "className=\"bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm\""
+          ]
+        }
+      },
+      "totalViolations": 35
+    },
+    {
+      "file": "src\\components\\finance\\ImportExpensesFromOFXModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 32,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2\"",
+            "className=\"text-sm text-gray-600 dark:text-gray-400\"",
+            "className=\"border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 1,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"px-6 py-2.5 bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white font-medium rounded-lg transition-colors\""
+          ]
+        },
+        "inlineStyles": {
+          "count": 1,
+          "severity": "MEDIUM",
+          "description": "Estilos inline (evitar quando possível)",
+          "examples": [
+            "style={{ maxHeight: 'calc(90vh - 200px)' }}"
+          ]
+        }
+      },
+      "totalViolations": 34
+    },
+    {
+      "file": "src\\components\\finance\\DREDynamicView.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 30,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white dark:bg-gray-800 rounded-lg p-6 animate-pulse\"",
+            "className=\"h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-6\"",
+            "className=\"h-16 bg-gray-200 dark:bg-gray-700 rounded mb-3\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 3,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"bg-gradient-to-r from-slate-700 to-slate-800 dark:from-slate-800 dark:to-slate-900 px-6 py-4 border-b border-slate-600\"",
+            "className=\"bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/30 px-6 py-5 border-t border-gray-200 dark:border-gray-700\"",
+            "className=\"bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/10 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow border border-green-200 dark:border-green-800\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 1,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center\""
+          ]
+        }
+      },
+      "totalViolations": 34
+    },
+    {
+      "file": "src\\pages\\RelatoriosPage\\components\\RelatorioDREMensal.old.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 32,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3\"",
+            "className=\"h-32 bg-gray-200 dark:bg-gray-700 rounded\"",
+            "className=\"h-64 bg-gray-200 dark:bg-gray-700 rounded\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 1,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"flex justify-between items-center py-3 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-4 rounded font-bold text-lg\""
+          ]
+        }
+      },
+      "totalViolations": 33
+    },
+    {
+      "file": "src\\pages\\FinanceiroAdvancedPage\\DespesasAccrualTabRefactored.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 23,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"card-theme rounded-xl p-5 border-2 border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-300\"",
+            "className=\"absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5\"",
+            "className=\"w-full pl-11 pr-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 9,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg\"",
+            "className=\"p-3 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl shadow-lg\"",
+            "className=\"p-3 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl shadow-lg\""
+          ]
+        }
+      },
+      "totalViolations": 32
+    },
+    {
+      "file": "src\\pages\\RelatoriosPage\\components\\RankingTable.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 31,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"w-4 h-4 text-gray-500\"",
+            "className=\"hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors\"",
+            "className=\"text-sm font-medium text-gray-900 dark:text-white\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 1,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"flex-shrink-0 h-10 w-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold\""
+          ]
+        }
+      },
+      "totalViolations": 32
+    },
+    {
+      "file": "src\\components\\finance\\MetasCard.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 19,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-3xl border-2 border-gray-200 dark:border-gray-700 p-8 shadow-2xl\"",
+            "className=\"bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-3xl border-2 border-gray-200 dark:border-gray-700 p-8 shadow-2xl\"",
+            "className=\"text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 11,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-3xl border-2 border-gray-200 dark:border-gray-700 p-8 shadow-2xl\"",
+            "className=\"w-14 h-14 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-2xl animate-pulse\"",
+            "className=\"h-7 w-40 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-lg mb-2 animate-pulse\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 1,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"absolute top-0 right-0 w-2 h-full bg-white/30 animate-pulse\""
+          ]
+        }
+      },
+      "totalViolations": 31
+    },
+    {
+      "file": "src\\atoms\\PartySelector\\PartySelector.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 27,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors\"",
+            "className=\"w-3 h-3 text-gray-400\"",
+            "className=\"absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg overflow-hidden flex flex-col max-h-80\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 2,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center\"",
+            "className=\"flex-1 px-4 py-2.5 text-sm font-medium text-white\n                  bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700\n                  rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed\n                  shadow-md hover:shadow-lg\n                  flex items-center justify-center gap-2\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 1,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"mt-6 p-3 bg-gray-50 rounded-md\""
+          ]
+        },
+        "inlineStyles": {
+          "count": 1,
+          "severity": "MEDIUM",
+          "description": "Estilos inline (evitar quando possível)",
+          "examples": [
+            "style={{ maxHeight: '240px' }}"
+          ]
+        }
+      },
+      "totalViolations": 31
+    },
+    {
+      "file": "src\\molecules\\ReconciliationMatchCard\\ReconciliationMatchCard.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 24,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"text-xs text-gray-500\"",
+            "className=\"p-1 hover:bg-gray-100 rounded\"",
+            "className=\"text-sm font-medium text-gray-700\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 6,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"bg-gray-50 border border-gray-200 rounded-lg p-3\"",
+            "className=\"font-semibold text-gray-900\"",
+            "className=\"font-medium text-gray-900 mb-2\""
+          ]
+        }
+      },
+      "totalViolations": 30
+    },
+    {
+      "file": "src\\molecules\\ProductModals\\StockMovementModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 30,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto\"",
+            "className=\"flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700\"",
+            "className=\"text-xl font-semibold text-gray-900 dark:text-white\""
+          ]
+        }
+      },
+      "totalViolations": 30
+    },
+    {
+      "file": "src\\atoms\\Skeleton.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 27,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white rounded-lg border border-gray-200 p-4 animate-pulse\"",
+            "className=\"h-5 w-20 bg-gray-200 rounded\"",
+            "className=\"h-5 w-24 bg-gray-200 rounded\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 2,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"bg-white rounded-lg border border-gray-200 p-4 animate-pulse\"",
+            "className=\"bg-white rounded-lg border border-gray-200 p-4 animate-pulse\""
+          ]
+        }
+      },
+      "totalViolations": 29
+    },
+    {
+      "file": "src\\pages\\FinanceiroAdvancedPage\\ReceitasAccrualTab.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 17,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"px-4 py-2 text-sm font-medium border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-theme-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all\"",
+            "className=\"absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400\"",
+            "className=\"w-full pl-11 pr-10 py-2.5 border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-theme-primary placeholder-gray-400 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 9,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl\"",
+            "className=\"p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl\"",
+            "className=\"p-3 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 3,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"p-3 bg-white/20 rounded-xl\"",
+            "className=\"p-2 hover:bg-white/20 rounded-lg transition-colors\"",
+            "className=\"p-3 bg-white/20 rounded-xl\""
+          ]
+        }
+      },
+      "totalViolations": 29
+    },
+    {
+      "file": "src\\pages\\UnitsPage\\UnitsComparison.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 26,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-3\"",
+            "className=\"font-medium text-gray-900 dark:text-white\"",
+            "className=\"ml-2 text-gray-600 dark:text-gray-400\""
+          ]
+        },
+        "inlineStyles": {
+          "count": 1,
+          "severity": "MEDIUM",
+          "description": "Estilos inline (evitar quando possível)",
+          "examples": [
+            "style={{ color: entry.color }}"
+          ]
+        }
+      },
+      "totalViolations": 27
+    },
+    {
+      "file": "src\\organisms\\ConciliacaoPanel\\ConciliacaoPanel.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 20,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white border-b border-gray-200 p-6\"",
+            "className=\"text-xl font-semibold text-gray-900\"",
+            "className=\"text-sm text-gray-600 mt-1\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 7,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"bg-white border-b border-gray-200 p-6\"",
+            "className=\"text-xl font-semibold text-gray-900\"",
+            "className=\"p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors disabled:opacity-50\""
+          ]
+        }
+      },
+      "totalViolations": 27
+    },
+    {
+      "file": "src\\pages\\DashboardPage\\DashboardPage_OLD.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 26,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm hover:shadow-md transition-shadow\"",
+            "className=\"text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide\"",
+            "className=\"text-xs text-gray-500 dark:text-gray-500 mt-1\""
+          ]
+        }
+      },
+      "totalViolations": 26
+    },
+    {
+      "file": "src\\pages\\RelatoriosPage\\components\\RelatorioDREMensal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 12,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-gradient-to-br from-white to-gray-50/50 dark:from-dark-surface dark:to-dark-hover rounded-3xl border-2 border-gray-200/50 dark:border-gray-700/50 overflow-hidden shadow-2xl\"",
+            "className=\"px-3 py-1 bg-white/20 rounded-full backdrop-blur-sm\"",
+            "className=\"w-5 h-5 text-gray-400\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 12,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"bg-gradient-to-br from-indigo-500/20 via-blue-500/10 to-purple-500/20 dark:from-indigo-500/30 dark:via-blue-500/20 dark:to-purple-500/30 rounded-3xl p-8 border-2 border-indigo-200/50 dark:border-indigo-500/30 shadow-xl\"",
+            "className=\"w-16 h-16 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-2xl transform hover:scale-105 transition-transform\"",
+            "className=\"text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600 dark:from-indigo-400 dark:to-blue-400\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 2,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"px-3 py-1 bg-white/20 rounded-full backdrop-blur-sm\"",
+            "className=\"px-3 py-1 bg-white/30 rounded-lg text-lg backdrop-blur-sm\""
+          ]
+        }
+      },
+      "totalViolations": 26
+    },
+    {
+      "file": "src\\templates\\NovaReceitaAccrualModal\\NovaReceitaAccrualModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 20,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-3xl my-8 mx-auto flex flex-col max-h-[calc(100vh-4rem)] border-2 border-gray-100 dark:border-gray-700\"",
+            "className=\"relative px-6 py-5 border-b-2 border-gray-100 dark:border-gray-700 flex items-center justify-between flex-shrink-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-t-2xl\"",
+            "className=\"p-2.5 bg-white/20 backdrop-blur-sm rounded-xl\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 3,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"relative px-6 py-5 border-b-2 border-gray-100 dark:border-gray-700 flex items-center justify-between flex-shrink-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-t-2xl\"",
+            "className=\"bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-200 dark:border-green-800 rounded-xl p-4\"",
+            "className=\"px-6 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-lg shadow-green-500/30\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 2,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"p-2.5 bg-white/20 backdrop-blur-sm rounded-xl\"",
+            "className=\"p-2 text-white/80 hover:text-white hover:bg-white/20 rounded-lg transition-all\""
+          ]
+        }
+      },
+      "totalViolations": 25
+    },
+    {
+      "file": "src\\pages\\ListaDaVezPage\\ListaDaVezPage.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 22,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"min-h-screen bg-gray-50 dark:bg-gray-900 p-6 space-y-6\"",
+            "className=\"text-3xl font-bold text-gray-900 dark:text-white\"",
+            "className=\"text-sm text-gray-600 dark:text-gray-400 mt-1\""
+          ]
+        },
+        "inlineStyles": {
+          "count": 3,
+          "severity": "MEDIUM",
+          "description": "Estilos inline (evitar quando possível)",
+          "examples": [
+            "style={{\n                        borderLeftColor: isFirst ? '#065F46' : color,\n                      }}",
+            "style={{ height: '300px' }}",
+            "style={{ backgroundColor: color }}"
+          ]
+        }
+      },
+      "totalViolations": 25
+    },
+    {
+      "file": "src\\pages\\BankAccountsPage\\BankAccountsPage.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 20,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors\"",
+            "className=\"inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors\"",
+            "className=\"text-2xl font-bold text-gray-700 dark:text-gray-300\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 5,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:from-green-700 hover:to-green-800 transition-all font-semibold shadow-lg hover:shadow-xl hover:scale-105\"",
+            "className=\"card-theme p-8 rounded-3xl shadow-2xl mb-8 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-2 border-blue-200 dark:border-blue-800\"",
+            "className=\"inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all font-semibold shadow-lg\""
+          ]
+        }
+      },
+      "totalViolations": 25
+    },
+    {
+      "file": "src\\molecules\\CashflowChartCard\\CashflowChartCard.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 23,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-3 min-w-48\"",
+            "className=\"font-medium text-gray-900 dark:text-white mb-2\"",
+            "className=\"text-gray-600 dark:text-gray-400\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 1,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"bg-gray-50 rounded-lg p-3\""
+          ]
+        },
+        "inlineStyles": {
+          "count": 1,
+          "severity": "MEDIUM",
+          "description": "Estilos inline (evitar quando possível)",
+          "examples": [
+            "style={{ backgroundColor: entry.color }}"
+          ]
+        }
+      },
+      "totalViolations": 25
+    },
+    {
+      "file": "src\\molecules\\SupplierModals\\SupplierInfoModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 13,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"flex items-start gap-4 py-4 border-b-2 border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-750/50 transition-colors px-4 rounded-lg\"",
+            "className=\"text-gray-400 dark:text-gray-500 italic\"",
+            "className=\"flex items-center gap-3 pb-3 border-b-2 border-gray-200 dark:border-gray-700\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 10,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"px-6 py-2.5 rounded-xl font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700\"",
+            "className=\"flex-shrink-0 p-2.5 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 dark:from-blue-500/20 dark:to-indigo-500/20 rounded-lg\"",
+            "className=\"bg-gradient-to-r from-blue-600/10 via-indigo-600/10 to-transparent dark:from-blue-600/20 dark:via-indigo-600/20 px-6 py-5 border-b-2 border-light-border dark:border-dark-border\""
+          ]
+        }
+      },
+      "totalViolations": 23
+    },
+    {
+      "file": "src\\pages\\SuppliersPage\\SuppliersPageRefactored.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 13,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"w-16 h-16 mx-auto text-gray-400 dark:text-gray-600\"",
+            "className=\"card-theme rounded-xl p-5 border-2 border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-300\"",
+            "className=\"absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 9,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg\"",
+            "className=\"flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105\"",
+            "className=\"p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg\""
+          ]
+        }
+      },
+      "totalViolations": 22
+    },
+    {
+      "file": "src\\pages\\ProductsPage\\ProductsPage.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 14,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"text-gray-500 dark:text-gray-400\"",
+            "className=\"p-2.5 text-gray-400 hover:text-theme-primary hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all\"",
+            "className=\"absolute left-3.5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 8,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl\"",
+            "className=\"p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl\"",
+            "className=\"p-3 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl\""
+          ]
+        }
+      },
+      "totalViolations": 22
+    },
+    {
+      "file": "src\\pages\\FinanceiroAdvancedPage\\FluxoTab.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 21,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6\"",
+            "className=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2\"",
+            "className=\"px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500\""
+          ]
+        }
+      },
+      "totalViolations": 21
+    },
+    {
+      "file": "src\\pages\\RelatoriosPage\\components\\RelatorioComparativoUnidades.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 21,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/2\"",
+            "className=\"h-40 bg-gray-200 dark:bg-gray-700 rounded\"",
+            "className=\"h-40 bg-gray-200 dark:bg-gray-700 rounded\""
+          ]
+        }
+      },
+      "totalViolations": 21
+    },
+    {
+      "file": "src\\pages\\OrderHistoryPage.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 18,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"text-2xl font-bold text-gray-900\"",
+            "className=\"text-gray-600\"",
+            "className=\"font-medium text-gray-900 flex items-center gap-2\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 2,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"text-2xl font-bold text-gray-900\"",
+            "className=\"font-medium text-gray-900 flex items-center gap-2\""
+          ]
+        }
+      },
+      "totalViolations": 20
+    },
+    {
+      "file": "src\\pages\\TurnHistoryPage\\TurnHistoryPage.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 20,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"text-2xl font-bold text-gray-800 dark:text-white\"",
+            "className=\"text-sm text-gray-600 dark:text-gray-400\"",
+            "className=\"text-gray-500\""
+          ]
+        }
+      },
+      "totalViolations": 20
+    },
+    {
+      "file": "src\\molecules\\ClientModals\\EditClientModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 20,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto\"",
+            "className=\"flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700\"",
+            "className=\"text-xl font-semibold text-gray-900 dark:text-white\""
+          ]
+        }
+      },
+      "totalViolations": 20
+    },
+    {
+      "file": "src\\atoms\\DateRangePicker\\DateRangePicker.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 18,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"w-4 h-4 mr-2 text-gray-400\"",
+            "className=\"p-0.5 hover:bg-gray-100 rounded\"",
+            "className=\"w-3 h-3 text-gray-400\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 2,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"absolute z-50 w-80 mt-1 bg-white border border-gray-200 rounded-md shadow-lg\"",
+            "className=\"mt-4 p-3 bg-gray-50 rounded-md\""
+          ]
+        }
+      },
+      "totalViolations": 20
+    },
+    {
+      "file": "src\\molecules\\ClientModals\\CreateClientModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 19,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto\"",
+            "className=\"flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700\"",
+            "className=\"text-xl font-semibold text-gray-900 dark:text-white\""
+          ]
+        }
+      },
+      "totalViolations": 19
+    },
+    {
+      "file": "src\\molecules\\SupplierModals\\CreateSupplierModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 18,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden\"",
+            "className=\"flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700\"",
+            "className=\"text-xl font-bold text-gray-900 dark:text-white\""
+          ]
+        }
+      },
+      "totalViolations": 18
+    },
+    {
+      "file": "src\\molecules\\RankingProfissionais\\RankingProfissionais.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 18,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"h-5 w-5 text-gray-400\"",
+            "className=\"h-5 w-5 text-gray-400\"",
+            "className=\"bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700\""
+          ]
+        }
+      },
+      "totalViolations": 18
+    },
+    {
+      "file": "src\\molecules\\MatchTable\\MatchTable.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 18,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"text-center py-12 text-gray-500 dark:text-gray-400\"",
+            "className=\"bg-gray-100 dark:bg-gray-800 border-b-2 border-gray-300 dark:border-gray-600\"",
+            "className=\"px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300\""
+          ]
+        }
+      },
+      "totalViolations": 18
+    },
+    {
+      "file": "src\\pages\\UnitsPage\\UnitsPage.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 16,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"inline-flex items-center justify-center w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full mb-6\"",
+            "className=\"h-10 w-10 text-gray-400\"",
+            "className=\"text-2xl font-bold text-gray-900 dark:text-white mb-3\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 1,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold text-lg rounded-xl shadow-2xl hover:shadow-blue-500/50 transform hover:scale-105 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 disabled:transform-none\""
+          ]
+        }
+      },
+      "totalViolations": 17
+    },
+    {
+      "file": "src\\organisms\\BankAccountModals\\EditInitialBalanceModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 14,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full p-6 transform transition-all\"",
+            "className=\"flex items-center justify-between mb-6 pb-4 border-b border-gray-200 dark:border-gray-700\"",
+            "className=\"text-2xl font-bold text-gray-900 dark:text-white\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 3,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl\"",
+            "className=\"mb-6 p-4 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl border border-blue-100 dark:border-blue-800/30\"",
+            "className=\"inline-flex items-center px-6 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl\""
+          ]
+        }
+      },
+      "totalViolations": 17
+    },
+    {
+      "file": "src\\organisms\\AutoMatchStep\\AutoMatchStep.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 17,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"text-lg font-medium text-gray-700 dark:text-gray-300\"",
+            "className=\"text-sm text-gray-500 dark:text-gray-400\"",
+            "className=\"text-lg font-medium text-gray-700 dark:text-gray-300\""
+          ]
+        }
+      },
+      "totalViolations": 17
+    },
+    {
+      "file": "src\\pages\\UnitsPage\\UnitsStats.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 14,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"ml-2 text-gray-600 dark:text-gray-400\"",
+            "className=\"h-16 w-16 text-gray-400 mx-auto mb-4\"",
+            "className=\"text-lg font-medium text-gray-900 dark:text-white mb-2\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 2,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"p-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800\"",
+            "className=\"p-6 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-blue-200 dark:border-blue-800\""
+          ]
+        }
+      },
+      "totalViolations": 16
+    },
+    {
+      "file": "src\\molecules\\SupplierModals\\EditSupplierModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 12,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"flex items-center gap-3 pb-3 border-b-2 border-gray-200 dark:border-gray-700\"",
+            "className=\"absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5\"",
+            "className=\"absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 4,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"bg-gradient-to-r from-blue-600/10 via-indigo-600/10 to-transparent dark:from-blue-600/20 dark:via-indigo-600/20 px-6 py-5 border-b-2 border-light-border dark:border-dark-border\"",
+            "className=\"p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg\"",
+            "className=\"px-6 py-4 border-t-2 border-light-border dark:border-dark-border bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750\""
+          ]
+        }
+      },
+      "totalViolations": 16
+    },
+    {
+      "file": "src\\molecules\\SupplierModals\\CreateSupplierModalRefactored.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 12,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"flex items-center gap-3 pb-3 border-b-2 border-gray-200 dark:border-gray-700\"",
+            "className=\"absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5\"",
+            "className=\"absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 4,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"bg-gradient-to-r from-blue-600/10 via-indigo-600/10 to-transparent dark:from-blue-600/20 dark:via-indigo-600/20 px-6 py-5 border-b-2 border-light-border dark:border-dark-border\"",
+            "className=\"p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg\"",
+            "className=\"px-6 py-4 border-t-2 border-light-border dark:border-dark-border bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750\""
+          ]
+        }
+      },
+      "totalViolations": 16
+    },
+    {
+      "file": "src\\molecules\\CashflowTimelineChart\\CashflowTimelineChart.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 16,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4 min-w-64\"",
+            "className=\"font-semibold text-gray-900 dark:text-white mb-3\"",
+            "className=\"text-sm text-gray-600 dark:text-gray-400\""
+          ]
+        }
+      },
+      "totalViolations": 16
+    },
+    {
+      "file": "src\\components\\ThemeValidator\\ThemeValidator.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 14,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"text-lg font-semibold text-gray-900 dark:text-white\"",
+            "className=\"text-sm text-gray-600 dark:text-gray-300\"",
+            "className=\"font-medium text-gray-900 dark:text-white\""
+          ]
+        },
+        "inlineStyles": {
+          "count": 2,
+          "severity": "MEDIUM",
+          "description": "Estilos inline (evitar quando possível)",
+          "examples": [
+            "style={{ backgroundColor: result.foreground }}",
+            "style={{ backgroundColor: result.background }}"
+          ]
+        }
+      },
+      "totalViolations": 16
+    },
+    {
+      "file": "src\\organisms\\DiscountModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 13,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"block text-sm font-medium text-gray-700\"",
+            "className=\"ml-2 text-sm text-gray-700\"",
+            "className=\"ml-2 text-sm text-gray-700\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 2,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-2\"",
+            "className=\"font-medium text-gray-900 mb-3\""
+          ]
+        }
+      },
+      "totalViolations": 15
+    },
+    {
+      "file": "src\\organisms\\BarbeiroHeader\\BarbeiroHeader.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 7,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"absolute -top-20 right-0 h-56 w-56 rounded-full bg-white/10 blur-3xl\"",
+            "className=\"absolute -bottom-12 left-16 h-32 w-32 rounded-full bg-white/10 blur-2xl\"",
+            "className=\"flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 text-2xl font-semibold uppercase backdrop-blur-sm sm:h-16 sm:w-16\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 1,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary-dark to-primary-dark/90 text-white shadow-xl\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 7,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"absolute -top-20 right-0 h-56 w-56 rounded-full bg-white/10 blur-3xl\"",
+            "className=\"absolute -bottom-12 left-16 h-32 w-32 rounded-full bg-white/10 blur-2xl\"",
+            "className=\"flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 text-2xl font-semibold uppercase backdrop-blur-sm sm:h-16 sm:w-16\""
+          ]
+        }
+      },
+      "totalViolations": 15
+    },
+    {
+      "file": "src\\pages\\UnitsPage\\UnitCard.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 14,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"text-lg font-semibold text-gray-900 dark:text-white\"",
+            "className=\"ml-2 text-sm text-gray-500\"",
+            "className=\"bg-gray-50 dark:bg-gray-700 rounded-lg p-3\""
+          ]
+        }
+      },
+      "totalViolations": 14
+    },
+    {
+      "file": "src\\pages\\UnitsPage\\DeleteUnitModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 14,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 px-6 pb-6 pt-5 text-left shadow-xl transition-all w-full max-w-lg\"",
+            "className=\"text-lg font-semibold text-gray-900 dark:text-white\"",
+            "className=\"text-sm text-gray-600 dark:text-gray-400\""
+          ]
+        }
+      },
+      "totalViolations": 14
+    },
+    {
+      "file": "src\\components\\modals\\DeleteConfirmationModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 13,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4\"",
+            "className=\"text-lg font-semibold text-gray-900 dark:text-white\"",
+            "className=\"text-gray-400 hover:text-gray-600 dark:hover:text-gray-300\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 1,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors\""
+          ]
+        }
+      },
+      "totalViolations": 14
+    },
+    {
+      "file": "src\\pages\\FinanceiroAdvancedPage\\FluxoTabRefactored.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 7,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"p-2.5 text-theme-secondary hover:text-theme-primary hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all\"",
+            "className=\"flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-theme-secondary border-2 border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-theme-primary transition-all disabled:opacity-50\"",
+            "className=\"flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-theme-secondary border-2 border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-theme-primary transition-all disabled:opacity-50\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 6,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl\"",
+            "className=\"flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border-2 border-blue-200 dark:border-blue-800\"",
+            "className=\"p-2.5 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl shadow-lg\""
+          ]
+        }
+      },
+      "totalViolations": 13
+    },
+    {
+      "file": "src\\molecules\\NovaFormaPagamentoModal\\NovaFormaPagamentoModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 13,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white dark:bg-gray-800 rounded-lg max-w-md w-full shadow-xl\"",
+            "className=\"flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700\"",
+            "className=\"text-xl font-bold text-gray-900 dark:text-white\""
+          ]
+        }
+      },
+      "totalViolations": 13
+    },
+    {
+      "file": "src\\pages\\UnitsPage\\EditUnitModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 12,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 px-6 pb-6 pt-5 text-left shadow-xl transition-all w-full max-w-lg\"",
+            "className=\"text-lg font-semibold text-gray-900 dark:text-white\"",
+            "className=\"text-sm text-gray-600 dark:text-gray-400\""
+          ]
+        }
+      },
+      "totalViolations": 12
+    },
+    {
+      "file": "src\\molecules\\ChartComponent\\ChartComponent.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 11,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 animate-pulse\"",
+            "className=\"h-6 w-48 bg-gray-200 dark:bg-gray-700 rounded mb-4\"",
+            "className=\"h-full bg-gray-100 dark:bg-gray-700 rounded\""
+          ]
+        },
+        "inlineStyles": {
+          "count": 1,
+          "severity": "MEDIUM",
+          "description": "Estilos inline (evitar quando possível)",
+          "examples": [
+            "style={{ height: height + 100 }}"
+          ]
+        }
+      },
+      "totalViolations": 12
+    },
+    {
+      "file": "src\\components\\LoadingComponents\\LoadingComponents.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 12,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"text-sm text-gray-600 dark:text-gray-300 font-medium\"",
+            "className=\"w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full\"",
+            "className=\"h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4\""
+          ]
+        }
+      },
+      "totalViolations": 12
+    },
+    {
+      "file": "src\\components\\templates\\modals\\OrderPaymentModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 9,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"text-sm text-gray-600\"",
+            "className=\"text-gray-600\"",
+            "className=\"text-gray-600\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 1,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg mb-4\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 2,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"flex items-center justify-between bg-white border border-gray-100 rounded-lg p-3\"",
+            "className=\"bg-gray-50 rounded-lg p-4 mb-6 space-y-2\""
+          ]
+        }
+      },
+      "totalViolations": 12
+    },
+    {
+      "file": "src\\pages\\FinanceiroAdvancedPage\\ConciliacaoTab.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 11,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6\"",
+            "className=\"text-lg font-semibold text-gray-900 dark:text-white\"",
+            "className=\"text-sm text-gray-600 dark:text-gray-400 mt-1\""
+          ]
+        }
+      },
+      "totalViolations": 11
+    },
+    {
+      "file": "src\\pages\\DashboardPage\\DashboardPage.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 8,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-4 shadow-xl\"",
+            "className=\"font-bold text-gray-900 dark:text-white mb-2\"",
+            "className=\"text-gray-700 dark:text-gray-300\""
+          ]
+        },
+        "inlineStyles": {
+          "count": 3,
+          "severity": "MEDIUM",
+          "description": "Estilos inline (evitar quando possível)",
+          "examples": [
+            "style={{ backgroundColor: entry.color }}",
+            "style={{ fontSize: '14px', fontWeight: 600 }}",
+            "style={{ fontSize: '14px', fontWeight: 600 }}"
+          ]
+        }
+      },
+      "totalViolations": 11
+    },
+    {
+      "file": "src\\molecules\\KPICard\\KPICard.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 11,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 animate-pulse\"",
+            "className=\"p-2 rounded-lg bg-gray-200 dark:bg-gray-700\"",
+            "className=\"h-5 w-5 bg-gray-300 dark:bg-gray-600 rounded\""
+          ]
+        }
+      },
+      "totalViolations": 11
+    },
+    {
+      "file": "src\\organisms\\Navbar\\Navbar.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 6,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"lg:hidden p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-white/5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-surface\"",
+            "className=\"md:hidden p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-white/5 hover:text-text-light-primary dark:hover:text-text-dark-primary transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-surface\"",
+            "className=\"relative p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-white/5 hover:text-text-light-primary dark:hover:text-text-dark-primary transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-surface\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 3,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"w-10 h-10 bg-gradient-to-br from-primary to-primary-hover rounded-lg flex items-center justify-center shadow-md\"",
+            "className=\"w-9 h-9 bg-gradient-to-br from-primary to-primary-hover rounded-full flex items-center justify-center shadow-md ring-2 ring-light-surface dark:ring-dark-surface\"",
+            "className=\"p-4 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5 border-b border-light-border dark:border-dark-border\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 2,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-white/5 hover:text-text-light-primary dark:hover:text-text-dark-primary transition-all duration-200 focus:outline-none focus:bg-light-bg dark:focus:bg-white/5\"",
+            "className=\"flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-white/5 hover:text-text-light-primary dark:hover:text-text-dark-primary transition-all duration-200 focus:outline-none focus:bg-light-bg dark:focus:bg-white/5\""
+          ]
+        }
+      },
+      "totalViolations": 11
+    },
+    {
+      "file": "src\\templates\\EditarReceitaModal\\EditarReceitaModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 6,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"p-3 bg-white/20 rounded-xl\"",
+            "className=\"p-2 hover:bg-white/20 rounded-lg transition-colors\"",
+            "className=\"w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-theme-primary font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 cursor-pointer\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 2,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"sticky top-0 bg-gradient-to-r from-green-500 to-emerald-600 p-6 rounded-t-2xl\"",
+            "className=\"flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 2,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"p-3 bg-white/20 rounded-xl\"",
+            "className=\"p-2 hover:bg-white/20 rounded-lg transition-colors\""
+          ]
+        }
+      },
+      "totalViolations": 10
+    },
+    {
+      "file": "src\\organisms\\BankAccountModals\\DeleteBankAccountModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 10,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"relative w-full max-w-md transform rounded-lg bg-white dark:bg-gray-800 shadow-xl transition-all\"",
+            "className=\"flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700\"",
+            "className=\"text-lg font-semibold text-gray-900 dark:text-white\""
+          ]
+        }
+      },
+      "totalViolations": 10
+    },
+    {
+      "file": "src\\pages\\RelatoriosPage\\components\\FiltrosRelatorio.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 9,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300\"",
+            "className=\"w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500\"",
+            "className=\"px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-sm\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 1,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 hover:bg-gray-50\""
+          ]
+        }
+      },
+      "totalViolations": 10
+    },
+    {
+      "file": "src\\pages\\UnitsPage\\CreateUnitModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 9,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 px-6 pb-6 pt-5 text-left shadow-xl transition-all w-full max-w-lg\"",
+            "className=\"text-lg font-semibold text-gray-900 dark:text-white\"",
+            "className=\"text-sm text-gray-600 dark:text-gray-400\""
+          ]
+        }
+      },
+      "totalViolations": 9
+    },
+    {
+      "file": "src\\pages\\FinanceiroAdvancedPage\\FinanceiroAdvancedPage.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 4,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"w-full pl-11 pr-10 py-3 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-theme-primary font-semibold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 appearance-none cursor-pointer transition-all duration-200 hover:border-blue-400 dark:hover:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md\"",
+            "className=\"w-5 h-5 text-gray-400 dark:text-gray-500\"",
+            "className=\"card-theme rounded-xl overflow-hidden border-2 border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-300\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 5,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"p-6 bg-gradient-to-br from-red-500 to-pink-600 rounded-full shadow-2xl\"",
+            "className=\"p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg\"",
+            "className=\"bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750 border-b-2 border-gray-200 dark:border-gray-600\""
+          ]
+        }
+      },
+      "totalViolations": 9
+    },
+    {
+      "file": "src\\organisms\\BankAccountModals\\EditBankAccountModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 9,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"relative w-full max-w-lg transform rounded-lg bg-white dark:bg-gray-800 shadow-xl transition-all\"",
+            "className=\"flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700\"",
+            "className=\"text-lg font-semibold text-gray-900 dark:text-white\""
+          ]
+        }
+      },
+      "totalViolations": 9
+    },
+    {
+      "file": "src\\components\\molecules\\OrderTimeline.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 7,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200\"",
+            "className=\"w-2 h-2 bg-white rounded-full\"",
+            "className=\"bg-white rounded-lg border border-gray-200 p-4 shadow-sm\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 2,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"w-2 h-2 bg-white rounded-full\"",
+            "className=\"bg-white rounded-lg border border-gray-200 p-4 shadow-sm\""
+          ]
+        }
+      },
+      "totalViolations": 9
+    },
+    {
+      "file": "src\\components\\PermissionsTest\\PermissionsTest.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 9,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"font-medium text-gray-700\"",
+            "className=\"text-sm font-mono bg-gray-100 px-2 py-1 rounded\"",
+            "className=\"font-medium text-gray-700\""
+          ]
+        }
+      },
+      "totalViolations": 9
+    },
+    {
+      "file": "src\\pages\\RelatoriosPage\\components\\KPIDashboard.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 9,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"w-4 h-4 text-gray-500\"",
+            "className=\"text-sm font-medium text-gray-600 dark:text-gray-400\"",
+            "className=\"bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700\""
+          ]
+        }
+      },
+      "totalViolations": 9
+    },
+    {
+      "file": "src\\components\\templates\\modals\\OrderEditModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 7,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-gray-50 p-4 rounded-lg mb-4\"",
+            "className=\"text-sm text-gray-600\"",
+            "className=\"text-gray-500 text-sm italic\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 2,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"bg-gray-50 p-4 rounded-lg mb-4\"",
+            "className=\"flex items-center justify-between bg-white border border-gray-200 rounded-lg p-3\""
+          ]
+        }
+      },
+      "totalViolations": 9
+    },
+    {
+      "file": "src\\organisms\\ServicesTable.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 7,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"w-full pl-10 pr-4 py-2.5 rounded-lg border border-light-border dark:border-dark-border bg-white dark:bg-dark-surface text-theme-primary placeholder-theme-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary\"",
+            "className=\"flex items-center gap-2 px-4 py-2.5 rounded-lg border border-light-border dark:border-dark-border bg-white dark:bg-dark-surface cursor-pointer hover:bg-light-surface dark:hover:bg-dark-hover transition-colors\"",
+            "className=\"w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/20\""
+          ]
+        }
+      },
+      "totalViolations": 7
+    },
+    {
+      "file": "src\\organisms\\Sidebar\\Sidebar.backup.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 2,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"text-sm font-semibold tracking-wide text-gray-400 dark:text-gray-400 uppercase\"",
+            "className=\"ml-5 mt-1 space-y-1 border-l border-gray-700 dark:border-gray-700 pl-2\""
+          ]
+        },
+        "hexColors": {
+          "count": 3,
+          "severity": "CRITICAL",
+          "description": "Valores hexadecimais inline (bg-[#...], text-[#...], border-[#...])",
+          "examples": [
+            "className=\"absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-7 bg-[#C5A676] rounded-r-full\"",
+            "className=\"text-[#C5A676]\"",
+            "className=\"group w-full h-9 flex items-center gap-2 px-2 rounded-md text-left text-sm font-medium cursor-pointer text-[#e74c3c] dark:text-[#e74c3c] opacity-80 hover:opacity-100 hover:translate-x-1 transition-all duration-200\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 1,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"w-10 h-10 bg-gradient-to-br from-primary to-primary-hover rounded-lg flex items-center justify-center shadow-md\""
+          ]
+        },
+        "inlineStyles": {
+          "count": 1,
+          "severity": "MEDIUM",
+          "description": "Estilos inline (evitar quando possível)",
+          "examples": [
+            "style={{\n                                boxShadow: '0 0 8px rgba(197, 166, 118, 0.5)',\n                              }}"
+          ]
+        }
+      },
+      "totalViolations": 7
+    },
+    {
+      "file": "src\\templates\\ManualReconciliationModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 4,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"p-6 bg-gray-100 min-h-screen\"",
+            "className=\"bg-white p-6 rounded-lg shadow\"",
+            "className=\"text-2xl font-bold text-gray-900 mb-4\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 2,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"bg-white p-6 rounded-lg shadow\"",
+            "className=\"text-2xl font-bold text-gray-900 mb-4\""
+          ]
+        }
+      },
+      "totalViolations": 6
+    },
+    {
+      "file": "src\\pages\\ListaDaVezPage\\components\\BarbeiroCard.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 6,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"absolute -top-2 -left-2 w-8 h-8 rounded-full bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 flex items-center justify-center\"",
+            "className=\"text-sm font-bold text-gray-700 dark:text-gray-300\"",
+            "className=\"w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center\""
+          ]
+        }
+      },
+      "totalViolations": 6
+    },
+    {
+      "file": "src\\pages\\DREPage.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 5,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"text-sm font-medium text-gray-600 dark:text-gray-400\"",
+            "className=\"text-gray-600 dark:text-gray-400 mt-1\"",
+            "className=\"text-xs text-gray-500 dark:text-gray-500 mt-1\""
+          ]
+        }
+      },
+      "totalViolations": 5
+    },
+    {
+      "file": "src\\organisms\\BankAccountModals\\CreateBankAccountModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 5,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"relative w-full max-w-lg transform rounded-lg bg-white dark:bg-gray-800 shadow-xl transition-all\"",
+            "className=\"flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700\"",
+            "className=\"text-lg font-semibold text-gray-900 dark:text-white\""
+          ]
+        }
+      },
+      "totalViolations": 5
+    },
+    {
+      "file": "src\\pages\\RelatoriosPage\\components\\RelatorioReceitaDespesa.old.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 5,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"text-xl font-semibold text-gray-900 dark:text-white mb-2\"",
+            "className=\"text-gray-600 dark:text-gray-400 mb-6\"",
+            "className=\"mx-auto mb-4 text-gray-400\""
+          ]
+        }
+      },
+      "totalViolations": 5
+    },
+    {
+      "file": "src\\pages\\RelatoriosPage\\components\\RelatorioReceitaDespesa.jsx",
+      "violations": {
+        "inlineStyles": {
+          "count": 5,
+          "severity": "MEDIUM",
+          "description": "Estilos inline (evitar quando possível)",
+          "examples": [
+            "style={{ color: entry.color }}",
+            "style={{ fontSize: '12px' }}",
+            "style={{ fontSize: '12px' }}"
+          ]
+        }
+      },
+      "totalViolations": 5
+    },
+    {
+      "file": "src\\pages\\RelatoriosPage\\components\\RelatorioPerformanceProfissionais.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 5,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"text-xl font-semibold text-gray-900 dark:text-white mb-2\"",
+            "className=\"text-gray-600 dark:text-gray-400 mb-6\"",
+            "className=\"mx-auto mb-4 text-gray-400\""
+          ]
+        }
+      },
+      "totalViolations": 5
+    },
+    {
+      "file": "src\\pages\\RelatoriosPage\\components\\RelatorioAnaliseAtendimentos.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 5,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"text-xl font-semibold text-gray-900 dark:text-white mb-2\"",
+            "className=\"text-gray-600 dark:text-gray-400 mb-6\"",
+            "className=\"mx-auto mb-4 text-gray-400\""
+          ]
+        }
+      },
+      "totalViolations": 5
+    },
+    {
+      "file": "src\\pages\\ServicesPage.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 4,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"w-full pl-10 pr-4 py-2 rounded-lg border border-theme-border bg-white dark:bg-gray-800 text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500\"",
+            "className=\"w-full px-4 py-2 rounded-lg border border-theme-border bg-white dark:bg-gray-800 text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500\"",
+            "className=\"bg-gray-50 dark:bg-gray-800 border-b border-theme-border\""
+          ]
+        }
+      },
+      "totalViolations": 4
+    },
+    {
+      "file": "src\\pages\\OrdersPage.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 4,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"w-full pl-10 pr-4 py-2 rounded-lg border border-theme-border bg-white dark:bg-gray-800 text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500\"",
+            "className=\"w-full px-4 py-2 rounded-lg border border-theme-border bg-white dark:bg-gray-800 text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500\"",
+            "className=\"w-full px-4 py-2 rounded-lg border border-theme-border bg-white dark:bg-gray-800 text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500\""
+          ]
+        }
+      },
+      "totalViolations": 4
+    },
+    {
+      "file": "src\\pages\\CashRegisterPage.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 4,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"w-full px-4 py-2 rounded-lg border border-theme-border bg-white dark:bg-gray-800 text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500\"",
+            "className=\"w-full px-4 py-2 rounded-lg border border-theme-border bg-white dark:bg-gray-800 text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500\"",
+            "className=\"bg-gray-50 dark:bg-gray-800 border-b border-theme-border\""
+          ]
+        }
+      },
+      "totalViolations": 4
+    },
+    {
+      "file": "src\\molecules\\CategoryHierarchicalDropdown\\CategoryHierarchicalDropdown.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 2,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2\"",
+            "className=\"mt-1 text-sm text-gray-500 dark:text-gray-400\""
+          ]
+        },
+        "inlineStyles": {
+          "count": 2,
+          "severity": "MEDIUM",
+          "description": "Estilos inline (evitar quando possível)",
+          "examples": [
+            "style={{\n            fontWeight: 'bold',\n            color: '#1f2937', // gray-800\n            backgroundColor: '#f9fafb', // gray-50\n          }}",
+            "style={{\n                paddingLeft: '1.5rem',\n              }}"
+          ]
+        }
+      },
+      "totalViolations": 4
+    },
+    {
+      "file": "src\\components\\organisms\\CommissionSummaryCard.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 4,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"w-full px-4 py-2 rounded-lg border border-theme-border bg-white dark:bg-gray-800 text-theme-primary focus:outline-none focus:ring-2 focus:ring-purple-500\"",
+            "className=\"w-full px-4 py-2 rounded-lg border border-theme-border bg-white dark:bg-gray-800 text-theme-primary focus:outline-none focus:ring-2 focus:ring-purple-500\"",
+            "className=\"w-full px-4 py-2 rounded-lg border border-theme-border bg-white dark:bg-gray-800 text-theme-primary focus:outline-none focus:ring-2 focus:ring-purple-500\""
+          ]
+        }
+      },
+      "totalViolations": 4
+    },
+    {
+      "file": "src\\components\\modals\\ExpenseEditModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 1,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"w-5 h-5 text-primary bg-white dark:bg-dark-surface border-2 border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 dark:focus:ring-offset-dark-bg cursor-pointer transition-all\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 3,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"bg-gradient-to-r from-primary/10 via-primary/5 to-transparent dark:from-primary/20 dark:via-primary/10 px-6 py-5 border-b border-light-border dark:border-dark-border\"",
+            "className=\"p-4 bg-gradient-to-br from-primary/5 to-transparent dark:from-primary/10 rounded-xl border border-primary/20 dark:border-primary/30\"",
+            "className=\"flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium transition-all duration-200 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white shadow-lg shadow-green-500/30 hover:shadow-green-500/50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-dark-bg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none\""
+          ]
+        }
+      },
+      "totalViolations": 4
+    },
+    {
+      "file": "src\\components\\AuthDiagnostic\\AuthDiagnostic.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 3,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"p-4 bg-gray-50 border border-gray-200 rounded-lg\"",
+            "className=\"font-semibold text-gray-800 mb-2\"",
+            "className=\"list-disc list-inside space-y-1 text-gray-700\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 1,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"p-4 bg-gray-50 border border-gray-200 rounded-lg\""
+          ]
+        }
+      },
+      "totalViolations": 4
+    },
+    {
+      "file": "src\\atoms\\UnitSelector\\UnitSelector.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 4,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"h-10 bg-gray-200 dark:bg-gray-700 rounded-lg\"",
+            "className=\"\n          w-full px-3 py-2.5 text-sm font-medium\n          bg-white dark:bg-gray-800\n          border-2 border-primary/20 dark:border-primary/30\n          rounded-lg shadow-sm\n          text-gray-900 dark:text-gray-100\n          focus:ring-2 focus:ring-primary focus:border-primary\n          hover:border-primary/40 dark:hover:border-primary/50\n          transition-all duration-200\n          cursor-pointer\n        \"",
+            "className=\"text-[10px] text-gray-500 dark:text-gray-400 px-1\""
+          ]
+        }
+      },
+      "totalViolations": 4
+    },
+    {
+      "file": "src\\components\\templates\\modals\\ServiceFormModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 4,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50\"",
+            "className=\"w-full px-4 py-2.5 rounded-lg border bg-white dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-60 disabled:cursor-not-allowed border-light-border dark:border-dark-border focus:border-primary\"",
+            "className=\"flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-theme-border\""
+          ]
+        }
+      },
+      "totalViolations": 4
+    },
+    {
+      "file": "src\\components\\templates\\modals\\CloseCashModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 3,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50\"",
+            "className=\"p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-theme-border\"",
+            "className=\"\n                w-full\n                px-4\n                py-2\n                rounded-lg\n                border\n                border-theme-border\n                bg-white\n                dark:bg-gray-800\n                text-theme-primary\n                placeholder-theme-muted\n                focus:outline-none\n                focus:ring-2\n                focus:ring-primary-500\n                disabled:opacity-50\n                disabled:cursor-not-allowed\n                resize-none\n              \""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 1,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"\n                w-full\n                px-4\n                py-2\n                rounded-lg\n                border\n                border-theme-border\n                bg-white\n                dark:bg-gray-800\n                text-theme-primary\n                placeholder-theme-muted\n                focus:outline-none\n                focus:ring-2\n                focus:ring-primary-500\n                disabled:opacity-50\n                disabled:cursor-not-allowed\n                resize-none\n              \""
+          ]
+        }
+      },
+      "totalViolations": 4
+    },
+    {
+      "file": "src\\utils\\performance.jsx",
+      "violations": {
+        "inlineStyles": {
+          "count": 3,
+          "severity": "MEDIUM",
+          "description": "Estilos inline (evitar quando possível)",
+          "examples": [
+            "style={{ height: containerHeight }}",
+            "style={{ height: totalHeight, position: 'relative' }}",
+            "style={{ height: itemHeight }}"
+          ]
+        }
+      },
+      "totalViolations": 3
+    },
+    {
+      "file": "src\\templates\\OpenCashModal.jsx",
+      "violations": {
+        "inlineGradients": {
+          "count": 3,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"relative overflow-hidden rounded-xl border border-primary/30 bg-gradient-to-br from-primary/5 to-transparent dark:from-primary/10 p-5\"",
+            "className=\"card-theme rounded-xl p-6 border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent dark:from-primary/10 shadow-lg\"",
+            "className=\"bg-gradient-to-r from-feedback-light-success/10 to-feedback-light-success/5 dark:from-feedback-dark-success/10 dark:to-feedback-dark-success/5 rounded-lg p-4 border border-feedback-light-success/30 dark:border-feedback-dark-success/30\""
+          ]
+        }
+      },
+      "totalViolations": 3
+    },
+    {
+      "file": "src\\components\\molecules\\CashRegisterCard.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 3,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-900/30 flex items-center justify-center\"",
+            "className=\"text-gray-600 dark:text-gray-400\"",
+            "className=\"mb-6 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700\""
+          ]
+        }
+      },
+      "totalViolations": 3
+    },
+    {
+      "file": "src\\components\\organisms\\OrderItemsTable.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 3,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"bg-gray-50 dark:bg-gray-800/50 border-b border-theme-border\"",
+            "className=\"hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors\"",
+            "className=\"bg-gray-50 dark:bg-gray-800/50 border-t border-theme-border p-4\""
+          ]
+        }
+      },
+      "totalViolations": 3
+    },
+    {
+      "file": "src\\components\\AuthDebugger\\AuthDebugger.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 3,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border space-y-4\"",
+            "className=\"text-lg font-semibold text-gray-900 dark:text-gray-100\"",
+            "className=\"text-sm text-gray-600 mt-2\""
+          ]
+        }
+      },
+      "totalViolations": 3
+    },
+    {
+      "file": "src\\components\\templates\\modals\\OpenCashModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 2,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50\"",
+            "className=\"\n                w-full\n                px-4\n                py-2\n                rounded-lg\n                border\n                border-theme-border\n                bg-white\n                dark:bg-gray-800\n                text-theme-primary\n                placeholder-theme-muted\n                focus:outline-none\n                focus:ring-2\n                focus:ring-primary-500\n                disabled:opacity-50\n                disabled:cursor-not-allowed\n                resize-none\n              \""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 1,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"\n                w-full\n                px-4\n                py-2\n                rounded-lg\n                border\n                border-theme-border\n                bg-white\n                dark:bg-gray-800\n                text-theme-primary\n                placeholder-theme-muted\n                focus:outline-none\n                focus:ring-2\n                focus:ring-primary-500\n                disabled:opacity-50\n                disabled:cursor-not-allowed\n                resize-none\n              \""
+          ]
+        }
+      },
+      "totalViolations": 3
+    },
+    {
+      "file": "src\\templates\\OrderItemModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 2,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"w-10 h-10 rounded-lg border border-light-border dark:border-dark-border bg-white dark:bg-dark-surface text-theme-primary hover:bg-light-surface dark:hover:bg-dark-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center\"",
+            "className=\"w-10 h-10 rounded-lg border border-light-border dark:border-dark-border bg-white dark:bg-dark-surface text-theme-primary hover:bg-light-surface dark:hover:bg-dark-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center\""
+          ]
+        }
+      },
+      "totalViolations": 2
+    },
+    {
+      "file": "src\\molecules\\ServiceSelector.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 2,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"absolute z-50 w-full mt-2 bg-white dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg shadow-lg max-h-80 flex flex-col\"",
+            "className=\"px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400\""
+          ]
+        }
+      },
+      "totalViolations": 2
+    },
+    {
+      "file": "src\\molecules\\CommissionsTableResponsive.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 2,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"w-full text-sm bg-white dark:bg-zinc-900\"",
+            "className=\"bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 shadow-sm\""
+          ]
+        }
+      },
+      "totalViolations": 2
+    },
+    {
+      "file": "src\\organisms\\OrdersTable.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 2,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"w-full pl-10 pr-4 py-2.5 rounded-lg border border-light-border dark:border-dark-border bg-white dark:bg-dark-surface text-theme-primary placeholder-theme-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary\"",
+            "className=\"px-4 py-2.5 rounded-lg border border-light-border dark:border-dark-border bg-white dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary\""
+          ]
+        }
+      },
+      "totalViolations": 2
+    },
+    {
+      "file": "src\\molecules\\PieChartCard\\PieChartCard.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 1,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"absolute inset-0 rounded-xl bg-white/20 blur-sm\""
+          ]
+        },
+        "missingDarkMode": {
+          "count": 1,
+          "severity": "HIGH",
+          "description": "Elementos sem suporte a dark mode",
+          "examples": [
+            "className=\"absolute inset-0 rounded-xl bg-white/20 blur-sm\""
+          ]
+        }
+      },
+      "totalViolations": 2
+    },
+    {
+      "file": "src\\components\\modals\\ExpenseDetailsModal.jsx",
+      "violations": {
+        "inlineGradients": {
+          "count": 2,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"bg-gradient-to-r from-primary/10 via-primary/5 to-transparent dark:from-primary/20 dark:via-primary/10 px-6 py-5 border-b border-light-border dark:border-dark-border\"",
+            "className=\"flex items-center justify-between gap-4 mb-8 p-4 bg-gradient-to-br from-primary/5 to-transparent dark:from-primary/10 rounded-xl border border-primary/20 dark:border-primary/30\""
+          ]
+        }
+      },
+      "totalViolations": 2
+    },
+    {
+      "file": "src\\atoms\\Tooltip\\Tooltip.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 2,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"px-2 py-1 text-xs bg-gray-600 dark:bg-gray-300 dark:text-gray-800 rounded border\"",
+            "className=\"text-gray-400\""
+          ]
+        }
+      },
+      "totalViolations": 2
+    },
+    {
+      "file": "src\\atoms\\PeriodFilter\\PeriodFilter.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 2,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"flex items-center gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-xl\"",
+            "className=\"px-4 py-2 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-theme-primary font-semibold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 cursor-pointer transition-all duration-200 hover:border-blue-400 dark:hover:border-blue-500\""
+          ]
+        }
+      },
+      "totalViolations": 2
+    },
+    {
+      "file": "src\\templates\\OrderModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 1,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"w-full px-4 py-2.5 rounded-lg border border-light-border dark:border-dark-border bg-white dark:bg-dark-surface text-theme-primary placeholder-theme-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary disabled:opacity-60 disabled:cursor-not-allowed resize-none\""
+          ]
+        }
+      },
+      "totalViolations": 1
+    },
+    {
+      "file": "src\\templates\\CloseCashModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 1,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"w-full px-4 py-2.5 rounded-lg border border-light-border dark:border-dark-border bg-white dark:bg-dark-surface text-theme-primary placeholder-theme-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary disabled:opacity-60 disabled:cursor-not-allowed resize-none\""
+          ]
+        }
+      },
+      "totalViolations": 1
+    },
+    {
+      "file": "src\\molecules\\ProfessionalSelector.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 1,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"absolute z-50 w-full mt-2 bg-white dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg shadow-lg max-h-80 flex flex-col\""
+          ]
+        }
+      },
+      "totalViolations": 1
+    },
+    {
+      "file": "src\\molecules\\OrderItemRow.jsx",
+      "violations": {
+        "inlineStyles": {
+          "count": 1,
+          "severity": "MEDIUM",
+          "description": "Estilos inline (evitar quando possível)",
+          "examples": [
+            "style={{\n        gridTemplateColumns: showCommission\n          ? 'minmax(150px, 2fr) minmax(120px, 1.5fr) 80px 100px 100px 100px 40px'\n          : 'minmax(150px, 2fr) minmax(120px, 1.5fr) 80px 100px 40px',\n      }}"
+          ]
+        }
+      },
+      "totalViolations": 1
+    },
+    {
+      "file": "src\\molecules\\CommissionBadge.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 1,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10 pointer-events-none\""
+          ]
+        }
+      },
+      "totalViolations": 1
+    },
+    {
+      "file": "src\\organisms\\OrderItemsTable.jsx",
+      "violations": {
+        "inlineStyles": {
+          "count": 1,
+          "severity": "MEDIUM",
+          "description": "Estilos inline (evitar quando possível)",
+          "examples": [
+            "style={{\n              gridTemplateColumns: showCommission\n                ? 'minmax(150px, 2fr) minmax(120px, 1.5fr) 80px 100px 100px 100px 40px'\n                : 'minmax(150px, 2fr) minmax(120px, 1.5fr) 80px 100px 40px',\n            }}"
+          ]
+        }
+      },
+      "totalViolations": 1
+    },
+    {
+      "file": "src\\organisms\\CommissionSummaryCard.jsx",
+      "violations": {
+        "inlineGradients": {
+          "count": 1,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"absolute inset-y-0 left-0 bg-gradient-to-r from-green-500 to-green-600 rounded-full transition-all duration-500\""
+          ]
+        }
+      },
+      "totalViolations": 1
+    },
+    {
+      "file": "src\\organisms\\CashReportPanel.jsx",
+      "violations": {
+        "inlineGradients": {
+          "count": 1,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"px-6 py-5 border-b border-light-border dark:border-dark-border bg-gradient-to-r from-primary/10 to-primary/5\""
+          ]
+        }
+      },
+      "totalViolations": 1
+    },
+    {
+      "file": "src\\atoms\\AnimatedComponents.jsx",
+      "violations": {
+        "inlineStyles": {
+          "count": 1,
+          "severity": "MEDIUM",
+          "description": "Estilos inline (evitar quando possível)",
+          "examples": [
+            "style={{ overflow: 'hidden' }}"
+          ]
+        }
+      },
+      "totalViolations": 1
+    },
+    {
+      "file": "src\\pages\\LoginPage\\LoginPage.jsx",
+      "violations": {
+        "inlineGradients": {
+          "count": 1,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"h-screen flex items-center justify-center bg-gradient-to-br from-light-bg via-light-surface to-light-bg dark:from-dark-bg dark:via-dark-surface dark:to-dark-bg px-4 sm:px-6 lg:px-8 relative overflow-hidden\""
+          ]
+        }
+      },
+      "totalViolations": 1
+    },
+    {
+      "file": "src\\organisms\\PalettePreview\\PalettePreview.jsx",
+      "violations": {
+        "inlineStyles": {
+          "count": 1,
+          "severity": "MEDIUM",
+          "description": "Estilos inline (evitar quando possível)",
+          "examples": [
+            "style={{ backgroundColor: color.hex }}"
+          ]
+        }
+      },
+      "totalViolations": 1
+    },
+    {
+      "file": "src\\organisms\\Sidebar\\Sidebar.jsx",
+      "violations": {
+        "inlineGradients": {
+          "count": 1,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"w-10 h-10 bg-gradient-to-br from-primary to-primary-hover rounded-lg flex items-center justify-center shadow-md\""
+          ]
+        }
+      },
+      "totalViolations": 1
+    },
+    {
+      "file": "src\\components\\molecules\\ServiceCard.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 1,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 mb-4\""
+          ]
+        }
+      },
+      "totalViolations": 1
+    },
+    {
+      "file": "src\\components\\molecules\\OrderListItem.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 1,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors\""
+          ]
+        }
+      },
+      "totalViolations": 1
+    }
+  ],
+  "summary": {
+    "totalFiles": 367,
+    "filesWithViolations": 128,
+    "filesClean": 239,
+    "totalViolations": 2129,
+    "criticalFiles": 116,
+    "highFiles": 6,
+    "conformityRate": "65.12"
+  }
+}

@@ -1,4 +1,9 @@
-import { supabase } from './supabase';
+import { partiesRepository } from '../repositories/partiesRepository';
+import {
+  PartyFiltersDTO,
+  CreatePartyDTO,
+  UpdatePartyDTO,
+} from '../dtos/partiesDTO';
 
 /**
  * Service para gerenciar operações CRUD de parties (clientes e fornecedores)
@@ -15,32 +20,18 @@ export class PartiesService {
    */
   static async getParties(filters = {}) {
     try {
-      const { unitId, tipo, search, isActive } = filters;
+      const filtersDTO = new PartyFiltersDTO(filters);
 
-      if (!unitId) {
-        return { data: null, error: 'Unit ID é obrigatório' };
+      if (!filtersDTO.isValid()) {
+        return {
+          data: null,
+          error: filtersDTO.getErrors().join(', ') || 'Filtros inválidos',
+        };
       }
 
-      let query = supabase.from('parties').select('*').eq('unit_id', unitId);
-
-      // Filtrar por is_active apenas se especificado
-      if (isActive !== undefined) {
-        query = query.eq('is_active', isActive);
-      }
-
-      query = query.order('nome', { ascending: true });
-
-      // Filtrar por tipo se especificado
-      if (tipo) {
-        query = query.eq('tipo', tipo);
-      }
-
-      // Busca por nome ou CPF/CNPJ
-      if (search) {
-        query = query.or(`nome.ilike.%${search}%,cpf_cnpj.ilike.%${search}%`);
-      }
-
-      const { data, error } = await query;
+      const { data, error } = await partiesRepository.findByFilters(
+        filtersDTO.toFilters()
+      );
 
       if (error) {
         return { data: null, error: error.message };
@@ -63,11 +54,7 @@ export class PartiesService {
         return { data: null, error: 'ID é obrigatório' };
       }
 
-      const { data, error } = await supabase
-        .from('parties')
-        .select('*')
-        .eq('id', id)
-        .single();
+      const { data, error } = await partiesRepository.findById(id);
 
       if (error) {
         return { data: null, error: error.message };
@@ -94,62 +81,42 @@ export class PartiesService {
    */
   static async createParty(partyData) {
     try {
-      // Validações obrigatórias
-      const { unit_id, nome, tipo, cpf_cnpj } = partyData;
+      const dto = new CreatePartyDTO(partyData);
 
-      if (!unit_id) {
-        return { data: null, error: 'Unit ID é obrigatório' };
+      if (!dto.isValid()) {
+        return {
+          data: null,
+          error: dto.getErrors().join(', ') || 'Dados inválidos',
+        };
       }
 
-      if (!nome) {
-        return { data: null, error: 'Nome é obrigatório' };
-      }
+      const insertData = dto.toDatabase();
 
-      if (!tipo || !['Cliente', 'Fornecedor'].includes(tipo)) {
-        return { data: null, error: 'Tipo deve ser Cliente ou Fornecedor' };
-      }
-
-      if (!cpf_cnpj) {
-        return { data: null, error: 'CPF/CNPJ é obrigatório' };
-      }
-
-      // Validar CPF/CNPJ
-      const cpfCnpjValidation = this.validateCpfCnpj(cpf_cnpj);
+      const cpfCnpjValidation = this.validateCpfCnpj(insertData.cpf_cnpj);
       if (!cpfCnpjValidation.isValid) {
         return { data: null, error: cpfCnpjValidation.error };
       }
 
-      // Validar email se fornecido
-      if (partyData.email && !this.validateEmail(partyData.email)) {
+      if (insertData.email && !this.validateEmail(insertData.email)) {
         return { data: null, error: 'Email inválido' };
       }
 
       // Verificar se CPF/CNPJ já existe na unidade
-      const existingParty = await this.checkCpfCnpjExists(unit_id, cpf_cnpj);
-      if (existingParty.exists) {
+      const { data: existingCpf, error: existsError } =
+        await partiesRepository.existsByCpfCnpj(
+          insertData.unit_id,
+          insertData.cpf_cnpj
+        );
+
+      if (existsError) {
+        return { data: null, error: existsError.message };
+      }
+
+      if (existingCpf && existingCpf.length > 0) {
         return { data: null, error: 'CPF/CNPJ já cadastrado nesta unidade' };
       }
 
-      // Preparar dados para inserção
-      const insertData = {
-        unit_id,
-        nome: nome.trim(),
-        tipo,
-        cpf_cnpj: cpf_cnpj.replace(/\D/g, ''), // Remove caracteres não numéricos
-        razao_social: partyData.razao_social?.trim() || null,
-        telefone: partyData.telefone?.replace(/\D/g, '') || null,
-        email: partyData.email?.toLowerCase().trim() || null,
-        endereco: partyData.endereco?.trim() || null,
-        observacoes: partyData.observacoes?.trim() || null,
-        date_of_birth: partyData.date_of_birth || null, // ✅ Cliente birthdate support
-        is_active: true,
-      };
-
-      const { data, error } = await supabase
-        .from('parties')
-        .insert(insertData)
-        .select()
-        .single();
+      const { data, error } = await partiesRepository.create(insertData);
 
       if (error) {
         return { data: null, error: error.message };
@@ -197,11 +164,7 @@ export class PartiesService {
         is_active: true,
       };
 
-      const { data, error } = await supabase
-        .from('parties')
-        .insert(insertData)
-        .select()
-        .single();
+      const { data, error } = await partiesRepository.create(insertData);
 
       if (error) {
         // Retornar erro detalhado para debugging
@@ -231,53 +194,33 @@ export class PartiesService {
         return { data: null, error: 'ID é obrigatório' };
       }
 
-      // Validar dados se fornecidos
-      if (
-        updateData.tipo &&
-        !['Cliente', 'Fornecedor'].includes(updateData.tipo)
-      ) {
-        return { data: null, error: 'Tipo deve ser Cliente ou Fornecedor' };
+      const dto = new UpdatePartyDTO(updateData);
+
+      if (!dto.isValid()) {
+        return {
+          data: null,
+          error: dto.getErrors().join(', ') || 'Dados inválidos',
+        };
       }
 
-      if (updateData.cpf_cnpj) {
-        const cpfCnpjValidation = this.validateCpfCnpj(updateData.cpf_cnpj);
+      const cleanData = dto.toDatabase();
+
+      if (cleanData.cpf_cnpj) {
+        const cpfCnpjValidation = this.validateCpfCnpj(cleanData.cpf_cnpj);
         if (!cpfCnpjValidation.isValid) {
           return { data: null, error: cpfCnpjValidation.error };
         }
       }
 
-      if (updateData.email && !this.validateEmail(updateData.email)) {
+      if (cleanData.email && !this.validateEmail(cleanData.email)) {
         return { data: null, error: 'Email inválido' };
       }
 
-      // Preparar dados para atualização
-      const cleanData = {};
+      if (Object.keys(cleanData).length === 0) {
+        return { data: null, error: 'Nenhum dado para atualizar' };
+      }
 
-      if (updateData.nome) cleanData.nome = updateData.nome.trim();
-      if (updateData.tipo) cleanData.tipo = updateData.tipo;
-      if (updateData.cpf_cnpj)
-        cleanData.cpf_cnpj = updateData.cpf_cnpj.replace(/\D/g, '');
-      if (updateData.razao_social !== undefined)
-        cleanData.razao_social = updateData.razao_social?.trim() || null;
-      if (updateData.telefone !== undefined)
-        cleanData.telefone = updateData.telefone?.replace(/\D/g, '') || null;
-      if (updateData.email !== undefined)
-        cleanData.email = updateData.email?.toLowerCase().trim() || null;
-      if (updateData.endereco !== undefined)
-        cleanData.endereco = updateData.endereco?.trim() || null;
-      if (updateData.observacoes !== undefined)
-        cleanData.observacoes = updateData.observacoes?.trim() || null;
-      if (updateData.date_of_birth !== undefined)
-        cleanData.date_of_birth = updateData.date_of_birth || null; // ✅ Cliente birthdate support
-      if (updateData.is_active !== undefined)
-        cleanData.is_active = updateData.is_active;
-
-      const { data, error } = await supabase
-        .from('parties')
-        .update(cleanData)
-        .eq('id', id)
-        .select()
-        .single();
+      const { data, error } = await partiesRepository.update(id, cleanData);
 
       if (error) {
         return { data: null, error: error.message };
@@ -300,10 +243,7 @@ export class PartiesService {
         return { data: false, error: 'ID é obrigatório' };
       }
 
-      const { error } = await supabase
-        .from('parties')
-        .update({ is_active: false })
-        .eq('id', id);
+      const { error } = await partiesRepository.softDelete(id);
 
       if (error) {
         return { data: false, error: error.message };
@@ -325,13 +265,10 @@ export class PartiesService {
     try {
       const cleanCpfCnpj = cpfCnpj.replace(/\D/g, '');
 
-      const { data, error } = await supabase
-        .from('parties')
-        .select('id')
-        .eq('unit_id', unitId)
-        .eq('cpf_cnpj', cleanCpfCnpj)
-        .eq('is_active', true)
-        .limit(1);
+      const { data, error } = await partiesRepository.existsByCpfCnpj(
+        unitId,
+        cleanCpfCnpj
+      );
 
       if (error) {
         return { exists: false, error: error.message };
@@ -453,10 +390,7 @@ export class PartiesService {
         return { data: false, error: 'ID é obrigatório' };
       }
 
-      const { error } = await supabase
-        .from('parties')
-        .update({ is_active: true })
-        .eq('id', id);
+      const { error } = await partiesRepository.activate(id);
 
       if (error) {
         return { data: false, error: error.message };

@@ -19,8 +19,15 @@ const FiltrosRelatorio = ({ filters, onFiltersChange }) => {
     const loadUnits = async () => {
       setLoadingUnits(true);
       try {
-        const unitsData = await unitsService.getUnits(false);
-        setUnits(unitsData || []);
+        const { data, error } = await unitsService.getUnits({
+          includeInactive: false,
+        });
+
+        if (error) {
+          throw error;
+        }
+
+        setUnits(data || []);
       } catch (error) {
         console.error('Erro ao carregar unidades:', error);
         setUnits([]);

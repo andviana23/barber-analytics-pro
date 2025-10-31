@@ -80,9 +80,12 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
     setLoadingData(true);
     try {
       // Carregar unidades
-      const unitsData = await unitsService.getUnits();
-      if (unitsData && Array.isArray(unitsData)) {
+      const { data: unitsData, error: unitsError } =
+        await unitsService.getUnits();
+      if (!unitsError && Array.isArray(unitsData)) {
         setUnits(unitsData.filter(u => u.is_active));
+      } else if (unitsError) {
+        throw unitsError;
       }
 
       // Carregar categorias de receita
