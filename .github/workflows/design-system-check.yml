@@ -65,26 +65,10 @@ jobs:
               
               const reportContent = fs.readFileSync(reportPath, 'utf8');
               
-              // Extrair resumo (primeiras 50 linhas)
               const summaryLines = reportContent.split('\n').slice(0, 50);
               const summary = summaryLines.join('\n');
               
-              const comment = `## 🎨 Design System Compliance Report
-
-${summary}
-
-<details>
-<summary>📊 Ver relatório completo</summary>
-
-\`\`\`
-Download do artefato "design-system-audit-report" para ver o relatório completo
-\`\`\`
-
-</details>
-
----
-*Gerado automaticamente pelo workflow de Design System Compliance*
-`;
+              const comment = `## 🎨 Design System Compliance Report\n\n${summary}\n\n<details>\n<summary>📊 Ver relatório completo</summary>\n\nDownload do artefato "design-system-audit-report" para ver o relatório completo\n\n</details>\n\n*Gerado automaticamente pelo workflow de Design System Compliance*`;
               
               github.rest.issues.createComment({
                 issue_number: context.issue.number,
@@ -122,42 +106,7 @@ Download do artefato "design-system-audit-report" para ver o relatório completo
         uses: actions/github-script@v7
         with:
           script: |
-            const comment = `## ❌ ESLint - Violações de Design System Detectadas
-
-O ESLint detectou violações de Design System que bloqueiam o merge deste PR.
-
-### Como corrigir:
-
-1. **Executar localmente:**
-   \`\`\`bash
-   npm run lint
-   \`\`\`
-
-2. **Ver violações específicas:**
-   \`\`\`bash
-   npm run lint -- src/path/to/file.jsx
-   \`\`\`
-
-3. **Migração automática (recomendado):**
-   \`\`\`bash
-   # Preview das mudanças
-   npm run migrate:dry-run -- --file src/path/to/file.jsx
-   
-   # Aplicar correções com backup
-   npm run migrate:design-system -- --file src/path/to/file.jsx --backup
-   \`\`\`
-
-### Regras do ESLint Plugin:
-
-- \`barber-design-system/no-hardcoded-colors\` (error)
-- \`barber-design-system/prefer-theme-classes\` (warn)
-- \`barber-design-system/no-inline-hex-colors\` (error)
-
-Consulte a documentação: \`eslint-plugin-barber-design-system/README.md\`
-
----
-*Este comentário foi gerado automaticamente pelo workflow de CI/CD*
-`;
+            const comment = '## ❌ ESLint - Violações de Design System Detectadas\n\nO ESLint detectou violações que bloqueiam o merge.\n\n### Como corrigir:\n\n1. Execute `npm run lint` localmente\n2. Use `npm run migrate:dry-run` para preview\n3. Aplique correções com `npm run migrate:design-system --backup`\n\n### Regras:\n- barber-design-system/no-hardcoded-colors (error)\n- barber-design-system/prefer-theme-classes (warn)\n- barber-design-system/no-inline-hex-colors (error)\n\nConsulte: eslint-plugin-barber-design-system/README.md';
             
             github.rest.issues.createComment({
               issue_number: context.issue.number,
