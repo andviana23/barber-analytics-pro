@@ -95,7 +95,7 @@ Download do artefato "design-system-audit-report" para ver o relatório completo
             } catch (error) {
               console.error('Erro ao comentar PR:', error);
             }
-  
+
   lint:
     name: ESLint - Design System Rules
     runs-on: ubuntu-latest
