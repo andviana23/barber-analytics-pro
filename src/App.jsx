@@ -18,6 +18,7 @@ import {
 import { Layout } from './components/Layout/Layout';
 import { useSkipLinks } from './utils/accessibility';
 
+// Sprint 0: Testing CI/CD workflow (GitHub Actions)
 // Páginas públicas (não precisam de autenticação)
 import { LoginPage } from './pages/LoginPage/LoginPage';
 import { SignUpPage } from './pages/SignUpPage/SignUpPage';
