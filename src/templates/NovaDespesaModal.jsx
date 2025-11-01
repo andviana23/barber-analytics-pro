@@ -581,8 +581,9 @@ const NovaDespesaModal = ({
             parcelamento: expenseData.parcelamento,
             status: 'Pending',
             is_active: true,
-            observations: `Recorrência ${i + 1}/${totalParcelas}`,
-            parent_expense_id: expense.id, // Vincular à despesa principal
+            observations: `Recorrência ${i + 1}/${totalParcelas} - Origem: ${expense.id}`,
+            is_recurring: true,
+            recurring_series_id: expense.id, // Vincular à despesa principal
           });
         }
         
