@@ -13,6 +13,7 @@ import React, {
   useCallback,
 } from 'react';
 import { unitsService } from '../services';
+import { supabase } from '../services/supabase';
 
 const UnitContext = createContext({});
 
@@ -143,9 +144,50 @@ export const UnitProvider = ({ children }) => {
     await loadUnits();
   }, [loadUnits]);
 
-  // Carregar unidades na inicialização
+  // Carregar unidades na inicialização E após login
   useEffect(() => {
-    loadUnits();
+    // Verificar se há sessão ativa antes de carregar
+    const checkSessionAndLoad = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session) {
+        console.log(
+          '✅ [UnitContext] Sessão ativa detectada, carregando unidades...'
+        );
+        loadUnits();
+      } else {
+        console.log(
+          '⏳ [UnitContext] Aguardando login para carregar unidades...'
+        );
+      }
+    };
+
+    checkSessionAndLoad();
+  }, [loadUnits]);
+
+  // Escutar mudanças de autenticação e recarregar unidades após login
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('🔐 [UnitContext] Auth event:', event, 'Session:', !!session);
+
+      if (event === 'SIGNED_IN' && session) {
+        console.log(
+          '✅ [UnitContext] Login detectado! Recarregando unidades...'
+        );
+        loadUnits();
+      } else if (event === 'SIGNED_OUT') {
+        console.log('👋 [UnitContext] Logout detectado! Limpando unidades...');
+        setAllUnits([]);
+        setSelectedUnit(null);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [loadUnits]);
 
   // Validar se unidade selecionada ainda existe
