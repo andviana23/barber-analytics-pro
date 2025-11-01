@@ -57,11 +57,18 @@ const FinanceiroAdvancedPage = () => {
   } = useUnit();
 
   // eslint-disable-next-line no-console
-  console.log('🏢 FinanceiroAdvancedPage - Units carregadas:', units);
+  console.log('🏢 [FinanceiroAdvancedPage] Units carregadas:', units);
   // eslint-disable-next-line no-console
-  console.log('🏢 FinanceiroAdvancedPage - Current Unit:', currentUnit);
+  console.log(
+    '🏢 [FinanceiroAdvancedPage] Units é array?:',
+    Array.isArray(units)
+  );
   // eslint-disable-next-line no-console
-  console.log('🏢 FinanceiroAdvancedPage - Units Loading:', unitsLoading);
+  console.log('🏢 [FinanceiroAdvancedPage] Units length:', units?.length);
+  // eslint-disable-next-line no-console
+  console.log('🏢 [FinanceiroAdvancedPage] Current Unit:', currentUnit);
+  // eslint-disable-next-line no-console
+  console.log('🏢 [FinanceiroAdvancedPage] Units Loading:', unitsLoading);
   const [activeTab, setActiveTab] = useState('fluxo');
 
   // Estado local para unidade selecionada (independente do UnitContext)
@@ -95,15 +102,29 @@ const FinanceiroAdvancedPage = () => {
   const selectedUnit = useMemo(() => {
     // Garantir que units é um array
     const unitsArray = Array.isArray(units) ? units : [];
+    // eslint-disable-next-line no-console
+    console.log('🔍 [selectedUnit useMemo] selectedUnitId:', selectedUnitId);
+    // eslint-disable-next-line no-console
+    console.log('🔍 [selectedUnit useMemo] unitsArray:', unitsArray);
+    // eslint-disable-next-line no-console
+    console.log('🔍 [selectedUnit useMemo] currentUnit:', currentUnit);
+
     if (selectedUnitId && unitsArray.length > 0) {
-      return (
-        unitsArray.find(u => u.id === selectedUnitId) ||
-        currentUnit ||
-        unitsArray[0] ||
-        null
-      );
+      const found = unitsArray.find(u => u.id === selectedUnitId);
+      // eslint-disable-next-line no-console
+      console.log('🔍 [selectedUnit useMemo] found by selectedUnitId:', found);
+      const result = found || currentUnit || unitsArray[0] || null;
+      // eslint-disable-next-line no-console
+      console.log('✅ [selectedUnit useMemo] RESULTADO FINAL:', result);
+      return result;
     }
-    return currentUnit || unitsArray[0] || null;
+    const fallback = currentUnit || unitsArray[0] || null;
+    // eslint-disable-next-line no-console
+    console.log(
+      '✅ [selectedUnit useMemo] RESULTADO FINAL (fallback):',
+      fallback
+    );
+    return fallback;
   }, [selectedUnitId, units, currentUnit]);
 
   // Auto-selecionar primeira unidade se nenhuma estiver selecionada
@@ -112,6 +133,7 @@ const FinanceiroAdvancedPage = () => {
       const firstUnit = units[0];
       // eslint-disable-next-line no-console
       console.log('🏢 Auto-selecionando primeira unidade:', firstUnit.name);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       handleUnitChange(firstUnit.id);
     }
   }, [units, selectedUnitId, handleUnitChange]);
@@ -125,6 +147,7 @@ const FinanceiroAdvancedPage = () => {
   // Atualizar globalFilters quando unidade mudar
   useEffect(() => {
     if (selectedUnit?.id) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setGlobalFilters(prev => ({
         ...prev,
         unitId: selectedUnit.id,
@@ -269,6 +292,21 @@ const FinanceiroAdvancedPage = () => {
               Unidade
             </label>
             <div className="relative">
+              {/* DEBUG: Log antes de renderizar select */}
+              {(() => {
+                // eslint-disable-next-line no-console
+                console.log('🔍 [SELECT RENDER] units:', units);
+                // eslint-disable-next-line no-console
+                console.log(
+                  '🔍 [SELECT RENDER] Array.isArray(units):',
+                  Array.isArray(units)
+                );
+                // eslint-disable-next-line no-console
+                console.log('🔍 [SELECT RENDER] units?.length:', units?.length);
+                // eslint-disable-next-line no-console
+                console.log('🔍 [SELECT RENDER] unitsLoading:', unitsLoading);
+                return null;
+              })()}
               <select
                 value={selectedUnit?.id || ''}
                 onChange={e => handleUnitChange(e.target.value)}
@@ -339,7 +377,7 @@ const FinanceiroAdvancedPage = () => {
         {/* 📑 Navigation Tabs Premium - DESIGN SYSTEM */}
         <div className="card-theme rounded-xl overflow-hidden border-2 border-transparent hover:border-light-border dark:border-dark-border dark:hover:border-dark-border transition-all duration-300">
           {/* Tab Headers com gradiente */}
-          <div className="bg-gradient-light dark:from-gray-800 dark:to-gray-750 border-b-2 border-light-border dark:border-dark-border">
+          <div className="bg-light-surface dark:bg-dark-surface border-b-2 border-light-border dark:border-dark-border">
             <nav
               className="flex overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600"
               aria-label="Tabs"
@@ -354,16 +392,16 @@ const FinanceiroAdvancedPage = () => {
                     className={`
                       group flex items-center gap-3 px-6 py-4 border-b-4 font-semibold text-sm whitespace-nowrap
                       transition-all duration-300 relative
-                      ${isActive ? 'border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-800 shadow-lg' : 'border-transparent text-theme-secondary hover:text-theme-primary hover:bg-white/50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-500'}
+                      ${isActive ? 'border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-400 bg-light-bg dark:bg-dark-hover shadow-lg' : 'border-transparent text-theme-secondary hover:text-theme-primary hover:bg-light-hover dark:hover:bg-dark-hover hover:border-gray-300 dark:hover:border-gray-500'}
                     `}
                     title={tab.description}
                   >
                     {/* Ícone com animação */}
                     <div
-                      className={`p-2 rounded-lg transition-all duration-300 ${isActive ? 'bg-gradient-primary shadow-lg scale-110' : 'bg-gray-200 dark:bg-gray-700 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 group-hover:scale-105'}`}
+                      className={`p-2 rounded-lg transition-all duration-300 ${isActive ? 'bg-gradient-primary shadow-lg scale-110' : 'bg-light-surface dark:bg-dark-surface group-hover:bg-primary/10 dark:group-hover:bg-primary/20 group-hover:scale-105'}`}
                     >
                       <Icon
-                        className={`w-4 h-4 transition-colors ${isActive ? 'text-white' : 'text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400'}`}
+                        className={`w-4 h-4 transition-colors ${isActive ? 'text-white' : 'text-theme-secondary group-hover:text-primary'}`}
                       />
                     </div>
 
