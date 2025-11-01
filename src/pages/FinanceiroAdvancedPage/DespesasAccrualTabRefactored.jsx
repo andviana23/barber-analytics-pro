@@ -77,10 +77,8 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
   // Buscar despesas
   const fetchExpenses = async () => {
     if (!globalFilters.unitId) return;
-
     try {
       setLoading(true);
-
       let query = supabase
         .from('expenses')
         .select(
@@ -93,7 +91,9 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
         )
         .eq('unit_id', globalFilters.unitId)
         .eq('is_active', true)
-        .order('expected_payment_date', { ascending: false });
+        .order('expected_payment_date', {
+          ascending: false,
+        });
 
       // Aplicar filtro de data
       if (filters.dueDateFrom) {
@@ -102,11 +102,8 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
       if (filters.dueDateTo) {
         query = query.lte('expected_payment_date', filters.dueDateTo);
       }
-
       const { data, error } = await query;
-
       if (error) throw error;
-
       setExpenses(data || []);
     } catch (error) {
       console.error('❌ Erro ao buscar despesas:', error);
@@ -119,7 +116,6 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchExpenses();
   }, [globalFilters.unitId, filters.dueDateFrom, filters.dueDateTo]);
@@ -127,7 +123,6 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
   // Calcular KPIs
   const kpis = useMemo(() => {
     const now = new Date();
-
     const paid = expenses.filter(e => e.status?.toLowerCase() === 'paid');
     const pending = expenses.filter(e => e.status?.toLowerCase() === 'pending');
     const overdue = expenses.filter(e => {
@@ -135,7 +130,6 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
       const dueDate = parseISO(e.expected_payment_date);
       return isBefore(dueDate, now);
     });
-
     return {
       paid: {
         count: paid.length,
@@ -170,7 +164,6 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
     // Filtro de status
     if (filters.status !== 'all') {
       const now = new Date();
-
       if (filters.status === 'paid') {
         filtered = filtered.filter(e => e.status?.toLowerCase() === 'paid');
       } else if (filters.status === 'pending') {
@@ -187,7 +180,6 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
         });
       }
     }
-
     return filtered;
   }, [expenses, searchTerm, filters.status]);
 
@@ -198,11 +190,12 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
       currency: 'BRL',
     }).format(value || 0);
   };
-
   const formatDate = dateStr => {
     if (!dateStr) return '-';
     try {
-      return format(parseISO(dateStr), 'dd/MM/yyyy', { locale: ptBR });
+      return format(parseISO(dateStr), 'dd/MM/yyyy', {
+        locale: ptBR,
+      });
     } catch {
       return dateStr;
     }
@@ -214,7 +207,6 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
     const dueDate = parseISO(expense.expected_payment_date);
     const isOverdue =
       isBefore(dueDate, now) && expense.status?.toLowerCase() !== 'paid';
-
     if (expense.status?.toLowerCase() === 'paid') {
       return (
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
@@ -223,7 +215,6 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
         </span>
       );
     }
-
     if (isOverdue) {
       return (
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400">
@@ -232,7 +223,6 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
         </span>
       );
     }
-
     return (
       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400">
         <Clock className="w-3 h-3 mr-1" />
@@ -246,12 +236,10 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
     setSelectedExpenseForAction(expense);
     setIsDetailsModalOpen(true);
   };
-
   const handleEdit = expense => {
     setSelectedExpenseForAction(expense);
     setIsEditModalOpen(true);
   };
-
   const handleDelete = expense => {
     console.log('🗑️ handleDelete chamado para despesa:', expense);
     setSelectedExpenseForAction(expense);
@@ -267,7 +255,6 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
   // Confirmar baixa com data selecionada
   const handleConfirmDarBaixa = async () => {
     if (!selectedPaymentDate || !selectedExpenseForAction) return;
-
     try {
       const { error } = await supabase
         .from('expenses')
@@ -276,15 +263,12 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
           actual_payment_date: selectedPaymentDate,
         })
         .eq('id', selectedExpenseForAction.id);
-
       if (error) throw error;
-
       showToast({
         type: 'success',
         message: 'Baixa realizada!',
         description: `Despesa "${selectedExpenseForAction.description}" marcada como paga.`,
       });
-
       setIsPaymentDateModalOpen(false);
       setSelectedPaymentDate(null);
       setSelectedExpenseForAction(null);
@@ -297,7 +281,6 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
       });
     }
   };
-
   return (
     <div className="space-y-6">
       {/* 💳 KPI Cards Premium - DESIGN SYSTEM */}
@@ -305,8 +288,8 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
         {/* Card: Despesas Pagas */}
         <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-green-300 dark:hover:border-green-700 transition-all duration-300">
           <div className="flex items-center justify-between mb-3">
-            <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg">
-              <CheckCircle className="w-6 h-6 text-white" />
+            <div className="p-3 bg-gradient-success rounded-xl shadow-lg">
+              <CheckCircle className="w-6 h-6 text-dark-text-primary" />
             </div>
             <TrendingDown className="w-5 h-5 text-green-500 dark:text-green-400 opacity-60" />
           </div>
@@ -325,8 +308,8 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
         {/* Card: Despesas a Pagar */}
         <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-yellow-300 dark:hover:border-yellow-700 transition-all duration-300">
           <div className="flex items-center justify-between mb-3">
-            <div className="p-3 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl shadow-lg">
-              <Clock className="w-6 h-6 text-white" />
+            <div className="p-3 bg-gradient-warning rounded-xl shadow-lg">
+              <Clock className="w-6 h-6 text-dark-text-primary" />
             </div>
             <TrendingUp className="w-5 h-5 text-yellow-500 dark:text-yellow-400 opacity-60" />
           </div>
@@ -345,8 +328,8 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
         {/* Card: Despesas Atrasadas */}
         <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-red-300 dark:hover:border-red-700 transition-all duration-300">
           <div className="flex items-center justify-between mb-3">
-            <div className="p-3 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl shadow-lg">
-              <AlertTriangle className="w-6 h-6 text-white" />
+            <div className="p-3 bg-gradient-danger rounded-xl shadow-lg">
+              <AlertTriangle className="w-6 h-6 text-dark-text-primary" />
             </div>
             <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400 opacity-60" />
           </div>
@@ -364,19 +347,19 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
       </div>
 
       {/* 🎛️ Filtros e Ações Premium - DESIGN SYSTEM */}
-      <div className="card-theme rounded-xl p-5 border-2 border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-300">
+      <div className="card-theme rounded-xl p-5 border-2 border-transparent hover:border-light-border dark:border-dark-border dark:hover:border-dark-border transition-all duration-300">
         <div className="flex flex-col gap-4">
           {/* Linha 1: Busca, Filtros e Botão Nova Despesa */}
           <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
             {/* Busca Premium */}
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary w-5 h-5" />
               <input
                 type="text"
                 placeholder="Buscar por descrição, fornecedor ou categoria..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md"
+                className="w-full pl-11 pr-4 py-3 card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-xl text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md"
               />
             </div>
 
@@ -386,9 +369,12 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
               <select
                 value={filters.status}
                 onChange={e =>
-                  setFilters(prev => ({ ...prev, status: e.target.value }))
+                  setFilters(prev => ({
+                    ...prev,
+                    status: e.target.value,
+                  }))
                 }
-                className="px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-sm font-semibold text-theme-primary focus:ring-2 focus:ring-blue-500 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
+                className="px-4 py-3 card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-xl text-sm font-semibold text-theme-primary focus:ring-2 focus:ring-blue-500 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
               >
                 <option value="all">📋 Todos os Status</option>
                 <option value="paid">✅ Pagas</option>
@@ -397,7 +383,7 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
               </select>
 
               {/* Data Início */}
-              <div className="flex items-center gap-2 px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm hover:shadow-md transition-all duration-200">
+              <div className="flex items-center gap-2 px-4 py-3 card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-xl shadow-sm hover:shadow-md transition-all duration-200">
                 <Calendar className="w-4 h-4 text-blue-500 dark:text-blue-400" />
                 <input
                   type="date"
@@ -413,13 +399,16 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
               </div>
 
               {/* Data Fim */}
-              <div className="flex items-center gap-2 px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm hover:shadow-md transition-all duration-200">
+              <div className="flex items-center gap-2 px-4 py-3 card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-xl shadow-sm hover:shadow-md transition-all duration-200">
                 <Calendar className="w-4 h-4 text-blue-500 dark:text-blue-400" />
                 <input
                   type="date"
                   value={filters.dueDateTo}
                   onChange={e =>
-                    setFilters(prev => ({ ...prev, dueDateTo: e.target.value }))
+                    setFilters(prev => ({
+                      ...prev,
+                      dueDateTo: e.target.value,
+                    }))
                   }
                   className="bg-transparent text-sm font-medium text-theme-primary focus:outline-none cursor-pointer"
                 />
@@ -431,7 +420,7 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
                   setSelectedExpenseForAction(null);
                   setIsEditModalOpen(true);
                 }}
-                className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                className="flex items-center gap-2 px-5 py-3 bg-gradient-primary hover:opacity-90 text-dark-text-primary font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
               >
                 <Plus className="w-5 h-5" />
                 Nova Despesa
@@ -447,7 +436,7 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
 
           {/* Linha 2: Ações de Seleção Múltipla */}
           {filteredExpenses.length > 0 && (
-            <div className="flex items-center gap-3 pt-4 border-t-2 border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-3 pt-4 border-t-2 border-light-border dark:border-dark-border">
               <button
                 onClick={() => {
                   if (selectedExpenses.length === filteredExpenses.length) {
@@ -466,7 +455,7 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
 
               {selectedExpenses.length > 0 && (
                 <>
-                  <div className="h-8 w-px bg-gray-300 dark:bg-gray-600"></div>
+                  <div className="h-8 w-px bg-light-border dark:bg-dark-border"></div>
                   <span className="text-sm font-semibold text-theme-primary">
                     {selectedExpenses.length} despesa
                     {selectedExpenses.length !== 1 ? 's' : ''} selecionada
@@ -482,17 +471,16 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
                         try {
                           const { error } = await supabase
                             .from('expenses')
-                            .update({ is_active: false })
+                            .update({
+                              is_active: false,
+                            })
                             .in('id', selectedExpenses);
-
                           if (error) throw error;
-
                           showToast({
                             type: 'success',
                             message: 'Despesas excluídas',
                             description: `${selectedExpenses.length} despesa${selectedExpenses.length !== 1 ? 's' : ''} excluída${selectedExpenses.length !== 1 ? 's' : ''} com sucesso!`,
                           });
-
                           setSelectedExpenses([]);
                           fetchExpenses();
                         } catch (error) {
@@ -507,7 +495,7 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
                         }
                       }
                     }}
-                    className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-dark-text-primary bg-gradient-danger hover:opacity-90 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
                   >
                     <Trash2 className="w-4 h-4" />
                     Excluir Selecionadas
@@ -520,10 +508,10 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
       </div>
 
       {/* 📊 Tabela Premium - DESIGN SYSTEM */}
-      <div className="card-theme rounded-xl overflow-hidden border-2 border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-300">
+      <div className="card-theme rounded-xl overflow-hidden border-2 border-transparent hover:border-light-border dark:border-dark-border dark:hover:border-dark-border transition-all duration-300">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750 border-b-2 border-gray-200 dark:border-gray-600">
+            <thead className="bg-gradient-light dark:from-gray-800 dark:to-gray-750 border-b-2 border-light-border dark:border-dark-border">
               <tr>
                 <th className="px-6 py-4 text-left">
                   <input
@@ -539,7 +527,7 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
                         setSelectedExpenses(filteredExpenses.map(e => e.id));
                       }
                     }}
-                    className="w-4 h-4 text-blue-600 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 cursor-pointer transition-all"
+                    className="w-4 h-4 text-blue-600 card-theme dark:bg-gray-700 border-light-border dark:border-dark-border rounded focus:ring-2 focus:ring-blue-500 cursor-pointer transition-all"
                   />
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-bold text-theme-secondary uppercase tracking-wider">
@@ -584,7 +572,7 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
                     className="px-6 py-16 text-center text-theme-secondary"
                   >
                     <div className="flex flex-col items-center gap-3">
-                      <CreditCard className="w-12 h-12 text-gray-300 dark:text-gray-600" />
+                      <CreditCard className="w-12 h-12 text-gray-300 dark:text-gray-600 dark:text-theme-secondary" />
                       <p className="font-medium">Nenhuma despesa encontrada</p>
                       <p className="text-xs">
                         Tente ajustar os filtros ou adicione uma nova despesa
@@ -596,11 +584,7 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
                 filteredExpenses.map(expense => (
                   <tr
                     key={expense.id}
-                    className={`group transition-all duration-200 ${
-                      selectedExpenses.includes(expense.id)
-                        ? 'bg-blue-50 dark:bg-blue-900/20'
-                        : 'hover:bg-gradient-to-r hover:from-gray-50/50 hover:to-gray-100/50 dark:hover:from-gray-800/50 dark:hover:to-gray-750/50'
-                    }`}
+                    className={`group transition-all duration-200 ${selectedExpenses.includes(expense.id) ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-light-hover dark:hover:bg-dark-hover'}`}
                   >
                     <td className="px-6 py-4">
                       <input
@@ -615,12 +599,12 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
                             );
                           }
                         }}
-                        className="w-4 h-4 text-blue-600 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 cursor-pointer transition-all"
+                        className="w-4 h-4 text-blue-600 card-theme dark:bg-gray-700 border-light-border dark:border-dark-border rounded focus:ring-2 focus:ring-blue-500 cursor-pointer transition-all"
                       />
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-start gap-3">
-                        <div className="p-2 bg-gradient-to-br from-red-100 to-pink-100 dark:from-red-900/30 dark:to-pink-900/30 rounded-lg">
+                        <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
                           <CreditCard className="w-4 h-4 text-red-600 dark:text-red-400" />
                         </div>
                         <div>
@@ -760,18 +744,18 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
       {/* Modal de Seleção de Data de Pagamento */}
       {isPaymentDateModalOpen && selectedExpenseForAction && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-md w-full p-6 space-y-4">
+          <div className="card-theme dark:bg-dark-surface rounded-lg shadow-2xl max-w-md w-full p-6 space-y-4">
             {/* Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between pb-4 border-b border-light-border dark:border-dark-border">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
-                  <CheckCircle className="w-5 h-5 text-white" />
+                <div className="w-10 h-10 bg-green-500 dark:bg-green-600 rounded-lg flex items-center justify-center">
+                  <CheckCircle className="w-5 h-5 text-dark-text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
                     Dar Baixa na Despesa
                   </h3>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                     {selectedExpenseForAction.description}
                   </p>
                 </div>
@@ -783,16 +767,16 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
                   setSelectedExpenseForAction(null);
                   setSelectedPaymentDate(format(new Date(), 'yyyy-MM-dd'));
                 }}
-                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="p-1 hover:card-theme dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
-                <X className="w-5 h-5 text-gray-500" />
+                <X className="w-5 h-5 text-theme-secondary" />
               </button>
             </div>
 
             {/* Body */}
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                   Data do Pagamento *
                 </label>
                 <input
@@ -801,12 +785,9 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
                   onChange={e => setSelectedPaymentDate(e.target.value)}
                   max={format(new Date(), 'yyyy-MM-dd')} // Não permite datas futuras
                   min={format(startOfMonth(new Date()), 'yyyy-MM-dd')} // Apenas no mês atual
-                  className="w-full px-4 py-3 text-sm border-2 border-gray-300 dark:border-gray-600 rounded-lg 
-                    focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent
-                    bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                    transition-all duration-200"
+                  className="w-full px-4 py-3 text-sm border-2 border-light-border dark:border-dark-border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary transition-all duration-200"
                 />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                <p className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-2">
                   ⚠️ A data deve ser hoje ou anterior, dentro do mês atual.
                 </p>
               </div>
@@ -835,9 +816,7 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
                   setSelectedExpenseForAction(null);
                   setSelectedPaymentDate(format(new Date(), 'yyyy-MM-dd'));
                 }}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 
-                  bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 
-                  rounded-lg transition-colors"
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 card-theme dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
               >
                 Cancelar
               </button>
@@ -845,11 +824,7 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
                 type="button"
                 onClick={handleConfirmDarBaixa}
                 disabled={!selectedPaymentDate}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-white
-                  bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700
-                  rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed
-                  shadow-md hover:shadow-lg
-                  flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-dark-text-primary bg-gradient-success hover:from-green-600 hover:to-green-700 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg flex items-center justify-center gap-2"
               >
                 <CheckCircle className="w-4 h-4" />
                 Confirmar Baixa
@@ -861,5 +836,4 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
     </div>
   );
 };
-
 export default DespesasAccrualTabRefactored;

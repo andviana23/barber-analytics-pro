@@ -55,7 +55,6 @@ const GoalModal = ({
   month,
 }) => {
   const { showSuccess, showError } = useToast();
-
   const [formData, setFormData] = useState({
     goal_type: 'revenue_general',
     period: 'monthly',
@@ -65,17 +64,14 @@ const GoalModal = ({
     goal_quarter: null,
     is_active: true,
   });
-
   const [selectedUnitId, setSelectedUnitId] = useState(unitId);
   const [selectedUnitName, setSelectedUnitName] = useState(unitName);
-
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
   // Unidades via contexto global
   const { allUnits, selectedUnit } = useUnit();
   const unitsLoading = false;
-
   useEffect(() => {
     if (goal) {
       setFormData({
@@ -99,7 +95,6 @@ const GoalModal = ({
       });
     }
   }, [goal, year, month]);
-
   useEffect(() => {
     setSelectedUnitId(unitId);
     setSelectedUnitName(unitName);
@@ -111,7 +106,7 @@ const GoalModal = ({
       value: 'revenue_general',
       label: 'Faturamento Geral',
       icon: DollarSign,
-      gradient: 'from-green-600 to-emerald-600',
+      gradient: 'bg-gradient-success',
       bg: 'bg-green-50 dark:bg-green-900/20',
       border: 'border-green-500',
       text: 'text-green-600 dark:text-green-400',
@@ -120,7 +115,7 @@ const GoalModal = ({
       value: 'subscription',
       label: 'Assinaturas',
       icon: Users,
-      gradient: 'from-blue-600 to-indigo-600',
+      gradient: 'bg-gradient-primary',
       bg: 'bg-blue-50 dark:bg-blue-900/20',
       border: 'border-blue-500',
       text: 'text-blue-600 dark:text-blue-400',
@@ -129,7 +124,7 @@ const GoalModal = ({
       value: 'product_sales',
       label: 'Venda de Produtos',
       icon: Package,
-      gradient: 'from-purple-600 to-pink-600',
+      gradient: 'bg-gradient-secondary',
       bg: 'bg-purple-50 dark:bg-purple-900/20',
       border: 'border-purple-500',
       text: 'text-purple-600 dark:text-purple-400',
@@ -138,7 +133,7 @@ const GoalModal = ({
       value: 'expenses',
       label: 'Despesas',
       icon: CreditCard,
-      gradient: 'from-red-600 to-rose-600',
+      gradient: 'bg-gradient-danger',
       bg: 'bg-red-50 dark:bg-red-900/20',
       border: 'border-red-500',
       text: 'text-red-600 dark:text-red-400',
@@ -147,62 +142,124 @@ const GoalModal = ({
       value: 'profit',
       label: 'Resultado/Lucro',
       icon: TrendingUp,
-      gradient: 'from-orange-600 to-amber-600',
+      gradient: 'bg-gradient-warning',
       bg: 'bg-orange-50 dark:bg-orange-900/20',
       border: 'border-orange-500',
       text: 'text-orange-600 dark:text-orange-400',
     },
   ];
-
   const periods = [
-    { value: 'monthly', label: 'Mensal', icon: Calendar },
-    { value: 'quarterly', label: 'Trimestral', icon: BarChart3 },
-    { value: 'yearly', label: 'Anual', icon: Target },
+    {
+      value: 'monthly',
+      label: 'Mensal',
+      icon: Calendar,
+    },
+    {
+      value: 'quarterly',
+      label: 'Trimestral',
+      icon: BarChart3,
+    },
+    {
+      value: 'yearly',
+      label: 'Anual',
+      icon: Target,
+    },
   ];
-
   const months = [
-    { value: 1, label: 'Janeiro' },
-    { value: 2, label: 'Fevereiro' },
-    { value: 3, label: 'Março' },
-    { value: 4, label: 'Abril' },
-    { value: 5, label: 'Maio' },
-    { value: 6, label: 'Junho' },
-    { value: 7, label: 'Julho' },
-    { value: 8, label: 'Agosto' },
-    { value: 9, label: 'Setembro' },
-    { value: 10, label: 'Outubro' },
-    { value: 11, label: 'Novembro' },
-    { value: 12, label: 'Dezembro' },
+    {
+      value: 1,
+      label: 'Janeiro',
+    },
+    {
+      value: 2,
+      label: 'Fevereiro',
+    },
+    {
+      value: 3,
+      label: 'Março',
+    },
+    {
+      value: 4,
+      label: 'Abril',
+    },
+    {
+      value: 5,
+      label: 'Maio',
+    },
+    {
+      value: 6,
+      label: 'Junho',
+    },
+    {
+      value: 7,
+      label: 'Julho',
+    },
+    {
+      value: 8,
+      label: 'Agosto',
+    },
+    {
+      value: 9,
+      label: 'Setembro',
+    },
+    {
+      value: 10,
+      label: 'Outubro',
+    },
+    {
+      value: 11,
+      label: 'Novembro',
+    },
+    {
+      value: 12,
+      label: 'Dezembro',
+    },
   ];
-
   const quarters = [
-    { value: 1, label: '1º Trimestre', period: 'Jan-Mar' },
-    { value: 2, label: '2º Trimestre', period: 'Abr-Jun' },
-    { value: 3, label: '3º Trimestre', period: 'Jul-Set' },
-    { value: 4, label: '4º Trimestre', period: 'Out-Dez' },
+    {
+      value: 1,
+      label: '1º Trimestre',
+      period: 'Jan-Mar',
+    },
+    {
+      value: 2,
+      label: '2º Trimestre',
+      period: 'Abr-Jun',
+    },
+    {
+      value: 3,
+      label: '3º Trimestre',
+      period: 'Jul-Set',
+    },
+    {
+      value: 4,
+      label: '4º Trimestre',
+      period: 'Out-Dez',
+    },
   ];
-
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => ({
+      ...prev,
+      [field]: value,
+    }));
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: null }));
+      setErrors(prev => ({
+        ...prev,
+        [field]: null,
+      }));
     }
   };
-
   const validateForm = () => {
     const newErrors = {};
-
     if (!selectedUnitId) {
       newErrors.unit = 'Selecione uma unidade';
     }
-
     const numericValue = parseFloat(
       formData.target_value.toString().replace(',', '.')
     );
     if (!formData.target_value || isNaN(numericValue) || numericValue <= 0) {
       newErrors.target_value = 'Valor da meta deve ser maior que zero';
     }
-
     if (
       !formData.goal_year ||
       formData.goal_year < 2020 ||
@@ -210,31 +267,25 @@ const GoalModal = ({
     ) {
       newErrors.goal_year = 'Ano deve estar entre 2020 e 2030';
     }
-
     if (formData.period === 'monthly' && !formData.goal_month) {
       newErrors.goal_month = 'Mês é obrigatório para metas mensais';
     }
-
     if (formData.period === 'quarterly' && !formData.goal_quarter) {
       newErrors.goal_quarter = 'Trimestre é obrigatório para metas trimestrais';
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleSave = async () => {
     if (!validateForm()) {
       showError('Por favor, preencha todos os campos obrigatórios.');
       return;
     }
-
     setLoading(true);
     try {
       const numericValue = parseFloat(
         formData.target_value.toString().replace(',', '.')
       );
-
       const goalData = {
         unit_id: selectedUnitId,
         goal_type: formData.goal_type,
@@ -246,13 +297,10 @@ const GoalModal = ({
           formData.period === 'quarterly' ? formData.goal_quarter : null,
         is_active: formData.is_active,
       };
-
       await onSave(goalData);
-
       showSuccess(
         `Meta ${goal ? 'atualizada' : 'criada'} com sucesso! ${goalTypes.find(t => t.value === formData.goal_type)?.label}`
       );
-
       onClose();
     } catch (error) {
       console.error('Erro ao salvar meta:', error);
@@ -261,27 +309,26 @@ const GoalModal = ({
       setLoading(false);
     }
   };
-
   if (!isOpen) return null;
 
   // Alerta se não houver unidade selecionada
   if (!selectedUnitId) {
     return (
       <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-100 dark:border-gray-700 w-full max-w-md shadow-2xl">
+        <div className="card-theme dark:bg-dark-surface rounded-2xl border-2 border-light-border dark:border-dark-border w-full max-w-md shadow-2xl">
           <div className="p-8 text-center">
-            <div className="p-4 bg-gradient-to-br from-red-500 to-rose-500 rounded-2xl w-20 h-20 mx-auto mb-6 flex items-center justify-center shadow-lg shadow-red-500/30">
-              <AlertCircle className="w-10 h-10 text-white" />
+            <div className="p-4 bg-gradient-danger rounded-2xl w-20 h-20 mx-auto mb-6 flex items-center justify-center shadow-lg shadow-red-500/30">
+              <AlertCircle className="w-10 h-10 text-dark-text-primary" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+            <h3 className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary mb-3">
               Unidade Necessária
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
+            <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-8 leading-relaxed">
               Selecione uma unidade no topo da página antes de criar uma meta.
             </p>
             <button
               onClick={onClose}
-              className="w-full px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl hover:from-gray-700 hover:to-gray-800 transition-all font-semibold shadow-lg shadow-gray-500/30"
+              className="w-full px-6 py-3 bg-gradient-secondary text-dark-text-primary rounded-xl transition-all font-semibold shadow-lg"
             >
               Entendi
             </button>
@@ -290,32 +337,30 @@ const GoalModal = ({
       </div>
     );
   }
-
   const selectedGoalType = goalTypes.find(t => t.value === formData.goal_type);
-
   return (
     <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4 overflow-y-auto backdrop-blur-sm">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-100 dark:border-gray-700 w-full max-w-3xl my-8 mx-auto flex flex-col max-h-[calc(100vh-4rem)] shadow-2xl">
+      <div className="card-theme dark:bg-dark-surface rounded-2xl border-2 border-light-border dark:border-dark-border w-full max-w-3xl my-8 mx-auto flex flex-col max-h-[calc(100vh-4rem)] shadow-2xl">
         {/* 🎨 Header com gradiente dinâmico */}
         <div
-          className={`relative px-6 py-6 border-b-2 border-gray-100 dark:border-gray-700 flex items-center justify-between flex-shrink-0 bg-gradient-to-r ${selectedGoalType?.gradient || 'from-blue-600 to-indigo-600'} rounded-t-2xl`}
+          className={`relative px-6 py-6 border-b-2 border-light-border dark:border-gray-700 flex items-center justify-between flex-shrink-0 bg-gradient-to-r ${selectedGoalType?.gradient || 'bg-gradient-primary'} rounded-t-2xl`}
         >
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl shadow-lg">
-              <Target className="w-7 h-7 text-white" />
+            <div className="p-3 card-theme/20 backdrop-blur-sm rounded-xl shadow-lg">
+              <Target className="w-7 h-7 text-dark-text-primary" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white tracking-wide">
+              <h2 className="text-2xl font-bold text-dark-text-primary tracking-wide">
                 {goal ? '✏️ Editar Meta' : '✨ Nova Meta'}
               </h2>
-              <p className="text-sm text-white/80 mt-1">
+              <p className="text-sm text-dark-text-primary/80 mt-1">
                 {goal
                   ? 'Atualize os parâmetros da meta'
                   : 'Configure uma nova meta financeira'}
               </p>
               <div className="mt-2 flex items-center gap-2">
-                <div className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-lg">
-                  <span className="text-xs font-bold text-white">
+                <div className="px-3 py-1 card-theme/20 backdrop-blur-sm rounded-lg">
+                  <span className="text-xs font-bold text-dark-text-primary">
                     📍 {selectedUnitName || 'Unidade não selecionada'}
                   </span>
                 </div>
@@ -325,7 +370,7 @@ const GoalModal = ({
           <button
             onClick={onClose}
             disabled={loading}
-            className="p-2 text-white/80 hover:text-white hover:bg-white/20 rounded-xl transition-all"
+            className="p-2 text-dark-text-primary/80 hover:text-dark-text-primary hover:card-theme/20 rounded-xl transition-all"
           >
             <X className="w-6 h-6" />
           </button>
@@ -335,7 +380,7 @@ const GoalModal = ({
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6 min-h-0">
           {/* 🏢 Seletor de Unidade */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-gray-200 mb-3">
               <Award className="w-4 h-4 text-purple-600 dark:text-purple-400" />
               Unidade *
             </label>
@@ -349,14 +394,13 @@ const GoalModal = ({
                 setSelectedUnitId(unitId);
                 setSelectedUnitName(unit?.name || '');
                 if (errors.unit) {
-                  setErrors(prev => ({ ...prev, unit: null }));
+                  setErrors(prev => ({
+                    ...prev,
+                    unit: null,
+                  }));
                 }
               }}
-              className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-medium ${
-                errors.unit
-                  ? 'border-red-400 dark:border-red-500'
-                  : 'border-gray-200 dark:border-gray-600'
-              }`}
+              className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-medium ${errors.unit ? 'border-red-400 dark:border-red-500' : 'border-gray-200 dark:border-gray-600'}`}
               disabled={unitsLoading}
             >
               <option value="">
@@ -382,7 +426,7 @@ const GoalModal = ({
 
           {/* 🎯 Tipo de Meta - Cards Premium */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-gray-200 mb-3">
               <Target className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               Tipo de Meta *
             </label>
@@ -395,34 +439,18 @@ const GoalModal = ({
                     key={type.value}
                     type="button"
                     onClick={() => handleInputChange('goal_type', type.value)}
-                    className={`group p-4 rounded-xl border-2 transition-all duration-300 ${
-                      isSelected
-                        ? `${type.border} ${type.bg} shadow-lg`
-                        : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 hover:shadow-md'
-                    }`}
+                    className={`group p-4 rounded-xl border-2 transition-all duration-300 ${isSelected ? `${type.border} ${type.bg} shadow-lg` : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 hover:shadow-md'}`}
                   >
                     <div className="flex items-center gap-3">
                       <div
-                        className={`p-2 rounded-lg transition-all ${
-                          isSelected
-                            ? `bg-gradient-to-r ${type.gradient} shadow-md`
-                            : 'bg-gray-100 dark:bg-gray-700 group-hover:scale-110'
-                        }`}
+                        className={`p-2 rounded-lg transition-all ${isSelected ? `bg-gradient-to-r ${type.gradient} shadow-md` : 'bg-gray-100 dark:bg-gray-700 group-hover:scale-110'}`}
                       >
                         <Icon
-                          className={`w-5 h-5 ${
-                            isSelected
-                              ? 'text-white'
-                              : 'text-gray-600 dark:text-gray-400'
-                          }`}
+                          className={`w-5 h-5 ${isSelected ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`}
                         />
                       </div>
                       <span
-                        className={`text-sm font-semibold ${
-                          isSelected
-                            ? type.text
-                            : 'text-gray-900 dark:text-white'
-                        }`}
+                        className={`text-sm font-semibold ${isSelected ? type.text : 'text-gray-900 dark:text-white'}`}
                       >
                         {type.label}
                       </span>
@@ -435,7 +463,7 @@ const GoalModal = ({
 
           {/* 📅 Período - Pills Interativos */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-gray-200 mb-3">
               <Calendar className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
               Período *
             </label>
@@ -448,26 +476,14 @@ const GoalModal = ({
                     key={period.value}
                     type="button"
                     onClick={() => handleInputChange('period', period.value)}
-                    className={`group p-3 rounded-xl border-2 transition-all duration-300 ${
-                      isSelected
-                        ? 'border-indigo-500 bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/30 dark:to-blue-900/30 shadow-lg'
-                        : 'border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-500 hover:shadow-md'
-                    }`}
+                    className={`group p-3 rounded-xl border-2 transition-all duration-300 ${isSelected ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 shadow-lg' : 'border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-500 hover:shadow-md'}`}
                   >
                     <div className="flex flex-col items-center gap-2">
                       <PeriodIcon
-                        className={`w-5 h-5 transition-all ${
-                          isSelected
-                            ? 'text-indigo-600 dark:text-indigo-400 scale-110'
-                            : 'text-gray-500 dark:text-gray-400 group-hover:scale-110'
-                        }`}
+                        className={`w-5 h-5 transition-all ${isSelected ? 'text-indigo-600 dark:text-indigo-400 scale-110' : 'text-gray-500 dark:text-gray-400 group-hover:scale-110'}`}
                       />
                       <span
-                        className={`text-sm font-semibold ${
-                          isSelected
-                            ? 'text-indigo-700 dark:text-indigo-300'
-                            : 'text-gray-900 dark:text-white'
-                        }`}
+                        className={`text-sm font-semibold ${isSelected ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-900 dark:text-white'}`}
                       >
                         {period.label}
                       </span>
@@ -482,7 +498,7 @@ const GoalModal = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Ano */}
             <div>
-              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
+              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-gray-200 mb-2">
                 <Calendar className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                 Ano *
               </label>
@@ -495,11 +511,7 @@ const GoalModal = ({
                 min="2020"
                 max="2030"
                 placeholder="2025"
-                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-semibold text-lg ${
-                  errors.goal_year
-                    ? 'border-red-400 dark:border-red-500'
-                    : 'border-gray-300 dark:border-gray-600'
-                }`}
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-semibold text-lg ${errors.goal_year ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
               />
               {errors.goal_year && (
                 <div className="flex items-center gap-1.5 mt-2">
@@ -514,7 +526,7 @@ const GoalModal = ({
             {/* Mês (se mensal) */}
             {formData.period === 'monthly' && (
               <div>
-                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
+                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-gray-200 mb-2">
                   <Calendar className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
                   Mês *
                 </label>
@@ -523,11 +535,7 @@ const GoalModal = ({
                   onChange={e =>
                     handleInputChange('goal_month', parseInt(e.target.value))
                   }
-                  className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-medium ${
-                    errors.goal_month
-                      ? 'border-red-400 dark:border-red-500'
-                      : 'border-gray-300 dark:border-gray-600'
-                  }`}
+                  className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-medium ${errors.goal_month ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                 >
                   <option value="">📅 Selecionar mês...</option>
                   {months.map(month => (
@@ -550,7 +558,7 @@ const GoalModal = ({
             {/* Trimestre (se trimestral) */}
             {formData.period === 'quarterly' && (
               <div>
-                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
+                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-gray-200 mb-2">
                   <BarChart3 className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                   Trimestre *
                 </label>
@@ -559,11 +567,7 @@ const GoalModal = ({
                   onChange={e =>
                     handleInputChange('goal_quarter', parseInt(e.target.value))
                   }
-                  className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-medium ${
-                    errors.goal_quarter
-                      ? 'border-red-400 dark:border-red-500'
-                      : 'border-gray-300 dark:border-gray-600'
-                  }`}
+                  className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-medium ${errors.goal_quarter ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                 >
                   <option value="">📊 Selecionar trimestre...</option>
                   {quarters.map(quarter => (
@@ -586,7 +590,7 @@ const GoalModal = ({
 
           {/* 💰 Valor da Meta */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-gray-200 mb-2">
               <DollarSign className="w-4 h-4 text-green-600 dark:text-green-400" />
               Valor da Meta *
             </label>
@@ -621,11 +625,7 @@ const GoalModal = ({
                   }
                 }}
                 placeholder="0,00"
-                className={`w-full pl-14 pr-4 py-4 border-2 rounded-xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-xl font-bold ${
-                  errors.target_value
-                    ? 'border-red-400 dark:border-red-500'
-                    : 'border-gray-300 dark:border-gray-600'
-                }`}
+                className={`w-full pl-14 pr-4 py-4 border-2 rounded-xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-xl font-bold ${errors.target_value ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
               />
             </div>
             {errors.target_value && (
@@ -637,7 +637,7 @@ const GoalModal = ({
               </div>
             )}
             {formData.target_value && (
-              <div className="mt-2 p-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+              <div className="mt-2 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                 <p className="text-sm font-bold text-green-700 dark:text-green-300">
                   💰 Meta Total:{' '}
                   {new Intl.NumberFormat('pt-BR', {
@@ -654,17 +654,17 @@ const GoalModal = ({
           </div>
 
           {/* ✅ Status Ativo/Inativo */}
-          <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600">
+          <div className="flex items-center gap-3 p-4 bg-light-bg dark:bg-dark-bg dark:bg-gray-700/50 rounded-xl border border-light-border dark:border-dark-border">
             <input
               type="checkbox"
               id="is_active"
               checked={formData.is_active}
               onChange={e => handleInputChange('is_active', e.target.checked)}
-              className="w-5 h-5 text-green-600 bg-gray-100 border-gray-300 rounded-lg focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 cursor-pointer transition-all"
+              className="w-5 h-5 text-green-600 card-theme border-light-border dark:border-dark-border rounded-lg focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 cursor-pointer transition-all"
             />
             <label
               htmlFor="is_active"
-              className="text-sm font-semibold text-gray-700 dark:text-gray-300 cursor-pointer flex items-center gap-2"
+              className="text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 cursor-pointer flex items-center gap-2"
             >
               <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
               Meta ativa (visível nos relatórios)
@@ -673,12 +673,12 @@ const GoalModal = ({
         </div>
 
         {/* 🎯 Footer com Botões Gradientes */}
-        <div className="px-6 py-4 border-t-2 border-gray-100 dark:border-gray-700 flex justify-end gap-3 flex-shrink-0 bg-gray-50 dark:bg-gray-800/50 rounded-b-2xl">
+        <div className="px-6 py-4 border-t-2 border-light-border dark:border-dark-border flex justify-end gap-3 flex-shrink-0 bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50 rounded-b-2xl">
           <button
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="px-5 py-2.5 text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all font-medium disabled:opacity-50"
+            className="px-5 py-2.5 text-gray-700 dark:text-gray-300 dark:text-gray-600 border-2 border-light-border dark:border-dark-border rounded-xl hover:card-theme dark:hover:bg-gray-700 transition-all font-medium disabled:opacity-50"
           >
             Cancelar
           </button>
@@ -686,7 +686,7 @@ const GoalModal = ({
             type="button"
             onClick={handleSave}
             disabled={loading}
-            className={`px-6 py-2.5 bg-gradient-to-r ${selectedGoalType?.gradient || 'from-blue-600 to-indigo-600'} text-white rounded-xl hover:opacity-90 disabled:opacity-50 transition-all font-semibold flex items-center gap-2 shadow-lg ${selectedGoalType ? 'shadow-' + selectedGoalType.value.split('_')[0] + '-500/30' : 'shadow-blue-500/30'}`}
+            className={`px-6 py-2.5 bg-gradient-to-r ${selectedGoalType?.gradient || 'bg-gradient-primary'} text-white rounded-xl hover:opacity-90 disabled:opacity-50 transition-all font-semibold flex items-center gap-2 shadow-lg`}
           >
             {loading ? (
               <>
@@ -724,7 +724,6 @@ const GoalCard = ({ goal, onEdit, onDelete, onToggleStatus }) => {
           : 0,
     });
   }, [goal]);
-
   const getGoalTypeInfo = type => {
     const types = {
       revenue_general: {
@@ -779,7 +778,6 @@ const GoalCard = ({ goal, onEdit, onDelete, onToggleStatus }) => {
       }
     );
   };
-
   const getPeriodLabel = (period, month, quarter) => {
     if (period === 'monthly' && month) {
       const months = [
@@ -807,7 +805,6 @@ const GoalCard = ({ goal, onEdit, onDelete, onToggleStatus }) => {
     }
     return 'N/A';
   };
-
   const typeInfo = getGoalTypeInfo(goal.goal_type);
   const Icon = typeInfo.icon;
 
@@ -821,23 +818,21 @@ const GoalCard = ({ goal, onEdit, onDelete, onToggleStatus }) => {
         : 0
     )
   );
-
   const isAchieved = percentage >= 100;
-
   return (
-    <div className="group bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-2xl hover:shadow-gray-300/50 dark:hover:shadow-gray-900/50 transition-all duration-300">
+    <div className="group card-theme dark:bg-dark-surface rounded-2xl border border-light-border dark:border-dark-border overflow-hidden hover:shadow-2xl hover:shadow-gray-300/50 dark:hover:shadow-gray-900/50 transition-all duration-300">
       {/* 🎨 Header com gradiente dinâmico */}
       <div className={`bg-gradient-to-r ${typeInfo.gradient} p-5`}>
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-white/20 backdrop-blur-sm rounded-xl shadow-lg group-hover:scale-110 transition-transform">
-              <Icon className="w-6 h-6 text-white" />
+            <div className="p-2.5 card-theme/20 backdrop-blur-sm rounded-xl shadow-lg group-hover:scale-110 transition-transform">
+              <Icon className="w-6 h-6 text-dark-text-primary" />
             </div>
             <div>
-              <h3 className="font-bold text-white text-lg tracking-wide">
+              <h3 className="font-bold text-dark-text-primary text-lg tracking-wide">
                 {typeInfo.label}
               </h3>
-              <p className="text-sm text-white/80 font-medium">
+              <p className="text-sm text-dark-text-primary/80 font-medium">
                 📅{' '}
                 {getPeriodLabel(
                   goal.period,
@@ -851,11 +846,7 @@ const GoalCard = ({ goal, onEdit, onDelete, onToggleStatus }) => {
           {/* Badge de status premium */}
           <div className="flex items-center gap-2">
             <span
-              className={`px-3 py-1.5 rounded-full text-xs font-bold shadow-lg backdrop-blur-sm ${
-                goal.is_active
-                  ? 'bg-white/30 text-white border border-white/50'
-                  : 'bg-black/20 text-white/70 border border-white/30'
-              }`}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold shadow-lg backdrop-blur-sm ${goal.is_active ? 'bg-white/30 text-white border border-white/50' : 'bg-black/20 text-white/70 border border-white/30'}`}
             >
               {goal.is_active ? '✓ Ativa' : '○ Inativa'}
             </span>
@@ -868,10 +859,10 @@ const GoalCard = ({ goal, onEdit, onDelete, onToggleStatus }) => {
         {/* Valor da meta */}
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+            <p className="text-xs font-semibold text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider mb-1">
               🎯 Meta
             </p>
-            <div className="text-3xl font-black text-gray-900 dark:text-white">
+            <div className="text-3xl font-black text-theme-primary dark:text-dark-text-primary">
               {new Intl.NumberFormat('pt-BR', {
                 style: 'currency',
                 currency: 'BRL',
@@ -883,7 +874,7 @@ const GoalCard = ({ goal, onEdit, onDelete, onToggleStatus }) => {
 
           {/* Badge de atingimento */}
           {isAchieved && (
-            <div className="px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl shadow-lg animate-pulse">
+            <div className="px-3 py-2 bg-gradient-to-r bg-gradient-success text-dark-text-primary rounded-xl shadow-lg animate-pulse">
               <div className="flex items-center gap-1.5">
                 <Award className="w-5 h-5" />
                 <span className="text-sm font-bold">META ATINGIDA!</span>
@@ -893,11 +884,11 @@ const GoalCard = ({ goal, onEdit, onDelete, onToggleStatus }) => {
         </div>
 
         {/* Valor atingido */}
-        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900/30 rounded-xl">
-          <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+        <div className="flex items-center justify-between p-3 bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/30 rounded-xl">
+          <span className="text-sm font-semibold text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
             💎 Atingido:
           </span>
-          <span className="text-lg font-black text-gray-900 dark:text-white">
+          <span className="text-lg font-black text-theme-primary dark:text-dark-text-primary">
             {new Intl.NumberFormat('pt-BR', {
               style: 'currency',
               currency: 'BRL',
@@ -910,19 +901,11 @@ const GoalCard = ({ goal, onEdit, onDelete, onToggleStatus }) => {
         {/* Barra de progresso com gradiente */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="font-semibold text-gray-700 dark:text-gray-300">
+            <span className="font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600">
               Progresso
             </span>
             <span
-              className={`font-black text-lg ${
-                percentage >= 100
-                  ? 'text-green-600 dark:text-green-400'
-                  : percentage >= 75
-                    ? 'text-blue-600 dark:text-blue-400'
-                    : percentage >= 50
-                      ? 'text-orange-600 dark:text-orange-400'
-                      : 'text-gray-600 dark:text-gray-400'
-              }`}
+              className={`font-black text-lg ${percentage >= 100 ? 'text-green-600 dark:text-green-400' : percentage >= 75 ? 'text-blue-600 dark:text-blue-400' : percentage >= 50 ? 'text-orange-600 dark:text-orange-400' : 'text-gray-600 dark:text-gray-400'}`}
             >
               {percentage.toFixed(1)}%
             </span>
@@ -931,7 +914,9 @@ const GoalCard = ({ goal, onEdit, onDelete, onToggleStatus }) => {
           <div className="relative w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden shadow-inner">
             <div
               className={`h-3 rounded-full bg-gradient-to-r ${typeInfo.progress} transition-all duration-700 ease-out shadow-lg relative`}
-              style={{ width: `${percentage}%` }}
+              style={{
+                width: `${percentage}%`,
+              }}
             >
               {/* Brilho animado */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
@@ -940,14 +925,10 @@ const GoalCard = ({ goal, onEdit, onDelete, onToggleStatus }) => {
         </div>
 
         {/* Botões de ação */}
-        <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-end gap-2 pt-3 border-t border-light-border dark:border-dark-border">
           <button
             onClick={() => onToggleStatus(goal)}
-            className={`group/btn p-2.5 rounded-xl transition-all duration-300 ${
-              goal.is_active
-                ? 'text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 hover:shadow-lg hover:shadow-orange-500/30'
-                : 'text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 hover:shadow-lg hover:shadow-green-500/30'
-            }`}
+            className={`group/btn p-2.5 rounded-xl transition-all duration-300 ${goal.is_active ? 'text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 hover:shadow-lg hover:shadow-orange-500/30' : 'text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 hover:shadow-lg hover:shadow-green-500/30'}`}
             title={goal.is_active ? 'Desativar meta' : 'Ativar meta'}
           >
             {goal.is_active ? (
@@ -977,7 +958,6 @@ const GoalCard = ({ goal, onEdit, onDelete, onToggleStatus }) => {
     </div>
   );
 };
-
 export default function GoalsPage() {
   const { selectedUnit, selectUnit, allUnits } = useUnit();
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -985,7 +965,6 @@ export default function GoalsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const {
     goals,
     loading: goalsLoading,
@@ -1005,7 +984,6 @@ export default function GoalsPage() {
 
   // Verificar se há unidade selecionada
   const hasSelectedUnit = !!selectedUnit;
-
   const handleCreateGoal = async goalData => {
     try {
       const { data, error } = await createGoal(goalData);
@@ -1026,7 +1004,6 @@ export default function GoalsPage() {
       if (goalData.goal_month && goalData.goal_month !== selectedMonth) {
         setSelectedMonth(goalData.goal_month);
       }
-
       addToast({
         type: 'success',
         title: 'Meta criada!',
@@ -1040,18 +1017,15 @@ export default function GoalsPage() {
       });
     }
   };
-
   const handleUpdateGoal = async goalData => {
     try {
       const { data, error } = await updateGoal(editingGoal.id, goalData);
       if (error) throw error;
-
       addToast({
         type: 'success',
         title: 'Meta atualizada!',
         message: 'A meta foi atualizada com sucesso.',
       });
-
       refetch();
     } catch (error) {
       addToast({
@@ -1061,21 +1035,17 @@ export default function GoalsPage() {
       });
     }
   };
-
   const handleDeleteGoal = async goal => {
     if (!confirm(`Tem certeza que deseja excluir a meta de ${goal.goal_type}?`))
       return;
-
     try {
       const { error } = await deleteGoal(goal.id);
       if (error) throw error;
-
       addToast({
         type: 'success',
         title: 'Meta excluída!',
         message: 'A meta foi excluída com sucesso.',
       });
-
       refetch();
     } catch (error) {
       addToast({
@@ -1085,20 +1055,17 @@ export default function GoalsPage() {
       });
     }
   };
-
   const handleToggleStatus = async goal => {
     try {
       const { error } = await updateGoal(goal.id, {
         is_active: !goal.is_active,
       });
       if (error) throw error;
-
       addToast({
         type: 'success',
         title: 'Status atualizado!',
         message: `A meta foi ${!goal.is_active ? 'ativada' : 'desativada'}.`,
       });
-
       refetch();
     } catch (error) {
       addToast({
@@ -1109,17 +1076,14 @@ export default function GoalsPage() {
       });
     }
   };
-
   const handleEditGoal = goal => {
     setEditingGoal(goal);
     setIsModalOpen(true);
   };
-
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingGoal(null);
   };
-
   const handleSaveGoal = async goalData => {
     if (editingGoal) {
       await handleUpdateGoal(goalData);
@@ -1127,22 +1091,21 @@ export default function GoalsPage() {
       await handleCreateGoal(goalData);
     }
   };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900 p-6">
+    <div className="min-h-screen from-gray-50 via-blue-50/30 to-purple-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900 p-6 bg-light-bg dark:bg-dark-bg">
       {/* 🎨 Header Premium com gradiente */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-8">
           <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg">
-                <Target className="w-8 h-8 text-white" />
+              <div className="p-3 bg-gradient-primary rounded-xl shadow-lg">
+                <Target className="w-8 h-8 text-dark-text-primary" />
               </div>
               <div>
-                <h1 className="text-4xl font-black text-gray-900 dark:text-white tracking-tight">
+                <h1 className="text-4xl font-black text-theme-primary dark:text-dark-text-primary tracking-tight">
                   🎯 Cadastro de Metas
                 </h1>
-                <p className="text-base text-gray-600 dark:text-gray-400 font-medium">
+                <p className="text-base text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted font-medium">
                   Gerencie as metas financeiras por unidade e período
                 </p>
               </div>
@@ -1150,19 +1113,19 @@ export default function GoalsPage() {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-1">
+            <div className="card-theme dark:bg-dark-surface rounded-xl shadow-lg border border-light-border dark:border-dark-border p-1">
               <UnitSelector userId="current-user" />
             </div>
             {hasSelectedUnit ? (
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="group flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 font-bold hover:scale-105"
+                className="group flex items-center gap-2 px-6 py-3 bg-gradient-primary text-dark-text-primary rounded-xl hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 font-bold hover:scale-105"
               >
                 <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
                 Nova Meta
               </button>
             ) : (
-              <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 px-5 py-3 bg-white dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl">
+              <div className="flex items-center gap-2 text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-5 py-3 card-theme dark:bg-dark-surface border-2 border-dashed border-light-border dark:border-dark-border rounded-xl">
                 <Info className="w-4 h-4" />
                 Selecione uma unidade para criar metas
               </div>
@@ -1171,55 +1134,65 @@ export default function GoalsPage() {
         </div>
 
         {/* 🔍 Filtros Premium */}
-        <div className="flex items-center gap-4 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-5">
-          <div className="flex items-center gap-2 text-sm font-bold text-gray-700 dark:text-gray-300">
+        <div className="flex items-center gap-4 card-theme dark:bg-dark-surface rounded-2xl shadow-lg border border-light-border dark:border-dark-border p-5">
+          <div className="flex items-center gap-2 text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-600">
             <Calendar className="w-5 h-5 text-indigo-600" />
             Filtrar por:
           </div>
 
           <div className="flex-1 grid grid-cols-2 gap-4">
             <div>
-              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                 <Calendar className="w-4 h-4 text-teal-600" />
                 Ano
               </label>
               <select
                 value={selectedYear}
                 onChange={e => setSelectedYear(parseInt(e.target.value))}
-                className="w-full px-4 py-2.5 border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-semibold hover:border-indigo-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                className="w-full px-4 py-2.5 border-2 border-light-border dark:border-dark-border rounded-xl card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary font-semibold hover:border-indigo-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
               >
-                {Array.from({ length: 5 }, (_, i) => {
-                  const year = new Date().getFullYear() - 2 + i;
-                  return (
-                    <option key={year} value={year}>
-                      📅 {year}
-                    </option>
-                  );
-                })}
+                {Array.from(
+                  {
+                    length: 5,
+                  },
+                  (_, i) => {
+                    const year = new Date().getFullYear() - 2 + i;
+                    return (
+                      <option key={year} value={year}>
+                        📅 {year}
+                      </option>
+                    );
+                  }
+                )}
               </select>
             </div>
 
             <div>
-              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                 <Calendar className="w-4 h-4 text-cyan-600" />
                 Mês
               </label>
               <select
                 value={selectedMonth}
                 onChange={e => setSelectedMonth(parseInt(e.target.value))}
-                className="w-full px-4 py-2.5 border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-semibold hover:border-indigo-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                className="w-full px-4 py-2.5 border-2 border-light-border dark:border-dark-border rounded-xl card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary font-semibold hover:border-indigo-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
               >
-                {Array.from({ length: 12 }, (_, i) => {
-                  const month = i + 1;
-                  const monthName = format(new Date(2024, i), 'MMMM', {
-                    locale: ptBR,
-                  });
-                  return (
-                    <option key={month} value={month}>
-                      {monthName.charAt(0).toUpperCase() + monthName.slice(1)}
-                    </option>
-                  );
-                })}
+                {Array.from(
+                  {
+                    length: 12,
+                  },
+                  (_, i) => {
+                    const month = i + 1;
+                    const monthName = format(new Date(2024, i), 'MMMM', {
+                      locale: ptBR,
+                    });
+                    return (
+                      <option key={month} value={month}>
+                        {monthName.charAt(0).toUpperCase() + monthName.slice(1)}
+                      </option>
+                    );
+                  }
+                )}
               </select>
             </div>
           </div>
@@ -1228,18 +1201,18 @@ export default function GoalsPage() {
 
       {/* 📊 Lista de Metas com Estados Premium */}
       {!hasSelectedUnit ? (
-        <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border-2 border-dashed border-gray-300 dark:border-gray-600">
-          <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl inline-block mb-6">
+        <div className="text-center py-16 card-theme dark:bg-dark-surface rounded-2xl shadow-xl border-2 border-dashed border-light-border dark:border-dark-border">
+          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-2xl inline-block mb-6">
             <Target className="w-20 h-20 text-blue-500 dark:text-blue-400" />
           </div>
-          <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-3">
+          <h3 className="text-2xl font-black text-theme-primary dark:text-dark-text-primary mb-3">
             🏢 Selecione uma unidade
           </h3>
-          <p className="text-base text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+          <p className="text-base text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-6 max-w-md mx-auto">
             Escolha uma unidade no seletor acima para visualizar e gerenciar
             suas metas financeiras.
           </p>
-          <div className="flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+          <div className="flex items-center justify-center gap-2 text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
             <Info className="w-4 h-4" />
             <span>Você pode criar metas personalizadas para cada unidade</span>
           </div>
@@ -1249,10 +1222,10 @@ export default function GoalsPage() {
           {[...Array(6)].map((_, index) => (
             <div
               key={index}
-              className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-lg"
+              className="card-theme dark:bg-dark-surface rounded-2xl border border-light-border dark:border-dark-border overflow-hidden shadow-lg"
             >
-              {/* Header skeleton com gradiente animado */}
-              <div className="h-28 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 animate-pulse"></div>
+              {/* Header skeleton com cor sólida */}
+              <div className="h-28 bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
 
               {/* Body skeleton */}
               <div className="p-6 space-y-4">
@@ -1269,36 +1242,36 @@ export default function GoalsPage() {
           ))}
         </div>
       ) : goals.length === 0 ? (
-        <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border-2 border-dashed border-indigo-300 dark:border-indigo-600">
+        <div className="text-center py-16 card-theme dark:bg-dark-surface rounded-2xl shadow-xl border-2 border-dashed border-indigo-300 dark:border-indigo-600">
           <div className="relative inline-block mb-6">
-            <div className="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-2xl">
+            <div className="p-4 from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl">
               <Target className="w-20 h-20 text-indigo-500 dark:text-indigo-400" />
             </div>
-            <div className="absolute -top-2 -right-2 p-2 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full shadow-lg animate-bounce">
-              <Sparkles className="w-6 h-6 text-white" />
+            <div className="absolute -top-2 -right-2 p-2 from-yellow-400 to-orange-400 bg-yellow-400 rounded-full shadow-lg animate-bounce">
+              <Sparkles className="w-6 h-6 text-dark-text-primary" />
             </div>
           </div>
 
-          <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-3">
+          <h3 className="text-2xl font-black text-theme-primary dark:text-dark-text-primary mb-3">
             📈 Nenhuma meta cadastrada
           </h3>
-          <p className="text-base text-gray-600 dark:text-gray-400 mb-2 font-medium">
+          <p className="text-base text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-2 font-medium">
             {selectedUnit?.name}
           </p>
-          <p className="text-base text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
+          <p className="text-base text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-8 max-w-md mx-auto">
             Comece criando sua primeira meta financeira para esta unidade e
             acompanhe o progresso em tempo real.
           </p>
 
           <button
             onClick={() => setIsModalOpen(true)}
-            className="group inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:shadow-2xl hover:shadow-indigo-500/50 transition-all duration-300 font-bold hover:scale-105"
+            className="group inline-flex items-center gap-2 px-6 py-3 bg-gradient-primary text-dark-text-primary rounded-xl hover:shadow-2xl hover:shadow-indigo-500/50 transition-all duration-300 font-bold hover:scale-105"
           >
             <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
             Criar primeira meta
           </button>
 
-          <div className="mt-8 flex items-center justify-center gap-6 text-sm text-gray-500 dark:text-gray-400">
+          <div className="mt-8 flex items-center justify-center gap-6 text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
               <span>Faturamento</span>

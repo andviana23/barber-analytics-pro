@@ -40,16 +40,23 @@ import {
 const formatFullDate = (dateString, periodType) => {
   if (!dateString) return '';
   const date = new Date(dateString);
-
   switch (periodType) {
     case 'daily':
-      return format(date, "EEEE, dd 'de' MMMM", { locale: ptBR });
+      return format(date, "EEEE, dd 'de' MMMM", {
+        locale: ptBR,
+      });
     case 'weekly':
-      return `Semana de ${format(date, 'dd/MM/yyyy', { locale: ptBR })}`;
+      return `Semana de ${format(date, 'dd/MM/yyyy', {
+        locale: ptBR,
+      })}`;
     case 'monthly':
-      return format(date, "MMMM 'de' yyyy", { locale: ptBR });
+      return format(date, "MMMM 'de' yyyy", {
+        locale: ptBR,
+      });
     default:
-      return format(date, 'dd/MM/yyyy', { locale: ptBR });
+      return format(date, 'dd/MM/yyyy', {
+        locale: ptBR,
+      });
   }
 };
 
@@ -65,31 +72,38 @@ const formatCurrency = value => {
 const formatDateForPeriod = (dateString, periodType) => {
   if (!dateString) return '';
   const date = new Date(dateString);
-
   switch (periodType) {
     case 'daily':
-      return format(date, 'dd/MM', { locale: ptBR });
+      return format(date, 'dd/MM', {
+        locale: ptBR,
+      });
     case 'weekly':
-      return format(date, 'dd/MM', { locale: ptBR });
+      return format(date, 'dd/MM', {
+        locale: ptBR,
+      });
     case 'monthly':
-      return format(date, 'MMM/yy', { locale: ptBR });
+      return format(date, 'MMM/yy', {
+        locale: ptBR,
+      });
     case 'yearly':
-      return format(date, 'yyyy', { locale: ptBR });
+      return format(date, 'yyyy', {
+        locale: ptBR,
+      });
     default:
-      return format(date, 'dd/MM', { locale: ptBR });
+      return format(date, 'dd/MM', {
+        locale: ptBR,
+      });
   }
 };
 
 // Tooltip customizado com Dark Mode - MOVIDO PARA FORA DO COMPONENTE
 const CustomTooltip = ({ active, payload, period }) => {
   if (!active || !payload || payload.length === 0) return null;
-
   const data = payload[0]?.payload;
   if (!data) return null;
-
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-3 min-w-48">
-      <div className="font-medium text-gray-900 dark:text-white mb-2">
+    <div className="card-theme dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg shadow-lg p-3 min-w-48">
+      <div className="font-medium text-theme-primary dark:text-dark-text-primary mb-2">
         {formatFullDate(data.date, period)}
       </div>
 
@@ -102,22 +116,24 @@ const CustomTooltip = ({ active, payload, period }) => {
             <div className="flex items-center">
               <div
                 className="w-3 h-3 rounded mr-2"
-                style={{ backgroundColor: entry.color }}
+                style={{
+                  backgroundColor: entry.color,
+                }}
               />
-              <span className="text-gray-600 dark:text-gray-400">
+              <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 {entry.name}:
               </span>
             </div>
-            <span className="font-medium text-gray-900 dark:text-white">
+            <span className="font-medium text-theme-primary dark:text-dark-text-primary">
               {formatCurrency(entry.value)}
             </span>
           </div>
         ))}
 
         {data.saldoDiario !== undefined && (
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-1 mt-1">
+          <div className="border-t border-light-border dark:border-dark-border pt-1 mt-1">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600 dark:text-gray-400">
+              <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 Saldo do dia:
               </span>
               <span
@@ -130,7 +146,7 @@ const CustomTooltip = ({ active, payload, period }) => {
         )}
 
         {data.transactions_count > 0 && (
-          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <div className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
             {data.transactions_count} transações
           </div>
         )}
@@ -138,7 +154,6 @@ const CustomTooltip = ({ active, payload, period }) => {
     </div>
   );
 };
-
 const CashflowChartCard = ({
   data = [],
   title = 'Fluxo de Caixa',
@@ -160,13 +175,13 @@ const CashflowChartCard = ({
   // Processar dados para o gráfico
   const processedData = useMemo(() => {
     if (!data || data.length === 0) return [];
-
     return data.map(entry => ({
       ...entry,
       date: entry.date,
       displayDate: formatDateForPeriod(entry.date, period),
       entradas: entry.inflows || entry.entradas || 0,
-      saidas: Math.abs(entry.outflows || entry.saidas || 0), // Sempre positivo para visualização
+      saidas: Math.abs(entry.outflows || entry.saidas || 0),
+      // Sempre positivo para visualização
       saldoAcumulado: entry.accumulated_balance || entry.saldoAcumulado || 0,
       saldoDiario:
         (entry.inflows || entry.entradas || 0) -
@@ -180,7 +195,6 @@ const CashflowChartCard = ({
   // Calcular métricas
   const metrics = useMemo(() => {
     if (processedData.length === 0) return null;
-
     const totalEntradas = processedData.reduce(
       (sum, item) => sum + item.entradas,
       0
@@ -196,7 +210,6 @@ const CashflowChartCard = ({
     const variacao = saldoFinal - saldoInicial;
     const variacaoPercentual =
       saldoInicial !== 0 ? (variacao / Math.abs(saldoInicial)) * 100 : 0;
-
     return {
       totalEntradas,
       totalSaidas,
@@ -223,24 +236,25 @@ const CashflowChartCard = ({
 
   // Classes CSS com Dark Mode
   const cardClasses = `
-    bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow
+    card-theme border border-light-border dark:border-dark-border rounded-lg shadow-sm hover:shadow-md transition-shadow
     ${className}
   `;
-
   if (error) {
     return (
       <div className={cardClasses}>
         <div className="p-6 text-center">
           <AlertCircle className="w-12 h-12 text-red-500 dark:text-red-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+          <h3 className="text-lg font-medium text-theme-primary dark:text-dark-text-primary mb-2">
             Erro ao carregar dados
           </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
+          <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-4">
+            {error}
+          </p>
           {onRefresh && (
             <button
               type="button"
               onClick={onRefresh}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              className="inline-flex items-center px-4 py-2 bg-blue-600 text-dark-text-primary rounded-md hover:bg-blue-700"
             >
               <RefreshCw className="w-4 h-4 mr-2" />
               Tentar novamente
@@ -250,21 +264,20 @@ const CashflowChartCard = ({
       </div>
     );
   }
-
   return (
     <div className={cardClasses}>
       {/* Header com Dark Mode */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="p-4 border-b border-light-border dark:border-dark-border">
         <div className="flex items-start justify-between">
           <div className="min-w-0 flex-1">
             <div className="flex items-center">
               <BarChart3 className="w-5 h-5 text-blue-500 dark:text-blue-400 mr-2" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
                 {title}
               </h3>
             </div>
             {subtitle && (
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
                 {subtitle}
               </p>
             )}
@@ -272,37 +285,25 @@ const CashflowChartCard = ({
 
           <div className="flex items-center space-x-2 ml-4">
             {/* View toggles com Dark Mode */}
-            <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+            <div className="flex card-theme dark:bg-dark-surface/50 rounded-lg p-1">
               <button
                 type="button"
                 onClick={() => setActiveView('combined')}
-                className={`px-2 py-1 text-xs rounded transition-colors ${
-                  activeView === 'combined'
-                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                }`}
+                className={`px-2 py-1 text-xs rounded transition-colors ${activeView === 'combined' ? 'bg-light-surface dark:bg-dark-hover text-theme-primary dark:text-dark-text-primary shadow-sm' : 'text-theme-secondary dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary'}`}
               >
                 Completo
               </button>
               <button
                 type="button"
                 onClick={() => setActiveView('bars')}
-                className={`px-2 py-1 text-xs rounded transition-colors ${
-                  activeView === 'bars'
-                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                }`}
+                className={`px-2 py-1 text-xs rounded transition-colors ${activeView === 'bars' ? 'bg-light-surface dark:bg-dark-hover text-theme-primary dark:text-dark-text-primary shadow-sm' : 'text-theme-secondary dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary'}`}
               >
                 Barras
               </button>
               <button
                 type="button"
                 onClick={() => setActiveView('line')}
-                className={`px-2 py-1 text-xs rounded transition-colors ${
-                  activeView === 'line'
-                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                }`}
+                className={`px-2 py-1 text-xs rounded transition-colors ${activeView === 'line' ? 'bg-light-surface dark:bg-dark-hover text-theme-primary dark:text-dark-text-primary shadow-sm' : 'text-theme-secondary dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary'}`}
               >
                 Linha
               </button>
@@ -313,7 +314,7 @@ const CashflowChartCard = ({
               <button
                 type="button"
                 onClick={onExport}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100"
+                className="p-2 text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary rounded-md hover:card-theme"
                 title="Exportar dados"
               >
                 <Download className="w-4 h-4" />
@@ -324,7 +325,7 @@ const CashflowChartCard = ({
               <button
                 type="button"
                 onClick={onFullscreen}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100"
+                className="p-2 text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary rounded-md hover:card-theme"
                 title="Tela cheia"
               >
                 <Maximize2 className="w-4 h-4" />
@@ -335,7 +336,7 @@ const CashflowChartCard = ({
               <button
                 type="button"
                 onClick={onRefresh}
-                className={`p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100 ${loading ? 'animate-spin' : ''}`}
+                className={`p-2 text-theme-secondary dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary rounded-md hover:bg-light-surface/50 dark:hover:bg-dark-surface/50 transition-colors ${loading ? 'animate-spin' : ''}`}
                 title="Atualizar"
               >
                 <RefreshCw className="w-4 h-4" />
@@ -348,7 +349,7 @@ const CashflowChartCard = ({
         {metrics && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
             <div className="text-center">
-              <div className="text-xs text-gray-500 dark:text-gray-400">
+              <div className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 Entradas
               </div>
               <div className="text-lg font-semibold text-green-600 dark:text-green-400">
@@ -356,7 +357,7 @@ const CashflowChartCard = ({
               </div>
             </div>
             <div className="text-center">
-              <div className="text-xs text-gray-500 dark:text-gray-400">
+              <div className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 Saídas
               </div>
               <div className="text-lg font-semibold text-red-600 dark:text-red-400">
@@ -364,29 +365,21 @@ const CashflowChartCard = ({
               </div>
             </div>
             <div className="text-center">
-              <div className="text-xs text-gray-500 dark:text-gray-400">
+              <div className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 Saldo Final
               </div>
               <div
-                className={`text-lg font-semibold ${
-                  metrics.saldoFinal >= 0
-                    ? 'text-green-600 dark:text-green-400'
-                    : 'text-red-600 dark:text-red-400'
-                }`}
+                className={`text-lg font-semibold ${metrics.saldoFinal >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
               >
                 {formatCurrencyLocal(metrics.saldoFinal)}
               </div>
             </div>
             <div className="text-center">
-              <div className="text-xs text-gray-500 dark:text-gray-400">
+              <div className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 Variação
               </div>
               <div
-                className={`text-lg font-semibold flex items-center justify-center ${
-                  metrics.variacao >= 0
-                    ? 'text-green-600 dark:text-green-400'
-                    : 'text-red-600 dark:text-red-400'
-                }`}
+                className={`text-lg font-semibold flex items-center justify-center ${metrics.variacao >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
               >
                 {metrics.variacao >= 0 ? (
                   <TrendingUp className="w-4 h-4 mr-1" />
@@ -405,12 +398,12 @@ const CashflowChartCard = ({
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 dark:border-blue-400"></div>
-            <span className="ml-2 text-gray-600 dark:text-gray-400">
+            <span className="ml-2 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
               Carregando dados...
             </span>
           </div>
         ) : processedData.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 text-gray-500 dark:text-gray-400">
+          <div className="flex flex-col items-center justify-center h-64 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
             <Calendar className="w-12 h-12 mb-4" />
             <p>Nenhum dado disponível para o período selecionado</p>
           </div>
@@ -418,18 +411,27 @@ const CashflowChartCard = ({
           <ResponsiveContainer width="100%" height={height}>
             <ComposedChart
               data={processedData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+              margin={{
+                top: 20,
+                right: 30,
+                left: 20,
+                bottom: 5,
+              }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis
                 dataKey="displayDate"
-                tick={{ fontSize: 12 }}
+                tick={{
+                  fontSize: 12,
+                }}
                 stroke="#6b7280"
               />
               <YAxis
                 yAxisId="bars"
                 orientation="left"
-                tick={{ fontSize: 12 }}
+                tick={{
+                  fontSize: 12,
+                }}
                 stroke="#6b7280"
                 tickFormatter={value =>
                   formatCurrencyLocal(value).replace('R$', 'R$')
@@ -439,7 +441,9 @@ const CashflowChartCard = ({
                 <YAxis
                   yAxisId="line"
                   orientation="right"
-                  tick={{ fontSize: 12 }}
+                  tick={{
+                    fontSize: 12,
+                  }}
                   stroke="#6b7280"
                   tickFormatter={value =>
                     formatCurrencyLocal(value).replace('R$', 'R$')
@@ -495,7 +499,11 @@ const CashflowChartCard = ({
                     name="Saldo Acumulado"
                     stroke="#3b82f6"
                     strokeWidth={3}
-                    dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
+                    dot={{
+                      fill: '#3b82f6',
+                      strokeWidth: 2,
+                      r: 4,
+                    }}
                     activeDot={{
                       r: 6,
                       stroke: '#3b82f6',
@@ -512,7 +520,7 @@ const CashflowChartCard = ({
       {/* Footer com insights */}
       {metrics && !loading && (
         <div className="px-4 pb-4">
-          <div className="bg-gray-50 rounded-lg p-3">
+          <div className="bg-light-bg dark:bg-dark-bg rounded-lg p-3">
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center space-x-4">
                 <div className="flex items-center text-green-600">
@@ -526,7 +534,7 @@ const CashflowChartCard = ({
                   </div>
                 )}
               </div>
-              <div className="text-gray-600 text-xs">
+              <div className="text-theme-secondary text-xs">
                 Período: {processedData.length}{' '}
                 {period === 'daily' ? 'dias' : 'períodos'}
               </div>
@@ -537,7 +545,6 @@ const CashflowChartCard = ({
     </div>
   );
 };
-
 CashflowChartCard.propTypes = {
   /**
    * Dados do fluxo de caixa
@@ -555,67 +562,54 @@ CashflowChartCard.propTypes = {
       reconciled_percentage: PropTypes.number,
     })
   ),
-
   /**
    * Título do card
    */
   title: PropTypes.string,
-
   /**
    * Subtítulo do card
    */
   subtitle: PropTypes.string,
-
   /**
    * Período dos dados
    */
   period: PropTypes.oneOf(['daily', 'weekly', 'monthly', 'yearly']),
-
   /**
    * Mostrar linha de saldo acumulado
    */
   showBalance: PropTypes.bool,
-
   /**
    * Mostrar barras de entrada/saída
    */
   showBars: PropTypes.bool,
-
   /**
    * Mostrar linha
    */
   showLine: PropTypes.bool,
-
   /**
    * Altura do gráfico
    */
   height: PropTypes.number,
-
   /**
    * Estado de loading
    */
   loading: PropTypes.bool,
-
   /**
    * Mensagem de erro
    */
   error: PropTypes.string,
-
   /**
    * Callback para atualizar dados
    */
   onRefresh: PropTypes.func,
-
   /**
    * Callback para exportar dados
    */
   onExport: PropTypes.func,
-
   /**
    * Callback para tela cheia
    */
   onFullscreen: PropTypes.func,
-
   /**
    * Classes CSS adicionais
    */
@@ -629,7 +623,6 @@ export const CashflowChartCardPreview = () => {
     const data = [];
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - 30);
-
     let accumulatedBalance = 5000; // Saldo inicial
 
     for (let i = 0; i < 30; i++) {
@@ -642,7 +635,6 @@ export const CashflowChartCardPreview = () => {
       const saidas = (seedValue % 800) + 100; // 100-900
       const dailyBalance = entradas - saidas;
       accumulatedBalance += dailyBalance;
-
       data.push({
         date: date.toISOString().split('T')[0],
         inflows: entradas,
@@ -652,14 +644,12 @@ export const CashflowChartCardPreview = () => {
         reconciled_percentage: 70 + (i % 30), // 70-100%
       });
     }
-
     return data;
   }, []); // Array vazio significa que só gera uma vez
 
   const handleAction = action => {
     alert(`Ação: ${action}`);
   };
-
   return (
     <div className="space-y-6 p-4 max-w-6xl">
       <h3 className="text-lg font-semibold">CashflowChartCard Preview</h3>
@@ -713,5 +703,4 @@ export const CashflowChartCardPreview = () => {
     </div>
   );
 };
-
 export default CashflowChartCard;

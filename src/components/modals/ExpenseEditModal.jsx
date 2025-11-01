@@ -52,7 +52,6 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
   const [childCategories, setChildCategories] = useState([]);
   const [selectedParentId, setSelectedParentId] = useState('');
   const [selectedCategoryName, setSelectedCategoryName] = useState('');
-
   const [parties, setParties] = useState([]);
   const [professionals, setProfessionals] = useState([]);
   const [bankAccounts, setBankAccounts] = useState([]);
@@ -89,11 +88,9 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
       }
     }
   }, [isOpen, expense]);
-
   const loadRelatedData = async () => {
     try {
       const currentUnitId = expense?.unit_id || unitId;
-
       if (!currentUnitId) {
         console.error('❌ unitId não fornecido');
         return;
@@ -108,7 +105,6 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
         .eq('is_active', true)
         .is('parent_id', null)
         .order('name');
-
       setParentCategories(parentCategoriesData || []);
 
       // Carregar parties
@@ -134,7 +130,6 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
         .eq('unit_id', currentUnitId)
         .eq('is_active', true)
         .order('name');
-
       setParties(partiesData || []);
       setProfessionals(professionalsData || []);
       setBankAccounts(accountsData || []);
@@ -156,11 +151,9 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
         .select('id, name, parent_id')
         .eq('id', categoryId)
         .single();
-
       if (categoryData) {
         // Atualizar nome da categoria para detecção de comissão
         setSelectedCategoryName(categoryData.name);
-
         if (categoryData.parent_id) {
           // É uma categoria filha
           setSelectedParentId(categoryData.parent_id);
@@ -186,7 +179,6 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
         .eq('is_active', true)
         .eq('parent_id', parentId)
         .order('name');
-
       setChildCategories(childCategoriesData || []);
     } catch (error) {
       console.error('❌ Erro ao carregar subcategorias:', error);
@@ -196,9 +188,12 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
   // Handler para mudança de categoria pai
   const handleParentCategoryChange = async parentId => {
     setSelectedParentId(parentId);
-    setFormData(prev => ({ ...prev, category_id: '', party_id: '' })); // Reset categoria filha e party
+    setFormData(prev => ({
+      ...prev,
+      category_id: '',
+      party_id: '',
+    })); // Reset categoria filha e party
     setSelectedCategoryName('');
-
     if (parentId) {
       await loadChildCategories(parentId);
 
@@ -214,7 +209,11 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
 
   // Handler para mudança de categoria filha
   const handleChildCategoryChange = categoryId => {
-    setFormData(prev => ({ ...prev, category_id: categoryId, party_id: '' })); // Reset party ao trocar categoria
+    setFormData(prev => ({
+      ...prev,
+      category_id: categoryId,
+      party_id: '',
+    })); // Reset party ao trocar categoria
 
     // Atualizar nome da categoria selecionada
     const childCategory = childCategories.find(c => c.id === categoryId);
@@ -222,7 +221,6 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
       setSelectedCategoryName(childCategory.name);
     }
   };
-
   const populateForm = () => {
     if (expense) {
       setFormData({
@@ -241,10 +239,8 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
       });
     }
   };
-
   const handleSubmit = async e => {
     e.preventDefault();
-
     if (!formData.description || !formData.value) {
       showToast({
         type: 'error',
@@ -253,13 +249,11 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
       });
       return;
     }
-
     try {
       setLoading(true);
 
       // Se não selecionou categoria filha, usa a categoria pai
       const finalCategoryId = formData.category_id || selectedParentId || null;
-
       const dataToSave = {
         description: formData.description,
         value: parseFloat(formData.value),
@@ -274,17 +268,13 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
         status: formData.status,
         actual_payment_date: formData.actual_payment_date,
       };
-
       let error;
-
       if (isCreateMode) {
         // Modo criação
         const currentUnitId = unitId;
-
         if (!currentUnitId) {
           throw new Error('Unit ID não fornecido');
         }
-
         const createData = {
           ...dataToSave,
           unit_id: currentUnitId,
@@ -292,10 +282,8 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         };
-
         const result = await supabase.from('expenses').insert([createData]);
         error = result.error;
-
         if (!error) {
           showToast({
             type: 'success',
@@ -309,14 +297,11 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
           ...dataToSave,
           updated_at: new Date().toISOString(),
         };
-
         const result = await supabase
           .from('expenses')
           .update(updateData)
           .eq('id', expense.id);
-
         error = result.error;
-
         if (!error) {
           showToast({
             type: 'success',
@@ -326,9 +311,7 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
           });
         }
       }
-
       if (error) throw error;
-
       onSave();
       onClose();
     } catch (error) {
@@ -345,9 +328,7 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
       setLoading(false);
     }
   };
-
   if (!isOpen) return null;
-
   return (
     <div
       className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
@@ -361,7 +342,7 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
         onClick={e => e.stopPropagation()}
       >
         {/* 🎯 Header com visual destacado */}
-        <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent dark:from-primary/20 dark:via-primary/10 px-6 py-5 border-b border-light-border dark:border-dark-border">
+        <div className="bg-primary/10 dark:bg-primary/20 px-6 py-5 border-b border-light-border dark:border-dark-border">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
               <h2
@@ -430,7 +411,10 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
                     min="0"
                     value={formData.value}
                     onChange={e =>
-                      setFormData(prev => ({ ...prev, value: e.target.value }))
+                      setFormData(prev => ({
+                        ...prev,
+                        value: e.target.value,
+                      }))
                     }
                     className="input-theme pl-10"
                     placeholder="0,00"
@@ -444,7 +428,10 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
                   type="date"
                   value={formData.date}
                   onChange={e =>
-                    setFormData(prev => ({ ...prev, date: e.target.value }))
+                    setFormData(prev => ({
+                      ...prev,
+                      date: e.target.value,
+                    }))
                   }
                   className="input-theme"
                 />
@@ -468,7 +455,7 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
 
           {/* ✅ Seção: Status de Pagamento */}
           <div className="mb-8">
-            <div className="p-4 bg-gradient-to-br from-primary/5 to-transparent dark:from-primary/10 rounded-xl border border-primary/20 dark:border-primary/30">
+            <div className="p-4 bg-primary/5 dark:bg-primary/10 rounded-xl border border-primary/20 dark:border-primary/30">
               <label className="flex items-start gap-3 cursor-pointer group">
                 <div className="flex items-center h-6">
                   <input
@@ -484,7 +471,7 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
                           : null,
                       }));
                     }}
-                    className="w-5 h-5 text-primary bg-white dark:bg-dark-surface border-2 border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 dark:focus:ring-offset-dark-bg cursor-pointer transition-all"
+                    className="w-5 h-5 text-primary card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 dark:focus:ring-offset-dark-bg cursor-pointer transition-all"
                   />
                 </div>
                 <div className="flex-1">
@@ -556,7 +543,10 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
                 <select
                   value={formData.party_id}
                   onChange={e =>
-                    setFormData(prev => ({ ...prev, party_id: e.target.value }))
+                    setFormData(prev => ({
+                      ...prev,
+                      party_id: e.target.value,
+                    }))
                   }
                   className="input-theme"
                 >
@@ -680,7 +670,7 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-5 py-2.5 rounded-lg font-medium transition-all duration-200 bg-light-surface dark:bg-dark-surface text-theme-primary hover:bg-light-border dark:hover:bg-dark-border focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-dark-bg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-5 py-2.5 rounded-lg font-medium transition-all duration-200 card-theme text-theme-primary hover:bg-light-border dark:hover:bg-dark-border focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-dark-bg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancelar
             </button>
@@ -688,11 +678,11 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
               type="submit"
               disabled={loading}
               onClick={handleSubmit}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium transition-all duration-200 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white shadow-lg shadow-green-500/30 hover:shadow-green-500/50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-dark-bg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+              className="flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium transition-all duration-200 bg-gradient-success hover:opacity-90 text-dark-text-primary shadow-lg shadow-green-500/30 hover:shadow-green-500/50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-dark-bg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
             >
               {loading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-light-surface dark:border-dark-surface/30 border-t-white rounded-full animate-spin" />
                   {isCreateMode ? 'Criando...' : 'Salvando...'}
                 </>
               ) : (
@@ -733,5 +723,4 @@ const FormField = ({
     </div>
   );
 };
-
 export default ExpenseEditModal;

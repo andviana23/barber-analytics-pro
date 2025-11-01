@@ -54,10 +54,8 @@ import {
 } from 'lucide-react';
 import { format, addMonths, isAfter, isBefore } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-
 import { PartySelector } from '../atoms/PartySelector';
 import { StatusBadge } from '../atoms/StatusBadge';
-
 const NovaDespesaModal = ({
   isOpen = false,
   onClose = () => {},
@@ -97,7 +95,6 @@ const NovaDespesaModal = ({
             .eq('is_active', true)
             .eq('unit_id', unidadeId)
             .order('name');
-
         if (categoriesError) throw categoriesError;
 
         // Se não encontrar categorias para a unidade, buscar todas
@@ -112,7 +109,6 @@ const NovaDespesaModal = ({
               .eq('category_type', 'Expense')
               .eq('is_active', true)
               .order('name');
-
           if (allCategoriesError) throw allCategoriesError;
           categoriesData = allCategories || [];
         } else {
@@ -126,7 +122,6 @@ const NovaDespesaModal = ({
           .eq('is_active', true)
           .eq('unit_id', unidadeId)
           .order('name');
-
         if (accountsError) throw accountsError;
 
         // Buscar fornecedores
@@ -137,9 +132,7 @@ const NovaDespesaModal = ({
           .eq('is_active', true)
           .eq('unit_id', unidadeId)
           .order('nome');
-
         if (suppliersError) throw suppliersError;
-
         setCategories(categoriesData || []);
         setAccounts(accountsData || []);
         setSuppliers(suppliersData || []);
@@ -154,21 +147,30 @@ const NovaDespesaModal = ({
         setLoadingData(false);
       }
     };
-
     fetchData();
   }, [unidadeId]);
 
   // Centros de custo baseados nas unidades
   const costCenters = useMemo(() => {
     return [
-      { id: '1', nome: 'Nova Lima' },
-      { id: '2', nome: 'Mangabeiras' },
-      { id: '3', nome: 'Administração' },
+      {
+        id: '1',
+        nome: 'Nova Lima',
+      },
+      {
+        id: '2',
+        nome: 'Mangabeiras',
+      },
+      {
+        id: '3',
+        nome: 'Administração',
+      },
     ];
   }, []);
   const [formData, setFormData] = useState({
     fornecedor_id: '',
-    data_competencia: null, // Forçar seleção manual da data correta
+    data_competencia: null,
+    // Forçar seleção manual da data correta
     descricao: '',
     valor: '',
     categoria_id: '',
@@ -180,7 +182,6 @@ const NovaDespesaModal = ({
     anexos: [],
     status: 'pendente',
   });
-
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringConfig, setRecurringConfig] = useState({
     configuracao: 'mensal-12x',
@@ -188,7 +189,6 @@ const NovaDespesaModal = ({
     duracao_personalizada: '',
     previewExpanded: false,
   });
-
   const [errors, setErrors] = useState({});
   const [isDirty, setIsDirty] = useState(false);
 
@@ -223,56 +223,102 @@ const NovaDespesaModal = ({
       color: 'orange',
     },
   ];
-
-  const dayOptions = Array.from({ length: 31 }, (_, i) => ({
-    value: i + 1,
-    label: `${i + 1}º dia`,
-  }));
-
+  const dayOptions = Array.from(
+    {
+      length: 31,
+    },
+    (_, i) => ({
+      value: i + 1,
+      label: `${i + 1}º dia`,
+    })
+  );
   const paymentMethods = [
-    { value: 'pix', label: 'PIX', icon: Zap, color: 'green' },
+    {
+      value: 'pix',
+      label: 'PIX',
+      icon: Zap,
+      color: 'green',
+    },
     {
       value: 'transferencia',
       label: 'Transferência',
       icon: Building2,
       color: 'blue',
     },
-    { value: 'cartao', label: 'Cartão', icon: CreditCard, color: 'purple' },
-    { value: 'dinheiro', label: 'Dinheiro', icon: DollarSign, color: 'yellow' },
+    {
+      value: 'cartao',
+      label: 'Cartão',
+      icon: CreditCard,
+      color: 'purple',
+    },
+    {
+      value: 'dinheiro',
+      label: 'Dinheiro',
+      icon: DollarSign,
+      color: 'yellow',
+    },
   ];
-
   const installmentOptions = [
-    { value: 'avista', label: 'À vista', icon: CheckCircle },
-    { value: '2x', label: '2x sem juros', icon: CreditCard },
-    { value: '3x', label: '3x sem juros', icon: CreditCard },
-    { value: '6x', label: '6x sem juros', icon: CreditCard },
-    { value: '12x', label: '12x sem juros', icon: CreditCard },
-    { value: 'personalizado', label: 'Personalizado', icon: Settings },
+    {
+      value: 'avista',
+      label: 'À vista',
+      icon: CheckCircle,
+    },
+    {
+      value: '2x',
+      label: '2x sem juros',
+      icon: CreditCard,
+    },
+    {
+      value: '3x',
+      label: '3x sem juros',
+      icon: CreditCard,
+    },
+    {
+      value: '6x',
+      label: '6x sem juros',
+      icon: CreditCard,
+    },
+    {
+      value: '12x',
+      label: '12x sem juros',
+      icon: CreditCard,
+    },
+    {
+      value: 'personalizado',
+      label: 'Personalizado',
+      icon: Settings,
+    },
   ];
 
   // Cálculo inteligente de preview das despesas recorrentes
   const recurringPreview = useMemo(() => {
     if (!isRecurring || !formData.data_vencimento) return [];
-
     const previews = [];
     let currentDate = new Date(formData.data_vencimento);
     let count = 0;
     const maxPreviews = 6;
-
     const durationConfigs = {
-      'mensal-12x': { months: 12, maxParcels: 12 },
-      'mensal-36x': { months: 36, maxParcels: 36 },
-      'mensal-8x': { months: 8, maxParcels: 8 },
+      'mensal-12x': {
+        months: 12,
+        maxParcels: 12,
+      },
+      'mensal-36x': {
+        months: 36,
+        maxParcels: 36,
+      },
+      'mensal-8x': {
+        months: 8,
+        maxParcels: 8,
+      },
       personalizar: {
         months: parseInt(recurringConfig.duracao_personalizada) || 12,
         maxParcels: parseInt(recurringConfig.duracao_personalizada) || 12,
       },
     };
-
     const config =
       durationConfigs[recurringConfig.configuracao] ||
       durationConfigs['mensal-12x'];
-
     while (count < maxPreviews && count < config.maxParcels) {
       if (count > 0) {
         const targetDate = new Date(
@@ -280,7 +326,6 @@ const NovaDespesaModal = ({
           currentDate.getMonth(),
           recurringConfig.cobrar_sempre_no
         );
-
         previews.push({
           date: targetDate,
           value: parseFloat(formData.valor || 0),
@@ -288,11 +333,9 @@ const NovaDespesaModal = ({
           parcela: count + 1,
         });
       }
-
       currentDate = addMonths(currentDate, 1);
       count++;
     }
-
     return previews;
   }, [
     isRecurring,
@@ -310,7 +353,6 @@ const NovaDespesaModal = ({
         [field]: value,
       }));
       setIsDirty(true);
-
       if (errors[field]) {
         setErrors(prev => ({
           ...prev,
@@ -332,13 +374,10 @@ const NovaDespesaModal = ({
         });
         return;
       }
-
       try {
         setLoadingData(true);
-
         const { data: newSupplier, error } =
           await partiesService.createQuickSupplier(unidadeId, supplierName);
-
         if (error) {
           addToast({
             type: 'error',
@@ -364,7 +403,6 @@ const NovaDespesaModal = ({
             fornecedor_id: null,
           }));
         }
-
         addToast({
           type: 'success',
           title: 'Fornecedor criado',
@@ -382,34 +420,26 @@ const NovaDespesaModal = ({
     },
     [unidadeId, errors.fornecedor_id, addToast]
   );
-
   const validateForm = useCallback(() => {
     const newErrors = {};
-
     if (!formData.fornecedor_id) {
       newErrors.fornecedor_id = 'Fornecedor é obrigatório';
     }
-
     if (!formData.descricao.trim()) {
       newErrors.descricao = 'Descrição é obrigatória';
     }
-
     if (!formData.valor || parseFloat(formData.valor) <= 0) {
       newErrors.valor = 'Valor deve ser maior que zero';
     }
-
     if (!formData.categoria_id) {
       newErrors.categoria_id = 'Categoria é obrigatória';
     }
-
     if (!formData.data_vencimento) {
       newErrors.data_vencimento = 'Data de vencimento é obrigatória';
     }
-
     if (!formData.data_competencia) {
       newErrors.data_competencia = 'Data de competência é obrigatória';
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }, [formData]);
@@ -424,7 +454,6 @@ const NovaDespesaModal = ({
     };
     return durationConfigs[recurringConfig.configuracao] || 12;
   }, [recurringConfig.configuracao, recurringConfig.duracao_personalizada]);
-
   const handleSave = useCallback(async () => {
     if (!validateForm()) {
       console.log('❌ Validação falhou');
@@ -435,22 +464,25 @@ const NovaDespesaModal = ({
       });
       return;
     }
-
     try {
       setSaving(true);
 
       // Preparar dados da despesa conforme schema REAL do banco
       const expenseData = {
-        type: 'other', // Enum obrigatório: rent, salary, supplies, utilities, other
+        type: 'other',
+        // Enum obrigatório: rent, salary, supplies, utilities, other
         unit_id: unidadeId,
         party_id: formData.fornecedor_id || null,
         account_id: formData.conta_id || null,
         category_id: formData.categoria_id || null,
         description: formData.descricao.trim(),
         value: parseFloat(formData.valor),
-        date: formData.data_competencia, // Data de emissão (obrigatória)
-        data_competencia: formData.data_competencia, // Data de competência contábil
-        expected_payment_date: formData.data_vencimento, // Data de vencimento
+        date: formData.data_competencia,
+        // Data de emissão (obrigatória)
+        data_competencia: formData.data_competencia,
+        // Data de competência contábil
+        expected_payment_date: formData.data_vencimento,
+        // Data de vencimento
         actual_payment_date:
           formData.status === 'pago' ? formData.data_vencimento : null,
         forma_pagamento: formData.forma_pagamento || null,
@@ -461,45 +493,37 @@ const NovaDespesaModal = ({
         anexos:
           formData.anexos && formData.anexos.length > 0 ? formData.anexos : [],
       };
-
       console.log('💾 Salvando despesa:', expenseData);
-
       let expense;
 
       // ✅ CORREÇÃO DO BUG: Verificar se está editando ou criando
       if (isEditing && initialData?.id) {
         // 🔄 MODO EDIÇÃO: Atualizar despesa existente
         console.log('🔄 Atualizando despesa existente, ID:', initialData.id);
-
         const { data: updatedExpense, error: expenseError } = await supabase
           .from('expenses')
           .update(expenseData)
           .eq('id', initialData.id)
           .select()
           .single();
-
         if (expenseError) {
           console.error('❌ Erro ao atualizar despesa:', expenseError);
           throw expenseError;
         }
-
         expense = updatedExpense;
         console.log('✅ Despesa atualizada:', expense);
       } else {
         // ➕ MODO CRIAÇÃO: Inserir nova despesa
         console.log('➕ Criando nova despesa');
-
         const { data: newExpense, error: expenseError } = await supabase
           .from('expenses')
           .insert(expenseData)
           .select()
           .single();
-
         if (expenseError) {
           console.error('❌ Erro ao inserir despesa:', expenseError);
           throw expenseError;
         }
-
         expense = newExpense;
         console.log('✅ Despesa criada:', expense);
       }
@@ -515,14 +539,11 @@ const NovaDespesaModal = ({
           data_inicio: formData.data_competencia,
           total_parcelas: getTotalParcels(),
         };
-
         const { error: recurringError } = await supabase
           .from('recurring_expenses')
           .insert(recurringData);
-
         if (recurringError) throw recurringError;
       }
-
       addToast({
         type: 'success',
         title: isEditing ? 'Despesa atualizada!' : 'Despesa salva!',
@@ -532,7 +553,6 @@ const NovaDespesaModal = ({
             ? 'Despesa recorrente criada com sucesso.'
             : 'Despesa única salva com sucesso.',
       });
-
       onSave(expense);
       onClose(); // Fechar modal após salvar
     } catch (error) {
@@ -558,7 +578,6 @@ const NovaDespesaModal = ({
     isEditing,
     initialData,
   ]);
-
   const handleClose = useCallback(() => {
     if (isDirty) {
       if (
@@ -596,7 +615,6 @@ const NovaDespesaModal = ({
         anexos: initialData.anexos || [],
         status: initialData.status || 'pendente',
       });
-
       if (initialData.recorrencia) {
         setIsRecurring(true);
         setRecurringConfig(initialData.recorrencia);
@@ -606,20 +624,19 @@ const NovaDespesaModal = ({
 
   // Não renderizar se não estiver aberto
   if (!isOpen) return null;
-
   if (loadingData) {
     return (
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8 max-w-md w-full">
+        <div className="card-theme dark:bg-dark-surface rounded-2xl shadow-2xl p-8 max-w-md w-full">
           <div className="flex flex-col items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg flex items-center justify-center">
-              <Clock className="w-6 h-6 text-white animate-spin" />
+            <div className="w-12 h-12 bg-gradient-primary rounded-xl shadow-lg flex items-center justify-center">
+              <Clock className="w-6 h-6 text-dark-text-primary animate-spin" />
             </div>
             <div className="text-center">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
                 Carregando dados...
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
                 Buscando categorias, contas e fornecedores
               </p>
             </div>
@@ -628,21 +645,20 @@ const NovaDespesaModal = ({
       </div>
     );
   }
-
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-300 overflow-y-auto">
-      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-5xl min-h-[80vh] max-h-[95vh] border border-gray-200 dark:border-gray-700 animate-in zoom-in-95 duration-300 my-8 flex flex-col">
+      <div className="card-theme dark:bg-dark-surface rounded-2xl shadow-2xl w-full max-w-5xl min-h-[80vh] max-h-[95vh] border border-light-border dark:border-dark-border animate-in zoom-in-95 duration-300 my-8 flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20">
+        <div className="flex items-center justify-between p-4 border-b border-light-border dark:border-dark-border bg-red-50 dark:bg-red-900/20">
           <div className="flex items-center gap-4">
-            <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg">
-              <Calculator className="w-6 h-6 text-white" />
+            <div className="flex items-center justify-center w-12 h-12 bg-gradient-error rounded-xl shadow-lg">
+              <Calculator className="w-6 h-6 text-dark-text-primary" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+              <h2 className="text-lg font-bold text-theme-primary dark:text-dark-text-primary">
                 {isEditing ? 'Editar Despesa' : 'Nova Despesa'}
               </h2>
-              <p className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-2">
+              <p className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted flex items-center gap-2">
                 <span
                   className={`w-2 h-2 rounded-full ${isRecurring ? 'bg-orange-500' : 'bg-green-500'}`}
                 ></span>
@@ -652,23 +668,23 @@ const NovaDespesaModal = ({
           </div>
           <button
             onClick={handleClose}
-            className="flex items-center justify-center w-10 h-10 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 group"
+            className="flex items-center justify-center w-10 h-10 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted hover:text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:hover:text-gray-200 rounded-xl hover:card-theme dark:hover:bg-dark-surface transition-all duration-200 group"
           >
             <X className="w-5 h-5 group-hover:scale-110 transition-transform" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-800/50 scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-200 dark:scrollbar-track-gray-800 max-h-[calc(95vh-200px)]">
+        <div className="flex-1 overflow-y-auto bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50 scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-200 dark:scrollbar-track-gray-800 max-h-[calc(95vh-200px)]">
           <div className="p-6 space-y-6">
             {/* 📋 1. Informações do Lançamento */}
             <div className="space-y-6">
-              <div className="flex items-center gap-4 pb-6 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg">
-                  <FileText className="w-5 h-5 text-white" />
+              <div className="flex items-center gap-4 pb-6 border-b border-light-border dark:border-dark-border">
+                <div className="flex items-center justify-center w-10 h-10 bg-gradient-primary rounded-xl shadow-lg">
+                  <FileText className="w-5 h-5 text-dark-text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                  <h3 className="text-base font-semibold text-theme-primary dark:text-dark-text-primary">
                     Informações do lançamento
                   </h3>
                 </div>
@@ -677,10 +693,10 @@ const NovaDespesaModal = ({
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                 {/* Fornecedor */}
                 <div className="lg:col-span-1">
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                     Fornecedor
                   </label>
-                  <div className="bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-300 dark:border-gray-600 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/20 transition-all duration-200">
+                  <div className="card-theme dark:bg-dark-surface rounded-xl border-2 border-light-border dark:border-dark-border focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/20 transition-all duration-200">
                     <PartySelector
                       value={formData.fornecedor_id}
                       onChange={value =>
@@ -703,7 +719,7 @@ const NovaDespesaModal = ({
 
                 {/* Data de Competência */}
                 <div className="lg:col-span-1">
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                     Data de competência *
                   </label>
                   <input
@@ -719,11 +735,7 @@ const NovaDespesaModal = ({
                         e.target.value ? new Date(e.target.value) : null
                       )
                     }
-                    className={`w-full px-3 py-2 text-sm border-2 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
-                      errors.data_competencia
-                        ? 'border-red-400 dark:border-red-500'
-                        : 'border-gray-300 dark:border-gray-600'
-                    }`}
+                    className={`w-full px-3 py-2 text-sm border-2 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${errors.data_competencia ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                   />
                   {errors.data_competencia && (
                     <div className="mt-2 flex items-center gap-2 text-red-600 dark:text-red-400 text-xs">
@@ -735,7 +747,7 @@ const NovaDespesaModal = ({
 
                 {/* Descrição */}
                 <div className="lg:col-span-1">
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                     Descrição *
                   </label>
                   <input
@@ -745,11 +757,7 @@ const NovaDespesaModal = ({
                       handleInputChange('descricao', e.target.value)
                     }
                     placeholder="Ex: Aluguel, Material..."
-                    className={`w-full px-3 py-2 text-sm border-2 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
-                      errors.descricao
-                        ? 'border-red-400 dark:border-red-500'
-                        : 'border-gray-300 dark:border-gray-600'
-                    }`}
+                    className={`w-full px-3 py-2 text-sm border-2 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${errors.descricao ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                   />
                   {errors.descricao && (
                     <div className="mt-2 flex items-center gap-2 text-red-600 dark:text-red-400 text-xs">
@@ -761,11 +769,11 @@ const NovaDespesaModal = ({
 
                 {/* Valor */}
                 <div className="lg:col-span-1">
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                     Valor *
                   </label>
                   <div className="relative">
-                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400 font-medium text-sm">
+                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted font-medium text-sm">
                       R$
                     </div>
                     <input
@@ -775,11 +783,7 @@ const NovaDespesaModal = ({
                       value={formData.valor}
                       onChange={e => handleInputChange('valor', e.target.value)}
                       placeholder="0,00"
-                      className={`w-full pl-10 pr-4 py-2 text-sm border-2 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
-                        errors.valor
-                          ? 'border-red-400 dark:border-red-500'
-                          : 'border-gray-300 dark:border-gray-600'
-                      }`}
+                      className={`w-full pl-10 pr-4 py-2 text-sm border-2 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${errors.valor ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                     />
                   </div>
                   {errors.valor && (
@@ -792,7 +796,7 @@ const NovaDespesaModal = ({
 
                 {/* Categoria */}
                 <div className="lg:col-span-4">
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                     Categoria *
                   </label>
                   <div className="relative">
@@ -801,11 +805,7 @@ const NovaDespesaModal = ({
                       onChange={e =>
                         handleInputChange('categoria_id', e.target.value)
                       }
-                      className={`w-full px-3 py-2 text-sm border-2 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
-                        errors.categoria_id
-                          ? 'border-red-400 dark:border-red-500'
-                          : 'border-gray-300 dark:border-gray-600'
-                      }`}
+                      className={`w-full px-3 py-2 text-sm border-2 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${errors.categoria_id ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                     >
                       <option value="">Selecionar categoria...</option>
                       {(() => {
@@ -827,7 +827,6 @@ const NovaDespesaModal = ({
                             .sort((a, b) => a.name.localeCompare(b.name));
                           organized.push(...parentChildren);
                         });
-
                         return organized.map(category => {
                           const isParent = !category.parent_id;
                           return (
@@ -873,16 +872,16 @@ const NovaDespesaModal = ({
             </div>
 
             {/* Toggle de Recorrência */}
-            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/10 dark:to-indigo-900/10 border-2 border-purple-200 dark:border-purple-700/50 rounded-2xl">
+            <div className="flex items-center justify-between p-4 bg-purple-50 dark:bg-purple-900/10 border-2 border-purple-200 dark:border-purple-700/50 rounded-2xl">
               <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg">
-                  <Repeat className="w-5 h-5 text-white" />
+                <div className="flex items-center justify-center w-10 h-10 bg-gradient-purple rounded-xl shadow-lg">
+                  <Repeat className="w-5 h-5 text-dark-text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                  <h3 className="text-sm font-semibold text-theme-primary dark:text-dark-text-primary">
                     Despesa Recorrente
                   </h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                  <p className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                     Ativar para repetir este lançamento mensalmente
                   </p>
                 </div>
@@ -890,16 +889,10 @@ const NovaDespesaModal = ({
               <button
                 type="button"
                 onClick={() => setIsRecurring(!isRecurring)}
-                className={`relative inline-flex h-8 w-14 items-center rounded-full transition-all duration-300 ${
-                  isRecurring
-                    ? 'bg-gradient-to-r from-purple-500 to-purple-600'
-                    : 'bg-gray-300 dark:bg-gray-600'
-                }`}
+                className={`relative inline-flex h-8 w-14 items-center rounded-full transition-all duration-300 ${isRecurring ? 'bg-gradient-secondary' : 'bg-gray-300 dark:bg-gray-600'}`}
               >
                 <span
-                  className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform duration-300 shadow-lg ${
-                    isRecurring ? 'translate-x-7' : 'translate-x-1'
-                  }`}
+                  className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform duration-300 shadow-lg ${isRecurring ? 'translate-x-7' : 'translate-x-1'}`}
                 />
               </button>
             </div>
@@ -907,23 +900,23 @@ const NovaDespesaModal = ({
             {/* 🔁 2. Configuração de Repetição - Aparece apenas quando ativada */}
             {isRecurring && (
               <div className="space-y-6">
-                <div className="flex items-center justify-between pb-6 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between pb-6 border-b border-light-border dark:border-dark-border">
                   <div className="flex items-center gap-4">
-                    <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg">
-                      <Repeat className="w-5 h-5 text-white" />
+                    <div className="flex items-center justify-center w-10 h-10 bg-gradient-purple rounded-xl shadow-lg">
+                      <Repeat className="w-5 h-5 text-dark-text-primary" />
                     </div>
                     <div>
-                      <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                      <h3 className="text-base font-semibold text-theme-primary dark:text-dark-text-primary">
                         Configurações de repetição
                       </h3>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 border-2 border-purple-200 dark:border-purple-700 rounded-2xl p-6 space-y-6">
+                <div className="bg-purple-50 dark:bg-purple-900/20 border-2 border-purple-200 dark:border-purple-700 rounded-2xl p-6 space-y-6">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                         Configurações de Repetição
                       </label>
                       <select
@@ -934,7 +927,7 @@ const NovaDespesaModal = ({
                             configuracao: e.target.value,
                           }))
                         }
-                        className="w-full px-4 py-3 border-2 border-purple-300 dark:border-purple-600 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                        className="w-full px-4 py-3 border-2 border-purple-300 dark:border-purple-600 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-200 card-theme dark:bg-dark-surface text-theme-primary dark:text-dark-text-primary"
                       >
                         <option value="mensal-12x">
                           Mensal - A cada 1 mês(es), 12 vez(es)
@@ -950,7 +943,7 @@ const NovaDespesaModal = ({
                     </div>
 
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                         Cobrar sempre no
                       </label>
                       <select
@@ -961,7 +954,7 @@ const NovaDespesaModal = ({
                             cobrar_sempre_no: parseInt(e.target.value),
                           }))
                         }
-                        className="w-full px-4 py-3 border-2 border-purple-300 dark:border-purple-600 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                        className="w-full px-4 py-3 border-2 border-purple-300 dark:border-purple-600 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-200 card-theme dark:bg-dark-surface text-theme-primary dark:text-dark-text-primary"
                       >
                         {dayOptions.map(option => (
                           <option key={option.value} value={option.value}>
@@ -974,7 +967,7 @@ const NovaDespesaModal = ({
 
                   {recurringConfig.configuracao === 'personalizar' && (
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                         Duração (meses)
                       </label>
                       <input
@@ -988,7 +981,7 @@ const NovaDespesaModal = ({
                           }))
                         }
                         placeholder="Ex: 12"
-                        className="w-full px-4 py-3 border-2 border-purple-300 dark:border-purple-600 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                        className="w-full px-4 py-3 border-2 border-purple-300 dark:border-purple-600 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-200 card-theme dark:bg-dark-surface text-theme-primary dark:text-dark-text-primary placeholder-gray-500 dark:placeholder-gray-400"
                       />
                     </div>
                   )}
@@ -998,12 +991,12 @@ const NovaDespesaModal = ({
 
             {/* 💳 3. Condição de Pagamento */}
             <div className="space-y-6">
-              <div className="flex items-center gap-4 pb-6 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg">
-                  <CreditCard className="w-5 h-5 text-white" />
+              <div className="flex items-center gap-4 pb-6 border-b border-light-border dark:border-dark-border">
+                <div className="flex items-center justify-center w-10 h-10 bg-gradient-warning rounded-xl shadow-lg">
+                  <CreditCard className="w-5 h-5 text-dark-text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                  <h3 className="text-base font-semibold text-theme-primary dark:text-dark-text-primary">
                     Condição de pagamento
                   </h3>
                 </div>
@@ -1012,7 +1005,7 @@ const NovaDespesaModal = ({
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* 1º vencimento */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                     Data de vencimento *
                   </label>
                   <input
@@ -1028,11 +1021,7 @@ const NovaDespesaModal = ({
                         e.target.value ? new Date(e.target.value) : null
                       )
                     }
-                    className={`w-full px-3 py-2 text-sm border-2 rounded-lg focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
-                      errors.data_vencimento
-                        ? 'border-red-400 dark:border-red-500'
-                        : 'border-gray-300 dark:border-gray-600'
-                    }`}
+                    className={`w-full px-3 py-2 text-sm border-2 rounded-lg focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${errors.data_vencimento ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                   />
                   {errors.data_vencimento && (
                     <div className="mt-2 flex items-center gap-2 text-red-600 dark:text-red-400 text-xs">
@@ -1044,7 +1033,7 @@ const NovaDespesaModal = ({
 
                 {/* Forma de pagamento */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                     Forma de pagamento
                   </label>
                   <select
@@ -1052,7 +1041,7 @@ const NovaDespesaModal = ({
                     onChange={e =>
                       handleInputChange('forma_pagamento', e.target.value)
                     }
-                    className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 border-2 border-light-border dark:border-dark-border rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 card-theme dark:bg-dark-surface text-theme-primary dark:text-dark-text-primary"
                   >
                     {paymentMethods.map(method => (
                       <option key={method.value} value={method.value}>
@@ -1064,7 +1053,7 @@ const NovaDespesaModal = ({
 
                 {/* Conta de pagamento */}
                 <div className="lg:col-span-2">
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                     Conta de pagamento
                   </label>
                   <select
@@ -1072,7 +1061,7 @@ const NovaDespesaModal = ({
                     onChange={e =>
                       handleInputChange('conta_id', e.target.value)
                     }
-                    className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 border-2 border-light-border dark:border-dark-border rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 card-theme dark:bg-dark-surface text-theme-primary dark:text-dark-text-primary"
                   >
                     <option value="">Selecionar conta...</option>
                     {accounts.map(account => (
@@ -1090,19 +1079,19 @@ const NovaDespesaModal = ({
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Observações Tab */}
                 <div className="lg:col-span-2">
-                  <div className="border-b border-gray-200 dark:border-gray-700 mb-4">
+                  <div className="border-b border-light-border dark:border-dark-border mb-4">
                     <div className="flex gap-4">
                       <button className="px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400">
                         Observações
                       </button>
-                      <button className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+                      <button className="px-4 py-2 text-sm font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary">
                         Anexo
                       </button>
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                       Observações
                     </label>
                     <textarea
@@ -1112,7 +1101,7 @@ const NovaDespesaModal = ({
                       }
                       placeholder="Descreva observações relevantes sobre esse lançamento financeiro"
                       rows={4}
-                      className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-gray-500/20 focus:border-gray-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none"
+                      className="w-full px-4 py-3 border-2 border-light-border dark:border-dark-border rounded-xl focus:ring-4 focus:ring-gray-500/20 focus:border-gray-500 dark:border-gray-400 transition-all duration-200 card-theme dark:bg-dark-surface text-theme-primary dark:text-dark-text-primary placeholder-gray-500 dark:placeholder-gray-400 resize-none"
                     />
                   </div>
                 </div>
@@ -1122,8 +1111,8 @@ const NovaDespesaModal = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 mt-auto">
-          <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+        <div className="flex items-center justify-between p-4 border-t border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50 mt-auto">
+          <div className="flex items-center gap-3 text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
             {formData.status && (
               <>
                 <Shield className="w-4 h-4" />
@@ -1149,7 +1138,7 @@ const NovaDespesaModal = ({
             <button
               type="button"
               onClick={handleClose}
-              className="px-6 py-3 text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 font-medium"
+              className="px-6 py-3 text-gray-700 dark:text-gray-300 dark:text-gray-600 border-2 border-light-border dark:border-dark-border rounded-xl hover:card-theme dark:hover:bg-gray-700 transition-all duration-200 font-medium"
             >
               Cancelar
             </button>
@@ -1157,11 +1146,11 @@ const NovaDespesaModal = ({
               type="button"
               onClick={handleSave}
               disabled={loading}
-              className="px-8 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-3 font-semibold shadow-lg hover:shadow-xl"
+              className="px-8 py-3 bg-gradient-error text-dark-text-primary rounded-xl hover:from-red-600 hover:to-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-3 font-semibold shadow-lg hover:shadow-xl"
             >
               {loading ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-2 border-light-surface dark:border-dark-surface border-t-transparent rounded-full animate-spin" />
                   Salvando...
                 </>
               ) : (
@@ -1177,7 +1166,6 @@ const NovaDespesaModal = ({
     </div>
   );
 };
-
 NovaDespesaModal.propTypes = {
   isOpen: PropTypes.bool,
   onClose: PropTypes.func,
@@ -1220,27 +1208,24 @@ export const NovaDespesaModalPreview = () => {
         },
       }
     : null;
-
   const handleSave = async data => {
     setLoading(true);
     console.log('Saving expense:', data);
 
     // Simular salvamento
     await new Promise(resolve => setTimeout(resolve, 2000));
-
     setLoading(false);
     setIsOpen(false);
     alert('Despesa salva com sucesso!');
   };
-
   return (
-    <div className="p-6 bg-gray-100 dark:bg-gray-900 min-h-screen">
+    <div className="p-6 card-theme dark:bg-dark-surface min-h-screen">
       <div className="max-w-4xl mx-auto space-y-6">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+        <div className="card-theme dark:bg-dark-surface p-6 rounded-xl shadow-lg">
+          <h2 className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary mb-4">
             Nova Despesa Modal - Preview
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
+          <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-6">
             Modal completamente refatorado seguindo as especificações
             fornecidas. Inclui sistema inteligente de repetição, validação
             avançada e design otimizado.
@@ -1252,7 +1237,7 @@ export const NovaDespesaModalPreview = () => {
                 setIsEditing(false);
                 setIsOpen(true);
               }}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              className="px-4 py-2 bg-red-600 text-dark-text-primary rounded-lg hover:bg-red-700 transition-colors"
             >
               Nova Despesa
             </button>
@@ -1261,7 +1246,7 @@ export const NovaDespesaModalPreview = () => {
                 setIsEditing(true);
                 setIsOpen(true);
               }}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-blue-600 text-dark-text-primary rounded-lg hover:bg-blue-700 transition-colors"
             >
               Editar Despesa
             </button>
@@ -1281,5 +1266,4 @@ export const NovaDespesaModalPreview = () => {
     </div>
   );
 };
-
 export default NovaDespesaModal;

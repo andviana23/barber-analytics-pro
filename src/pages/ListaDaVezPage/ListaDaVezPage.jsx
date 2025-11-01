@@ -23,16 +23,22 @@ ChartJS.register(ArcElement, Tooltip, Legend);
  * Paleta premium inspirada no design system
  */
 const BARBER_COLORS = [
-  '#3B82F6', // Azul
-  '#EF4444', // Vermelho
-  '#F59E0B', // Amarelo/Laranja
-  '#10B981', // Verde
-  '#8B5CF6', // Roxo
-  '#EC4899', // Rosa
-  '#06B6D4', // Ciano
+  '#3B82F6',
+  // Azul
+  '#EF4444',
+  // Vermelho
+  '#F59E0B',
+  // Amarelo/Laranja
+  '#10B981',
+  // Verde
+  '#8B5CF6',
+  // Roxo
+  '#EC4899',
+  // Rosa
+  '#06B6D4',
+  // Ciano
   '#F97316', // Laranja escuro
 ];
-
 const ListaDaVezPage = () => {
   const navigate = useNavigate();
   const {
@@ -79,7 +85,6 @@ const ListaDaVezPage = () => {
       showToast('Selecione uma unidade primeiro', 'warning');
       return;
     }
-
     try {
       await initializeTurnList(selectedUnit.id);
       showToast('Lista inicializada com sucesso!', 'success');
@@ -117,7 +122,6 @@ const ListaDaVezPage = () => {
         ],
       };
     }
-
     return {
       labels: turnList.map(b => b.professionalName),
       datasets: [
@@ -134,7 +138,6 @@ const ListaDaVezPage = () => {
       ],
     };
   };
-
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: true,
@@ -155,16 +158,15 @@ const ListaDaVezPage = () => {
       },
     },
   };
-
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 space-y-6">
+    <div className="min-h-screen bg-light-bg dark:bg-dark-bg dark:bg-dark-surface p-6 space-y-6">
       {/* Cabeçalho */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-theme-primary dark:text-dark-text-primary">
             Lista da Vez
           </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
             Gerencie a ordem de atendimento dos barbeiros
           </p>
         </div>
@@ -205,7 +207,7 @@ const ListaDaVezPage = () => {
       {/* Seletor de Unidade */}
       <Card className="p-4">
         <div className="flex items-center gap-4">
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
+          <label className="text-sm font-medium text-theme-secondary whitespace-nowrap">
             Unidade:
           </label>
           <UnitSelector />
@@ -220,10 +222,10 @@ const ListaDaVezPage = () => {
               <FiUsers className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 Total de Barbeiros
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary">
                 {totalBarbers}
               </p>
             </div>
@@ -236,10 +238,10 @@ const ListaDaVezPage = () => {
               <FiTrendingUp className="w-6 h-6 text-green-600 dark:text-green-400" />
             </div>
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 Total de Atendimentos
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary">
                 {totalPoints}
               </p>
             </div>
@@ -252,10 +254,10 @@ const ListaDaVezPage = () => {
               <FiAward className="w-6 h-6 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 Média de Atendimentos
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary">
                 {averagePoints}
               </p>
             </div>
@@ -268,10 +270,10 @@ const ListaDaVezPage = () => {
               <FiClock className="w-6 h-6 text-orange-600 dark:text-orange-400" />
             </div>
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 Última Atualização
               </p>
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
+              <p className="text-sm font-medium text-theme-primary dark:text-dark-text-primary">
                 {new Date().toLocaleTimeString('pt-BR', {
                   hour: '2-digit',
                   minute: '2-digit',
@@ -285,21 +287,21 @@ const ListaDaVezPage = () => {
       {/* Conteúdo Principal */}
       {!selectedUnit?.id ? (
         <Card className="p-12 text-center">
-          <FiUsers className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          <FiUsers className="w-16 h-16 mx-auto text-light-text-muted dark:text-dark-text-muted mb-4" />
+          <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-2">
             Selecione uma Unidade
           </h3>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
             Escolha uma unidade acima para visualizar a lista da vez
           </p>
         </Card>
       ) : turnList.length === 0 ? (
         <Card className="p-12 text-center">
-          <FiUsers className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          <FiUsers className="w-16 h-16 mx-auto text-light-text-muted dark:text-dark-text-muted mb-4" />
+          <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-2">
             Nenhuma lista encontrada
           </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
+          <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-6">
             Inicialize a lista para esta unidade
           </p>
           <Button onClick={handleInitialize} disabled={loading}>
@@ -311,7 +313,7 @@ const ListaDaVezPage = () => {
           {/* Lista de Barbeiros (2/3) */}
           <div className="lg:col-span-2">
             <Card className="p-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+              <h2 className="text-xl font-bold text-theme-primary dark:text-dark-text-primary mb-4">
                 Ordem de Atendimento
               </h2>
 
@@ -325,17 +327,12 @@ const ListaDaVezPage = () => {
                   const color = BARBER_COLORS[index % BARBER_COLORS.length];
                   const isProcessing =
                     processingBarber === barber.professionalId;
-
                   return (
                     <div
                       key={barber.id}
                       className={`
                         flex items-center gap-3 p-3 rounded-lg border-l-4 transition-all
-                        ${
-                          isFirst
-                            ? 'bg-green-600 dark:bg-green-700 text-white border-green-800'
-                            : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700'
-                        }
+                        ${isFirst ? 'bg-green-600 dark:bg-green-700 text-white border-green-800' : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700'}
                         ${isProcessing ? 'opacity-50' : ''}
                       `}
                       style={{
@@ -400,11 +397,7 @@ const ListaDaVezPage = () => {
                         size="sm"
                         className={`
                           flex-shrink-0
-                          ${
-                            isFirst
-                              ? 'bg-green-800 text-white hover:bg-green-900 border-green-900 font-bold shadow-lg'
-                              : 'bg-blue-600 text-white hover:bg-blue-700 border-blue-600 font-semibold'
-                          }
+                          ${isFirst ? 'bg-green-800 text-white hover:bg-green-900 border-green-900 font-bold shadow-lg' : 'bg-blue-600 text-white hover:bg-blue-700 border-blue-600 font-semibold'}
                         `}
                       >
                         {isProcessing ? '...' : '+1'}
@@ -419,13 +412,15 @@ const ListaDaVezPage = () => {
           {/* Gráfico de Distribuição (1/3) */}
           <div className="lg:col-span-1">
             <Card className="p-6 h-full">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+              <h2 className="text-xl font-bold text-theme-primary dark:text-dark-text-primary mb-4">
                 Distribuição de Atendimentos
               </h2>
 
               <div
                 className="flex items-center justify-center"
-                style={{ height: '300px' }}
+                style={{
+                  height: '300px',
+                }}
               >
                 <Doughnut data={getChartData()} options={chartOptions} />
               </div>
@@ -438,7 +433,6 @@ const ListaDaVezPage = () => {
                       ? ((barber.points / totalPoints) * 100).toFixed(1)
                       : '0.0';
                   const color = BARBER_COLORS[index % BARBER_COLORS.length];
-
                   return (
                     <div
                       key={barber.id}
@@ -447,13 +441,15 @@ const ListaDaVezPage = () => {
                       <div className="flex items-center gap-2">
                         <div
                           className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: color }}
+                          style={{
+                            backgroundColor: color,
+                          }}
                         />
-                        <span className="text-sm text-gray-700 dark:text-gray-300 truncate">
+                        <span className="text-sm text-theme-secondary truncate">
                           {barber.professionalName}
                         </span>
                       </div>
-                      <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                      <span className="text-sm font-semibold text-theme-primary dark:text-dark-text-primary">
                         {percentage}%
                       </span>
                     </div>
@@ -474,5 +470,4 @@ const ListaDaVezPage = () => {
     </div>
   );
 };
-
 export default ListaDaVezPage;

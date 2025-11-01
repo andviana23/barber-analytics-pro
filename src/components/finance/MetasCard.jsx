@@ -23,7 +23,6 @@ import { useNavigate } from 'react-router-dom';
  */
 export const MetasCard = ({ goals, loading, unitName }) => {
   const navigate = useNavigate();
-
   const getGoalTypeInfo = type => {
     const types = {
       revenue_general: {
@@ -84,7 +83,6 @@ export const MetasCard = ({ goals, loading, unitName }) => {
       }
     );
   };
-
   const getStatusInfo = status => {
     const statuses = {
       achieved: {
@@ -126,7 +124,6 @@ export const MetasCard = ({ goals, loading, unitName }) => {
     };
     return statuses[status] || statuses.critical;
   };
-
   const formatCurrency = value => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -135,21 +132,19 @@ export const MetasCard = ({ goals, loading, unitName }) => {
       maximumFractionDigits: 0,
     }).format(value || 0);
   };
-
   const formatPercent = value => {
     if (!value && value !== 0) return '0%';
     return `${value.toFixed(1).replace('.', ',')}%`;
   };
-
   if (loading) {
     return (
-      <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-3xl border-2 border-gray-200 dark:border-gray-700 p-8 shadow-2xl">
+      <div className="card-theme rounded-3xl p-8 shadow-2xl">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-2xl animate-pulse"></div>
+            <div className="w-14 h-14 bg-gray-200 dark:bg-gray-700 rounded-2xl animate-pulse"></div>
             <div>
-              <div className="h-7 w-40 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-lg mb-2 animate-pulse"></div>
-              <div className="h-4 w-24 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded animate-pulse"></div>
+              <div className="h-7 w-40 bg-gray-200 dark:bg-gray-700 rounded-lg mb-2 animate-pulse"></div>
+              <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
             </div>
           </div>
         </div>
@@ -157,32 +152,31 @@ export const MetasCard = ({ goals, loading, unitName }) => {
           {[...Array(3)].map((_, i) => (
             <div
               key={i}
-              className="h-36 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700/50 dark:to-gray-600/50 rounded-2xl animate-pulse"
+              className="h-36 bg-gradient-light dark:from-gray-700/50 dark:to-gray-600/50 rounded-2xl animate-pulse"
             ></div>
           ))}
         </div>
       </div>
     );
   }
-
   if (!goals || goals.length === 0) {
     return (
-      <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-3xl border-2 border-gray-200 dark:border-gray-700 p-8 shadow-2xl">
+      <div className="card-theme rounded-3xl p-8 shadow-2xl">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <div className="relative">
-              <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
-                <Target className="w-7 h-7 text-white" />
+              <div className="w-14 h-14 bg-gradient-primary rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+                <Target className="w-7 h-7 text-dark-text-primary" />
               </div>
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-400 rounded-full animate-ping"></div>
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <h3 className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary flex items-center gap-2">
                 Metas do Mês
                 <Sparkles className="w-5 h-5 text-blue-500" />
               </h3>
               {unitName && (
-                <p className="text-sm text-gray-600 dark:text-gray-400 font-medium mt-1">
+                <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted font-medium mt-1">
                   {unitName}
                 </p>
               )}
@@ -191,18 +185,18 @@ export const MetasCard = ({ goals, loading, unitName }) => {
         </div>
 
         <div className="text-center py-12">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 rounded-3xl mb-6 shadow-lg">
-            <Target className="w-10 h-10 text-gray-400 dark:text-gray-500" />
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-3xl mb-6 shadow-lg">
+            <Target className="w-10 h-10 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary" />
           </div>
-          <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          <h4 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-2">
             Nenhuma meta cadastrada
           </h4>
-          <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-sm mx-auto">
+          <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-6 max-w-sm mx-auto">
             Defina suas metas mensais para acompanhar o desempenho da unidade
           </p>
           <button
             onClick={() => navigate('/cadastros/metas')}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-semibold shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-primary text-dark-text-primary rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-semibold shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105"
           >
             <Target className="w-5 h-5" />
             Cadastrar Metas
@@ -223,27 +217,25 @@ export const MetasCard = ({ goals, loading, unitName }) => {
     };
     return (priority[a.goal_type] || 99) - (priority[b.goal_type] || 99);
   });
-
   const displayGoals = sortedGoals.slice(0, 5);
-
   return (
-    <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-3xl border-2 border-gray-200 dark:border-gray-700 p-8 shadow-2xl hover:shadow-3xl transition-shadow duration-300">
+    <div className="card-theme rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-shadow duration-300">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
           <div className="relative">
-            <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
-              <Target className="w-7 h-7 text-white" />
+            <div className="w-14 h-14 bg-gradient-primary rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+              <Target className="w-7 h-7 text-dark-text-primary" />
             </div>
             <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-400 rounded-full animate-ping"></div>
           </div>
           <div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <h3 className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary flex items-center gap-2">
               Metas do Mês
               <Sparkles className="w-5 h-5 text-blue-500" />
             </h3>
             {unitName && (
-              <p className="text-sm text-gray-600 dark:text-gray-400 font-medium mt-1">
+              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted font-medium mt-1">
                 {unitName}
               </p>
             )}
@@ -252,7 +244,7 @@ export const MetasCard = ({ goals, loading, unitName }) => {
 
         <button
           onClick={() => navigate('/cadastros/metas')}
-          className="group flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-all duration-300 font-semibold shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105"
+          className="group flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-dark-text-primary rounded-xl transition-all duration-300 font-semibold shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105"
         >
           Ver todas
           <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -268,16 +260,11 @@ export const MetasCard = ({ goals, loading, unitName }) => {
           const StatusIcon = statusInfo.icon;
           const percentage = goal.progress_percentage || 0;
           const isAchieved = goal.status === 'achieved';
-
           return (
             <div
               key={goal.id}
               onClick={() => navigate('/cadastros/metas')}
-              className={`group relative overflow-hidden rounded-2xl border-2 ${
-                isAchieved
-                  ? 'border-green-300 dark:border-green-700 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/20'
-                  : 'border-gray-200 dark:border-gray-700 bg-gradient-to-br from-gray-50 to-white dark:from-gray-800/50 dark:to-gray-900/50'
-              } p-6 cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-[1.02] ${statusInfo.glowColor}`}
+              className={`group relative overflow-hidden rounded-2xl border-2 ${isAchieved ? 'border-green-300 dark:border-green-700 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/20' : 'border-gray-200 dark:border-gray-700 bg-gradient-to-br from-gray-50 to-white dark:from-gray-800/50 dark:to-gray-900/50'} p-6 cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-[1.02] ${statusInfo.glowColor}`}
             >
               {/* Background Pattern */}
               <div className="absolute top-0 right-0 w-40 h-40 opacity-5 dark:opacity-10">
@@ -295,10 +282,10 @@ export const MetasCard = ({ goals, loading, unitName }) => {
                       <TypeIcon className={`w-6 h-6 ${typeInfo.iconColor}`} />
                     </div>
                     <div>
-                      <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
+                      <h4 className="text-lg font-bold text-theme-primary dark:text-dark-text-primary mb-1">
                         {typeInfo.label}
                       </h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                      <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted font-medium">
                         Meta: {formatCurrency(goal.target_value)}
                       </p>
                     </div>
@@ -327,7 +314,7 @@ export const MetasCard = ({ goals, loading, unitName }) => {
                         width: `${Math.min(100, Math.max(0, percentage))}%`,
                       }}
                     >
-                      <div className="absolute top-0 right-0 w-2 h-full bg-white/30 animate-pulse"></div>
+                      <div className="absolute top-0 right-0 w-2 h-full card-theme/30 animate-pulse"></div>
                     </div>
                   </div>
                 </div>
@@ -336,18 +323,18 @@ export const MetasCard = ({ goals, loading, unitName }) => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Zap className="w-4 h-4 text-blue-500" />
-                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                       Atingido:
                     </span>
-                    <span className="text-base font-bold text-gray-900 dark:text-white">
+                    <span className="text-base font-bold text-theme-primary dark:text-dark-text-primary">
                       {formatCurrency(goal.achieved_value)}
                     </span>
                   </div>
 
                   {goal.remaining_value > 0 && !isAchieved && (
-                    <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-700/50 rounded-lg">
-                      <Target className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                      <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center gap-2 px-3 py-1.5 card-theme dark:bg-gray-700/50 rounded-lg">
+                      <Target className="w-4 h-4 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted" />
+                      <span className="text-xs font-semibold text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                         Faltam: {formatCurrency(goal.remaining_value)}
                       </span>
                     </div>

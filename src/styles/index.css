@@ -173,4 +173,9 @@
   .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: #64748b;
   }
+
+  /* Chart Axis Text - Recharts compatibility */
+  .chart-axis-text {
+    font-size: 12px;
+  }
 }

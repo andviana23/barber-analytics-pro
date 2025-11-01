@@ -41,7 +41,6 @@ const CashReportPanel = ({
       </div>
     );
   }
-
   if (!cashRegister) {
     return (
       <div
@@ -69,24 +68,20 @@ const CashReportPanel = ({
       </div>
     );
   }
-
   const inflows = transactions.filter(t => t.type === 'inflow');
   const outflows = transactions.filter(t => t.type === 'outflow');
-
   const totalInflow = inflows.reduce((sum, t) => sum + (t.amount || 0), 0);
   const totalOutflow = outflows.reduce((sum, t) => sum + (t.amount || 0), 0);
-
   const expectedBalance =
     (cashRegister.opening_balance || 0) + totalInflow - totalOutflow;
   const actualBalance = cashRegister.closing_balance || 0;
   const difference = actualBalance - expectedBalance;
-
   return (
     <div
-      className={`bg-white dark:bg-dark-surface rounded-lg border border-light-border dark:border-dark-border overflow-hidden ${className}`}
+      className={`card-theme rounded-lg border border-light-border dark:border-dark-border overflow-hidden ${className}`}
     >
-      {/* Header com gradiente */}
-      <div className="px-6 py-5 border-b border-light-border dark:border-dark-border bg-gradient-to-r from-primary/10 to-primary/5">
+      {/* Header */}
+      <div className="px-6 py-5 border-b border-light-border dark:border-dark-border bg-primary/5 dark:bg-primary/10">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-theme-primary mb-1">
@@ -108,7 +103,7 @@ const CashReportPanel = ({
             {cashRegister.status === 'open' && onCloseCash && (
               <button
                 onClick={onCloseCash}
-                className="btn-theme-primary px-4 py-2 rounded-lg inline-flex items-center gap-2 text-sm font-medium transition-all hover:shadow-md bg-red-600 hover:bg-red-700 text-white"
+                className="btn-theme-primary px-4 py-2 rounded-lg inline-flex items-center gap-2 text-sm font-medium transition-all hover:shadow-md bg-red-600 hover:bg-red-700 text-dark-text-primary"
               >
                 <DollarSign className="w-4 h-4" />
                 Fechar Caixa
@@ -226,23 +221,13 @@ const CashReportPanel = ({
                   </span>
                 </div>
                 <div
-                  className={`px-4 py-3 flex justify-between items-center ${
-                    difference === 0
-                      ? 'bg-green-50 dark:bg-green-900/20'
-                      : 'bg-yellow-50 dark:bg-yellow-900/20'
-                  }`}
+                  className={`px-4 py-3 flex justify-between items-center ${difference === 0 ? 'bg-green-50 dark:bg-green-900/20' : 'bg-yellow-50 dark:bg-yellow-900/20'}`}
                 >
                   <span className="font-semibold text-theme-primary">
                     Diferença
                   </span>
                   <span
-                    className={`font-bold text-lg ${
-                      difference === 0
-                        ? 'text-green-600 dark:text-green-400'
-                        : difference > 0
-                          ? 'text-green-600 dark:text-green-400'
-                          : 'text-red-600 dark:text-red-400'
-                    }`}
+                    className={`font-bold text-lg ${difference === 0 ? 'text-green-600 dark:text-green-400' : difference > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
                   >
                     {difference > 0 ? '+' : ''}
                     {formatCurrency(difference)}
@@ -301,11 +286,7 @@ const CashReportPanel = ({
                     >
                       <td className="px-4 py-3">
                         <span
-                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            transaction.type === 'inflow'
-                              ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
-                              : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400'
-                          }`}
+                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${transaction.type === 'inflow' ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400'}`}
                         >
                           {transaction.type === 'inflow' ? 'Entrada' : 'Saída'}
                         </span>
@@ -314,11 +295,7 @@ const CashReportPanel = ({
                         {transaction.description || '-'}
                       </td>
                       <td
-                        className={`px-4 py-3 text-sm font-semibold text-right ${
-                          transaction.type === 'inflow'
-                            ? 'text-green-600 dark:text-green-400'
-                            : 'text-red-600 dark:text-red-400'
-                        }`}
+                        className={`px-4 py-3 text-sm font-semibold text-right ${transaction.type === 'inflow' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
                       >
                         {transaction.type === 'inflow' ? '+' : '-'}
                         {formatCurrency(transaction.amount || 0)}
@@ -337,7 +314,6 @@ const CashReportPanel = ({
     </div>
   );
 };
-
 CashReportPanel.propTypes = {
   /** Dados do caixa */
   cashRegister: PropTypes.shape({
@@ -372,5 +348,4 @@ CashReportPanel.propTypes = {
   /** Classes CSS adicionais */
   className: PropTypes.string,
 };
-
 export default CashReportPanel;

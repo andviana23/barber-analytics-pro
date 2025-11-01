@@ -35,36 +35,74 @@ const PieChartCard = ({
 
   // Paleta de cores premium (harmonizada para dark mode)
   const colors = [
-    { light: '#3B82F6', dark: '#60A5FA' }, // Azul
-    { light: '#8B5CF6', dark: '#A78BFA' }, // Roxo
-    { light: '#10B981', dark: '#34D399' }, // Verde
-    { light: '#F59E0B', dark: '#FBBF24' }, // Amarelo
-    { light: '#EF4444', dark: '#F87171' }, // Vermelho
-    { light: '#06B6D4', dark: '#22D3EE' }, // Ciano
-    { light: '#EC4899', dark: '#F472B6' }, // Rosa
-    { light: '#F97316', dark: '#FB923C' }, // Laranja
-    { light: '#84CC16', dark: '#A3E635' }, // Lima
-    { light: '#6366F1', dark: '#818CF8' }, // Indigo
+    {
+      light: '#3B82F6',
+      dark: '#60A5FA',
+    },
+    // Azul
+    {
+      light: '#8B5CF6',
+      dark: '#A78BFA',
+    },
+    // Roxo
+    {
+      light: '#10B981',
+      dark: '#34D399',
+    },
+    // Verde
+    {
+      light: '#F59E0B',
+      dark: '#FBBF24',
+    },
+    // Amarelo
+    {
+      light: '#EF4444',
+      dark: '#F87171',
+    },
+    // Vermelho
+    {
+      light: '#06B6D4',
+      dark: '#22D3EE',
+    },
+    // Ciano
+    {
+      light: '#EC4899',
+      dark: '#F472B6',
+    },
+    // Rosa
+    {
+      light: '#F97316',
+      dark: '#FB923C',
+    },
+    // Laranja
+    {
+      light: '#84CC16',
+      dark: '#A3E635',
+    },
+    // Lima
+    {
+      light: '#6366F1',
+      dark: '#818CF8',
+    }, // Indigo
   ];
 
   // Configurações de estilo por tipo
   const typeConfig = {
     revenue: {
-      iconBg: 'bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600',
+      iconBg: 'bg-emerald-500',
       iconRing: 'ring-emerald-500/20',
       accentColor: 'text-emerald-600 dark:text-emerald-400',
       glowColor: 'shadow-emerald-500/10',
       Icon: TrendingUp,
     },
     expense: {
-      iconBg: 'bg-gradient-to-br from-rose-500 via-red-500 to-pink-600',
+      iconBg: 'bg-rose-500',
       iconRing: 'ring-rose-500/20',
       accentColor: 'text-rose-600 dark:text-rose-400',
       glowColor: 'shadow-rose-500/10',
       Icon: DollarSign,
     },
   };
-
   const config = typeConfig[type] || typeConfig.revenue;
 
   // Calcular total
@@ -75,10 +113,8 @@ const PieChartCard = ({
   // Gerar segmentos do gráfico de pizza
   const pieSegments = useMemo(() => {
     if (!data || data.length === 0) return [];
-
     let currentAngle = -90; // Começar no topo (12h)
     const segments = [];
-
     data.forEach((item, index) => {
       const percentage = total > 0 ? (item.value / total) * 100 : 0;
       const angle = (percentage / 100) * 360;
@@ -87,7 +123,6 @@ const PieChartCard = ({
       const radius = 85;
       const cx = 100;
       const cy = 100;
-
       const startAngle = currentAngle;
       const endAngle = currentAngle + angle;
 
@@ -111,7 +146,6 @@ const PieChartCard = ({
         `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}`,
         'Z',
       ].join(' ');
-
       segments.push({
         path: pathData,
         color: colors[index % colors.length],
@@ -119,10 +153,8 @@ const PieChartCard = ({
         name: item.name,
         value: item.value,
       });
-
       currentAngle = endAngle;
     });
-
     return segments;
   }, [data, total, colors]);
 
@@ -142,7 +174,6 @@ const PieChartCard = ({
       </div>
     );
   }
-
   return (
     <div className="card-theme rounded-2xl p-6 border border-light-border dark:border-dark-border shadow-sm hover:shadow-lg transition-all duration-300">
       {/* Header Premium */}
@@ -151,9 +182,12 @@ const PieChartCard = ({
           <div
             className={`relative p-3 ${config.iconBg} rounded-xl shadow-lg ring-4 ${config.iconRing} ${config.glowColor}`}
           >
-            <config.Icon className="w-5 h-5 text-white" strokeWidth={2.5} />
+            <config.Icon
+              className="w-5 h-5 text-dark-text-primary"
+              strokeWidth={2.5}
+            />
             {/* Glow effect */}
-            <div className="absolute inset-0 rounded-xl bg-white/20 blur-sm" />
+            <div className="absolute inset-0 rounded-xl card-theme/20 blur-sm" />
           </div>
           <div>
             <h3 className="text-base font-bold text-theme-primary tracking-tight">
@@ -195,13 +229,7 @@ const PieChartCard = ({
                   <path
                     d={segment.path}
                     fill={segment.color.light}
-                    className={`transition-all duration-300 cursor-pointer ${
-                      hoveredIndex === index
-                        ? 'opacity-100 drop-shadow-2xl scale-105'
-                        : hoveredIndex === null
-                          ? 'opacity-90'
-                          : 'opacity-40'
-                    }`}
+                    className={`transition-all duration-300 cursor-pointer ${hoveredIndex === index ? 'opacity-100 drop-shadow-2xl scale-105' : hoveredIndex === null ? 'opacity-90' : 'opacity-40'}`}
                     strokeWidth="2"
                     stroke="white"
                     onMouseEnter={() => setHoveredIndex(index)}
@@ -247,15 +275,10 @@ const PieChartCard = ({
           {data.map((item, index) => {
             const isHovered = hoveredIndex === index;
             const colorObj = colors[index % colors.length];
-
             return (
               <div
                 key={item.name || index}
-                className={`group relative p-3 rounded-xl border transition-all duration-300 ${
-                  isHovered
-                    ? 'bg-light-bg dark:bg-dark-hover border-light-border dark:border-dark-border shadow-md scale-[1.02]'
-                    : 'bg-light-surface dark:bg-dark-surface border-transparent hover:border-light-border dark:hover:border-dark-border'
-                }`}
+                className={`group relative p-3 rounded-xl border transition-all duration-300 ${isHovered ? 'bg-light-bg dark:bg-dark-hover border-light-border dark:border-dark-border shadow-md scale-[1.02]' : 'bg-light-surface dark:bg-dark-surface border-transparent hover:border-light-border dark:hover:border-dark-border'}`}
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}
               >
@@ -263,9 +286,7 @@ const PieChartCard = ({
                   {/* Nome da categoria com indicador de cor */}
                   <div className="flex items-center gap-2.5 flex-1">
                     <div
-                      className={`w-2.5 h-2.5 rounded-full shadow-sm transition-transform duration-300 ${
-                        isHovered ? 'scale-150 shadow-lg' : ''
-                      }`}
+                      className={`w-2.5 h-2.5 rounded-full shadow-sm transition-transform duration-300 ${isHovered ? 'scale-150 shadow-lg' : ''}`}
                       style={{
                         backgroundColor: colorObj.light,
                         boxShadow: isHovered
@@ -294,9 +315,7 @@ const PieChartCard = ({
                 {/* Barra de progresso */}
                 <div className="relative w-full h-1.5 bg-light-border dark:bg-dark-border rounded-full overflow-hidden">
                   <div
-                    className={`absolute inset-y-0 left-0 rounded-full transition-all duration-500 ease-out ${
-                      isHovered ? 'shadow-lg' : ''
-                    }`}
+                    className={`absolute inset-y-0 left-0 rounded-full transition-all duration-500 ease-out ${isHovered ? 'shadow-lg' : ''}`}
                     style={{
                       width: `${item.percentage || 0}%`,
                       backgroundColor: colorObj.light,
@@ -314,5 +333,4 @@ const PieChartCard = ({
     </div>
   );
 };
-
 export default PieChartCard;

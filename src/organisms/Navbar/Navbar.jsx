@@ -20,7 +20,6 @@ import {
   LogOut,
   UserCircle,
 } from 'lucide-react';
-
 export function Navbar({ onMenuToggle }) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
@@ -34,25 +33,20 @@ export function Navbar({ onMenuToggle }) {
         setIsUserMenuOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
   const handleSignOut = async () => {
     await signOut();
     setIsUserMenuOpen(false);
   };
-
   const handleProfileClick = () => {
     navigate('/profile');
     setIsUserMenuOpen(false);
   };
-
   const getUserDisplayName = () => {
     return user?.user_metadata?.name || user?.email?.split('@')[0] || 'Usuário';
   };
-
   const getUserRole = () => {
     const role = user?.user_metadata?.role || 'barbeiro';
     const roles = {
@@ -66,7 +60,6 @@ export function Navbar({ onMenuToggle }) {
     };
     return roles[role] || 'Usuário';
   };
-
   return (
     <nav className="sticky top-0 z-50 bg-light-surface/95 dark:bg-dark-surface/95 backdrop-blur-md border-b border-light-border dark:border-dark-border transition-all duration-200 shadow-sm">
       <div className="px-4 sm:px-6 lg:px-8">
@@ -76,7 +69,7 @@ export function Navbar({ onMenuToggle }) {
             {/* Mobile menu button - Design System */}
             <button
               onClick={onMenuToggle}
-              className="lg:hidden p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-white/5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-surface"
+              className="lg:hidden p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:card-theme/5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-surface"
               aria-label="Abrir menu de navegação"
             >
               <Menu className="h-5 w-5" />
@@ -84,8 +77,10 @@ export function Navbar({ onMenuToggle }) {
 
             {/* Logo - Design System */}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary-hover rounded-lg flex items-center justify-center shadow-md">
-                <span className="text-white font-bold text-base">TB</span>
+              <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center shadow-md">
+                <span className="text-dark-text-primary font-bold text-base">
+                  TB
+                </span>
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-text-light-primary dark:text-text-dark-primary font-semibold text-base leading-tight">
@@ -115,7 +110,7 @@ export function Navbar({ onMenuToggle }) {
           <div className="flex items-center gap-2">
             {/* Search button (mobile) - Design System */}
             <button
-              className="md:hidden p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-white/5 hover:text-text-light-primary dark:hover:text-text-dark-primary transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-surface"
+              className="md:hidden p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:card-theme/5 hover:text-text-light-primary dark:hover:text-text-dark-primary transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-surface"
               aria-label="Buscar"
             >
               <Search className="h-5 w-5" />
@@ -123,7 +118,7 @@ export function Navbar({ onMenuToggle }) {
 
             {/* Notifications - Design System */}
             <button
-              className="relative p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-white/5 hover:text-text-light-primary dark:hover:text-text-dark-primary transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-surface"
+              className="relative p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:card-theme/5 hover:text-text-light-primary dark:hover:text-text-dark-primary transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-surface"
               aria-label="Notificações"
             >
               <Bell className="h-5 w-5" />
@@ -137,11 +132,11 @@ export function Navbar({ onMenuToggle }) {
             <div className="relative" ref={userMenuRef}>
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="flex items-center gap-2 p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-white/5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-surface"
+                className="flex items-center gap-2 p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:card-theme/5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-surface"
                 aria-label="Menu do usuário"
                 aria-expanded={isUserMenuOpen}
               >
-                <div className="w-9 h-9 bg-gradient-to-br from-primary to-primary-hover rounded-full flex items-center justify-center shadow-md ring-2 ring-light-surface dark:ring-dark-surface">
+                <div className="w-9 h-9 bg-gradient-primary rounded-full flex items-center justify-center shadow-md ring-2 ring-light-surface dark:ring-dark-surface">
                   {user?.user_metadata?.avatar_url ? (
                     <img
                       src={user.user_metadata.avatar_url}
@@ -149,7 +144,7 @@ export function Navbar({ onMenuToggle }) {
                       className="w-full h-full rounded-full object-cover"
                     />
                   ) : (
-                    <User className="h-5 w-5 text-white" />
+                    <User className="h-5 w-5 text-dark-text-primary" />
                   )}
                 </div>
                 <div className="hidden sm:block text-left">
@@ -167,9 +162,9 @@ export function Navbar({ onMenuToggle }) {
 
               {/* Dropdown menu - Design System */}
               {isUserMenuOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-light-surface dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute right-0 mt-2 w-64 card-theme border border-light-border dark:border-dark-border rounded-lg shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                   {/* User Info Header */}
-                  <div className="p-4 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5 border-b border-light-border dark:border-dark-border">
+                  <div className="p-4 bg-primary/5 dark:bg-primary/10 border-b border-light-border dark:border-dark-border">
                     <p className="font-semibold text-text-light-primary dark:text-text-dark-primary truncate">
                       {getUserDisplayName()}
                     </p>
@@ -185,7 +180,7 @@ export function Navbar({ onMenuToggle }) {
                   <div className="py-1.5">
                     <button
                       onClick={handleProfileClick}
-                      className="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-white/5 hover:text-text-light-primary dark:hover:text-text-dark-primary transition-all duration-200 focus:outline-none focus:bg-light-bg dark:focus:bg-white/5"
+                      className="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:card-theme/5 hover:text-text-light-primary dark:hover:text-text-dark-primary transition-all duration-200 focus:outline-none focus:bg-light-bg dark:focus:card-theme/5"
                     >
                       <UserCircle className="h-4 w-4 flex-shrink-0" />
                       <span>Meu Perfil</span>
@@ -196,7 +191,7 @@ export function Navbar({ onMenuToggle }) {
                         navigate('/settings');
                         setIsUserMenuOpen(false);
                       }}
-                      className="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-white/5 hover:text-text-light-primary dark:hover:text-text-dark-primary transition-all duration-200 focus:outline-none focus:bg-light-bg dark:focus:bg-white/5"
+                      className="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:card-theme/5 hover:text-text-light-primary dark:hover:text-text-dark-primary transition-all duration-200 focus:outline-none focus:bg-light-bg dark:focus:card-theme/5"
                     >
                       <Settings className="h-4 w-4 flex-shrink-0" />
                       <span>Configurações</span>

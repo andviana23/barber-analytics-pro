@@ -52,27 +52,29 @@ const formatCurrency = value => {
 const formatDateForChart = dateString => {
   if (!dateString) return '';
   const date = new Date(dateString);
-  return format(date, 'MMM/yy', { locale: ptBR });
+  return format(date, 'MMM/yy', {
+    locale: ptBR,
+  });
 };
 
 // Tooltip customizado
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload || payload.length === 0) return null;
-
   const data = payload[0]?.payload;
   if (!data) return null;
-
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4 min-w-64">
-      <div className="font-semibold text-gray-900 dark:text-white mb-3">
-        {format(new Date(data.date), "MMMM 'de' yyyy", { locale: ptBR })}
+    <div className="card-theme dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg shadow-lg p-4 min-w-64">
+      <div className="font-semibold text-theme-primary dark:text-dark-text-primary mb-3">
+        {format(new Date(data.date), "MMMM 'de' yyyy", {
+          locale: ptBR,
+        })}
       </div>
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
               Entradas:
             </span>
           </div>
@@ -84,7 +86,7 @@ const CustomTooltip = ({ active, payload, label }) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-            <span className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
               Saídas:
             </span>
           </div>
@@ -93,32 +95,24 @@ const CustomTooltip = ({ active, payload, label }) => {
           </span>
         </div>
 
-        <div className="border-t border-gray-200 dark:border-gray-600 pt-2 mt-2">
+        <div className="border-t border-light-border dark:border-dark-border pt-2 mt-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <span className="text-sm font-medium text-theme-primary dark:text-dark-text-primary">
               Resultado:
             </span>
             <span
-              className={`font-bold ${
-                data.result >= 0
-                  ? 'text-green-600 dark:text-green-400'
-                  : 'text-red-600 dark:text-red-400'
-              }`}
+              className={`font-bold ${data.result >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
             >
               {formatCurrency(data.result)}
             </span>
           </div>
 
           <div className="flex items-center justify-between mt-1">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <span className="text-sm font-medium text-theme-primary dark:text-dark-text-primary">
               Margem:
             </span>
             <span
-              className={`font-semibold ${
-                data.margin >= 0
-                  ? 'text-green-600 dark:text-green-400'
-                  : 'text-red-600 dark:text-red-400'
-              }`}
+              className={`font-semibold ${data.margin >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
             >
               {data.margin.toFixed(1)}%
             </span>
@@ -128,7 +122,6 @@ const CustomTooltip = ({ active, payload, label }) => {
     </div>
   );
 };
-
 const CashflowTimelineChart = ({
   data = [],
   loading = false,
@@ -151,7 +144,6 @@ const CashflowTimelineChart = ({
     // Filtrar dados baseado no período selecionado
     const monthsToShow = parseInt(timeRange);
     const cutoffDate = subMonths(new Date(), monthsToShow);
-
     return data
       .filter(item => new Date(item.date) >= cutoffDate)
       .map(item => ({
@@ -179,7 +171,6 @@ const CashflowTimelineChart = ({
         trendValue: 0,
       };
     }
-
     const totalRevenues = chartData.reduce(
       (sum, item) => sum + item.revenues,
       0
@@ -194,7 +185,6 @@ const CashflowTimelineChart = ({
     // Calcular tendência (comparar últimos 3 meses com anteriores)
     const recentMonths = chartData.slice(-3);
     const previousMonths = chartData.slice(-6, -3);
-
     const recentAvg =
       recentMonths.reduce(
         (sum, item) => sum + (item.revenues - item.expenses),
@@ -207,13 +197,11 @@ const CashflowTimelineChart = ({
             0
           ) / previousMonths.length
         : recentAvg;
-
     const trendValue =
       previousAvg !== 0
         ? ((recentAvg - previousAvg) / Math.abs(previousAvg)) * 100
         : 0;
     const trend = trendValue > 5 ? 'up' : trendValue < -5 ? 'down' : 'neutral';
-
     return {
       totalRevenues,
       totalExpenses,
@@ -228,12 +216,12 @@ const CashflowTimelineChart = ({
   if (loading) {
     return (
       <div
-        className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 ${className}`}
+        className={`card-theme rounded-lg border border-light-border dark:border-dark-border p-6 ${className}`}
       >
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <RefreshCw className="w-8 h-8 animate-spin text-blue-500 mx-auto mb-4" />
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-theme-secondary dark:text-dark-text-muted">
               Carregando dados do fluxo de caixa...
             </p>
           </div>
@@ -241,7 +229,6 @@ const CashflowTimelineChart = ({
       </div>
     );
   }
-
   if (error) {
     return (
       <div
@@ -253,13 +240,13 @@ const CashflowTimelineChart = ({
             <p className="text-red-600 dark:text-red-400 mb-2">
               Erro ao carregar dados
             </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-4">
               {error}
             </p>
             {onRefresh && (
               <button
                 onClick={onRefresh}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="px-4 py-2 bg-blue-600 text-dark-text-primary rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Tentar Novamente
               </button>
@@ -269,23 +256,22 @@ const CashflowTimelineChart = ({
       </div>
     );
   }
-
   return (
     <div
       className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 ${className}`}
     >
       {/* Header */}
-      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+      <div className="p-6 border-b border-light-border dark:border-dark-border">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
               <Activity className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
                 {title}
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 Evolução temporal dos últimos {timeRange} meses
               </p>
             </div>
@@ -293,16 +279,12 @@ const CashflowTimelineChart = ({
 
           <div className="flex items-center gap-2">
             {/* Controles de período */}
-            <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+            <div className="flex items-center gap-1 card-theme dark:bg-gray-700 rounded-lg p-1">
               {['6', '12', '24'].map(period => (
                 <button
                   key={period}
                   onClick={() => setTimeRange(period)}
-                  className={`px-3 py-1 text-sm rounded-md transition-colors ${
-                    timeRange === period
-                      ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                  }`}
+                  className={`px-3 py-1 text-sm rounded-md transition-colors ${timeRange === period ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}
                 >
                   {period}m
                 </button>
@@ -310,25 +292,17 @@ const CashflowTimelineChart = ({
             </div>
 
             {/* Controles de tipo de gráfico */}
-            <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+            <div className="flex items-center gap-1 card-theme dark:bg-gray-700 rounded-lg p-1">
               <button
                 onClick={() => setChartType('area')}
-                className={`p-2 rounded-md transition-colors ${
-                  chartType === 'area'
-                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                }`}
+                className={`p-2 rounded-md transition-colors ${chartType === 'area' ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}
                 title="Gráfico de Área"
               >
                 <BarChart3 className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setChartType('line')}
-                className={`p-2 rounded-md transition-colors ${
-                  chartType === 'line'
-                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                }`}
+                className={`p-2 rounded-md transition-colors ${chartType === 'line' ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}
                 title="Gráfico de Linha"
               >
                 <TrendingUp className="w-4 h-4" />
@@ -339,7 +313,7 @@ const CashflowTimelineChart = ({
             {onRefresh && (
               <button
                 onClick={onRefresh}
-                className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="p-2 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary hover:card-theme dark:hover:bg-gray-700 rounded-lg transition-colors"
                 title="Atualizar dados"
               >
                 <RefreshCw className="w-4 h-4" />
@@ -349,7 +323,7 @@ const CashflowTimelineChart = ({
             {onExport && (
               <button
                 onClick={onExport}
-                className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="p-2 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary hover:card-theme dark:hover:bg-gray-700 rounded-lg transition-colors"
                 title="Exportar gráfico"
               >
                 <Download className="w-4 h-4" />
@@ -385,72 +359,40 @@ const CashflowTimelineChart = ({
           </div>
 
           <div
-            className={`rounded-lg p-3 ${
-              stats.netResult >= 0
-                ? 'bg-green-50 dark:bg-green-900/20'
-                : 'bg-red-50 dark:bg-red-900/20'
-            }`}
+            className={`rounded-lg p-3 ${stats.netResult >= 0 ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20'}`}
           >
             <div className="flex items-center gap-2 mb-1">
               <DollarSign
-                className={`w-4 h-4 ${
-                  stats.netResult >= 0
-                    ? 'text-green-600 dark:text-green-400'
-                    : 'text-red-600 dark:text-red-400'
-                }`}
+                className={`w-4 h-4 ${stats.netResult >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
               />
               <span
-                className={`text-sm font-medium ${
-                  stats.netResult >= 0
-                    ? 'text-green-700 dark:text-green-300'
-                    : 'text-red-700 dark:text-red-300'
-                }`}
+                className={`text-sm font-medium ${stats.netResult >= 0 ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}`}
               >
                 Resultado Líquido
               </span>
             </div>
             <p
-              className={`text-lg font-bold ${
-                stats.netResult >= 0
-                  ? 'text-green-800 dark:text-green-200'
-                  : 'text-red-800 dark:text-red-200'
-              }`}
+              className={`text-lg font-bold ${stats.netResult >= 0 ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'}`}
             >
               {formatCurrency(stats.netResult)}
             </p>
           </div>
 
           <div
-            className={`rounded-lg p-3 ${
-              stats.avgMargin >= 0
-                ? 'bg-blue-50 dark:bg-blue-900/20'
-                : 'bg-orange-50 dark:bg-orange-900/20'
-            }`}
+            className={`rounded-lg p-3 ${stats.avgMargin >= 0 ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-orange-50 dark:bg-orange-900/20'}`}
           >
             <div className="flex items-center gap-2 mb-1">
               <Activity
-                className={`w-4 h-4 ${
-                  stats.avgMargin >= 0
-                    ? 'text-blue-600 dark:text-blue-400'
-                    : 'text-orange-600 dark:text-orange-400'
-                }`}
+                className={`w-4 h-4 ${stats.avgMargin >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-orange-600 dark:text-orange-400'}`}
               />
               <span
-                className={`text-sm font-medium ${
-                  stats.avgMargin >= 0
-                    ? 'text-blue-700 dark:text-blue-300'
-                    : 'text-orange-700 dark:text-orange-300'
-                }`}
+                className={`text-sm font-medium ${stats.avgMargin >= 0 ? 'text-blue-700 dark:text-blue-300' : 'text-orange-700 dark:text-orange-300'}`}
               >
                 Margem Média
               </span>
             </div>
             <p
-              className={`text-lg font-bold ${
-                stats.avgMargin >= 0
-                  ? 'text-blue-800 dark:text-blue-200'
-                  : 'text-orange-800 dark:text-orange-200'
-              }`}
+              className={`text-lg font-bold ${stats.avgMargin >= 0 ? 'text-blue-800 dark:text-blue-200' : 'text-orange-800 dark:text-orange-200'}`}
             >
               {stats.avgMargin.toFixed(1)}%
             </p>
@@ -460,12 +402,21 @@ const CashflowTimelineChart = ({
 
       {/* Gráfico */}
       <div className="p-6">
-        <div style={{ height: `${height}px` }}>
+        <div
+          style={{
+            height: `${height}px`,
+          }}
+        >
           <ResponsiveContainer width="100%" height="100%">
             {chartType === 'area' ? (
               <AreaChart
                 data={chartData}
-                margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                margin={{
+                  top: 20,
+                  right: 30,
+                  left: 20,
+                  bottom: 20,
+                }}
               >
                 <defs>
                   <linearGradient
@@ -529,7 +480,12 @@ const CashflowTimelineChart = ({
             ) : (
               <LineChart
                 data={chartData}
-                margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                margin={{
+                  top: 20,
+                  right: 30,
+                  left: 20,
+                  bottom: 20,
+                }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis
@@ -553,8 +509,16 @@ const CashflowTimelineChart = ({
                   dataKey="revenues"
                   stroke="#10b981"
                   strokeWidth={3}
-                  dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
-                  activeDot={{ r: 6, stroke: '#10b981', strokeWidth: 2 }}
+                  dot={{
+                    fill: '#10b981',
+                    strokeWidth: 2,
+                    r: 4,
+                  }}
+                  activeDot={{
+                    r: 6,
+                    stroke: '#10b981',
+                    strokeWidth: 2,
+                  }}
                   name="Entradas"
                 />
                 <Line
@@ -562,8 +526,16 @@ const CashflowTimelineChart = ({
                   dataKey="expenses"
                   stroke="#ef4444"
                   strokeWidth={3}
-                  dot={{ fill: '#ef4444', strokeWidth: 2, r: 4 }}
-                  activeDot={{ r: 6, stroke: '#ef4444', strokeWidth: 2 }}
+                  dot={{
+                    fill: '#ef4444',
+                    strokeWidth: 2,
+                    r: 4,
+                  }}
+                  activeDot={{
+                    r: 6,
+                    stroke: '#ef4444',
+                    strokeWidth: 2,
+                  }}
                   name="Saídas"
                 />
 
@@ -576,7 +548,6 @@ const CashflowTimelineChart = ({
     </div>
   );
 };
-
 CashflowTimelineChart.propTypes = {
   data: PropTypes.arrayOf(
     PropTypes.shape({
@@ -595,5 +566,4 @@ CashflowTimelineChart.propTypes = {
   onExport: PropTypes.func,
   className: PropTypes.string,
 };
-
 export default CashflowTimelineChart;

@@ -70,7 +70,6 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
     const now = new Date();
     return format(now, 'yyyy-MM');
   });
-
   const { showError, showSuccess } = useToast();
   const { user } = useAuth();
   const { selectedUnit } = useUnit();
@@ -84,7 +83,6 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
     const [year, month] = selectedMonth.split('-').map(Number);
     const primeiroDiaMes = new Date(year, month - 1, 1);
     const ultimoDiaMes = new Date(year, month, 0);
-
     console.log('📊 Calculando métricas para o mês:', {
       mesSelecionado: selectedMonth,
       primeiroDia: primeiroDiaMes.toISOString().split('T')[0],
@@ -116,7 +114,6 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
         prevReceb >= primeiroDiaMes && prevReceb <= ultimoDiaMes;
       return noMesSelecionado && r.status === 'Pending';
     });
-
     const result = {
       // Faturamento: soma de todas as receitas com Data Pgto no mês
       total: receitasComDataPgtoNoMes.reduce(
@@ -124,22 +121,18 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
         0
       ),
       count: receitasComDataPgtoNoMes.length,
-
       // Recebido: soma das receitas com Prev. Receb. no mês E status Received
       recebido: recebidas.reduce((sum, r) => sum + (r.value || 0), 0),
       recebidoCount: recebidas.length,
-
       // Pendente: soma das receitas com Prev. Receb. no mês E status Pending
       pendente: pendentes.reduce((sum, r) => sum + (r.value || 0), 0),
       pendenteCount: pendentes.length,
     };
-
     console.log('📊 Métricas calculadas:', {
       faturamento: `R$ ${result.total.toFixed(2)} (${result.count} receitas com Data Pgto no mês)`,
       recebido: `R$ ${result.recebido.toFixed(2)} (${result.recebidoCount} receitas com Prev. Receb. no mês + status Received)`,
       pendente: `R$ ${result.pendente.toFixed(2)} (${result.pendenteCount} receitas com Prev. Receb. no mês + status Pending)`,
     });
-
     return result;
   }, [receitas, selectedMonth]);
 
@@ -149,7 +142,6 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
     const [year, month] = selectedMonth.split('-').map(Number);
     const primeiroDiaMes = new Date(year, month - 1, 1);
     const ultimoDiaMes = new Date(year, month, 0);
-
     return receitas.filter(receita => {
       // ✅ Filtro de mês: Data Pgto OU Prev. Receb. deve estar no mês selecionado
       let dentroDoMes = false;
@@ -189,7 +181,6 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
       if (statusFilter !== 'all' && receita.status !== statusFilter) {
         return false;
       }
-
       return true;
     });
   }, [receitas, searchTerm, statusFilter, selectedMonth]);
@@ -201,11 +192,9 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
       globalFilters,
       selectedUnit: selectedUnit?.id,
     });
-
     setLoading(true);
     try {
       const filters = {};
-
       if (selectedUnitFilter) {
         filters.unit_id = selectedUnitFilter;
       } else if (globalFilters?.unit_id) {
@@ -213,11 +202,8 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
       } else if (selectedUnit?.id) {
         filters.unit_id = selectedUnit.id;
       }
-
       console.log('🔍 ReceitasAccrualTab: Filtros aplicados:', filters);
-
       const { data, error } = await financeiroService.getReceitas(filters);
-
       if (error) {
         console.error('❌ ReceitasAccrualTab: Erro ao buscar receitas:', error);
         showError(
@@ -248,11 +234,9 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
   const fetchUnits = useCallback(async () => {
     try {
       const { data, error } = await unitsService.getUnits();
-
       if (error) {
         throw error;
       }
-
       setUnits(data || []);
     } catch (err) {
       console.error('❌ Erro ao buscar unidades:', err);
@@ -262,11 +246,9 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
   // 🗑️ Deletar receita
   const handleDelete = async id => {
     if (!confirm('Tem certeza que deseja deletar esta receita?')) return;
-
     setDeletingId(id);
     try {
       const { error } = await financeiroService.deleteReceita(id);
-
       if (error) {
         showError(
           'Erro ao deletar',
@@ -305,13 +287,11 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
   // 🗑️ Confirmar e deletar
   const confirmDelete = async () => {
     if (!selectedReceita) return;
-
     setDeletingId(selectedReceita.id);
     try {
       const { error } = await financeiroService.deleteReceita(
         selectedReceita.id
       );
-
       if (error) {
         showError(
           'Erro ao deletar',
@@ -335,17 +315,14 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
   const handleSuccess = async receita => {
     try {
       setLoading(true);
-
       console.log('📝 ReceitasAccrualTab: Salvando receita...', receita);
 
       // Salvar receita no banco via service
       const result = await financeiroService.createRevenue(receita);
-
       if (!result.success || result.error) {
         console.error('❌ Erro ao criar receita:', result.error);
         return;
       }
-
       console.log('✅ Receita criada com sucesso:', result.data);
 
       // Fechar modal e recarregar lista
@@ -381,7 +358,6 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
       return '-';
     }
   };
-
   return (
     <div className="space-y-6">
       {/* 📊 Cards de Métricas - DESIGN SYSTEM */}
@@ -389,8 +365,8 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
         {/* Total - Faturamento do Mês Vigente */}
         <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-blue-300 dark:hover:border-blue-600 transition-all">
           <div className="flex items-center justify-between mb-3">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl">
-              <DollarSign className="w-6 h-6 text-white" />
+            <div className="p-3 bg-gradient-primary rounded-xl">
+              <DollarSign className="w-6 h-6 text-dark-text-primary" />
             </div>
             <TrendingUp className="w-8 h-8 text-blue-400 dark:text-blue-500 opacity-20" />
           </div>
@@ -409,8 +385,8 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
         {/* Recebido - Prev. Receb. até hoje */}
         <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-green-300 dark:hover:border-green-600 transition-all">
           <div className="flex items-center justify-between mb-3">
-            <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl">
-              <CheckCircle2 className="w-6 h-6 text-white" />
+            <div className="p-3 bg-gradient-success rounded-xl">
+              <CheckCircle2 className="w-6 h-6 text-dark-text-primary" />
             </div>
             <CheckCircle2 className="w-8 h-8 text-green-400 dark:text-green-500 opacity-20" />
           </div>
@@ -429,8 +405,8 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
         {/* Pendente - Prev. Receb. a partir de amanhã */}
         <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-yellow-300 dark:hover:border-yellow-600 transition-all">
           <div className="flex items-center justify-between mb-3">
-            <div className="p-3 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl">
-              <Clock className="w-6 h-6 text-white" />
+            <div className="p-3 bg-gradient-warning rounded-xl">
+              <Clock className="w-6 h-6 text-dark-text-primary" />
             </div>
             <Clock className="w-8 h-8 text-yellow-400 dark:text-yellow-500 opacity-20" />
           </div>
@@ -449,7 +425,7 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
 
       {/* 📅 Seletor de Mês - DESIGN SYSTEM */}
       <div className="card-theme p-4 rounded-xl flex items-center gap-4">
-        <div className="p-2.5 bg-gradient-to-br from-purple-100 to-violet-100 dark:from-purple-900/30 dark:to-violet-900/30 rounded-xl">
+        <div className="p-2.5 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
           <Calendar className="w-5 h-5 text-purple-600 dark:text-purple-400" />
         </div>
         <label className="text-sm font-semibold text-theme-primary">
@@ -459,7 +435,7 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
           type="month"
           value={selectedMonth}
           onChange={e => setSelectedMonth(e.target.value)}
-          className="px-4 py-2 text-sm font-medium border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-theme-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+          className="px-4 py-2 text-sm font-medium border-2 border-light-border dark:border-dark-border rounded-xl card-theme dark:bg-gray-700 text-theme-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
         />
         <button
           onClick={() => {
@@ -479,18 +455,18 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
           <div className="flex flex-col sm:flex-row gap-3 flex-1">
             {/* Busca */}
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-light-text-muted dark:text-dark-text-muted" />
               <input
                 type="text"
                 placeholder="Buscar receitas..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-11 pr-10 py-2.5 border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-theme-primary placeholder-gray-400 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                className="w-full pl-11 pr-10 py-2.5 border-2 border-light-border dark:border-dark-border rounded-xl card-theme dark:bg-gray-700 text-theme-primary placeholder-gray-400 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
               />
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-theme-primary transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -498,34 +474,22 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
             </div>
 
             {/* Filtro de Status */}
-            <div className="flex gap-2 p-1.5 bg-gray-100 dark:bg-gray-700/50 rounded-xl">
+            <div className="flex gap-2 p-1.5 card-theme dark:bg-gray-700/50 rounded-xl">
               <button
                 onClick={() => setStatusFilter('all')}
-                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
-                  statusFilter === 'all'
-                    ? 'bg-white dark:bg-gray-600 text-theme-primary shadow-md'
-                    : 'text-theme-secondary hover:text-theme-primary'
-                }`}
+                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${statusFilter === 'all' ? 'bg-white dark:bg-gray-600 text-theme-primary shadow-md' : 'text-theme-secondary hover:text-theme-primary'}`}
               >
                 Todas
               </button>
               <button
                 onClick={() => setStatusFilter('Received')}
-                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
-                  statusFilter === 'Received'
-                    ? 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 shadow-md'
-                    : 'text-theme-secondary hover:text-green-600'
-                }`}
+                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${statusFilter === 'Received' ? 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 shadow-md' : 'text-theme-secondary hover:text-green-600'}`}
               >
                 Recebido
               </button>
               <button
                 onClick={() => setStatusFilter('Pending')}
-                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
-                  statusFilter === 'Pending'
-                    ? 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300 shadow-md'
-                    : 'text-theme-secondary hover:text-yellow-600'
-                }`}
+                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${statusFilter === 'Pending' ? 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300 shadow-md' : 'text-theme-secondary hover:text-yellow-600'}`}
               >
                 Pendente
               </button>
@@ -534,11 +498,11 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
             {/* Filtro de Unidade */}
             {units.length > 1 && (
               <div className="relative">
-                <Filter className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                <Filter className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-light-text-muted dark:text-dark-text-muted pointer-events-none" />
                 <select
                   value={selectedUnitFilter}
                   onChange={e => setSelectedUnitFilter(e.target.value)}
-                  className="pl-10 pr-10 py-2.5 text-sm font-medium border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-theme-primary focus:outline-none focus:ring-2 focus:ring-primary appearance-none cursor-pointer transition-all"
+                  className="pl-10 pr-10 py-2.5 text-sm font-medium border-2 border-light-border dark:border-dark-border rounded-xl card-theme dark:bg-gray-700 text-theme-primary focus:outline-none focus:ring-2 focus:ring-primary appearance-none cursor-pointer transition-all"
                 >
                   <option value="">Todas unidades</option>
                   {units.map(unit => (
@@ -556,7 +520,7 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
             <button
               onClick={fetchReceitas}
               disabled={loading}
-              className="p-2.5 text-theme-secondary hover:text-theme-primary hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all disabled:opacity-50"
+              className="p-2.5 text-theme-secondary hover:text-theme-primary hover:card-theme dark:hover:bg-gray-700 rounded-xl transition-all disabled:opacity-50"
               title="Atualizar"
             >
               <RefreshCw
@@ -564,7 +528,7 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
               />
             </button>
 
-            <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-theme-secondary border-2 border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-theme-primary transition-all">
+            <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-theme-secondary border-2 border-light-border dark:border-dark-border rounded-xl hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700 hover:text-theme-primary transition-all">
               <Download className="w-4 h-4" />
               <span className="hidden sm:inline">Exportar</span>
             </button>
@@ -622,7 +586,7 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 border-b-2 border-gray-200 dark:border-gray-600">
+              <thead className="bg-light-bg dark:bg-dark-surface border-b-2 border-light-border dark:border-dark-border">
                 <tr>
                   <th className="px-6 py-4 text-left text-xs font-bold text-theme-secondary uppercase tracking-wider">
                     Status
@@ -651,7 +615,7 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
                 {filteredReceitas.map(receita => (
                   <tr
                     key={receita.id}
-                    className="group hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/50 dark:hover:from-blue-900/10 dark:hover:to-indigo-900/10 transition-all duration-200"
+                    className="group hover:bg-light-hover dark:hover:bg-dark-hover transition-all duration-200"
                   >
                     {/* Status */}
                     <td className="px-6 py-4">
@@ -671,7 +635,7 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
                     {/* Descrição */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-lg group-hover:scale-110 transition-transform">
+                        <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg group-hover:scale-110 transition-transform">
                           <FileText className="w-4 h-4 text-green-600 dark:text-green-400" />
                         </div>
                         <p
@@ -772,14 +736,14 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="card-theme rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
             {/* Header */}
-            <div className="sticky top-0 bg-gradient-to-r from-blue-500 to-indigo-600 p-6 rounded-t-2xl">
+            <div className="sticky top-0 bg-gradient-primary p-6 rounded-t-2xl">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-3 bg-white/20 rounded-xl">
-                    <Eye className="w-6 h-6 text-white" />
+                  <div className="p-3 card-theme/20 rounded-xl">
+                    <Eye className="w-6 h-6 text-dark-text-primary" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-white">
+                    <h2 className="text-2xl font-bold text-dark-text-primary">
                       Detalhes da Receita
                     </h2>
                     <p className="text-blue-100 text-sm mt-1">
@@ -789,9 +753,9 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
                 </div>
                 <button
                   onClick={() => setIsDetailsModalOpen(false)}
-                  className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                  className="p-2 hover:card-theme/20 rounded-lg transition-colors"
                 >
-                  <X className="w-6 h-6 text-white" />
+                  <X className="w-6 h-6 text-dark-text-primary" />
                 </button>
               </div>
             </div>
@@ -912,7 +876,7 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
             </div>
 
             {/* Footer */}
-            <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-800/50 p-6 rounded-b-2xl border-t border-gray-200 dark:border-gray-700">
+            <div className="sticky bottom-0 bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50 p-6 rounded-b-2xl border-t border-light-border dark:border-dark-border">
               <div className="flex items-center justify-end gap-3">
                 {isAdmin && (
                   <>
@@ -921,7 +885,7 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
                         setIsDetailsModalOpen(false);
                         handleEdit(selectedReceita);
                       }}
-                      className="px-5 py-2.5 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 transition-all flex items-center gap-2"
+                      className="px-5 py-2.5 bg-green-600 text-dark-text-primary font-semibold rounded-xl hover:bg-green-700 transition-all flex items-center gap-2"
                     >
                       <Edit2 className="w-4 h-4" />
                       Editar
@@ -931,7 +895,7 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
                         setIsDetailsModalOpen(false);
                         handleDeleteClick(selectedReceita);
                       }}
-                      className="px-5 py-2.5 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-all flex items-center gap-2"
+                      className="px-5 py-2.5 bg-red-600 text-dark-text-primary font-semibold rounded-xl hover:bg-red-700 transition-all flex items-center gap-2"
                     >
                       <Trash2 className="w-4 h-4" />
                       Deletar
@@ -940,7 +904,7 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
                 )}
                 <button
                   onClick={() => setIsDetailsModalOpen(false)}
-                  className="px-5 py-2.5 bg-gray-200 dark:bg-gray-700 text-theme-primary font-semibold rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all"
+                  className="px-5 py-2.5 bg-gray-200 dark:bg-gray-700 text-theme-primary font-semibold rounded-xl hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-600 transition-all"
                 >
                   Fechar
                 </button>
@@ -972,13 +936,13 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="card-theme rounded-2xl max-w-md w-full shadow-2xl">
             {/* Header */}
-            <div className="bg-gradient-to-r from-red-500 to-pink-600 p-6 rounded-t-2xl">
+            <div className="bg-gradient-error p-6 rounded-t-2xl">
               <div className="flex items-center gap-3">
-                <div className="p-3 bg-white/20 rounded-xl">
-                  <Trash2 className="w-6 h-6 text-white" />
+                <div className="p-3 card-theme/20 rounded-xl">
+                  <Trash2 className="w-6 h-6 text-dark-text-primary" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white">
+                  <h2 className="text-2xl font-bold text-dark-text-primary">
                     Confirmar Exclusão
                   </h2>
                   <p className="text-red-100 text-sm mt-1">
@@ -1014,7 +978,7 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
             </div>
 
             {/* Footer */}
-            <div className="bg-gray-50 dark:bg-gray-800/50 p-6 rounded-b-2xl border-t border-gray-200 dark:border-gray-700">
+            <div className="bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50 p-6 rounded-b-2xl border-t border-light-border dark:border-dark-border">
               <div className="flex items-center justify-end gap-3">
                 <button
                   onClick={() => {
@@ -1022,14 +986,14 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
                     setSelectedReceita(null);
                   }}
                   disabled={deletingId === selectedReceita.id}
-                  className="px-5 py-2.5 bg-gray-200 dark:bg-gray-700 text-theme-primary font-semibold rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all disabled:opacity-50"
+                  className="px-5 py-2.5 bg-gray-200 dark:bg-gray-700 text-theme-primary font-semibold rounded-xl hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-600 transition-all disabled:opacity-50"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={confirmDelete}
                   disabled={deletingId === selectedReceita.id}
-                  className="px-5 py-2.5 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-all flex items-center gap-2 disabled:opacity-50"
+                  className="px-5 py-2.5 bg-red-600 text-dark-text-primary font-semibold rounded-xl hover:bg-red-700 transition-all flex items-center gap-2 disabled:opacity-50"
                 >
                   {deletingId === selectedReceita.id ? (
                     <>
@@ -1051,5 +1015,4 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
     </div>
   );
 };
-
 export default ReceitasAccrualTab;

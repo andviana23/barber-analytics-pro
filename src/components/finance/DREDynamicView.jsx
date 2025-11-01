@@ -17,7 +17,6 @@ import {
   AlertCircle,
   XCircle,
 } from 'lucide-react';
-
 const formatCurrency = value => {
   if (!value && value !== 0) return 'R$ 0,00';
   return new Intl.NumberFormat('pt-BR', {
@@ -25,29 +24,25 @@ const formatCurrency = value => {
     currency: 'BRL',
   }).format(value);
 };
-
 const formatPercent = value => {
   if (!value && value !== 0) return '0,00%';
   return `${value.toFixed(2).replace('.', ',')}%`;
 };
-
 const DREDynamicView = ({ dreData, isLoading = false }) => {
   const [expanded, setExpanded] = useState({});
-
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 animate-pulse">
-        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-6"></div>
+      <div className="card-theme dark:bg-dark-surface rounded-lg p-6 animate-pulse">
+        <div className="h-8 bg-light-surface/50 dark:bg-dark-surface/50 rounded w-1/3 mb-6"></div>
         {[...Array(6)].map((_, i) => (
           <div
             key={i}
-            className="h-16 bg-gray-200 dark:bg-gray-700 rounded mb-3"
+            className="h-16 bg-light-surface/50 dark:bg-dark-surface/50 rounded mb-3"
           ></div>
         ))}
       </div>
     );
   }
-
   if (!dreData || (!dreData.sucesso && !dreData.metadata)) {
     return (
       <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
@@ -57,9 +52,11 @@ const DREDynamicView = ({ dreData, isLoading = false }) => {
       </div>
     );
   }
-
-  const toggle = key => setExpanded(prev => ({ ...prev, [key]: !prev[key] }));
-
+  const toggle = key =>
+    setExpanded(prev => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
   const Line = ({
     label,
     value,
@@ -72,7 +69,6 @@ const DREDynamicView = ({ dreData, isLoading = false }) => {
   }) => {
     const isExpanded = expanded[itemKey];
     const hasItems = items?.length > 0;
-
     return (
       <div
         className={`mb-1 ${highlight ? 'bg-blue-50 dark:bg-blue-900/10' : ''}`}
@@ -85,12 +81,12 @@ const DREDynamicView = ({ dreData, isLoading = false }) => {
             {expandable &&
               hasItems &&
               (isExpanded ? (
-                <ChevronUp className="w-4 h-4 text-gray-400" />
+                <ChevronUp className="w-4 h-4 text-light-text-muted dark:text-dark-text-muted" />
               ) : (
-                <ChevronDown className="w-4 h-4 text-gray-400" />
+                <ChevronDown className="w-4 h-4 text-light-text-muted dark:text-dark-text-muted" />
               ))}
             <span
-              className={`text-gray-700 dark:text-gray-300 ${bold ? 'font-bold text-base' : 'text-sm'}`}
+              className={`text-theme-primary dark:text-dark-text-primary ${bold ? 'font-bold text-base' : 'text-sm'}`}
             >
               {label}
             </span>
@@ -98,7 +94,7 @@ const DREDynamicView = ({ dreData, isLoading = false }) => {
 
           <div className="flex items-center gap-6">
             {percent !== null && percent !== undefined && (
-              <span className="text-xs text-gray-500 dark:text-gray-400 w-16 text-right">
+              <span className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted w-16 text-right">
                 {formatPercent(percent)}
               </span>
             )}
@@ -115,12 +111,12 @@ const DREDynamicView = ({ dreData, isLoading = false }) => {
             {items.map((item, i) => (
               <div
                 key={i}
-                className="flex justify-between py-1.5 px-3 text-xs hover:bg-gray-50 dark:hover:bg-gray-700/20 rounded"
+                className="flex justify-between py-1.5 px-3 text-xs hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700/20 rounded"
               >
-                <span className="text-gray-600 dark:text-gray-400">
+                <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                   {item.categoria_nome}
                 </span>
-                <span className="text-gray-700 dark:text-gray-300 font-medium">
+                <span className="text-theme-primary dark:text-dark-text-primary font-medium">
                   {formatCurrency(item.valor)}
                 </span>
               </div>
@@ -130,17 +126,16 @@ const DREDynamicView = ({ dreData, isLoading = false }) => {
       </div>
     );
   };
-
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-      <div className="bg-gradient-to-r from-slate-700 to-slate-800 dark:from-slate-800 dark:to-slate-900 px-6 py-4 border-b border-slate-600">
+    <div className="card-theme dark:bg-dark-surface rounded-xl shadow-sm border border-light-border dark:border-dark-border overflow-hidden">
+      <div className="bg-light-surface/80 dark:bg-dark-surface/80 px-6 py-4 border-b border-light-border dark:border-dark-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
-              <BarChart3 className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 card-theme/10 rounded-lg flex items-center justify-center">
+              <BarChart3 className="w-5 h-5 text-dark-text-primary" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white">
+              <h2 className="text-lg font-bold text-dark-text-primary">
                 DRE - Demonstração de Resultado
               </h2>
               <p className="text-xs text-slate-300">
@@ -216,7 +211,7 @@ const DREDynamicView = ({ dreData, isLoading = false }) => {
           highlight
         />
 
-        <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
+        <div className="border-t border-light-border dark:border-dark-border my-2"></div>
 
         <Line
           label="(-) CUSTOS OPERACIONAIS"
@@ -248,7 +243,7 @@ const DREDynamicView = ({ dreData, isLoading = false }) => {
           highlight
         />
 
-        <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
+        <div className="border-t border-light-border dark:border-dark-border my-2"></div>
 
         <Line
           label="(-) Despesas Administrativas"
@@ -280,7 +275,7 @@ const DREDynamicView = ({ dreData, isLoading = false }) => {
           highlight
         />
 
-        <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
+        <div className="border-t border-light-border dark:border-dark-border my-2"></div>
 
         {(dreData.impostos?.total || dreData.impostos || 0) > 0 && (
           <Line
@@ -306,7 +301,7 @@ const DREDynamicView = ({ dreData, isLoading = false }) => {
           dreData.resultado_financeiro ||
           0) !== 0 && (
           <>
-            <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
+            <div className="border-t border-light-border dark:border-dark-border my-2"></div>
             <Line
               label="(+/-) Resultado Financeiro"
               value={
@@ -319,7 +314,7 @@ const DREDynamicView = ({ dreData, isLoading = false }) => {
           </>
         )}
 
-        <div className="border-t-2 border-gray-300 dark:border-gray-600 my-3"></div>
+        <div className="border-t-2 border-light-border dark:border-dark-border my-3"></div>
 
         <div
           className={`rounded-lg p-4 border-2 ${(dreData.lucro_liquido || 0) >= 0 ? 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800' : 'bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-800'}`}
@@ -332,10 +327,10 @@ const DREDynamicView = ({ dreData, isLoading = false }) => {
                 <TrendingDown className="w-6 h-6 text-red-600 dark:text-red-400" />
               )}
               <div>
-                <span className="block text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+                <span className="block text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wide">
                   Resultado
                 </span>
-                <span className="text-lg font-bold text-gray-900 dark:text-white">
+                <span className="text-lg font-bold text-theme-primary dark:text-dark-text-primary">
                   LUCRO LÍQUIDO
                 </span>
               </div>
@@ -346,7 +341,7 @@ const DREDynamicView = ({ dreData, isLoading = false }) => {
               >
                 {formatCurrency(dreData.lucro_liquido || 0)}
               </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400">
+              <div className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 Margem:{' '}
                 <span className="font-semibold">
                   {formatPercent(
@@ -361,10 +356,10 @@ const DREDynamicView = ({ dreData, isLoading = false }) => {
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/30 px-6 py-5 border-t border-gray-200 dark:border-gray-700">
+      <div className="bg-gradient-light dark:from-gray-900/50 dark:to-gray-800/30 px-6 py-5 border-t border-light-border dark:border-dark-border">
         <div className="grid grid-cols-3 gap-4">
           {/* Card 1: Margem de Lucro Líquido (%) */}
-          <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/10 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow border border-green-200 dark:border-green-800">
+          <div className="card-theme rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow border-2 border-green-200/50 dark:border-green-800/30 bg-green-50/30 dark:bg-green-900/10">
             <div className="flex items-center gap-2 mb-2">
               <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
               <span className="text-xs font-semibold text-green-700 dark:text-green-300 uppercase">
@@ -372,13 +367,7 @@ const DREDynamicView = ({ dreData, isLoading = false }) => {
               </span>
             </div>
             <div
-              className={`text-2xl font-bold ${
-                (dreData.indicadores?.margem_liquida_percentual || 0) >= 15
-                  ? 'text-green-600 dark:text-green-400'
-                  : (dreData.indicadores?.margem_liquida_percentual || 0) >= 10
-                    ? 'text-yellow-600 dark:text-yellow-400'
-                    : 'text-red-600 dark:text-red-400'
-              }`}
+              className={`text-2xl font-bold ${(dreData.indicadores?.margem_liquida_percentual || 0) >= 15 ? 'text-green-600 dark:text-green-400' : (dreData.indicadores?.margem_liquida_percentual || 0) >= 10 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`}
             >
               {formatPercent(
                 dreData.indicadores?.margem_liquida_percentual ||
@@ -389,33 +378,21 @@ const DREDynamicView = ({ dreData, isLoading = false }) => {
             <p className="text-xs text-green-700 dark:text-green-400 mt-1 font-medium">
               {formatCurrency(dreData.lucro_liquido)} de lucro
             </p>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
+            <p className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-2">
               📈 Lucro real sobre a receita total
             </p>
           </div>
 
           {/* Card 2: Custo Operacional (% da Receita) */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm hover:shadow transition-shadow">
+          <div className="card-theme dark:bg-dark-surface rounded-lg p-4 shadow-sm hover:shadow transition-shadow">
             <div className="flex items-center gap-2 mb-2">
               <Target className="w-4 h-4 text-orange-500" />
-              <span className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase">
+              <span className="text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase">
                 Custo Operacional
               </span>
             </div>
             <div
-              className={`text-2xl font-bold ${
-                ((dreData.custos_operacionais?.total || 0) /
-                  (dreData.receita_bruta?.total || 1)) *
-                  100 <=
-                20
-                  ? 'text-green-600 dark:text-green-400'
-                  : ((dreData.custos_operacionais?.total || 0) /
-                        (dreData.receita_bruta?.total || 1)) *
-                        100 <=
-                      30
-                    ? 'text-yellow-600 dark:text-yellow-400'
-                    : 'text-red-600 dark:text-red-400'
-              }`}
+              className={`text-2xl font-bold ${((dreData.custos_operacionais?.total || 0) / (dreData.receita_bruta?.total || 1)) * 100 <= 20 ? 'text-green-600 dark:text-green-400' : ((dreData.custos_operacionais?.total || 0) / (dreData.receita_bruta?.total || 1)) * 100 <= 30 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`}
             >
               {formatPercent(
                 ((dreData.custos_operacionais?.total || 0) /
@@ -423,36 +400,24 @@ const DREDynamicView = ({ dreData, isLoading = false }) => {
                   100
               )}
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
               {formatCurrency(dreData.custos_operacionais?.total || 0)}
             </p>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
+            <p className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-2">
               ⚙️ Materiais, produtos, manutenção
             </p>
           </div>
 
           {/* Card 3: Despesas Fixas (% da Receita) */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm hover:shadow transition-shadow">
+          <div className="card-theme dark:bg-dark-surface rounded-lg p-4 shadow-sm hover:shadow transition-shadow">
             <div className="flex items-center gap-2 mb-2">
               <BarChart3 className="w-4 h-4 text-blue-500" />
-              <span className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase">
+              <span className="text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase">
                 Despesas Fixas
               </span>
             </div>
             <div
-              className={`text-2xl font-bold ${
-                ((dreData.despesas_administrativas?.total || 0) /
-                  (dreData.receita_bruta?.total || 1)) *
-                  100 <=
-                25
-                  ? 'text-green-600 dark:text-green-400'
-                  : ((dreData.despesas_administrativas?.total || 0) /
-                        (dreData.receita_bruta?.total || 1)) *
-                        100 <=
-                      35
-                    ? 'text-yellow-600 dark:text-yellow-400'
-                    : 'text-red-600 dark:text-red-400'
-              }`}
+              className={`text-2xl font-bold ${((dreData.despesas_administrativas?.total || 0) / (dreData.receita_bruta?.total || 1)) * 100 <= 25 ? 'text-green-600 dark:text-green-400' : ((dreData.despesas_administrativas?.total || 0) / (dreData.receita_bruta?.total || 1)) * 100 <= 35 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`}
             >
               {formatPercent(
                 ((dreData.despesas_administrativas?.total || 0) /
@@ -460,10 +425,10 @@ const DREDynamicView = ({ dreData, isLoading = false }) => {
                   100
               )}
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
               {formatCurrency(dreData.despesas_administrativas?.total || 0)}
             </p>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
+            <p className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-2">
               🏢 Aluguel, energia, salários fixos
             </p>
           </div>
@@ -565,51 +530,30 @@ const DREDynamicView = ({ dreData, isLoading = false }) => {
                 '💡 Ação: Monitore desperdícios, negocie com fornecedores e otimize o uso de produtos.',
             });
           }
-
           return alerts.length > 0 ? (
             <div className="mt-4 space-y-3">
               {alerts.map((alert, index) => (
                 <div
                   key={index}
-                  className={`rounded-lg p-4 border-l-4 ${
-                    alert.type === 'error'
-                      ? 'bg-red-50 dark:bg-red-900/20 border-red-500 dark:border-red-700'
-                      : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-500 dark:border-yellow-700'
-                  }`}
+                  className={`rounded-lg p-4 border-l-4 ${alert.type === 'error' ? 'bg-red-50 dark:bg-red-900/20 border-red-500 dark:border-red-700' : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-500 dark:border-yellow-700'}`}
                 >
                   <div className="flex items-start gap-3">
                     <alert.icon
-                      className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
-                        alert.type === 'error'
-                          ? 'text-red-600 dark:text-red-400'
-                          : 'text-yellow-600 dark:text-yellow-400'
-                      }`}
+                      className={`w-5 h-5 flex-shrink-0 mt-0.5 ${alert.type === 'error' ? 'text-red-600 dark:text-red-400' : 'text-yellow-600 dark:text-yellow-400'}`}
                     />
                     <div className="flex-1 min-w-0">
                       <h4
-                        className={`font-semibold text-sm mb-1 ${
-                          alert.type === 'error'
-                            ? 'text-red-800 dark:text-red-200'
-                            : 'text-yellow-800 dark:text-yellow-200'
-                        }`}
+                        className={`font-semibold text-sm mb-1 ${alert.type === 'error' ? 'text-red-800 dark:text-red-200' : 'text-yellow-800 dark:text-yellow-200'}`}
                       >
                         {alert.title}
                       </h4>
                       <p
-                        className={`text-sm mb-2 ${
-                          alert.type === 'error'
-                            ? 'text-red-700 dark:text-red-300'
-                            : 'text-yellow-700 dark:text-yellow-300'
-                        }`}
+                        className={`text-sm mb-2 ${alert.type === 'error' ? 'text-red-700 dark:text-red-300' : 'text-yellow-700 dark:text-yellow-300'}`}
                       >
                         {alert.message}
                       </p>
                       <p
-                        className={`text-xs font-medium ${
-                          alert.type === 'error'
-                            ? 'text-red-900 dark:text-red-100'
-                            : 'text-yellow-900 dark:text-yellow-100'
-                        }`}
+                        className={`text-xs font-medium ${alert.type === 'error' ? 'text-red-900 dark:text-red-100' : 'text-yellow-900 dark:text-yellow-100'}`}
                       >
                         {alert.action}
                       </p>
@@ -622,7 +566,7 @@ const DREDynamicView = ({ dreData, isLoading = false }) => {
         })()}
 
         {dreData.metadata?.calculation_timestamp && (
-          <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+          <div className="mt-4 pt-3 border-t border-light-border dark:border-dark-border flex items-center justify-between text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
             <span>
               Gerado em:{' '}
               {new Date(dreData.metadata.calculation_timestamp).toLocaleString(
@@ -638,10 +582,8 @@ const DREDynamicView = ({ dreData, isLoading = false }) => {
     </div>
   );
 };
-
 DREDynamicView.propTypes = {
   dreData: PropTypes.object,
   isLoading: PropTypes.bool,
 };
-
 export default DREDynamicView;

@@ -39,14 +39,18 @@ const CloseCashModal = ({
     const expected = expectedBalance || 0;
     setDifference(closingBalance - expected);
   }, [formData.closingBalance, expectedBalance]);
-
   const handleChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => ({
+      ...prev,
+      [field]: value,
+    }));
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: null }));
+      setErrors(prev => ({
+        ...prev,
+        [field]: null,
+      }));
     }
   };
-
   const handleSubmit = async e => {
     e.preventDefault();
 
@@ -55,9 +59,10 @@ const CloseCashModal = ({
       closingBalance: parseFloat(formData.closingBalance) || 0,
       observations: formData.observations,
     });
-
     if (!validation.success) {
-      setErrors({ form: validation.error });
+      setErrors({
+        form: validation.error,
+      });
       return;
     }
 
@@ -65,20 +70,23 @@ const CloseCashModal = ({
     await onConfirm(validation.data);
 
     // Reseta form
-    setFormData({ closingBalance: '', observations: '' });
+    setFormData({
+      closingBalance: '',
+      observations: '',
+    });
     setErrors({});
   };
-
   const handleClose = () => {
     if (!loading) {
-      setFormData({ closingBalance: '', observations: '' });
+      setFormData({
+        closingBalance: '',
+        observations: '',
+      });
       setErrors({});
       onClose();
     }
   };
-
   if (!isOpen || !cashRegister) return null;
-
   const closingBalanceNumber = parseFloat(formData.closingBalance) || 0;
   const hasDifference = Math.abs(difference) > 0.01;
 
@@ -90,8 +98,7 @@ const CloseCashModal = ({
       ? 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
       : difference < 0
         ? 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
-        : 'text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800';
-
+        : 'text-theme-secondary dark:text-dark-text-muted bg-light-surface/30 dark:bg-dark-surface/30 border-light-border dark:border-dark-border';
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="card-theme w-full max-w-md max-h-[90vh] overflow-y-auto">
@@ -108,7 +115,7 @@ const CloseCashModal = ({
           <button
             onClick={handleClose}
             disabled={loading}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
+            className="p-2 rounded-lg hover:card-theme dark:hover:bg-dark-surface transition-colors disabled:opacity-50"
             aria-label="Fechar modal"
           >
             <X size={20} className="text-theme-muted" />
@@ -118,7 +125,7 @@ const CloseCashModal = ({
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Saldo Inicial */}
-          <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-theme-border">
+          <div className="p-4 bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50 rounded-lg border border-theme-border">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-theme-muted">
                 Saldo Inicial:
@@ -208,24 +215,7 @@ const CloseCashModal = ({
               rows={4}
               disabled={loading}
               required={hasDifference}
-              className="
-                w-full
-                px-4
-                py-2
-                rounded-lg
-                border
-                border-theme-border
-                bg-white
-                dark:bg-gray-800
-                text-theme-primary
-                placeholder-theme-muted
-                focus:outline-none
-                focus:ring-2
-                focus:ring-primary-500
-                disabled:opacity-50
-                disabled:cursor-not-allowed
-                resize-none
-              "
+              className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary placeholder-theme-muted focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed resize-none"
             />
             <p className="text-xs text-theme-muted mt-1">
               {formData.observations.length}/500 caracteres
@@ -274,7 +264,6 @@ const CloseCashModal = ({
     </div>
   );
 };
-
 CloseCashModal.propTypes = {
   /** Se o modal está aberto */
   isOpen: PropTypes.bool.isRequired,
@@ -292,5 +281,4 @@ CloseCashModal.propTypes = {
   /** Estado de loading */
   loading: PropTypes.bool,
 };
-
 export default CloseCashModal;

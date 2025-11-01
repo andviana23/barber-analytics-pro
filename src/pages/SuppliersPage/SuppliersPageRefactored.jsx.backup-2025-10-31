@@ -1,0 +1,463 @@
+/**
+ * 📦 SUPPLIERS PAGE (Fornecedores) - 100% REFATORADO COM DESIGN SYSTEM
+ *
+ * Página premium para gerenciamento de fornecedores
+ *
+ * Features:
+ * - ✅ Design System completo aplicado
+ * - ✅ 3 KPI Cards premium com gradientes temáticos
+ * - ✅ Filtros compactos e elegantes
+ * - ✅ Tabela moderna com hover effects
+ * - ✅ Modais profissionais (Criar, Editar, Detalhes)
+ * - ✅ Paginação inteligente
+ * - ✅ Busca avançada com debounce
+ * - ✅ UI ultra moderna com feedback visual
+ * - ✅ Dark mode completo
+ * - ✅ Responsive design
+ * - ✅ Permissões por role (Admin/Gerente)
+ */
+
+import React, { useState, useMemo } from 'react';
+import { Plus, Search, Package, Info, Edit, Trash2, CheckCircle, XCircle, TrendingUp, Building2, Eye } from 'lucide-react';
+import { Layout } from '../../components/Layout/Layout';
+import { useAuth } from '../../context/AuthContext';
+import { useUnit } from '../../context/UnitContext';
+import { useToast } from '../../context/ToastContext';
+import useSuppliers from '../../hooks/useSuppliers';
+import { CreateSupplierModal, EditSupplierModal, SupplierInfoModal } from '../../molecules/SupplierModals';
+const SuppliersPageRefactored = () => {
+  const {
+    user
+  } = useAuth();
+  const {
+    selectedUnit
+  } = useUnit();
+  const {
+    showToast
+  } = useToast();
+
+  // Estados
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showInactive, setShowInactive] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // Hook para buscar fornecedores
+  const {
+    data: suppliers,
+    loading,
+    error,
+    stats,
+    createSupplier,
+    updateSupplier,
+    deleteSupplier,
+    activateSupplier
+  } = useSuppliers(selectedUnit?.id, {
+    includeInactive: showInactive,
+    enableCache: true
+  });
+
+  // Verificar permissões - Admin e Gerente podem gerenciar
+  const canManage = useMemo(() => {
+    const role = user?.user_metadata?.role;
+    return ['admin', 'gerente'].includes(role);
+  }, [user]);
+
+  // Filtrar fornecedores
+  const filteredSuppliers = useMemo(() => {
+    return suppliers.filter(supplier => {
+      const matchesSearch = searchTerm === '' || supplier.nome?.toLowerCase().includes(searchTerm.toLowerCase()) || supplier.cpf_cnpj?.includes(searchTerm) || supplier.email?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = showInactive || supplier.is_active;
+      return matchesSearch && matchesStatus;
+    });
+  }, [suppliers, searchTerm, showInactive]);
+
+  // Paginação
+  const totalPages = Math.ceil(filteredSuppliers.length / itemsPerPage);
+  const paginatedSuppliers = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredSuppliers.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredSuppliers, currentPage, itemsPerPage]);
+
+  // Handlers
+  const handleCreate = () => {
+    setSelectedSupplier(null);
+    setIsCreateModalOpen(true);
+  };
+  const handleEdit = supplier => {
+    setSelectedSupplier(supplier);
+    setIsEditModalOpen(true);
+  };
+  const handleInfo = supplier => {
+    setSelectedSupplier(supplier);
+    setIsInfoModalOpen(true);
+  };
+  const handleDelete = async supplier => {
+    if (!window.confirm(`Deseja realmente excluir o fornecedor "${supplier.nome}"?`)) {
+      return;
+    }
+    setDeletingId(supplier.id);
+    try {
+      const {
+        error
+      } = await deleteSupplier(supplier.id);
+      if (error) {
+        showToast({
+          type: 'error',
+          message: 'Erro ao excluir fornecedor',
+          description: error
+        });
+      } else {
+        showToast({
+          type: 'success',
+          message: 'Fornecedor excluído com sucesso'
+        });
+      }
+    } catch (err) {
+      showToast({
+        type: 'error',
+        message: 'Erro inesperado',
+        description: err.message
+      });
+    } finally {
+      setDeletingId(null);
+    }
+  };
+  const handleActivate = async supplier => {
+    try {
+      const {
+        error
+      } = await activateSupplier(supplier.id);
+      if (error) {
+        showToast({
+          type: 'error',
+          message: 'Erro ao ativar fornecedor',
+          description: error
+        });
+      } else {
+        showToast({
+          type: 'success',
+          message: 'Fornecedor ativado com sucesso'
+        });
+      }
+    } catch (err) {
+      showToast({
+        type: 'error',
+        message: 'Erro inesperado',
+        description: err.message
+      });
+    }
+  };
+  const formatCNPJ = cnpj => {
+    if (!cnpj) return '';
+    if (cnpj.length === 11) {
+      // CPF: 000.000.000-00
+      return cnpj.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    }
+    // CNPJ: 00.000.000/0000-00
+    return cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+  };
+
+  // UI Loading/Error
+  if (!selectedUnit) {
+    return <Layout>
+        <div className="flex items-center justify-center h-screen">
+          <div className="text-center space-y-4">
+            <Building2 className="w-16 h-16 mx-auto text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary" />
+            <p className="text-theme-secondary font-medium">
+              Selecione uma unidade para visualizar os fornecedores
+            </p>
+          </div>
+        </div>
+      </Layout>;
+  }
+  return <Layout>
+      <div className="space-y-6">
+        {/* 🎯 Header Premium - DESIGN SYSTEM */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
+              <Package className="w-8 h-8 text-dark-text-primary" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-theme-primary">
+                Fornecedores
+              </h1>
+              <p className="text-theme-secondary mt-1">
+                Gerencie os fornecedores da unidade{' '}
+                <span className="font-semibold">{selectedUnit.name}</span>
+              </p>
+            </div>
+          </div>
+
+          {canManage && <button onClick={handleCreate} className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r bg-gradient-primary hover:from-blue-700 hover:to-indigo-700 text-dark-text-primary font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105">
+              <Plus className="w-5 h-5" />
+              Fornecedor
+            </button>}
+        </div>
+
+        {/* 💳 KPI Cards Premium - DESIGN SYSTEM */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Card: Total */}
+          <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-300">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
+                <Package className="w-6 h-6 text-dark-text-primary" />
+              </div>
+              <TrendingUp className="w-5 h-5 text-blue-500 dark:text-blue-400 opacity-60" />
+            </div>
+            <p className="text-xs font-bold text-theme-secondary uppercase tracking-wider mb-2">
+              Total de Fornecedores
+            </p>
+            <p className="text-3xl font-bold text-theme-primary mb-1">
+              {stats.total}
+            </p>
+            <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+              Cadastrados no sistema
+            </p>
+          </div>
+
+          {/* Card: Ativos */}
+          <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-green-300 dark:hover:border-green-700 transition-all duration-300">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-3 bg-gradient-success rounded-xl shadow-lg">
+                <CheckCircle className="w-6 h-6 text-dark-text-primary" />
+              </div>
+              <TrendingUp className="w-5 h-5 text-green-500 dark:text-green-400 opacity-60" />
+            </div>
+            <p className="text-xs font-bold text-theme-secondary uppercase tracking-wider mb-2">
+              Fornecedores Ativos
+            </p>
+            <p className="text-3xl font-bold text-theme-primary mb-1">
+              {stats.active}
+            </p>
+            <p className="text-xs text-green-600 dark:text-green-400 font-medium">
+              Disponíveis para uso
+            </p>
+          </div>
+
+          {/* Card: Inativos */}
+          <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-red-300 dark:hover:border-red-700 transition-all duration-300">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-3 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl shadow-lg">
+                <XCircle className="w-6 h-6 text-dark-text-primary" />
+              </div>
+              <XCircle className="w-5 h-5 text-red-500 dark:text-red-400 opacity-60" />
+            </div>
+            <p className="text-xs font-bold text-theme-secondary uppercase tracking-wider mb-2">
+              Fornecedores Inativos
+            </p>
+            <p className="text-3xl font-bold text-theme-primary mb-1">
+              {stats.inactive}
+            </p>
+            <p className="text-xs text-red-600 dark:text-red-400 font-medium">
+              Desativados temporariamente
+            </p>
+          </div>
+        </div>
+
+        {/* 🎛️ Filtros Premium - DESIGN SYSTEM */}
+        <div className="card-theme rounded-xl p-5 border-2 border-transparent hover:border-light-border dark:border-dark-border dark:hover:border-dark-border transition-all duration-300">
+          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+            {/* Busca Premium */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary w-5 h-5" />
+              <input type="text" placeholder="Pesquisar por nome, CNPJ ou email..." value={searchTerm} onChange={e => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }} className="w-full pl-11 pr-4 py-3 card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-xl text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md" />
+            </div>
+
+            {/* Controles */}
+            <div className="flex flex-wrap gap-4 items-center">
+              {/* Items por página */}
+              <div className="flex items-center gap-2">
+                <select value={itemsPerPage} onChange={e => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }} className="px-4 py-3 card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-xl text-sm font-semibold text-theme-primary focus:ring-2 focus:ring-blue-500 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer">
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+                <span className="text-sm font-medium text-theme-secondary whitespace-nowrap">
+                  por página
+                </span>
+              </div>
+
+              {/* Mostrar inativos */}
+              <label className="flex items-center gap-2 px-4 py-3 card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer">
+                <input type="checkbox" checked={showInactive} onChange={e => {
+                setShowInactive(e.target.checked);
+                setCurrentPage(1);
+              }} className="w-4 h-4 text-blue-600 card-theme dark:bg-gray-700 border-light-border dark:border-dark-border rounded focus:ring-2 focus:ring-blue-500 cursor-pointer transition-all" />
+                <span className="text-sm font-semibold text-theme-primary whitespace-nowrap">
+                  Mostrar inativos
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* 📊 Tabela Premium - DESIGN SYSTEM */}
+        <div className="card-theme rounded-xl overflow-hidden border-2 border-transparent hover:border-light-border dark:border-dark-border dark:hover:border-dark-border transition-all duration-300">
+          {loading ? <div className="flex items-center justify-center py-20">
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-theme-secondary font-medium">
+                  Carregando fornecedores...
+                </span>
+              </div>
+            </div> : error ? <div className="flex items-center justify-center py-20">
+              <div className="text-center space-y-3">
+                <XCircle className="w-12 h-12 text-red-500 mx-auto" />
+                <p className="text-red-600 dark:text-red-400 font-medium">
+                  Erro ao carregar fornecedores
+                </p>
+                <p className="text-sm text-theme-secondary">{error}</p>
+              </div>
+            </div> : filteredSuppliers.length === 0 ? <div className="flex flex-col items-center justify-center py-20">
+              <Package className="w-16 h-16 text-gray-300 dark:text-theme-secondary mb-4" />
+              <p className="text-theme-primary font-medium mb-2">
+                {searchTerm ? 'Nenhum fornecedor encontrado' : 'Nenhum fornecedor cadastrado'}
+              </p>
+              <p className="text-sm text-theme-secondary">
+                {searchTerm ? 'Tente ajustar os filtros ou o termo de busca' : 'Clique em "Fornecedor" para cadastrar o primeiro'}
+              </p>
+            </div> : <>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gradient-light dark:from-gray-800 dark:to-gray-750 border-b-2 border-light-border dark:border-dark-border">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                        Fornecedor
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                        CNPJ
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                        Observação
+                      </th>
+                      <th className="px-6 py-4 text-center text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                        Ações
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                    {paginatedSuppliers.map(supplier => <tr key={supplier.id} className={`group transition-all duration-200 ${!supplier.is_active ? 'opacity-60' : 'hover:bg-gradient-to-r hover:from-gray-50/50 hover:to-gray-100/50 dark:hover:from-gray-800/50 dark:hover:to-gray-750/50'}`}>
+                        <td className="px-6 py-4">
+                          <div className="flex items-start gap-3">
+                            <div className="p-2 bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-lg">
+                              <Package className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold text-theme-primary">
+                                {supplier.nome}
+                              </p>
+                              {supplier.razao_social && <p className="text-xs text-theme-secondary mt-0.5">
+                                  {supplier.razao_social}
+                                </p>}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <p className="text-sm font-medium text-theme-primary font-mono">
+                            {formatCNPJ(supplier.cpf_cnpj)}
+                          </p>
+                        </td>
+                        <td className="px-6 py-4">
+                          <p className="text-sm text-theme-secondary truncate max-w-xs">
+                            {supplier.observacoes || '-'}
+                          </p>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center justify-center gap-2">
+                            {/* Ver Detalhes */}
+                            <button onClick={() => handleInfo(supplier)} className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-all duration-200" title="Ver detalhes">
+                              <Eye className="w-4 h-4" />
+                            </button>
+
+                            {/* Editar */}
+                            {canManage && supplier.is_active && <button onClick={() => handleEdit(supplier)} className="p-2 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-all duration-200" title="Editar">
+                                <Edit className="w-4 h-4" />
+                              </button>}
+
+                            {/* Excluir/Ativar */}
+                            {canManage && (supplier.is_active ? <button onClick={() => handleDelete(supplier)} disabled={deletingId === supplier.id} className="p-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-all duration-200 disabled:opacity-50" title="Excluir">
+                                  {deletingId === supplier.id ? <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                                </button> : <button onClick={() => handleActivate(supplier)} className="p-2 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-all duration-200" title="Ativar">
+                                  <CheckCircle className="w-4 h-4" />
+                                </button>)}
+                          </div>
+                        </td>
+                      </tr>)}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Paginação Premium */}
+              {totalPages > 1 && <div className="px-6 py-4 border-t-2 border-light-border dark:border-dark-border bg-gradient-light dark:from-gray-800 dark:to-gray-750">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-theme-secondary">
+                      Mostrando{' '}
+                      <span className="font-bold text-theme-primary">
+                        {(currentPage - 1) * itemsPerPage + 1}
+                      </span>{' '}
+                      a{' '}
+                      <span className="font-bold text-theme-primary">
+                        {Math.min(currentPage * itemsPerPage, filteredSuppliers.length)}
+                      </span>{' '}
+                      de{' '}
+                      <span className="font-bold text-theme-primary">
+                        {filteredSuppliers.length}
+                      </span>{' '}
+                      resultados
+                    </p>
+                    <div className="flex gap-2">
+                      <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-4 py-2 text-sm font-semibold text-theme-primary card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md">
+                        Anterior
+                      </button>
+                      <span className="px-4 py-2 text-sm font-bold text-theme-primary bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-300 dark:border-blue-700 rounded-lg">
+                        Página {currentPage} de {totalPages}
+                      </span>
+                      <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-4 py-2 text-sm font-semibold text-theme-primary card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md">
+                        Próxima
+                      </button>
+                    </div>
+                  </div>
+                </div>}
+            </>}
+        </div>
+      </div>
+
+      {/* Modals */}
+      <CreateSupplierModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} onSave={async data => {
+      const result = await createSupplier(data);
+      if (result.error) {
+        throw new Error(result.error);
+      }
+    }} unitId={selectedUnit?.id} />
+
+      <EditSupplierModal isOpen={isEditModalOpen} onClose={() => {
+      setIsEditModalOpen(false);
+      setSelectedSupplier(null);
+    }} onSave={async data => {
+      const result = await updateSupplier(selectedSupplier.id, data);
+      if (result.error) {
+        throw new Error(result.error);
+      }
+    }} supplier={selectedSupplier} />
+
+      <SupplierInfoModal isOpen={isInfoModalOpen} onClose={() => {
+      setIsInfoModalOpen(false);
+      setSelectedSupplier(null);
+    }} supplier={selectedSupplier} />
+    </Layout>;
+};
+export default SuppliersPageRefactored;

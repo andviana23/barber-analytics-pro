@@ -71,10 +71,10 @@ const ContasBancariasTab = ({ globalFilters }) => {
 
   // Hook para carregar contas bancárias com novos saldos calculados
   const { bankAccounts, loading, error, refetch } = useBankAccounts({
-    unitId: globalFilters?.unitId || null, // Usar filtro global de unidade
+    unitId: globalFilters?.unitId || null,
+    // Usar filtro global de unidade
     incluirInativas: showInactive,
   });
-
   console.log(
     '🏦 ContasBancariasTab - Contas carregadas:',
     bankAccounts?.length || 0,
@@ -90,7 +90,6 @@ const ContasBancariasTab = ({ globalFilters }) => {
   // Filtrar e ordenar contas
   const filteredAndSortedAccounts = useMemo(() => {
     if (!bankAccounts) return [];
-
     let filtered = bankAccounts.filter(account => {
       // Filtro de busca
       const matchesSearch =
@@ -105,14 +104,12 @@ const ContasBancariasTab = ({ globalFilters }) => {
       // Filtro de banco
       const matchesBank =
         selectedBank === 'all' || account.bank === selectedBank;
-
       return matchesSearch && matchesBank;
     });
 
     // Ordenação
     filtered.sort((a, b) => {
       let aValue, bValue;
-
       switch (sortBy) {
         case 'name':
           aValue = a.name?.toLowerCase() || '';
@@ -128,14 +125,12 @@ const ContasBancariasTab = ({ globalFilters }) => {
           bValue = new Date(b.created_at || 0);
           break;
       }
-
       if (sortOrder === 'asc') {
         return aValue > bValue ? 1 : -1;
       } else {
         return aValue < bValue ? 1 : -1;
       }
     });
-
     return filtered;
   }, [bankAccounts, searchTerm, selectedBank, sortBy, sortOrder]);
 
@@ -161,7 +156,6 @@ const ContasBancariasTab = ({ globalFilters }) => {
         topBank: '',
         recentActivity: 0,
       };
-
     const total = bankAccounts.length;
     const active = bankAccounts.filter(acc => acc.is_active).length;
     const inactive = total - active;
@@ -198,7 +192,6 @@ const ContasBancariasTab = ({ globalFilters }) => {
       (a, b) => (bankCounts[a] > bankCounts[b] ? a : b),
       ''
     );
-
     return {
       total,
       active,
@@ -222,22 +215,18 @@ const ContasBancariasTab = ({ globalFilters }) => {
   const handleCreate = () => {
     setIsCreateModalOpen(true);
   };
-
   const handleEdit = account => {
     setSelectedAccount(account);
     setIsEditModalOpen(true);
   };
-
   const handleDelete = account => {
     setSelectedAccount(account);
     setIsDeleteModalOpen(true);
   };
-
   const handleEditBalance = account => {
     setSelectedAccount(account);
     setIsEditBalanceModalOpen(true);
   };
-
   const handleSuccess = () => {
     refetch(); // Recarregar lista
     setIsCreateModalOpen(false);
@@ -246,18 +235,15 @@ const ContasBancariasTab = ({ globalFilters }) => {
     setIsEditBalanceModalOpen(false);
     setSelectedAccount(null);
   };
-
   const handleRefresh = () => {
     refetch();
   };
-
   const formatCurrency = value => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
     }).format(value || 0);
   };
-
   const formatDate = date => {
     return new Date(date).toLocaleDateString('pt-BR', {
       day: '2-digit',
@@ -276,29 +262,27 @@ const ContasBancariasTab = ({ globalFilters }) => {
       total_revenues: account.total_revenues,
       total_expenses: account.total_expenses,
     });
-
     const balanceVariation =
       (account.current_balance || 0) - (account.initial_balance || 0);
     const isPositiveVariation = balanceVariation >= 0;
-
     return (
-      <div className="group bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-2xl hover:border-blue-400 dark:hover:border-blue-500 transition-all duration-300 hover:-translate-y-1">
+      <div className="group card-theme dark:bg-dark-surface rounded-2xl border border-light-border dark:border-dark-border p-6 hover:shadow-2xl hover:border-blue-400 dark:hover:border-blue-500 transition-all duration-300 hover:-translate-y-1">
         {/* Header do Card */}
         <div className="flex items-start justify-between mb-6">
           <div className="flex items-center space-x-4">
             <div className="relative">
-              <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
-                <Building2 className="w-6 h-6 text-white" />
+              <div className="p-3 bg-gradient-primary rounded-xl shadow-lg">
+                <Building2 className="w-6 h-6 text-dark-text-primary" />
               </div>
               {account.is_active && (
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-800 animate-pulse" />
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-light-surface dark:border-dark-surface dark:border-gray-800 animate-pulse" />
               )}
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+              <h3 className="text-xl font-bold text-theme-primary dark:text-dark-text-primary group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                 {account.name}
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 font-medium flex items-center gap-2">
+              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted font-medium flex items-center gap-2">
                 <Building2 className="w-3.5 h-3.5" />
                 {account.bank_name || account.bank}
               </p>
@@ -309,14 +293,14 @@ const ContasBancariasTab = ({ globalFilters }) => {
             <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
               <button
                 onClick={() => handleEdit(account)}
-                className="p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all"
+                className="p-2 text-light-text-muted dark:text-dark-text-muted hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all"
                 title="Editar conta"
               >
                 <Edit className="w-4 h-4" />
               </button>
               <button
                 onClick={() => handleDelete(account)}
-                className="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
+                className="p-2 text-light-text-muted dark:text-dark-text-muted hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
                 title="Excluir conta"
               >
                 <Trash2 className="w-4 h-4" />
@@ -328,25 +312,25 @@ const ContasBancariasTab = ({ globalFilters }) => {
         {/* Detalhes da Conta */}
         <div className="space-y-3 mb-6">
           <div className="grid grid-cols-2 gap-3">
-            <div className="flex items-center space-x-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-              <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
+            <div className="flex items-center space-x-2 p-3 bg-light-bg dark:bg-dark-bg dark:bg-gray-700/50 rounded-lg">
+              <MapPin className="w-4 h-4 text-light-text-muted dark:text-dark-text-muted flex-shrink-0" />
               <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                   Agência
                 </p>
-                <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                <p className="text-sm font-semibold text-theme-primary dark:text-dark-text-primary">
                   {account.agency}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center space-x-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-              <CreditCard className="w-4 h-4 text-gray-400 flex-shrink-0" />
+            <div className="flex items-center space-x-2 p-3 bg-light-bg dark:bg-dark-bg dark:bg-gray-700/50 rounded-lg">
+              <CreditCard className="w-4 h-4 text-light-text-muted dark:text-dark-text-muted flex-shrink-0" />
               <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                   Conta
                 </p>
-                <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                <p className="text-sm font-semibold text-theme-primary dark:text-dark-text-primary">
                   {account.account_number}
                 </p>
               </div>
@@ -357,7 +341,7 @@ const ContasBancariasTab = ({ globalFilters }) => {
         {/* SALDOS - NOVO LAYOUT */}
         <div className="space-y-3 mb-5">
           {/* Saldo Inicial */}
-          <div className="p-4 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl border border-blue-100 dark:border-blue-800/30">
+          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800/30">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-lg">
@@ -385,7 +369,7 @@ const ContasBancariasTab = ({ globalFilters }) => {
           </div>
 
           {/* Saldo Atual */}
-          <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl border border-green-100 dark:border-green-800/30">
+          <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-100 dark:border-green-800/30">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-green-100 dark:bg-green-900/40 rounded-lg">
@@ -402,11 +386,7 @@ const ContasBancariasTab = ({ globalFilters }) => {
               </div>
               {balanceVariation !== 0 && (
                 <div
-                  className={`flex items-center space-x-1 px-2 py-1 rounded-lg ${
-                    isPositiveVariation
-                      ? 'bg-green-100 dark:bg-green-900/30'
-                      : 'bg-red-100 dark:bg-red-900/30'
-                  }`}
+                  className={`flex items-center space-x-1 px-2 py-1 rounded-lg ${isPositiveVariation ? 'bg-green-100 dark:bg-green-900/30' : 'bg-red-100 dark:bg-red-900/30'}`}
                 >
                   {isPositiveVariation ? (
                     <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
@@ -414,11 +394,7 @@ const ContasBancariasTab = ({ globalFilters }) => {
                     <TrendingDown className="w-4 h-4 text-red-600 dark:text-red-400" />
                   )}
                   <span
-                    className={`text-xs font-semibold ${
-                      isPositiveVariation
-                        ? 'text-green-700 dark:text-green-300'
-                        : 'text-red-700 dark:text-red-300'
-                    }`}
+                    className={`text-xs font-semibold ${isPositiveVariation ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}`}
                   >
                     {formatCurrency(Math.abs(balanceVariation))}
                   </span>
@@ -428,7 +404,7 @@ const ContasBancariasTab = ({ globalFilters }) => {
           </div>
 
           {/* Saldo Disponível */}
-          <div className="p-4 bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 rounded-xl border border-purple-100 dark:border-purple-800/30">
+          <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-100 dark:border-purple-800/30">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-purple-100 dark:bg-purple-900/40 rounded-lg">
@@ -449,15 +425,15 @@ const ContasBancariasTab = ({ globalFilters }) => {
 
         {/* Resumo de Movimentações */}
         {(account.total_revenues > 0 || account.total_expenses > 0) && (
-          <div className="pt-4 border-t border-gray-200 dark:border-gray-700 mb-4">
-            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
+          <div className="pt-4 border-t border-light-border dark:border-dark-border mb-4">
+            <p className="text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wide mb-3">
               Movimentações
             </p>
             <div className="grid grid-cols-2 gap-3">
               <div className="flex items-center space-x-2">
                 <TrendingUp className="w-4 h-4 text-green-500" />
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                     Receitas
                   </p>
                   <p className="text-sm font-semibold text-green-600 dark:text-green-400">
@@ -468,7 +444,7 @@ const ContasBancariasTab = ({ globalFilters }) => {
               <div className="flex items-center space-x-2">
                 <TrendingDown className="w-4 h-4 text-red-500" />
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                     Despesas
                   </p>
                   <p className="text-sm font-semibold text-red-600 dark:text-red-400">
@@ -481,13 +457,9 @@ const ContasBancariasTab = ({ globalFilters }) => {
         )}
 
         {/* Status e Data de Criação */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between pt-4 border-t border-light-border dark:border-dark-border">
           <span
-            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-              account.is_active
-                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
-                : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
-            }`}
+            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${account.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'}`}
           >
             {account.is_active ? (
               <>
@@ -502,7 +474,7 @@ const ContasBancariasTab = ({ globalFilters }) => {
             )}
           </span>
 
-          <div className="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-400">
+          <div className="flex items-center space-x-1 text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
             <Calendar className="w-3.5 h-3.5" />
             <span>{formatDate(account.created_at)}</span>
           </div>
@@ -513,34 +485,34 @@ const ContasBancariasTab = ({ globalFilters }) => {
 
   // Componente de Linha da Tabela Melhorado
   const TableRow = ({ account }) => (
-    <tr className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group">
+    <tr className="hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700/50 transition-colors group">
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center">
           <div className="relative">
-            <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg">
-              <Building2 className="w-5 h-5 text-white" />
+            <div className="p-2 bg-gradient-primary rounded-lg">
+              <Building2 className="w-5 h-5 text-dark-text-primary" />
             </div>
             {account.is_active && (
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border border-white"></div>
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border border-light-surface dark:border-dark-surface"></div>
             )}
           </div>
           <div className="ml-4">
-            <div className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+            <div className="text-sm font-semibold text-theme-primary dark:text-dark-text-primary group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
               {account.name}
             </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">
+            <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
               {account.bank}
             </div>
           </div>
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm font-medium text-gray-900 dark:text-white">
+        <div className="text-sm font-medium text-theme-primary dark:text-dark-text-primary">
           {account.agency}
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm font-medium text-gray-900 dark:text-white">
+        <div className="text-sm font-medium text-theme-primary dark:text-dark-text-primary">
           {account.account_number}
         </div>
       </td>
@@ -551,16 +523,12 @@ const ContasBancariasTab = ({ globalFilters }) => {
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <span
-          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-            account.is_active
-              ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
-              : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
-          }`}
+          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${account.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'}`}
         >
           {account.is_active ? 'Ativa' : 'Inativa'}
         </span>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
         {formatDate(account.created_at)}
       </td>
       {canManage && (
@@ -583,27 +551,28 @@ const ContasBancariasTab = ({ globalFilters }) => {
       )}
     </tr>
   );
-
   if (loading) {
     return (
       <div className="space-y-6">
         {/* Header com Loading */}
-        <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-2xl p-8 text-white">
+        <div className="bg-gradient-primary rounded-2xl p-8 text-dark-text-primary">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-3xl font-bold mb-2">🏦 Contas Bancárias</h1>
               <p className="text-blue-100 text-lg">Carregando informações...</p>
             </div>
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-light-surface dark:border-dark-surface"></div>
           </div>
         </div>
 
         {/* Cards de Loading */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {Array.from({ length: 4 }).map((_, i) => (
+          {Array.from({
+            length: 4,
+          }).map((_, i) => (
             <div
               key={i}
-              className="bg-white dark:bg-gray-800 rounded-xl p-6 animate-pulse"
+              className="card-theme dark:bg-dark-surface rounded-xl p-6 animate-pulse"
             >
               <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
               <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded"></div>
@@ -613,7 +582,6 @@ const ContasBancariasTab = ({ globalFilters }) => {
       </div>
     );
   }
-
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] p-6">
@@ -625,7 +593,7 @@ const ContasBancariasTab = ({ globalFilters }) => {
           <p className="text-red-700 dark:text-red-300 mb-4">{error}</p>
           <button
             onClick={handleRefresh}
-            className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            className="inline-flex items-center px-4 py-2 bg-red-600 text-dark-text-primary rounded-lg hover:bg-red-700 transition-colors"
           >
             <RefreshCw className="w-4 h-4 mr-2" />
             Tentar novamente
@@ -634,24 +602,23 @@ const ContasBancariasTab = ({ globalFilters }) => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       {/* Header Principal */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+      <div className="card-theme dark:bg-dark-surface rounded-lg border border-light-border dark:border-dark-border p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-1">
+            <h1 className="text-2xl font-semibold text-theme-primary dark:text-dark-text-primary mb-1">
               Contas Bancárias
             </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
               Gerencie todas as contas bancárias do sistema
             </p>
           </div>
           <div className="flex items-center space-x-3">
             <button
               onClick={handleRefresh}
-              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              className="p-2 text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary dark:hover:text-gray-300 dark:text-gray-600 dark:text-theme-secondary transition-colors"
               title="Atualizar"
             >
               <RefreshCw className="w-5 h-5" />
@@ -659,7 +626,7 @@ const ContasBancariasTab = ({ globalFilters }) => {
             {canManage && (
               <button
                 onClick={handleCreate}
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-dark-text-primary text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Nova Conta
@@ -670,7 +637,7 @@ const ContasBancariasTab = ({ globalFilters }) => {
 
         {/* Cards de Estatísticas - Saldos Consolidados */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl p-5 border border-blue-100 dark:border-blue-800/30">
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-5 border border-blue-100 dark:border-blue-800/30">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide mb-1">
@@ -689,7 +656,7 @@ const ContasBancariasTab = ({ globalFilters }) => {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-5 border border-green-100 dark:border-green-800/30">
+          <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-5 border border-green-100 dark:border-green-800/30">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold text-green-600 dark:text-green-400 uppercase tracking-wide mb-1">
@@ -709,7 +676,7 @@ const ContasBancariasTab = ({ globalFilters }) => {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 rounded-xl p-5 border border-purple-100 dark:border-purple-800/30">
+          <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-5 border border-purple-100 dark:border-purple-800/30">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wide mb-1">
@@ -728,21 +695,21 @@ const ContasBancariasTab = ({ globalFilters }) => {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-gray-50 to-slate-50 dark:from-gray-700/50 dark:to-slate-700/50 rounded-xl p-5 border border-gray-200 dark:border-gray-600">
+          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-5 border border-light-border dark:border-dark-border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1">
+                <p className="text-xs font-semibold text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wide mb-1">
                   Banco Principal
                 </p>
-                <p className="text-lg font-bold text-gray-900 dark:text-white truncate">
+                <p className="text-lg font-bold text-theme-primary dark:text-dark-text-primary truncate">
                   {stats.topBank || 'N/A'}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
                   Mais utilizado
                 </p>
               </div>
-              <div className="p-3 bg-gray-100 dark:bg-gray-600/50 rounded-xl">
-                <Building2 className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+              <div className="p-3 card-theme dark:bg-gray-600/50 rounded-xl">
+                <Building2 className="w-6 h-6 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted" />
               </div>
             </div>
           </div>
@@ -783,18 +750,18 @@ const ContasBancariasTab = ({ globalFilters }) => {
       </div>
 
       {/* Filtros e Controles */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <div className="card-theme dark:bg-dark-surface rounded-xl border border-light-border dark:border-dark-border p-6">
         <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
           <div className="flex flex-col sm:flex-row gap-3 flex-1">
             {/* Busca */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-text-muted dark:text-dark-text-muted h-4 w-4" />
               <input
                 type="text"
                 placeholder="Buscar por nome, banco, agência ou conta..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="pl-10 w-full sm:w-80 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                className="pl-10 w-full sm:w-80 px-4 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
               />
             </div>
 
@@ -802,7 +769,7 @@ const ContasBancariasTab = ({ globalFilters }) => {
             <select
               value={selectedBank}
               onChange={e => setSelectedBank(e.target.value)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              className="px-4 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
             >
               <option value="all">Todos os Bancos</option>
               {uniqueBanks.map(bank => (
@@ -820,7 +787,7 @@ const ContasBancariasTab = ({ globalFilters }) => {
                 setSortBy(field);
                 setSortOrder(order);
               }}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              className="px-4 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
             >
               <option value="created_at-desc">Mais Recentes</option>
               <option value="created_at-asc">Mais Antigas</option>
@@ -838,33 +805,25 @@ const ContasBancariasTab = ({ globalFilters }) => {
                 type="checkbox"
                 checked={showInactive}
                 onChange={e => setShowInactive(e.target.checked)}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="rounded border-light-border dark:border-dark-border text-blue-600 focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300">
+              <span className="text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                 Mostrar inativas
               </span>
             </label>
 
             {/* Toggle de visualização */}
-            <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+            <div className="flex card-theme dark:bg-gray-700 rounded-lg p-1">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-2 rounded-md transition-colors ${
-                  viewMode === 'grid'
-                    ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-                }`}
+                className={`p-2 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
                 title="Visualização em Grid"
               >
                 <BarChart3 className="w-5 h-5" />
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-2 rounded-md transition-colors ${
-                  viewMode === 'list'
-                    ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-                }`}
+                className={`p-2 rounded-md transition-colors ${viewMode === 'list' ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
                 title="Visualização em Lista"
               >
                 <Activity className="w-5 h-5" />
@@ -875,16 +834,16 @@ const ContasBancariasTab = ({ globalFilters }) => {
       </div>
 
       {/* Conteúdo Principal */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="card-theme dark:bg-dark-surface rounded-xl border border-light-border dark:border-dark-border overflow-hidden">
         {filteredAndSortedAccounts.length === 0 ? (
           <div className="p-12 text-center">
-            <CreditCard className="mx-auto h-16 w-16 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            <CreditCard className="mx-auto h-16 w-16 text-light-text-muted dark:text-dark-text-muted mb-4" />
+            <h3 className="text-lg font-medium text-theme-primary dark:text-dark-text-primary mb-2">
               {bankAccounts?.length === 0
                 ? 'Nenhuma conta cadastrada'
                 : 'Nenhuma conta encontrada'}
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-6">
               {bankAccounts?.length === 0
                 ? 'Cadastre a primeira conta bancária para começar.'
                 : 'Tente ajustar os filtros de busca.'}
@@ -892,7 +851,7 @@ const ContasBancariasTab = ({ globalFilters }) => {
             {bankAccounts?.length === 0 && canManage && (
               <button
                 onClick={handleCreate}
-                className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center px-6 py-3 bg-blue-600 text-dark-text-primary font-semibold rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Cadastrar Primeira Conta
@@ -910,34 +869,34 @@ const ContasBancariasTab = ({ globalFilters }) => {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 dark:bg-gray-700">
+              <thead className="bg-light-bg dark:bg-dark-bg dark:bg-gray-700">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
                     Conta
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
                     Agência
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
                     Conta
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
                     Saldo
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
                     Criada em
                   </th>
                   {canManage && (
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
                       Ações
                     </th>
                   )}
                 </tr>
               </thead>
-              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              <tbody className="card-theme dark:bg-dark-surface divide-y divide-gray-200 dark:divide-gray-700">
                 {filteredAndSortedAccounts.map(account => (
                   <TableRow key={account.id} account={account} />
                 ))}
@@ -988,5 +947,4 @@ const ContasBancariasTab = ({ globalFilters }) => {
     </div>
   );
 };
-
 export default ContasBancariasTab;

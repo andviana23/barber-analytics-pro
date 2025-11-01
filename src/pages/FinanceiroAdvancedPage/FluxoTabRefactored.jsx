@@ -91,7 +91,6 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
       isCurrentPeriod,
     });
   }, [selectedPeriod, selectedDate, dateRange]);
-
   const [cashflowData, setCashflowData] = useState({
     daily: [],
     paid: [],
@@ -100,7 +99,6 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
     revenueDistribution: [],
     expenseDistribution: [],
   });
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -129,7 +127,6 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
   // ✅ Buscar saldo final do período anterior ao selecionado
   const fetchPreviousMonthBalance = async () => {
     if (!globalFilters.unitId) return 0;
-
     try {
       // ✅ CORRIGIDO: Usar selectedDate do filtro ao invés de new Date()
       const referenceDate =
@@ -137,7 +134,6 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
       const previousMonth = subMonths(referenceDate, 1);
       const startOfPreviousMonth = startOfMonth(previousMonth);
       const endOfPreviousMonth = endOfMonth(previousMonth);
-
       console.log('📊 Buscando saldo do mês anterior:', {
         referenceDate: format(referenceDate, 'yyyy-MM-dd'),
         start: format(startOfPreviousMonth, 'yyyy-MM-dd'),
@@ -172,13 +168,11 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
         0
       );
       const previousBalance = totalRevenues - totalExpenses;
-
       console.log('📊 Saldo do mês anterior calculado:', {
         receitas: totalRevenues,
         despesas: totalExpenses,
         saldo: previousBalance,
       });
-
       return previousBalance;
     } catch (error) {
       console.error('❌ Erro ao buscar saldo do mês anterior:', error);
@@ -189,11 +183,9 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
   // Buscar dados completos do fluxo de caixa
   const fetchCompleteCashflowData = async () => {
     if (!globalFilters.unitId) return;
-
     try {
       setLoading(true);
       setError(null);
-
       console.log('🔄 Buscando dados completos do fluxo de caixa...');
 
       // ✅ Buscar saldo inicial do mês anterior
@@ -215,7 +207,6 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
         .gte('date', dateRange.startDate)
         .lte('date', dateRange.endDate)
         .order('date');
-
       if (paidRevenuesError) throw paidRevenuesError;
 
       // 2. Buscar receitas PENDENTES - BUSCAR TODAS E FILTRAR DEPOIS
@@ -233,7 +224,6 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
           .eq('status', 'Pending')
           .eq('is_active', true)
           .order('expected_receipt_date');
-
       if (pendingRevenuesError) throw pendingRevenuesError;
 
       // Combinar receitas pagas e pendentes
@@ -255,7 +245,6 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
         .gte('date', dateRange.startDate)
         .lte('date', dateRange.endDate)
         .order('date');
-
       if (paidExpensesError) throw paidExpensesError;
 
       // 4. Buscar despesas PENDENTES (por expected_payment_date = Prev. Pgto)
@@ -274,7 +263,6 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
           .eq('status', 'Pending')
           .eq('is_active', true)
           .order('expected_payment_date');
-
       if (pendingExpensesError) throw pendingExpensesError;
 
       // Combinar despesas pagas e pendentes
@@ -305,7 +293,6 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
         expenses || [],
         dateRange
       );
-
       setCashflowData({
         daily: dailyData,
         paid,
@@ -314,7 +301,6 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
         revenueDistribution,
         expenseDistribution,
       });
-
       console.log('✅ Dados do fluxo de caixa carregados:', {
         daily: dailyData.length,
         paid: paid.length,
@@ -344,7 +330,6 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
     // 🔧 FIX: Usar parseISO + startOfDay para garantir timezone consistente
     const startDate = startOfDay(parseISO(dateRange.startDate));
     const endDate = startOfDay(parseISO(dateRange.endDate));
-
     console.log('📊 Processando período:', {
       startDate: format(startDate, 'yyyy-MM-dd'),
       endDate: format(endDate, 'yyyy-MM-dd'),
@@ -354,11 +339,9 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
     // Criar entrada para cada dia do período
     let currentDate = new Date(startDate);
     let dayCount = 0;
-
     while (currentDate <= endDate && dayCount < 100) {
       // Safety limit
       const dateKey = format(currentDate, 'yyyy-MM-dd');
-
       dailyMap.set(dateKey, {
         date: dateKey,
         // ✅ SEPARAÇÃO CLARA: RECEBIDAS vs PENDENTES
@@ -375,8 +358,14 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
         // ✅ CONTAGEM DE TRANSAÇÕES
         transaction_count: 0,
         // ✅ DETALHES PARA AUDITORIA
-        revenues: { received: [], pending: [] },
-        expenses: { paid: [], pending: [] },
+        revenues: {
+          received: [],
+          pending: [],
+        },
+        expenses: {
+          paid: [],
+          pending: [],
+        },
       });
 
       // Avançar para o próximo dia usando UTC para evitar problemas de timezone
@@ -395,21 +384,18 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
         new Date(revenue.expected_receipt_date || revenue.date),
         'yyyy-MM-dd'
       );
-
       const category = revenue.status === 'Received' ? 'received' : 'pending';
 
       // ✅ FILTRAR APENAS DATAS DO MÊS VIGENTE - VALIDAÇÃO RIGOROSA
       const revenueDate = new Date(date);
       const filterStartDate = new Date(dateRange.startDate);
       const filterEndDate = new Date(dateRange.endDate);
-
       if (
         revenueDate >= filterStartDate &&
         revenueDate <= filterEndDate &&
         dailyMap.has(date)
       ) {
         const dayData = dailyMap.get(date);
-
         if (category === 'received') {
           dayData.received_inflows += revenue.value || 0;
           dayData.revenues.received.push(revenue);
@@ -417,7 +403,6 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
           dayData.pending_inflows += revenue.value || 0;
           dayData.revenues.pending.push(revenue);
         }
-
         dayData.transaction_count++;
       } else {
         console.log('🚫 Receita filtrada fora do mês vigente:', {
@@ -439,21 +424,18 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
         new Date(expense.expected_payment_date || expense.date),
         'yyyy-MM-dd'
       );
-
       const category = expense.status === 'Paid' ? 'paid' : 'pending';
 
       // ✅ FILTRAR APENAS DATAS DO MÊS VIGENTE - VALIDAÇÃO RIGOROSA
       const expenseDate = new Date(date);
       const filterStartDate = new Date(dateRange.startDate);
       const filterEndDate = new Date(dateRange.endDate);
-
       if (
         expenseDate >= filterStartDate &&
         expenseDate <= filterEndDate &&
         dailyMap.has(date)
       ) {
         const dayData = dailyMap.get(date);
-
         if (category === 'paid') {
           dayData.paid_outflows += expense.value || 0;
           dayData.expenses.paid.push(expense);
@@ -461,7 +443,6 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
           dayData.pending_outflows += expense.value || 0;
           dayData.expenses.pending.push(expense);
         }
-
         dayData.transaction_count++;
       } else {
         console.log('🚫 Despesa filtrada fora do mês vigente:', {
@@ -492,7 +473,6 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
       // Calcular acumulado
       dayData.accumulatedBalance = accumulatedBalance + dayData.dailyBalance;
       accumulatedBalance = dayData.accumulatedBalance;
-
       return {
         ...dayData,
         dayNumber: index + 1,
@@ -501,8 +481,10 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
 
     // ✅ ADICIONAR LINHA DE SALDO INICIAL NO INÍCIO (com chave única)
     const saldoInicialRow = {
-      date: 'SALDO_INICIAL', // Chave única para evitar conflito com primeiro dia
-      displayDate: dateRange.startDate, // Data para exibição
+      date: 'SALDO_INICIAL',
+      // Chave única para evitar conflito com primeiro dia
+      displayDate: dateRange.startDate,
+      // Data para exibição
       isSaldoInicial: true,
       received_inflows: 0,
       pending_inflows: 0,
@@ -513,13 +495,17 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
       dailyBalance: 0,
       accumulatedBalance: saldoInicial,
       transaction_count: 0,
-      revenues: { received: [], pending: [] },
-      expenses: { paid: [], pending: [] },
+      revenues: {
+        received: [],
+        pending: [],
+      },
+      expenses: {
+        paid: [],
+        pending: [],
+      },
       dayNumber: 0, // Dia 0 = Saldo Inicial
     };
-
     const finalResult = [saldoInicialRow, ...result];
-
     return finalResult;
   };
 
@@ -528,8 +514,10 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
     // Como agora temos uma tabela única consolidada,
     // esta função apenas retorna os dados já processados
     return {
-      paid: dailyData, // Mesmos dados para ambos
-      pending: dailyData, // pois já estão separados por status
+      paid: dailyData,
+      // Mesmos dados para ambos
+      pending: dailyData,
+      // pois já estão separados por status
       daily: dailyData, // Dados consolidados para a nova tabela
     };
   };
@@ -571,13 +559,14 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
       last12MonthsRevenues > 0
         ? (last12MonthsResult / last12MonthsRevenues) * 100
         : 0;
-
     return {
       currentMonth: {
         revenues: currentMonthRevenues,
         expenses: currentMonthExpenses,
         result: currentMonthResult,
-        month: format(new Date(), 'MMM/yy', { locale: ptBR }),
+        month: format(new Date(), 'MMM/yy', {
+          locale: ptBR,
+        }),
       },
       last12Months: {
         revenues: last12MonthsRevenues,
@@ -597,7 +586,6 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
       if (!revenue.date) {
         return false; // Ignora receitas sem data de pagamento
       }
-
       const paymentDate = new Date(revenue.date + 'T00:00:00');
       const periodStart = new Date(dateRange.startDate + 'T00:00:00');
       const periodEnd = new Date(dateRange.endDate + 'T23:59:59');
@@ -605,7 +593,6 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
       // Incluir se a data de pagamento está dentro do período selecionado
       return paymentDate >= periodStart && paymentDate <= periodEnd;
     });
-
     filteredRevenues.forEach(revenue => {
       const categoryName = revenue.category?.name || 'Outras Receitas';
       if (!distribution.has(categoryName)) {
@@ -616,12 +603,10 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
         distribution.get(categoryName) + (revenue.value || 0)
       );
     });
-
     const total = Array.from(distribution.values()).reduce(
       (sum, val) => sum + val,
       0
     );
-
     return Array.from(distribution.entries())
       .map(([name, value]) => ({
         name,
@@ -640,11 +625,9 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
     const filteredExpenses = expenses.filter(expense => {
       // Usar expected_payment_date se disponível, senão usar date
       const referenceDate = expense.expected_payment_date || expense.date;
-
       if (!referenceDate) {
         return false; // Ignora despesas sem data
       }
-
       const expenseDate = new Date(referenceDate + 'T00:00:00');
       const periodStart = new Date(dateRange.startDate + 'T00:00:00');
       const periodEnd = new Date(dateRange.endDate + 'T23:59:59');
@@ -652,7 +635,6 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
       // Incluir se a data de vencimento esperada está dentro do período
       return expenseDate >= periodStart && expenseDate <= periodEnd;
     });
-
     filteredExpenses.forEach(expense => {
       const categoryName = expense.category?.name || 'Outras Despesas';
       if (!distribution.has(categoryName)) {
@@ -663,12 +645,10 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
         distribution.get(categoryName) + (expense.value || 0)
       );
     });
-
     const total = Array.from(distribution.values()).reduce(
       (sum, val) => sum + val,
       0
     );
-
     return Array.from(distribution.entries())
       .map(([name, value]) => ({
         name,
@@ -699,20 +679,16 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
       });
     }
   };
-
   const handleRefresh = () => {
     fetchCompleteCashflowData();
     refetch();
   };
-
   const handleExport = async format => {
     const dataToExport = cashflowData.daily || [];
-
     if (dataToExport.length === 0) {
       showToast('Não há dados para exportar', 'warning');
       return;
     }
-
     setExporting(true);
     try {
       const filters = {
@@ -722,7 +698,6 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
           dataFim: dateRange.endDate,
         },
       };
-
       let result;
       switch (format) {
         case 'csv':
@@ -737,7 +712,6 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
         default:
           throw new Error('Formato não suportado');
       }
-
       if (result.success) {
         showToast(
           `Relatório exportado como ${format.toUpperCase()}`,
@@ -776,7 +750,6 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
     '#EC4899',
     '#6B7280',
   ];
-
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-24">
@@ -787,7 +760,6 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
       </div>
     );
   }
-
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-24">
@@ -806,7 +778,6 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       {/* 📊 Header com Controles - DESIGN SYSTEM */}
@@ -815,8 +786,8 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
           {/* Linha 1: Título e Ações */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl">
-                <BarChart3 className="w-6 h-6 text-white" />
+              <div className="p-3 from-blue-500 to-indigo-600 bg-blue-500 rounded-xl">
+                <BarChart3 className="w-6 h-6 text-dark-text-primary" />
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-theme-primary">
@@ -832,7 +803,7 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
               {/* Botão Atualizar */}
               <button
                 onClick={handleRefresh}
-                className="p-2.5 text-theme-secondary hover:text-theme-primary hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all"
+                className="p-2.5 text-theme-secondary hover:text-theme-primary hover:card-theme dark:hover:bg-gray-700 rounded-xl transition-all"
                 title="Atualizar"
               >
                 <RefreshCw className="w-5 h-5" />
@@ -846,7 +817,7 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
                   !cashflowData.daily ||
                   cashflowData.daily.length === 0
                 }
-                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-theme-secondary border-2 border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-theme-primary transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-theme-secondary border-2 border-light-border dark:border-dark-border rounded-xl hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700 hover:text-theme-primary transition-all disabled:opacity-50"
                 title="Exportar CSV"
               >
                 {exporting ? (
@@ -864,7 +835,7 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
                   !cashflowData.daily ||
                   cashflowData.daily.length === 0
                 }
-                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-theme-secondary border-2 border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-theme-primary transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-theme-secondary border-2 border-light-border dark:border-dark-border rounded-xl hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700 hover:text-theme-primary transition-all disabled:opacity-50"
                 title="Exportar Excel"
               >
                 {exporting ? (
@@ -896,7 +867,7 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
           </div>
 
           {/* Linha 2: Filtros de Período */}
-          <div className="border-t-2 border-gray-200 dark:border-gray-700 pt-6">
+          <div className="border-t-2 border-light-border dark:border-dark-border pt-6">
             <PeriodFilter
               selectedPeriod={selectedPeriod}
               onPeriodChange={handlePeriodChange}
@@ -906,7 +877,7 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
           </div>
 
           {/* Linha 3: Navegação de Período e Descrição */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border-2 border-blue-200 dark:border-blue-800">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 bg-blue-50 dark:bg-blue-900/20 rounded-xl border-2 border-blue-200 dark:border-blue-800">
             {/* Navegação */}
             <div className="flex items-center gap-2">
               <button
@@ -917,7 +888,7 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
                 <ChevronLeft className="w-5 h-5" />
               </button>
 
-              <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-lg border border-blue-200 dark:border-blue-700">
+              <div className="flex items-center gap-2 px-4 py-2 card-theme dark:bg-dark-surface rounded-lg border border-blue-200 dark:border-blue-700">
                 <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 <span className="text-sm font-bold text-theme-primary">
                   {periodDescription}
@@ -937,7 +908,7 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
             {!isCurrentPeriod && (
               <button
                 onClick={resetToToday}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-dark-text-primary font-semibold rounded-lg transition-all shadow-md hover:shadow-lg"
               >
                 Voltar para Hoje
               </button>
@@ -960,8 +931,8 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
       <div className="card-theme rounded-xl p-6 border-2 border-transparent hover:border-purple-300 dark:hover:border-purple-700 transition-all duration-300">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-2.5 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl shadow-lg">
-            <TrendingUp className="w-5 h-5 text-white" />
+          <div className="p-2.5 from-purple-500 to-violet-600 bg-purple-500 rounded-xl shadow-lg">
+            <TrendingUp className="w-5 h-5 text-dark-text-primary" />
           </div>
           <div>
             <h3 className="text-lg font-bold text-theme-primary">
@@ -988,9 +959,9 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
       {/* 📊 Tabela Consolidada: ACUMULADO - DESIGN SYSTEM */}
       <div className="card-theme rounded-xl overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 px-6 py-4 border-b-2 border-gray-200 dark:border-gray-600">
+        <div className="bg-gradient-light dark:from-gray-800 dark:to-gray-700 px-6 py-4 border-b-2 border-light-border dark:border-dark-border">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-lg">
+            <div className="p-2 from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
               <DollarSign className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             </div>
             <h3 className="text-lg font-bold text-theme-primary">
@@ -1002,7 +973,7 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
         {/* Tabela */}
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 border-b-2 border-gray-200 dark:border-gray-600">
+            <thead className="bg-gradient-light dark:from-gray-800 dark:to-gray-700 border-b-2 border-light-border dark:border-dark-border">
               <tr>
                 <th className="px-6 py-4 text-left text-xs font-bold text-theme-secondary uppercase tracking-wider">
                   Data
@@ -1027,17 +998,10 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
                 const totalInflows = day.received_inflows + day.pending_inflows;
                 const totalOutflows = day.paid_outflows + day.pending_outflows;
                 const isSaldoInicial = day.isSaldoInicial;
-
                 return (
                   <tr
                     key={day.date}
-                    className={`group transition-all duration-200 ${
-                      isSaldoInicial
-                        ? 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-900/30 dark:hover:to-indigo-900/30'
-                        : isWeekend
-                          ? 'bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-indigo-50/30 dark:hover:from-blue-900/10 dark:hover:to-indigo-900/10'
-                          : 'hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/50 dark:hover:from-blue-900/10 dark:hover:to-indigo-900/10'
-                    }`}
+                    className={`group transition-all duration-200 ${isSaldoInicial ? 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-900/30 dark:hover:to-indigo-900/30' : isWeekend ? 'bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-indigo-50/30 dark:hover:from-blue-900/10 dark:hover:to-indigo-900/10' : 'hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/50 dark:hover:from-blue-900/10 dark:hover:to-indigo-900/10'}`}
                   >
                     {/* Data */}
                     <td className="px-6 py-4">
@@ -1100,11 +1064,7 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
                         <span className="text-sm text-theme-secondary">-</span>
                       ) : (
                         <span
-                          className={`text-sm font-bold ${
-                            day.dailyBalance >= 0
-                              ? 'text-green-600 dark:text-green-400'
-                              : 'text-red-600 dark:text-red-400'
-                          }`}
+                          className={`text-sm font-bold ${day.dailyBalance >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
                         >
                           {formatCurrency(day.dailyBalance)}
                         </span>
@@ -1115,11 +1075,7 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
                         <span
-                          className={`text-base font-bold ${
-                            day.accumulatedBalance >= 0
-                              ? 'text-blue-600 dark:text-blue-400'
-                              : 'text-orange-600 dark:text-orange-400'
-                          }`}
+                          className={`text-base font-bold ${day.accumulatedBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-orange-600 dark:text-orange-400'}`}
                         >
                           {formatCurrency(day.accumulatedBalance)}
                         </span>
@@ -1161,5 +1117,4 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
     </div>
   );
 };
-
 export default FluxoTabRefactored;

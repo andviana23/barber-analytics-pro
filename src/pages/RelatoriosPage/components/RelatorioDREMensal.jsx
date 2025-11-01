@@ -16,7 +16,6 @@ import {
 } from 'lucide-react';
 import { useUnit } from '../../../context/UnitContext';
 import dreService from '../../../services/dreService';
-
 const RelatorioDREMensal = ({ filters }) => {
   const { selectedUnit } = useUnit();
   const [dadosDRE, setDadosDRE] = useState(null);
@@ -27,33 +26,27 @@ const RelatorioDREMensal = ({ filters }) => {
     custosVariaveis: false,
     despesasOperacionais: false,
   });
-
   const toggleSection = section => {
     setExpandedSections(prev => ({
       ...prev,
       [section]: !prev[section],
     }));
   };
-
   const carregarDadosDRE = useCallback(async () => {
     if (!selectedUnit?.id || !filters?.periodo?.mes || !filters?.periodo?.ano) {
       return;
     }
-
     setLoading(true);
     setError(null);
-
     try {
       const { data, error: dreError } = await dreService.calculateMonthDRE(
         selectedUnit.id,
         filters.periodo.ano,
         filters.periodo.mes
       );
-
       if (dreError) {
         throw new Error(dreError.message || dreError);
       }
-
       console.log('📊 DRE Data recebida:', data);
       console.log('📊 Estrutura:', {
         temReceitas: !!data?.receitas,
@@ -61,7 +54,6 @@ const RelatorioDREMensal = ({ filters }) => {
         temDespesas: !!data?.despesas,
         keys: Object.keys(data || {}),
       });
-
       setDadosDRE(data);
     } catch (err) {
       setError(err.message || 'Erro ao carregar DRE');
@@ -70,18 +62,15 @@ const RelatorioDREMensal = ({ filters }) => {
       setLoading(false);
     }
   }, [selectedUnit?.id, filters?.periodo?.mes, filters?.periodo?.ano]);
-
   useEffect(() => {
     carregarDadosDRE();
   }, [carregarDadosDRE]);
-
   const formatarMoeda = valor => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
     }).format(valor || 0);
   };
-
   const formatarMes = mes => {
     const meses = [
       'Janeiro',
@@ -99,7 +88,6 @@ const RelatorioDREMensal = ({ filters }) => {
     ];
     return meses[mes - 1] || '';
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -107,7 +95,6 @@ const RelatorioDREMensal = ({ filters }) => {
       </div>
     );
   }
-
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
@@ -120,14 +107,13 @@ const RelatorioDREMensal = ({ filters }) => {
         </p>
         <button
           onClick={carregarDadosDRE}
-          className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-600 transition-all duration-200 font-medium"
+          className="px-6 py-3 bg-primary text-dark-text-primary rounded-lg hover:bg-primary-600 transition-all duration-200 font-medium"
         >
           Tentar novamente
         </button>
       </div>
     );
   }
-
   if (!dadosDRE) {
     return (
       <div className="text-center py-16">
@@ -154,7 +140,7 @@ const RelatorioDREMensal = ({ filters }) => {
         </p>
         <button
           onClick={carregarDadosDRE}
-          className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-600 transition-all duration-200 font-medium"
+          className="px-6 py-3 bg-primary text-dark-text-primary rounded-lg hover:bg-primary-600 transition-all duration-200 font-medium"
         >
           Tentar novamente
         </button>
@@ -167,7 +153,6 @@ const RelatorioDREMensal = ({ filters }) => {
     dadosDRE.receitas?.total || dadosDRE.receita_bruta?.total || 0;
   const categoriasReceitas =
     dadosDRE.receitas?.categorias || dadosDRE.receita_bruta?.categorias || [];
-
   const deducoes = dadosDRE.deducoes?.total || 0;
   const receitaLiquida = dadosDRE.receita_liquida || receitaBruta - deducoes;
 
@@ -176,7 +161,6 @@ const RelatorioDREMensal = ({ filters }) => {
     ...(dadosDRE.custos_operacionais?.categorias || []),
     ...(dadosDRE.despesas_administrativas?.categorias || []),
   ];
-
   const categoriasCustosVariaveis = todasCategoriasDespesas.filter(cat => {
     const nome = cat.categoria_nome || cat.name || '';
     const pai = cat.categoria_pai || cat.parent || '';
@@ -188,15 +172,12 @@ const RelatorioDREMensal = ({ filters }) => {
       pai.toLowerCase().includes('operacion')
     );
   });
-
   const custosVariaveis = categoriasCustosVariaveis.reduce(
     (sum, cat) => sum + (cat.valor || cat.value || 0),
     0
   );
-
   const margemContribuicao =
     dadosDRE.margem_contribuicao || receitaLiquida - custosVariaveis;
-
   const categoriasDespesasOperacionais = todasCategoriasDespesas.filter(cat => {
     const nome = cat.categoria_nome || cat.name || '';
     const pai = cat.categoria_pai || cat.parent || '';
@@ -207,15 +188,12 @@ const RelatorioDREMensal = ({ filters }) => {
       pai.toLowerCase().includes('fixa')
     );
   });
-
   const despesasOperacionais = categoriasDespesasOperacionais.reduce(
     (sum, cat) => sum + (cat.valor || cat.value || 0),
     0
   );
-
   const resultadoOperacional =
     dadosDRE.ebit || margemContribuicao - despesasOperacionais;
-
   const impostos = dadosDRE.impostos?.total || 0;
   const lucroLiquido =
     dadosDRE.lucro_liquido || resultadoOperacional - impostos;
@@ -227,17 +205,20 @@ const RelatorioDREMensal = ({ filters }) => {
     receitaLiquida > 0 ? (resultadoOperacional / receitaLiquida) * 100 : 0;
   const margemLiquidaPct =
     receitaLiquida > 0 ? (lucroLiquido / receitaLiquida) * 100 : 0;
-
   return (
     <div className="space-y-6">
       {/* Header Card - Melhorado */}
-      <div className="bg-gradient-to-br from-indigo-500/20 via-blue-500/10 to-purple-500/20 dark:from-indigo-500/30 dark:via-blue-500/20 dark:to-purple-500/30 rounded-3xl p-8 border-2 border-indigo-200/50 dark:border-indigo-500/30 shadow-xl">
+      <div className="bg-indigo-500/20 dark:bg-indigo-500/30 rounded-3xl p-8 border-2 border-indigo-200/50 dark:border-indigo-500/30 shadow-xl">
         <div className="flex items-center gap-5">
-          <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-2xl transform hover:scale-105 transition-transform">
-            <FileText className="w-9 h-9 text-white" strokeWidth={2.5} />
+          <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center shadow-2xl transform hover:scale-105 transition-transform">
+            <FileText
+              className="w-9 h-9 text-dark-text-primary"
+              strokeWidth={2.5}
+            />
           </div>
           <div>
-            <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600 dark:from-indigo-400 dark:to-blue-400">
+                      <div className="flex flex-col gap-2">
+            <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-primary">
               DRE Mensal
             </h1>
             <p className="text-text-light-secondary dark:text-text-dark-secondary text-lg mt-1 font-medium">
@@ -248,14 +229,14 @@ const RelatorioDREMensal = ({ filters }) => {
       </div>
 
       {/* DRE Principal - UI Premium */}
-      <div className="bg-gradient-to-br from-white to-gray-50/50 dark:from-dark-surface dark:to-dark-hover rounded-3xl border-2 border-gray-200/50 dark:border-gray-700/50 overflow-hidden shadow-2xl">
+      <div className="card-theme rounded-3xl overflow-hidden shadow-2xl">
         {/* Período - Header Melhorado */}
-        <div className="bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 px-8 py-6">
-          <h2 className="text-2xl font-bold text-white drop-shadow-lg">
+        <div className="bg-gradient-primary px-8 py-6">
+          <h2 className="text-2xl font-bold text-dark-text-primary drop-shadow-lg">
             Demonstração do Resultado do Exercício
           </h2>
-          <p className="text-white/90 text-sm mt-2 font-medium flex items-center gap-2">
-            <span className="px-3 py-1 bg-white/20 rounded-full backdrop-blur-sm">
+          <p className="text-dark-text-primary/90 text-sm mt-2 font-medium flex items-center gap-2">
+            <span className="px-3 py-1 card-theme/20 rounded-full backdrop-blur-sm">
               Período: {formatarMes(filters.periodo.mes)}/{filters.periodo.ano}
             </span>
           </p>
@@ -274,7 +255,7 @@ const RelatorioDREMensal = ({ filters }) => {
                   {expandedSections.receitas ? (
                     <ChevronDown className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                   ) : (
-                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                    <ChevronRight className="w-5 h-5 text-light-text-muted dark:text-dark-text-muted" />
                   )}
                   <TrendingUp className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                   <span className="text-lg font-bold text-emerald-700 dark:text-emerald-400">
@@ -321,7 +302,7 @@ const RelatorioDREMensal = ({ filters }) => {
                               className="px-8 py-2 pl-28 hover:bg-emerald-100/50 dark:hover:bg-emerald-900/10 transition-colors"
                             >
                               <div className="flex items-center justify-between">
-                                <span className="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                                <span className="text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted flex items-center gap-2">
                                   <span className="text-emerald-400">└─</span>
                                   {sub.name || 'Sem nome'}
                                 </span>
@@ -340,7 +321,7 @@ const RelatorioDREMensal = ({ filters }) => {
           </div>
 
           {/* (=) RECEITA LÍQUIDA */}
-          <div className="px-8 py-5 bg-gradient-to-r from-blue-100/50 to-cyan-100/50 dark:from-blue-900/20 dark:to-cyan-900/20 border-y-2 border-blue-200 dark:border-blue-800">
+          <div className="px-8 py-5 bg-blue-100/50 dark:bg-blue-900/20 border-y-2 border-blue-200 dark:border-blue-800">
             <div className="flex items-center justify-between">
               <span className="text-lg font-bold text-blue-700 dark:text-blue-300 flex items-center gap-2">
                 <span className="px-2 py-0.5 bg-blue-200 dark:bg-blue-800 rounded text-sm">
@@ -366,7 +347,7 @@ const RelatorioDREMensal = ({ filters }) => {
                     {expandedSections.custosVariaveis ? (
                       <ChevronDown className="w-5 h-5 text-red-600 dark:text-red-400" />
                     ) : (
-                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                      <ChevronRight className="w-5 h-5 text-light-text-muted dark:text-dark-text-muted" />
                     )}
                     <TrendingDown className="w-5 h-5 text-red-600 dark:text-red-400" />
                     <span className="text-lg font-bold text-red-700 dark:text-red-400">
@@ -413,7 +394,7 @@ const RelatorioDREMensal = ({ filters }) => {
                                 className="px-8 py-2 pl-28 hover:bg-red-100/50 dark:hover:bg-red-900/10 transition-colors"
                               >
                                 <div className="flex items-center justify-between">
-                                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                                  <span className="text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted flex items-center gap-2">
                                     <span className="text-red-400">└─</span>
                                     {sub.name || 'Sem nome'}
                                   </span>
@@ -433,7 +414,7 @@ const RelatorioDREMensal = ({ filters }) => {
           )}
 
           {/* (=) MARGEM DE CONTRIBUIÇÃO */}
-          <div className="px-8 py-5 bg-gradient-to-r from-green-100/50 to-emerald-100/50 dark:from-green-900/20 dark:to-emerald-900/20 border-y-2 border-green-300 dark:border-green-700">
+          <div className="px-8 py-5 bg-green-100/50 dark:bg-green-900/20 border-y-2 border-green-300 dark:border-green-700">
             <div className="flex items-center justify-between">
               <span className="text-lg font-bold text-green-700 dark:text-green-300 flex items-center gap-2">
                 <span className="px-2 py-0.5 bg-green-200 dark:bg-green-800 rounded text-sm">
@@ -459,7 +440,7 @@ const RelatorioDREMensal = ({ filters }) => {
                     {expandedSections.despesasOperacionais ? (
                       <ChevronDown className="w-5 h-5 text-orange-600 dark:text-orange-400" />
                     ) : (
-                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                      <ChevronRight className="w-5 h-5 text-light-text-muted dark:text-dark-text-muted" />
                     )}
                     <TrendingDown className="w-5 h-5 text-orange-600 dark:text-orange-400" />
                     <span className="text-lg font-bold text-orange-700 dark:text-orange-400">
@@ -506,7 +487,7 @@ const RelatorioDREMensal = ({ filters }) => {
                                 className="px-8 py-2 pl-28 hover:bg-orange-100/50 dark:hover:bg-orange-900/10 transition-colors"
                               >
                                 <div className="flex items-center justify-between">
-                                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                                  <span className="text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted flex items-center gap-2">
                                     <span className="text-orange-400">└─</span>
                                     {sub.name || 'Sem nome'}
                                   </span>
@@ -526,7 +507,7 @@ const RelatorioDREMensal = ({ filters }) => {
           )}
 
           {/* (=) RESULTADO OPERACIONAL */}
-          <div className="px-8 py-5 bg-gradient-to-r from-purple-100/50 to-pink-100/50 dark:from-purple-900/20 dark:to-pink-900/20 border-y-2 border-purple-300 dark:border-purple-700">
+          <div className="px-8 py-5 bg-purple-100/50 dark:bg-purple-900/20 border-y-2 border-purple-300 dark:border-purple-700">
             <div className="flex items-center justify-between">
               <span className="text-lg font-bold text-purple-700 dark:text-purple-300 flex items-center gap-2">
                 <span className="px-2 py-0.5 bg-purple-200 dark:bg-purple-800 rounded text-sm">
@@ -541,15 +522,16 @@ const RelatorioDREMensal = ({ filters }) => {
           </div>
 
           {/* (=) LUCRO LÍQUIDO - Destaque Especial */}
-          <div className="px-8 py-7 bg-gradient-to-r from-indigo-500 via-blue-600 to-purple-600 shadow-inner">
+                    {/* (=) LUCRO LÍQUIDO - Final Destacado */}
+          <div className="px-8 py-7 bg-gradient-primary shadow-inner">
             <div className="flex items-center justify-between">
-              <span className="text-2xl font-black text-white uppercase tracking-wider flex items-center gap-3 drop-shadow-lg">
-                <span className="px-3 py-1 bg-white/30 rounded-lg text-lg backdrop-blur-sm">
+              <span className="text-2xl font-black text-dark-text-primary uppercase tracking-wider flex items-center gap-3 drop-shadow-lg">
+                <span className="px-3 py-1 card-theme/30 rounded-lg text-lg backdrop-blur-sm">
                   =
                 </span>
                 LUCRO LÍQUIDO
               </span>
-              <span className="text-2xl font-black text-white drop-shadow-lg">
+              <span className="text-2xl font-black text-dark-text-primary drop-shadow-lg">
                 {formatarMoeda(lucroLiquido)}
               </span>
             </div>
@@ -560,7 +542,7 @@ const RelatorioDREMensal = ({ filters }) => {
       {/* Cards de Margens - UI Premium */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Margem de Contribuição */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-green-100 via-emerald-50 to-teal-100 dark:from-green-900/30 dark:via-emerald-900/20 dark:to-teal-900/30 rounded-3xl p-8 border-2 border-green-300/50 dark:border-green-600/30 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300">
+        <div className="relative overflow-hidden bg-green-100 dark:bg-green-900/30 rounded-3xl p-8 border-2 border-green-300/50 dark:border-green-600/30 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300">
           <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-3xl"></div>
           <p className="text-sm font-bold text-green-800 dark:text-green-300 mb-3 uppercase tracking-wide">
             Margem de Contribuição
@@ -571,7 +553,7 @@ const RelatorioDREMensal = ({ filters }) => {
         </div>
 
         {/* Margem Operacional */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-orange-100 via-amber-50 to-yellow-100 dark:from-orange-900/30 dark:via-amber-900/20 dark:to-yellow-900/30 rounded-3xl p-8 border-2 border-orange-300/50 dark:border-orange-600/30 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300">
+        <div className="relative overflow-hidden bg-orange-100 dark:bg-orange-900/30 rounded-3xl p-8 border-2 border-orange-300/50 dark:border-orange-600/30 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300">
           <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl"></div>
           <p className="text-sm font-bold text-orange-800 dark:text-orange-300 mb-3 uppercase tracking-wide">
             Margem Operacional
@@ -582,7 +564,7 @@ const RelatorioDREMensal = ({ filters }) => {
         </div>
 
         {/* Margem Líquida */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-blue-100 via-indigo-50 to-purple-100 dark:from-blue-900/30 dark:via-indigo-900/20 dark:to-purple-900/30 rounded-3xl p-8 border-2 border-blue-300/50 dark:border-blue-600/30 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300">
+        <div className="relative overflow-hidden bg-blue-100 dark:bg-blue-900/30 rounded-3xl p-8 border-2 border-blue-300/50 dark:border-blue-600/30 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300">
           <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"></div>
           <p className="text-sm font-bold text-blue-800 dark:text-blue-300 mb-3 uppercase tracking-wide">
             Margem Líquida
@@ -597,5 +579,4 @@ const RelatorioDREMensal = ({ filters }) => {
     </div>
   );
 };
-
 export default RelatorioDREMensal;

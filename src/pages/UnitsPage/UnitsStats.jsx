@@ -17,7 +17,6 @@ import {
   Trophy,
   TrendingUp,
 } from 'lucide-react';
-
 const UnitsStats = ({ units = [], loading = false }) => {
   const formatCurrency = value => {
     return new Intl.NumberFormat('pt-BR', {
@@ -30,7 +29,6 @@ const UnitsStats = ({ units = [], loading = false }) => {
   const globalStats = units.reduce(
     (acc, unit) => {
       if (!unit.stats) return acc;
-
       return {
         totalRevenue:
           acc.totalRevenue + (unit.stats.financial?.monthlyRevenue || 0),
@@ -49,7 +47,6 @@ const UnitsStats = ({ units = [], loading = false }) => {
       totalAttendances: 0,
     }
   );
-
   const globalProfit = globalStats.totalRevenue - globalStats.totalExpenses;
   const averageTicket =
     globalStats.totalAttendances > 0
@@ -64,7 +61,6 @@ const UnitsStats = ({ units = [], loading = false }) => {
       ? unit
       : best;
   }, units[0]);
-
   const topUnitByAttendances = units.reduce((best, unit) => {
     if (!unit.stats || !best.stats) return unit.stats ? unit : best;
     return (unit.stats.attendances?.count || 0) >
@@ -72,37 +68,34 @@ const UnitsStats = ({ units = [], loading = false }) => {
       ? unit
       : best;
   }, units[0]);
-
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-2 text-gray-600 dark:text-gray-400">
+        <span className="ml-2 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
           Carregando estatísticas...
         </span>
       </div>
     );
   }
-
   if (units.length === 0) {
     return (
       <Card className="p-8 text-center">
-        <BarChart3 className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+        <BarChart3 className="h-16 w-16 text-light-text-muted dark:text-dark-text-muted mx-auto mb-4" />
+        <h3 className="text-lg font-medium text-theme-primary dark:text-dark-text-primary mb-2">
           Sem dados para exibir
         </h3>
-        <p className="text-gray-500 dark:text-gray-400">
+        <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
           Não há estatísticas disponíveis para as unidades
         </p>
       </Card>
     );
   }
-
   return (
     <div className="space-y-6">
       {/* Estatísticas Globais */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-4">
           Visão Geral da Rede
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -110,7 +103,10 @@ const UnitsStats = ({ units = [], loading = false }) => {
             title="Faturamento Total"
             value={formatCurrency(globalStats.totalRevenue)}
             icon={<DollarSign className="h-6 w-6" />}
-            trend={{ value: 0, isPositive: true }}
+            trend={{
+              value: 0,
+              isPositive: true,
+            }}
             className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
           />
 
@@ -118,19 +114,21 @@ const UnitsStats = ({ units = [], loading = false }) => {
             title="Lucro Líquido"
             value={formatCurrency(globalProfit)}
             icon={<TrendingUp className="h-6 w-6" />}
-            trend={{ value: 0, isPositive: globalProfit >= 0 }}
-            className={`${
-              globalProfit >= 0
-                ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
-                : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
-            }`}
+            trend={{
+              value: 0,
+              isPositive: globalProfit >= 0,
+            }}
+            className={`${globalProfit >= 0 ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800' : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'}`}
           />
 
           <KPICard
             title="Total de Profissionais"
             value={globalStats.totalProfessionals}
             icon={<Users className="h-6 w-6" />}
-            trend={{ value: 0, isPositive: true }}
+            trend={{
+              value: 0,
+              isPositive: true,
+            }}
             className="bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800"
           />
 
@@ -138,7 +136,10 @@ const UnitsStats = ({ units = [], loading = false }) => {
             title="Ticket Médio"
             value={formatCurrency(averageTicket)}
             icon={<BarChart3 className="h-6 w-6" />}
-            trend={{ value: 0, isPositive: true }}
+            trend={{
+              value: 0,
+              isPositive: true,
+            }}
             className="bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800"
           />
         </div>
@@ -146,12 +147,12 @@ const UnitsStats = ({ units = [], loading = false }) => {
 
       {/* Top Performers */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-4">
           Destaques do Mês
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {topUnitByRevenue?.stats && (
-            <Card className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800">
+            <Card className="p-6 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
                   <Trophy className="h-8 w-8 text-green-600 mr-3" />
@@ -180,7 +181,7 @@ const UnitsStats = ({ units = [], loading = false }) => {
           )}
 
           {topUnitByAttendances?.stats && (
-            <Card className="p-6 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-blue-200 dark:border-blue-800">
+            <Card className="p-6 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
                   <BarChart3 className="h-8 w-8 text-blue-600 mr-3" />
@@ -212,7 +213,7 @@ const UnitsStats = ({ units = [], loading = false }) => {
 
       {/* Detalhes por Unidade */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-4">
           Desempenho por Unidade
         </h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -222,20 +223,16 @@ const UnitsStats = ({ units = [], loading = false }) => {
                 <div className="flex items-center">
                   <Building2 className="h-6 w-6 text-blue-600 mr-3" />
                   <div>
-                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <h4 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
                       {unit.name}
                     </h4>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                       {unit.stats?.professionals.total || 0} profissionais
                     </p>
                   </div>
                 </div>
                 <div
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    unit.status
-                      ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                      : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                  }`}
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${unit.status ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}`}
                 >
                   {unit.status ? 'Ativa' : 'Inativa'}
                 </div>
@@ -244,7 +241,7 @@ const UnitsStats = ({ units = [], loading = false }) => {
               {unit.stats ? (
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                    <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                       Faturamento
                     </div>
                     <div className="text-lg font-semibold text-green-600">
@@ -253,7 +250,7 @@ const UnitsStats = ({ units = [], loading = false }) => {
                   </div>
 
                   <div className="space-y-2">
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                    <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                       Atendimentos
                     </div>
                     <div className="text-lg font-semibold text-blue-600">
@@ -262,22 +259,18 @@ const UnitsStats = ({ units = [], loading = false }) => {
                   </div>
 
                   <div className="space-y-2">
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                    <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                       Lucro
                     </div>
                     <div
-                      className={`text-lg font-semibold ${
-                        unit.stats.financial.profit >= 0
-                          ? 'text-green-600'
-                          : 'text-red-600'
-                      }`}
+                      className={`text-lg font-semibold ${unit.stats.financial.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}
                     >
                       {formatCurrency(unit.stats.financial.profit)}
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                    <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                       Ticket Médio
                     </div>
                     <div className="text-lg font-semibold text-purple-600">
@@ -286,7 +279,7 @@ const UnitsStats = ({ units = [], loading = false }) => {
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-4 text-gray-500 dark:text-gray-400">
+                <div className="text-center py-4 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                   Estatísticas não disponíveis
                 </div>
               )}
@@ -297,5 +290,4 @@ const UnitsStats = ({ units = [], loading = false }) => {
     </div>
   );
 };
-
 export default UnitsStats;

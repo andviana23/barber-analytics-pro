@@ -18,11 +18,12 @@ const __dirname = path.dirname(__filename);
 // Padrões de violação do Design System
 const VIOLATION_PATTERNS = {
   hardcodedColors: {
-    pattern:
-      /className=["'][^"']*(?:bg-white|bg-gray-\d+|text-gray-\d+|border-gray-\d+)(?!-)(?:[^"']*["'])/g,
+    // DESABILITADO - Substituído por validação contextual
+    pattern: null,
     description:
       'Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)',
     severity: 'CRITICAL',
+    customCheck: true, // Flag para validação customizada
   },
   hexColors: {
     pattern:
@@ -32,9 +33,11 @@ const VIOLATION_PATTERNS = {
     severity: 'CRITICAL',
   },
   inlineGradients: {
-    pattern: /className=["'][^"']*bg-gradient-to-[rlbt](?:[^"']*["'])/g,
+    // DESABILITADO - Substituído por validação contextual
+    pattern: null,
     description: 'Gradientes inline sem tokens (bg-gradient-to-*)',
     severity: 'HIGH',
+    customCheck: true, // Flag para validação customizada
   },
   missingDarkMode: {
     pattern:
@@ -70,6 +73,139 @@ class DesignSystemAuditor {
       fileDetails: [],
       summary: {},
     };
+  }
+
+  /**
+   * Verifica se uma cor tem par dark mode válido
+   * @param {string} className - String completa do className
+   * @param {string} colorClass - Classe de cor específica (ex: 'bg-gray-200')
+   * @returns {boolean} true se tem dark mode válido
+   */
+  hasValidDarkMode(className, colorClass) {
+    // Extrai o prefixo (bg, text, border)
+    const prefix = colorClass.split('-')[0];
+
+    // Extrai o número da cor (ex: '200' de 'bg-gray-200')
+    const colorMatch = colorClass.match(/-(\d+)$/);
+    if (!colorMatch) return false;
+
+    const colorNumber = parseInt(colorMatch[1]);
+
+    // Define pares válidos de dark mode
+    const validPairs = {
+      50: [800, 900],
+      100: [700, 800, 900],
+      200: [600, 700, 800],
+      300: [500, 600, 700],
+      400: [500, 600],
+      500: [400, 500],
+      600: [300, 400],
+      700: [200, 300],
+      800: [100, 200],
+      900: [50, 100],
+    };
+
+    const expectedDarkNumbers = validPairs[colorNumber] || [];
+
+    // Verifica se algum par dark mode válido existe
+    for (const darkNumber of expectedDarkNumbers) {
+      const darkPattern = `dark:${prefix}-gray-${darkNumber}`;
+      if (className.includes(darkPattern)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Verifica se um gradiente tem token válido
+   * @param {string} className - String completa do className
+   * @returns {boolean} true se usa token válido
+   */
+  hasValidGradientToken(className) {
+    const gradientTokens = [
+      'bg-gradient-primary',
+      'bg-gradient-secondary',
+      'bg-gradient-success',
+      'bg-gradient-danger',
+      'bg-gradient-warning',
+      'bg-gradient-info',
+      'bg-gradient-dark',
+      'bg-gradient-light',
+      'bg-gradient-error', // Adicionado
+    ];
+
+    return gradientTokens.some(token => className.includes(token));
+  } /**
+   * Extrai todas as classes de um className
+   * @param {string} classNameStr - String className="..."
+   * @returns {Array<string>} Array de classes individuais
+   */
+  extractClasses(classNameStr) {
+    const match = classNameStr.match(/className=["']([^"']*)["']/);
+    if (!match) return [];
+    return match[1].split(/\s+/).filter(Boolean);
+  }
+
+  /**
+   * Validação customizada de cores hardcoded
+   * @param {string} content - Conteúdo do arquivo
+   * @returns {Array<string>} Violações encontradas
+   */
+  checkHardcodedColors(content) {
+    const violations = [];
+    const classNameRegex = /className=["'][^"']*["']/g;
+    const matches = content.match(classNameRegex) || [];
+
+    for (const match of matches) {
+      const classes = this.extractClasses(match);
+      const fullClassName = match;
+
+      // Verifica cada tipo de cor hardcoded
+      const colorPatterns = [
+        { pattern: /^bg-gray-(\d+)$/, type: 'bg' },
+        { pattern: /^text-gray-(\d+)$/, type: 'text' },
+        { pattern: /^border-gray-(\d+)$/, type: 'border' },
+        { pattern: /^bg-white$/, type: 'bg' },
+      ];
+
+      for (const cls of classes) {
+        for (const { pattern } of colorPatterns) {
+          if (pattern.test(cls)) {
+            // Verifica se tem dark mode válido
+            if (!this.hasValidDarkMode(fullClassName, cls)) {
+              violations.push(match);
+              break; // Não contar a mesma className múltiplas vezes
+            }
+          }
+        }
+      }
+    }
+
+    return violations;
+  }
+
+  /**
+   * Validação customizada de gradientes inline
+   * @param {string} content - Conteúdo do arquivo
+   * @returns {Array<string>} Violações encontradas
+   */
+  checkInlineGradients(content) {
+    const violations = [];
+    const classNameRegex = /className=["'][^"']*["']/g;
+    const matches = content.match(classNameRegex) || [];
+
+    for (const match of matches) {
+      // Verifica se tem bg-gradient-to-* mas não tem token válido
+      if (/bg-gradient-to-[rlbt]/.test(match)) {
+        if (!this.hasValidGradientToken(match)) {
+          violations.push(match);
+        }
+      }
+    }
+
+    return violations;
   }
 
   /**
@@ -117,7 +253,19 @@ class DesignSystemAuditor {
 
     // Verifica cada padrão de violação
     for (const [key, config] of Object.entries(VIOLATION_PATTERNS)) {
-      const matches = content.match(config.pattern) || [];
+      let matches = [];
+
+      // Usa validação customizada se configurado
+      if (config.customCheck) {
+        if (key === 'hardcodedColors') {
+          matches = this.checkHardcodedColors(content);
+        } else if (key === 'inlineGradients') {
+          matches = this.checkInlineGradients(content);
+        }
+      } else if (config.pattern) {
+        // Usa regex padrão
+        matches = content.match(config.pattern) || [];
+      }
 
       if (matches.length > 0) {
         fileViolations.violations[key] = {

@@ -34,64 +34,51 @@ const OpenCashModal = ({
   const [openingBalance, setOpeningBalance] = useState(suggestedBalance || 0);
   const [observations, setObservations] = useState('');
   const [errors, setErrors] = useState({});
-
   const handleReset = () => {
     setOpeningBalance(suggestedBalance || 0);
     setObservations('');
     setErrors({});
   };
-
   const handleClose = () => {
     if (!loading) {
       handleReset();
       onClose();
     }
   };
-
   const validate = () => {
     const newErrors = {};
-
     if (openingBalance < minBalance) {
       newErrors.openingBalance = `Saldo mínimo: R$ ${minBalance.toFixed(2)}`;
     }
-
     if (openingBalance > 100000) {
       newErrors.openingBalance = 'Saldo inicial muito alto. Verifique o valor.';
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleSubmit = e => {
     e.preventDefault();
-
     console.log('🎯 OpenCashModal - handleSubmit DISPARADO!', {
       openingBalance,
       observations,
       errors,
     });
-
     if (!validate()) {
       console.log('❌ Validação falhou:', errors);
       return;
     }
-
     console.log('✅ Validação passou, chamando onConfirm...');
-
     if (onConfirm) {
       const data = {
         opening_balance: openingBalance,
         observations: observations.trim() || null,
       };
-
       console.log('📤 Enviando dados:', data);
       onConfirm(data);
     } else {
       console.error('⚠️ onConfirm não está definido!');
     }
   };
-
   return (
     <Modal
       isOpen={isOpen}
@@ -105,7 +92,7 @@ const OpenCashModal = ({
           {/* Coluna Esquerda - Inputs */}
           <div className="space-y-6">
             {/* Alerta informativo - Compacto e claro */}
-            <div className="relative overflow-hidden rounded-xl border border-primary/30 bg-gradient-to-br from-primary/5 to-transparent dark:from-primary/10 p-5">
+            <div className="relative overflow-hidden rounded-xl border border-primary/30 from-primary/5 to-transparent dark:from-primary/10 bg-primary/5 dark:bg-primary/10 p-5">
               <div className="absolute top-0 left-0 w-1 h-full bg-primary"></div>
               <div className="flex items-start gap-4 ml-1">
                 <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
@@ -185,11 +172,11 @@ const OpenCashModal = ({
           {/* Coluna Direita - Resumo */}
           <div className="space-y-6">
             {/* Card de Resumo - Compacto e visual */}
-            <div className="card-theme rounded-xl p-6 border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent dark:from-primary/10 shadow-lg">
+            <div className="card-theme rounded-xl p-6 border-2 border-primary/20 from-primary/5 to-transparent dark:from-primary/10 bg-primary/5 dark:bg-primary/10 shadow-lg">
               {/* Header */}
               <div className="flex items-center gap-3 mb-6 pb-5 border-b border-primary/20">
                 <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-                  <CheckCircle className="w-6 h-6 text-white" />
+                  <CheckCircle className="w-6 h-6 text-dark-text-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="font-bold text-theme-primary text-base">
@@ -203,7 +190,7 @@ const OpenCashModal = ({
 
               <div className="space-y-4">
                 {/* Saldo Inicial - Grande destaque */}
-                <div className="bg-light-surface dark:bg-dark-surface rounded-lg p-5 border border-light-border dark:border-dark-border">
+                <div className="card-theme rounded-lg p-5 border border-light-border dark:border-dark-border">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-bold text-theme-secondary uppercase tracking-wide">
                       Saldo Inicial
@@ -218,7 +205,7 @@ const OpenCashModal = ({
                 </div>
 
                 {/* Data e Hora */}
-                <div className="bg-light-surface dark:bg-dark-surface rounded-lg p-4 border border-light-border dark:border-dark-border">
+                <div className="card-theme rounded-lg p-4 border border-light-border dark:border-dark-border">
                   <div className="flex items-center gap-3">
                     <div className="flex-shrink-0 w-9 h-9 rounded-md bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
                       <Calendar className="w-4 h-4 text-primary" />
@@ -238,7 +225,7 @@ const OpenCashModal = ({
                 </div>
 
                 {/* Status */}
-                <div className="bg-gradient-to-r from-feedback-light-success/10 to-feedback-light-success/5 dark:from-feedback-dark-success/10 dark:to-feedback-dark-success/5 rounded-lg p-4 border border-feedback-light-success/30 dark:border-feedback-dark-success/30">
+                <div className="from-feedback-light-success/10 to-feedback-light-success/5 dark:from-feedback-dark-success/10 dark:to-feedback-dark-success/5 bg-feedback-light-success/10 dark:bg-feedback-dark-success/10 rounded-lg p-4 border border-feedback-light-success/30 dark:border-feedback-dark-success/30">
                   <div className="flex items-center gap-3">
                     <div className="flex-shrink-0 w-9 h-9 rounded-md bg-feedback-light-success/20 dark:bg-feedback-dark-success/20 flex items-center justify-center">
                       <Clock className="w-4 h-4 text-feedback-light-success dark:text-feedback-dark-success" />
@@ -284,7 +271,7 @@ const OpenCashModal = ({
           >
             {loading ? (
               <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-light-surface dark:border-dark-surface border-t-transparent rounded-full animate-spin" />
                 <span>Abrindo Caixa...</span>
               </>
             ) : (
@@ -299,7 +286,6 @@ const OpenCashModal = ({
     </Modal>
   );
 };
-
 OpenCashModal.propTypes = {
   /** Se o modal está aberto */
   isOpen: PropTypes.bool.isRequired,
@@ -314,5 +300,4 @@ OpenCashModal.propTypes = {
   /** Saldo sugerido (último fechamento) */
   suggestedBalance: PropTypes.number,
 };
-
 export default OpenCashModal;

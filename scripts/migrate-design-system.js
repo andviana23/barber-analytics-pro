@@ -26,19 +26,24 @@ const TRANSFORMATION_RULES = {
     'bg-white': 'bg-light-surface dark:bg-dark-surface',
     'bg-gray-50': 'bg-light-bg dark:bg-dark-bg',
     'bg-gray-100': 'bg-light-surface dark:bg-dark-surface',
+    'bg-gray-200': 'bg-gray-200 dark:bg-gray-700', // Skeleton/loading states
+    'bg-gray-300': 'bg-gray-300 dark:bg-gray-600',
     'bg-gray-800': 'bg-dark-surface',
     'bg-gray-900': 'bg-dark-surface',
 
     'text-gray-900': 'text-light-text-primary dark:text-dark-text-primary',
     'text-gray-800': 'text-light-text-primary dark:text-dark-text-primary',
+    'text-gray-700': 'text-gray-700 dark:text-gray-300',
     'text-gray-600': 'text-light-text-secondary dark:text-dark-text-secondary',
     'text-gray-500': 'text-light-text-secondary dark:text-dark-text-secondary',
     'text-gray-400': 'text-light-text-muted dark:text-dark-text-muted',
+    'text-gray-300': 'text-gray-300 dark:text-gray-600',
     'text-black': 'text-light-text-primary',
     'text-white': 'text-dark-text-primary',
 
     'border-gray-200': 'border-light-border dark:border-dark-border',
     'border-gray-300': 'border-light-border dark:border-dark-border',
+    'border-gray-500': 'border-gray-500 dark:border-gray-400',
     'border-gray-600': 'border-dark-border',
     'border-gray-700': 'border-dark-border',
     'border-white': 'border-light-surface dark:border-dark-surface',
@@ -65,7 +70,177 @@ const TRANSFORMATION_RULES = {
     'border-[#E4E8EE]': 'border-light-border',
     'border-[#e4e8ee]': 'border-light-border',
   },
+
+  // Regra 4: Gradientes inline → tokens (Sprint 3)
+  gradientInline: {
+    // Gradientes primários (azul)
+    'bg-gradient-to-r from-blue-500 to-cyan-600': 'bg-gradient-primary',
+    'bg-gradient-to-r from-blue-500 to-blue-600': 'bg-gradient-primary',
+    'bg-gradient-to-br from-blue-500 to-cyan-600': 'bg-gradient-primary',
+    'bg-gradient-to-r from-[#1E8CFF] to-[#0072E0]': 'bg-gradient-primary',
+    'bg-gradient-to-br from-blue-600 to-cyan-600': 'bg-gradient-primary',
+    'bg-gradient-to-r from-blue-600 to-blue-700': 'bg-gradient-primary',
+
+    // Gradientes de sucesso (verde)
+    'bg-gradient-to-r from-green-500 to-emerald-600': 'bg-gradient-success',
+    'bg-gradient-to-r from-green-500 to-green-600': 'bg-gradient-success',
+    'bg-gradient-to-br from-green-500 to-emerald-600': 'bg-gradient-success',
+    'bg-gradient-to-r from-emerald-500 to-teal-600': 'bg-gradient-emerald',
+    'bg-gradient-to-br from-green-600 to-emerald-600': 'bg-gradient-success',
+
+    // Gradientes de erro (vermelho)
+    'bg-gradient-to-r from-red-500 to-red-600': 'bg-gradient-error',
+    'bg-gradient-to-r from-red-500 to-pink-600': 'bg-gradient-error',
+    'bg-gradient-to-br from-red-500 to-red-600': 'bg-gradient-error',
+    'bg-gradient-to-r from-red-600 to-red-700': 'bg-gradient-error',
+
+    // Gradientes de warning (laranja/amarelo)
+    'bg-gradient-to-r from-yellow-500 to-orange-600': 'bg-gradient-warning',
+    'bg-gradient-to-r from-orange-500 to-orange-600': 'bg-gradient-orange',
+    'bg-gradient-to-br from-amber-500 to-orange-600': 'bg-gradient-warning',
+    'bg-gradient-to-r from-yellow-400 to-orange-500': 'bg-gradient-warning',
+
+    // Gradientes de info (azul claro)
+    'bg-gradient-to-r from-blue-400 to-blue-500': 'bg-gradient-info',
+    'bg-gradient-to-br from-blue-400 to-blue-600': 'bg-gradient-info',
+    'bg-gradient-to-r from-sky-500 to-blue-600': 'bg-gradient-info',
+
+    // Gradientes especiais (purple)
+    'bg-gradient-to-r from-purple-500 to-purple-600': 'bg-gradient-purple',
+    'bg-gradient-to-r from-purple-500 to-pink-600': 'bg-gradient-purple',
+    'bg-gradient-to-br from-purple-500 to-purple-600': 'bg-gradient-purple',
+    'bg-gradient-to-r from-indigo-500 to-purple-600': 'bg-gradient-purple',
+    'bg-gradient-to-r from-violet-500 to-purple-600': 'bg-gradient-purple',
+
+    // Gradientes especiais (cyan)
+    'bg-gradient-to-r from-cyan-500 to-blue-600': 'bg-gradient-cyan',
+    'bg-gradient-to-br from-cyan-500 to-blue-600': 'bg-gradient-cyan',
+    'bg-gradient-to-r from-cyan-400 to-cyan-600': 'bg-gradient-cyan',
+
+    // Gradientes sutis (backgrounds)
+    'bg-gradient-to-r from-gray-50 to-gray-100': 'bg-gradient-light',
+    'bg-gradient-to-br from-gray-50 to-gray-100': 'bg-gradient-light',
+    'bg-gradient-to-r from-gray-100 to-gray-200': 'bg-gradient-light',
+    'bg-gradient-to-r from-gray-800 to-gray-900': 'bg-gradient-dark',
+    'bg-gradient-to-br from-gray-800 to-gray-900': 'bg-gradient-dark',
+    'bg-gradient-to-r from-gray-700 to-gray-900': 'bg-gradient-dark',
+
+    // Sprint 4: Gradientes com VIA (3 cores)
+    'bg-gradient-to-r from-blue-400 via-purple-500 to-pink-600':
+      'bg-gradient-purple',
+    'bg-gradient-to-r from-green-400 via-emerald-500 to-teal-600':
+      'bg-gradient-emerald',
+    'bg-gradient-to-r from-red-400 via-pink-500 to-rose-600':
+      'bg-gradient-error',
+    'bg-gradient-to-r from-yellow-400 via-orange-500 to-red-600':
+      'bg-gradient-warning',
+    'bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-600':
+      'bg-gradient-cyan',
+    'bg-gradient-to-br from-blue-400 via-purple-500 to-pink-600':
+      'bg-gradient-purple',
+    'bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600':
+      'bg-gradient-emerald',
+
+    // Sprint 4: Direções variadas
+    'bg-gradient-to-bl from-blue-500 to-cyan-600': 'bg-gradient-primary',
+    'bg-gradient-to-tr from-blue-500 to-cyan-600': 'bg-gradient-primary',
+    'bg-gradient-to-tl from-blue-500 to-cyan-600': 'bg-gradient-primary',
+    'bg-gradient-to-b from-blue-500 to-cyan-600': 'bg-gradient-primary',
+    'bg-gradient-to-t from-blue-500 to-cyan-600': 'bg-gradient-primary',
+    'bg-gradient-to-l from-blue-500 to-cyan-600': 'bg-gradient-primary',
+    'bg-gradient-to-bl from-green-500 to-emerald-600': 'bg-gradient-success',
+    'bg-gradient-to-tr from-green-500 to-emerald-600': 'bg-gradient-success',
+    'bg-gradient-to-b from-green-500 to-emerald-600': 'bg-gradient-success',
+    'bg-gradient-to-bl from-red-500 to-red-600': 'bg-gradient-error',
+    'bg-gradient-to-tr from-red-500 to-red-600': 'bg-gradient-error',
+
+    // Sprint 4: Variações de tonalidade
+    'bg-gradient-to-r from-blue-300 to-blue-500': 'bg-gradient-info',
+    'bg-gradient-to-r from-blue-600 to-cyan-700': 'bg-gradient-primary',
+    'bg-gradient-to-r from-green-300 to-green-500': 'bg-gradient-success',
+    'bg-gradient-to-r from-green-600 to-emerald-700': 'bg-gradient-success',
+    'bg-gradient-to-r from-red-300 to-red-500': 'bg-gradient-error',
+    'bg-gradient-to-r from-red-600 to-red-700': 'bg-gradient-error',
+    'bg-gradient-to-r from-purple-300 to-purple-500': 'bg-gradient-purple',
+    'bg-gradient-to-r from-purple-600 to-purple-700': 'bg-gradient-purple',
+    'bg-gradient-to-r from-orange-300 to-orange-500': 'bg-gradient-orange',
+    'bg-gradient-to-r from-orange-600 to-orange-700': 'bg-gradient-orange',
+
+    // Sprint 4: Gradientes com teal e indigo
+    'bg-gradient-to-r from-teal-500 to-cyan-600': 'bg-gradient-cyan',
+    'bg-gradient-to-r from-teal-400 to-emerald-500': 'bg-gradient-emerald',
+    'bg-gradient-to-r from-indigo-500 to-blue-600': 'bg-gradient-primary',
+    'bg-gradient-to-r from-indigo-400 to-purple-500': 'bg-gradient-purple',
+    'bg-gradient-to-br from-teal-500 to-cyan-600': 'bg-gradient-cyan',
+    'bg-gradient-to-br from-indigo-500 to-purple-600': 'bg-gradient-purple',
+
+    // Sprint 4: Gradientes com rose e pink
+    'bg-gradient-to-r from-pink-500 to-rose-600': 'bg-gradient-error',
+    'bg-gradient-to-r from-rose-500 to-red-600': 'bg-gradient-error',
+    'bg-gradient-to-br from-pink-500 to-rose-600': 'bg-gradient-error',
+
+    // Sprint 4: Gradientes com lime e yellow
+    'bg-gradient-to-r from-lime-500 to-green-600': 'bg-gradient-success',
+    'bg-gradient-to-r from-yellow-300 to-yellow-500': 'bg-gradient-warning',
+    'bg-gradient-to-r from-amber-400 to-orange-500': 'bg-gradient-warning',
+
+    // Sprint 4: Gradientes com slate e zinc (neutros)
+    'bg-gradient-to-r from-slate-50 to-slate-100': 'bg-gradient-light',
+    'bg-gradient-to-r from-slate-800 to-slate-900': 'bg-gradient-dark',
+    'bg-gradient-to-r from-zinc-50 to-zinc-100': 'bg-gradient-light',
+    'bg-gradient-to-r from-zinc-800 to-zinc-900': 'bg-gradient-dark',
+    'bg-gradient-to-br from-slate-50 to-gray-100': 'bg-gradient-light',
+    'bg-gradient-to-br from-gray-50 via-white to-gray-100': 'bg-gradient-light',
+
+    // Sprint 4: Gradientes específicos do GoalsPage
+    'bg-gradient-to-r from-blue-500 to-indigo-600': 'bg-gradient-primary',
+    'bg-gradient-to-r from-emerald-500 to-green-600': 'bg-gradient-success',
+    'bg-gradient-to-r from-violet-500 to-purple-600': 'bg-gradient-purple',
+    'bg-gradient-to-r from-sky-400 to-blue-500': 'bg-gradient-info',
+    'bg-gradient-to-r from-amber-500 to-yellow-600': 'bg-gradient-warning',
+
+    // Sprint 4: Gradientes com fuchsia
+    'bg-gradient-to-r from-fuchsia-500 to-pink-600': 'bg-gradient-purple',
+    'bg-gradient-to-r from-fuchsia-400 to-purple-500': 'bg-gradient-purple',
+    'bg-gradient-to-br from-fuchsia-500 to-pink-600': 'bg-gradient-purple',
+
+    // Sprint 4: Combinações específicas
+    'bg-gradient-to-r from-blue-400 to-cyan-500': 'bg-gradient-cyan',
+    'bg-gradient-to-r from-green-400 to-teal-500': 'bg-gradient-emerald',
+    'bg-gradient-to-r from-purple-400 to-indigo-500': 'bg-gradient-purple',
+    'bg-gradient-to-r from-red-400 to-rose-500': 'bg-gradient-error',
+
+    // Sprint 5: GoalsPage specific gradients (13 patterns)
+    'from-green-600 to-emerald-600': 'bg-gradient-success',
+    'from-blue-600 to-indigo-600': 'bg-gradient-primary',
+    'from-purple-600 to-pink-600': 'bg-gradient-purple',
+    'from-red-600 to-rose-600': 'bg-gradient-error',
+    'from-orange-600 to-amber-600': 'bg-gradient-orange',
+    'from-gray-600 to-gray-700': 'bg-gradient-dark',
+    'from-green-500 to-emerald-500': 'bg-gradient-success',
+    'from-blue-500 to-indigo-500': 'bg-gradient-primary',
+    'from-purple-500 to-pink-500': 'bg-gradient-purple',
+    'from-red-500 to-rose-500': 'bg-gradient-error',
+    'from-orange-500 to-amber-500': 'bg-gradient-orange',
+    'from-indigo-50 to-blue-50': 'bg-gradient-light',
+    'from-indigo-900/30 to-blue-900/30': 'bg-gradient-dark',
+  },
 };
+
+/**
+ * Remove classes duplicadas do className
+ * @param {string} className - String com classes CSS
+ * @returns {string} String com classes únicas
+ */
+function deduplicateClasses(className) {
+  if (!className || typeof className !== 'string') {
+    return className;
+  }
+
+  const classes = className.split(/\s+/).filter(Boolean);
+  const uniqueClasses = [...new Set(classes)];
+  return uniqueClasses.join(' ');
+}
 
 /**
  * Aplica transformações em um className
@@ -89,13 +264,23 @@ function transformClassName(className) {
     transformed = transformed.replace(old, newVal);
   });
 
-  // Terceira passagem: simplificar para classes utilitárias
+  // Terceira passagem: gradientes inline → tokens (Sprint 3)
+  Object.entries(TRANSFORMATION_RULES.gradientInline).forEach(
+    ([old, newVal]) => {
+      // Escape special characters for regex
+      const escapedOld = old.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(escapedOld, 'g');
+      transformed = transformed.replace(regex, newVal);
+    }
+  );
+
+  // Quarta passagem: simplificar para classes utilitárias
   Object.entries(TRANSFORMATION_RULES.themeClasses).forEach(([old, newVal]) => {
     transformed = transformed.replace(old, newVal);
   });
 
-  // Remover espaços duplicados
-  transformed = transformed.replace(/\s+/g, ' ').trim();
+  // Quinta passagem: deduplicar classes (Sprint 3)
+  transformed = deduplicateClasses(transformed);
 
   return transformed;
 }

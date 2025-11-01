@@ -9,32 +9,24 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-  X,
-  CreditCard,
-  Percent,
-  Calendar,
-  Save,
-  AlertCircle,
-  Building2,
-} from 'lucide-react';
+import { X, CreditCard, Percent, Calendar, Save, AlertCircle, Building2 } from 'lucide-react';
 import { useUnit } from '../../context/UnitContext';
-
 const NovaFormaPagamentoModal = ({
   isOpen,
   onClose,
   onSave,
-  paymentMethod = null,
+  paymentMethod = null
 }) => {
-  const { allUnits, selectedUnit } = useUnit();
-
+  const {
+    allUnits,
+    selectedUnit
+  } = useUnit();
   const [formData, setFormData] = useState({
     name: '',
     fee_percentage: '',
     receipt_days: '',
-    unit_id: '',
+    unit_id: ''
   });
-
   const [errors, setErrors] = useState({});
   const [isSaving, setIsSaving] = useState(false);
 
@@ -45,14 +37,14 @@ const NovaFormaPagamentoModal = ({
         name: paymentMethod.name || '',
         fee_percentage: paymentMethod.fee_percentage?.toString() || '',
         receipt_days: paymentMethod.receipt_days?.toString() || '',
-        unit_id: paymentMethod.unit_id || '',
+        unit_id: paymentMethod.unit_id || ''
       });
     } else {
       setFormData({
         name: '',
         fee_percentage: '',
         receipt_days: '',
-        unit_id: selectedUnit?.id || '',
+        unit_id: selectedUnit?.id || ''
       });
     }
     setErrors({});
@@ -61,15 +53,12 @@ const NovaFormaPagamentoModal = ({
   // Validação
   const validate = () => {
     const newErrors = {};
-
     if (!formData.unit_id) {
       newErrors.unit_id = 'Unidade é obrigatória';
     }
-
     if (!formData.name?.trim()) {
       newErrors.name = 'Nome é obrigatório';
     }
-
     if (formData.fee_percentage === '' || formData.fee_percentage === null) {
       newErrors.fee_percentage = 'Taxa é obrigatória';
     } else {
@@ -78,7 +67,6 @@ const NovaFormaPagamentoModal = ({
         newErrors.fee_percentage = 'Taxa deve ser entre 0% e 100%';
       }
     }
-
     if (formData.receipt_days === '' || formData.receipt_days === null) {
       newErrors.receipt_days = 'Prazo é obrigatório';
     } else {
@@ -87,7 +75,6 @@ const NovaFormaPagamentoModal = ({
         newErrors.receipt_days = 'Prazo deve ser 0 ou maior';
       }
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -96,59 +83,48 @@ const NovaFormaPagamentoModal = ({
   const handleChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
-      [field]: value,
+      [field]: value
     }));
     // Limpar erro do campo ao digitar
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,
-        [field]: undefined,
+        [field]: undefined
       }));
     }
   };
-
   const handleSubmit = async e => {
     e.preventDefault();
-
     if (!validate()) {
       return;
     }
-
     setIsSaving(true);
-
     try {
       const dataToSave = {
         unit_id: formData.unit_id,
         name: formData.name.trim(),
         fee_percentage: parseFloat(formData.fee_percentage),
-        receipt_days: parseInt(formData.receipt_days),
+        receipt_days: parseInt(formData.receipt_days)
       };
-
       await onSave(dataToSave);
       onClose();
     } catch (error) {
       setErrors({
-        submit: error.message || 'Erro ao salvar forma de pagamento',
+        submit: error.message || 'Erro ao salvar forma de pagamento'
       });
     } finally {
       setIsSaving(false);
     }
   };
-
   if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full shadow-xl">
+  return <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+      <div className="card-theme dark:bg-dark-surface rounded-lg max-w-md w-full shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+        <div className="flex items-center justify-between p-6 border-b border-light-border dark:border-dark-border">
+          <h2 className="text-xl font-bold text-theme-primary dark:text-dark-text-primary">
             {paymentMethod ? 'Editar' : 'Nova'} Forma de Pagamento
           </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-          >
+          <button onClick={onClose} className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary dark:hover:text-gray-300 dark:text-gray-600 transition-colors">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -157,53 +133,40 @@ const NovaFormaPagamentoModal = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Unidade */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
               <div className="flex items-center gap-2">
                 <Building2 className="h-4 w-4" />
                 Unidade *
               </div>
             </label>
-            <select
-              value={formData.unit_id}
-              onChange={e => handleChange('unit_id', e.target.value)}
-              className={`
+            <select value={formData.unit_id} onChange={e => handleChange('unit_id', e.target.value)} className={`
                 w-full px-4 py-2 border rounded-lg
                 bg-white dark:bg-gray-700
                 text-gray-900 dark:text-white
                 focus:ring-2 focus:ring-primary focus:border-transparent
                 transition-colors
                 ${errors.unit_id ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}
-              `}
-            >
+              `}>
               <option value="">Selecione uma unidade</option>
-              {allUnits.map(unit => (
-                <option key={unit.id} value={unit.id}>
+              {allUnits.map(unit => <option key={unit.id} value={unit.id}>
                   {unit.name}
-                </option>
-              ))}
+                </option>)}
             </select>
-            {errors.unit_id && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+            {errors.unit_id && <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                 <AlertCircle className="h-4 w-4" />
                 {errors.unit_id}
-              </p>
-            )}
+              </p>}
           </div>
 
           {/* Nome */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
               <div className="flex items-center gap-2">
                 <CreditCard className="h-4 w-4" />
                 Nome *
               </div>
             </label>
-            <input
-              type="text"
-              placeholder="Ex: Cartão de Crédito, PIX, Dinheiro"
-              value={formData.name}
-              onChange={e => handleChange('name', e.target.value)}
-              className={`
+            <input type="text" placeholder="Ex: Cartão de Crédito, PIX, Dinheiro" value={formData.name} onChange={e => handleChange('name', e.target.value)} className={`
                 w-full px-4 py-2 border rounded-lg
                 bg-white dark:bg-gray-700
                 text-gray-900 dark:text-white
@@ -211,34 +174,23 @@ const NovaFormaPagamentoModal = ({
                 focus:ring-2 focus:ring-primary focus:border-transparent
                 transition-colors
                 ${errors.name ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}
-              `}
-            />
-            {errors.name && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+              `} />
+            {errors.name && <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                 <AlertCircle className="h-4 w-4" />
                 {errors.name}
-              </p>
-            )}
+              </p>}
           </div>
 
           {/* Taxa */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
               <div className="flex items-center gap-2">
                 <Percent className="h-4 w-4" />
                 Taxa (%) *
               </div>
             </label>
             <div className="relative">
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                max="100"
-                placeholder="Ex: 2.5"
-                value={formData.fee_percentage}
-                onChange={e => handleChange('fee_percentage', e.target.value)}
-                className={`
+              <input type="number" step="0.01" min="0" max="100" placeholder="Ex: 2.5" value={formData.fee_percentage} onChange={e => handleChange('fee_percentage', e.target.value)} className={`
                   w-full px-4 py-2 pr-10 border rounded-lg
                   bg-white dark:bg-gray-700
                   text-gray-900 dark:text-white
@@ -246,39 +198,29 @@ const NovaFormaPagamentoModal = ({
                   focus:ring-2 focus:ring-primary focus:border-transparent
                   transition-colors
                   ${errors.fee_percentage ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}
-                `}
-              />
-              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                `} />
+              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-light-text-muted dark:text-dark-text-muted">
                 %
               </span>
             </div>
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <p className="mt-1 text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
               Percentual que será descontado do valor total (0 a 100%)
             </p>
-            {errors.fee_percentage && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+            {errors.fee_percentage && <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                 <AlertCircle className="h-4 w-4" />
                 {errors.fee_percentage}
-              </p>
-            )}
+              </p>}
           </div>
 
           {/* Prazo de Recebimento */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
                 Prazo de Recebimento (dias) *
               </div>
             </label>
-            <input
-              type="number"
-              step="1"
-              min="0"
-              placeholder="Ex: 30"
-              value={formData.receipt_days}
-              onChange={e => handleChange('receipt_days', e.target.value)}
-              className={`
+            <input type="number" step="1" min="0" placeholder="Ex: 30" value={formData.receipt_days} onChange={e => handleChange('receipt_days', e.target.value)} className={`
                 w-full px-4 py-2 border rounded-lg
                 bg-white dark:bg-gray-700
                 text-gray-900 dark:text-white
@@ -286,65 +228,46 @@ const NovaFormaPagamentoModal = ({
                 focus:ring-2 focus:ring-primary focus:border-transparent
                 transition-colors
                 ${errors.receipt_days ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}
-              `}
-            />
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              `} />
+            <p className="mt-1 text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
               Dias{' '}
-              <strong className="text-gray-700 dark:text-gray-300">
+              <strong className="text-gray-700 dark:text-gray-300 dark:text-gray-600">
                 úteis
               </strong>{' '}
               até receber (segunda a sexta, exclui feriados. 0 = recebimento
               imediato)
             </p>
-            {errors.receipt_days && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+            {errors.receipt_days && <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                 <AlertCircle className="h-4 w-4" />
                 {errors.receipt_days}
-              </p>
-            )}
+              </p>}
           </div>
 
           {/* Erro geral */}
-          {errors.submit && (
-            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          {errors.submit && <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
               <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
                 <AlertCircle className="h-4 w-4" />
                 {errors.submit}
               </p>
-            </div>
-          )}
+            </div>}
 
           {/* Botões */}
           <div className="flex items-center gap-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            >
+            <button type="button" onClick={onClose} className="flex-1 px-4 py-2 border border-light-border dark:border-dark-border text-gray-700 dark:text-gray-300 dark:text-gray-600 rounded-lg hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700 transition-colors">
               Cancelar
             </button>
-            <button
-              type="submit"
-              disabled={isSaving}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {isSaving ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            <button type="submit" disabled={isSaving} className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-primary text-dark-text-primary rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+              {isSaving ? <>
+                  <div className="w-4 h-4 border-2 border-light-surface dark:border-dark-surface border-t-transparent rounded-full animate-spin" />
                   Salvando...
-                </>
-              ) : (
-                <>
+                </> : <>
                   <Save className="h-4 w-4" />
                   Salvar
-                </>
-              )}
+                </>}
             </button>
           </div>
         </form>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default NovaFormaPagamentoModal;

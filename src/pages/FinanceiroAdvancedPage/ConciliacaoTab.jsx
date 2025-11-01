@@ -20,12 +20,13 @@ import ImportExpensesFromOFXModal from '../../templates/ImportExpensesFromOFXMod
  * - ManualReconciliationModal para vinculações manuais
  * - Integration com hooks de reconciliação e extratos
  */
-const ConciliacaoTab = ({ globalFilters }) => {
+const ConciliacaoTab = ({
+  globalFilters
+}) => {
   // Estado local
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
-  const [isImportExpensesOFXModalOpen, setIsImportExpensesOFXModalOpen] =
-    useState(false);
+  const [isImportExpensesOFXModalOpen, setIsImportExpensesOFXModalOpen] = useState(false);
 
   // Hooks para dados
   const {
@@ -35,28 +36,28 @@ const ConciliacaoTab = ({ globalFilters }) => {
     refetch: refetchMatches,
     runAutoMatch,
     confirmMatch,
-    rejectMatch,
+    rejectMatch
   } = useReconciliationMatches(globalFilters.accountId);
-
   const {
     statements,
     unreconciled,
     loading: statementsLoading,
     error: statementsError,
     refetch: refetchStatements,
-    importStatements,
+    importStatements
   } = useBankStatements(globalFilters.accountId, null, null);
-
   const {
     bankAccounts: availableAccounts,
     loading: bankAccountsLoading,
-    updateFilters: updateBankAccountFilters,
-  } = useBankAccounts({ unitId: globalFilters.unitId, incluirInativas: false });
-
+    updateFilters: updateBankAccountFilters
+  } = useBankAccounts({
+    unitId: globalFilters.unitId,
+    incluirInativas: false
+  });
   useEffect(() => {
     updateBankAccountFilters({
       unitId: globalFilters.unitId,
-      incluirInativas: false,
+      incluirInativas: false
     });
   }, [globalFilters.unitId, updateBankAccountFilters]);
 
@@ -65,32 +66,21 @@ const ConciliacaoTab = ({ globalFilters }) => {
     setIsImportModalOpen(false);
     refetchMatches();
   }, [refetchMatches]);
-
-  const handleImportExpensesOFXSuccess = useCallback(
-    report => {
-      setIsImportExpensesOFXModalOpen(false);
-      refetchMatches();
-      refetchStatements();
-      console.log('✅ Importação OFX concluída:', report);
-    },
-    [refetchMatches, refetchStatements]
-  );
-
-  const handleImport = useCallback(
-    payload => importStatements(payload),
-    [importStatements]
-  );
-
+  const handleImportExpensesOFXSuccess = useCallback(report => {
+    setIsImportExpensesOFXModalOpen(false);
+    refetchMatches();
+    refetchStatements();
+    console.log('✅ Importação OFX concluída:', report);
+  }, [refetchMatches, refetchStatements]);
+  const handleImport = useCallback(payload => importStatements(payload), [importStatements]);
   const handleManualReconciliationSuccess = () => {
     setIsManualModalOpen(false);
     refetchStatements();
     refetchMatches();
   };
-
   const handleRunAutoMatch = async () => {
     await runAutoMatch();
   };
-
   const handleConfirmMatch = async (matchId, adjustmentData) => {
     const result = await confirmMatch(matchId, adjustmentData);
     if (result.success) {
@@ -98,7 +88,6 @@ const ConciliacaoTab = ({ globalFilters }) => {
     }
     return result;
   };
-
   const handleRejectMatch = async (matchId, reason) => {
     const result = await rejectMatch(matchId, reason);
     if (result.success) {
@@ -106,150 +95,93 @@ const ConciliacaoTab = ({ globalFilters }) => {
     }
     return result;
   };
-
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       {/* Controles principais - Dark Mode */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+      <div className="card-theme dark:bg-dark-surface rounded-lg shadow-sm border border-light-border dark:border-dark-border p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
               Conciliação Bancária
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
               Gerencie a conciliação entre extratos bancários e lançamentos
               financeiros
             </p>
           </div>
 
           <div className="flex items-center space-x-3">
-            <button
-              onClick={() => setIsImportModalOpen(true)}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
+            <button onClick={() => setIsImportModalOpen(true)} className="px-4 py-2 text-sm font-medium text-dark-text-primary bg-blue-600 dark:bg-blue-500 rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
               Importar Extrato
             </button>
-            <button
-              onClick={() => setIsImportExpensesOFXModalOpen(true)}
-              className="px-4 py-2 text-sm font-medium text-white bg-purple-600 dark:bg-purple-500 rounded-md hover:bg-purple-700 dark:hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
+            <button onClick={() => setIsImportExpensesOFXModalOpen(true)} className="px-4 py-2 text-sm font-medium text-dark-text-primary bg-purple-600 dark:bg-purple-500 rounded-md hover:bg-purple-700 dark:hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500">
               Importar Despesas (OFX)
             </button>
-            <button
-              onClick={() => setIsManualModalOpen(true)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
+            <button onClick={() => setIsManualModalOpen(true)} className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 card-theme dark:bg-gray-700 border border-light-border dark:border-dark-border rounded-md hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
               Vincular Manual
             </button>
-            <button
-              onClick={handleRunAutoMatch}
-              disabled={matchesLoading || !globalFilters.accountId}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-            >
+            <button onClick={handleRunAutoMatch} disabled={matchesLoading || !globalFilters.accountId} className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 card-theme dark:bg-gray-700 border border-light-border dark:border-dark-border rounded-md hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50">
               Executar Auto-Match
             </button>
           </div>
         </div>
 
         {/* Info da conta selecionada - Dark Mode */}
-        {!globalFilters.accountId && (
-          <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
+        {!globalFilters.accountId && <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
             <p className="text-sm text-yellow-800 dark:text-yellow-300">
               Selecione uma conta bancária nos filtros globais para utilizar a
               conciliação.
             </p>
-          </div>
-        )}
+          </div>}
       </div>
 
       {/* Panel principal de conciliação */}
-      {globalFilters.accountId ? (
-        <ConciliacaoPanel
-          // Props adaptadas para o painel
-          reconciliationMatches={matches}
-          bankTransactions={statements}
-          internalTransactions={unreconciled}
-          selectedAccount={
-            availableAccounts.find(
-              acc => acc.id === globalFilters.accountId
-            ) || { id: globalFilters.accountId, nome: 'Conta Selecionada' }
-          }
-          // Estados
-          loading={matchesLoading || statementsLoading}
-          error={matchesError || statementsError}
-          // Callbacks
-          onApproveMatch={handleConfirmMatch}
-          onRejectMatch={handleRejectMatch}
-          onRefreshData={() => {
-            refetchMatches();
-            refetchStatements();
-          }}
-          onRunAutoMatch={handleRunAutoMatch}
-          onImportStatement={() => setIsImportModalOpen(true)}
-          onCreateManualMatch={() => setIsManualModalOpen(true)}
-        />
-      ) : (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-12">
+      {globalFilters.accountId ? <ConciliacaoPanel
+    // Props adaptadas para o painel
+    reconciliationMatches={matches} bankTransactions={statements} internalTransactions={unreconciled} selectedAccount={availableAccounts.find(acc => acc.id === globalFilters.accountId) || {
+      id: globalFilters.accountId,
+      nome: 'Conta Selecionada'
+    }}
+    // Estados
+    loading={matchesLoading || statementsLoading} error={matchesError || statementsError}
+    // Callbacks
+    onApproveMatch={handleConfirmMatch} onRejectMatch={handleRejectMatch} onRefreshData={() => {
+      refetchMatches();
+      refetchStatements();
+    }} onRunAutoMatch={handleRunAutoMatch} onImportStatement={() => setIsImportModalOpen(true)} onCreateManualMatch={() => setIsManualModalOpen(true)} /> : <div className="card-theme dark:bg-dark-surface rounded-lg shadow-sm border border-light-border dark:border-dark-border p-12">
           <div className="text-center">
-            <div className="text-gray-400 dark:text-gray-500 text-6xl mb-4">
+            <div className="text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary text-6xl mb-4">
               🏦
             </div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            <h3 className="text-lg font-medium text-theme-primary dark:text-dark-text-primary mb-2">
               Nenhuma conta selecionada
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+            <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted max-w-md mx-auto">
               Para utilizar a conciliação bancária, você precisa primeiro
               selecionar uma conta bancária nos filtros globais da página.
             </p>
           </div>
-        </div>
-      )}
+        </div>}
 
       {/* Modal de importação */}
-      <ImportStatementModal
-        isOpen={isImportModalOpen}
-        onClose={() => setIsImportModalOpen(false)}
-        onImport={handleImport}
-        onSuccess={handleImportSuccess}
-        loading={statementsLoading || bankAccountsLoading}
-        availableAccounts={availableAccounts}
-        defaultAccountId={globalFilters.accountId}
-      />
+      <ImportStatementModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} onImport={handleImport} onSuccess={handleImportSuccess} loading={statementsLoading || bankAccountsLoading} availableAccounts={availableAccounts} defaultAccountId={globalFilters.accountId} />
 
       {/* Modal de conciliação manual */}
-      <ManualReconciliationModal
-        isOpen={isManualModalOpen}
-        onClose={() => setIsManualModalOpen(false)}
-        onSuccess={handleManualReconciliationSuccess}
-        accountId={globalFilters.accountId}
-        unreconciled={unreconciled}
-      />
+      <ManualReconciliationModal isOpen={isManualModalOpen} onClose={() => setIsManualModalOpen(false)} onSuccess={handleManualReconciliationSuccess} accountId={globalFilters.accountId} unreconciled={unreconciled} />
 
       {/* Modal de importação de despesas OFX */}
-      <ImportExpensesFromOFXModal
-        isOpen={isImportExpensesOFXModalOpen}
-        onClose={() => setIsImportExpensesOFXModalOpen(false)}
-        onSuccess={handleImportExpensesOFXSuccess}
-        availableAccounts={availableAccounts}
-        defaultAccountId={globalFilters.accountId}
-        unitId={globalFilters.unitId}
-      />
+      <ImportExpensesFromOFXModal isOpen={isImportExpensesOFXModalOpen} onClose={() => setIsImportExpensesOFXModalOpen(false)} onSuccess={handleImportExpensesOFXSuccess} availableAccounts={availableAccounts} defaultAccountId={globalFilters.accountId} unitId={globalFilters.unitId} />
 
       {/* Status de loading overlay - Dark Mode */}
-      {(matchesLoading || statementsLoading) && (
-        <div className="fixed inset-0 bg-black bg-opacity-25 dark:bg-black dark:bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-xl border border-gray-200 dark:border-gray-700">
+      {(matchesLoading || statementsLoading) && <div className="fixed inset-0 bg-black bg-opacity-25 dark:bg-black dark:bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="card-theme dark:bg-dark-surface rounded-lg p-6 shadow-xl border border-light-border dark:border-dark-border">
             <div className="flex items-center space-x-3">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 dark:border-blue-400"></div>
-              <span className="text-gray-900 dark:text-white">
+              <span className="text-theme-primary dark:text-dark-text-primary">
                 Carregando dados de conciliação...
               </span>
             </div>
           </div>
-        </div>
-      )}
-    </div>
-  );
+        </div>}
+    </div>;
 };
-
 export default ConciliacaoTab;

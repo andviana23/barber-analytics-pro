@@ -19,33 +19,33 @@ const RankingProfissionais = ({
       currency: 'BRL',
     }).format(value);
   };
-
   const getRankIcon = position => {
     switch (position) {
       case 1:
         return <Crown className="h-5 w-5 text-yellow-500" />;
       case 2:
-        return <Medal className="h-5 w-5 text-gray-400" />;
+        return (
+          <Medal className="h-5 w-5 text-light-text-muted dark:text-dark-text-muted" />
+        );
       case 3:
         return <Award className="h-5 w-5 text-amber-600" />;
       default:
-        return <User className="h-5 w-5 text-gray-400" />;
+        return (
+          <User className="h-5 w-5 text-light-text-muted dark:text-dark-text-muted" />
+        );
     }
   };
-
   const getRankBadge = position => {
     const badges = {
       1: 'bg-yellow-100 text-yellow-800 border-yellow-200',
       2: 'bg-gray-100 text-gray-800 border-gray-200',
       3: 'bg-amber-100 text-amber-800 border-amber-200',
     };
-
     return badges[position] || 'bg-blue-100 text-blue-800 border-blue-200';
   };
-
   if (loading) {
     return (
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+      <div className="card-theme dark:bg-dark-surface p-6 rounded-xl border border-light-border dark:border-dark-border">
         <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 rounded mb-6"></div>
         <div className="space-y-4">
           {[...Array(5)].map((_, index) => (
@@ -62,39 +62,32 @@ const RankingProfissionais = ({
       </div>
     );
   }
-
   if (!data || data.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      <div className="card-theme dark:bg-dark-surface p-6 rounded-xl border border-light-border dark:border-dark-border">
+        <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-4">
           {title}
         </h3>
-        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+        <div className="text-center py-8 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
           <User className="h-12 w-12 mx-auto mb-3 opacity-50" />
           <p>Nenhum dado de profissional encontrado</p>
         </div>
       </div>
     );
   }
-
   return (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
+    <div className="card-theme dark:bg-dark-surface p-6 rounded-xl border border-light-border dark:border-dark-border">
+      <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-6">
         {title}
       </h3>
 
       <div className="space-y-4">
         {data.map((professional, index) => {
           const position = index + 1;
-
           return (
             <div
               key={professional.id || index}
-              className={`flex items-center gap-4 p-3 rounded-lg transition-colors ${
-                position <= 3
-                  ? 'bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-800'
-                  : 'bg-gray-50 dark:bg-gray-700'
-              }`}
+              className={`flex items-center gap-4 p-3 rounded-lg transition-colors ${position <= 3 ? 'bg-light-surface/50 dark:bg-dark-surface/50' : 'bg-light-surface dark:bg-dark-surface'}`}
             >
               {/* Posição e ícone */}
               <div className="flex items-center gap-2 min-w-0">
@@ -109,7 +102,7 @@ const RankingProfissionais = ({
               {/* Informações do profissional */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <h4 className="font-semibold text-gray-900 dark:text-white truncate">
+                  <h4 className="font-semibold text-theme-primary dark:text-dark-text-primary truncate">
                     {professional.name}
                   </h4>
                   {position <= 3 && (
@@ -119,7 +112,7 @@ const RankingProfissionais = ({
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mt-2 text-sm text-gray-600 dark:text-gray-400">
+                <div className="grid grid-cols-2 gap-4 mt-2 text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                   <div>
                     <span className="font-medium">Atendimentos:</span>{' '}
                     {professional.attendances || 0}
@@ -133,10 +126,10 @@ const RankingProfissionais = ({
 
               {/* Faturamento total */}
               <div className="text-right">
-                <div className="text-lg font-bold text-gray-900 dark:text-white">
+                <div className="text-lg font-bold text-theme-primary dark:text-dark-text-primary">
                   {formatCurrency(professional.totalRevenue || 0)}
                 </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">
+                <div className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                   Faturamento
                 </div>
               </div>
@@ -147,12 +140,11 @@ const RankingProfissionais = ({
 
       {/* Mostrar apenas top 10 */}
       {data.length > 10 && (
-        <div className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
+        <div className="mt-4 text-center text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
           Mostrando top 10 profissionais
         </div>
       )}
     </div>
   );
 };
-
 export default RankingProfissionais;

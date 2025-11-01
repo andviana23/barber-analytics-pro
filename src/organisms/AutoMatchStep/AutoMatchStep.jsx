@@ -21,15 +21,16 @@ const AutoMatchStep = ({
   onMatchesConfirmed,
   onSkip,
   tolerance = 0.01,
-  dateTolerance = 2,
+  dateTolerance = 2
 }) => {
   const [loading, setLoading] = useState(true);
   const [matches, setMatches] = useState([]);
   const [error, setError] = useState(null);
   const [confirmedCount, setConfirmedCount] = useState(0);
   const [rejectedCount, setRejectedCount] = useState(0);
-
-  const { showToast } = useToast();
+  const {
+    showToast
+  } = useToast();
 
   // Executa auto-match ao montar componente
   useEffect(() => {
@@ -39,33 +40,25 @@ const AutoMatchStep = ({
         setLoading(false);
         return;
       }
-
       setLoading(true);
       setError(null);
-
       try {
-        const { data, error: autoMatchError } =
-          await reconciliationService.autoReconcile({
-            account_id: accountId,
-            tolerance,
-            date_tolerance: dateTolerance,
-          });
-
+        const {
+          data,
+          error: autoMatchError
+        } = await reconciliationService.autoReconcile({
+          account_id: accountId,
+          tolerance,
+          date_tolerance: dateTolerance
+        });
         if (autoMatchError) {
-          throw new Error(
-            autoMatchError.message || 'Erro ao executar auto-match'
-          );
+          throw new Error(autoMatchError.message || 'Erro ao executar auto-match');
         }
-
         setMatches(data?.matches || []);
-
         if (!data?.matches || data.matches.length === 0) {
           showToast('Nenhum match automático encontrado', 'info');
         } else {
-          showToast(
-            `${data.matches.length} match(es) encontrado(s)`,
-            'success'
-          );
+          showToast(`${data.matches.length} match(es) encontrado(s)`, 'success');
         }
       } catch (err) {
         console.error('Erro no auto-match:', err);
@@ -75,31 +68,27 @@ const AutoMatchStep = ({
         setLoading(false);
       }
     };
-
     executeAutoMatch();
   }, [accountId, statements, tolerance, dateTolerance]);
 
   // Handler de confirmação de match individual
   const handleConfirmMatch = async (match, index) => {
     try {
-      const { error: confirmError } =
-        await reconciliationService.confirmReconciliation({
-          statement_id: match.statement_id || match.bank_statement_id,
-          reference_type: match.reference_type || 'Revenue',
-          reference_id: match.reference_id || match.revenue_id,
-          difference: match.difference || 0,
-        });
-
+      const {
+        error: confirmError
+      } = await reconciliationService.confirmReconciliation({
+        statement_id: match.statement_id || match.bank_statement_id,
+        reference_type: match.reference_type || 'Revenue',
+        reference_id: match.reference_id || match.revenue_id,
+        difference: match.difference || 0
+      });
       if (confirmError) {
-        throw new Error(
-          confirmError.message || 'Erro ao confirmar reconciliação'
-        );
+        throw new Error(confirmError.message || 'Erro ao confirmar reconciliação');
       }
 
       // Remove match da lista
       setMatches(prev => prev.filter((_, i) => i !== index));
       setConfirmedCount(prev => prev + 1);
-
       showToast('Match confirmado com sucesso', 'success');
     } catch (err) {
       console.error('Erro ao confirmar match:', err);
@@ -112,23 +101,17 @@ const AutoMatchStep = ({
     try {
       // Se já existe reconciliation_id, chama rejectReconciliation
       if (match.reconciliation_id) {
-        const { error: rejectError } =
-          await reconciliationService.rejectReconciliation(
-            match.reconciliation_id,
-            'Match rejeitado pelo usuário na revisão manual'
-          );
-
+        const {
+          error: rejectError
+        } = await reconciliationService.rejectReconciliation(match.reconciliation_id, 'Match rejeitado pelo usuário na revisão manual');
         if (rejectError) {
-          throw new Error(
-            rejectError.message || 'Erro ao rejeitar reconciliação'
-          );
+          throw new Error(rejectError.message || 'Erro ao rejeitar reconciliação');
         }
       }
 
       // Remove match da lista
       setMatches(prev => prev.filter((_, i) => i !== index));
       setRejectedCount(prev => prev + 1);
-
       showToast('Match rejeitado', 'warning');
     } catch (err) {
       console.error('Erro ao rejeitar match:', err);
@@ -142,170 +125,121 @@ const AutoMatchStep = ({
       showToast('Ainda existem matches pendentes de revisão', 'warning');
       return;
     }
-
     onMatchesConfirmed(confirmedCount);
   };
 
   // Renderização de loading
   if (loading) {
-    return (
-      <div
-        className="flex flex-col items-center justify-center py-16 space-y-4"
-        data-testid="auto-match-loading"
-      >
-        <Loader2
-          size={48}
-          className="animate-spin text-blue-600 dark:text-blue-400"
-        />
-        <p className="text-lg font-medium text-gray-700 dark:text-gray-300">
+    return <div className="flex flex-col items-center justify-center py-16 space-y-4" data-testid="auto-match-loading">
+        <Loader2 size={48} className="animate-spin text-blue-600 dark:text-blue-400" />
+        <p className="text-lg font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
           Executando auto-match...
         </p>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
           Comparando lançamentos bancários com receitas registradas
         </p>
-      </div>
-    );
+      </div>;
   }
 
   // Renderização de erro
   if (error) {
-    return (
-      <div
-        className="flex flex-col items-center justify-center py-16 space-y-4"
-        data-testid="auto-match-error"
-      >
+    return <div className="flex flex-col items-center justify-center py-16 space-y-4" data-testid="auto-match-error">
         <AlertCircle size={48} className="text-red-600 dark:text-red-400" />
-        <p className="text-lg font-medium text-gray-700 dark:text-gray-300">
+        <p className="text-lg font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
           Erro ao executar auto-match
         </p>
-        <p className="text-sm text-gray-500 dark:text-gray-400 max-w-md text-center">
+        <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted max-w-md text-center">
           {error}
         </p>
-        <button
-          onClick={onSkip}
-          className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
-          data-testid="btn-skip-after-error"
-        >
+        <button onClick={onSkip} className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-dark-text-primary rounded-md transition-colors" data-testid="btn-skip-after-error">
           Pular e continuar manualmente
         </button>
-      </div>
-    );
+      </div>;
   }
 
   // Renderização quando não há matches pendentes
   if (matches.length === 0) {
-    return (
-      <div className="space-y-6" data-testid="auto-match-complete">
+    return <div className="space-y-6" data-testid="auto-match-complete">
         <div className="flex flex-col items-center justify-center py-12 space-y-4">
-          <CheckCircle2
-            size={64}
-            className="text-green-600 dark:text-green-400"
-          />
-          <p className="text-xl font-semibold text-gray-700 dark:text-gray-300">
+          <CheckCircle2 size={64} className="text-green-600 dark:text-green-400" />
+          <p className="text-xl font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600">
             Revisão concluída!
           </p>
           <div className="text-center space-y-1">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
               <strong className="text-green-600 dark:text-green-400">
                 {confirmedCount}
               </strong>{' '}
               match(es) confirmado(s)
             </p>
-            {rejectedCount > 0 && (
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+            {rejectedCount > 0 && <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 <strong className="text-red-600 dark:text-red-400">
                   {rejectedCount}
                 </strong>{' '}
                 match(es) rejeitado(s)
-              </p>
-            )}
+              </p>}
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-          <button
-            onClick={onSkip}
-            className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
-            data-testid="btn-back-to-preview"
-          >
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-light-border dark:border-dark-border">
+          <button onClick={onSkip} className="px-4 py-2 text-gray-700 dark:text-gray-300 dark:text-gray-600 hover:card-theme dark:hover:bg-dark-surface rounded-md transition-colors" data-testid="btn-back-to-preview">
             Revisar lançamentos
           </button>
-          <button
-            onClick={handleFinishReview}
-            className="inline-flex items-center gap-2 px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
-            data-testid="btn-finish-review"
-          >
+          <button onClick={handleFinishReview} className="inline-flex items-center gap-2 px-6 py-2 bg-green-600 hover:bg-green-700 text-dark-text-primary rounded-md transition-colors" data-testid="btn-finish-review">
             Continuar
             <ArrowRight size={16} />
           </button>
         </div>
-      </div>
-    );
+      </div>;
   }
 
   // Renderização principal com MatchTable
-  return (
-    <div className="space-y-6" data-testid="auto-match-step">
+  return <div className="space-y-6" data-testid="auto-match-step">
       {/* Header com resumo */}
-      <div className="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex items-center justify-between pb-4 border-b border-light-border dark:border-dark-border">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
             Revisão de Matches Automáticos
           </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
             Revise cada match e confirme ou rejeite individualmente
           </p>
         </div>
         <div className="flex items-center gap-4 text-sm">
           <div className="flex items-center gap-2">
-            <span className="text-gray-600 dark:text-gray-400">Pendentes:</span>
+            <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">Pendentes:</span>
             <span className="font-semibold text-blue-600 dark:text-blue-400">
               {matches.length}
             </span>
           </div>
-          {confirmedCount > 0 && (
-            <div className="flex items-center gap-2">
-              <span className="text-gray-600 dark:text-gray-400">
+          {confirmedCount > 0 && <div className="flex items-center gap-2">
+              <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 Confirmados:
               </span>
               <span className="font-semibold text-green-600 dark:text-green-400">
                 {confirmedCount}
               </span>
-            </div>
-          )}
-          {rejectedCount > 0 && (
-            <div className="flex items-center gap-2">
-              <span className="text-gray-600 dark:text-gray-400">
+            </div>}
+          {rejectedCount > 0 && <div className="flex items-center gap-2">
+              <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 Rejeitados:
               </span>
               <span className="font-semibold text-red-600 dark:text-red-400">
                 {rejectedCount}
               </span>
-            </div>
-          )}
+            </div>}
         </div>
       </div>
 
       {/* Tabela de matches */}
-      <MatchTable
-        matches={matches}
-        onConfirm={handleConfirmMatch}
-        onReject={handleRejectMatch}
-        loading={loading}
-      />
+      <MatchTable matches={matches} onConfirm={handleConfirmMatch} onReject={handleRejectMatch} loading={loading} />
 
       {/* Footer com ações */}
-      <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <button
-          onClick={onSkip}
-          className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
-          data-testid="btn-skip-automatch"
-        >
+      <div className="flex items-center justify-end gap-3 pt-4 border-t border-light-border dark:border-dark-border">
+        <button onClick={onSkip} className="px-4 py-2 text-gray-700 dark:text-gray-300 dark:text-gray-600 hover:card-theme dark:hover:bg-dark-surface rounded-md transition-colors" data-testid="btn-skip-automatch">
           Pular auto-match
         </button>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default AutoMatchStep;

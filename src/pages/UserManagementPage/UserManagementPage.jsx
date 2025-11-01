@@ -5,7 +5,6 @@ import { Card } from '../../atoms';
 import { User, DollarSign, X } from 'lucide-react';
 import CommissionsTable from '../../molecules/CommissionsTable';
 import { useProfessionalCommissions } from '../../hooks/useProfessionalCommissions';
-
 const UserManagementPage = () => {
   const [users, setUsers] = useState([]);
   const [professionals, setProfessionals] = useState([]);
@@ -24,7 +23,6 @@ const UserManagementPage = () => {
         // Buscar usuários do auth.users
         const { data: authUsers, error: authError } =
           await supabase.auth.admin.listUsers();
-
         if (authError) throw authError;
 
         // Buscar profissionais
@@ -32,7 +30,6 @@ const UserManagementPage = () => {
           .from('professionals')
           .select('*, units(name)')
           .order('name');
-
         if (profError) throw profError;
 
         // Buscar unidades
@@ -40,9 +37,7 @@ const UserManagementPage = () => {
           .from('units')
           .select('*')
           .order('name');
-
         if (unitsError) throw unitsError;
-
         setUsers(authUsers?.users || []);
         setProfessionals(profData || []);
         setUnits(unitsData || []);
@@ -58,7 +53,6 @@ const UserManagementPage = () => {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
@@ -66,7 +60,6 @@ const UserManagementPage = () => {
   const handleSaveProfessional = async formData => {
     try {
       setLoading(true);
-
       if (selectedUser) {
         // Atualizar
         const { error } = await supabase
@@ -79,9 +72,7 @@ const UserManagementPage = () => {
             is_active: formData.is_active,
           })
           .eq('id', selectedUser.id);
-
         if (error) throw error;
-
         auditService.logUpdate(
           'professionals',
           selectedUser.id,
@@ -102,9 +93,7 @@ const UserManagementPage = () => {
           })
           .select()
           .single();
-
         if (error) throw error;
-
         auditService.logCreate('professionals', data.id, formData);
       }
 
@@ -123,19 +112,14 @@ const UserManagementPage = () => {
     if (!window.confirm('Tem certeza que deseja excluir este profissional?')) {
       return;
     }
-
     try {
       setLoading(true);
-
       const professional = professionals.find(p => p.id === professionalId);
-
       const { error } = await supabase
         .from('professionals')
         .delete()
         .eq('id', professionalId);
-
       if (error) throw error;
-
       auditService.logDelete('professionals', professionalId, professional);
 
       // Remover da lista local
@@ -156,22 +140,31 @@ const UserManagementPage = () => {
       // Atualizar no professionals
       const { error } = await supabase
         .from('professionals')
-        .update({ is_active: !currentStatus })
+        .update({
+          is_active: !currentStatus,
+        })
         .eq('user_id', userId);
-
       if (error) throw error;
-
       auditService.logUpdate(
         'professionals',
         userId,
-        { is_active: currentStatus },
-        { is_active: !currentStatus }
+        {
+          is_active: currentStatus,
+        },
+        {
+          is_active: !currentStatus,
+        }
       );
 
       // Atualizar lista local
       setProfessionals(
         professionals.map(p =>
-          p.user_id === userId ? { ...p, is_active: !currentStatus } : p
+          p.user_id === userId
+            ? {
+                ...p,
+                is_active: !currentStatus,
+              }
+            : p
         )
       );
     } catch (err) {
@@ -181,7 +174,6 @@ const UserManagementPage = () => {
       setLoading(false);
     }
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -189,16 +181,15 @@ const UserManagementPage = () => {
       </div>
     );
   }
-
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary">
             Gerenciamento de Usuários
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
             Gerencie usuários, profissionais e permissões do sistema
           </p>
         </div>
@@ -208,7 +199,7 @@ const UserManagementPage = () => {
             setSelectedUser(null);
             setIsModalOpen(true);
           }}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-dark-text-primary rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors"
         >
           Novo Profissional
         </button>
@@ -216,7 +207,7 @@ const UserManagementPage = () => {
 
       {/* Mensagem de erro */}
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-400 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded">
           {error}
         </div>
       )}
@@ -224,14 +215,14 @@ const UserManagementPage = () => {
       {/* Estatísticas */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="p-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
             Total de Usuários
           </h3>
           <p className="text-2xl font-bold text-blue-600">{users.length}</p>
         </Card>
 
         <Card className="p-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
             Profissionais
           </h3>
           <p className="text-2xl font-bold text-green-600">
@@ -240,7 +231,7 @@ const UserManagementPage = () => {
         </Card>
 
         <Card className="p-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
             Ativos
           </h3>
           <p className="text-2xl font-bold text-green-600">
@@ -249,7 +240,7 @@ const UserManagementPage = () => {
         </Card>
 
         <Card className="p-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
             Administradores
           </h3>
           <p className="text-2xl font-bold text-purple-600">
@@ -260,30 +251,30 @@ const UserManagementPage = () => {
 
       {/* Lista de Profissionais */}
       <Card className="p-6">
-        <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+        <h2 className="text-xl font-semibold mb-4 text-theme-primary dark:text-dark-text-primary">
           Lista de Profissionais
         </h2>
 
         <div className="overflow-x-auto">
           <table className="min-w-full table-auto">
             <thead>
-              <tr className="border-b border-gray-200 dark:border-gray-700">
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
+              <tr className="border-b border-light-border dark:border-dark-border">
+                <th className="px-4 py-2 text-left text-sm font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                   Nome
                 </th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
+                <th className="px-4 py-2 text-left text-sm font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                   Perfil
                 </th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
+                <th className="px-4 py-2 text-left text-sm font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                   Unidade
                 </th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
+                <th className="px-4 py-2 text-left text-sm font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                   Comissão
                 </th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
+                <th className="px-4 py-2 text-left text-sm font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                   Status
                 </th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
+                <th className="px-4 py-2 text-left text-sm font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                   Ações
                 </th>
               </tr>
@@ -292,37 +283,27 @@ const UserManagementPage = () => {
               {professionals.map(professional => (
                 <tr
                   key={professional.id}
-                  className="border-b border-gray-100 dark:border-gray-800"
+                  className="border-b border-light-border dark:border-dark-border"
                 >
-                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
+                  <td className="px-4 py-3 text-sm text-theme-primary dark:text-dark-text-primary">
                     {professional.name}
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        professional.role === 'admin'
-                          ? 'bg-purple-100 text-purple-800'
-                          : professional.role === 'gerente'
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-gray-100 text-gray-800'
-                      }`}
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${professional.role === 'admin' ? 'bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-300' : professional.role === 'gerente' ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300' : 'bg-light-surface/50 text-theme-secondary dark:bg-dark-surface/50'}`}
                     >
                       {professional.role}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
+                  <td className="px-4 py-3 text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                     {professional.units?.name || '-'}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
+                  <td className="px-4 py-3 text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                     {professional.commission_rate}%
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        professional.is_active
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${professional.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
                     >
                       {professional.is_active ? 'Ativo' : 'Inativo'}
                     </span>
@@ -345,11 +326,7 @@ const UserManagementPage = () => {
                           professional.is_active
                         )
                       }
-                      className={`font-medium ${
-                        professional.is_active
-                          ? 'text-red-600 hover:text-red-800'
-                          : 'text-green-600 hover:text-green-800'
-                      }`}
+                      className={`font-medium ${professional.is_active ? 'text-red-600 hover:text-red-800' : 'text-green-600 hover:text-green-800'}`}
                     >
                       {professional.is_active ? 'Desativar' : 'Ativar'}
                     </button>
@@ -367,7 +344,7 @@ const UserManagementPage = () => {
           </table>
 
           {professionals.length === 0 && (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+            <div className="text-center py-8 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
               Nenhum profissional encontrado
             </div>
           )}
@@ -419,7 +396,6 @@ const UserModal = ({ user, units, users, professionals, onSave, onClose }) => {
       fetchCommissions();
     }
   }, [activeTab, user?.id, user?.unit_id, fetchCommissions]);
-
   const handleSubmit = e => {
     e.preventDefault();
     onSave(formData);
@@ -430,17 +406,16 @@ const UserModal = ({ user, units, users, professionals, onSave, onClose }) => {
   const availableUsers = users.filter(
     u => !professionals.some(p => p.user_id === u.id) || u.id === user?.user_id
   );
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div className="card-theme dark:bg-dark-surface rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
             {user ? 'Editar Profissional' : 'Novo Profissional'}
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary transition-colors"
           >
             <X size={24} />
           </button>
@@ -448,15 +423,11 @@ const UserModal = ({ user, units, users, professionals, onSave, onClose }) => {
 
         {/* Navegação por abas - apenas para edição */}
         {user && (
-          <div className="flex border-b border-gray-200 mb-6">
+          <div className="flex border-b border-light-border dark:border-dark-border mb-6">
             <button
               type="button"
               onClick={() => setActiveTab('basic')}
-              className={`flex items-center px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === 'basic'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
+              className={`flex items-center px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'basic' ? 'border-blue-500 text-blue-600' : 'border-transparent text-theme-secondary hover:text-theme-primary'}`}
             >
               <User size={16} className="mr-2" />
               Informações Básicas
@@ -464,11 +435,7 @@ const UserModal = ({ user, units, users, professionals, onSave, onClose }) => {
             <button
               type="button"
               onClick={() => setActiveTab('commissions')}
-              className={`flex items-center px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === 'commissions'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
+              className={`flex items-center px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'commissions' ? 'border-blue-500 text-blue-600' : 'border-transparent text-theme-secondary hover:text-theme-primary'}`}
             >
               <DollarSign size={16} className="mr-2" />
               Comissões por Serviço
@@ -479,133 +446,152 @@ const UserModal = ({ user, units, users, professionals, onSave, onClose }) => {
         {/* Conteúdo das abas */}
         {activeTab === 'basic' && (
           <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Seleção de usuário (apenas para novo) */}
-          {!user && (
+            {/* Seleção de usuário (apenas para novo) */}
+            {!user && (
+              <div>
+                <label className="block text-sm font-medium text-theme-primary mb-1">
+                  Usuário
+                </label>
+                <select
+                  value={formData.user_id}
+                  onChange={e =>
+                    setFormData({
+                      ...formData,
+                      user_id: e.target.value,
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                >
+                  <option value="">Selecione um usuário</option>
+                  {availableUsers.map(u => (
+                    <option key={u.id} value={u.id}>
+                      {u.email}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Nome */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Usuário
+              <label className="block text-sm font-medium text-theme-primary mb-1">
+                Nome
+              </label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={e =>
+                  setFormData({
+                    ...formData,
+                    name: e.target.value,
+                  })
+                }
+                className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+
+            {/* Perfil/Role */}
+            <div>
+              <label className="block text-sm font-medium text-theme-primary mb-1">
+                Perfil
               </label>
               <select
-                value={formData.user_id}
+                value={formData.role}
                 onChange={e =>
-                  setFormData({ ...formData, user_id: e.target.value })
+                  setFormData({
+                    ...formData,
+                    role: e.target.value,
+                  })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
+                className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">Selecione um usuário</option>
-                {availableUsers.map(u => (
-                  <option key={u.id} value={u.id}>
-                    {u.email}
+                <option value="barbeiro">Barbeiro</option>
+                <option value="gerente">Gerente</option>
+                <option value="admin">Administrador</option>
+              </select>
+            </div>
+
+            {/* Unidade */}
+            <div>
+              <label className="block text-sm font-medium text-theme-primary mb-1">
+                Unidade
+              </label>
+              <select
+                value={formData.unit_id}
+                onChange={e =>
+                  setFormData({
+                    ...formData,
+                    unit_id: e.target.value,
+                  })
+                }
+                className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Selecione uma unidade</option>
+                {units.map(unit => (
+                  <option key={unit.id} value={unit.id}>
+                    {unit.name}
                   </option>
                 ))}
               </select>
             </div>
-          )}
 
-          {/* Nome */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Nome
-            </label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={e => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-
-          {/* Perfil/Role */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Perfil
-            </label>
-            <select
-              value={formData.role}
-              onChange={e => setFormData({ ...formData, role: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="barbeiro">Barbeiro</option>
-              <option value="gerente">Gerente</option>
-              <option value="admin">Administrador</option>
-            </select>
-          </div>
-
-          {/* Unidade */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Unidade
-            </label>
-            <select
-              value={formData.unit_id}
-              onChange={e =>
-                setFormData({ ...formData, unit_id: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Selecione uma unidade</option>
-              {units.map(unit => (
-                <option key={unit.id} value={unit.id}>
-                  {unit.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Comissão */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Taxa de Comissão (%)
-            </label>
-            <input
-              type="number"
-              min="0"
-              max="100"
-              step="0.01"
-              value={formData.commission_rate}
-              onChange={e =>
-                setFormData({
-                  ...formData,
-                  commission_rate: parseFloat(e.target.value) || 0,
-                })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* Status (apenas para edição) */}
-          {user && (
+            {/* Comissão */}
             <div>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={formData.is_active}
-                  onChange={e =>
-                    setFormData({ ...formData, is_active: e.target.checked })
-                  }
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Usuário Ativo
-                </span>
+              <label className="block text-sm font-medium text-theme-primary mb-1">
+                Taxa de Comissão (%)
               </label>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                value={formData.commission_rate}
+                onChange={e =>
+                  setFormData({
+                    ...formData,
+                    commission_rate: parseFloat(e.target.value) || 0,
+                  })
+                }
+                className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
-          )}
+
+            {/* Status (apenas para edição) */}
+            {user && (
+              <div>
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_active}
+                    onChange={e =>
+                      setFormData({
+                        ...formData,
+                        is_active: e.target.checked,
+                      })
+                    }
+                    className="rounded border-light-border dark:border-dark-border text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-sm font-medium text-theme-primary">
+                    Usuário Ativo
+                  </span>
+                </label>
+              </div>
+            )}
 
             {/* Botões */}
             <div className="flex space-x-3 pt-4">
               <button
                 type="submit"
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                className="flex-1 px-4 py-2 bg-blue-600 dark:bg-blue-700 text-dark-text-primary rounded-md hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors"
               >
                 {user ? 'Atualizar' : 'Criar'}
               </button>
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
+                className="btn-theme-secondary flex-1 px-4 py-2 rounded-md transition-colors"
               >
                 Cancelar
               </button>
@@ -621,7 +607,7 @@ const UserModal = ({ user, units, users, professionals, onSave, onClose }) => {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
               </div>
             ) : commissionsError ? (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-400 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded">
                 {commissionsError}
               </div>
             ) : (
@@ -638,5 +624,4 @@ const UserModal = ({ user, units, users, professionals, onSave, onClose }) => {
     </div>
   );
 };
-
 export default UserManagementPage;

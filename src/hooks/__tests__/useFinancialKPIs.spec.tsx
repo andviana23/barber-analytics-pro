@@ -127,13 +127,13 @@ describe('useFinancialKPIs', () => {
 
     // Verificar que service foi chamado duas vezes
     expect(mockFinanceiroService.getKPIs).toHaveBeenCalledTimes(2);
-    expect(mockFinanceiroService.getKPIs).toHaveBeenNthCalledWith(
-      1,
+
+    // Verificar que foi chamado com ambos os períodos (ordem não importa devido a Promise.all)
+    expect(mockFinanceiroService.getKPIs).toHaveBeenCalledWith(
       unitId,
       currentPeriod
     );
-    expect(mockFinanceiroService.getKPIs).toHaveBeenNthCalledWith(
-      2,
+    expect(mockFinanceiroService.getKPIs).toHaveBeenCalledWith(
       unitId,
       previousPeriod
     );

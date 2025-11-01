@@ -10,70 +10,46 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import {
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  Calendar,
-  Target,
-  AlertTriangle,
-  Download,
-  RefreshCw,
-  Settings,
-  Activity,
-  ArrowUp,
-  ArrowDown,
-  Minus,
-  Eye,
-  EyeOff,
-} from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, Calendar, Target, AlertTriangle, Download, RefreshCw, Settings, Activity, ArrowUp, ArrowDown, Minus, Eye, EyeOff } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { CashflowChartCard } from '../../molecules/CashflowChartCard';
 import DateRangePicker from '../../atoms/DateRangePicker';
 import { StatusBadge } from '../../atoms/StatusBadge';
-
 const FluxoSummaryPanel = ({
   // Dados financeiros
   cashflowData = [],
   periodComparison = null,
-
   // Período selecionado
   dateRange,
   onDateRangeChange,
-
   // Configurações de visualização
-  chartViewMode = 'combined', // 'combined', 'bars', 'line'
+  chartViewMode = 'combined',
+  // 'combined', 'bars', 'line'
   onChartViewModeChange,
   showPreviousPeriod = true,
   onShowPreviousPeriodChange,
-  kpiLayout = 'grid', // 'grid', 'horizontal'
+  kpiLayout = 'grid',
+  // 'grid', 'horizontal'
   onKpiLayoutChange,
-
   // Configurações de análise
   showTrendAnalysis = true,
   showProjections = false,
   onShowProjectionsChange,
   projectionDays = 30,
   onProjectionDaysChange,
-
   // Callbacks
   onExportData,
   onRefreshData,
   onOpenSettings,
-
   // Estados
   loading = false,
   error = null,
-
   // Configuração da interface
   compactMode = false,
-
-  className = '',
+  className = ''
 }) => {
   const [selectedKPI, setSelectedKPI] = useState(null);
-  const [expandedSections, setExpandedSections] = useState(
-    new Set(['overview', 'trends'])
-  );
+  const [expandedSections, setExpandedSections] = useState(new Set(['overview', 'trends']));
 
   // Cálculo de métricas principais
   const metrics = useMemo(() => {
@@ -93,100 +69,45 @@ const FluxoSummaryPanel = ({
         tendenciaSaldo: 0,
         projecaoSaldo: 0,
         burnRate: 0,
-        runwayDays: 0,
+        runwayDays: 0
       };
     }
-
-    const receitas = cashflowData.filter(
-      item => item.tipo === 'receita' || item.inflows > 0
-    );
-    const despesas = cashflowData.filter(
-      item => item.tipo === 'despesa' || item.outflows > 0
-    );
-
-    const totalReceitas = receitas.reduce(
-      (sum, item) => sum + (item.inflows || item.valor || 0),
-      0
-    );
-    const totalDespesas = despesas.reduce(
-      (sum, item) => sum + Math.abs(item.outflows || item.valor || 0),
-      0
-    );
+    const receitas = cashflowData.filter(item => item.tipo === 'receita' || item.inflows > 0);
+    const despesas = cashflowData.filter(item => item.tipo === 'despesa' || item.outflows > 0);
+    const totalReceitas = receitas.reduce((sum, item) => sum + (item.inflows || item.valor || 0), 0);
+    const totalDespesas = despesas.reduce((sum, item) => sum + Math.abs(item.outflows || item.valor || 0), 0);
     const saldoLiquido = totalReceitas - totalDespesas;
-
-    const receitaMedia =
-      receitas.length > 0 ? totalReceitas / receitas.length : 0;
-    const despesaMedia =
-      despesas.length > 0 ? totalDespesas / despesas.length : 0;
-
-    const maiorReceita = Math.max(
-      ...receitas.map(r => r.inflows || r.valor || 0),
-      0
-    );
-    const maiorDespesa = Math.max(
-      ...despesas.map(d => Math.abs(d.outflows || d.valor || 0)),
-      0
-    );
+    const receitaMedia = receitas.length > 0 ? totalReceitas / receitas.length : 0;
+    const despesaMedia = despesas.length > 0 ? totalDespesas / despesas.length : 0;
+    const maiorReceita = Math.max(...receitas.map(r => r.inflows || r.valor || 0), 0);
+    const maiorDespesa = Math.max(...despesas.map(d => Math.abs(d.outflows || d.valor || 0)), 0);
 
     // Análise de tendências (últimos vs primeiros 50% do período)
     const midPoint = Math.floor(cashflowData.length / 2);
     const firstHalf = cashflowData.slice(0, midPoint);
     const secondHalf = cashflowData.slice(midPoint);
-
-    const receitasPrimeira = firstHalf.reduce(
-      (sum, item) => sum + (item.inflows || 0),
-      0
-    );
-    const receitasSegunda = secondHalf.reduce(
-      (sum, item) => sum + (item.inflows || 0),
-      0
-    );
-    const tendenciaReceitas =
-      receitasPrimeira > 0
-        ? ((receitasSegunda - receitasPrimeira) / receitasPrimeira) * 100
-        : 0;
-
-    const despesasPrimeira = firstHalf.reduce(
-      (sum, item) => sum + Math.abs(item.outflows || 0),
-      0
-    );
-    const despesasSegunda = secondHalf.reduce(
-      (sum, item) => sum + Math.abs(item.outflows || 0),
-      0
-    );
-    const tendenciaDespesas =
-      despesasPrimeira > 0
-        ? ((despesasSegunda - despesasPrimeira) / despesasPrimeira) * 100
-        : 0;
-
+    const receitasPrimeira = firstHalf.reduce((sum, item) => sum + (item.inflows || 0), 0);
+    const receitasSegunda = secondHalf.reduce((sum, item) => sum + (item.inflows || 0), 0);
+    const tendenciaReceitas = receitasPrimeira > 0 ? (receitasSegunda - receitasPrimeira) / receitasPrimeira * 100 : 0;
+    const despesasPrimeira = firstHalf.reduce((sum, item) => sum + Math.abs(item.outflows || 0), 0);
+    const despesasSegunda = secondHalf.reduce((sum, item) => sum + Math.abs(item.outflows || 0), 0);
+    const tendenciaDespesas = despesasPrimeira > 0 ? (despesasSegunda - despesasPrimeira) / despesasPrimeira * 100 : 0;
     const saldoPrimeiro = receitasPrimeira - despesasPrimeira;
     const saldoSegundo = receitasSegunda - despesasSegunda;
-    const tendenciaSaldo =
-      saldoPrimeiro !== 0
-        ? ((saldoSegundo - saldoPrimeiro) / Math.abs(saldoPrimeiro)) * 100
-        : 0;
+    const tendenciaSaldo = saldoPrimeiro !== 0 ? (saldoSegundo - saldoPrimeiro) / Math.abs(saldoPrimeiro) * 100 : 0;
 
     // Dias positivos e negativos
-    const diasPositivos = cashflowData.filter(
-      item => (item.balance || item.inflows - Math.abs(item.outflows)) > 0
-    ).length;
-    const diasNegativos = cashflowData.filter(
-      item => (item.balance || item.inflows - Math.abs(item.outflows)) < 0
-    ).length;
+    const diasPositivos = cashflowData.filter(item => (item.balance || item.inflows - Math.abs(item.outflows)) > 0).length;
+    const diasNegativos = cashflowData.filter(item => (item.balance || item.inflows - Math.abs(item.outflows)) < 0).length;
 
     // Burn rate e runway (baseado na média de despesas)
     const burnRate = despesaMedia;
-    const runwayDays =
-      saldoLiquido > 0 && burnRate > 0
-        ? Math.floor(saldoLiquido / burnRate)
-        : 0;
+    const runwayDays = saldoLiquido > 0 && burnRate > 0 ? Math.floor(saldoLiquido / burnRate) : 0;
 
     // Projeção simples baseada na tendência
     const mediaReceitas = receitaMedia;
     const mediaDespesas = despesaMedia;
-    const projecaoSaldo =
-      saldoLiquido + projectionDays * (mediaReceitas - mediaDespesas);
-
+    const projecaoSaldo = saldoLiquido + projectionDays * (mediaReceitas - mediaDespesas);
     return {
       totalReceitas,
       totalDespesas,
@@ -202,7 +123,7 @@ const FluxoSummaryPanel = ({
       tendenciaSaldo,
       projecaoSaldo,
       burnRate,
-      runwayDays,
+      runwayDays
     };
   }, [cashflowData, projectionDays]);
 
@@ -211,38 +132,20 @@ const FluxoSummaryPanel = ({
     if (!periodComparison || !periodComparison.cashflowData) {
       return null;
     }
-
     const prevData = periodComparison.cashflowData;
-    const prevReceitas = prevData.reduce(
-      (sum, item) => sum + (item.inflows || 0),
-      0
-    );
-    const prevDespesas = prevData.reduce(
-      (sum, item) => sum + Math.abs(item.outflows || 0),
-      0
-    );
+    const prevReceitas = prevData.reduce((sum, item) => sum + (item.inflows || 0), 0);
+    const prevDespesas = prevData.reduce((sum, item) => sum + Math.abs(item.outflows || 0), 0);
     const prevSaldo = prevReceitas - prevDespesas;
-
-    const receitasVariacao =
-      prevReceitas > 0
-        ? ((metrics.totalReceitas - prevReceitas) / prevReceitas) * 100
-        : 0;
-    const despesasVariacao =
-      prevDespesas > 0
-        ? ((metrics.totalDespesas - prevDespesas) / prevDespesas) * 100
-        : 0;
-    const saldoVariacao =
-      prevSaldo !== 0
-        ? ((metrics.saldoLiquido - prevSaldo) / Math.abs(prevSaldo)) * 100
-        : 0;
-
+    const receitasVariacao = prevReceitas > 0 ? (metrics.totalReceitas - prevReceitas) / prevReceitas * 100 : 0;
+    const despesasVariacao = prevDespesas > 0 ? (metrics.totalDespesas - prevDespesas) / prevDespesas * 100 : 0;
+    const saldoVariacao = prevSaldo !== 0 ? (metrics.saldoLiquido - prevSaldo) / Math.abs(prevSaldo) * 100 : 0;
     return {
       receitasVariacao,
       despesasVariacao,
       saldoVariacao,
       prevReceitas,
       prevDespesas,
-      prevSaldo,
+      prevSaldo
     };
   }, [periodComparison, metrics]);
 
@@ -252,14 +155,12 @@ const FluxoSummaryPanel = ({
       style: 'currency',
       currency: 'BRL',
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
+      maximumFractionDigits: 0
     }).format(value || 0);
   }, []);
-
   const formatPercentage = useCallback((value, showSign = true) => {
     const formatted = `${Math.abs(value || 0).toFixed(1)}%`;
     if (!showSign) return formatted;
-
     if (value > 0) return `+${formatted}`;
     if (value < 0) return `-${formatted}`;
     return formatted;
@@ -279,235 +180,152 @@ const FluxoSummaryPanel = ({
   }, []);
 
   // Renderizar KPI card com Dark Mode
-  const renderKPICard = useCallback(
-    ({
-      title,
-      value,
-      previousValue,
-      variation,
-      icon: Icon,
-      colorClass = 'blue',
-      format = 'currency',
-      subtitle = null,
-      trend = null,
-    }) => {
-      const isSelected = selectedKPI === title;
-      const hasVariation = variation !== null && variation !== undefined;
-      const isPositive = variation > 0;
-      const isNegative = variation < 0;
+  const renderKPICard = useCallback(({
+    title,
+    value,
+    previousValue,
+    variation,
+    icon: Icon,
+    colorClass = 'blue',
+    format = 'currency',
+    subtitle = null,
+    trend = null
+  }) => {
+    const isSelected = selectedKPI === title;
+    const hasVariation = variation !== null && variation !== undefined;
+    const isPositive = variation > 0;
+    const isNegative = variation < 0;
 
-      // Color classes mapping para dark mode
-      const colorClasses = {
-        blue: 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400',
-        green:
-          'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400',
-        red: 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400',
-        orange:
-          'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400',
-      };
-
-      return (
-        <div
-          className={`bg-white dark:bg-gray-800 p-6 rounded-lg border transition-all cursor-pointer ${
-            isSelected
-              ? 'ring-2 ring-blue-500 dark:ring-blue-400 shadow-lg border-blue-200 dark:border-blue-700'
-              : 'border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600'
-          } ${compactMode ? 'p-4' : ''}`}
-          onClick={() => setSelectedKPI(isSelected ? null : title)}
-        >
+    // Color classes mapping para dark mode
+    const colorClasses = {
+      blue: 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400',
+      green: 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400',
+      red: 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400',
+      orange: 'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400'
+    };
+    return <div className={`bg-white dark:bg-gray-800 p-6 rounded-lg border transition-all cursor-pointer ${isSelected ? 'ring-2 ring-blue-500 dark:ring-blue-400 shadow-lg border-blue-200 dark:border-blue-700' : 'border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600'} ${compactMode ? 'p-4' : ''}`} onClick={() => setSelectedKPI(isSelected ? null : title)}>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div
-                className={`p-2 rounded-lg ${colorClasses[colorClass] || colorClasses.blue}`}
-              >
+              <div className={`p-2 rounded-lg ${colorClasses[colorClass] || colorClasses.blue}`}>
                 <Icon className="w-5 h-5" />
               </div>
               <div>
-                <h3
-                  className={`${compactMode ? 'text-sm' : 'text-base'} font-medium text-gray-900 dark:text-white`}
-                >
+                <h3 className={`${compactMode ? 'text-sm' : 'text-base'} font-medium text-gray-900 dark:text-white`}>
                   {title}
                 </h3>
-                {subtitle && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {subtitle && <p className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
                     {subtitle}
-                  </p>
-                )}
+                  </p>}
               </div>
             </div>
 
-            {hasVariation && (
-              <div
-                className={`flex items-center text-sm font-medium ${
-                  isPositive
-                    ? 'text-green-600 dark:text-green-400'
-                    : isNegative
-                      ? 'text-red-600 dark:text-red-400'
-                      : 'text-gray-500 dark:text-gray-400'
-                }`}
-              >
-                {isPositive ? (
-                  <ArrowUp className="w-4 h-4 mr-1" />
-                ) : isNegative ? (
-                  <ArrowDown className="w-4 h-4 mr-1" />
-                ) : (
-                  <Minus className="w-4 h-4 mr-1" />
-                )}
+            {hasVariation && <div className={`flex items-center text-sm font-medium ${isPositive ? 'text-green-600 dark:text-green-400' : isNegative ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                {isPositive ? <ArrowUp className="w-4 h-4 mr-1" /> : isNegative ? <ArrowDown className="w-4 h-4 mr-1" /> : <Minus className="w-4 h-4 mr-1" />}
                 {formatPercentage(variation)}
-              </div>
-            )}
+              </div>}
           </div>
 
           <div className="mt-4">
-            <div
-              className={`${compactMode ? 'text-xl' : 'text-2xl'} font-bold text-gray-900 dark:text-white`}
-            >
-              {format === 'currency'
-                ? formatCurrency(value)
-                : format === 'percentage'
-                  ? formatPercentage(value, false)
-                  : format === 'number'
-                    ? Math.round(value).toLocaleString('pt-BR')
-                    : value}
+            <div className={`${compactMode ? 'text-xl' : 'text-2xl'} font-bold text-gray-900 dark:text-white`}>
+              {format === 'currency' ? formatCurrency(value) : format === 'percentage' ? formatPercentage(value, false) : format === 'number' ? Math.round(value).toLocaleString('pt-BR') : value}
             </div>
 
-            {previousValue !== null && previousValue !== undefined && (
-              <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            {previousValue !== null && previousValue !== undefined && <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
                 Período anterior:{' '}
-                {format === 'currency'
-                  ? formatCurrency(previousValue)
-                  : previousValue}
-              </div>
-            )}
+                {format === 'currency' ? formatCurrency(previousValue) : previousValue}
+              </div>}
 
-            {trend && (
-              <div className="mt-2">
-                <StatusBadge
-                  status={
-                    trend > 0 ? 'positive' : trend < 0 ? 'negative' : 'neutral'
-                  }
-                  size="sm"
-                />
-              </div>
-            )}
+            {trend && <div className="mt-2">
+                <StatusBadge status={trend > 0 ? 'positive' : trend < 0 ? 'negative' : 'neutral'} size="sm" />
+              </div>}
           </div>
-        </div>
-      );
-    },
-    [selectedKPI, compactMode, formatCurrency, formatPercentage]
-  );
+        </div>;
+  }, [selectedKPI, compactMode, formatCurrency, formatPercentage]);
 
   // Renderizar seção de KPIs com Dark Mode
-  const renderKPISection = () => (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
-      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+  const renderKPISection = () => <div className="card-theme dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg shadow-sm">
+      <div className="p-6 border-b border-light-border dark:border-dark-border">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
             Indicadores Principais
           </h2>
           <div className="flex items-center space-x-2">
-            <button
-              type="button"
-              onClick={() => toggleSection('overview')}
-              className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
-              title={
-                expandedSections.has('overview')
-                  ? 'Ocultar seção'
-                  : 'Expandir seção'
-              }
-            >
-              {expandedSections.has('overview') ? (
-                <EyeOff className="w-4 h-4" />
-              ) : (
-                <Eye className="w-4 h-4" />
-              )}
+            <button type="button" onClick={() => toggleSection('overview')} className="p-2 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary hover:text-theme-secondary dark:hover:text-gray-300 dark:text-gray-600 hover:card-theme dark:hover:bg-gray-700 rounded-md transition-colors" title={expandedSections.has('overview') ? 'Ocultar seção' : 'Expandir seção'}>
+              {expandedSections.has('overview') ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
         </div>
       </div>
 
-      {expandedSections.has('overview') && (
-        <div className="p-6">
-          <div
-            className={`grid ${kpiLayout === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} gap-6`}
-          >
+      {expandedSections.has('overview') && <div className="p-6">
+          <div className={`grid ${kpiLayout === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} gap-6`}>
             {renderKPICard({
-              title: 'Total de Receitas',
-              value: metrics.totalReceitas,
-              previousValue: periodComparisonMetrics?.prevReceitas,
-              variation: periodComparisonMetrics?.receitasVariacao,
-              icon: TrendingUp,
-              colorClass: 'green',
-              subtitle: `Média: ${formatCurrency(metrics.receitaMedia)}`,
-            })}
+          title: 'Total de Receitas',
+          value: metrics.totalReceitas,
+          previousValue: periodComparisonMetrics?.prevReceitas,
+          variation: periodComparisonMetrics?.receitasVariacao,
+          icon: TrendingUp,
+          colorClass: 'green',
+          subtitle: `Média: ${formatCurrency(metrics.receitaMedia)}`
+        })}
 
             {renderKPICard({
-              title: 'Total de Despesas',
-              value: metrics.totalDespesas,
-              previousValue: periodComparisonMetrics?.prevDespesas,
-              variation: periodComparisonMetrics?.despesasVariacao,
-              icon: TrendingDown,
-              colorClass: 'red',
-              subtitle: `Média: ${formatCurrency(metrics.despesaMedia)}`,
-            })}
+          title: 'Total de Despesas',
+          value: metrics.totalDespesas,
+          previousValue: periodComparisonMetrics?.prevDespesas,
+          variation: periodComparisonMetrics?.despesasVariacao,
+          icon: TrendingDown,
+          colorClass: 'red',
+          subtitle: `Média: ${formatCurrency(metrics.despesaMedia)}`
+        })}
 
             {renderKPICard({
-              title: 'Saldo Líquido',
-              value: metrics.saldoLiquido,
-              previousValue: periodComparisonMetrics?.prevSaldo,
-              variation: periodComparisonMetrics?.saldoVariacao,
-              icon: DollarSign,
-              colorClass: metrics.saldoLiquido >= 0 ? 'green' : 'red',
-              trend: metrics.tendenciaSaldo,
-            })}
+          title: 'Saldo Líquido',
+          value: metrics.saldoLiquido,
+          previousValue: periodComparisonMetrics?.prevSaldo,
+          variation: periodComparisonMetrics?.saldoVariacao,
+          icon: DollarSign,
+          colorClass: metrics.saldoLiquido >= 0 ? 'green' : 'red',
+          trend: metrics.tendenciaSaldo
+        })}
 
             {renderKPICard({
-              title: 'Taxa de Crescimento',
-              value: metrics.tendenciaReceitas,
-              icon: Target,
-              colorClass: 'blue',
-              format: 'percentage',
-              subtitle: 'Receitas no período',
-            })}
+          title: 'Taxa de Crescimento',
+          value: metrics.tendenciaReceitas,
+          icon: Target,
+          colorClass: 'blue',
+          format: 'percentage',
+          subtitle: 'Receitas no período'
+        })}
 
             {renderKPICard({
-              title: 'Burn Rate',
-              value: metrics.burnRate,
-              icon: Activity,
-              colorClass: 'orange',
-              subtitle: `Runway: ${metrics.runwayDays} dias`,
-            })}
+          title: 'Burn Rate',
+          value: metrics.burnRate,
+          icon: Activity,
+          colorClass: 'orange',
+          subtitle: `Runway: ${metrics.runwayDays} dias`
+        })}
 
-            {showProjections &&
-              renderKPICard({
-                title: 'Projeção 30 dias',
-                value: metrics.projecaoSaldo,
-                icon: Calendar,
-                colorClass: metrics.projecaoSaldo >= 0 ? 'green' : 'red',
-                subtitle: 'Baseada na tendência atual',
-              })}
+            {showProjections && renderKPICard({
+          title: 'Projeção 30 dias',
+          value: metrics.projecaoSaldo,
+          icon: Calendar,
+          colorClass: metrics.projecaoSaldo >= 0 ? 'green' : 'red',
+          subtitle: 'Baseada na tendência atual'
+        })}
           </div>
-        </div>
-      )}
-    </div>
-  );
+        </div>}
+    </div>;
 
   // Renderizar seção de gráficos com Dark Mode
-  const renderChartsSection = () => (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
-      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+  const renderChartsSection = () => <div className="card-theme dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg shadow-sm">
+      <div className="p-6 border-b border-light-border dark:border-dark-border">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
             Fluxo de Caixa
           </h2>
           <div className="flex items-center space-x-2">
-            <select
-              value={chartViewMode}
-              onChange={e =>
-                onChartViewModeChange && onChartViewModeChange(e.target.value)
-              }
-              className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
-            >
+            <select value={chartViewMode} onChange={e => onChartViewModeChange && onChartViewModeChange(e.target.value)} className="px-3 py-2 text-sm border border-light-border dark:border-dark-border rounded-md card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-colors">
               <option value="combined">Combinado</option>
               <option value="bars">Barras</option>
               <option value="line">Linha</option>
@@ -517,47 +335,24 @@ const FluxoSummaryPanel = ({
       </div>
 
       <div className="p-6">
-        <CashflowChartCard
-          data={cashflowData}
-          viewMode={chartViewMode}
-          showPreviousPeriod={showPreviousPeriod}
-          previousPeriodData={periodComparison?.cashflowData}
-          height={compactMode ? 300 : 400}
-          onExport={onExportData}
-        />
+        <CashflowChartCard data={cashflowData} viewMode={chartViewMode} showPreviousPeriod={showPreviousPeriod} previousPeriodData={periodComparison?.cashflowData} height={compactMode ? 300 : 400} onExport={onExportData} />
       </div>
-    </div>
-  );
+    </div>;
 
   // Renderizar seção de análises com Dark Mode melhorado
-  const renderAnalysisSection = () => (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
-      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+  const renderAnalysisSection = () => <div className="card-theme dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg shadow-sm">
+      <div className="p-6 border-b border-light-border dark:border-dark-border">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
             Análises e Tendências
           </h2>
-          <button
-            type="button"
-            onClick={() => toggleSection('trends')}
-            className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
-            title={
-              expandedSections.has('trends')
-                ? 'Ocultar seção'
-                : 'Expandir seção'
-            }
-          >
-            {expandedSections.has('trends') ? (
-              <EyeOff className="w-4 h-4" />
-            ) : (
-              <Eye className="w-4 h-4" />
-            )}
+          <button type="button" onClick={() => toggleSection('trends')} className="p-2 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary hover:text-theme-secondary dark:hover:text-gray-300 dark:text-gray-600 hover:card-theme dark:hover:bg-gray-700 rounded-md transition-colors" title={expandedSections.has('trends') ? 'Ocultar seção' : 'Expandir seção'}>
+            {expandedSections.has('trends') ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
         </div>
       </div>
 
-      {expandedSections.has('trends') && (
-        <div className="p-6 space-y-6">
+      {expandedSections.has('trends') && <div className="p-6 space-y-6">
           {/* Análise de tendências com Dark Mode */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-5 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
@@ -571,11 +366,7 @@ const FluxoSummaryPanel = ({
                 {formatPercentage(metrics.tendenciaReceitas)}
               </div>
               <p className="text-sm text-green-700 dark:text-green-400 mt-2">
-                {metrics.tendenciaReceitas > 0
-                  ? '📈 Crescimento'
-                  : metrics.tendenciaReceitas < 0
-                    ? '📉 Declínio'
-                    : '➡️ Estável'}
+                {metrics.tendenciaReceitas > 0 ? '📈 Crescimento' : metrics.tendenciaReceitas < 0 ? '📉 Declínio' : '➡️ Estável'}
               </p>
             </div>
 
@@ -590,11 +381,7 @@ const FluxoSummaryPanel = ({
                 {formatPercentage(metrics.tendenciaDespesas)}
               </div>
               <p className="text-sm text-red-700 dark:text-red-400 mt-2">
-                {metrics.tendenciaDespesas > 0
-                  ? '📈 Aumento'
-                  : metrics.tendenciaDespesas < 0
-                    ? '📉 Redução'
-                    : '➡️ Estável'}
+                {metrics.tendenciaDespesas > 0 ? '📈 Aumento' : metrics.tendenciaDespesas < 0 ? '📉 Redução' : '➡️ Estável'}
               </p>
             </div>
 
@@ -609,57 +396,52 @@ const FluxoSummaryPanel = ({
                 {formatPercentage(metrics.tendenciaSaldo)}
               </div>
               <p className="text-sm text-blue-700 dark:text-blue-400 mt-2">
-                {metrics.tendenciaSaldo > 0
-                  ? '✅ Melhoria'
-                  : metrics.tendenciaSaldo < 0
-                    ? '⚠️ Deterioração'
-                    : '➡️ Estável'}
+                {metrics.tendenciaSaldo > 0 ? '✅ Melhoria' : metrics.tendenciaSaldo < 0 ? '⚠️ Deterioração' : '➡️ Estável'}
               </p>
             </div>
           </div>
 
           {/* Estatísticas adicionais com Dark Mode */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg hover:shadow-md transition-shadow">
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">
+            <div className="text-center p-4 bg-light-bg dark:bg-dark-bg dark:bg-gray-700/50 border border-light-border dark:border-dark-border rounded-lg hover:shadow-md transition-shadow">
+              <div className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary">
                 {metrics.diasPositivos}
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
                 Dias Positivos
               </div>
             </div>
 
-            <div className="text-center p-4 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg hover:shadow-md transition-shadow">
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">
+            <div className="text-center p-4 bg-light-bg dark:bg-dark-bg dark:bg-gray-700/50 border border-light-border dark:border-dark-border rounded-lg hover:shadow-md transition-shadow">
+              <div className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary">
                 {metrics.diasNegativos}
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
                 Dias Negativos
               </div>
             </div>
 
-            <div className="text-center p-4 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg hover:shadow-md transition-shadow">
-              <div className="text-xl font-bold text-gray-900 dark:text-white">
+            <div className="text-center p-4 bg-light-bg dark:bg-dark-bg dark:bg-gray-700/50 border border-light-border dark:border-dark-border rounded-lg hover:shadow-md transition-shadow">
+              <div className="text-xl font-bold text-theme-primary dark:text-dark-text-primary">
                 {formatCurrency(metrics.maiorReceita)}
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
                 Maior Receita
               </div>
             </div>
 
-            <div className="text-center p-4 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg hover:shadow-md transition-shadow">
-              <div className="text-xl font-bold text-gray-900 dark:text-white">
+            <div className="text-center p-4 bg-light-bg dark:bg-dark-bg dark:bg-gray-700/50 border border-light-border dark:border-dark-border rounded-lg hover:shadow-md transition-shadow">
+              <div className="text-xl font-bold text-theme-primary dark:text-dark-text-primary">
                 {formatCurrency(metrics.maiorDespesa)}
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
                 Maior Despesa
               </div>
             </div>
           </div>
 
           {/* Alertas e recomendações com Dark Mode */}
-          {metrics.runwayDays < 30 && metrics.runwayDays > 0 && (
-            <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+          {metrics.runwayDays < 30 && metrics.runwayDays > 0 && <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
               <div className="flex items-start space-x-3">
                 <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
                 <div>
@@ -673,124 +455,83 @@ const FluxoSummaryPanel = ({
                   </p>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
+            </div>}
+        </div>}
+    </div>;
 
   // Renderizar cabeçalho do painel com Dark Mode
-  const renderPanelHeader = () => (
-    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-6">
+  const renderPanelHeader = () => <div className="card-theme dark:bg-dark-surface border-b border-light-border dark:border-dark-border p-6">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary">
             Resumo Financeiro
           </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
             Análise completa do fluxo de caixa e indicadores financeiros
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <DateRangePicker
-            value={dateRange}
-            onChange={onDateRangeChange}
-            className="w-full sm:w-64"
-          />
+          <DateRangePicker value={dateRange} onChange={onDateRangeChange} className="w-full sm:w-64" />
 
-          <button
-            type="button"
-            onClick={() => onRefreshData && onRefreshData()}
-            disabled={loading}
-            className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors disabled:opacity-50"
-            title="Atualizar dados"
-          >
+          <button type="button" onClick={() => onRefreshData && onRefreshData()} disabled={loading} className="p-2 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary hover:card-theme dark:hover:bg-gray-700 rounded-md transition-colors disabled:opacity-50" title="Atualizar dados">
             <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
           </button>
 
-          {onExportData && (
-            <button
-              type="button"
-              onClick={() => onExportData('full')}
-              className="flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors shadow-sm"
-            >
+          {onExportData && <button type="button" onClick={() => onExportData('full')} className="flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-500 text-dark-text-primary rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors shadow-sm">
               <Download className="w-4 h-4 mr-2" />
               Exportar
-            </button>
-          )}
+            </button>}
 
-          {onOpenSettings && (
-            <button
-              type="button"
-              onClick={() => onOpenSettings()}
-              className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
-              title="Configurações"
-            >
+          {onOpenSettings && <button type="button" onClick={() => onOpenSettings()} className="p-2 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary hover:card-theme dark:hover:bg-gray-700 rounded-md transition-colors" title="Configurações">
               <Settings className="w-5 h-5" />
-            </button>
-          )}
+            </button>}
         </div>
       </div>
-    </div>
-  );
-
+    </div>;
   const containerClasses = `bg-gray-50 dark:bg-gray-900 min-h-full ${className}`;
-
   if (loading && (!cashflowData || cashflowData.length === 0)) {
-    return (
-      <div className={containerClasses}>
+    return <div className={containerClasses}>
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <div className="relative">
               <RefreshCw className="w-12 h-12 animate-spin mx-auto mb-4 text-blue-500 dark:text-blue-400" />
               <div className="absolute inset-0 w-12 h-12 mx-auto bg-blue-500/10 dark:bg-blue-400/10 rounded-full animate-ping"></div>
             </div>
-            <p className="text-gray-600 dark:text-gray-400 font-medium">
+            <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted font-medium">
               Carregando dados financeiros...
             </p>
-            <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
+            <p className="text-sm text-theme-secondary dark:text-theme-secondary mt-2">
               Isso pode levar alguns segundos
             </p>
           </div>
         </div>
-      </div>
-    );
+      </div>;
   }
 
   // ✅ Melhor tratamento: apenas exibir erro se for um erro real, não falta de dados
   if (error && typeof error === 'string' && error.length > 0) {
-    return (
-      <div className={containerClasses}>
+    return <div className={containerClasses}>
         <div className="flex items-center justify-center h-96">
           <div className="text-center max-w-md mx-auto p-6">
             <div className="bg-red-50 dark:bg-red-900/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <AlertTriangle className="w-8 h-8 text-red-500 dark:text-red-400" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-2">
               Erro ao carregar dados
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              {error ||
-                'Não foi possível carregar os dados financeiros. Verifique sua conexão e tente novamente.'}
+            <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-6">
+              {error || 'Não foi possível carregar os dados financeiros. Verifique sua conexão e tente novamente.'}
             </p>
-            <button
-              type="button"
-              onClick={() => onRefreshData && onRefreshData()}
-              className="px-6 py-3 bg-blue-600 dark:bg-blue-500 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors shadow-sm inline-flex items-center"
-            >
+            <button type="button" onClick={() => onRefreshData && onRefreshData()} className="px-6 py-3 bg-blue-600 dark:bg-blue-500 text-dark-text-primary rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors shadow-sm inline-flex items-center">
               <RefreshCw className="w-4 h-4 mr-2" />
               Tentar Novamente
             </button>
           </div>
         </div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className={containerClasses}>
+  return <div className={containerClasses}>
       {/* Cabeçalho */}
       {renderPanelHeader()}
 
@@ -805,121 +546,100 @@ const FluxoSummaryPanel = ({
         {/* Análises */}
         {showTrendAnalysis && renderAnalysisSection()}
       </div>
-    </div>
-  );
+    </div>;
 };
-
 FluxoSummaryPanel.propTypes = {
   /**
    * Dados do fluxo de caixa
    */
-  cashflowData: PropTypes.arrayOf(
-    PropTypes.shape({
-      date: PropTypes.string.isRequired,
-      inflows: PropTypes.number,
-      outflows: PropTypes.number,
-      balance: PropTypes.number,
-      tipo: PropTypes.string,
-    })
-  ),
-
+  cashflowData: PropTypes.arrayOf(PropTypes.shape({
+    date: PropTypes.string.isRequired,
+    inflows: PropTypes.number,
+    outflows: PropTypes.number,
+    balance: PropTypes.number,
+    tipo: PropTypes.string
+  })),
   /**
    * Dados do período anterior para comparação
    */
   periodComparison: PropTypes.shape({
     cashflowData: PropTypes.array,
-    label: PropTypes.string,
+    label: PropTypes.string
   }),
-
   /**
    * Range de datas
    */
   dateRange: PropTypes.shape({
     startDate: PropTypes.instanceOf(Date),
-    endDate: PropTypes.instanceOf(Date),
+    endDate: PropTypes.instanceOf(Date)
   }),
-
   /**
    * Callback para mudança de período
    */
   onDateRangeChange: PropTypes.func,
-
   /**
    * Modo de visualização do gráfico
    */
   chartViewMode: PropTypes.oneOf(['combined', 'bars', 'line']),
-
   /**
    * Callback para mudança do modo do gráfico
    */
   onChartViewModeChange: PropTypes.func,
-
   /**
    * Mostrar período anterior
    */
   showPreviousPeriod: PropTypes.bool,
-
   /**
    * Layout dos KPIs
    */
   kpiLayout: PropTypes.oneOf(['grid', 'horizontal']),
-
   /**
    * Mostrar análise de tendências
    */
   showTrendAnalysis: PropTypes.bool,
-
   /**
    * Mostrar projeções
    */
   showProjections: PropTypes.bool,
-
   /**
    * Dias para projeção
    */
   projectionDays: PropTypes.number,
-
   /**
    * Callback para exportar dados
    */
   onExportData: PropTypes.func,
-
   /**
    * Callback para atualizar dados
    */
   onRefreshData: PropTypes.func,
-
   /**
    * Callback para abrir configurações
    */
   onOpenSettings: PropTypes.func,
-
   /**
    * Estado de carregamento
    */
   loading: PropTypes.bool,
-
   /**
    * Erro nos dados
    */
   error: PropTypes.string,
-
   /**
    * Modo compacto
    */
   compactMode: PropTypes.bool,
-
   /**
    * Classes CSS adicionais
    */
-  className: PropTypes.string,
+  className: PropTypes.string
 };
 
 // Componente de preview para demonstração
 export const FluxoSummaryPanelPreview = () => {
   const [dateRange, setDateRange] = useState({
     startDate: new Date(2024, 0, 1),
-    endDate: new Date(2024, 2, 31),
+    endDate: new Date(2024, 2, 31)
   });
   const [chartViewMode, setChartViewMode] = useState('combined');
   const [showProjections, setShowProjections] = useState(false);
@@ -928,76 +648,46 @@ export const FluxoSummaryPanelPreview = () => {
   const mockData = useMemo(() => {
     const data = [];
     const startDate = new Date(2024, 0, 1);
-
     for (let i = 0; i < 90; i++) {
       const date = addDays(startDate, i);
       const baseInflow = 1000 + Math.sin(i / 30) * 500;
       const baseOutflow = 800 + Math.cos(i / 20) * 300;
-      const variance = (i * 7) % 400; // Usar função determinística
+      const variance = i * 7 % 400; // Usar função determinística
 
       data.push({
         date: format(date, 'yyyy-MM-dd'),
         inflows: baseInflow + variance,
         outflows: baseOutflow + variance * 0.5,
-        balance: baseInflow - baseOutflow + (variance - 200),
+        balance: baseInflow - baseOutflow + (variance - 200)
       });
     }
-
     return data;
   }, []);
-
-  const mockPreviousPeriod = useMemo(
-    () => ({
-      cashflowData: mockData.map(item => ({
-        ...item,
-        inflows: item.inflows * 0.9,
-        outflows: item.outflows * 0.85,
-      })),
-      label: 'Período anterior',
-    }),
-    [mockData]
-  );
-
+  const mockPreviousPeriod = useMemo(() => ({
+    cashflowData: mockData.map(item => ({
+      ...item,
+      inflows: item.inflows * 0.9,
+      outflows: item.outflows * 0.85
+    })),
+    label: 'Período anterior'
+  }), [mockData]);
   const handleAction = (action, data) => {
     // eslint-disable-next-line no-console
     console.log(`Ação: ${action}`, data);
   };
-
-  return (
-    <div className="space-y-6 p-4 max-w-7xl">
+  return <div className="space-y-6 p-4 max-w-7xl">
       <h3 className="text-lg font-semibold">FluxoSummaryPanel Preview</h3>
 
       {/* Painel completo */}
       <div className="h-screen">
-        <FluxoSummaryPanel
-          cashflowData={mockData}
-          periodComparison={mockPreviousPeriod}
-          dateRange={dateRange}
-          onDateRangeChange={setDateRange}
-          chartViewMode={chartViewMode}
-          onChartViewModeChange={setChartViewMode}
-          showProjections={showProjections}
-          onShowProjectionsChange={setShowProjections}
-          showTrendAnalysis={true}
-          onExportData={type => handleAction('Export Data', type)}
-          onRefreshData={() => handleAction('Refresh Data')}
-          onOpenSettings={() => handleAction('Open Settings')}
-          onDrillDown={data => handleAction('Drill Down', data)}
-        />
+        <FluxoSummaryPanel cashflowData={mockData} periodComparison={mockPreviousPeriod} dateRange={dateRange} onDateRangeChange={setDateRange} chartViewMode={chartViewMode} onChartViewModeChange={setChartViewMode} showProjections={showProjections} onShowProjectionsChange={setShowProjections} showTrendAnalysis={true} onExportData={type => handleAction('Export Data', type)} onRefreshData={() => handleAction('Refresh Data')} onOpenSettings={() => handleAction('Open Settings')} onDrillDown={data => handleAction('Drill Down', data)} />
       </div>
 
       {/* Versão compacta */}
       <div className="h-96">
         <h4 className="text-md font-medium mb-2">Modo compacto</h4>
-        <FluxoSummaryPanel
-          cashflowData={mockData.slice(0, 30)}
-          compactMode={true}
-          showTrendAnalysis={false}
-          kpiLayout="horizontal"
-        />
+        <FluxoSummaryPanel cashflowData={mockData.slice(0, 30)} compactMode={true} showTrendAnalysis={false} kpiLayout="horizontal" />
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default FluxoSummaryPanel;

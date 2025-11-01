@@ -42,7 +42,6 @@ export function BankAccountsPage() {
   // Buscar contas e saldo consolidado
   const fetchAccounts = async () => {
     if (!selectedUnit?.id) return;
-
     setLoading(true);
     try {
       const accountsData = await bankAccountsService.getBankAccounts(
@@ -61,13 +60,11 @@ export function BankAccountsPage() {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     if (selectedUnit?.id) {
       fetchAccounts();
     }
   }, [selectedUnit, showInactive]);
-
   const formatCurrency = value => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -76,7 +73,6 @@ export function BankAccountsPage() {
       maximumFractionDigits: 2,
     }).format(value || 0);
   };
-
   return (
     <div className="min-h-screen bg-light-bg dark:bg-dark-bg p-6">
       {/* Header */}
@@ -106,7 +102,7 @@ export function BankAccountsPage() {
             </button>
             <button
               onClick={() => setModalCreate(true)}
-              className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:from-green-700 hover:to-green-800 transition-all font-semibold shadow-lg hover:shadow-xl hover:scale-105"
+              className="flex items-center gap-2 px-5 py-3 bg-gradient-success text-dark-text-primary rounded-xl hover:opacity-90 transition-all font-semibold shadow-lg hover:shadow-xl hover:scale-105"
             >
               <Plus className="w-5 h-5" />
               Nova Conta
@@ -128,7 +124,7 @@ export function BankAccountsPage() {
 
             <button
               onClick={() => setShowBalances(!showBalances)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 card-theme dark:bg-dark-surface rounded-lg hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-700 transition-colors"
             >
               {showBalances ? (
                 <>
@@ -145,7 +141,7 @@ export function BankAccountsPage() {
 
             <button
               onClick={() => setShowInactive(!showInactive)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 card-theme dark:bg-dark-surface rounded-lg hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-700 transition-colors"
             >
               <CheckCircle className="w-4 h-4" />
               {showInactive ? 'Apenas Ativas' : 'Incluir Inativas'}
@@ -156,12 +152,12 @@ export function BankAccountsPage() {
 
       {/* Saldo Consolidado */}
       {consolidatedBalance && (
-        <div className="card-theme p-8 rounded-3xl shadow-2xl mb-8 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-2 border-blue-200 dark:border-blue-800">
+        <div className="card-theme p-8 rounded-3xl shadow-2xl mb-8 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800">
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3 mb-3">
                 <div className="p-3 bg-blue-500 rounded-xl shadow-lg">
-                  <DollarSign className="w-7 h-7 text-white" />
+                  <DollarSign className="w-7 h-7 text-dark-text-primary" />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-text-light-primary dark:text-text-dark-primary">
@@ -178,7 +174,7 @@ export function BankAccountsPage() {
                   <p className="text-sm text-text-light-secondary dark:text-text-dark-secondary mb-1">
                     Saldo Inicial
                   </p>
-                  <p className="text-2xl font-bold text-gray-700 dark:text-gray-300">
+                  <p className="text-2xl font-bold text-gray-700 dark:text-gray-300 dark:text-gray-600">
                     {showBalances
                       ? formatCurrency(
                           consolidatedBalance.total_initial_balance
@@ -236,8 +232,8 @@ export function BankAccountsPage() {
         </div>
       ) : accounts.length === 0 ? (
         <div className="card-theme p-12 rounded-3xl shadow-xl text-center">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-3xl mb-6">
-            <Wallet className="w-10 h-10 text-gray-400 dark:text-gray-600" />
+          <div className="inline-flex items-center justify-center w-20 h-20 card-theme dark:bg-dark-surface rounded-3xl mb-6">
+            <Wallet className="w-10 h-10 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary" />
           </div>
           <h3 className="text-2xl font-bold text-text-light-primary dark:text-text-dark-primary mb-3">
             Nenhuma conta cadastrada
@@ -247,7 +243,7 @@ export function BankAccountsPage() {
           </p>
           <button
             onClick={() => setModalCreate(true)}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all font-semibold shadow-lg"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-primary text-dark-text-primary rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all font-semibold shadow-lg"
           >
             <Plus className="w-5 h-5" />
             Cadastrar Primeira Conta
@@ -315,23 +311,17 @@ const BankAccountCard = ({
       maximumFractionDigits: 2,
     }).format(value || 0);
   };
-
   const balanceVariation = account.current_balance - account.initial_balance;
   const isPositive = balanceVariation >= 0;
-
   return (
     <div
-      className={`card-theme p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 ${
-        account.is_active
-          ? 'border-light-border dark:border-dark-border'
-          : 'border-red-300 dark:border-red-800 opacity-60'
-      }`}
+      className={`card-theme p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 ${account.is_active ? 'border-light-border dark:border-dark-border' : 'border-red-300 dark:border-red-800 opacity-60'}`}
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-md">
-            <Wallet className="w-6 h-6 text-white" />
+          <div className="p-3 bg-blue-500 rounded-xl shadow-md">
+            <Wallet className="w-6 h-6 text-dark-text-primary" />
           </div>
           <div>
             <h3 className="font-bold text-text-light-primary dark:text-text-dark-primary">
@@ -351,7 +341,7 @@ const BankAccountCard = ({
       </div>
 
       {/* Dados da Conta */}
-      <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+      <div className="mb-4 p-3 bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50 rounded-lg">
         <div className="grid grid-cols-2 gap-2 text-sm">
           <div>
             <span className="text-text-light-secondary dark:text-text-dark-secondary">
@@ -381,13 +371,13 @@ const BankAccountCard = ({
             </span>
             <button
               onClick={onEditBalance}
-              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+              className="p-1 hover:card-theme dark:hover:bg-gray-700 rounded transition-colors"
               title="Editar saldo inicial"
             >
               <Edit3 className="w-4 h-4 text-primary" />
             </button>
           </div>
-          <p className="text-lg font-bold text-gray-700 dark:text-gray-300">
+          <p className="text-lg font-bold text-gray-700 dark:text-gray-300 dark:text-gray-600">
             {showBalances ? formatCurrency(account.initial_balance) : '••••••'}
           </p>
         </div>
@@ -414,7 +404,7 @@ const BankAccountCard = ({
       </div>
 
       {/* Variação */}
-      <div className="mb-4 p-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-lg">
+      <div className="mb-4 p-3 bg-gradient-light dark:from-gray-800 dark:to-gray-700 rounded-lg">
         <div className="flex items-center justify-between">
           <span className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
             Variação
@@ -426,11 +416,7 @@ const BankAccountCard = ({
               <TrendingDown className="w-4 h-4 text-red-600 dark:text-red-400" />
             )}
             <span
-              className={`font-bold ${
-                isPositive
-                  ? 'text-green-600 dark:text-green-400'
-                  : 'text-red-600 dark:text-red-400'
-              }`}
+              className={`font-bold ${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
             >
               {showBalances
                 ? formatCurrency(Math.abs(balanceVariation))
@@ -451,10 +437,10 @@ const BankAccountCard = ({
         </button>
         <button
           onClick={onRefresh}
-          className="px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+          className="px-3 py-2 card-theme dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
           title="Recalcular saldo"
         >
-          <RefreshCw className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+          <RefreshCw className="w-4 h-4 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted" />
         </button>
       </div>
     </div>
@@ -467,23 +453,20 @@ const EditBalanceModal = ({ account, onClose, onSuccess }) => {
   const [reason, setReason] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
   const handleSubmit = async e => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     try {
       const { data, error: updateError } =
         await bankAccountsService.updateInitialBalance(
           account.id,
           parseFloat(newValue),
-          null, // userId será pego do auth context
+          null,
+          // userId será pego do auth context
           reason || 'Edição manual do saldo inicial'
         );
-
       if (updateError) throw new Error(updateError);
-
       onSuccess();
       onClose();
     } catch (err) {
@@ -492,7 +475,6 @@ const EditBalanceModal = ({ account, onClose, onSuccess }) => {
       setLoading(false);
     }
   };
-
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="card-theme max-w-md w-full p-6 rounded-2xl shadow-2xl">
@@ -502,7 +484,7 @@ const EditBalanceModal = ({ account, onClose, onSuccess }) => {
           </h3>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2 hover:card-theme dark:hover:bg-gray-700 rounded-lg transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -528,7 +510,7 @@ const EditBalanceModal = ({ account, onClose, onSuccess }) => {
               step="0.01"
               value={newValue}
               onChange={e => setNewValue(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border-2 border-light-border dark:border-dark-border bg-light-surface dark:bg-dark-surface text-text-light-primary dark:text-text-dark-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+              className="w-full px-4 py-3 rounded-lg border-2 border-light-border dark:border-dark-border card-theme text-text-light-primary dark:text-text-dark-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
               required
             />
           </div>
@@ -541,7 +523,7 @@ const EditBalanceModal = ({ account, onClose, onSuccess }) => {
               value={reason}
               onChange={e => setReason(e.target.value)}
               rows={3}
-              className="w-full px-4 py-3 rounded-lg border-2 border-light-border dark:border-dark-border bg-light-surface dark:bg-dark-surface text-text-light-primary dark:text-text-dark-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary resize-none"
+              className="w-full px-4 py-3 rounded-lg border-2 border-light-border dark:border-dark-border card-theme text-text-light-primary dark:text-text-dark-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary resize-none"
               placeholder="Ex: Ajuste de saldo após auditoria"
             />
           </div>
@@ -557,7 +539,7 @@ const EditBalanceModal = ({ account, onClose, onSuccess }) => {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-semibold"
+              className="flex-1 px-4 py-3 card-theme dark:bg-gray-700 text-gray-700 dark:text-gray-300 dark:text-gray-600 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-semibold"
             >
               Cancelar
             </button>
@@ -579,7 +561,6 @@ const EditBalanceModal = ({ account, onClose, onSuccess }) => {
 const BalanceHistoryModal = ({ account, onClose }) => {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const fetchHistory = async () => {
       setLoading(true);
@@ -595,17 +576,14 @@ const BalanceHistoryModal = ({ account, onClose }) => {
         setLoading(false);
       }
     };
-
     fetchHistory();
   }, [account.id]);
-
   const formatCurrency = value => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
     }).format(value || 0);
   };
-
   const formatDate = date => {
     return new Date(date).toLocaleString('pt-BR', {
       day: '2-digit',
@@ -615,7 +593,6 @@ const BalanceHistoryModal = ({ account, onClose }) => {
       minute: '2-digit',
     });
   };
-
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="card-theme max-w-2xl w-full p-6 rounded-2xl shadow-2xl max-h-[80vh] overflow-y-auto">
@@ -630,7 +607,7 @@ const BalanceHistoryModal = ({ account, onClose }) => {
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2 hover:card-theme dark:hover:bg-gray-700 rounded-lg transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -647,7 +624,7 @@ const BalanceHistoryModal = ({ account, onClose }) => {
           </div>
         ) : history.length === 0 ? (
           <div className="text-center py-12">
-            <Clock className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+            <Clock className="w-12 h-12 text-light-text-muted dark:text-dark-text-muted mx-auto mb-3" />
             <p className="text-text-light-secondary dark:text-text-dark-secondary">
               Nenhuma alteração registrada
             </p>
@@ -657,7 +634,7 @@ const BalanceHistoryModal = ({ account, onClose }) => {
             {history.map(log => (
               <div
                 key={log.id}
-                className="p-4 border-2 border-light-border dark:border-dark-border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                className="p-4 border-2 border-light-border dark:border-dark-border rounded-lg hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-dark-surface/50 transition-colors"
               >
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-2">
@@ -682,7 +659,7 @@ const BalanceHistoryModal = ({ account, onClose }) => {
                       {formatCurrency(log.old_value)}
                     </p>
                   </div>
-                  <TrendingUp className="w-5 h-5 text-gray-400" />
+                  <TrendingUp className="w-5 h-5 text-light-text-muted dark:text-dark-text-muted" />
                   <div>
                     <p className="text-xs text-text-light-secondary dark:text-text-dark-secondary mb-1">
                       Novo Valor

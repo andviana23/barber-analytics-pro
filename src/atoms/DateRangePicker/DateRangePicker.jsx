@@ -10,22 +10,9 @@
 
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import {
-  format,
-  startOfDay,
-  endOfDay,
-  startOfWeek,
-  endOfWeek,
-  startOfMonth,
-  endOfMonth,
-  subDays,
-  addDays,
-  parseISO,
-  isValid,
-} from 'date-fns';
+import { format, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subDays, addDays, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Calendar, ChevronDown, X } from 'lucide-react';
-
 const DateRangePicker = ({
   value,
   onChange,
@@ -33,7 +20,7 @@ const DateRangePicker = ({
   placeholder = 'Selecione o período',
   className = '',
   disabled = false,
-  clearable = true,
+  clearable = true
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState(null);
@@ -41,96 +28,90 @@ const DateRangePicker = ({
   const [customEndDate, setCustomEndDate] = useState('');
 
   // Presets de período
-  const datePresets = [
-    {
-      id: 'today',
-      label: 'Hoje',
-      getValue: () => ({
-        startDate: startOfDay(new Date()),
-        endDate: endOfDay(new Date()),
+  const datePresets = [{
+    id: 'today',
+    label: 'Hoje',
+    getValue: () => ({
+      startDate: startOfDay(new Date()),
+      endDate: endOfDay(new Date())
+    })
+  }, {
+    id: 'yesterday',
+    label: 'Ontem',
+    getValue: () => {
+      const yesterday = subDays(new Date(), 1);
+      return {
+        startDate: startOfDay(yesterday),
+        endDate: endOfDay(yesterday)
+      };
+    }
+  }, {
+    id: 'thisWeek',
+    label: 'Esta semana',
+    getValue: () => ({
+      startDate: startOfWeek(new Date(), {
+        locale: ptBR
       }),
-    },
-    {
-      id: 'yesterday',
-      label: 'Ontem',
-      getValue: () => {
-        const yesterday = subDays(new Date(), 1);
-        return {
-          startDate: startOfDay(yesterday),
-          endDate: endOfDay(yesterday),
-        };
-      },
-    },
-    {
-      id: 'thisWeek',
-      label: 'Esta semana',
-      getValue: () => ({
-        startDate: startOfWeek(new Date(), { locale: ptBR }),
-        endDate: endOfWeek(new Date(), { locale: ptBR }),
-      }),
-    },
-    {
-      id: 'lastWeek',
-      label: 'Semana passada',
-      getValue: () => {
-        const lastWeek = subDays(new Date(), 7);
-        return {
-          startDate: startOfWeek(lastWeek, { locale: ptBR }),
-          endDate: endOfWeek(lastWeek, { locale: ptBR }),
-        };
-      },
-    },
-    {
-      id: 'thisMonth',
-      label: 'Este mês',
-      getValue: () => ({
-        startDate: startOfMonth(new Date()),
-        endDate: endOfMonth(new Date()),
-      }),
-    },
-    {
-      id: 'lastMonth',
-      label: 'Mês passado',
-      getValue: () => {
-        const lastMonth = subDays(startOfMonth(new Date()), 1);
-        return {
-          startDate: startOfMonth(lastMonth),
-          endDate: endOfMonth(lastMonth),
-        };
-      },
-    },
-    {
-      id: 'last30Days',
-      label: 'Últimos 30 dias',
-      getValue: () => ({
-        startDate: startOfDay(subDays(new Date(), 29)),
-        endDate: endOfDay(new Date()),
-      }),
-    },
-    {
-      id: 'last90Days',
-      label: 'Últimos 90 dias',
-      getValue: () => ({
-        startDate: startOfDay(subDays(new Date(), 89)),
-        endDate: endOfDay(new Date()),
-      }),
-    },
-  ];
+      endDate: endOfWeek(new Date(), {
+        locale: ptBR
+      })
+    })
+  }, {
+    id: 'lastWeek',
+    label: 'Semana passada',
+    getValue: () => {
+      const lastWeek = subDays(new Date(), 7);
+      return {
+        startDate: startOfWeek(lastWeek, {
+          locale: ptBR
+        }),
+        endDate: endOfWeek(lastWeek, {
+          locale: ptBR
+        })
+      };
+    }
+  }, {
+    id: 'thisMonth',
+    label: 'Este mês',
+    getValue: () => ({
+      startDate: startOfMonth(new Date()),
+      endDate: endOfMonth(new Date())
+    })
+  }, {
+    id: 'lastMonth',
+    label: 'Mês passado',
+    getValue: () => {
+      const lastMonth = subDays(startOfMonth(new Date()), 1);
+      return {
+        startDate: startOfMonth(lastMonth),
+        endDate: endOfMonth(lastMonth)
+      };
+    }
+  }, {
+    id: 'last30Days',
+    label: 'Últimos 30 dias',
+    getValue: () => ({
+      startDate: startOfDay(subDays(new Date(), 29)),
+      endDate: endOfDay(new Date())
+    })
+  }, {
+    id: 'last90Days',
+    label: 'Últimos 90 dias',
+    getValue: () => ({
+      startDate: startOfDay(subDays(new Date(), 89)),
+      endDate: endOfDay(new Date())
+    })
+  }];
 
   // Detectar preset ativo baseado no valor atual
   useEffect(() => {
     if (value?.startDate && value?.endDate) {
       const currentStart = new Date(value.startDate).getTime();
       const currentEnd = new Date(value.endDate).getTime();
-
       const matchingPreset = datePresets.find(preset => {
         const presetValue = preset.getValue();
-        return (
-          presetValue.startDate.getTime() === currentStart &&
-          presetValue.endDate.getTime() === currentEnd
-        );
+        return presetValue.startDate.getTime() === currentStart && presetValue.endDate.getTime() === currentEnd;
       });
-
       setSelectedPreset(matchingPreset?.id || 'custom');
 
       // Se é customizado, preencher campos
@@ -157,17 +138,14 @@ const DateRangePicker = ({
   // Aplicar datas customizadas
   const handleCustomDateApply = () => {
     if (!customStartDate || !customEndDate) return;
-
     const startDate = parseISO(customStartDate);
     const endDate = parseISO(customEndDate);
-
     if (!isValid(startDate) || !isValid(endDate)) return;
     if (startDate > endDate) return;
-
     setSelectedPreset('custom');
     onChange({
       startDate: startOfDay(startDate),
-      endDate: endOfDay(endDate),
+      endDate: endOfDay(endDate)
     });
     setIsOpen(false);
   };
@@ -186,7 +164,6 @@ const DateRangePicker = ({
     if (!value?.startDate || !value?.endDate) {
       return placeholder;
     }
-
     const preset = datePresets.find(p => p.id === selectedPreset);
     if (preset) {
       return preset.label;
@@ -194,19 +171,16 @@ const DateRangePicker = ({
 
     // Formato customizado
     const startStr = format(new Date(value.startDate), 'dd/MM/yyyy', {
-      locale: ptBR,
+      locale: ptBR
     });
     const endStr = format(new Date(value.endDate), 'dd/MM/yyyy', {
-      locale: ptBR,
+      locale: ptBR
     });
-
     if (startStr === endStr) {
       return startStr;
     }
-
     return `${startStr} - ${endStr}`;
   };
-
   const containerClasses = `relative inline-block ${className}`;
   const triggerClasses = `
     flex items-center justify-between w-full px-3 py-2 text-sm border border-gray-300 rounded-md
@@ -214,262 +188,164 @@ const DateRangePicker = ({
     ${disabled ? 'bg-gray-50 cursor-not-allowed' : 'cursor-pointer'}
     ${value ? 'text-gray-900' : 'text-gray-500'}
   `;
-
-  return (
-    <div className={containerClasses}>
+  return <div className={containerClasses}>
       {/* Trigger - Usando div para evitar button aninhado */}
-      <div
-        className={triggerClasses}
-        onClick={() => !disabled && setIsOpen(!isOpen)}
-        role="button"
-        tabIndex={disabled ? -1 : 0}
-        onKeyDown={e => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            !disabled && setIsOpen(!isOpen);
-          }
-        }}
-        aria-disabled={disabled}
-        aria-expanded={isOpen}
-      >
+      <div className={triggerClasses} onClick={() => !disabled && setIsOpen(!isOpen)} role="button" tabIndex={disabled ? -1 : 0} onKeyDown={e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        !disabled && setIsOpen(!isOpen);
+      }
+    }} aria-disabled={disabled} aria-expanded={isOpen}>
         <div className="flex items-center">
-          <Calendar className="w-4 h-4 mr-2 text-gray-400" />
+          <Calendar className="w-4 h-4 mr-2 text-light-text-muted dark:text-dark-text-muted" />
           <span className="truncate">{formatDisplayValue()}</span>
         </div>
 
         <div className="flex items-center ml-2">
-          {clearable && value && (
-            <button
-              type="button"
-              onClick={e => {
-                e.stopPropagation();
-                handleClear(e);
-              }}
-              className="p-0.5 hover:bg-gray-100 rounded"
-              title="Limpar"
-            >
-              <X className="w-3 h-3 text-gray-400" />
-            </button>
-          )}
-          <ChevronDown
-            className={`w-4 h-4 ml-1 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          />
+          {clearable && value && <button type="button" onClick={e => {
+          e.stopPropagation();
+          handleClear(e);
+        }} className="p-0.5 hover:card-theme rounded" title="Limpar">
+              <X className="w-3 h-3 text-light-text-muted dark:text-dark-text-muted" />
+            </button>}
+          <ChevronDown className={`w-4 h-4 ml-1 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </div>
       </div>
 
       {/* Dropdown */}
-      {isOpen && (
-        <div className="absolute z-50 w-80 mt-1 bg-white border border-gray-200 rounded-md shadow-lg">
+      {isOpen && <div className="absolute z-50 w-80 mt-1 card-theme border border-light-border dark:border-dark-border rounded-md shadow-lg">
           <div className="p-4">
             {/* Presets */}
-            {presets && (
-              <div className="mb-4">
-                <h4 className="text-sm font-medium text-gray-700 mb-2">
+            {presets && <div className="mb-4">
+                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                   Períodos Rápidos
                 </h4>
                 <div className="grid grid-cols-2 gap-2">
-                  {datePresets.map(preset => (
-                    <button
-                      key={preset.id}
-                      type="button"
-                      onClick={() => handlePresetSelect(preset.id)}
-                      className={`
+                  {datePresets.map(preset => <button key={preset.id} type="button" onClick={() => handlePresetSelect(preset.id)} className={`
                         px-3 py-2 text-xs rounded-md text-left transition-colors
-                        ${
-                          selectedPreset === preset.id
-                            ? 'bg-blue-100 text-blue-700 border border-blue-200'
-                            : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-transparent'
-                        }
-                      `}
-                    >
+                        ${selectedPreset === preset.id ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-transparent'}
+                      `}>
                       {preset.label}
-                    </button>
-                  ))}
+                    </button>)}
                 </div>
-              </div>
-            )}
+              </div>}
 
             {/* Divisor */}
-            {presets && (
-              <div className="border-t border-gray-200 mb-4 -mx-4"></div>
-            )}
+            {presets && <div className="border-t border-light-border dark:border-dark-border mb-4 -mx-4"></div>}
 
             {/* Datas customizadas */}
             <div className="px-4 -mx-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-3">
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-3">
                 Período Personalizado
               </h4>
 
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                  <label className="block text-xs font-medium text-theme-secondary mb-1">
                     Data Inicial
                   </label>
-                  <input
-                    type="date"
-                    value={customStartDate}
-                    onChange={e => setCustomStartDate(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                  <input type="date" value={customStartDate} onChange={e => setCustomStartDate(e.target.value)} className="w-full px-3 py-2 text-sm border border-light-border dark:border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                  <label className="block text-xs font-medium text-theme-secondary mb-1">
                     Data Final
                   </label>
-                  <input
-                    type="date"
-                    value={customEndDate}
-                    onChange={e => setCustomEndDate(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                  <input type="date" value={customEndDate} onChange={e => setCustomEndDate(e.target.value)} className="w-full px-3 py-2 text-sm border border-light-border dark:border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
 
                 <div className="flex justify-between pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsOpen(false)}
-                    className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800"
-                  >
+                  <button type="button" onClick={() => setIsOpen(false)} className="px-3 py-1.5 text-sm text-theme-secondary hover:text-theme-primary">
                     Cancelar
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={handleCustomDateApply}
-                    disabled={!customStartDate || !customEndDate}
-                    className="px-4 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
+                  <button type="button" onClick={handleCustomDateApply} disabled={!customStartDate || !customEndDate} className="px-4 py-1.5 text-sm bg-blue-600 text-dark-text-primary rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
                     Aplicar
                   </button>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        </div>}
 
       {/* Overlay */}
-      {isOpen && (
-        <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-      )}
-    </div>
-  );
+      {isOpen && <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />}
+    </div>;
 };
-
 DateRangePicker.propTypes = {
   /**
    * Valor atual do range selecionado
    */
   value: PropTypes.shape({
-    startDate: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.instanceOf(Date),
-    ]),
-    endDate: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.instanceOf(Date),
-    ]),
+    startDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
+    endDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)])
   }),
-
   /**
    * Callback quando o valor muda
    */
   onChange: PropTypes.func.isRequired,
-
   /**
    * Mostrar presets rápidos
    */
   presets: PropTypes.bool,
-
   /**
    * Placeholder quando nenhum valor selecionado
    */
   placeholder: PropTypes.string,
-
   /**
    * Classes CSS adicionais
    */
   className: PropTypes.string,
-
   /**
    * Componente desabilitado
    */
   disabled: PropTypes.bool,
-
   /**
    * Permite limpar seleção
    */
-  clearable: PropTypes.bool,
+  clearable: PropTypes.bool
 };
 
 // Componente de preview para demonstração
 export const DateRangePickerPreview = () => {
   const [selectedRange, setSelectedRange] = useState(null);
-
-  return (
-    <div className="space-y-4 p-4 max-w-md">
+  return <div className="space-y-4 p-4 max-w-md">
       <h3 className="text-lg font-semibold">DateRangePicker Preview</h3>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
           Selecione um período:
         </label>
-        <DateRangePicker
-          value={selectedRange}
-          onChange={setSelectedRange}
-          placeholder="Escolha o período"
-        />
+        <DateRangePicker value={selectedRange} onChange={setSelectedRange} placeholder="Escolha o período" />
       </div>
 
-      {selectedRange && (
-        <div className="mt-4 p-3 bg-gray-50 rounded-md">
-          <h4 className="text-sm font-medium text-gray-700 mb-2">
+      {selectedRange && <div className="mt-4 p-3 bg-light-bg dark:bg-dark-bg rounded-md">
+          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
             Valor selecionado:
           </h4>
-          <pre className="text-xs text-gray-600">
-            {JSON.stringify(
-              {
-                startDate: format(
-                  new Date(selectedRange.startDate),
-                  'yyyy-MM-dd'
-                ),
-                endDate: format(new Date(selectedRange.endDate), 'yyyy-MM-dd'),
-              },
-              null,
-              2
-            )}
+          <pre className="text-xs text-theme-secondary">
+            {JSON.stringify({
+          startDate: format(new Date(selectedRange.startDate), 'yyyy-MM-dd'),
+          endDate: format(new Date(selectedRange.endDate), 'yyyy-MM-dd')
+        }, null, 2)}
           </pre>
-        </div>
-      )}
+        </div>}
 
       {/* Versão sem presets */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
           Sem presets:
         </label>
-        <DateRangePicker
-          value={selectedRange}
-          onChange={setSelectedRange}
-          presets={false}
-          placeholder="Somente datas customizadas"
-        />
+        <DateRangePicker value={selectedRange} onChange={setSelectedRange} presets={false} placeholder="Somente datas customizadas" />
       </div>
 
       {/* Versão desabilitada */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
           Desabilitado:
         </label>
-        <DateRangePicker
-          value={selectedRange}
-          onChange={setSelectedRange}
-          disabled={true}
-          placeholder="Componente desabilitado"
-        />
+        <DateRangePicker value={selectedRange} onChange={setSelectedRange} disabled={true} placeholder="Componente desabilitado" />
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default DateRangePicker;

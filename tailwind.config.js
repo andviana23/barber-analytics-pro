@@ -64,6 +64,30 @@ export default {
         },
       },
 
+      // === GRADIENTES - DESIGN SYSTEM ===
+      backgroundImage: {
+        // Gradientes primários
+        'gradient-primary': 'linear-gradient(135deg, #1E8CFF 0%, #0072E0 100%)',
+        'gradient-primary-hover':
+          'linear-gradient(135deg, #0072E0 0%, #005BB5 100%)',
+
+        // Gradientes de feedback
+        'gradient-success': 'linear-gradient(135deg, #16A34A 0%, #059669 100%)',
+        'gradient-error': 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
+        'gradient-warning': 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+        'gradient-info': 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
+
+        // Gradientes especiais
+        'gradient-purple': 'linear-gradient(135deg, #A855F7 0%, #9333EA 100%)',
+        'gradient-orange': 'linear-gradient(135deg, #FB923C 0%, #F97316 100%)',
+        'gradient-cyan': 'linear-gradient(135deg, #06B6D4 0%, #0891B2 100%)',
+        'gradient-emerald': 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+
+        // Gradientes sutis (para backgrounds)
+        'gradient-light': 'linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%)',
+        'gradient-dark': 'linear-gradient(135deg, #1F2937 0%, #111827 100%)',
+      },
+
       transitionProperty: {
         colors:
           'color, background-color, border-color, text-decoration-color, fill, stroke',
@@ -71,6 +95,10 @@ export default {
 
       transitionDuration: {
         300: '300ms',
+      },
+
+      boxShadow: {
+        'glow-amber': '0 0 8px rgba(245, 158, 11, 0.5)',
       },
 
       animation: {

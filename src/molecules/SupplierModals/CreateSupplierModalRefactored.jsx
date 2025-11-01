@@ -36,7 +36,6 @@ import {
   FileText,
 } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
-
 const CreateSupplierModalRefactored = ({ isOpen, onClose, onSave, unitId }) => {
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -49,9 +48,7 @@ const CreateSupplierModalRefactored = ({ isOpen, onClose, onSave, unitId }) => {
     endereco: '',
     observacoes: '',
   });
-
   const [errors, setErrors] = useState({});
-
   if (!isOpen) return null;
 
   // Validações
@@ -59,41 +56,39 @@ const CreateSupplierModalRefactored = ({ isOpen, onClose, onSave, unitId }) => {
     const cleaned = value.replace(/\D/g, '');
     return cleaned.length === 11 || cleaned.length === 14;
   };
-
   const validateEmail = email => {
     if (!email) return true; // Email é opcional
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
-
   const validateForm = () => {
     const newErrors = {};
-
     if (!formData.nome.trim()) {
       newErrors.nome = 'Nome é obrigatório';
     }
-
     if (!formData.cpf_cnpj.trim()) {
       newErrors.cpf_cnpj = 'CPF/CNPJ é obrigatório';
     } else if (!validateCNPJ(formData.cpf_cnpj)) {
       newErrors.cpf_cnpj = 'CPF/CNPJ inválido';
     }
-
     if (formData.email && !validateEmail(formData.email)) {
       newErrors.email = 'Email inválido';
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => ({
+      ...prev,
+      [field]: value,
+    }));
     // Limpar erro do campo ao digitar
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: null }));
+      setErrors(prev => ({
+        ...prev,
+        [field]: null,
+      }));
     }
   };
-
   const formatCNPJ = value => {
     const cleaned = value.replace(/\D/g, '');
     if (cleaned.length <= 11) {
@@ -112,7 +107,6 @@ const CreateSupplierModalRefactored = ({ isOpen, onClose, onSave, unitId }) => {
       .replace(/(\d{4})(\d)/, '$1-$2')
       .replace(/(-\d{2})\d+?$/, '$1');
   };
-
   const formatPhone = value => {
     const cleaned = value.replace(/\D/g, '');
     if (cleaned.length <= 10) {
@@ -127,10 +121,8 @@ const CreateSupplierModalRefactored = ({ isOpen, onClose, onSave, unitId }) => {
       .replace(/(\d{5})(\d)/, '$1-$2')
       .replace(/(-\d{4})\d+?$/, '$1');
   };
-
   const handleSubmit = async e => {
     e.preventDefault();
-
     if (!validateForm()) {
       showToast({
         type: 'error',
@@ -139,9 +131,7 @@ const CreateSupplierModalRefactored = ({ isOpen, onClose, onSave, unitId }) => {
       });
       return;
     }
-
     setLoading(true);
-
     try {
       // Limpar formatação do CNPJ e telefone antes de enviar
       const cleanedData = {
@@ -149,9 +139,7 @@ const CreateSupplierModalRefactored = ({ isOpen, onClose, onSave, unitId }) => {
         cpf_cnpj: formData.cpf_cnpj.replace(/\D/g, ''),
         telefone: formData.telefone.replace(/\D/g, ''),
       };
-
       await onSave(cleanedData);
-
       showToast({
         type: 'success',
         message: 'Fornecedor cadastrado com sucesso!',
@@ -179,7 +167,6 @@ const CreateSupplierModalRefactored = ({ isOpen, onClose, onSave, unitId }) => {
       setLoading(false);
     }
   };
-
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn"
@@ -190,11 +177,11 @@ const CreateSupplierModalRefactored = ({ isOpen, onClose, onSave, unitId }) => {
         onClick={e => e.stopPropagation()}
       >
         {/* 🎯 Header Premium - DESIGN SYSTEM */}
-        <div className="bg-gradient-to-r from-blue-600/10 via-indigo-600/10 to-transparent dark:from-blue-600/20 dark:via-indigo-600/20 px-6 py-5 border-b-2 border-light-border dark:border-dark-border">
+        <div className="bg-blue-600/10 dark:bg-blue-600/20 px-6 py-5 border-b-2 border-light-border dark:border-dark-border">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
-                <Package className="w-6 h-6 text-white" />
+              <div className="p-3 bg-blue-500 dark:bg-indigo-600 rounded-xl shadow-lg">
+                <Package className="w-6 h-6 text-dark-text-primary" />
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-theme-primary">
@@ -222,7 +209,7 @@ const CreateSupplierModalRefactored = ({ isOpen, onClose, onSave, unitId }) => {
         >
           {/* Seção: Dados Cadastrais */}
           <div className="space-y-6">
-            <div className="flex items-center gap-3 pb-3 border-b-2 border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-3 pb-3 border-b-2 border-light-border dark:border-dark-border">
               <Building2 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               <h3 className="text-lg font-bold text-theme-primary">
                 Dados Cadastrais
@@ -236,17 +223,13 @@ const CreateSupplierModalRefactored = ({ isOpen, onClose, onSave, unitId }) => {
                   Descrição <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <Package className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
+                  <Package className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary w-5 h-5" />
                   <input
                     type="text"
                     placeholder="Nome do fornecedor"
                     value={formData.nome}
                     onChange={e => handleChange('nome', e.target.value)}
-                    className={`w-full pl-11 pr-4 py-3 border-2 rounded-xl bg-white dark:bg-gray-800 text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${
-                      errors.nome
-                        ? 'border-red-500 focus:border-red-500'
-                        : 'border-gray-300 dark:border-gray-600 focus:border-blue-500'
-                    }`}
+                    className={`w-full pl-11 pr-4 py-3 border-2 rounded-xl bg-white dark:bg-gray-800 text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${errors.nome ? 'border-red-500 focus:border-red-500' : 'border-gray-300 dark:border-gray-600 focus:border-blue-500'}`}
                   />
                 </div>
                 {errors.nome && (
@@ -263,7 +246,7 @@ const CreateSupplierModalRefactored = ({ isOpen, onClose, onSave, unitId }) => {
                   CNPJ <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
+                  <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary w-5 h-5" />
                   <input
                     type="text"
                     placeholder="00.000.000/0000-00"
@@ -272,11 +255,7 @@ const CreateSupplierModalRefactored = ({ isOpen, onClose, onSave, unitId }) => {
                       handleChange('cpf_cnpj', formatCNPJ(e.target.value))
                     }
                     maxLength={18}
-                    className={`w-full pl-11 pr-4 py-3 border-2 rounded-xl bg-white dark:bg-gray-800 text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 transition-all duration-200 font-mono ${
-                      errors.cpf_cnpj
-                        ? 'border-red-500 focus:border-red-500'
-                        : 'border-gray-300 dark:border-gray-600 focus:border-blue-500'
-                    }`}
+                    className={`w-full pl-11 pr-4 py-3 border-2 rounded-xl bg-white dark:bg-gray-800 text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 transition-all duration-200 font-mono ${errors.cpf_cnpj ? 'border-red-500 focus:border-red-500' : 'border-gray-300 dark:border-gray-600 focus:border-blue-500'}`}
                   />
                 </div>
                 {errors.cpf_cnpj && (
@@ -293,13 +272,13 @@ const CreateSupplierModalRefactored = ({ isOpen, onClose, onSave, unitId }) => {
                   Razão Social
                 </label>
                 <div className="relative">
-                  <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
+                  <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary w-5 h-5" />
                   <input
                     type="text"
                     placeholder="Razão Social da empresa"
                     value={formData.razao_social}
                     onChange={e => handleChange('razao_social', e.target.value)}
-                    className="w-full pl-11 pr-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                    className="w-full pl-11 pr-4 py-3 border-2 border-light-border dark:border-dark-border rounded-xl card-theme dark:bg-dark-surface text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                   />
                 </div>
               </div>
@@ -310,17 +289,13 @@ const CreateSupplierModalRefactored = ({ isOpen, onClose, onSave, unitId }) => {
                   Email
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary w-5 h-5" />
                   <input
                     type="email"
                     placeholder="email@exemplo.com"
                     value={formData.email}
                     onChange={e => handleChange('email', e.target.value)}
-                    className={`w-full pl-11 pr-4 py-3 border-2 rounded-xl bg-white dark:bg-gray-800 text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${
-                      errors.email
-                        ? 'border-red-500 focus:border-red-500'
-                        : 'border-gray-300 dark:border-gray-600 focus:border-blue-500'
-                    }`}
+                    className={`w-full pl-11 pr-4 py-3 border-2 rounded-xl bg-white dark:bg-gray-800 text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${errors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-300 dark:border-gray-600 focus:border-blue-500'}`}
                   />
                 </div>
                 {errors.email && (
@@ -337,7 +312,7 @@ const CreateSupplierModalRefactored = ({ isOpen, onClose, onSave, unitId }) => {
                   Telefone
                 </label>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
+                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary w-5 h-5" />
                   <input
                     type="text"
                     placeholder="(00) 00000-0000"
@@ -346,7 +321,7 @@ const CreateSupplierModalRefactored = ({ isOpen, onClose, onSave, unitId }) => {
                       handleChange('telefone', formatPhone(e.target.value))
                     }
                     maxLength={15}
-                    className="w-full pl-11 pr-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-mono"
+                    className="w-full pl-11 pr-4 py-3 border-2 border-light-border dark:border-dark-border rounded-xl card-theme dark:bg-dark-surface text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-mono"
                   />
                 </div>
               </div>
@@ -357,13 +332,13 @@ const CreateSupplierModalRefactored = ({ isOpen, onClose, onSave, unitId }) => {
                   Endereço
                 </label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-3 text-gray-400 dark:text-gray-500 w-5 h-5" />
+                  <MapPin className="absolute left-3 top-3 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary w-5 h-5" />
                   <input
                     type="text"
                     placeholder="Endereço completo"
                     value={formData.endereco}
                     onChange={e => handleChange('endereco', e.target.value)}
-                    className="w-full pl-11 pr-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                    className="w-full pl-11 pr-4 py-3 border-2 border-light-border dark:border-dark-border rounded-xl card-theme dark:bg-dark-surface text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                   />
                 </div>
               </div>
@@ -378,7 +353,7 @@ const CreateSupplierModalRefactored = ({ isOpen, onClose, onSave, unitId }) => {
                   value={formData.observacoes}
                   onChange={e => handleChange('observacoes', e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none"
+                  className="w-full px-4 py-3 border-2 border-light-border dark:border-dark-border rounded-xl card-theme dark:bg-dark-surface text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none"
                 />
               </div>
             </div>
@@ -386,24 +361,24 @@ const CreateSupplierModalRefactored = ({ isOpen, onClose, onSave, unitId }) => {
         </form>
 
         {/* 🎬 Footer com Ações - DESIGN SYSTEM */}
-        <div className="px-6 py-4 border-t-2 border-light-border dark:border-dark-border bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750">
+        <div className="px-6 py-4 border-t-2 border-light-border dark:border-dark-border bg-gradient-light dark:from-gray-800 dark:to-gray-750">
           <div className="flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-5 py-2.5 text-sm font-semibold text-theme-primary hover:bg-light-surface dark:hover:bg-dark-surface rounded-xl transition-all duration-200 border-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600 disabled:opacity-50"
+              className="px-5 py-2.5 text-sm font-semibold text-theme-primary hover:bg-light-surface dark:hover:bg-dark-surface rounded-xl transition-all duration-200 border-2 border-transparent hover:border-light-border dark:border-dark-border dark:hover:border-dark-border disabled:opacity-50"
             >
               Cancelar
             </button>
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold transition-all duration-200 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg shadow-green-500/30 hover:shadow-green-500/50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-dark-bg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transform hover:scale-105"
+              className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold transition-all duration-200 bg-gradient-success hover:from-green-700 hover:to-emerald-700 text-dark-text-primary shadow-lg shadow-green-500/30 hover:shadow-green-500/50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-dark-bg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transform hover:scale-105"
             >
               {loading ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-2 border-light-surface dark:border-dark-surface/30 border-t-white rounded-full animate-spin" />
                   Salvando...
                 </>
               ) : (
@@ -419,5 +394,4 @@ const CreateSupplierModalRefactored = ({ isOpen, onClose, onSave, unitId }) => {
     </div>
   );
 };
-
 export default CreateSupplierModalRefactored;

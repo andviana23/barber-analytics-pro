@@ -17,9 +17,15 @@
 import React, { useState } from 'react';
 import { X, Package, Save, Loader } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
-
-const CreateSupplierModal = ({ isOpen, onClose, onSave, unitId }) => {
-  const { showToast } = useToast();
+const CreateSupplierModal = ({
+  isOpen,
+  onClose,
+  onSave,
+  unitId
+}) => {
+  const {
+    showToast
+  } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     nome: '',
@@ -28,11 +34,9 @@ const CreateSupplierModal = ({ isOpen, onClose, onSave, unitId }) => {
     email: '',
     telefone: '',
     endereco: '',
-    observacoes: '',
+    observacoes: ''
   });
-
   const [errors, setErrors] = useState({});
-
   if (!isOpen) return null;
 
   // Validações
@@ -40,86 +44,69 @@ const CreateSupplierModal = ({ isOpen, onClose, onSave, unitId }) => {
     const cleaned = value.replace(/\D/g, '');
     return cleaned.length === 11 || cleaned.length === 14;
   };
-
   const validateEmail = email => {
     if (!email) return true; // Email é opcional
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
-
   const validateForm = () => {
     const newErrors = {};
-
     if (!formData.nome.trim()) {
       newErrors.nome = 'Nome é obrigatório';
     }
-
     if (!formData.cpf_cnpj.trim()) {
       newErrors.cpf_cnpj = 'CPF/CNPJ é obrigatório';
     } else if (!validateCNPJ(formData.cpf_cnpj)) {
       newErrors.cpf_cnpj = 'CPF/CNPJ inválido';
     }
-
     if (formData.email && !validateEmail(formData.email)) {
       newErrors.email = 'Email inválido';
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
     // Limpar erro do campo ao digitar
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: null }));
+      setErrors(prev => ({
+        ...prev,
+        [field]: null
+      }));
     }
   };
-
   const formatCNPJ = value => {
     const cleaned = value.replace(/\D/g, '');
     if (cleaned.length <= 11) {
       // CPF: 000.000.000-00
-      return cleaned
-        .replace(/(\d{3})(\d)/, '$1.$2')
-        .replace(/(\d{3})(\d)/, '$1.$2')
-        .replace(/(\d{3})(\d{1,2})/, '$1-$2')
-        .replace(/(-\d{2})\d+?$/, '$1');
+      return cleaned.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})/, '$1-$2').replace(/(-\d{2})\d+?$/, '$1');
     }
     // CNPJ: 00.000.000/0000-00
-    return cleaned
-      .replace(/(\d{2})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d)/, '$1/$2')
-      .replace(/(\d{4})(\d)/, '$1-$2')
-      .replace(/(-\d{2})\d+?$/, '$1');
+    return cleaned.replace(/(\d{2})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1/$2').replace(/(\d{4})(\d)/, '$1-$2').replace(/(-\d{2})\d+?$/, '$1');
   };
-
   const handleSubmit = async e => {
     e.preventDefault();
-
     if (!validateForm()) {
       showToast({
         type: 'error',
         message: 'Erro de validação',
-        description: 'Verifique os campos e tente novamente',
+        description: 'Verifique os campos e tente novamente'
       });
       return;
     }
-
     setLoading(true);
-
     try {
       // Limpar formatação do CNPJ antes de enviar
       const cleanedData = {
         ...formData,
-        cpf_cnpj: formData.cpf_cnpj.replace(/\D/g, ''),
+        cpf_cnpj: formData.cpf_cnpj.replace(/\D/g, '')
       };
-
       await onSave(cleanedData);
-
       showToast({
         type: 'success',
-        message: 'Fornecedor cadastrado com sucesso!',
+        message: 'Fornecedor cadastrado com sucesso!'
       });
 
       // Resetar formulário
@@ -130,7 +117,7 @@ const CreateSupplierModal = ({ isOpen, onClose, onSave, unitId }) => {
         email: '',
         telefone: '',
         endereco: '',
-        observacoes: '',
+        observacoes: ''
       });
       setErrors({});
       onClose();
@@ -138,199 +125,113 @@ const CreateSupplierModal = ({ isOpen, onClose, onSave, unitId }) => {
       showToast({
         type: 'error',
         message: 'Erro ao cadastrar fornecedor',
-        description: error.message,
+        description: error.message
       });
     } finally {
       setLoading(false);
     }
   };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+  return <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+      <div className="card-theme dark:bg-dark-surface rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between p-6 border-b border-light-border dark:border-dark-border">
           <div className="flex items-center gap-3">
             <Package className="w-6 h-6 text-primary-600" />
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-xl font-bold text-theme-primary dark:text-dark-text-primary">
               Novo Fornecedor
             </h2>
           </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-          >
+          <button onClick={onClose} className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary dark:hover:text-gray-300 dark:text-gray-600">
             <X className="w-6 h-6" />
           </button>
         </div>
 
         {/* Body */}
-        <form
-          onSubmit={handleSubmit}
-          className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]"
-        >
+        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-4 pb-2 border-b border-light-border dark:border-dark-border">
               Dados Cadastrais
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Nome/Descrição */}
               <div className="md:col-span-1">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-1">
                   Descrição <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
-                  placeholder="Nome do fornecedor"
-                  value={formData.nome}
-                  onChange={e => handleChange('nome', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 ${
-                    errors.nome
-                      ? 'border-red-500'
-                      : 'border-gray-300 dark:border-gray-600'
-                  }`}
-                />
-                {errors.nome && (
-                  <p className="text-red-500 text-sm mt-1">{errors.nome}</p>
-                )}
+                <input type="text" placeholder="Nome do fornecedor" value={formData.nome} onChange={e => handleChange('nome', e.target.value)} className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 ${errors.nome ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`} />
+                {errors.nome && <p className="text-red-500 text-sm mt-1">{errors.nome}</p>}
               </div>
 
               {/* CNPJ */}
               <div className="md:col-span-1">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-1">
                   CNPJ <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
-                  placeholder="00.000.000/0000-00"
-                  value={formData.cpf_cnpj}
-                  onChange={e =>
-                    handleChange('cpf_cnpj', formatCNPJ(e.target.value))
-                  }
-                  maxLength={18}
-                  className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 ${
-                    errors.cpf_cnpj
-                      ? 'border-red-500'
-                      : 'border-gray-300 dark:border-gray-600'
-                  }`}
-                />
-                {errors.cpf_cnpj && (
-                  <p className="text-red-500 text-sm mt-1">{errors.cpf_cnpj}</p>
-                )}
+                <input type="text" placeholder="00.000.000/0000-00" value={formData.cpf_cnpj} onChange={e => handleChange('cpf_cnpj', formatCNPJ(e.target.value))} maxLength={18} className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 ${errors.cpf_cnpj ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`} />
+                {errors.cpf_cnpj && <p className="text-red-500 text-sm mt-1">{errors.cpf_cnpj}</p>}
               </div>
 
               {/* Razão Social */}
               <div className="md:col-span-1">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-1">
                   Razão Social
                 </label>
-                <input
-                  type="text"
-                  placeholder="Razão Social"
-                  value={formData.razao_social}
-                  onChange={e => handleChange('razao_social', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
-                />
+                <input type="text" placeholder="Razão Social" value={formData.razao_social} onChange={e => handleChange('razao_social', e.target.value)} className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-primary-500" />
               </div>
 
               {/* Email */}
               <div className="md:col-span-1">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-1">
                   Email
                 </label>
-                <input
-                  type="email"
-                  placeholder="email@exemplo.com"
-                  value={formData.email}
-                  onChange={e => handleChange('email', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 ${
-                    errors.email
-                      ? 'border-red-500'
-                      : 'border-gray-300 dark:border-gray-600'
-                  }`}
-                />
-                {errors.email && (
-                  <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-                )}
+                <input type="email" placeholder="email@exemplo.com" value={formData.email} onChange={e => handleChange('email', e.target.value)} className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 ${errors.email ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`} />
+                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
               </div>
 
               {/* Telefone */}
               <div className="md:col-span-1">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-1">
                   Telefone
                 </label>
-                <input
-                  type="text"
-                  placeholder="(00) 00000-0000"
-                  value={formData.telefone}
-                  onChange={e => handleChange('telefone', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
-                />
+                <input type="text" placeholder="(00) 00000-0000" value={formData.telefone} onChange={e => handleChange('telefone', e.target.value)} className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-primary-500" />
               </div>
 
               {/* Endereço */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-1">
                   Endereço
                 </label>
-                <input
-                  type="text"
-                  placeholder="Endereço completo"
-                  value={formData.endereco}
-                  onChange={e => handleChange('endereco', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
-                />
+                <input type="text" placeholder="Endereço completo" value={formData.endereco} onChange={e => handleChange('endereco', e.target.value)} className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-primary-500" />
               </div>
 
               {/* Observações */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-1">
                   Observações
                 </label>
-                <textarea
-                  placeholder="Observações adicionais..."
-                  value={formData.observacoes}
-                  onChange={e => handleChange('observacoes', e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
-                />
+                <textarea placeholder="Observações adicionais..." value={formData.observacoes} onChange={e => handleChange('observacoes', e.target.value)} rows={3} className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-primary-500" />
               </div>
             </div>
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-              disabled={loading}
-            >
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-light-border dark:border-dark-border">
+            <button type="button" onClick={onClose} className="px-4 py-2 text-gray-700 dark:text-gray-300 dark:text-gray-600 hover:card-theme dark:hover:bg-gray-700 rounded-lg transition-colors" disabled={loading}>
               Cancelar
             </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary flex items-center gap-2"
-            >
-              {loading ? (
-                <>
+            <button type="submit" disabled={loading} className="btn-primary flex items-center gap-2">
+              {loading ? <>
                   <Loader className="w-5 h-5 animate-spin" />
                   Salvando...
-                </>
-              ) : (
-                <>
+                </> : <>
                   <Save className="w-5 h-5" />
                   Cadastrar
-                </>
-              )}
+                </>}
             </button>
           </div>
         </form>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default CreateSupplierModal;

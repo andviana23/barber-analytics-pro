@@ -192,7 +192,7 @@ export function LazyImage({
       )}
       {!isIntersecting && (
         <div
-          className={`bg-gray-200 dark:bg-gray-700 animate-pulse ${className}`}
+          className={`bg-light-hover dark:bg-dark-hover animate-pulse ${className}`}
         />
       )}
     </div>

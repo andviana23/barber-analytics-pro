@@ -25,7 +25,6 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-
 const RelatorioReceitaDespesa = ({ filters }) => {
   const { selectedUnit } = useUnit();
   const [dadosGrafico, setDadosGrafico] = useState([]);
@@ -36,19 +35,16 @@ const RelatorioReceitaDespesa = ({ filters }) => {
   const carregarUltimosMeses = useCallback(
     async quantidade => {
       if (!selectedUnit?.id) return [];
-
       const dados = [];
       const hoje = new Date();
       let mes = hoje.getMonth() + 1;
       let ano = hoje.getFullYear();
-
       for (let i = 0; i < quantidade; i++) {
         const { data } = await dreService.getDREMensal(
           mes,
           ano,
           selectedUnit.id
         );
-
         if (data) {
           dados.unshift({
             mes: `${String(mes).padStart(2, '0')}/${ano}`,
@@ -68,25 +64,20 @@ const RelatorioReceitaDespesa = ({ filters }) => {
           ano--;
         }
       }
-
       return dados;
     },
     [selectedUnit?.id]
   );
-
   const carregarMesesDoAno = useCallback(
     async ano => {
       if (!selectedUnit?.id) return [];
-
       const dados = [];
-
       for (let mes = 1; mes <= 12; mes++) {
         const { data } = await dreService.getDREMensal(
           mes,
           ano,
           selectedUnit.id
         );
-
         dados.push({
           mes: `${String(mes).padStart(2, '0')}/${ano}`,
           mesNum: mes,
@@ -97,20 +88,16 @@ const RelatorioReceitaDespesa = ({ filters }) => {
           margem: data?.resultado.margemLiquida || 0,
         });
       }
-
       return dados;
     },
     [selectedUnit?.id]
   );
-
   const carregarDados = useCallback(async () => {
     if (!selectedUnit?.id || !filters?.periodo) {
       return;
     }
-
     setLoading(true);
     setError(null);
-
     try {
       if (filters.periodo.tipo === 'mes') {
         // Carregar últimos 6 meses
@@ -133,11 +120,9 @@ const RelatorioReceitaDespesa = ({ filters }) => {
     carregarUltimosMeses,
     carregarMesesDoAno,
   ]);
-
   useEffect(() => {
     carregarDados();
   }, [carregarDados]);
-
   const formatarMoeda = valor => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -146,16 +131,21 @@ const RelatorioReceitaDespesa = ({ filters }) => {
       maximumFractionDigits: 0,
     }).format(valor || 0);
   };
-
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-light-surface dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg p-4 shadow-lg">
+        <div className="card-theme border border-light-border dark:border-dark-border rounded-lg p-4 shadow-lg">
           <p className="font-semibold text-text-light-primary dark:text-text-dark-primary mb-2">
             {label}
           </p>
           {payload.map((entry, index) => (
-            <p key={index} className="text-sm" style={{ color: entry.color }}>
+            <p
+              key={index}
+              className="text-sm"
+              style={{
+                color: entry.color,
+              }}
+            >
               {entry.name}: {formatarMoeda(entry.value)}
             </p>
           ))}
@@ -164,7 +154,6 @@ const RelatorioReceitaDespesa = ({ filters }) => {
     }
     return null;
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -175,7 +164,6 @@ const RelatorioReceitaDespesa = ({ filters }) => {
       </div>
     );
   }
-
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
@@ -188,14 +176,13 @@ const RelatorioReceitaDespesa = ({ filters }) => {
         </p>
         <button
           onClick={carregarDados}
-          className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-600 transition-colors"
+          className="px-4 py-2 bg-primary text-dark-text-primary rounded-lg hover:bg-primary-600 transition-colors"
         >
           Tentar novamente
         </button>
       </div>
     );
   }
-
   const totalReceitas = dadosGrafico.reduce(
     (sum, item) => sum + item.receitas,
     0
@@ -207,12 +194,11 @@ const RelatorioReceitaDespesa = ({ filters }) => {
   const totalLucro = totalReceitas - totalDespesas;
   const margemMedia =
     totalReceitas > 0 ? (totalLucro / totalReceitas) * 100 : 0;
-
   return (
     <div className="space-y-6">
       {/* KPIs do Período */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-light-surface dark:bg-dark-surface p-6 rounded-xl border border-light-border dark:border-dark-border">
+        <div className="card-theme p-6 rounded-xl border border-light-border dark:border-dark-border">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
@@ -226,7 +212,7 @@ const RelatorioReceitaDespesa = ({ filters }) => {
           </div>
         </div>
 
-        <div className="bg-light-surface dark:bg-dark-surface p-6 rounded-xl border border-light-border dark:border-dark-border">
+        <div className="card-theme p-6 rounded-xl border border-light-border dark:border-dark-border">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
@@ -240,7 +226,7 @@ const RelatorioReceitaDespesa = ({ filters }) => {
           </div>
         </div>
 
-        <div className="bg-light-surface dark:bg-dark-surface p-6 rounded-xl border border-light-border dark:border-dark-border">
+        <div className="card-theme p-6 rounded-xl border border-light-border dark:border-dark-border">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
@@ -258,7 +244,7 @@ const RelatorioReceitaDespesa = ({ filters }) => {
           </div>
         </div>
 
-        <div className="bg-light-surface dark:bg-dark-surface p-6 rounded-xl border border-light-border dark:border-dark-border">
+        <div className="card-theme p-6 rounded-xl border border-light-border dark:border-dark-border">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
@@ -275,7 +261,7 @@ const RelatorioReceitaDespesa = ({ filters }) => {
       </div>
 
       {/* Controles do Gráfico */}
-      <div className="bg-light-surface dark:bg-dark-surface p-4 rounded-xl border border-light-border dark:border-dark-border">
+      <div className="card-theme p-4 rounded-xl border border-light-border dark:border-dark-border">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-text-light-primary dark:text-text-dark-primary">
             Evolução Temporal
@@ -283,21 +269,13 @@ const RelatorioReceitaDespesa = ({ filters }) => {
           <div className="flex gap-2">
             <button
               onClick={() => setViewMode('line')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                viewMode === 'line'
-                  ? 'bg-primary text-white'
-                  : 'bg-light-hover dark:bg-dark-hover text-text-light-primary dark:text-text-dark-primary'
-              }`}
+              className={`px-4 py-2 rounded-lg transition-colors ${viewMode === 'line' ? 'bg-primary text-white' : 'bg-light-hover dark:bg-dark-hover text-text-light-primary dark:text-text-dark-primary'}`}
             >
               Linha
             </button>
             <button
               onClick={() => setViewMode('bar')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                viewMode === 'bar'
-                  ? 'bg-primary text-white'
-                  : 'bg-light-hover dark:bg-dark-hover text-text-light-primary dark:text-text-dark-primary'
-              }`}
+              className={`px-4 py-2 rounded-lg transition-colors ${viewMode === 'bar' ? 'bg-primary text-white' : 'bg-light-hover dark:bg-dark-hover text-text-light-primary dark:text-text-dark-primary'}`}
             >
               Barra
             </button>
@@ -306,7 +284,7 @@ const RelatorioReceitaDespesa = ({ filters }) => {
       </div>
 
       {/* Gráfico Principal */}
-      <div className="bg-light-surface dark:bg-dark-surface p-6 rounded-xl border border-light-border dark:border-dark-border">
+      <div className="card-theme p-6 rounded-xl border border-light-border dark:border-dark-border">
         <ResponsiveContainer width="100%" height={400}>
           {viewMode === 'line' ? (
             <LineChart data={dadosGrafico}>
@@ -318,11 +296,11 @@ const RelatorioReceitaDespesa = ({ filters }) => {
               <XAxis
                 dataKey="mes"
                 stroke="#9CA3AF"
-                style={{ fontSize: '12px' }}
+                className="chart-axis-text"
               />
               <YAxis
                 stroke="#9CA3AF"
-                style={{ fontSize: '12px' }}
+                className="chart-axis-text"
                 tickFormatter={value => formatarMoeda(value)}
               />
               <Tooltip content={<CustomTooltip />} />
@@ -333,8 +311,13 @@ const RelatorioReceitaDespesa = ({ filters }) => {
                 stroke="#10B981"
                 strokeWidth={3}
                 name="Receitas"
-                dot={{ fill: '#10B981', r: 5 }}
-                activeDot={{ r: 7 }}
+                dot={{
+                  fill: '#10B981',
+                  r: 5,
+                }}
+                activeDot={{
+                  r: 7,
+                }}
               />
               <Line
                 type="monotone"
@@ -342,8 +325,13 @@ const RelatorioReceitaDespesa = ({ filters }) => {
                 stroke="#EF4444"
                 strokeWidth={3}
                 name="Despesas"
-                dot={{ fill: '#EF4444', r: 5 }}
-                activeDot={{ r: 7 }}
+                dot={{
+                  fill: '#EF4444',
+                  r: 5,
+                }}
+                activeDot={{
+                  r: 7,
+                }}
               />
               <Line
                 type="monotone"
@@ -351,8 +339,13 @@ const RelatorioReceitaDespesa = ({ filters }) => {
                 stroke="#3B82F6"
                 strokeWidth={3}
                 name="Lucro"
-                dot={{ fill: '#3B82F6', r: 5 }}
-                activeDot={{ r: 7 }}
+                dot={{
+                  fill: '#3B82F6',
+                  r: 5,
+                }}
+                activeDot={{
+                  r: 7,
+                }}
               />
             </LineChart>
           ) : (
@@ -365,11 +358,11 @@ const RelatorioReceitaDespesa = ({ filters }) => {
               <XAxis
                 dataKey="mes"
                 stroke="#9CA3AF"
-                style={{ fontSize: '12px' }}
+                className="chart-axis-text"
               />
               <YAxis
                 stroke="#9CA3AF"
-                style={{ fontSize: '12px' }}
+                className="chart-axis-text"
                 tickFormatter={value => formatarMoeda(value)}
               />
               <Tooltip content={<CustomTooltip />} />
@@ -383,7 +376,7 @@ const RelatorioReceitaDespesa = ({ filters }) => {
       </div>
 
       {/* Tabela de Dados */}
-      <div className="bg-light-surface dark:bg-dark-surface rounded-xl border border-light-border dark:border-dark-border overflow-hidden">
+      <div className="card-theme rounded-xl border border-light-border dark:border-dark-border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-light-hover dark:bg-dark-hover">
@@ -421,16 +414,12 @@ const RelatorioReceitaDespesa = ({ filters }) => {
                     {formatarMoeda(item.despesas)}
                   </td>
                   <td
-                    className={`px-6 py-4 whitespace-nowrap text-sm text-right font-semibold ${
-                      item.lucro >= 0 ? 'text-success' : 'text-danger'
-                    }`}
+                    className={`px-6 py-4 whitespace-nowrap text-sm text-right font-semibold ${item.lucro >= 0 ? 'text-success' : 'text-danger'}`}
                   >
                     {formatarMoeda(item.lucro)}
                   </td>
                   <td
-                    className={`px-6 py-4 whitespace-nowrap text-sm text-right font-semibold ${
-                      item.margem >= 0 ? 'text-success' : 'text-danger'
-                    }`}
+                    className={`px-6 py-4 whitespace-nowrap text-sm text-right font-semibold ${item.margem >= 0 ? 'text-success' : 'text-danger'}`}
                   >
                     {item.margem.toFixed(1)}%
                   </td>
@@ -443,5 +432,4 @@ const RelatorioReceitaDespesa = ({ filters }) => {
     </div>
   );
 };
-
 export default RelatorioReceitaDespesa;

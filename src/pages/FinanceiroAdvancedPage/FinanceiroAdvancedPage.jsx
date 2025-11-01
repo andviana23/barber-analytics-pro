@@ -62,7 +62,6 @@ const FinanceiroAdvancedPage = () => {
   console.log('🏢 FinanceiroAdvancedPage - Current Unit:', currentUnit);
   // eslint-disable-next-line no-console
   console.log('🏢 FinanceiroAdvancedPage - Units Loading:', unitsLoading);
-
   const [activeTab, setActiveTab] = useState('fluxo');
 
   // Estado local para unidade selecionada (independente do UnitContext)
@@ -96,7 +95,6 @@ const FinanceiroAdvancedPage = () => {
   const selectedUnit = useMemo(() => {
     // Garantir que units é um array
     const unitsArray = Array.isArray(units) ? units : [];
-
     if (selectedUnitId && unitsArray.length > 0) {
       return (
         unitsArray.find(u => u.id === selectedUnitId) ||
@@ -105,7 +103,6 @@ const FinanceiroAdvancedPage = () => {
         null
       );
     }
-
     return currentUnit || unitsArray[0] || null;
   }, [selectedUnitId, units, currentUnit]);
 
@@ -118,7 +115,6 @@ const FinanceiroAdvancedPage = () => {
       handleUnitChange(firstUnit.id);
     }
   }, [units, selectedUnitId, handleUnitChange]);
-
   const [globalFilters, setGlobalFilters] = useState({
     unitId: selectedUnit?.id || null,
     startDate: null,
@@ -129,7 +125,10 @@ const FinanceiroAdvancedPage = () => {
   // Atualizar globalFilters quando unidade mudar
   useEffect(() => {
     if (selectedUnit?.id) {
-      setGlobalFilters(prev => ({ ...prev, unitId: selectedUnit.id }));
+      setGlobalFilters(prev => ({
+        ...prev,
+        unitId: selectedUnit.id,
+      }));
     }
   }, [selectedUnit?.id]);
 
@@ -177,7 +176,10 @@ const FinanceiroAdvancedPage = () => {
 
   // Handler para mudança de filtros globais
   const handleGlobalFiltersChange = newFilters => {
-    setGlobalFilters(prev => ({ ...prev, ...newFilters }));
+    setGlobalFilters(prev => ({
+      ...prev,
+      ...newFilters,
+    }));
   };
 
   // Renderizar conteúdo da tab ativa
@@ -187,7 +189,6 @@ const FinanceiroAdvancedPage = () => {
       onFiltersChange: handleGlobalFiltersChange,
       units,
     };
-
     switch (activeTab) {
       case 'fluxo':
         return <FluxoTabRefactored {...tabProps} />;
@@ -214,8 +215,8 @@ const FinanceiroAdvancedPage = () => {
           <div className="card-theme rounded-2xl p-12 max-w-md text-center border-2 border-red-200 dark:border-red-800">
             {/* Ícone com gradiente vermelho */}
             <div className="flex justify-center mb-6">
-              <div className="p-6 bg-gradient-to-br from-red-500 to-pink-600 rounded-full shadow-2xl">
-                <Activity className="w-16 h-16 text-white" />
+              <div className="p-6 bg-gradient-danger rounded-full shadow-2xl">
+                <Activity className="w-16 h-16 text-dark-text-primary" />
               </div>
             </div>
 
@@ -241,7 +242,6 @@ const FinanceiroAdvancedPage = () => {
       </Layout>
     );
   }
-
   return (
     <Layout activeMenuItem="financial">
       <div className="space-y-6">
@@ -249,8 +249,8 @@ const FinanceiroAdvancedPage = () => {
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
           {/* Título com ícone gradiente */}
           <div className="flex items-start gap-4">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
-              <BarChart3 className="w-8 h-8 text-white" />
+            <div className="p-3 bg-gradient-primary rounded-xl shadow-lg">
+              <BarChart3 className="w-8 h-8 text-dark-text-primary" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-theme-primary mb-1">
@@ -273,7 +273,7 @@ const FinanceiroAdvancedPage = () => {
                 value={selectedUnit?.id || ''}
                 onChange={e => handleUnitChange(e.target.value)}
                 disabled={unitsLoading || !units || units.length === 0}
-                className="w-full pl-11 pr-10 py-3 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-theme-primary font-semibold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 appearance-none cursor-pointer transition-all duration-200 hover:border-blue-400 dark:hover:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+                className="w-full pl-11 pr-10 py-3 card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-xl text-theme-primary font-semibold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 appearance-none cursor-pointer transition-all duration-200 hover:border-blue-400 dark:hover:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
               >
                 {unitsLoading ? (
                   <option value="">Carregando...</option>
@@ -301,7 +301,7 @@ const FinanceiroAdvancedPage = () => {
               {/* Ícone de seta à direita */}
               <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
                 <svg
-                  className="w-5 h-5 text-gray-400 dark:text-gray-500"
+                  className="w-5 h-5 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -337,9 +337,9 @@ const FinanceiroAdvancedPage = () => {
         </div>
 
         {/* 📑 Navigation Tabs Premium - DESIGN SYSTEM */}
-        <div className="card-theme rounded-xl overflow-hidden border-2 border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-300">
+        <div className="card-theme rounded-xl overflow-hidden border-2 border-transparent hover:border-light-border dark:border-dark-border dark:hover:border-dark-border transition-all duration-300">
           {/* Tab Headers com gradiente */}
-          <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750 border-b-2 border-gray-200 dark:border-gray-600">
+          <div className="bg-gradient-light dark:from-gray-800 dark:to-gray-750 border-b-2 border-light-border dark:border-dark-border">
             <nav
               className="flex overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600"
               aria-label="Tabs"
@@ -347,7 +347,6 @@ const FinanceiroAdvancedPage = () => {
               {tabs.map(tab => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
-
                 return (
                   <button
                     key={tab.id}
@@ -355,28 +354,16 @@ const FinanceiroAdvancedPage = () => {
                     className={`
                       group flex items-center gap-3 px-6 py-4 border-b-4 font-semibold text-sm whitespace-nowrap
                       transition-all duration-300 relative
-                      ${
-                        isActive
-                          ? 'border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-800 shadow-lg'
-                          : 'border-transparent text-theme-secondary hover:text-theme-primary hover:bg-white/50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-500'
-                      }
+                      ${isActive ? 'border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-800 shadow-lg' : 'border-transparent text-theme-secondary hover:text-theme-primary hover:bg-white/50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-500'}
                     `}
                     title={tab.description}
                   >
                     {/* Ícone com animação */}
                     <div
-                      className={`p-2 rounded-lg transition-all duration-300 ${
-                        isActive
-                          ? 'bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg scale-110'
-                          : 'bg-gray-200 dark:bg-gray-700 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 group-hover:scale-105'
-                      }`}
+                      className={`p-2 rounded-lg transition-all duration-300 ${isActive ? 'bg-gradient-primary shadow-lg scale-110' : 'bg-gray-200 dark:bg-gray-700 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 group-hover:scale-105'}`}
                     >
                       <Icon
-                        className={`w-4 h-4 transition-colors ${
-                          isActive
-                            ? 'text-white'
-                            : 'text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400'
-                        }`}
+                        className={`w-4 h-4 transition-colors ${isActive ? 'text-white' : 'text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400'}`}
                       />
                     </div>
 
@@ -385,7 +372,7 @@ const FinanceiroAdvancedPage = () => {
 
                     {/* Indicador ativo (barra superior) */}
                     {isActive && (
-                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-b-full" />
+                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-primary rounded-b-full" />
                     )}
                   </button>
                 );
@@ -394,7 +381,7 @@ const FinanceiroAdvancedPage = () => {
           </div>
 
           {/* Tab Content com padding premium */}
-          <div className="p-6 bg-gradient-to-b from-transparent to-gray-50/30 dark:to-gray-800/30">
+          <div className="p-6 bg-light-bg dark:bg-dark-bg">
             {renderActiveTab()}
           </div>
         </div>
@@ -402,5 +389,4 @@ const FinanceiroAdvancedPage = () => {
     </Layout>
   );
 };
-
 export default FinanceiroAdvancedPage;

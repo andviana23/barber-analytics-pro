@@ -38,9 +38,21 @@ export function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [chartData, setChartData] = useState([]);
   const [kpis, setKpis] = useState({
-    revenueGeneral: { current: 0, target: 0, trend: 0 },
-    revenueSubscription: { current: 0, target: 0, trend: 0 },
-    revenueProduct: { current: 0, target: 0, trend: 0 },
+    revenueGeneral: {
+      current: 0,
+      target: 0,
+      trend: 0,
+    },
+    revenueSubscription: {
+      current: 0,
+      target: 0,
+      trend: 0,
+    },
+    revenueProduct: {
+      current: 0,
+      target: 0,
+      trend: 0,
+    },
   });
 
   // Hook para buscar metas do mês atual
@@ -49,9 +61,7 @@ export function DashboardPage() {
   // Buscar dados dos últimos 3 meses
   const fetchDashboardData = async () => {
     if (!selectedUnit?.id) return;
-
     setLoading(true);
-
     try {
       const currentDate = new Date();
       const threeMonthsAgo = subMonths(currentDate, 2);
@@ -66,8 +76,9 @@ export function DashboardPage() {
           format(startOfMonth(threeMonthsAgo), 'yyyy-MM-dd')
         )
         .lte('data_competencia', format(endOfMonth(currentDate), 'yyyy-MM-dd'))
-        .order('data_competencia', { ascending: true });
-
+        .order('data_competencia', {
+          ascending: true,
+        });
       if (error) throw error;
 
       // Processar dados por mês
@@ -75,8 +86,9 @@ export function DashboardPage() {
       for (let i = 0; i < 3; i++) {
         const monthDate = subMonths(currentDate, 2 - i);
         const monthKey = format(monthDate, 'yyyy-MM');
-        const monthLabel = format(monthDate, 'MMM/yy', { locale: ptBR });
-
+        const monthLabel = format(monthDate, 'MMM/yy', {
+          locale: ptBR,
+        });
         monthlyData[monthKey] = {
           month: monthLabel,
           faturamentoGeral: 0,
@@ -94,16 +106,13 @@ export function DashboardPage() {
         if (monthlyData[monthKey]) {
           const categoryName = rev.categories?.name?.toLowerCase() || '';
           const amount = parseFloat(rev.amount) || 0;
-
           monthlyData[monthKey].faturamentoGeral += amount;
-
           if (
             categoryName.includes('assinatura') ||
             categoryName.includes('clube')
           ) {
             monthlyData[monthKey].assinaturas += amount;
           }
-
           if (
             categoryName.includes('produto') ||
             categoryName.includes('venda')
@@ -126,7 +135,6 @@ export function DashboardPage() {
       // Buscar metas
       const currentMonthNumber = currentDate.getMonth() + 1;
       const currentYear = currentDate.getFullYear();
-
       const { data: goalsData } = await supabase
         .from('vw_goals_detailed')
         .select('*')
@@ -134,7 +142,6 @@ export function DashboardPage() {
         .eq('goal_year', currentYear)
         .eq('goal_month', currentMonthNumber)
         .eq('is_active', true);
-
       const revenueGoal = goalsData?.find(
         g => g.goal_type === 'revenue_general'
       );
@@ -148,7 +155,6 @@ export function DashboardPage() {
         if (!previous) return 0;
         return ((current - previous) / previous) * 100;
       };
-
       setKpis({
         revenueGeneral: {
           current: currentData.faturamentoGeral || 0,
@@ -181,13 +187,11 @@ export function DashboardPage() {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     if (selectedUnit?.id) {
       fetchDashboardData();
     }
   }, [selectedUnit]);
-
   const formatCurrency = value => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -196,13 +200,11 @@ export function DashboardPage() {
       maximumFractionDigits: 0,
     }).format(value || 0);
   };
-
   const CustomTooltip = ({ active, payload }) => {
     if (!active || !payload || !payload.length) return null;
-
     return (
-      <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-4 shadow-xl">
-        <p className="font-bold text-gray-900 dark:text-white mb-2">
+      <div className="card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-xl p-4 shadow-xl">
+        <p className="font-bold text-theme-primary dark:text-dark-text-primary mb-2">
           {payload[0].payload.month}
         </p>
         {payload.map((entry, index) => (
@@ -213,13 +215,15 @@ export function DashboardPage() {
             <div className="flex items-center gap-2">
               <div
                 className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: entry.color }}
+                style={{
+                  backgroundColor: entry.color,
+                }}
               ></div>
-              <span className="text-gray-700 dark:text-gray-300">
+              <span className="text-gray-700 dark:text-gray-300 dark:text-gray-600">
                 {entry.name}:
               </span>
             </div>
-            <span className="font-bold text-gray-900 dark:text-white">
+            <span className="font-bold text-theme-primary dark:text-dark-text-primary">
               {formatCurrency(entry.value)}
             </span>
           </div>
@@ -227,7 +231,6 @@ export function DashboardPage() {
       </div>
     );
   };
-
   return (
     <div className="min-h-screen bg-light-bg dark:bg-dark-bg p-6">
       {/* Header */}
@@ -350,16 +353,25 @@ export function DashboardPage() {
               <XAxis
                 dataKey="month"
                 stroke="#6B7280"
-                style={{ fontSize: '14px', fontWeight: 600 }}
+                style={{
+                  fontSize: '14px',
+                  fontWeight: 600,
+                }}
               />
               <YAxis
                 stroke="#6B7280"
-                style={{ fontSize: '14px', fontWeight: 600 }}
+                style={{
+                  fontSize: '14px',
+                  fontWeight: 600,
+                }}
                 tickFormatter={value => `R$ ${(value / 1000).toFixed(0)}k`}
               />
               <Tooltip content={<CustomTooltip />} />
               <Legend
-                wrapperStyle={{ fontSize: '14px', fontWeight: 600 }}
+                wrapperStyle={{
+                  fontSize: '14px',
+                  fontWeight: 600,
+                }}
                 iconType="circle"
               />
               <Line
@@ -368,8 +380,13 @@ export function DashboardPage() {
                 name="Faturamento Geral"
                 stroke="#10B981"
                 strokeWidth={3}
-                dot={{ fill: '#10B981', r: 6 }}
-                activeDot={{ r: 8 }}
+                dot={{
+                  fill: '#10B981',
+                  r: 6,
+                }}
+                activeDot={{
+                  r: 8,
+                }}
               />
               <Line
                 type="monotone"
@@ -377,8 +394,13 @@ export function DashboardPage() {
                 name="Assinaturas"
                 stroke="#3B82F6"
                 strokeWidth={3}
-                dot={{ fill: '#3B82F6', r: 6 }}
-                activeDot={{ r: 8 }}
+                dot={{
+                  fill: '#3B82F6',
+                  r: 6,
+                }}
+                activeDot={{
+                  r: 8,
+                }}
               />
               <Line
                 type="monotone"
@@ -386,8 +408,13 @@ export function DashboardPage() {
                 name="Produtos"
                 stroke="#A855F7"
                 strokeWidth={3}
-                dot={{ fill: '#A855F7', r: 6 }}
-                activeDot={{ r: 8 }}
+                dot={{
+                  fill: '#A855F7',
+                  r: 6,
+                }}
+                activeDot={{
+                  r: 8,
+                }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -439,7 +466,6 @@ const MetaCard = ({
 }) => {
   const isAchieved = percentage >= 100;
   const isOnTrack = percentage >= 80;
-
   if (loading) {
     return (
       <div className="card-theme p-6 rounded-2xl shadow-lg animate-pulse">
@@ -449,7 +475,6 @@ const MetaCard = ({
       </div>
     );
   }
-
   return (
     <div
       className={`card-theme p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 ${isAchieved ? 'border-green-300 dark:border-green-700' : 'border-light-border dark:border-dark-border'}`}
@@ -512,8 +537,10 @@ const MetaCard = ({
         </div>
         <div className="w-full h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
           <div
-            className={`h-full bg-gradient-to-r ${color} rounded-full transition-all duration-1000`}
-            style={{ width: `${Math.min(100, percentage)}%` }}
+            className={`h-full ${color} rounded-full transition-all duration-1000`}
+            style={{
+              width: `${Math.min(100, percentage)}%`,
+            }}
           ></div>
         </div>
       </div>
@@ -584,10 +611,8 @@ const InsightCard = ({ title, value, description, type }) => {
         };
     }
   };
-
   const config = getConfig();
   const IconComponent = config.icon;
-
   return (
     <div className="card-theme p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
       <div className="flex items-center gap-3 mb-3">

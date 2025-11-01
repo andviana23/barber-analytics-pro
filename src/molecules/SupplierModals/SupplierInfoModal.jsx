@@ -31,7 +31,6 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-
 const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
   // Debug log
   React.useEffect(() => {
@@ -40,9 +39,7 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
       console.log('📦 SupplierInfoModal - Dados do fornecedor:', supplier);
     }
   }, [isOpen, supplier]);
-
   if (!isOpen) return null;
-
   if (!supplier) {
     console.warn('⚠️ SupplierInfoModal - Fornecedor não fornecido!');
     // Mostrar modal vazio com mensagem
@@ -65,7 +62,7 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
             </p>
             <button
               onClick={onClose}
-              className="px-6 py-2.5 rounded-xl font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700"
+              className="px-6 py-2.5 rounded-xl font-semibold bg-gradient-primary text-dark-text-primary hover:opacity-90 transition-all"
             >
               Fechar
             </button>
@@ -88,7 +85,6 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
     created_at: supplier?.created_at || new Date().toISOString(),
     updated_at: supplier?.updated_at || null,
   };
-
   const formatCNPJ = cnpj => {
     if (!cnpj) return '';
     const cleaned = cnpj.replace(/\D/g, '');
@@ -100,7 +96,6 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
       '$1.$2.$3/$4-$5'
     );
   };
-
   const formatPhone = phone => {
     if (!phone) return '';
     const cleaned = phone.replace(/\D/g, '');
@@ -109,18 +104,18 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
     }
     return cleaned.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
   };
-
   const formatDate = date => {
     try {
-      return format(new Date(date), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
+      return format(new Date(date), "dd/MM/yyyy 'às' HH:mm", {
+        locale: ptBR,
+      });
     } catch {
       return '-';
     }
   };
-
   const InfoRow = ({ icon: Icon, label, value, multiline = false }) => (
-    <div className="flex items-start gap-4 py-4 border-b-2 border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-750/50 transition-colors px-4 rounded-lg">
-      <div className="flex-shrink-0 p-2.5 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 dark:from-blue-500/20 dark:to-indigo-500/20 rounded-lg">
+    <div className="flex items-start gap-4 py-4 border-b-2 border-gray-100 dark:border-dark-border last:border-0 hover:bg-light-bg dark:bg-dark-bg/50 dark:hover:bg-gray-750/50 transition-colors px-4 rounded-lg">
+      <div className="flex-shrink-0 p-2.5 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
         <Icon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
       </div>
       <div className="flex-1 min-w-0">
@@ -131,7 +126,7 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
           className={`text-sm font-medium text-theme-primary ${multiline ? 'whitespace-pre-wrap' : ''}`}
         >
           {value || (
-            <span className="text-gray-400 dark:text-gray-500 italic">
+            <span className="text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary italic">
               Não informado
             </span>
           )}
@@ -139,7 +134,6 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
       </div>
     </div>
   );
-
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn"
@@ -150,11 +144,11 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
         onClick={e => e.stopPropagation()}
       >
         {/* 🎯 Header Premium - DESIGN SYSTEM */}
-        <div className="bg-gradient-to-r from-blue-600/10 via-indigo-600/10 to-transparent dark:from-blue-600/20 dark:via-indigo-600/20 px-6 py-5 border-b-2 border-light-border dark:border-dark-border">
+        <div className="bg-blue-50 dark:bg-blue-900/20 px-6 py-5 border-b-2 border-light-border dark:border-dark-border">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
-                <Info className="w-6 h-6 text-white" />
+              <div className="p-3 bg-gradient-primary rounded-xl shadow-lg">
+                <Info className="w-6 h-6 text-dark-text-primary" />
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-theme-primary">
@@ -180,11 +174,7 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
           {/* Badge de Status Premium */}
           <div className="mb-6 flex items-center gap-3">
             <div
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm shadow-lg transition-all duration-200 ${
-                supplierData.is_active
-                  ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-green-500/30'
-                  : 'bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-red-500/30'
-              }`}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm shadow-lg transition-all duration-200 ${supplierData.is_active ? 'bg-gradient-success text-white shadow-green-500/30' : 'bg-gradient-danger text-white shadow-red-500/30'}`}
             >
               {supplierData.is_active ? (
                 <>
@@ -202,7 +192,7 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
 
           {/* Seção: Dados Cadastrais */}
           <div className="space-y-6">
-            <div className="flex items-center gap-3 pb-3 border-b-2 border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-3 pb-3 border-b-2 border-light-border dark:border-dark-border">
               <Building2 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               <h3 className="text-lg font-bold text-theme-primary">
                 Dados Cadastrais
@@ -230,7 +220,7 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
 
           {/* Seção: Contato */}
           <div className="space-y-6 mt-8">
-            <div className="flex items-center gap-3 pb-3 border-b-2 border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-3 pb-3 border-b-2 border-light-border dark:border-dark-border">
               <Mail className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               <h3 className="text-lg font-bold text-theme-primary">
                 Informações de Contato
@@ -250,7 +240,7 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
                       {supplierData.email}
                     </a>
                   ) : (
-                    <span className="text-gray-400 dark:text-gray-500 italic">
+                    <span className="text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary italic">
                       Não informado
                     </span>
                   )
@@ -268,7 +258,7 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
                       {formatPhone(supplierData.telefone)}
                     </a>
                   ) : (
-                    <span className="text-gray-400 dark:text-gray-500 italic">
+                    <span className="text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary italic">
                       Não informado
                     </span>
                   )
@@ -279,7 +269,7 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
                 label="Endereço"
                 value={
                   supplierData.endereco || (
-                    <span className="text-gray-400 dark:text-gray-500 italic">
+                    <span className="text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary italic">
                       Não informado
                     </span>
                   )
@@ -291,7 +281,7 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
 
           {/* Seção: Observações - SEMPRE VISÍVEL */}
           <div className="space-y-6 mt-8">
-            <div className="flex items-center gap-3 pb-3 border-b-2 border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-3 pb-3 border-b-2 border-light-border dark:border-dark-border">
               <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               <h3 className="text-lg font-bold text-theme-primary">
                 Observações
@@ -299,14 +289,14 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
             </div>
 
             {supplierData.observacoes ? (
-              <div className="bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-900/10 dark:to-indigo-900/10 rounded-xl p-4 border-2 border-blue-200 dark:border-blue-800">
+              <div className="bg-blue-50 dark:bg-blue-900/10 rounded-xl p-4 border-2 border-blue-200 dark:border-blue-800">
                 <p className="text-sm text-theme-primary whitespace-pre-wrap">
                   {supplierData.observacoes}
                 </p>
               </div>
             ) : (
-              <div className="bg-gradient-to-br from-gray-50/50 to-gray-100/50 dark:from-gray-800/30 dark:to-gray-750/30 rounded-xl p-4 border-2 border-gray-200 dark:border-gray-700">
-                <p className="text-sm text-gray-400 dark:text-gray-500 italic text-center">
+              <div className="bg-gray-50 dark:bg-gray-800/30 rounded-xl p-4 border-2 border-light-border dark:border-dark-border">
+                <p className="text-sm text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary italic text-center">
                   Nenhuma observação cadastrada para este fornecedor
                 </p>
               </div>
@@ -315,7 +305,7 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
 
           {/* Seção: Auditoria */}
           <div className="space-y-6 mt-8">
-            <div className="flex items-center gap-3 pb-3 border-b-2 border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-3 pb-3 border-b-2 border-light-border dark:border-dark-border">
               <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               <h3 className="text-lg font-bold text-theme-primary">
                 Informações de Auditoria
@@ -323,7 +313,7 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750 rounded-xl border-2 border-gray-200 dark:border-gray-700">
+              <div className="p-4 bg-gradient-light dark:from-gray-800 dark:to-gray-750 rounded-xl border-2 border-light-border dark:border-dark-border">
                 <p className="text-xs font-bold text-theme-secondary uppercase tracking-wide mb-2">
                   Cadastrado em
                 </p>
@@ -333,7 +323,7 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
               </div>
 
               {supplierData.updated_at && (
-                <div className="p-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750 rounded-xl border-2 border-gray-200 dark:border-gray-700">
+                <div className="p-4 bg-gradient-light dark:from-gray-800 dark:to-gray-750 rounded-xl border-2 border-light-border dark:border-dark-border">
                   <p className="text-xs font-bold text-theme-secondary uppercase tracking-wide mb-2">
                     Última Atualização
                   </p>
@@ -347,11 +337,11 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
         </div>
 
         {/* 🎬 Footer com Ações - DESIGN SYSTEM */}
-        <div className="px-6 py-4 border-t-2 border-light-border dark:border-dark-border bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750">
+        <div className="px-6 py-4 border-t-2 border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-surface">
           <div className="flex items-center justify-end gap-3">
             <button
               onClick={onClose}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold transition-all duration-200 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-dark-bg transform hover:scale-105"
+              className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold transition-all duration-200 bg-gradient-primary hover:opacity-90 text-dark-text-primary shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-dark-bg transform hover:scale-105"
             >
               <X className="w-5 h-5" />
               Fechar
@@ -362,5 +352,4 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
     </div>
   );
 };
-
 export default SupplierInfoModal;

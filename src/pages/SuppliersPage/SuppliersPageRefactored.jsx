@@ -41,7 +41,6 @@ import {
   EditSupplierModal,
   SupplierInfoModal,
 } from '../../molecules/SupplierModals';
-
 const SuppliersPageRefactored = () => {
   const { user } = useAuth();
   const { selectedUnit } = useUnit();
@@ -87,9 +86,7 @@ const SuppliersPageRefactored = () => {
         supplier.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         supplier.cpf_cnpj?.includes(searchTerm) ||
         supplier.email?.toLowerCase().includes(searchTerm.toLowerCase());
-
       const matchesStatus = showInactive || supplier.is_active;
-
       return matchesSearch && matchesStatus;
     });
   }, [suppliers, searchTerm, showInactive]);
@@ -106,17 +103,14 @@ const SuppliersPageRefactored = () => {
     setSelectedSupplier(null);
     setIsCreateModalOpen(true);
   };
-
   const handleEdit = supplier => {
     setSelectedSupplier(supplier);
     setIsEditModalOpen(true);
   };
-
   const handleInfo = supplier => {
     setSelectedSupplier(supplier);
     setIsInfoModalOpen(true);
   };
-
   const handleDelete = async supplier => {
     if (
       !window.confirm(
@@ -125,12 +119,9 @@ const SuppliersPageRefactored = () => {
     ) {
       return;
     }
-
     setDeletingId(supplier.id);
-
     try {
       const { error } = await deleteSupplier(supplier.id);
-
       if (error) {
         showToast({
           type: 'error',
@@ -153,11 +144,9 @@ const SuppliersPageRefactored = () => {
       setDeletingId(null);
     }
   };
-
   const handleActivate = async supplier => {
     try {
       const { error } = await activateSupplier(supplier.id);
-
       if (error) {
         showToast({
           type: 'error',
@@ -178,7 +167,6 @@ const SuppliersPageRefactored = () => {
       });
     }
   };
-
   const formatCNPJ = cnpj => {
     if (!cnpj) return '';
     if (cnpj.length === 11) {
@@ -198,7 +186,7 @@ const SuppliersPageRefactored = () => {
       <Layout>
         <div className="flex items-center justify-center h-screen">
           <div className="text-center space-y-4">
-            <Building2 className="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600" />
+            <Building2 className="w-16 h-16 mx-auto text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary" />
             <p className="text-theme-secondary font-medium">
               Selecione uma unidade para visualizar os fornecedores
             </p>
@@ -207,15 +195,14 @@ const SuppliersPageRefactored = () => {
       </Layout>
     );
   }
-
   return (
     <Layout>
       <div className="space-y-6">
         {/* 🎯 Header Premium - DESIGN SYSTEM */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
-              <Package className="w-8 h-8 text-white" />
+            <div className="p-3 bg-gradient-primary rounded-xl shadow-lg">
+              <Package className="w-8 h-8 text-dark-text-primary" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-theme-primary">
@@ -231,7 +218,7 @@ const SuppliersPageRefactored = () => {
           {canManage && (
             <button
               onClick={handleCreate}
-              className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+              className="flex items-center gap-2 px-5 py-3 bg-gradient-primary hover:opacity-90 text-dark-text-primary font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
             >
               <Plus className="w-5 h-5" />
               Fornecedor
@@ -244,8 +231,8 @@ const SuppliersPageRefactored = () => {
           {/* Card: Total */}
           <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-300">
             <div className="flex items-center justify-between mb-3">
-              <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
-                <Package className="w-6 h-6 text-white" />
+              <div className="p-3 bg-gradient-primary rounded-xl shadow-lg">
+                <Package className="w-6 h-6 text-dark-text-primary" />
               </div>
               <TrendingUp className="w-5 h-5 text-blue-500 dark:text-blue-400 opacity-60" />
             </div>
@@ -263,8 +250,8 @@ const SuppliersPageRefactored = () => {
           {/* Card: Ativos */}
           <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-green-300 dark:hover:border-green-700 transition-all duration-300">
             <div className="flex items-center justify-between mb-3">
-              <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg">
-                <CheckCircle className="w-6 h-6 text-white" />
+              <div className="p-3 bg-gradient-success rounded-xl shadow-lg">
+                <CheckCircle className="w-6 h-6 text-dark-text-primary" />
               </div>
               <TrendingUp className="w-5 h-5 text-green-500 dark:text-green-400 opacity-60" />
             </div>
@@ -282,8 +269,8 @@ const SuppliersPageRefactored = () => {
           {/* Card: Inativos */}
           <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-red-300 dark:hover:border-red-700 transition-all duration-300">
             <div className="flex items-center justify-between mb-3">
-              <div className="p-3 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl shadow-lg">
-                <XCircle className="w-6 h-6 text-white" />
+              <div className="p-3 bg-gradient-danger rounded-xl shadow-lg">
+                <XCircle className="w-6 h-6 text-dark-text-primary" />
               </div>
               <XCircle className="w-5 h-5 text-red-500 dark:text-red-400 opacity-60" />
             </div>
@@ -300,11 +287,11 @@ const SuppliersPageRefactored = () => {
         </div>
 
         {/* 🎛️ Filtros Premium - DESIGN SYSTEM */}
-        <div className="card-theme rounded-xl p-5 border-2 border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-300">
+        <div className="card-theme rounded-xl p-5 border-2 border-transparent hover:border-light-border dark:border-dark-border dark:hover:border-dark-border transition-all duration-300">
           <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
             {/* Busca Premium */}
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary w-5 h-5" />
               <input
                 type="text"
                 placeholder="Pesquisar por nome, CNPJ ou email..."
@@ -313,7 +300,7 @@ const SuppliersPageRefactored = () => {
                   setSearchTerm(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full pl-11 pr-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md"
+                className="w-full pl-11 pr-4 py-3 card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-xl text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md"
               />
             </div>
 
@@ -327,7 +314,7 @@ const SuppliersPageRefactored = () => {
                     setItemsPerPage(Number(e.target.value));
                     setCurrentPage(1);
                   }}
-                  className="px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-sm font-semibold text-theme-primary focus:ring-2 focus:ring-blue-500 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
+                  className="px-4 py-3 card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-xl text-sm font-semibold text-theme-primary focus:ring-2 focus:ring-blue-500 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
                 >
                   <option value={10}>10</option>
                   <option value={25}>25</option>
@@ -340,7 +327,7 @@ const SuppliersPageRefactored = () => {
               </div>
 
               {/* Mostrar inativos */}
-              <label className="flex items-center gap-2 px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer">
+              <label className="flex items-center gap-2 px-4 py-3 card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={showInactive}
@@ -348,7 +335,7 @@ const SuppliersPageRefactored = () => {
                     setShowInactive(e.target.checked);
                     setCurrentPage(1);
                   }}
-                  className="w-4 h-4 text-blue-600 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 cursor-pointer transition-all"
+                  className="w-4 h-4 text-blue-600 card-theme dark:bg-gray-700 border-light-border dark:border-dark-border rounded focus:ring-2 focus:ring-blue-500 cursor-pointer transition-all"
                 />
                 <span className="text-sm font-semibold text-theme-primary whitespace-nowrap">
                   Mostrar inativos
@@ -359,7 +346,7 @@ const SuppliersPageRefactored = () => {
         </div>
 
         {/* 📊 Tabela Premium - DESIGN SYSTEM */}
-        <div className="card-theme rounded-xl overflow-hidden border-2 border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-300">
+        <div className="card-theme rounded-xl overflow-hidden border-2 border-transparent hover:border-light-border dark:border-dark-border dark:hover:border-dark-border transition-all duration-300">
           {loading ? (
             <div className="flex items-center justify-center py-20">
               <div className="flex flex-col items-center gap-4">
@@ -381,7 +368,7 @@ const SuppliersPageRefactored = () => {
             </div>
           ) : filteredSuppliers.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20">
-              <Package className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" />
+              <Package className="w-16 h-16 text-gray-300 dark:text-gray-600 dark:text-theme-secondary mb-4" />
               <p className="text-theme-primary font-medium mb-2">
                 {searchTerm
                   ? 'Nenhum fornecedor encontrado'
@@ -397,7 +384,7 @@ const SuppliersPageRefactored = () => {
             <>
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750 border-b-2 border-gray-200 dark:border-gray-600">
+                  <thead className="bg-light-bg dark:bg-dark-surface border-b-2 border-light-border dark:border-dark-border">
                     <tr>
                       <th className="px-6 py-4 text-left text-xs font-bold text-theme-secondary uppercase tracking-wider">
                         Fornecedor
@@ -417,15 +404,11 @@ const SuppliersPageRefactored = () => {
                     {paginatedSuppliers.map(supplier => (
                       <tr
                         key={supplier.id}
-                        className={`group transition-all duration-200 ${
-                          !supplier.is_active
-                            ? 'opacity-60'
-                            : 'hover:bg-gradient-to-r hover:from-gray-50/50 hover:to-gray-100/50 dark:hover:from-gray-800/50 dark:hover:to-gray-750/50'
-                        }`}
+                        className={`group transition-all duration-200 ${!supplier.is_active ? 'opacity-60' : 'hover:bg-gray-50/50 dark:hover:bg-gray-800/50'}`}
                       >
                         <td className="px-6 py-4">
                           <div className="flex items-start gap-3">
-                            <div className="p-2 bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-lg">
+                            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                               <Package className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                             </div>
                             <div>
@@ -506,7 +489,7 @@ const SuppliersPageRefactored = () => {
 
               {/* Paginação Premium */}
               {totalPages > 1 && (
-                <div className="px-6 py-4 border-t-2 border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750">
+                <div className="px-6 py-4 border-t-2 border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-surface">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-medium text-theme-secondary">
                       Mostrando{' '}
@@ -530,11 +513,11 @@ const SuppliersPageRefactored = () => {
                       <button
                         onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                         disabled={currentPage === 1}
-                        className="px-4 py-2 text-sm font-semibold text-theme-primary bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md"
+                        className="px-4 py-2 text-sm font-semibold text-theme-primary card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md"
                       >
                         Anterior
                       </button>
-                      <span className="px-4 py-2 text-sm font-bold text-theme-primary bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-300 dark:border-blue-700 rounded-lg">
+                      <span className="px-4 py-2 text-sm font-bold text-theme-primary bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-300 dark:border-blue-700 rounded-lg">
                         Página {currentPage} de {totalPages}
                       </span>
                       <button
@@ -542,7 +525,7 @@ const SuppliersPageRefactored = () => {
                           setCurrentPage(p => Math.min(totalPages, p + 1))
                         }
                         disabled={currentPage === totalPages}
-                        className="px-4 py-2 text-sm font-semibold text-theme-primary bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md"
+                        className="px-4 py-2 text-sm font-semibold text-theme-primary card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md"
                       >
                         Próxima
                       </button>
@@ -594,5 +577,4 @@ const SuppliersPageRefactored = () => {
     </Layout>
   );
 };
-
 export default SuppliersPageRefactored;

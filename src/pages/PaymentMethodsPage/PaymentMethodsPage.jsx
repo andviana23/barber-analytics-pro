@@ -12,30 +12,23 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import {
-  Plus,
-  Search,
-  CreditCard,
-  Percent,
-  Calendar,
-  Edit2,
-  Trash2,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
-  Loader,
-} from 'lucide-react';
+import { Plus, Search, CreditCard, Percent, Calendar, Edit2, Trash2, CheckCircle, XCircle, AlertCircle, Loader } from 'lucide-react';
 import { Layout } from '../../components/Layout/Layout';
 import { useAuth } from '../../context/AuthContext';
 import { useUnit } from '../../context/UnitContext';
 import { useToast } from '../../context/ToastContext';
 import NovaFormaPagamentoModal from '../../molecules/NovaFormaPagamentoModal/NovaFormaPagamentoModal';
 import usePaymentMethods from '../../hooks/usePaymentMethods';
-
 const PaymentMethodsPage = () => {
-  const { user } = useAuth();
-  const { selectedUnit } = useUnit();
-  const { showToast } = useToast();
+  const {
+    user
+  } = useAuth();
+  const {
+    selectedUnit
+  } = useUnit();
+  const {
+    showToast
+  } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [showInactive, setShowInactive] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -51,10 +44,10 @@ const PaymentMethodsPage = () => {
     createPaymentMethod,
     updatePaymentMethod,
     deletePaymentMethod,
-    activatePaymentMethod,
+    activatePaymentMethod
   } = usePaymentMethods(selectedUnit?.id, {
     includeInactive: showInactive,
-    enableRealtime: true,
+    enableRealtime: true
   });
 
   // Verificar permissões - APENAS ADMIN pode gerenciar formas de pagamento
@@ -66,13 +59,10 @@ const PaymentMethodsPage = () => {
   const filteredMethods = useMemo(() => {
     return paymentMethods.filter(method => {
       // Filtro de busca
-      const matchesSearch =
-        searchTerm === '' ||
-        method.name?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = searchTerm === '' || method.name?.toLowerCase().includes(searchTerm.toLowerCase());
 
       // Filtro de status
       const matchesStatus = showInactive || method.is_active;
-
       return matchesSearch && matchesStatus;
     });
   }, [paymentMethods, searchTerm, showInactive]);
@@ -84,128 +74,113 @@ const PaymentMethodsPage = () => {
     setSelectedMethod(null);
     setIsModalOpen(true);
   };
-
   const handleEdit = method => {
     setSelectedMethod(method);
     setIsModalOpen(true);
   };
-
   const handleDelete = async method => {
-    if (
-      !window.confirm(
-        `Deseja realmente desativar a forma de pagamento "${method.name}"?`
-      )
-    ) {
+    if (!window.confirm(`Deseja realmente desativar a forma de pagamento "${method.name}"?`)) {
       return;
     }
-
     setDeletingId(method.id);
-
     try {
-      const { error } = await deletePaymentMethod(method.id);
-
+      const {
+        error
+      } = await deletePaymentMethod(method.id);
       if (error) {
         showToast({
           type: 'error',
           message: 'Erro ao desativar forma de pagamento',
-          description: error.message || 'Tente novamente mais tarde',
+          description: error.message || 'Tente novamente mais tarde'
         });
       } else {
         showToast({
           type: 'success',
-          message: 'Forma de pagamento desativada com sucesso',
+          message: 'Forma de pagamento desativada com sucesso'
         });
       }
     } catch (err) {
       showToast({
         type: 'error',
         message: 'Erro inesperado ao desativar forma de pagamento',
-        description: err.message,
+        description: err.message
       });
     } finally {
       setDeletingId(null);
     }
   };
-
   const handleActivate = async method => {
     try {
-      const { error } = await activatePaymentMethod(method.id);
-
+      const {
+        error
+      } = await activatePaymentMethod(method.id);
       if (error) {
         showToast({
           type: 'error',
           message: 'Erro ao ativar forma de pagamento',
-          description: error.message || 'Tente novamente mais tarde',
+          description: error.message || 'Tente novamente mais tarde'
         });
       } else {
         showToast({
           type: 'success',
-          message: 'Forma de pagamento ativada com sucesso',
+          message: 'Forma de pagamento ativada com sucesso'
         });
       }
     } catch (err) {
       showToast({
         type: 'error',
         message: 'Erro inesperado ao ativar forma de pagamento',
-        description: err.message,
+        description: err.message
       });
     }
   };
-
   const handleSave = async data => {
     try {
       let result;
-
       if (selectedMethod) {
         // Editar
         result = await updatePaymentMethod(selectedMethod.id, data);
-
         if (result.error) {
           showToast({
             type: 'error',
             message: 'Erro ao atualizar forma de pagamento',
-            description: result.error.message || 'Tente novamente mais tarde',
+            description: result.error.message || 'Tente novamente mais tarde'
           });
           return;
         }
-
         showToast({
           type: 'success',
-          message: 'Forma de pagamento atualizada com sucesso',
+          message: 'Forma de pagamento atualizada com sucesso'
         });
       } else {
         // Criar
         result = await createPaymentMethod(data);
-
         if (result.error) {
           showToast({
             type: 'error',
             message: 'Erro ao criar forma de pagamento',
-            description: result.error.message || 'Tente novamente mais tarde',
+            description: result.error.message || 'Tente novamente mais tarde'
           });
           return;
         }
-
         showToast({
           type: 'success',
-          message: 'Forma de pagamento criada com sucesso',
+          message: 'Forma de pagamento criada com sucesso'
         });
       }
-
       setIsModalOpen(false);
     } catch (err) {
       showToast({
         type: 'error',
         message: 'Erro inesperado ao salvar forma de pagamento',
-        description: err.message,
+        description: err.message
       });
     }
   };
 
   // Estado de loading
   if (loading) {
-    return (
-      <Layout activeMenuItem="cadastros">
+    return <Layout activeMenuItem="cadastros">
         <div className="p-6 flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <Loader className="w-12 h-12 animate-spin text-primary-light-500 dark:text-primary-dark-500 mx-auto mb-4" />
@@ -214,14 +189,12 @@ const PaymentMethodsPage = () => {
             </p>
           </div>
         </div>
-      </Layout>
-    );
+      </Layout>;
   }
 
   // Estado de erro
   if (error) {
-    return (
-      <Layout activeMenuItem="cadastros">
+    return <Layout activeMenuItem="cadastros">
         <div className="p-6 flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
@@ -231,24 +204,17 @@ const PaymentMethodsPage = () => {
             <p className="text-text-light-secondary dark:text-text-dark-secondary mb-4">
               {error.message || 'Ocorreu um erro inesperado'}
             </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-primary-light-500 dark:bg-primary-dark-500 text-white rounded-lg hover:bg-primary-light-600 dark:hover:bg-primary-dark-600"
-            >
+            <button onClick={() => window.location.reload()} className="px-4 py-2 bg-primary-light-500 dark:bg-primary-dark-500 text-dark-text-primary rounded-lg hover:bg-primary-light-600 dark:hover:bg-primary-dark-600">
               Tentar Novamente
             </button>
           </div>
         </div>
-      </Layout>
-    );
+      </Layout>;
   }
-
-  return (
-    <Layout activeMenuItem="cadastros">
+  return <Layout activeMenuItem="cadastros">
       <div className="p-6 space-y-6">
         {/* Aviso para não-admin */}
-        {!isAdmin && (
-          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 flex items-start gap-3">
+        {!isAdmin && <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 flex items-start gap-3">
             <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
             <div>
               <h3 className="font-semibold text-amber-800 dark:text-amber-300">
@@ -260,8 +226,7 @@ const PaymentMethodsPage = () => {
                 cadastradas, mas não pode modificá-las.
               </p>
             </div>
-          </div>
-        )}
+          </div>}
 
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -275,34 +240,24 @@ const PaymentMethodsPage = () => {
           </div>
 
           {/* Botão criar - apenas para ADMIN */}
-          {isAdmin ? (
-            <button
-              onClick={handleCreate}
-              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-600 transition-colors duration-300"
-            >
+          {isAdmin ? <button onClick={handleCreate} className="flex items-center gap-2 px-4 py-2 bg-primary text-dark-text-primary rounded-lg hover:bg-primary-600 transition-colors duration-300">
               <Plus className="h-5 w-5" />
               Nova Forma de Pagamento
-            </button>
-          ) : (
-            <div
-              className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 rounded-lg cursor-not-allowed"
-              title="Apenas administradores podem criar formas de pagamento"
-            >
+            </button> : <div className="flex items-center gap-2 px-4 py-2 card-theme dark:bg-gray-700 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary rounded-lg cursor-not-allowed" title="Apenas administradores podem criar formas de pagamento">
               <Plus className="h-5 w-5" />
               Nova Forma de Pagamento
-            </div>
-          )}
+            </div>}
         </div>
 
         {/* KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+          <div className="card-theme dark:bg-dark-surface p-6 rounded-lg border border-light-border dark:border-dark-border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                   Total
                 </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+                <p className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary mt-1">
                   {stats?.total || 0}
                 </p>
               </div>
@@ -310,10 +265,10 @@ const PaymentMethodsPage = () => {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+          <div className="card-theme dark:bg-dark-surface p-6 rounded-lg border border-light-border dark:border-dark-border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                   Ativas
                 </p>
                 <p className="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">
@@ -324,10 +279,10 @@ const PaymentMethodsPage = () => {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+          <div className="card-theme dark:bg-dark-surface p-6 rounded-lg border border-light-border dark:border-dark-border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                   Taxa Média
                 </p>
                 <p className="text-2xl font-bold text-orange-600 dark:text-orange-400 mt-1">
@@ -340,32 +295,21 @@ const PaymentMethodsPage = () => {
         </div>
 
         {/* Filtros */}
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="card-theme dark:bg-dark-surface p-4 rounded-lg border border-light-border dark:border-dark-border">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Busca */}
             <div className="md:col-span-2">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Buscar por nome..."
-                  value={searchTerm}
-                  onChange={e => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-light-text-muted dark:text-dark-text-muted" />
+                <input type="text" placeholder="Buscar por nome..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-primary focus:border-transparent" />
               </div>
             </div>
 
             {/* Filtro por Unidade (apenas para visualização) */}
             <div className="flex items-center gap-2">
               <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={showInactive}
-                  onChange={e => setShowInactive(e.target.checked)}
-                  className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
-                />
-                <span className="text-sm text-gray-700 dark:text-gray-300">
+                <input type="checkbox" checked={showInactive} onChange={e => setShowInactive(e.target.checked)} className="w-4 h-4 text-primary border-light-border dark:border-dark-border rounded focus:ring-primary" />
+                <span className="text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Mostrar inativas
                 </span>
               </label>
@@ -373,89 +317,73 @@ const PaymentMethodsPage = () => {
           </div>
 
           {/* Informação da unidade filtrada */}
-          {selectedUnit && (
-            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+          {selectedUnit && <div className="mt-3 pt-3 border-t border-light-border dark:border-dark-border">
+              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 Exibindo formas de pagamento da unidade:{' '}
-                <span className="font-semibold text-gray-900 dark:text-white">
+                <span className="font-semibold text-theme-primary dark:text-dark-text-primary">
                   {selectedUnit.name}
                 </span>
               </p>
-            </div>
-          )}
-          {!selectedUnit && (
-            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+            </div>}
+          {!selectedUnit && <div className="mt-3 pt-3 border-t border-light-border dark:border-dark-border">
+              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 Exibindo formas de pagamento de{' '}
-                <span className="font-semibold text-gray-900 dark:text-white">
+                <span className="font-semibold text-theme-primary dark:text-dark-text-primary">
                   todas as unidades
                 </span>
               </p>
-            </div>
-          )}
+            </div>}
         </div>
 
         {/* Lista de Formas de Pagamento */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="card-theme dark:bg-dark-surface rounded-lg border border-light-border dark:border-dark-border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 dark:bg-gray-700">
+              <thead className="bg-light-bg dark:bg-dark-bg dark:bg-gray-700">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
                     Nome
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
                     Unidade
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
                     Taxa (%)
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
                     Prazo (dias)
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
                     Status
                   </th>
-                  {isAdmin && (
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {isAdmin && <th className="px-6 py-3 text-right text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
                       Ações
-                    </th>
-                  )}
+                    </th>}
                 </tr>
               </thead>
-              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                {filteredMethods.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={isAdmin ? 6 : 5}
-                      className="px-6 py-8 text-center text-gray-500 dark:text-gray-400"
-                    >
+              <tbody className="card-theme dark:bg-dark-surface divide-y divide-gray-200 dark:divide-gray-700">
+                {filteredMethods.length === 0 ? <tr>
+                    <td colSpan={isAdmin ? 6 : 5} className="px-6 py-8 text-center text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                       Nenhuma forma de pagamento encontrada
                     </td>
-                  </tr>
-                ) : (
-                  filteredMethods.map(method => (
-                    <tr
-                      key={method.id}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-700"
-                    >
+                  </tr> : filteredMethods.map(method => <tr key={method.id} className="hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <CreditCard className="h-5 w-5 text-gray-400 mr-3" />
-                          <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          <CreditCard className="h-5 w-5 text-light-text-muted dark:text-dark-text-muted mr-3" />
+                          <span className="text-sm font-medium text-theme-primary dark:text-dark-text-primary">
                             {method.name}
                           </span>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-gray-700 dark:text-gray-300">
+                        <span className="text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600">
                           {method.units?.name || 'N/A'}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <Percent className="h-4 w-4 text-orange-500 mr-2" />
-                          <span className="text-sm text-gray-900 dark:text-white">
+                          <span className="text-sm text-theme-primary dark:text-dark-text-primary">
                             {method.fee_percentage.toFixed(2)}%
                           </span>
                         </div>
@@ -463,65 +391,33 @@ const PaymentMethodsPage = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <Calendar className="h-4 w-4 text-blue-500 mr-2" />
-                          <span className="text-sm text-gray-900 dark:text-white">
-                            {method.receipt_days === 0
-                              ? 'Imediato'
-                              : `${method.receipt_days} dias`}
+                          <span className="text-sm text-theme-primary dark:text-dark-text-primary">
+                            {method.receipt_days === 0 ? 'Imediato' : `${method.receipt_days} dias`}
                           </span>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {method.is_active ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                        {method.is_active ? <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                             <CheckCircle className="h-3 w-3" />
                             Ativa
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                          </span> : <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
                             <XCircle className="h-3 w-3" />
                             Inativa
-                          </span>
-                        )}
+                          </span>}
                       </td>
-                      {isAdmin && (
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      {isAdmin && <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex items-center justify-end gap-2">
-                            <button
-                              onClick={() => handleEdit(method)}
-                              className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 disabled:opacity-50"
-                              title="Editar"
-                              disabled={deletingId === method.id}
-                            >
+                            <button onClick={() => handleEdit(method)} className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 disabled:opacity-50" title="Editar" disabled={deletingId === method.id}>
                               <Edit2 className="h-4 w-4" />
                             </button>
-                            {method.is_active ? (
-                              <button
-                                onClick={() => handleDelete(method)}
-                                className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50"
-                                title="Desativar"
-                                disabled={deletingId === method.id}
-                              >
-                                {deletingId === method.id ? (
-                                  <Loader className="h-4 w-4 animate-spin" />
-                                ) : (
-                                  <Trash2 className="h-4 w-4" />
-                                )}
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() => handleActivate(method)}
-                                className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
-                                title="Ativar"
-                              >
+                            {method.is_active ? <button onClick={() => handleDelete(method)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50" title="Desativar" disabled={deletingId === method.id}>
+                                {deletingId === method.id ? <Loader className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                              </button> : <button onClick={() => handleActivate(method)} className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300" title="Ativar">
                                 <CheckCircle className="h-4 w-4" />
-                              </button>
-                            )}
+                              </button>}
                           </div>
-                        </td>
-                      )}
-                    </tr>
-                  ))
-                )}
+                        </td>}
+                    </tr>)}
               </tbody>
             </table>
           </div>
@@ -529,14 +425,7 @@ const PaymentMethodsPage = () => {
       </div>
 
       {/* Modal de Nova/Editar Forma de Pagamento */}
-      <NovaFormaPagamentoModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleSave}
-        paymentMethod={selectedMethod}
-      />
-    </Layout>
-  );
+      <NovaFormaPagamentoModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={handleSave} paymentMethod={selectedMethod} />
+    </Layout>;
 };
-
 export default PaymentMethodsPage;
