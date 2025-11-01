@@ -96,9 +96,12 @@ export function AuthProvider({ children }) {
 
     // Função para buscar papel do usuário
     const fetchUserRole = async userSession => {
+      // ✅ CRÍTICO: Se não tem sessão válida, retornar imediatamente
       if (!userSession?.user) {
         setAdminStatus(false);
         setUserRole(null);
+        setGerenteStatus(false);
+        setReceptionistStatus(false);
         return;
       }
 
@@ -187,12 +190,16 @@ export function AuthProvider({ children }) {
           }
         } else if (event === 'SIGNED_OUT') {
           console.log('👋 User signed out, clearing state...');
+          // ✅ CRÍTICO: Limpar TUDO imediatamente
           setSession(null);
           setUser(null);
           setUserRole(null);
           setAdminStatus(false);
           setGerenteStatus(false);
           setReceptionistStatus(false);
+          setLoading(false);
+          // ✅ CRÍTICO: Return para evitar finally
+          return;
         } else if (event === 'INITIAL_SESSION') {
           console.log('🚀 Initial session loaded');
           setSession(session);
@@ -317,6 +324,14 @@ export function AuthProvider({ children }) {
   // Função de logout
   const signOut = async () => {
     try {
+      // ✅ CRÍTICO: Limpar estado ANTES de fazer logout
+      // Isso evita race conditions com onAuthStateChange
+      setSession(null);
+      setUser(null);
+      setUserRole(null);
+      setAdminStatus(false);
+      setGerenteStatus(false);
+      setReceptionistStatus(false);
       setLoading(true);
 
       // TODO: Registrar logout no sistema de auditoria (desabilitado temporariamente)
