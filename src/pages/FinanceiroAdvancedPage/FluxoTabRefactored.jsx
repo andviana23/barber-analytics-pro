@@ -671,14 +671,16 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
   }, [globalFilters.unitId, dateRange.startDate, dateRange.endDate]);
 
   // Handlers
-  const handleDateRangeChange = newRange => {
-    if (newRange.startDate && newRange.endDate) {
-      setDateRange({
-        startDate: format(new Date(newRange.startDate), 'yyyy-MM-dd'),
-        endDate: format(new Date(newRange.endDate), 'yyyy-MM-dd'),
-      });
-    }
-  };
+  // NOTA: handleDateRangeChange não é mais necessário pois usamos usePeriodFilter hook
+  // const handleDateRangeChange = newRange => {
+  //   if (newRange.startDate && newRange.endDate) {
+  //     setDateRange({
+  //       startDate: format(new Date(newRange.startDate), 'yyyy-MM-dd'),
+  //       endDate: format(new Date(newRange.endDate), 'yyyy-MM-dd'),
+  //     });
+  //   }
+  // };
+
   const handleRefresh = () => {
     fetchCompleteCashflowData();
     refetch();
@@ -753,8 +755,8 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-24">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p className="text-theme-secondary font-medium">
+        <div className="w-12 h-12 mb-4 border-4 rounded-full border-primary border-t-transparent animate-spin"></div>
+        <p className="font-medium text-theme-secondary">
           Carregando fluxo de caixa...
         </p>
       </div>
@@ -763,14 +765,14 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-24">
-        <TrendingDown className="w-16 h-16 text-red-400 mb-4" />
-        <h3 className="text-xl font-semibold text-theme-primary mb-2">
+        <TrendingDown className="w-16 h-16 mb-4 text-red-400" />
+        <h3 className="mb-2 text-xl font-semibold text-theme-primary">
           Erro ao carregar dados
         </h3>
-        <p className="text-theme-secondary mb-6">{error}</p>
+        <p className="mb-6 text-theme-secondary">{error}</p>
         <button
           onClick={handleRefresh}
-          className="btn-theme-primary px-6 py-3 rounded-xl flex items-center gap-2"
+          className="flex items-center gap-2 px-6 py-3 btn-theme-primary rounded-xl"
         >
           <RefreshCw className="w-5 h-5" />
           Tentar Novamente
@@ -781,12 +783,12 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
   return (
     <div className="space-y-6">
       {/* 📊 Header com Controles - DESIGN SYSTEM */}
-      <div className="card-theme rounded-xl p-6">
+      <div className="p-6 card-theme rounded-xl">
         <div className="flex flex-col gap-6">
           {/* Linha 1: Título e Ações */}
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-3 from-blue-500 to-indigo-600 bg-blue-500 rounded-xl">
+              <div className="p-3 shadow-lg bg-gradient-primary rounded-xl">
                 <BarChart3 className="w-6 h-6 text-dark-text-primary" />
               </div>
               <div>
@@ -803,7 +805,7 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
               {/* Botão Atualizar */}
               <button
                 onClick={handleRefresh}
-                className="p-2.5 text-theme-secondary hover:text-theme-primary hover:card-theme dark:hover:bg-gray-700 rounded-xl transition-all"
+                className="p-2.5 text-theme-secondary hover:text-theme-primary hover:bg-light-hover dark:hover:bg-dark-hover rounded-xl transition-all"
                 title="Atualizar"
               >
                 <RefreshCw className="w-5 h-5" />
@@ -817,7 +819,7 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
                   !cashflowData.daily ||
                   cashflowData.daily.length === 0
                 }
-                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-theme-secondary border-2 border-light-border dark:border-dark-border rounded-xl hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700 hover:text-theme-primary transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-theme-secondary border-2 border-light-border dark:border-dark-border rounded-xl hover:bg-light-hover dark:hover:bg-dark-hover hover:text-theme-primary transition-all disabled:opacity-50"
                 title="Exportar CSV"
               >
                 {exporting ? (
@@ -835,7 +837,7 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
                   !cashflowData.daily ||
                   cashflowData.daily.length === 0
                 }
-                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-theme-secondary border-2 border-light-border dark:border-dark-border rounded-xl hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700 hover:text-theme-primary transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-theme-secondary border-2 border-light-border dark:border-dark-border rounded-xl hover:bg-light-hover dark:hover:bg-dark-hover hover:text-theme-primary transition-all disabled:opacity-50"
                 title="Exportar Excel"
               >
                 {exporting ? (
@@ -867,7 +869,7 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
           </div>
 
           {/* Linha 2: Filtros de Período */}
-          <div className="border-t-2 border-light-border dark:border-dark-border pt-6">
+          <div className="pt-6 border-t-2 border-light-border dark:border-dark-border">
             <PeriodFilter
               selectedPeriod={selectedPeriod}
               onPeriodChange={handlePeriodChange}
@@ -877,19 +879,19 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
           </div>
 
           {/* Linha 3: Navegação de Período e Descrição */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 bg-blue-50 dark:bg-blue-900/20 rounded-xl border-2 border-blue-200 dark:border-blue-800">
+          <div className="flex flex-col items-center justify-between gap-4 p-4 border-2 sm:flex-row bg-primary/5 dark:bg-primary/10 rounded-xl border-light-border dark:border-dark-border">
             {/* Navegação */}
             <div className="flex items-center gap-2">
               <button
                 onClick={goToPreviousPeriod}
-                className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-all"
+                className="p-2 transition-all rounded-lg text-primary hover:bg-light-hover dark:hover:bg-dark-hover"
                 title="Período anterior"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
 
-              <div className="flex items-center gap-2 px-4 py-2 card-theme dark:bg-dark-surface rounded-lg border border-blue-200 dark:border-blue-700">
-                <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              <div className="flex items-center gap-2 px-4 py-2 border rounded-lg card-theme dark:bg-dark-surface border-light-border dark:border-dark-border">
+                <Calendar className="w-4 h-4 text-primary" />
                 <span className="text-sm font-bold text-theme-primary">
                   {periodDescription}
                 </span>
@@ -897,7 +899,7 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
 
               <button
                 onClick={goToNextPeriod}
-                className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-all"
+                className="p-2 transition-all rounded-lg text-primary hover:bg-light-hover dark:hover:bg-dark-hover"
                 title="Próximo período"
               >
                 <ChevronRight className="w-5 h-5" />
@@ -908,7 +910,7 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
             {!isCurrentPeriod && (
               <button
                 onClick={resetToToday}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-dark-text-primary font-semibold rounded-lg transition-all shadow-md hover:shadow-lg"
+                className="px-4 py-2 transition-all rounded-lg shadow-md btn-theme-primary hover:shadow-lg"
               >
                 Voltar para Hoje
               </button>
@@ -916,9 +918,9 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
 
             {/* Badge Período Atual */}
             {isCurrentPeriod && (
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-green-100 dark:bg-green-900/30 border-2 border-green-300 dark:border-green-700 rounded-full">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 rounded-full">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                <span className="text-xs font-bold text-green-700 dark:text-green-300">
+                <span className="text-xs font-bold text-green-600 dark:text-green-400">
                   PERÍODO ATUAL
                 </span>
               </div>
@@ -928,10 +930,10 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
       </div>
 
       {/* 📈 Timeline de 12 Meses - DESIGN SYSTEM */}
-      <div className="card-theme rounded-xl p-6 border-2 border-transparent hover:border-purple-300 dark:hover:border-purple-700 transition-all duration-300">
+      <div className="p-6 transition-all duration-300 border-2 border-transparent card-theme rounded-xl hover:border-purple-300 dark:hover:border-purple-700">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-2.5 from-purple-500 to-violet-600 bg-purple-500 rounded-xl shadow-lg">
+          <div className="p-2.5 bg-purple-500 rounded-xl shadow-lg">
             <TrendingUp className="w-5 h-5 text-dark-text-primary" />
           </div>
           <div>
@@ -957,11 +959,11 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
       </div>
 
       {/* 📊 Tabela Consolidada: ACUMULADO - DESIGN SYSTEM */}
-      <div className="card-theme rounded-xl overflow-hidden">
+      <div className="overflow-hidden card-theme rounded-xl">
         {/* Header */}
-        <div className="bg-gradient-light dark:from-gray-800 dark:to-gray-700 px-6 py-4 border-b-2 border-light-border dark:border-dark-border">
+        <div className="px-6 py-4 border-b-2 bg-light-surface dark:bg-dark-surface border-light-border dark:border-dark-border">
           <div className="flex items-center gap-3">
-            <div className="p-2 from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
+            <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
               <DollarSign className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             </div>
             <h3 className="text-lg font-bold text-theme-primary">
@@ -973,21 +975,21 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
         {/* Tabela */}
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gradient-light dark:from-gray-800 dark:to-gray-700 border-b-2 border-light-border dark:border-dark-border">
+            <thead className="border-b-2 bg-light-surface dark:bg-dark-surface border-light-border dark:border-dark-border">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                <th className="px-6 py-4 text-xs font-bold tracking-wider text-left uppercase text-theme-secondary">
                   Data
                 </th>
-                <th className="px-6 py-4 text-right text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                <th className="px-6 py-4 text-xs font-bold tracking-wider text-right uppercase text-theme-secondary">
                   Entradas
                 </th>
-                <th className="px-6 py-4 text-right text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                <th className="px-6 py-4 text-xs font-bold tracking-wider text-right uppercase text-theme-secondary">
                   Saídas
                 </th>
-                <th className="px-6 py-4 text-right text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                <th className="px-6 py-4 text-xs font-bold tracking-wider text-right uppercase text-theme-secondary">
                   Saldo do Dia
                 </th>
-                <th className="px-6 py-4 text-right text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                <th className="px-6 py-4 text-xs font-bold tracking-wider text-right uppercase text-theme-secondary">
                   Acumulado
                 </th>
               </tr>
@@ -1001,16 +1003,16 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
                 return (
                   <tr
                     key={day.date}
-                    className={`group transition-all duration-200 ${isSaldoInicial ? 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-900/30 dark:hover:to-indigo-900/30' : isWeekend ? 'bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-indigo-50/30 dark:hover:from-blue-900/10 dark:hover:to-indigo-900/10' : 'hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/50 dark:hover:from-blue-900/10 dark:hover:to-indigo-900/10'}`}
+                    className={`group transition-all duration-200 ${isSaldoInicial ? 'bg-primary/5 dark:bg-primary/10 hover:bg-primary/10 dark:hover:bg-primary/15' : isWeekend ? 'bg-light-surface/50 dark:bg-dark-surface/50 hover:bg-light-hover dark:hover:bg-dark-hover' : 'hover:bg-light-hover dark:hover:bg-dark-hover'}`}
                   >
                     {/* Data */}
                     <td className="px-6 py-4">
                       {isSaldoInicial ? (
                         <div className="flex items-center gap-2">
-                          <div className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                            <TrendingUp className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                          <div className="p-1.5 bg-primary/10 dark:bg-primary/20 rounded-lg">
+                            <TrendingUp className="w-4 h-4 text-primary" />
                           </div>
-                          <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
+                          <span className="text-sm font-bold text-primary">
                             SALDO INICIAL
                           </span>
                         </div>
@@ -1095,7 +1097,7 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
       </div>
 
       {/* 📊 Gráficos de Distribuição - PIE CHARTS */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Distribuição de Receitas */}
         <PieChartCard
           title="Distribuição de Receitas"

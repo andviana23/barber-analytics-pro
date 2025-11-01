@@ -6,59 +6,59 @@
       "total": 22,
       "files": [
         {
-          "file": "src\\utils\\performance.jsx",
+          "file": "src/utils/performance.jsx",
           "count": 3
         },
         {
-          "file": "src\\organisms\\OrderItemsTable.jsx",
+          "file": "src/organisms/OrderItemsTable.jsx",
           "count": 1
         },
         {
-          "file": "src\\molecules\\OrderItemRow.jsx",
+          "file": "src/molecules/OrderItemRow.jsx",
           "count": 1
         },
         {
-          "file": "src\\atoms\\AnimatedComponents.jsx",
+          "file": "src/atoms/AnimatedComponents.jsx",
           "count": 1
         },
         {
-          "file": "src\\pages\\UnitsPage\\UnitsComparison.jsx",
+          "file": "src/pages/UnitsPage/UnitsComparison.jsx",
           "count": 1
         },
         {
-          "file": "src\\pages\\ListaDaVezPage\\ListaDaVezPage.jsx",
+          "file": "src/pages/ListaDaVezPage/ListaDaVezPage.jsx",
           "count": 3
         },
         {
-          "file": "src\\pages\\DashboardPage\\DashboardPage.jsx",
+          "file": "src/pages/DashboardPage/DashboardPage.jsx",
           "count": 3
         },
         {
-          "file": "src\\organisms\\PalettePreview\\PalettePreview.jsx",
+          "file": "src/organisms/PalettePreview/PalettePreview.jsx",
           "count": 1
         },
         {
-          "file": "src\\molecules\\ChartComponent\\ChartComponent.jsx",
+          "file": "src/molecules/ChartComponent/ChartComponent.jsx",
           "count": 1
         },
         {
-          "file": "src\\molecules\\CategoryHierarchicalDropdown\\CategoryHierarchicalDropdown.jsx",
+          "file": "src/molecules/CategoryHierarchicalDropdown/CategoryHierarchicalDropdown.jsx",
           "count": 2
         },
         {
-          "file": "src\\molecules\\CashflowChartCard\\CashflowChartCard.jsx",
+          "file": "src/molecules/CashflowChartCard/CashflowChartCard.jsx",
           "count": 1
         },
         {
-          "file": "src\\components\\ThemeValidator\\ThemeValidator.jsx",
+          "file": "src/components/ThemeValidator/ThemeValidator.jsx",
           "count": 2
         },
         {
-          "file": "src\\atoms\\PartySelector\\PartySelector.jsx",
+          "file": "src/atoms/PartySelector/PartySelector.jsx",
           "count": 1
         },
         {
-          "file": "src\\pages\\RelatoriosPage\\components\\RelatorioReceitaDespesa.jsx",
+          "file": "src/pages/RelatoriosPage/components/RelatorioReceitaDespesa.jsx",
           "count": 1
         }
       ],
@@ -69,23 +69,23 @@
       "total": 5,
       "files": [
         {
-          "file": "src\\pages\\LoginPage\\LoginPage.jsx",
+          "file": "src/pages/LoginPage/LoginPage.jsx",
           "count": 1
         },
         {
-          "file": "src\\pages\\GoalsPage\\GoalsPage.jsx",
+          "file": "src/pages/GoalsPage/GoalsPage.jsx",
           "count": 1
         },
         {
-          "file": "src\\organisms\\BarbeiroHeader\\BarbeiroHeader.jsx",
+          "file": "src/organisms/BarbeiroHeader/BarbeiroHeader.jsx",
           "count": 1
         },
         {
-          "file": "src\\atoms\\PartySelector\\PartySelector.jsx",
+          "file": "src/atoms/PartySelector/PartySelector.jsx",
           "count": 1
         },
         {
-          "file": "src\\components\\templates\\modals\\OrderPaymentModal.jsx",
+          "file": "src/components/templates/modals/OrderPaymentModal.jsx",
           "count": 1
         }
       ],
@@ -96,19 +96,19 @@
       "total": 4,
       "files": [
         {
-          "file": "src\\pages\\FinanceiroAdvancedPage\\ContasBancariasTab.jsx",
+          "file": "src/pages/FinanceiroAdvancedPage/ContasBancariasTab.jsx",
           "count": 1
         },
         {
-          "file": "src\\organisms\\ConciliacaoPanel\\ConciliacaoPanel.jsx",
+          "file": "src/organisms/ConciliacaoPanel/ConciliacaoPanel.jsx",
           "count": 1
         },
         {
-          "file": "src\\molecules\\SupplierModals\\SupplierInfoModal.jsx",
+          "file": "src/molecules/SupplierModals/SupplierInfoModal.jsx",
           "count": 1
         },
         {
-          "file": "src\\components\\templates\\modals\\OrderPaymentModal.jsx",
+          "file": "src/components/templates/modals/OrderPaymentModal.jsx",
           "count": 1
         }
       ],
@@ -118,7 +118,7 @@
   },
   "fileDetails": [
     {
-      "file": "src\\utils\\performance.jsx",
+      "file": "src/utils/performance.jsx",
       "violations": {
         "inlineStyles": {
           "count": 3,
@@ -134,7 +134,7 @@
       "totalViolations": 3
     },
     {
-      "file": "src\\pages\\ListaDaVezPage\\ListaDaVezPage.jsx",
+      "file": "src/pages/ListaDaVezPage/ListaDaVezPage.jsx",
       "violations": {
         "inlineStyles": {
           "count": 3,
@@ -150,7 +150,7 @@
       "totalViolations": 3
     },
     {
-      "file": "src\\pages\\DashboardPage\\DashboardPage.jsx",
+      "file": "src/pages/DashboardPage/DashboardPage.jsx",
       "violations": {
         "inlineStyles": {
           "count": 3,
@@ -166,37 +166,37 @@
       "totalViolations": 3
     },
     {
-      "file": "src\\molecules\\CategoryHierarchicalDropdown\\CategoryHierarchicalDropdown.jsx",
+      "file": "src/molecules/CategoryHierarchicalDropdown/CategoryHierarchicalDropdown.jsx",
       "violations": {
         "inlineStyles": {
           "count": 2,
           "severity": "MEDIUM",
           "description": "Estilos inline (evitar quando possível)",
           "examples": [
-            "style={{\n        fontWeight: 'bold',\n        color: '#1f2937',\n        // gray-800\n        backgroundColor: '#f9fafb' // gray-50\n      }}",
-            "style={{\n            paddingLeft: '1.5rem'\n          }}"
+            "style={{\n            fontWeight: 'bold',\n            color: '#1f2937',\n            // gray-800\n            backgroundColor: '#f9fafb', // gray-50\n          }}",
+            "style={{\n                paddingLeft: '1.5rem',\n              }}"
           ]
         }
       },
       "totalViolations": 2
     },
     {
-      "file": "src\\components\\ThemeValidator\\ThemeValidator.jsx",
+      "file": "src/components/ThemeValidator/ThemeValidator.jsx",
       "violations": {
         "inlineStyles": {
           "count": 2,
           "severity": "MEDIUM",
           "description": "Estilos inline (evitar quando possível)",
           "examples": [
-            "style={{\n                backgroundColor: result.foreground\n              }}",
-            "style={{\n                backgroundColor: result.background\n              }}"
+            "style={{\n                      backgroundColor: result.foreground,\n                    }}",
+            "style={{\n                      backgroundColor: result.background,\n                    }}"
           ]
         }
       },
       "totalViolations": 2
     },
     {
-      "file": "src\\atoms\\PartySelector\\PartySelector.jsx",
+      "file": "src/atoms/PartySelector/PartySelector.jsx",
       "violations": {
         "inlineGradients": {
           "count": 1,
@@ -210,13 +210,15 @@
           "count": 1,
           "severity": "MEDIUM",
           "description": "Estilos inline (evitar quando possível)",
-          "examples": ["style={{\n        maxHeight: '240px'\n      }}"]
+          "examples": [
+            "style={{\n              maxHeight: '240px',\n            }}"
+          ]
         }
       },
       "totalViolations": 2
     },
     {
-      "file": "src\\components\\templates\\modals\\OrderPaymentModal.jsx",
+      "file": "src/components/templates/modals/OrderPaymentModal.jsx",
       "violations": {
         "hardcodedColors": {
           "count": 1,
@@ -238,59 +240,63 @@
       "totalViolations": 2
     },
     {
-      "file": "src\\organisms\\OrderItemsTable.jsx",
+      "file": "src/organisms/OrderItemsTable.jsx",
       "violations": {
         "inlineStyles": {
           "count": 1,
           "severity": "MEDIUM",
           "description": "Estilos inline (evitar quando possível)",
           "examples": [
-            "style={{\n        gridTemplateColumns: showCommission ? 'minmax(150px, 2fr) minmax(120px, 1.5fr) 80px 100px 100px 100px 40px' : 'minmax(150px, 2fr) minmax(120px, 1.5fr) 80px 100px 40px'\n      }}"
+            "style={{\n              gridTemplateColumns: showCommission\n                ? 'minmax(150px, 2fr) minmax(120px, 1.5fr) 80px 100px 100px 100px 40px'\n                : 'minmax(150px, 2fr) minmax(120px, 1.5fr) 80px 100px 40px',\n            }}"
           ]
         }
       },
       "totalViolations": 1
     },
     {
-      "file": "src\\molecules\\OrderItemRow.jsx",
+      "file": "src/molecules/OrderItemRow.jsx",
       "violations": {
         "inlineStyles": {
           "count": 1,
           "severity": "MEDIUM",
           "description": "Estilos inline (evitar quando possível)",
           "examples": [
-            "style={{\n    gridTemplateColumns: showCommission ? 'minmax(150px, 2fr) minmax(120px, 1.5fr) 80px 100px 100px 100px 40px' : 'minmax(150px, 2fr) minmax(120px, 1.5fr) 80px 100px 40px'\n  }}"
+            "style={{\n        gridTemplateColumns: showCommission\n          ? 'minmax(150px, 2fr) minmax(120px, 1.5fr) 80px 100px 100px 100px 40px'\n          : 'minmax(150px, 2fr) minmax(120px, 1.5fr) 80px 100px 40px',\n      }}"
           ]
         }
       },
       "totalViolations": 1
     },
     {
-      "file": "src\\atoms\\AnimatedComponents.jsx",
+      "file": "src/atoms/AnimatedComponents.jsx",
       "violations": {
         "inlineStyles": {
           "count": 1,
           "severity": "MEDIUM",
           "description": "Estilos inline (evitar quando possível)",
-          "examples": ["style={{ overflow: 'hidden' }}"]
+          "examples": [
+            "style={{ overflow: 'hidden' }}"
+          ]
         }
       },
       "totalViolations": 1
     },
     {
-      "file": "src\\pages\\UnitsPage\\UnitsComparison.jsx",
+      "file": "src/pages/UnitsPage/UnitsComparison.jsx",
       "violations": {
         "inlineStyles": {
           "count": 1,
           "severity": "MEDIUM",
           "description": "Estilos inline (evitar quando possível)",
-          "examples": ["style={{\n          color: entry.color\n        }}"]
+          "examples": [
+            "style={{\n                color: entry.color,\n              }}"
+          ]
         }
       },
       "totalViolations": 1
     },
     {
-      "file": "src\\pages\\LoginPage\\LoginPage.jsx",
+      "file": "src/pages/LoginPage/LoginPage.jsx",
       "violations": {
         "inlineGradients": {
           "count": 1,
@@ -304,7 +310,7 @@
       "totalViolations": 1
     },
     {
-      "file": "src\\pages\\GoalsPage\\GoalsPage.jsx",
+      "file": "src/pages/GoalsPage/GoalsPage.jsx",
       "violations": {
         "inlineGradients": {
           "count": 1,
@@ -318,7 +324,7 @@
       "totalViolations": 1
     },
     {
-      "file": "src\\pages\\FinanceiroAdvancedPage\\ContasBancariasTab.jsx",
+      "file": "src/pages/FinanceiroAdvancedPage/ContasBancariasTab.jsx",
       "violations": {
         "hardcodedColors": {
           "count": 1,
@@ -332,19 +338,21 @@
       "totalViolations": 1
     },
     {
-      "file": "src\\organisms\\PalettePreview\\PalettePreview.jsx",
+      "file": "src/organisms/PalettePreview/PalettePreview.jsx",
       "violations": {
         "inlineStyles": {
           "count": 1,
           "severity": "MEDIUM",
           "description": "Estilos inline (evitar quando possível)",
-          "examples": ["style={{\n        backgroundColor: color.hex\n      }}"]
+          "examples": [
+            "style={{\n            backgroundColor: color.hex,\n          }}"
+          ]
         }
       },
       "totalViolations": 1
     },
     {
-      "file": "src\\organisms\\ConciliacaoPanel\\ConciliacaoPanel.jsx",
+      "file": "src/organisms/ConciliacaoPanel/ConciliacaoPanel.jsx",
       "violations": {
         "hardcodedColors": {
           "count": 1,
@@ -358,7 +366,7 @@
       "totalViolations": 1
     },
     {
-      "file": "src\\organisms\\BarbeiroHeader\\BarbeiroHeader.jsx",
+      "file": "src/organisms/BarbeiroHeader/BarbeiroHeader.jsx",
       "violations": {
         "inlineGradients": {
           "count": 1,
@@ -372,7 +380,7 @@
       "totalViolations": 1
     },
     {
-      "file": "src\\molecules\\SupplierModals\\SupplierInfoModal.jsx",
+      "file": "src/molecules/SupplierModals/SupplierInfoModal.jsx",
       "violations": {
         "hardcodedColors": {
           "count": 1,
@@ -386,19 +394,21 @@
       "totalViolations": 1
     },
     {
-      "file": "src\\molecules\\ChartComponent\\ChartComponent.jsx",
+      "file": "src/molecules/ChartComponent/ChartComponent.jsx",
       "violations": {
         "inlineStyles": {
           "count": 1,
           "severity": "MEDIUM",
           "description": "Estilos inline (evitar quando possível)",
-          "examples": ["style={{\n      height: height + 100\n    }}"]
+          "examples": [
+            "style={{\n          height: height + 100,\n        }}"
+          ]
         }
       },
       "totalViolations": 1
     },
     {
-      "file": "src\\molecules\\CashflowChartCard\\CashflowChartCard.jsx",
+      "file": "src/molecules/CashflowChartCard/CashflowChartCard.jsx",
       "violations": {
         "inlineStyles": {
           "count": 1,
@@ -412,7 +422,7 @@
       "totalViolations": 1
     },
     {
-      "file": "src\\pages\\RelatoriosPage\\components\\RelatorioReceitaDespesa.jsx",
+      "file": "src/pages/RelatoriosPage/components/RelatorioReceitaDespesa.jsx",
       "violations": {
         "inlineStyles": {
           "count": 1,
