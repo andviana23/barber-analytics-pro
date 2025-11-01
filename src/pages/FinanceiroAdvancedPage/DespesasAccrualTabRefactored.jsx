@@ -66,6 +66,9 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
   const [selectedPaymentDate, setSelectedPaymentDate] = useState(
     format(new Date(), 'yyyy-MM-dd')
   );
+  
+  // Estado para contar despesas recorrentes fora do período
+  const [recurringOutsidePeriod, setRecurringOutsidePeriod] = useState(0);
 
   // Filtros compactos
   const [filters, setFilters] = useState({
@@ -105,6 +108,17 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
       const { data, error } = await query;
       if (error) throw error;
       setExpenses(data || []);
+      
+      // 🔍 Verificar se há despesas recorrentes fora do período filtrado
+      const { count: countOutside } = await supabase
+        .from('expenses')
+        .select('id', { count: 'exact', head: true })
+        .eq('unit_id', globalFilters.unitId)
+        .eq('is_active', true)
+        .eq('is_recurring', true)
+        .or(`expected_payment_date.lt.${filters.dueDateFrom},expected_payment_date.gt.${filters.dueDateTo}`);
+      
+      setRecurringOutsidePeriod(countOutside || 0);
     } catch (error) {
       console.error('❌ Erro ao buscar despesas:', error);
       showToast({
@@ -345,6 +359,41 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
           </p>
         </div>
       </div>
+
+      {/* 🔔 Alerta: Despesas Recorrentes Fora do Período */}
+      {recurringOutsidePeriod > 0 && (
+        <div className="card-theme rounded-xl p-4 border-2 border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+          <div className="flex items-start gap-3">
+            <div className="p-2 bg-blue-500 dark:bg-blue-600 rounded-lg">
+              <Calendar className="w-5 h-5 text-white" />
+            </div>
+            <div className="flex-1">
+              <h4 className="text-sm font-bold text-blue-900 dark:text-blue-200 mb-1">
+                📅 Despesas Recorrentes Detectadas
+              </h4>
+              <p className="text-xs text-blue-800 dark:text-blue-300 leading-relaxed">
+                Existem <span className="font-bold">{recurringOutsidePeriod} despesas recorrentes</span> fora do período filtrado atual.
+                Para visualizar todas as parcelas, ajuste o filtro de data para um período maior (ex: próximos 12 meses).
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                const today = new Date();
+                const nextYear = new Date(today);
+                nextYear.setFullYear(today.getFullYear() + 1);
+                setFilters(prev => ({
+                  ...prev,
+                  dueDateFrom: format(today, 'yyyy-MM-dd'),
+                  dueDateTo: format(nextYear, 'yyyy-MM-dd'),
+                }));
+              }}
+              className="px-3 py-1.5 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200"
+            >
+              Ver Próximos 12 Meses
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 🎛️ Filtros e Ações Premium - DESIGN SYSTEM */}
       <div className="card-theme rounded-xl p-5 border-2 border-transparent hover:border-light-border dark:border-dark-border dark:hover:border-dark-border transition-all duration-300">
