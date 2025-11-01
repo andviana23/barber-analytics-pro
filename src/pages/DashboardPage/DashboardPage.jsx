@@ -15,7 +15,6 @@ import {
 import { UnitSelector } from '../../atoms';
 import { useUnit } from '../../context/UnitContext';
 import { supabase } from '../../services/supabase';
-import { useGoalsSummary } from '../../hooks';
 import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import {
@@ -66,7 +65,7 @@ export function DashboardPage() {
       // Buscar receitas dos últimos 3 meses
       const { data: revenues, error } = await supabase
         .from('revenues')
-        .select('amount, revenue_date, data_competencia, category_id, categories(name)')
+        .select('value, date, data_competencia, category_id, categories(name)')
         .eq('unit_id', selectedUnit.id)
         .gte(
           'data_competencia',
@@ -77,14 +76,19 @@ export function DashboardPage() {
         .order('data_competencia', {
           ascending: true,
         });
-      
+
       if (error) {
         console.error('❌ Erro ao buscar receitas:', error); // eslint-disable-line no-console
         throw error;
       }
-      
+
       if (process.env.NODE_ENV === 'development') {
-        console.log('📊 Receitas carregadas:', revenues?.length || 0, revenues?.slice(0, 3)); // eslint-disable-line no-console
+        // eslint-disable-line no-undef
+        console.log(
+          '📊 Receitas carregadas:',
+          revenues?.length || 0,
+          revenues?.slice(0, 3)
+        ); // eslint-disable-line no-console
       }
 
       // Processar dados por mês
@@ -105,33 +109,35 @@ export function DashboardPage() {
 
       // Agregar valores
       revenues?.forEach(rev => {
-        const competenciaDate = rev.data_competencia || rev.revenue_date;
+        const competenciaDate = rev.data_competencia || rev.date;
         if (!competenciaDate) {
           if (process.env.NODE_ENV === 'development') {
+            // eslint-disable-line no-undef
             console.warn('⚠️ Receita sem data:', rev); // eslint-disable-line no-console
           }
           return;
         }
-        
+
         const monthKey = format(new Date(competenciaDate), 'yyyy-MM');
-        
+
         if (monthlyData[monthKey]) {
           const categoryName = rev.categories?.name?.toLowerCase() || '';
-          const amount = parseFloat(rev.amount) || 0;
-          
+          const amount = parseFloat(rev.value) || 0;
+
           if (process.env.NODE_ENV === 'development') {
+            // eslint-disable-line no-undef
             console.log(`📅 ${monthKey}: ${categoryName} = R$ ${amount}`); // eslint-disable-line no-console
           }
-          
+
           monthlyData[monthKey].faturamentoGeral += amount;
-          
+
           if (
             categoryName.includes('assinatura') ||
             categoryName.includes('clube')
           ) {
             monthlyData[monthKey].assinaturas += amount;
           }
-          
+
           if (
             categoryName.includes('produto') ||
             categoryName.includes('venda')
@@ -144,6 +150,7 @@ export function DashboardPage() {
       // Converter para array para o gráfico
       const chartArray = Object.values(monthlyData);
       if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-line no-undef
         console.log('📈 Dados do gráfico:', chartArray); // eslint-disable-line no-console
       }
       setChartData(chartArray);
@@ -163,6 +170,7 @@ export function DashboardPage() {
       };
 
       if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-line no-undef
         console.log('📊 Dados do mês atual:', currentData); // eslint-disable-line no-console
         console.log('📊 Dados do mês anterior:', previousData); // eslint-disable-line no-console
       }
@@ -190,11 +198,12 @@ export function DashboardPage() {
         if (!previous || previous === 0) return 0;
         return ((current - previous) / previous) * 100;
       };
-      
+
       if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-line no-undef
         console.log('🎯 Metas carregadas:', goalsData); // eslint-disable-line no-console
       }
-      
+
       setKpis({
         revenueGeneral: {
           current: currentData.faturamentoGeral || 0,
@@ -203,32 +212,35 @@ export function DashboardPage() {
             currentData.faturamentoGeral || 0,
             previousData.faturamentoGeral || 0
           ),
-          achieved: revenueGoal?.achieved_value || currentData.faturamentoGeral || 0,
+          achieved:
+            revenueGoal?.achieved_value || currentData.faturamentoGeral || 0,
           percentage: revenueGoal?.progress_percentage || 0,
         },
         revenueSubscription: {
           current: currentData.assinaturas || 0,
           target: subscriptionGoal?.target_value || 0,
           trend: calcTrend(
-            currentData.assinaturas || 0, 
+            currentData.assinaturas || 0,
             previousData.assinaturas || 0
           ),
-          achieved: subscriptionGoal?.achieved_value || currentData.assinaturas || 0,
+          achieved:
+            subscriptionGoal?.achieved_value || currentData.assinaturas || 0,
           percentage: subscriptionGoal?.progress_percentage || 0,
         },
         revenueProduct: {
           current: currentData.produtos || 0,
           target: productGoal?.target_value || 0,
           trend: calcTrend(
-            currentData.produtos || 0, 
+            currentData.produtos || 0,
             previousData.produtos || 0
           ),
           achieved: productGoal?.achieved_value || currentData.produtos || 0,
           percentage: productGoal?.progress_percentage || 0,
         },
       });
-      
+
       if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-line no-undef
         console.log('✅ KPIs calculados com sucesso'); // eslint-disable-line no-console
       }
     } catch (error) {
@@ -237,13 +249,13 @@ export function DashboardPage() {
       setLoading(false);
     }
   };
-  
+
   useEffect(() => {
     if (selectedUnit?.id) {
       fetchDashboardData();
     }
   }, [selectedUnit?.id]); // eslint-disable-line react-hooks/exhaustive-deps
-  
+
   const formatCurrency = value => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -255,12 +267,15 @@ export function DashboardPage() {
   const CustomTooltip = ({ active, payload }) => {
     if (!active || !payload || !payload.length) return null;
     return (
-      <div className="card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-xl p-4 shadow-xl">
-        <p className="font-bold text-theme-primary dark:text-dark-text-primary mb-2">
+      <div className="p-4 border-2 shadow-xl card-theme dark:bg-dark-surface border-light-border dark:border-dark-border rounded-xl">
+        <p className="mb-2 font-bold text-theme-primary dark:text-dark-text-primary">
           {payload[0].payload.month}
         </p>
         {payload.map((entry, index) => (
-          <div key={index} className="flex items-center justify-between gap-4 text-sm">
+          <div
+            key={index}
+            className="flex items-center justify-between gap-4 text-sm"
+          >
             <div className="flex items-center gap-2">
               <div
                 className="w-3 h-3 rounded-full"
@@ -268,9 +283,7 @@ export function DashboardPage() {
                   backgroundColor: entry.color,
                 }}
               ></div>
-              <span className="text-theme-secondary">
-                {entry.name}:
-              </span>
+              <span className="text-theme-secondary">{entry.name}:</span>
             </div>
             <span className="font-bold text-theme-primary">
               {formatCurrency(entry.value)}
@@ -281,16 +294,16 @@ export function DashboardPage() {
     );
   };
   return (
-    <div className="min-h-screen bg-light-bg dark:bg-dark-bg p-6">
+    <div className="min-h-screen p-6 bg-light-bg dark:bg-dark-bg">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-4xl font-bold text-text-light-primary dark:text-text-dark-primary mb-2 flex items-center gap-3">
+            <h1 className="flex items-center gap-3 mb-2 text-4xl font-bold text-text-light-primary dark:text-text-dark-primary">
               <Activity className="w-9 h-9 text-primary" />
               Dashboard Financeiro
             </h1>
-            <p className="text-text-light-secondary dark:text-text-dark-secondary text-lg">
+            <p className="text-lg text-text-light-secondary dark:text-text-dark-secondary">
               Análise completa de desempenho e metas
             </p>
           </div>
@@ -300,7 +313,7 @@ export function DashboardPage() {
             <button
               onClick={fetchDashboardData}
               disabled={loading}
-              className="btn-theme-primary px-5 py-3 rounded-xl flex items-center gap-2 shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-5 py-3 transition-all shadow-lg btn-theme-primary rounded-xl hover:shadow-xl disabled:opacity-50"
             >
               <RefreshCw
                 className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`}
@@ -311,18 +324,18 @@ export function DashboardPage() {
         </div>
 
         {selectedUnit && (
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-light dark:bg-primary/20 rounded-lg border-2 border-primary/30">
+          <div className="inline-flex items-center gap-2 px-4 py-2 border-2 rounded-lg bg-primary-light dark:bg-primary/20 border-primary/30">
             <Calendar className="w-4 h-4 text-primary" />
             <span className="font-semibold text-text-light-primary dark:text-text-dark-primary">
               Unidade:
             </span>
-            <span className="text-primary font-bold">{selectedUnit.name}</span>
+            <span className="font-bold text-primary">{selectedUnit.name}</span>
           </div>
         )}
       </div>
 
       {/* 3 Cards de Metas Principais */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-3">
         <MetaCard
           title="Faturamento Geral"
           icon={DollarSign}
@@ -366,19 +379,19 @@ export function DashboardPage() {
       </div>
 
       {/* Gráfico de Linha - 3 Meses */}
-      <div className="card-theme p-8 rounded-3xl shadow-2xl mb-8">
+      <div className="p-8 mb-8 shadow-2xl card-theme rounded-3xl">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-text-light-primary dark:text-text-dark-primary flex items-center gap-2">
+            <h2 className="flex items-center gap-2 text-2xl font-bold text-text-light-primary dark:text-text-dark-primary">
               <TrendingUp className="w-7 h-7 text-primary" />
               Evolução Trimestral
             </h2>
-            <p className="text-text-light-secondary dark:text-text-dark-secondary mt-1">
+            <p className="mt-1 text-text-light-secondary dark:text-text-dark-secondary">
               Análise comparativa dos últimos 3 meses
             </p>
           </div>
 
-          <div className="flex items-center gap-3 px-4 py-2 bg-primary-light dark:bg-primary/20 rounded-lg">
+          <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-primary-light dark:bg-primary/20">
             <Calendar className="w-4 h-4 text-primary" />
             <span className="text-sm font-semibold text-text-light-primary dark:text-text-dark-primary">
               3 Meses
@@ -389,7 +402,7 @@ export function DashboardPage() {
         {loading ? (
           <div className="h-[400px] flex items-center justify-center">
             <div className="text-center">
-              <RefreshCw className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+              <RefreshCw className="w-12 h-12 mx-auto mb-4 text-primary animate-spin" />
               <p className="text-text-light-secondary dark:text-text-dark-secondary">
                 Carregando dados...
               </p>
@@ -471,7 +484,7 @@ export function DashboardPage() {
       </div>
 
       {/* Insights Rápidos */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <InsightCard
           title="Tendência Geral"
           value={kpis.revenueGeneral?.trend || 0}
@@ -517,10 +530,10 @@ const MetaCard = ({
   const isOnTrack = percentage >= 80;
   if (loading) {
     return (
-      <div className="card-theme p-6 rounded-2xl shadow-lg animate-pulse">
-        <div className="h-16 bg-light-surface dark:bg-dark-hover rounded-xl mb-4"></div>
-        <div className="h-10 bg-light-surface dark:bg-dark-hover rounded mb-3"></div>
-        <div className="h-3 bg-light-surface dark:bg-dark-hover rounded"></div>
+      <div className="p-6 shadow-lg card-theme rounded-2xl animate-pulse">
+        <div className="h-16 mb-4 bg-light-surface dark:bg-dark-hover rounded-xl"></div>
+        <div className="h-10 mb-3 rounded bg-light-surface dark:bg-dark-hover"></div>
+        <div className="h-3 rounded bg-light-surface dark:bg-dark-hover"></div>
       </div>
     );
   }
@@ -553,7 +566,7 @@ const MetaCard = ({
 
       {/* Valor Atual */}
       <div className="mb-3">
-        <div className="text-3xl font-bold text-text-light-primary dark:text-text-dark-primary mb-1">
+        <div className="mb-1 text-3xl font-bold text-text-light-primary dark:text-text-dark-primary">
           {new Intl.NumberFormat('pt-BR', {
             style: 'currency',
             currency: 'BRL',
@@ -574,21 +587,21 @@ const MetaCard = ({
 
       {/* Progress Bar */}
       <div className="mb-4">
-        <div className="flex justify-between text-xs mb-1">
-          <span className="text-text-light-secondary dark:text-text-dark-secondary font-medium">
+        <div className="flex justify-between mb-1 text-xs">
+          <span className="font-medium text-text-light-secondary dark:text-text-dark-secondary">
             Progresso
           </span>
           <span
             className={`font-bold ${isAchieved ? 'text-green-600 dark:text-green-400' : isOnTrack ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}
           >
-            {percentage.toFixed(1)}%
+            {(percentage || 0).toFixed(1)}%
           </span>
         </div>
         <div className="w-full h-2.5 bg-light-surface dark:bg-dark-hover rounded-full overflow-hidden">
           <div
             className={`h-full ${color} rounded-full transition-all duration-1000`}
             style={{
-              width: `${Math.min(100, percentage)}%`,
+              width: `${Math.min(100, percentage || 0)}%`,
             }}
           ></div>
         </div>
@@ -596,15 +609,15 @@ const MetaCard = ({
 
       {/* Trend */}
       <div className="flex items-center gap-2">
-        {trend >= 0 ? (
+        {(trend || 0) >= 0 ? (
           <ArrowUpRight className="w-4 h-4 text-green-600 dark:text-green-400" />
         ) : (
           <ArrowDownRight className="w-4 h-4 text-red-600 dark:text-red-400" />
         )}
         <span
-          className={`text-sm font-semibold ${trend >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+          className={`text-sm font-semibold ${(trend || 0) >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
         >
-          {Math.abs(trend).toFixed(1)}%
+          {Math.abs(trend || 0).toFixed(1)}%
         </span>
         <span className="text-xs text-text-light-secondary dark:text-text-dark-secondary">
           vs mês anterior
@@ -617,8 +630,9 @@ const MetaCard = ({
 // Componente de Insight Card
 const InsightCard = ({ title, value, description, type }) => {
   // Validar valor para evitar NaN ou undefined
-  const safeValue = isNaN(value) || value === null || value === undefined ? 0 : value;
-  
+  const safeValue =
+    isNaN(value) || value === null || value === undefined ? 0 : value;
+
   const getConfig = () => {
     switch (type) {
       case 'trend':
@@ -663,12 +677,12 @@ const InsightCard = ({ title, value, description, type }) => {
         };
     }
   };
-  
+
   const config = getConfig();
   const IconComponent = config.icon;
-  
+
   return (
-    <div className="card-theme p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
+    <div className="p-6 transition-shadow shadow-lg card-theme rounded-2xl hover:shadow-xl">
       <div className="flex items-center gap-3 mb-3">
         <div className={`p-3 rounded-xl ${config.bgColor}`}>
           <IconComponent className={`w-6 h-6 ${config.color}`} />
