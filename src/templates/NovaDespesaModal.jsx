@@ -528,8 +528,11 @@ const NovaDespesaModal = ({
         console.log('✅ Despesa criada:', expense);
       }
 
-      // Se for recorrente, criar configuração de recorrência
+      // Se for recorrente, criar configuração de recorrência E GERAR DESPESAS MENSAIS
       if (isRecurring && expense) {
+        console.log('🔁 Criando despesas recorrentes...');
+        
+        const totalParcelas = getTotalParcels();
         const recurringData = {
           expense_id: expense.id,
           unit_id: unidadeId,
@@ -537,12 +540,64 @@ const NovaDespesaModal = ({
           cobrar_sempre_no: recurringConfig.cobrar_sempre_no,
           duracao_personalizada: recurringConfig.duracao_personalizada,
           data_inicio: formData.data_competencia,
-          total_parcelas: getTotalParcels(),
+          total_parcelas: totalParcelas,
         };
+        
         const { error: recurringError } = await supabase
           .from('recurring_expenses')
           .insert(recurringData);
-        if (recurringError) throw recurringError;
+        
+        if (recurringError) {
+          console.error('❌ Erro ao criar configuração recorrente:', recurringError);
+          throw recurringError;
+        }
+        
+        // 🎯 CORREÇÃO DO BUG: Gerar as despesas mensais subsequentes
+        console.log(`📅 Gerando ${totalParcelas - 1} despesas mensais...`);
+        
+        const monthlyExpenses = [];
+        for (let i = 1; i < totalParcelas; i++) {
+          const nextMonthDate = addMonths(new Date(formData.data_competencia), i);
+          
+          // Ajustar dia do vencimento se configurado
+          let dueDate = nextMonthDate;
+          if (recurringConfig.cobrar_sempre_no) {
+            dueDate = new Date(nextMonthDate);
+            dueDate.setDate(parseInt(recurringConfig.cobrar_sempre_no));
+          }
+          
+          monthlyExpenses.push({
+            type: expenseData.type,
+            unit_id: unidadeId,
+            party_id: expenseData.party_id,
+            account_id: expenseData.account_id,
+            category_id: expenseData.category_id,
+            description: `${expenseData.description} (${i + 1}/${totalParcelas})`,
+            value: expenseData.value,
+            date: format(nextMonthDate, 'yyyy-MM-dd'),
+            data_competencia: format(nextMonthDate, 'yyyy-MM-dd'),
+            expected_payment_date: format(dueDate, 'yyyy-MM-dd'),
+            forma_pagamento: expenseData.forma_pagamento,
+            parcelamento: expenseData.parcelamento,
+            status: 'Pending',
+            is_active: true,
+            observations: `Recorrência ${i + 1}/${totalParcelas}`,
+            parent_expense_id: expense.id, // Vincular à despesa principal
+          });
+        }
+        
+        if (monthlyExpenses.length > 0) {
+          const { error: monthlyError } = await supabase
+            .from('expenses')
+            .insert(monthlyExpenses);
+          
+          if (monthlyError) {
+            console.error('❌ Erro ao criar despesas mensais:', monthlyError);
+            throw monthlyError;
+          }
+          
+          console.log(`✅ ${monthlyExpenses.length} despesas mensais criadas com sucesso!`);
+        }
       }
       addToast({
         type: 'success',

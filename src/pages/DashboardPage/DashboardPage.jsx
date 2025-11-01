@@ -55,9 +55,6 @@ export function DashboardPage() {
     },
   });
 
-  // Hook para buscar metas do mês atual
-  const { goals: monthlyGoals } = useGoalsSummary(selectedUnit?.id);
-
   // Buscar dados dos últimos 3 meses
   const fetchDashboardData = async () => {
     if (!selectedUnit?.id) return;
@@ -69,17 +66,26 @@ export function DashboardPage() {
       // Buscar receitas dos últimos 3 meses
       const { data: revenues, error } = await supabase
         .from('revenues')
-        .select('*, categories(name)')
+        .select('amount, revenue_date, data_competencia, category_id, categories(name)')
         .eq('unit_id', selectedUnit.id)
         .gte(
           'data_competencia',
           format(startOfMonth(threeMonthsAgo), 'yyyy-MM-dd')
         )
         .lte('data_competencia', format(endOfMonth(currentDate), 'yyyy-MM-dd'))
+        .eq('is_active', true)
         .order('data_competencia', {
           ascending: true,
         });
-      if (error) throw error;
+      
+      if (error) {
+        console.error('❌ Erro ao buscar receitas:', error); // eslint-disable-line no-console
+        throw error;
+      }
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('📊 Receitas carregadas:', revenues?.length || 0, revenues?.slice(0, 3)); // eslint-disable-line no-console
+      }
 
       // Processar dados por mês
       const monthlyData = {};
@@ -99,20 +105,33 @@ export function DashboardPage() {
 
       // Agregar valores
       revenues?.forEach(rev => {
-        const monthKey = format(
-          new Date(rev.data_competencia || rev.date),
-          'yyyy-MM'
-        );
+        const competenciaDate = rev.data_competencia || rev.revenue_date;
+        if (!competenciaDate) {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('⚠️ Receita sem data:', rev); // eslint-disable-line no-console
+          }
+          return;
+        }
+        
+        const monthKey = format(new Date(competenciaDate), 'yyyy-MM');
+        
         if (monthlyData[monthKey]) {
           const categoryName = rev.categories?.name?.toLowerCase() || '';
           const amount = parseFloat(rev.amount) || 0;
+          
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`📅 ${monthKey}: ${categoryName} = R$ ${amount}`); // eslint-disable-line no-console
+          }
+          
           monthlyData[monthKey].faturamentoGeral += amount;
+          
           if (
             categoryName.includes('assinatura') ||
             categoryName.includes('clube')
           ) {
             monthlyData[monthKey].assinaturas += amount;
           }
+          
           if (
             categoryName.includes('produto') ||
             categoryName.includes('venda')
@@ -124,13 +143,29 @@ export function DashboardPage() {
 
       // Converter para array para o gráfico
       const chartArray = Object.values(monthlyData);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('📈 Dados do gráfico:', chartArray); // eslint-disable-line no-console
+      }
       setChartData(chartArray);
 
       // Calcular KPIs do mês atual
       const currentMonth = format(currentDate, 'yyyy-MM');
-      const currentData = monthlyData[currentMonth] || {};
+      const currentData = monthlyData[currentMonth] || {
+        faturamentoGeral: 0,
+        assinaturas: 0,
+        produtos: 0,
+      };
       const previousMonth = format(subMonths(currentDate, 1), 'yyyy-MM');
-      const previousData = monthlyData[previousMonth] || {};
+      const previousData = monthlyData[previousMonth] || {
+        faturamentoGeral: 0,
+        assinaturas: 0,
+        produtos: 0,
+      };
+
+      if (process.env.NODE_ENV === 'development') {
+        console.log('📊 Dados do mês atual:', currentData); // eslint-disable-line no-console
+        console.log('📊 Dados do mês anterior:', previousData); // eslint-disable-line no-console
+      }
 
       // Buscar metas
       const currentMonthNumber = currentDate.getMonth() + 1;
@@ -152,46 +187,63 @@ export function DashboardPage() {
 
       // Calcular tendência (crescimento mês anterior)
       const calcTrend = (current, previous) => {
-        if (!previous) return 0;
+        if (!previous || previous === 0) return 0;
         return ((current - previous) / previous) * 100;
       };
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🎯 Metas carregadas:', goalsData); // eslint-disable-line no-console
+      }
+      
       setKpis({
         revenueGeneral: {
           current: currentData.faturamentoGeral || 0,
           target: revenueGoal?.target_value || 0,
           trend: calcTrend(
-            currentData.faturamentoGeral,
-            previousData.faturamentoGeral
+            currentData.faturamentoGeral || 0,
+            previousData.faturamentoGeral || 0
           ),
-          achieved: revenueGoal?.achieved_value || 0,
+          achieved: revenueGoal?.achieved_value || currentData.faturamentoGeral || 0,
           percentage: revenueGoal?.progress_percentage || 0,
         },
         revenueSubscription: {
           current: currentData.assinaturas || 0,
           target: subscriptionGoal?.target_value || 0,
-          trend: calcTrend(currentData.assinaturas, previousData.assinaturas),
-          achieved: subscriptionGoal?.achieved_value || 0,
+          trend: calcTrend(
+            currentData.assinaturas || 0, 
+            previousData.assinaturas || 0
+          ),
+          achieved: subscriptionGoal?.achieved_value || currentData.assinaturas || 0,
           percentage: subscriptionGoal?.progress_percentage || 0,
         },
         revenueProduct: {
           current: currentData.produtos || 0,
           target: productGoal?.target_value || 0,
-          trend: calcTrend(currentData.produtos, previousData.produtos),
-          achieved: productGoal?.achieved_value || 0,
+          trend: calcTrend(
+            currentData.produtos || 0, 
+            previousData.produtos || 0
+          ),
+          achieved: productGoal?.achieved_value || currentData.produtos || 0,
           percentage: productGoal?.progress_percentage || 0,
         },
       });
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('✅ KPIs calculados com sucesso'); // eslint-disable-line no-console
+      }
     } catch (error) {
-      console.error('Erro ao buscar dados:', error);
+      console.error('Erro ao buscar dados:', error); // eslint-disable-line no-console
     } finally {
       setLoading(false);
     }
   };
+  
   useEffect(() => {
     if (selectedUnit?.id) {
       fetchDashboardData();
     }
-  }, [selectedUnit]);
+  }, [selectedUnit?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  
   const formatCurrency = value => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -208,10 +260,7 @@ export function DashboardPage() {
           {payload[0].payload.month}
         </p>
         {payload.map((entry, index) => (
-          <div
-            key={index}
-            className="flex items-center justify-between gap-4 text-sm"
-          >
+          <div key={index} className="flex items-center justify-between gap-4 text-sm">
             <div className="flex items-center gap-2">
               <div
                 className="w-3 h-3 rounded-full"
@@ -219,11 +268,11 @@ export function DashboardPage() {
                   backgroundColor: entry.color,
                 }}
               ></div>
-              <span className="text-gray-700 dark:text-gray-300 dark:text-gray-600">
+              <span className="text-theme-secondary">
                 {entry.name}:
               </span>
             </div>
-            <span className="font-bold text-theme-primary dark:text-dark-text-primary">
+            <span className="font-bold text-theme-primary">
               {formatCurrency(entry.value)}
             </span>
           </div>
@@ -425,23 +474,23 @@ export function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <InsightCard
           title="Tendência Geral"
-          value={kpis.revenueGeneral.trend}
+          value={kpis.revenueGeneral?.trend || 0}
           description="Crescimento em relação ao mês anterior"
           type="trend"
         />
         <InsightCard
           title="Melhor Performance"
           value={Math.max(
-            kpis.revenueGeneral.percentage,
-            kpis.revenueSubscription.percentage,
-            kpis.revenueProduct.percentage
+            kpis.revenueGeneral?.percentage || 0,
+            kpis.revenueSubscription?.percentage || 0,
+            kpis.revenueProduct?.percentage || 0
           )}
           description="Meta com maior atingimento"
           type="performance"
         />
         <InsightCard
           title="Total do Mês"
-          value={kpis.revenueGeneral.achieved}
+          value={kpis.revenueGeneral?.achieved || 0}
           description="Faturamento acumulado"
           type="total"
         />
@@ -469,9 +518,9 @@ const MetaCard = ({
   if (loading) {
     return (
       <div className="card-theme p-6 rounded-2xl shadow-lg animate-pulse">
-        <div className="h-16 bg-gray-200 dark:bg-gray-700 rounded-xl mb-4"></div>
-        <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded mb-3"></div>
-        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded"></div>
+        <div className="h-16 bg-light-surface dark:bg-dark-hover rounded-xl mb-4"></div>
+        <div className="h-10 bg-light-surface dark:bg-dark-hover rounded mb-3"></div>
+        <div className="h-3 bg-light-surface dark:bg-dark-hover rounded"></div>
       </div>
     );
   }
@@ -535,7 +584,7 @@ const MetaCard = ({
             {percentage.toFixed(1)}%
           </span>
         </div>
-        <div className="w-full h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+        <div className="w-full h-2.5 bg-light-surface dark:bg-dark-hover rounded-full overflow-hidden">
           <div
             className={`h-full ${color} rounded-full transition-all duration-1000`}
             style={{
@@ -567,17 +616,20 @@ const MetaCard = ({
 
 // Componente de Insight Card
 const InsightCard = ({ title, value, description, type }) => {
+  // Validar valor para evitar NaN ou undefined
+  const safeValue = isNaN(value) || value === null || value === undefined ? 0 : value;
+  
   const getConfig = () => {
     switch (type) {
       case 'trend':
         return {
           icon: TrendingUp,
           color:
-            value >= 0
+            safeValue >= 0
               ? 'text-green-600 dark:text-green-400'
               : 'text-red-600 dark:text-red-400',
           bgColor:
-            value >= 0
+            safeValue >= 0
               ? 'bg-green-100 dark:bg-green-900/40'
               : 'bg-red-100 dark:bg-red-900/40',
           format: v => `${v >= 0 ? '+' : ''}${v.toFixed(1)}%`,
@@ -611,8 +663,10 @@ const InsightCard = ({ title, value, description, type }) => {
         };
     }
   };
+  
   const config = getConfig();
   const IconComponent = config.icon;
+  
   return (
     <div className="card-theme p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
       <div className="flex items-center gap-3 mb-3">
@@ -625,7 +679,7 @@ const InsightCard = ({ title, value, description, type }) => {
       </div>
 
       <div className={`text-3xl font-bold ${config.color} mb-2`}>
-        {config.format(value)}
+        {config.format(safeValue)}
       </div>
 
       <p className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
