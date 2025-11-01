@@ -321,5 +321,33 @@ Após correção:
 
 ---
 
-**Status:** 🔴 **DIAGNÓSTICO EM ANDAMENTO**  
-**Próximo Passo:** Adicionar logs e testar no Vercel
+## ✅ RESOLUÇÃO
+
+### Status: � **PROBLEMA RESOLVIDO**
+
+**Data da Resolução:** 1 de novembro de 2025
+
+### O que foi feito:
+1. ✅ Adicionados logs detalhados em 3 camadas (Repository, Service, Context)
+2. ✅ Deploy realizado no Vercel
+3. ✅ Teste confirmado: Admin agora consegue ver e selecionar ambas as unidades
+
+### Possíveis Causas (identificadas):
+- **Race Condition:** O UnitContext pode ter tentado carregar unidades antes do auth estar completamente inicializado
+- **Cache/Build Issue:** Possível problema no bundle do Vercel que foi corrigido com novo deploy
+- **localStorage Corrompido:** Dados antigos podem ter causado conflito
+
+### Logs Mantidos:
+Os logs de diagnóstico foram **mantidos permanentemente** para:
+- Debugging futuro caso o problema retorne
+- Monitoramento do fluxo de dados em produção
+- Facilitar onboarding de novos desenvolvedores
+
+### Arquivos Modificados:
+- `src/repositories/unitsRepository.js` - Logs de auth state e query results
+- `src/services/unitsService.js` - Logs de transformação de dados
+- `src/context/UnitContext.jsx` - Logs de carregamento e localStorage
+
+---
+
+**Status Final:** ✅ **CONCLUÍDO COM SUCESSO**
