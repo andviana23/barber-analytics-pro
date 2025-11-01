@@ -30,22 +30,26 @@ export const UnitProvider = ({ children }) => {
    * Carregar lista de unidades ativas
    */
   const loadUnits = useCallback(async () => {
-    console.log('🔄 UnitContext - Iniciando loadUnits...');
+    console.log('🔄 [UnitContext] Iniciando loadUnits...');
     try {
       setLoading(true);
       setError(null);
 
-      console.log('🔄 UnitContext - Chamando unitsService.getUnits...');
+      console.log('🔄 [UnitContext] Chamando unitsService.getUnits...');
       const { data, error } = await unitsService.getUnits({
         includeInactive: false,
       });
 
+      console.log('🔍 [UnitContext] loadUnits - data:', data);
+      console.log('🔍 [UnitContext] loadUnits - error:', error);
+
       if (error) {
+        console.error('❌ [UnitContext] loadUnits - erro:', error);
         throw error;
       }
 
       console.log(
-        '📍 UnitContext - Unidades carregadas:',
+        '📍 [UnitContext] Unidades carregadas:',
         data?.length || 0,
         data
       );
@@ -54,9 +58,11 @@ export const UnitProvider = ({ children }) => {
       // Se não há unidade selecionada, verificar localStorage
       if (!selectedUnit) {
         const savedUnitId = localStorage.getItem(SELECTED_UNIT_KEY);
+        console.log('🔍 [UnitContext] localStorage savedUnitId:', savedUnitId);
 
         if (savedUnitId && savedUnitId !== 'all') {
           const savedUnit = (data || []).find(unit => unit.id === savedUnitId);
+          console.log('🔍 [UnitContext] savedUnit encontrada:', savedUnit);
           if (savedUnit) {
             setSelectedUnit(savedUnit);
           }
@@ -65,7 +71,7 @@ export const UnitProvider = ({ children }) => {
 
       return data || [];
     } catch (err) {
-      console.error('❌ UnitContext - Erro ao carregar unidades:', err);
+      console.error('❌ [UnitContext] Erro ao carregar unidades:', err);
       setError(err.message || 'Erro ao carregar unidades');
       return [];
     } finally {

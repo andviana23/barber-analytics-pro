@@ -15,6 +15,25 @@ const formatOrder = query => query.order('name', { ascending: true });
 
 export const unitsRepository = {
   async findAll({ includeInactive = false } = {}) {
+    console.log(
+      '🔍 [unitsRepository] findAll - includeInactive:',
+      includeInactive
+    );
+
+    // Verificar estado de autenticação do Supabase
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+    console.log(
+      '👤 [unitsRepository] Supabase Auth User:',
+      user?.email,
+      user?.id
+    );
+    if (authError) {
+      console.error('❌ [unitsRepository] Erro de autenticação:', authError);
+    }
+
     let query = supabase.from(table).select(defaultSelect);
 
     if (!includeInactive) {
@@ -22,6 +41,11 @@ export const unitsRepository = {
     }
 
     const { data, error } = await formatOrder(query);
+
+    console.log('🔍 [unitsRepository] findAll - data:', data);
+    console.log('🔍 [unitsRepository] findAll - error:', error);
+    console.log('🔍 [unitsRepository] findAll - count:', data?.length);
+
     return { data, error };
   },
 

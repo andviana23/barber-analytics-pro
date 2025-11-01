@@ -160,10 +160,16 @@ class UnitsService {
   }
 
   async getUnits(params = {}) {
+    console.log('🔍 [unitsService] getUnits - params:', params);
+
     const includeInactive = this.resolveIncludeInactiveFlag(params);
     const filtersDTO = new UnitFiltersDTO({ includeInactive });
 
     if (!filtersDTO.isValid()) {
+      console.error(
+        '❌ [unitsService] getUnits - DTO inválido:',
+        filtersDTO.getErrorMessage()
+      );
       return {
         data: null,
         error: buildError(filtersDTO.getErrorMessage()),
@@ -171,18 +177,33 @@ class UnitsService {
     }
 
     try {
+      console.log('🔍 [unitsService] Chamando unitsRepository.findAll...');
       const { data, error } = await unitsRepository.findAll(
         filtersDTO.toRepositoryFilters()
       );
 
+      console.log('🔍 [unitsService] getUnits - repository data:', data);
+      console.log('🔍 [unitsService] getUnits - repository error:', error);
+
       if (error) {
+        console.error(
+          '❌ [unitsService] getUnits - erro do repository:',
+          error
+        );
         return { data: null, error };
       }
 
       const units = (data || []).map(toUnitResponse);
 
+      console.log(
+        '✅ [unitsService] getUnits - units mapeadas:',
+        units.length,
+        units
+      );
+
       return { data: units, error: null };
     } catch (error) {
+      console.error('❌ [unitsService] getUnits - catch error:', error);
       return {
         data: null,
         error: buildError(`Falha ao carregar unidades: ${error.message}`),
