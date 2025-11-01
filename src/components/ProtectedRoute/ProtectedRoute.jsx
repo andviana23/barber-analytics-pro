@@ -7,33 +7,36 @@ import { Loader2 } from 'lucide-react';
 export function ProtectedRoute({
   children,
   roles = [],
-  redirectTo = '/login'
+  redirectTo = '/login',
 }) {
-  const {
-    isAuthenticated,
-    loading,
-    userRole,
-    adminStatus
-  } = useAuth();
+  const { isAuthenticated, loading, userRole, adminStatus } = useAuth();
   const location = useLocation();
 
   // Mostrar loading enquanto verifica autenticação
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-light-bg dark:bg-dark-bg">
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-light-bg dark:bg-dark-bg">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
           <p className="text-text-light-secondary dark:text-text-dark-secondary">
             Verificando autenticação...
           </p>
         </div>
-      </div>;
+      </div>
+    );
   }
 
   // Se não estiver autenticado, redirecionar para login
   if (!isAuthenticated) {
-    return <Navigate to={redirectTo} state={{
-      from: location
-    }} replace />;
+    return (
+      <Navigate
+        to={redirectTo}
+        state={{
+          from: location,
+        }}
+        replace
+      />
+    );
   }
 
   // Se roles foram especificados, verificar permissão
@@ -54,25 +57,21 @@ export function ProtectedRoute({
 }
 
 // Componente para rotas que só devem ser acessadas quando NÃO autenticado
-export function PublicRoute({
-  children,
-  redirectTo = '/dashboard'
-}) {
-  const {
-    isAuthenticated,
-    loading
-  } = useAuth();
+export function PublicRoute({ children, redirectTo = '/dashboard' }) {
+  const { isAuthenticated, loading } = useAuth();
 
   // Mostrar loading enquanto verifica autenticação
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-light-bg dark:bg-dark-bg">
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-light-bg dark:bg-dark-bg">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
           <p className="text-text-light-secondary dark:text-text-dark-secondary">
             Carregando...
           </p>
         </div>
-      </div>;
+      </div>
+    );
   }
 
   // Se estiver autenticado, redirecionar para dashboard
@@ -90,34 +89,36 @@ export function RoleProtectedRoute({
   requiredRole,
   requiredPermission,
   fallback = null,
-  redirectTo = '/unauthorized'
+  redirectTo = '/unauthorized',
 }) {
-  const {
-    isAuthenticated,
-    loading,
-    hasPermission,
-    isAdmin,
-    user
-  } = useAuth();
+  const { isAuthenticated, loading, hasPermission, isAdmin, user } = useAuth();
   const location = useLocation();
 
   // Mostrar loading enquanto verifica autenticação
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-light-bg dark:bg-dark-bg">
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-light-bg dark:bg-dark-bg">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
           <p className="text-text-light-secondary dark:text-text-dark-secondary">
             Verificando permissões...
           </p>
         </div>
-      </div>;
+      </div>
+    );
   }
 
   // Se não estiver autenticado, redirecionar para login
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{
-      from: location
-    }} replace />;
+    return (
+      <Navigate
+        to="/login"
+        state={{
+          from: location,
+        }}
+        replace
+      />
+    );
   }
 
   // Verificar se é admin (tem acesso a tudo)
@@ -146,33 +147,35 @@ export function RoleProtectedRoute({
 }
 
 // Componente específico para Recepcionista - redireciona para Lista da Vez
-export function ReceptionistRoute({
-  children
-}) {
-  const {
-    isAuthenticated,
-    loading,
-    receptionistStatus
-  } = useAuth();
+export function ReceptionistRoute({ children }) {
+  const { isAuthenticated, loading, receptionistStatus } = useAuth();
   const location = useLocation();
 
   // Mostrar loading enquanto verifica autenticação
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-light-bg dark:bg-dark-bg">
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-light-bg dark:bg-dark-bg">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
           <p className="text-text-light-secondary dark:text-text-dark-secondary">
             Verificando permissões...
           </p>
         </div>
-      </div>;
+      </div>
+    );
   }
 
   // Se não estiver autenticado, redirecionar para login
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{
-      from: location
-    }} replace />;
+    return (
+      <Navigate
+        to="/login"
+        state={{
+          from: location,
+        }}
+        replace
+      />
+    );
   }
 
   // Se for Recepcionista, redirecionar para Lista da Vez
@@ -186,7 +189,8 @@ export function ReceptionistRoute({
 
 // Componente de fallback para acesso negado
 export function UnauthorizedPage() {
-  return <div className="min-h-screen flex items-center justify-center bg-light-bg dark:bg-dark-bg px-4">
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-light-bg dark:bg-dark-bg px-4">
       <div className="max-w-md w-full text-center">
         <div className="card-theme p-8 rounded-xl border border-light-border dark:border-dark-border shadow-lg">
           <div className="mx-auto w-16 h-16 bg-danger rounded-xl flex items-center justify-center mb-4">
@@ -198,10 +202,14 @@ export function UnauthorizedPage() {
           <p className="text-text-light-secondary dark:text-text-dark-secondary mb-6">
             Você não tem permissão para acessar esta página.
           </p>
-          <button onClick={() => window.history.back()} className="px-6 py-3 bg-primary text-dark-text-primary rounded-lg hover:bg-primary-600 transition-colors duration-300">
+          <button
+            onClick={() => window.history.back()}
+            className="px-6 py-3 bg-primary text-dark-text-primary rounded-lg hover:bg-primary-600 transition-colors duration-300"
+          >
             Voltar
           </button>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 }

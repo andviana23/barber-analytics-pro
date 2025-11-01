@@ -12,11 +12,7 @@ import { Edit, Check, X, AlertCircle, Clock, DollarSign } from 'lucide-react';
  * - onSave: (serviceId, newCommission) => Promise
  * - loading: boolean
  */
-export default function CommissionsTable({
-  commissions,
-  onSave,
-  loading
-}) {
+export default function CommissionsTable({ commissions, onSave, loading }) {
   const [editId, setEditId] = useState(null);
   const [editValue, setEditValue] = useState('');
   const [savingId, setSavingId] = useState(null);
@@ -70,35 +66,68 @@ export default function CommissionsTable({
   };
 
   // Componente de input editável reutilizável
-  const EditableInput = ({
-    item
-  }) => <div className="flex flex-col items-center gap-1">
-      <input type="number" min={0} max={100} step={0.01} value={editValue} onChange={e => handleInputChange(e.target.value)} className={`input-theme w-20 text-right ${validationError ? 'border-feedback-light-error dark:border-feedback-dark-error focus:ring-feedback-light-error/50' : ''}`} disabled={savingId === item.serviceId} autoFocus placeholder="0.00" />
-      {validationError && <div className="flex items-center gap-1 text-xs text-feedback-light-error dark:text-feedback-dark-error">
+  const EditableInput = ({ item }) => (
+    <div className="flex flex-col items-center gap-1">
+      <input
+        type="number"
+        min={0}
+        max={100}
+        step={0.01}
+        value={editValue}
+        onChange={e => handleInputChange(e.target.value)}
+        className={`input-theme w-20 text-right ${validationError ? 'border-feedback-light-error dark:border-feedback-dark-error focus:ring-feedback-light-error/50' : ''}`}
+        disabled={savingId === item.serviceId}
+        autoFocus
+        placeholder="0.00"
+      />
+      {validationError && (
+        <div className="flex items-center gap-1 text-xs text-feedback-light-error dark:text-feedback-dark-error">
           <AlertCircle className="w-3 h-3" />
           <span>{validationError}</span>
-        </div>}
-    </div>;
+        </div>
+      )}
+    </div>
+  );
 
   // Botões de ação reutilizáveis
-  const ActionButtons = ({
-    item
-  }) => {
+  const ActionButtons = ({ item }) => {
     if (editId === item.serviceId) {
-      return <div className="flex items-center justify-center gap-2">
-          <button className="p-1.5 rounded-lg text-feedback-light-success dark:text-feedback-dark-success hover:bg-light-bg dark:hover:bg-dark-hover transition-colors disabled:opacity-50" onClick={() => handleSave(item.serviceId)} disabled={savingId === item.serviceId || validationError} title={validationError ? 'Corrija os erros antes de salvar' : 'Salvar'}>
+      return (
+        <div className="flex items-center justify-center gap-2">
+          <button
+            className="p-1.5 rounded-lg text-feedback-light-success dark:text-feedback-dark-success hover:bg-light-bg dark:hover:bg-dark-hover transition-colors disabled:opacity-50"
+            onClick={() => handleSave(item.serviceId)}
+            disabled={savingId === item.serviceId || validationError}
+            title={
+              validationError ? 'Corrija os erros antes de salvar' : 'Salvar'
+            }
+          >
             <Check className="w-4 h-4" />
           </button>
-          <button className="p-1.5 rounded-lg text-feedback-light-error dark:text-feedback-dark-error hover:bg-light-bg dark:hover:bg-dark-hover transition-colors" onClick={handleCancel} title="Cancelar">
+          <button
+            className="p-1.5 rounded-lg text-feedback-light-error dark:text-feedback-dark-error hover:bg-light-bg dark:hover:bg-dark-hover transition-colors"
+            onClick={handleCancel}
+            title="Cancelar"
+          >
             <X className="w-4 h-4" />
           </button>
-        </div>;
+        </div>
+      );
     }
-    return <button className="p-1.5 rounded-lg text-primary hover:bg-light-bg dark:hover:bg-dark-hover transition-colors" onClick={() => handleEdit(item.serviceId, item.currentCommission?.toFixed(2) ?? '')} title="Editar comissão">
+    return (
+      <button
+        className="p-1.5 rounded-lg text-primary hover:bg-light-bg dark:hover:bg-dark-hover transition-colors"
+        onClick={() =>
+          handleEdit(item.serviceId, item.currentCommission?.toFixed(2) ?? '')
+        }
+        title="Editar comissão"
+      >
         <Edit className="w-4 h-4" />
-      </button>;
+      </button>
+    );
   };
-  return <div className="w-full space-y-3">
+  return (
+    <div className="w-full space-y-3">
       {/* Versão Desktop - Tabela */}
       <div className="hidden md:block overflow-x-auto rounded-lg border border-light-border dark:border-dark-border shadow-sm">
         <table className="w-full text-sm card-theme">
@@ -122,14 +151,22 @@ export default function CommissionsTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-light-border dark:divide-dark-border">
-            {commissions.map(item => <tr key={item.serviceId} className="hover:bg-light-bg dark:hover:bg-dark-hover transition-colors">
+            {commissions.map(item => (
+              <tr
+                key={item.serviceId}
+                className="hover:bg-light-bg dark:hover:bg-dark-hover transition-colors"
+              >
                 <td className="px-4 py-3 text-text-light-primary dark:text-text-dark-primary font-medium">
                   {item.serviceName}
                 </td>
                 <td className="px-4 py-3 text-center">
-                  {editId === item.serviceId ? <EditableInput item={item} /> : <span className="text-text-light-primary dark:text-text-dark-primary font-semibold">
+                  {editId === item.serviceId ? (
+                    <EditableInput item={item} />
+                  ) : (
+                    <span className="text-text-light-primary dark:text-text-dark-primary font-semibold">
                       {item.currentCommission?.toFixed(2) ?? '—'}%
-                    </span>}
+                    </span>
+                  )}
                 </td>
                 <td className="px-4 py-3 text-center text-text-light-secondary dark:text-text-dark-secondary">
                   {item.serviceDuration ?? '—'} min
@@ -140,14 +177,19 @@ export default function CommissionsTable({
                 <td className="px-4 py-3 text-center">
                   <ActionButtons item={item} />
                 </td>
-              </tr>)}
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
 
       {/* Versão Mobile - Cards */}
       <div className="md:hidden space-y-3">
-        {commissions.map(item => <div key={item.serviceId} className="card-theme border border-light-border dark:border-dark-border rounded-lg p-4 shadow-sm">
+        {commissions.map(item => (
+          <div
+            key={item.serviceId}
+            className="card-theme border border-light-border dark:border-dark-border rounded-lg p-4 shadow-sm"
+          >
             {/* Nome do Serviço */}
             <div className="flex items-start justify-between mb-3">
               <h4 className="font-semibold text-text-light-primary dark:text-text-dark-primary text-base">
@@ -163,9 +205,13 @@ export default function CommissionsTable({
                 <span className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
                   Comissão:
                 </span>
-                {editId === item.serviceId ? <EditableInput item={item} /> : <span className="text-sm font-semibold text-text-light-primary dark:text-text-dark-primary">
+                {editId === item.serviceId ? (
+                  <EditableInput item={item} />
+                ) : (
+                  <span className="text-sm font-semibold text-text-light-primary dark:text-text-dark-primary">
                     {item.currentCommission?.toFixed(2) ?? '—'}%
-                  </span>}
+                  </span>
+                )}
               </div>
 
               {/* Tempo e Valor */}
@@ -177,18 +223,24 @@ export default function CommissionsTable({
                 <div className="flex items-center gap-1.5 text-sm font-medium text-text-light-primary dark:text-text-dark-primary">
                   <DollarSign className="w-4 h-4" />
                   <span>
-                    {item.servicePrice ? formatCurrency(item.servicePrice) : '—'}
+                    {item.servicePrice
+                      ? formatCurrency(item.servicePrice)
+                      : '—'}
                   </span>
                 </div>
               </div>
             </div>
-          </div>)}
+          </div>
+        ))}
       </div>
 
       {/* Loading Indicator */}
-      {loading && <div className="mt-3 flex items-center justify-center gap-2 text-sm text-text-light-secondary dark:text-text-dark-secondary">
+      {loading && (
+        <div className="mt-3 flex items-center justify-center gap-2 text-sm text-text-light-secondary dark:text-text-dark-secondary">
           <div className="animate-spin rounded-full h-4 w-4 border-2 border-light-border dark:border-dark-border border-t-primary"></div>
           Salvando alterações...
-        </div>}
-    </div>;
+        </div>
+      )}
+    </div>
+  );
 }

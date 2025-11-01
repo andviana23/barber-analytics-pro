@@ -37,7 +37,10 @@ const BarbeiroStatsCard = React.memo(
     tone = 'neutral',
     annotation,
     annotationTone = 'neutral',
+    key, // Remover key do spread (é automaticamente filtrado pelo React)
+    ...rest // Capturar e ignorar outras propriedades que possam vir do spread
   }) => {
+    // Ignorar as demais propriedades (como 'jsx' ou outras não esperadas)
     const cardTone = cardToneMap[tone] ?? cardToneMap.neutral;
     const badgeTone = badgeToneMap[tone] ?? badgeToneMap.neutral;
     const annotationClass =

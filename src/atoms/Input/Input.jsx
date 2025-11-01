@@ -7,6 +7,22 @@ const Input = ({ label, error, helperText, className = '', ...props }) => {
     ${className}
   `;
 
+  // Filtrar apenas atributos válidos para input
+  const validInputProps = {};
+  const validInputAttributes = [
+    'type', 'id', 'name', 'value', 'placeholder', 'disabled',
+    'readonly', 'required', 'minLength', 'maxLength', 'pattern',
+    'min', 'max', 'step', 'onChange', 'onBlur', 'onFocus',
+    'onClick', 'onKeyDown', 'onKeyUp', 'onPaste', 'autoComplete',
+    'autoFocus', 'defaultValue', 'title', 'aria-label', 'aria-describedby'
+  ];
+  
+  Object.keys(props).forEach(key => {
+    if (validInputAttributes.includes(key)) {
+      validInputProps[key] = props[key];
+    }
+  });
+
   return (
     <div className="space-y-1">
       {label && (
@@ -14,7 +30,7 @@ const Input = ({ label, error, helperText, className = '', ...props }) => {
           {label}
         </label>
       )}
-      <input className={inputClasses} {...props} />
+      <input className={inputClasses} {...validInputProps} />
       {error && (
         <p className="text-feedback-light-error dark:text-feedback-dark-error text-sm">
           {error}
@@ -44,6 +60,22 @@ const Textarea = ({
     ${className}
   `;
 
+  // Filtrar apenas atributos válidos para textarea
+  const validTextareaProps = {};
+  const validTextareaAttributes = [
+    'id', 'name', 'value', 'placeholder', 'disabled',
+    'readonly', 'required', 'minLength', 'maxLength',
+    'onChange', 'onBlur', 'onFocus', 'onClick',
+    'onKeyDown', 'onKeyUp', 'onPaste', 'autoComplete',
+    'autoFocus', 'defaultValue', 'title', 'aria-label', 'aria-describedby'
+  ];
+  
+  Object.keys(props).forEach(key => {
+    if (validTextareaAttributes.includes(key)) {
+      validTextareaProps[key] = props[key];
+    }
+  });
+
   return (
     <div className="space-y-1">
       {label && (
@@ -51,7 +83,7 @@ const Textarea = ({
           {label}
         </label>
       )}
-      <textarea className={textareaClasses} rows={rows} {...props} />
+      <textarea className={textareaClasses} rows={rows} {...validTextareaProps} />
       {error && (
         <p className="text-feedback-light-error dark:text-feedback-dark-error text-sm">
           {error}
@@ -81,6 +113,21 @@ const Select = ({
     ${className}
   `;
 
+  // Filtrar apenas atributos válidos para select
+  const validSelectProps = {};
+  const validSelectAttributes = [
+    'id', 'name', 'value', 'disabled', 'required',
+    'onChange', 'onBlur', 'onFocus', 'onClick',
+    'onKeyDown', 'onKeyUp', 'autoComplete', 'autoFocus',
+    'defaultValue', 'title', 'aria-label', 'aria-describedby', 'multiple'
+  ];
+  
+  Object.keys(props).forEach(key => {
+    if (validSelectAttributes.includes(key)) {
+      validSelectProps[key] = props[key];
+    }
+  });
+
   return (
     <div className="space-y-1">
       {label && (
@@ -88,7 +135,7 @@ const Select = ({
           {label}
         </label>
       )}
-      <select className={selectClasses} {...props}>
+      <select className={selectClasses} {...validSelectProps}>
         <option value="">{placeholder}</option>
         {options.map((option, index) => (
           <option key={index} value={option.value}>

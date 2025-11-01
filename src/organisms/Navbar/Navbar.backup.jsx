@@ -2,15 +2,19 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ThemeToggleCompact } from '../../atoms/ThemeToggle';
 import { useAuth } from '../../context/AuthContext';
-import { Menu, Bell, Search, User, ChevronDown, Settings, LogOut, UserCircle } from 'lucide-react';
-export function Navbar({
-  onMenuToggle
-}) {
+import {
+  Menu,
+  Bell,
+  Search,
+  User,
+  ChevronDown,
+  Settings,
+  LogOut,
+  UserCircle,
+} from 'lucide-react';
+export function Navbar({ onMenuToggle }) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const {
-    user,
-    signOut
-  } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const userMenuRef = useRef(null);
 
@@ -44,24 +48,31 @@ export function Navbar({
       barbeiro: 'Barbeiro',
       barber: 'Barbeiro',
       recepcionista: 'Recepcionista',
-      receptionist: 'Recepcionista'
+      receptionist: 'Recepcionista',
     };
     return roles[role] || 'Usuário';
   };
-  return <nav className="sticky top-0 z-50 bg-light-surface/80 dark:bg-dark-surface/80 backdrop-blur-sm border-b border-light-border dark:border-dark-border transition-colors duration-300">
+  return (
+    <nav className="sticky top-0 z-50 bg-light-surface/80 dark:bg-dark-surface/80 backdrop-blur-sm border-b border-light-border dark:border-dark-border transition-colors duration-300">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Left section */}
           <div className="flex items-center gap-4">
             {/* Mobile menu button */}
-            <button onClick={onMenuToggle} className="lg:hidden p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-dark-bg transition-colors duration-300" aria-label="Toggle menu">
+            <button
+              onClick={onMenuToggle}
+              className="lg:hidden p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-dark-bg transition-colors duration-300"
+              aria-label="Toggle menu"
+            >
               <Menu className="h-5 w-5" />
             </button>
 
             {/* Logo */}
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-dark-text-primary font-bold text-sm">TB</span>
+                <span className="text-dark-text-primary font-bold text-sm">
+                  TB
+                </span>
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-text-light-primary dark:text-text-dark-primary font-semibold text-lg">
@@ -78,7 +89,11 @@ export function Navbar({
           <div className="hidden md:flex flex-1 max-w-md mx-8">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-text-light-secondary dark:text-text-dark-secondary" />
-              <input type="text" placeholder="Buscar..." className="w-full pl-10 pr-4 py-2 rounded-lg border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-300" />
+              <input
+                type="text"
+                placeholder="Buscar..."
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-300"
+              />
             </div>
           </div>
 
@@ -100,9 +115,20 @@ export function Navbar({
 
             {/* User menu */}
             <div className="relative" ref={userMenuRef}>
-              <button onClick={() => setIsUserMenuOpen(!isUserMenuOpen)} className="flex items-center gap-2 p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-dark-bg transition-colors duration-300">
+              <button
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                className="flex items-center gap-2 p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-dark-bg transition-colors duration-300"
+              >
                 <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                  {user?.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} alt="Avatar" className="w-full h-full rounded-full object-cover" /> : <User className="h-4 w-4 text-dark-text-primary" />}
+                  {user?.user_metadata?.avatar_url ? (
+                    <img
+                      src={user.user_metadata.avatar_url}
+                      alt="Avatar"
+                      className="w-full h-full rounded-full object-cover"
+                    />
+                  ) : (
+                    <User className="h-4 w-4 text-dark-text-primary" />
+                  )}
                 </div>
                 <div className="hidden sm:block text-left">
                   <p className="text-text-light-primary dark:text-text-dark-primary text-sm font-medium">
@@ -116,7 +142,8 @@ export function Navbar({
               </button>
 
               {/* Dropdown menu */}
-              {isUserMenuOpen && <div className="absolute right-0 mt-2 w-56 card-theme border border-light-border dark:border-dark-border rounded-lg shadow-lg z-50">
+              {isUserMenuOpen && (
+                <div className="absolute right-0 mt-2 w-56 card-theme border border-light-border dark:border-dark-border rounded-lg shadow-lg z-50">
                   <div className="p-4 border-b border-light-border dark:border-dark-border">
                     <p className="font-medium text-text-light-primary dark:text-text-dark-primary">
                       {getUserDisplayName()}
@@ -130,30 +157,41 @@ export function Navbar({
                   </div>
 
                   <div className="py-2">
-                    <button onClick={handleProfileClick} className="flex items-center gap-3 w-full px-4 py-2 text-sm text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-dark-bg transition-colors duration-200">
+                    <button
+                      onClick={handleProfileClick}
+                      className="flex items-center gap-3 w-full px-4 py-2 text-sm text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-dark-bg transition-colors duration-200"
+                    >
                       <UserCircle className="h-4 w-4" />
                       Meu Perfil
                     </button>
 
-                    <button onClick={() => {
-                  navigate('/settings');
-                  setIsUserMenuOpen(false);
-                }} className="flex items-center gap-3 w-full px-4 py-2 text-sm text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-dark-bg transition-colors duration-200">
+                    <button
+                      onClick={() => {
+                        navigate('/settings');
+                        setIsUserMenuOpen(false);
+                      }}
+                      className="flex items-center gap-3 w-full px-4 py-2 text-sm text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-dark-bg transition-colors duration-200"
+                    >
                       <Settings className="h-4 w-4" />
                       Configurações
                     </button>
                   </div>
 
                   <div className="border-t border-light-border dark:border-dark-border py-2">
-                    <button onClick={handleSignOut} className="flex items-center gap-3 w-full px-4 py-2 text-sm text-feedback-light-error dark:text-feedback-dark-error hover:bg-feedback-light-error/10 dark:hover:bg-feedback-dark-error/10 transition-colors duration-200">
+                    <button
+                      onClick={handleSignOut}
+                      className="flex items-center gap-3 w-full px-4 py-2 text-sm text-feedback-light-error dark:text-feedback-dark-error hover:bg-feedback-light-error/10 dark:hover:bg-feedback-dark-error/10 transition-colors duration-200"
+                    >
                       <LogOut className="h-4 w-4" />
                       Sair
                     </button>
                   </div>
-                </div>}
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
-    </nav>;
+    </nav>
+  );
 }

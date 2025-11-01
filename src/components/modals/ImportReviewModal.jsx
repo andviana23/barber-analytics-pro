@@ -1,5 +1,11 @@
 import { useState, useMemo, useEffect } from 'react';
-import { X, AlertTriangle, CheckCircle, AlertCircle, Download } from 'lucide-react';
+import {
+  X,
+  AlertTriangle,
+  CheckCircle,
+  AlertCircle,
+  Download,
+} from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import categoriesService from '../../services/categoriesService';
@@ -23,13 +29,15 @@ const ImportReviewModal = ({
   records = [],
   onConfirm,
   loading = false,
-  unitId
+  unitId,
 }) => {
   // Estado local para edições
-  const [editedRecords, setEditedRecords] = useState(() => records.map(r => ({
-    ...r,
-    approved: true
-  })));
+  const [editedRecords, setEditedRecords] = useState(() =>
+    records.map(r => ({
+      ...r,
+      approved: true,
+    }))
+  );
   const [selectedRows, setSelectedRows] = useState(new Set());
   const [selectAll, setSelectAll] = useState(true);
   const [categories, setCategories] = useState([]);
@@ -47,93 +55,149 @@ const ImportReviewModal = ({
   useEffect(() => {
     if (categories.length > 0 && editedRecords.length > 0) {
       // Encontrar categoria padrão para serviços
-      const defaultServiceCategory = categories.find(c => c.revenue_type === 'service');
+      const defaultServiceCategory = categories.find(
+        c => c.revenue_type === 'service'
+      );
 
       // Pré-selecionar categoria para registros que não têm categoria
-      setEditedRecords(prev => prev.map(r => {
-        // Se já tem categoria, não muda
-        if (r.category_id) return r;
+      setEditedRecords(prev =>
+        prev.map(r => {
+          // Se já tem categoria, não muda
+          if (r.category_id) return r;
 
-        // Pré-selecionar categoria baseada no tipo
-        const defaultCategory = r.type === 'product' ? categories.find(c => c.revenue_type === 'product') : defaultServiceCategory;
-        if (defaultCategory) {
-          console.log('🔄 ImportReviewModal: Pré-selecionando categoria:', defaultCategory.name, 'para tipo:', r.type);
-          return {
-            ...r,
-            category_id: defaultCategory.id
-          };
-        }
-        return r;
-      }));
+          // Pré-selecionar categoria baseada no tipo
+          const defaultCategory =
+            r.type === 'product'
+              ? categories.find(c => c.revenue_type === 'product')
+              : defaultServiceCategory;
+          if (defaultCategory) {
+            console.log(
+              '🔄 ImportReviewModal: Pré-selecionando categoria:',
+              defaultCategory.name,
+              'para tipo:',
+              r.type
+            );
+            return {
+              ...r,
+              category_id: defaultCategory.id,
+            };
+          }
+          return r;
+        })
+      );
     }
   }, [categories]);
   useEffect(() => {
     if (paymentMethods.length > 0 && editedRecords.length > 0) {
       console.log('🔄 Iniciando auto-detecção de formas de pagamento...');
-      console.log('📋 Formas disponíveis:', paymentMethods.map(pm => pm.name || pm.nome));
+      console.log(
+        '📋 Formas disponíveis:',
+        paymentMethods.map(pm => pm.name || pm.nome)
+      );
       console.log('📋 Primeiro registro:', editedRecords[0]);
-      setEditedRecords(prev => prev.map(r => {
-        if (r.payment_method_id) return r;
-        if (r.paymentMethodName) {
-          const descLower = String(r.paymentMethodName).toLowerCase().trim().replace(/\s+/g, ' '); // Normalizar espaços
+      setEditedRecords(prev =>
+        prev.map(r => {
+          if (r.payment_method_id) return r;
+          if (r.paymentMethodName) {
+            const descLower = String(r.paymentMethodName)
+              .toLowerCase()
+              .trim()
+              .replace(/\s+/g, ' '); // Normalizar espaços
 
-          console.log('🔍 Tentando detectar:', r.paymentMethodName, '→', descLower);
+            console.log(
+              '🔍 Tentando detectar:',
+              r.paymentMethodName,
+              '→',
+              descLower
+            );
 
-          // 1️⃣ Match exato
-          const exactMatch = paymentMethods.find(pm => {
-            const label = String(pm.name || pm.nome || '').toLowerCase().trim().replace(/\s+/g, ' '); // Normalizar espaços
-            const match = label && descLower === label;
-            if (match) console.log('✅ Match exato:', label);
-            return match;
-          });
-          if (exactMatch) {
-            const receiptDays = exactMatch.receipt_days || 0;
-            const paymentDate = new Date(r.date);
-            const expectedReceiptDate = addCalendarDaysAndAdjustToBusinessDay(paymentDate, receiptDays);
-            const feePercentage = exactMatch.fee_percentage || 0;
-            const feeAmount = r.value * feePercentage / 100;
-            console.log('💳 Auto-detectada (exato):', exactMatch.name || exactMatch.nome, '→ Dias:', receiptDays);
-            return {
-              ...r,
-              payment_method_id: exactMatch.id,
-              expected_receipt_date: format(expectedReceiptDate, 'yyyy-MM-dd'),
-              fees: feeAmount,
-              gross_amount: r.value,
-              net_amount: r.value - feeAmount,
-              status: receiptDays === 0 ? 'Received' : 'Pending',
-              actual_receipt_date: receiptDays === 0 ? r.date : null
-            };
+            // 1️⃣ Match exato
+            const exactMatch = paymentMethods.find(pm => {
+              const label = String(pm.name || pm.nome || '')
+                .toLowerCase()
+                .trim()
+                .replace(/\s+/g, ' '); // Normalizar espaços
+              const match = label && descLower === label;
+              if (match) console.log('✅ Match exato:', label);
+              return match;
+            });
+            if (exactMatch) {
+              const receiptDays = exactMatch.receipt_days || 0;
+              const paymentDate = new Date(r.date);
+              const expectedReceiptDate = addCalendarDaysAndAdjustToBusinessDay(
+                paymentDate,
+                receiptDays
+              );
+              const feePercentage = exactMatch.fee_percentage || 0;
+              const feeAmount = (r.value * feePercentage) / 100;
+              console.log(
+                '💳 Auto-detectada (exato):',
+                exactMatch.name || exactMatch.nome,
+                '→ Dias:',
+                receiptDays
+              );
+              return {
+                ...r,
+                payment_method_id: exactMatch.id,
+                expected_receipt_date: format(
+                  expectedReceiptDate,
+                  'yyyy-MM-dd'
+                ),
+                fees: feeAmount,
+                gross_amount: r.value,
+                net_amount: r.value - feeAmount,
+                status: receiptDays === 0 ? 'Received' : 'Pending',
+                actual_receipt_date: receiptDays === 0 ? r.date : null,
+              };
+            }
+
+            // 2️⃣ Match parcial (palavra-chave)
+            const partialMatch = paymentMethods.find(pm => {
+              const label = String(pm.name || pm.nome || '')
+                .toLowerCase()
+                .trim()
+                .replace(/\s+/g, ' '); // Normalizar espaços
+              const match =
+                label &&
+                (descLower.includes(label) || label.includes(descLower));
+              if (match)
+                console.log('✅ Match parcial:', label, 'em', descLower);
+              return match;
+            });
+            if (partialMatch) {
+              const receiptDays = partialMatch.receipt_days || 0;
+              const paymentDate = new Date(r.date);
+              const expectedReceiptDate = addCalendarDaysAndAdjustToBusinessDay(
+                paymentDate,
+                receiptDays
+              );
+              const feePercentage = partialMatch.fee_percentage || 0;
+              const feeAmount = (r.value * feePercentage) / 100;
+              console.log(
+                '💳 Auto-detectada (parcial):',
+                partialMatch.name || partialMatch.nome,
+                '→ Dias:',
+                receiptDays
+              );
+              return {
+                ...r,
+                payment_method_id: partialMatch.id,
+                expected_receipt_date: format(
+                  expectedReceiptDate,
+                  'yyyy-MM-dd'
+                ),
+                fees: feeAmount,
+                gross_amount: r.value,
+                net_amount: r.value - feeAmount,
+                status: receiptDays === 0 ? 'Received' : 'Pending',
+                actual_receipt_date: receiptDays === 0 ? r.date : null,
+              };
+            }
+            console.warn('❌ Não encontrou match para:', r.paymentMethodName);
           }
-
-          // 2️⃣ Match parcial (palavra-chave)
-          const partialMatch = paymentMethods.find(pm => {
-            const label = String(pm.name || pm.nome || '').toLowerCase().trim().replace(/\s+/g, ' '); // Normalizar espaços
-            const match = label && (descLower.includes(label) || label.includes(descLower));
-            if (match) console.log('✅ Match parcial:', label, 'em', descLower);
-            return match;
-          });
-          if (partialMatch) {
-            const receiptDays = partialMatch.receipt_days || 0;
-            const paymentDate = new Date(r.date);
-            const expectedReceiptDate = addCalendarDaysAndAdjustToBusinessDay(paymentDate, receiptDays);
-            const feePercentage = partialMatch.fee_percentage || 0;
-            const feeAmount = r.value * feePercentage / 100;
-            console.log('💳 Auto-detectada (parcial):', partialMatch.name || partialMatch.nome, '→ Dias:', receiptDays);
-            return {
-              ...r,
-              payment_method_id: partialMatch.id,
-              expected_receipt_date: format(expectedReceiptDate, 'yyyy-MM-dd'),
-              fees: feeAmount,
-              gross_amount: r.value,
-              net_amount: r.value - feeAmount,
-              status: receiptDays === 0 ? 'Received' : 'Pending',
-              actual_receipt_date: receiptDays === 0 ? r.date : null
-            };
-          }
-          console.warn('❌ Não encontrou match para:', r.paymentMethodName);
-        }
-        return r;
-      }));
+          return r;
+        })
+      );
     }
   }, [paymentMethods]);
 
@@ -144,20 +208,28 @@ const ImportReviewModal = ({
       console.log('🔄 ImportReviewModal: Carregando categorias...');
       const revenueCategories = await categoriesService.getRevenueCategories();
       setCategories(revenueCategories);
-      console.log(`✅ ImportReviewModal: ${revenueCategories.length} categorias carregadas`);
+      console.log(
+        `✅ ImportReviewModal: ${revenueCategories.length} categorias carregadas`
+      );
       console.log('📋 ImportReviewModal: Categorias:', revenueCategories);
     } catch (error) {
-      console.error('❌ ImportReviewModal: Erro ao carregar categorias:', error);
+      console.error(
+        '❌ ImportReviewModal: Erro ao carregar categorias:',
+        error
+      );
       // Fallback para categorias padrão
-      setCategories([{
-        id: 'service',
-        name: 'Serviço',
-        category_type: 'Revenue'
-      }, {
-        id: 'product',
-        name: 'Produto',
-        category_type: 'Revenue'
-      }]);
+      setCategories([
+        {
+          id: 'service',
+          name: 'Serviço',
+          category_type: 'Revenue',
+        },
+        {
+          id: 'product',
+          name: 'Produto',
+          category_type: 'Revenue',
+        },
+      ]);
     } finally {
       setLoadingCategories(false);
     }
@@ -171,26 +243,36 @@ const ImportReviewModal = ({
         console.warn('⚠️ ImportReviewModal: Unit ID não encontrado');
         return;
       }
-      console.log('🔄 ImportReviewModal: Chamando paymentMethodsService.getPaymentMethods...');
-      const result = await paymentMethodsService.getPaymentMethods(unitId, false);
+      console.log(
+        '🔄 ImportReviewModal: Chamando paymentMethodsService.getPaymentMethods...'
+      );
+      const result = await paymentMethodsService.getPaymentMethods(
+        unitId,
+        false
+      );
       console.log('🔄 ImportReviewModal: Resultado do serviço:', result);
-      const {
-        data: methods,
-        error
-      } = result;
+      const { data: methods, error } = result;
       if (error) {
         console.error('❌ ImportReviewModal: Erro do serviço:', error);
         setPaymentMethods([]);
         return;
       }
-      console.log(`✅ ImportReviewModal: ${methods?.length || 0} formas de pagamento carregadas`);
-      console.log('📋 ImportReviewModal: Formas:', methods?.map(m => ({
-        nome: m.name || m.nome,
-        dias: m.receipt_days
-      })));
+      console.log(
+        `✅ ImportReviewModal: ${methods?.length || 0} formas de pagamento carregadas`
+      );
+      console.log(
+        '📋 ImportReviewModal: Formas:',
+        methods?.map(m => ({
+          nome: m.name || m.nome,
+          dias: m.receipt_days,
+        }))
+      );
       setPaymentMethods(methods || []);
     } catch (error) {
-      console.error('❌ ImportReviewModal: Erro ao carregar formas de pagamento:', error);
+      console.error(
+        '❌ ImportReviewModal: Erro ao carregar formas de pagamento:',
+        error
+      );
       setPaymentMethods([]);
     } finally {
       setLoadingPaymentMethods(false);
@@ -204,8 +286,12 @@ const ImportReviewModal = ({
     const services = editedRecords.filter(r => r.type === 'service').length;
     const products = editedRecords.filter(r => r.type === 'product').length;
     const newClients = editedRecords.filter(r => r.isNewClient).length;
-    const noProfessional = editedRecords.filter(r => r.hasProfessionalWarning).length;
-    const totalValue = editedRecords.filter(r => r.approved).reduce((sum, r) => sum + r.value, 0);
+    const noProfessional = editedRecords.filter(
+      r => r.hasProfessionalWarning
+    ).length;
+    const totalValue = editedRecords
+      .filter(r => r.approved)
+      .reduce((sum, r) => sum + r.value, 0);
     return {
       total,
       approved,
@@ -213,16 +299,22 @@ const ImportReviewModal = ({
       products,
       newClients,
       noProfessional,
-      totalValue
+      totalValue,
     };
   }, [editedRecords]);
 
   // Alternar aprovação de um registro
   const toggleApproval = index => {
-    setEditedRecords(prev => prev.map((r, i) => i === index ? {
-      ...r,
-      approved: !r.approved
-    } : r));
+    setEditedRecords(prev =>
+      prev.map((r, i) =>
+        i === index
+          ? {
+              ...r,
+              approved: !r.approved,
+            }
+          : r
+      )
+    );
   };
 
   // Alternar seleção de uma linha
@@ -248,86 +340,115 @@ const ImportReviewModal = ({
 
   // Mudar categoria e tipo de um registro
   const changeType = (index, categoryId) => {
-    setEditedRecords(prev => prev.map((r, i) => {
-      if (i !== index) return r;
+    setEditedRecords(prev =>
+      prev.map((r, i) => {
+        if (i !== index) return r;
 
-      // Encontrar a categoria selecionada
-      const selectedCategory = categories.find(c => c.id === categoryId);
+        // Encontrar a categoria selecionada
+        const selectedCategory = categories.find(c => c.id === categoryId);
 
-      // Usar o revenue_type que já vem calculado do serviço
-      const type = selectedCategory?.revenue_type || 'service';
-      console.log('🔄 ImportReviewModal: Mudando tipo para:', type, 'categoria:', categoryId);
-      return {
-        ...r,
-        category_id: categoryId,
-        type
-      };
-    }));
+        // Usar o revenue_type que já vem calculado do serviço
+        const type = selectedCategory?.revenue_type || 'service';
+        console.log(
+          '🔄 ImportReviewModal: Mudando tipo para:',
+          type,
+          'categoria:',
+          categoryId
+        );
+        return {
+          ...r,
+          category_id: categoryId,
+          type,
+        };
+      })
+    );
   };
 
   // Mudar forma de pagamento e recalcular data de recebimento
   const changePaymentMethod = (index, paymentMethodId) => {
-    setEditedRecords(prev => prev.map((r, i) => {
-      if (i !== index) return r;
+    setEditedRecords(prev =>
+      prev.map((r, i) => {
+        if (i !== index) return r;
 
-      // Encontrar a forma de pagamento selecionada
-      const selectedMethod = paymentMethods.find(pm => pm.id === paymentMethodId);
-      if (!selectedMethod) return r;
+        // Encontrar a forma de pagamento selecionada
+        const selectedMethod = paymentMethods.find(
+          pm => pm.id === paymentMethodId
+        );
+        if (!selectedMethod) return r;
 
-      // Calcular nova data de recebimento baseada nos dias
-      const receiptDays = selectedMethod.receipt_days || 0;
-      const paymentDate = new Date(r.date);
-      const expectedReceiptDate = addCalendarDaysAndAdjustToBusinessDay(paymentDate, receiptDays);
+        // Calcular nova data de recebimento baseada nos dias
+        const receiptDays = selectedMethod.receipt_days || 0;
+        const paymentDate = new Date(r.date);
+        const expectedReceiptDate = addCalendarDaysAndAdjustToBusinessDay(
+          paymentDate,
+          receiptDays
+        );
 
-      // Calcular taxas e valores líquidos
-      const feePercentage = selectedMethod.fee_percentage || 0;
-      const feeAmount = r.value * feePercentage / 100;
-      console.log('💳 ImportReviewModal: Mudando forma de pagamento:', selectedMethod.name || selectedMethod.nome, '| Dias:', receiptDays, '| Nova data:', format(expectedReceiptDate, 'dd/MM/yyyy'));
-      return {
-        ...r,
-        payment_method_id: selectedMethod.id,
-        paymentMethodName: selectedMethod.name || selectedMethod.nome,
-        expected_receipt_date: format(expectedReceiptDate, 'yyyy-MM-dd'),
-        fees: feeAmount,
-        gross_amount: r.value,
-        net_amount: r.value - feeAmount,
-        status: receiptDays === 0 ? 'Received' : 'Pending',
-        actual_receipt_date: receiptDays === 0 ? r.date : null
-      };
-    }));
+        // Calcular taxas e valores líquidos
+        const feePercentage = selectedMethod.fee_percentage || 0;
+        const feeAmount = (r.value * feePercentage) / 100;
+        console.log(
+          '💳 ImportReviewModal: Mudando forma de pagamento:',
+          selectedMethod.name || selectedMethod.nome,
+          '| Dias:',
+          receiptDays,
+          '| Nova data:',
+          format(expectedReceiptDate, 'dd/MM/yyyy')
+        );
+        return {
+          ...r,
+          payment_method_id: selectedMethod.id,
+          paymentMethodName: selectedMethod.name || selectedMethod.nome,
+          expected_receipt_date: format(expectedReceiptDate, 'yyyy-MM-dd'),
+          fees: feeAmount,
+          gross_amount: r.value,
+          net_amount: r.value - feeAmount,
+          status: receiptDays === 0 ? 'Received' : 'Pending',
+          actual_receipt_date: receiptDays === 0 ? r.date : null,
+        };
+      })
+    );
   };
 
   // Mudar tipo em massa para registros selecionados
   const changeBulkType = newType => {
-    setEditedRecords(prev => prev.map((r, i) => {
-      if (selectedRows.has(i)) {
-        // Encontrar uma categoria padrão para o tipo
-        const defaultCategory = categories.find(c => c.revenue_type === newType);
-        return {
-          ...r,
-          type: newType,
-          category_id: defaultCategory?.id || null
-        };
-      }
-      return r;
-    }));
+    setEditedRecords(prev =>
+      prev.map((r, i) => {
+        if (selectedRows.has(i)) {
+          // Encontrar uma categoria padrão para o tipo
+          const defaultCategory = categories.find(
+            c => c.revenue_type === newType
+          );
+          return {
+            ...r,
+            type: newType,
+            category_id: defaultCategory?.id || null,
+          };
+        }
+        return r;
+      })
+    );
     setSelectedRows(new Set());
   };
 
   // Aprovar todos
   const approveAll = () => {
-    setEditedRecords(prev => prev.map(r => ({
-      ...r,
-      approved: true
-    })));
+    setEditedRecords(prev =>
+      prev.map(r => ({
+        ...r,
+        approved: true,
+      }))
+    );
   };
 
   // Rejeitar todos
   const rejectAll = () => {
-    setEditedRecords(prev => prev.map(r => ({
-      ...r,
-      approved: false
-    })));
+    setEditedRecords(prev =>
+      prev.map(r => ({
+        ...r,
+        approved: false,
+      }))
+    );
   };
 
   // Confirmar importação
@@ -335,24 +456,66 @@ const ImportReviewModal = ({
     const approved = editedRecords.filter(r => r.approved);
 
     // Validar se todas as receitas aprovadas têm categoria
-    const withoutCategory = approved.filter(r => !r.category_id || r.category_id === '');
+    const withoutCategory = approved.filter(
+      r => !r.category_id || r.category_id === ''
+    );
     if (withoutCategory.length > 0) {
-      console.error('❌ ImportReviewModal: Receitas sem categoria:', withoutCategory.length);
-      alert(`Por favor, selecione uma categoria para todas as ${withoutCategory.length} receitas sem categoria antes de confirmar.`);
+      console.error(
+        '❌ ImportReviewModal: Receitas sem categoria:',
+        withoutCategory.length
+      );
+      alert(
+        `Por favor, selecione uma categoria para todas as ${withoutCategory.length} receitas sem categoria antes de confirmar.`
+      );
       return;
     }
     console.log('📋 ImportReviewModal: Registros aprovados:', approved.length);
     console.log('📋 ImportReviewModal: Primeiro registro:', approved[0]);
-    console.log('📋 ImportReviewModal: Campos do primeiro registro:', Object.keys(approved[0]));
+    console.log(
+      '📋 ImportReviewModal: Campos do primeiro registro:',
+      Object.keys(approved[0])
+    );
     console.log('✅ ImportReviewModal: Todas as receitas têm categoria_id');
     onConfirm(approved);
   };
 
   // Exportar relatório de validação (CSV)
   const exportValidationReport = () => {
-    const csv = [['Linha', 'Data', 'Descrição', 'Valor', 'Tipo', 'Profissional', 'Cliente', 'Forma Pagamento', 'Status', 'Alertas'].join(';'), ...editedRecords.map(r => [r.lineNumber, format(new Date(r.date), 'dd/MM/yyyy'), r.source, `R$ ${r.value.toFixed(2)}`, r.type === 'service' ? 'Serviço' : 'Produto', r.professionalName || '-', r.partyName || '-', r.paymentMethodName || '-', r.approved ? 'Aprovado' : 'Rejeitado', [r.isNewClient ? 'Cliente Novo' : '', r.hasProfessionalWarning ? 'Sem Profissional' : ''].filter(Boolean).join(', ')].join(';'))].join('\n');
+    const csv = [
+      [
+        'Linha',
+        'Data',
+        'Descrição',
+        'Valor',
+        'Tipo',
+        'Profissional',
+        'Cliente',
+        'Forma Pagamento',
+        'Status',
+        'Alertas',
+      ].join(';'),
+      ...editedRecords.map(r =>
+        [
+          r.lineNumber,
+          format(new Date(r.date), 'dd/MM/yyyy'),
+          r.source,
+          `R$ ${r.value.toFixed(2)}`,
+          r.type === 'service' ? 'Serviço' : 'Produto',
+          r.professionalName || '-',
+          r.partyName || '-',
+          r.paymentMethodName || '-',
+          r.approved ? 'Aprovado' : 'Rejeitado',
+          [
+            r.isNewClient ? 'Cliente Novo' : '',
+            r.hasProfessionalWarning ? 'Sem Profissional' : '',
+          ]
+            .filter(Boolean)
+            .join(', '),
+        ].join(';')
+      ),
+    ].join('\n');
     const blob = new Blob([csv], {
-      type: 'text/csv;charset=utf-8;'
+      type: 'text/csv;charset=utf-8;',
     });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
@@ -360,7 +523,8 @@ const ImportReviewModal = ({
     link.click();
   };
   if (!isOpen) return null;
-  return <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
       <div className="bg-dark-surface rounded-xl shadow-2xl w-full max-w-7xl max-h-[90vh] flex flex-col border border-dark-border">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-dark-border bg-dark-surface">
@@ -373,7 +537,12 @@ const ImportReviewModal = ({
               Revise e aprove as receitas identificadas antes de importar
             </p>
           </div>
-          <button onClick={onClose} disabled={loading} className="p-2 hover:bg-dark-bg rounded-lg transition-colors" aria-label="Fechar">
+          <button
+            onClick={onClose}
+            disabled={loading}
+            className="p-2 hover:bg-dark-bg rounded-lg transition-colors"
+            aria-label="Fechar"
+          >
             <X className="w-6 h-6 text-text-dark-secondary hover:text-text-dark-primary" />
           </button>
         </div>
@@ -437,20 +606,30 @@ const ImportReviewModal = ({
         </div>
 
         {/* Bulk Actions */}
-        {selectedRows.size > 0 && <div className="p-4 bg-primary/10 border-b border-primary/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        {selectedRows.size > 0 && (
+          <div className="p-4 bg-primary/10 border-b border-primary/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <p className="text-sm text-primary font-semibold">
               {selectedRows.size}{' '}
-              {selectedRows.size === 1 ? 'registro selecionado' : 'registros selecionados'}
+              {selectedRows.size === 1
+                ? 'registro selecionado'
+                : 'registros selecionados'}
             </p>
             <div className="flex gap-2 flex-wrap">
-              <button onClick={() => changeBulkType('service')} className="px-4 py-2 bg-primary text-dark-bg rounded-lg hover:bg-primary-hover text-sm font-semibold transition-all">
+              <button
+                onClick={() => changeBulkType('service')}
+                className="px-4 py-2 bg-primary text-dark-bg rounded-lg hover:bg-primary-hover text-sm font-semibold transition-all"
+              >
                 Marcar como Serviço
               </button>
-              <button onClick={() => changeBulkType('product')} className="px-4 py-2 bg-primary-hover text-dark-text-primary rounded-lg hover:bg-primary text-sm font-semibold transition-all">
+              <button
+                onClick={() => changeBulkType('product')}
+                className="px-4 py-2 bg-primary-hover text-dark-text-primary rounded-lg hover:bg-primary text-sm font-semibold transition-all"
+              >
                 Marcar como Produto
               </button>
             </div>
-          </div>}
+          </div>
+        )}
 
         {/* Table */}
         <div className="flex-1 overflow-auto p-4 sm:p-6 bg-dark-bg">
@@ -459,7 +638,12 @@ const ImportReviewModal = ({
               <thead className="sticky top-0 bg-dark-surface z-10 border-b-2 border-dark-border shadow-lg">
                 <tr className="text-text-dark-primary">
                   <th className="p-2 text-left">
-                    <input type="checkbox" checked={selectAll} onChange={toggleSelectAll} className="rounded" />
+                    <input
+                      type="checkbox"
+                      checked={selectAll}
+                      onChange={toggleSelectAll}
+                      className="rounded"
+                    />
                   </th>
                   <th className="p-2 text-left font-semibold">Linha</th>
                   <th className="p-2 text-left font-semibold">Data</th>
@@ -475,17 +659,26 @@ const ImportReviewModal = ({
                 </tr>
               </thead>
               <tbody>
-                {editedRecords.map((record, index) => <tr key={index} className={`border-b border-dark-border transition-colors ${!record.approved ? 'opacity-60 bg-dark-surface/50' : 'bg-dark-surface hover:bg-dark-bg'}`}>
+                {editedRecords.map((record, index) => (
+                  <tr
+                    key={index}
+                    className={`border-b border-dark-border transition-colors ${!record.approved ? 'opacity-60 bg-dark-surface/50' : 'bg-dark-surface hover:bg-dark-bg'}`}
+                  >
                     <td className="p-2">
-                      <input type="checkbox" checked={selectedRows.has(index)} onChange={() => toggleSelection(index)} className="rounded" />
+                      <input
+                        type="checkbox"
+                        checked={selectedRows.has(index)}
+                        onChange={() => toggleSelection(index)}
+                        className="rounded"
+                      />
                     </td>
                     <td className="p-2 text-text-dark-secondary font-medium">
                       {record.lineNumber}
                     </td>
                     <td className="p-2 text-text-dark-primary whitespace-nowrap font-medium">
                       {format(new Date(record.date), 'dd/MM/yyyy', {
-                    locale: ptBR
-                  })}
+                        locale: ptBR,
+                      })}
                     </td>
                     <td className="p-2 text-text-dark-primary">
                       <div className="max-w-xs truncate" title={record.source}>
@@ -497,44 +690,84 @@ const ImportReviewModal = ({
                     </td>
                     <td className="p-2">
                       <div className="flex items-center gap-1.5">
-                        {record.hasProfessionalWarning && <AlertCircle className="w-4 h-4 text-feedback-dark-error flex-shrink-0" />}
-                        <span className={`text-sm font-medium ${record.hasProfessionalWarning ? 'text-feedback-dark-error' : 'text-text-dark-primary'}`}>
+                        {record.hasProfessionalWarning && (
+                          <AlertCircle className="w-4 h-4 text-feedback-dark-error flex-shrink-0" />
+                        )}
+                        <span
+                          className={`text-sm font-medium ${record.hasProfessionalWarning ? 'text-feedback-dark-error' : 'text-text-dark-primary'}`}
+                        >
                           {record.professionalName}
                         </span>
                       </div>
                     </td>
                     <td className="p-2">
                       <div className="flex items-center gap-1.5">
-                        {record.isNewClient && <AlertTriangle className="w-4 h-4 text-feedback-dark-warning flex-shrink-0" />}
-                        <span className={`text-sm font-medium ${record.isNewClient ? 'text-feedback-dark-warning' : 'text-text-dark-primary'}`}>
+                        {record.isNewClient && (
+                          <AlertTriangle className="w-4 h-4 text-feedback-dark-warning flex-shrink-0" />
+                        )}
+                        <span
+                          className={`text-sm font-medium ${record.isNewClient ? 'text-feedback-dark-warning' : 'text-text-dark-primary'}`}
+                        >
                           {record.partyName}
                         </span>
                       </div>
                     </td>
                     <td className="p-2">
-                      <select value={record.payment_method_id || ''} onChange={e => changePaymentMethod(index, e.target.value)} className="px-3 py-1.5 rounded-lg border border-dark-border bg-dark-bg text-text-dark-primary text-sm font-semibold focus:ring-2 focus:ring-primary outline-none transition-all w-full" disabled={loadingPaymentMethods}>
+                      <select
+                        value={record.payment_method_id || ''}
+                        onChange={e =>
+                          changePaymentMethod(index, e.target.value)
+                        }
+                        className="px-3 py-1.5 rounded-lg border border-dark-border bg-dark-bg text-text-dark-primary text-sm font-semibold focus:ring-2 focus:ring-primary outline-none transition-all w-full"
+                        disabled={loadingPaymentMethods}
+                      >
                         <option value="" className="bg-dark-surface">
-                          {loadingPaymentMethods ? 'Carregando...' : 'Selecionar forma...'}
+                          {loadingPaymentMethods
+                            ? 'Carregando...'
+                            : 'Selecionar forma...'}
                         </option>
-                        {paymentMethods.map(method => <option key={method.id} value={method.id} className="bg-dark-surface">
+                        {paymentMethods.map(method => (
+                          <option
+                            key={method.id}
+                            value={method.id}
+                            className="bg-dark-surface"
+                          >
                             {method.name || method.nome}
-                          </option>)}
+                          </option>
+                        ))}
                       </select>
                     </td>
                     <td className="p-2">
-                      <select value={record.category_id || ''} onChange={e => changeType(index, e.target.value)} className="px-3 py-1.5 rounded-lg border border-dark-border bg-dark-bg text-text-dark-primary text-sm font-semibold focus:ring-2 focus:ring-primary outline-none transition-all" disabled={loadingCategories}>
+                      <select
+                        value={record.category_id || ''}
+                        onChange={e => changeType(index, e.target.value)}
+                        className="px-3 py-1.5 rounded-lg border border-dark-border bg-dark-bg text-text-dark-primary text-sm font-semibold focus:ring-2 focus:ring-primary outline-none transition-all"
+                        disabled={loadingCategories}
+                      >
                         <option value="" className="bg-dark-surface">
                           {loadingCategories ? 'Carregando...' : 'Assinatura'}
                         </option>
-                        {categories.map(category => <option key={category.id} value={category.id} className="bg-dark-surface">
+                        {categories.map(category => (
+                          <option
+                            key={category.id}
+                            value={category.id}
+                            className="bg-dark-surface"
+                          >
                             {category.name}
-                          </option>)}
+                          </option>
+                        ))}
                       </select>
                     </td>
                     <td className="p-2 text-center">
-                      <input type="checkbox" checked={record.approved} onChange={() => toggleApproval(index)} className="w-5 h-5 rounded" />
+                      <input
+                        type="checkbox"
+                        checked={record.approved}
+                        onChange={() => toggleApproval(index)}
+                        className="w-5 h-5 rounded"
+                      />
                     </td>
-                  </tr>)}
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -543,35 +776,60 @@ const ImportReviewModal = ({
         {/* Footer Actions */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between p-4 sm:p-6 border-t border-dark-border bg-dark-surface gap-3">
           <div className="flex gap-2 flex-wrap">
-            <button onClick={approveAll} disabled={loading} className="px-4 py-2.5 text-sm bg-feedback-dark-success text-dark-text-primary rounded-lg hover:bg-feedback-dark-success/80 disabled:opacity-50 flex items-center gap-2 font-semibold transition-all">
+            <button
+              onClick={approveAll}
+              disabled={loading}
+              className="px-4 py-2.5 text-sm bg-feedback-dark-success text-dark-text-primary rounded-lg hover:bg-feedback-dark-success/80 disabled:opacity-50 flex items-center gap-2 font-semibold transition-all"
+            >
               <CheckCircle className="w-4 h-4" />
               Aprovar Todos
             </button>
-            <button onClick={rejectAll} disabled={loading} className="px-4 py-2.5 text-sm bg-feedback-dark-error text-dark-text-primary rounded-lg hover:bg-feedback-dark-error/80 disabled:opacity-50 font-semibold transition-all">
+            <button
+              onClick={rejectAll}
+              disabled={loading}
+              className="px-4 py-2.5 text-sm bg-feedback-dark-error text-dark-text-primary rounded-lg hover:bg-feedback-dark-error/80 disabled:opacity-50 font-semibold transition-all"
+            >
               Rejeitar Todos
             </button>
-            <button onClick={exportValidationReport} disabled={loading} className="px-4 py-2.5 text-sm bg-dark-border text-text-dark-primary rounded-lg hover:bg-dark-bg disabled:opacity-50 flex items-center gap-2 font-semibold transition-all">
+            <button
+              onClick={exportValidationReport}
+              disabled={loading}
+              className="px-4 py-2.5 text-sm bg-dark-border text-text-dark-primary rounded-lg hover:bg-dark-bg disabled:opacity-50 flex items-center gap-2 font-semibold transition-all"
+            >
               <Download className="w-4 h-4" />
               Exportar
             </button>
           </div>
 
           <div className="flex gap-3 flex-col sm:flex-row">
-            <button onClick={onClose} disabled={loading} className="px-6 py-2.5 text-text-dark-primary border-2 border-dark-border rounded-lg hover:bg-dark-bg disabled:opacity-50 font-semibold transition-all">
+            <button
+              onClick={onClose}
+              disabled={loading}
+              className="px-6 py-2.5 text-text-dark-primary border-2 border-dark-border rounded-lg hover:bg-dark-bg disabled:opacity-50 font-semibold transition-all"
+            >
               Cancelar
             </button>
-            <button onClick={handleConfirm} disabled={loading || stats.approved === 0} className="px-6 py-2.5 bg-primary text-dark-bg rounded-lg hover:bg-primary-hover disabled:opacity-50 flex items-center justify-center gap-2 font-bold transition-all shadow-lg shadow-primary/30">
-              {loading ? <>
+            <button
+              onClick={handleConfirm}
+              disabled={loading || stats.approved === 0}
+              className="px-6 py-2.5 bg-primary text-dark-bg rounded-lg hover:bg-primary-hover disabled:opacity-50 flex items-center justify-center gap-2 font-bold transition-all shadow-lg shadow-primary/30"
+            >
+              {loading ? (
+                <>
                   <div className="w-5 h-5 border-3 border-dark-bg border-t-transparent rounded-full animate-spin" />
                   Importando...
-                </> : <>
+                </>
+              ) : (
+                <>
                   <CheckCircle className="w-5 h-5" />
                   Confirmar Importação ({stats.approved})
-                </>}
+                </>
+              )}
             </button>
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 export default ImportReviewModal;

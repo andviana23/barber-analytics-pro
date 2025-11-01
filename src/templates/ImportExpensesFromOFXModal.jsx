@@ -1,6 +1,25 @@
-import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
+import React, {
+  useState,
+  useCallback,
+  useRef,
+  useMemo,
+  useEffect,
+} from 'react';
 import PropTypes from 'prop-types';
-import { X, Upload, FileText, AlertCircle, CheckCircle, Eye, ArrowRight, RefreshCw, Tag, DollarSign, Calendar, Building2 } from 'lucide-react';
+import {
+  X,
+  Upload,
+  FileText,
+  AlertCircle,
+  CheckCircle,
+  Eye,
+  ArrowRight,
+  RefreshCw,
+  Tag,
+  DollarSign,
+  Calendar,
+  Building2,
+} from 'lucide-react';
 import { format } from 'date-fns';
 import { CategoryHierarchicalDropdown } from '../molecules';
 import { useCategoryTree } from '../hooks/useCategories';
@@ -29,7 +48,7 @@ const ImportExpensesFromOFXModal = ({
   onSuccess = () => {},
   availableAccounts = [],
   defaultAccountId = null,
-  unitId = null
+  unitId = null,
 }) => {
   // ========================================
   // ESTADO DO MODAL
@@ -50,22 +69,22 @@ const ImportExpensesFromOFXModal = ({
   // ========================================
   // HOOKS EXTERNOS
   // ========================================
-  const {
-    selectedUnit
-  } = useUnit();
+  const { selectedUnit } = useUnit();
 
   // Usar unitId do selectedUnit se não for passado por prop
   const effectiveUnitId = unitId || selectedUnit?.id;
   const {
     data: categoriesTree,
     loading: categoriesLoading,
-    error: categoriesError
+    error: categoriesError,
   } = useCategoryTree(effectiveUnitId, 'Expense');
 
   // Filtrar contas bancárias pela unidade selecionada
   const filteredAccounts = useMemo(() => {
     if (!effectiveUnitId || !availableAccounts) return availableAccounts;
-    return availableAccounts.filter(account => account.unit_id === effectiveUnitId);
+    return availableAccounts.filter(
+      account => account.unit_id === effectiveUnitId
+    );
   }, [availableAccounts, effectiveUnitId]);
 
   // ========================================
@@ -88,72 +107,83 @@ const ImportExpensesFromOFXModal = ({
   /**
    * Handler de upload de arquivo OFX
    */
-  const handleFileUpload = useCallback(async selectedFile => {
-    if (!selectedFile) {
-      setValidationErrors(['Nenhum arquivo selecionado']);
-      return;
-    }
-
-    // Validar extensão
-    if (!selectedFile.name.toLowerCase().endsWith('.ofx')) {
-      setValidationErrors(['Apenas arquivos .ofx são suportados']);
-      return;
-    }
-
-    // Validar tamanho (máx 10MB)
-    if (selectedFile.size > 10 * 1024 * 1024) {
-      setValidationErrors(['Arquivo muito grande. Tamanho máximo: 10MB']);
-      return;
-    }
-    setFile(selectedFile);
-    setValidationErrors([]);
-    try {
-      console.log('📄 Iniciando parsing do arquivo OFX:', selectedFile.name);
-
-      // 1️⃣ Ler e parsear OFX
-      const {
-        data,
-        error
-      } = await ImportExpensesFromOFXService.readFile(selectedFile);
-      if (error || !data) {
-        setValidationErrors([error || 'Erro ao ler arquivo OFX']);
+  const handleFileUpload = useCallback(
+    async selectedFile => {
+      if (!selectedFile) {
+        setValidationErrors(['Nenhum arquivo selecionado']);
         return;
       }
-      setParseResult(data);
-      console.log('✅ Parsing concluído:', data.length, 'transações');
 
-      // 2️⃣ Validar e filtrar DEBIT
-      const validationResult = ImportExpensesFromOFXService.validateTransactions(data);
-      if (!validationResult.isValid) {
-        setValidationErrors(validationResult.missing);
+      // Validar extensão
+      if (!selectedFile.name.toLowerCase().endsWith('.ofx')) {
+        setValidationErrors(['Apenas arquivos .ofx são suportados']);
         return;
       }
-      console.log('✅ Validação concluída:', validationResult.transactions.length, 'despesas DEBIT');
 
-      // 3️⃣ Normalizar dados
-      const context = {
-        unitId: effectiveUnitId,
-        userId: null,
-        // Será preenchido pelo backend via RLS
-        bankAccountId: selectedAccount
-      };
-      const {
-        normalized,
-        errors
-      } = ImportExpensesFromOFXService.normalizeData(validationResult.transactions, context);
-      if (errors.length > 0) {
-        console.warn('⚠️ Erros durante normalização:', errors);
+      // Validar tamanho (máx 10MB)
+      if (selectedFile.size > 10 * 1024 * 1024) {
+        setValidationErrors(['Arquivo muito grande. Tamanho máximo: 10MB']);
+        return;
       }
-      setNormalizedData(normalized);
-      console.log('✅ Normalização concluída:', normalized.length, 'registros');
+      setFile(selectedFile);
+      setValidationErrors([]);
+      try {
+        console.log('📄 Iniciando parsing do arquivo OFX:', selectedFile.name);
 
-      // Avançar para step 2
-      setCurrentStep(2);
-    } catch (err) {
-      console.error('❌ Erro no parsing do OFX:', err);
-      setValidationErrors([err.message || 'Erro ao processar arquivo OFX']);
-    }
-  }, [selectedAccount, unitId]);
+        // 1️⃣ Ler e parsear OFX
+        const { data, error } =
+          await ImportExpensesFromOFXService.readFile(selectedFile);
+        if (error || !data) {
+          setValidationErrors([error || 'Erro ao ler arquivo OFX']);
+          return;
+        }
+        setParseResult(data);
+        console.log('✅ Parsing concluído:', data.length, 'transações');
+
+        // 2️⃣ Validar e filtrar DEBIT
+        const validationResult =
+          ImportExpensesFromOFXService.validateTransactions(data);
+        if (!validationResult.isValid) {
+          setValidationErrors(validationResult.missing);
+          return;
+        }
+        console.log(
+          '✅ Validação concluída:',
+          validationResult.transactions.length,
+          'despesas DEBIT'
+        );
+
+        // 3️⃣ Normalizar dados
+        const context = {
+          unitId: effectiveUnitId,
+          userId: null,
+          // Será preenchido pelo backend via RLS
+          bankAccountId: selectedAccount,
+        };
+        const { normalized, errors } =
+          ImportExpensesFromOFXService.normalizeData(
+            validationResult.transactions,
+            context
+          );
+        if (errors.length > 0) {
+          console.warn('⚠️ Erros durante normalização:', errors);
+        }
+        setNormalizedData(normalized);
+        console.log(
+          '✅ Normalização concluída:',
+          normalized.length,
+          'registros'
+        );
+
+        // Avançar para step 2
+        setCurrentStep(2);
+      } catch (err) {
+        console.error('❌ Erro no parsing do OFX:', err);
+        setValidationErrors([err.message || 'Erro ao processar arquivo OFX']);
+      }
+    },
+    [selectedAccount, unitId]
+  );
 
   // ========================================
   // STEP 2: SELEÇÃO DE CATEGORIAS
@@ -165,7 +195,7 @@ const ImportExpensesFromOFXModal = ({
   const handleCategoryChange = useCallback((index, categoryId) => {
     setUserCategorySelections(prev => ({
       ...prev,
-      [index]: categoryId
+      [index]: categoryId,
     }));
   }, []);
 
@@ -176,23 +206,28 @@ const ImportExpensesFromOFXModal = ({
     console.log('🔄 Aplicando categorias selecionadas...');
 
     // Aplicar categorias manuais
-    let processedData = ImportExpensesFromOFXService.applyUserCategorySelections(normalizedData, userCategorySelections);
+    let processedData =
+      ImportExpensesFromOFXService.applyUserCategorySelections(
+        normalizedData,
+        userCategorySelections
+      );
 
     // Buscar fornecedores e categorias para enriquecimento
-    const {
-      data: suppliers
-    } = await PartiesService.getParties({
+    const { data: suppliers } = await PartiesService.getParties({
       unit_id: effectiveUnitId,
-      tipo: 'Fornecedor'
+      tipo: 'Fornecedor',
     });
     const referenceData = {
       categories: categoriesTree,
       suppliers: suppliers || [],
-      unitId: effectiveUnitId
+      unitId: effectiveUnitId,
     };
 
     // Enriquecer dados (auto-criar suppliers se necessário)
-    processedData = await ImportExpensesFromOFXService.enrichData(processedData, referenceData);
+    processedData = await ImportExpensesFromOFXService.enrichData(
+      processedData,
+      referenceData
+    );
 
     // Marcar todas como Paid
     processedData = ImportExpensesFromOFXService.markAllAsPaid(processedData);
@@ -213,13 +248,16 @@ const ImportExpensesFromOFXModal = ({
     const withCategory = enrichedData.filter(r => r.expense.category_id).length;
     const withoutCategory = enrichedData.length - withCategory;
     const newSuppliers = enrichedData.filter(r => r.isNewSupplier).length;
-    const totalValue = enrichedData.reduce((sum, r) => sum + r.expense.value, 0);
+    const totalValue = enrichedData.reduce(
+      (sum, r) => sum + r.expense.value,
+      0
+    );
     return {
       total: enrichedData.length,
       withCategory,
       withoutCategory,
       newSuppliers,
-      totalValue
+      totalValue,
     };
   }, [enrichedData]);
 
@@ -234,15 +272,24 @@ const ImportExpensesFromOFXModal = ({
       const startTime = Date.now();
 
       // Inserir no banco
-      const results = await ImportExpensesFromOFXService.insertApprovedRecords(enrichedData, {
-        unitId: effectiveUnitId
-      });
+      const results = await ImportExpensesFromOFXService.insertApprovedRecords(
+        enrichedData,
+        {
+          unitId: effectiveUnitId,
+        }
+      );
 
       // Gerar relatório
-      const report = ImportExpensesFromOFXService.generateReport(results, enrichedData, startTime);
+      const report = ImportExpensesFromOFXService.generateReport(
+        results,
+        enrichedData,
+        startTime
+      );
       console.log('✅ Importação concluída:', report);
       if (results.errors && results.errors.length > 0) {
-        setValidationErrors(results.errors.map(err => `Linha ${err.line}: ${err.error}`));
+        setValidationErrors(
+          results.errors.map(err => `Linha ${err.line}: ${err.error}`)
+        );
         return;
       }
 
@@ -292,24 +339,28 @@ const ImportExpensesFromOFXModal = ({
   /**
    * Obter nome da categoria pelo ID
    */
-  const getCategoryName = useCallback(categoryId => {
-    if (!categoryId || !categoriesTree) return 'Sem categoria';
-    for (const parent of categoriesTree) {
-      if (parent.id === categoryId) return parent.name;
-      if (parent.children) {
-        const child = parent.children.find(c => c.id === categoryId);
-        if (child) return `${parent.name} > ${child.name}`;
+  const getCategoryName = useCallback(
+    categoryId => {
+      if (!categoryId || !categoriesTree) return 'Sem categoria';
+      for (const parent of categoriesTree) {
+        if (parent.id === categoryId) return parent.name;
+        if (parent.children) {
+          const child = parent.children.find(c => c.id === categoryId);
+          if (child) return `${parent.name} > ${child.name}`;
+        }
       }
-    }
-    return 'Categoria desconhecida';
-  }, [categoriesTree]);
+      return 'Categoria desconhecida';
+    },
+    [categoriesTree]
+  );
   if (!isOpen) return null;
 
   // ========================================
   // RENDERIZAÇÃO
   // ========================================
 
-  return <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
       <div className="card-theme dark:bg-dark-surface rounded-lg shadow-xl w-full max-w-4xl max-h-[85vh] overflow-hidden flex flex-col">
         {/* Header - Compacto */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-light-border dark:border-dark-border flex-shrink-0">
@@ -323,12 +374,19 @@ const ImportExpensesFromOFXModal = ({
               </h2>
               <p className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 Passo {currentStep} de 3 -{' '}
-                {currentStep === 1 ? 'Upload' : currentStep === 2 ? 'Categorias' : 'Preview'}
+                {currentStep === 1
+                  ? 'Upload'
+                  : currentStep === 2
+                    ? 'Categorias'
+                    : 'Preview'}
               </p>
             </div>
           </div>
 
-          <button onClick={handleClose} className="flex items-center justify-center w-8 h-8 text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary dark:hover:text-gray-300 dark:text-gray-600 rounded-lg hover:card-theme dark:hover:bg-gray-700 transition-colors">
+          <button
+            onClick={handleClose}
+            className="flex items-center justify-center w-8 h-8 text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary dark:hover:text-gray-300 dark:text-gray-600 rounded-lg hover:card-theme dark:hover:bg-gray-700 transition-colors"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -336,56 +394,82 @@ const ImportExpensesFromOFXModal = ({
         {/* Progress Bar - Compacto */}
         <div className="px-6 py-2.5 bg-light-bg dark:bg-dark-bg dark:bg-dark-surface border-b border-light-border dark:border-dark-border flex-shrink-0">
           <div className="flex items-center justify-center gap-8">
-            {[{
-            step: 1,
-            title: 'Upload'
-          }, {
-            step: 2,
-            title: 'Categorias'
-          }, {
-            step: 3,
-            title: 'Preview'
-          }].map(({
-            step,
-            title
-          }) => <div key={step} className={`flex items-center gap-2 ${currentStep >= step ? 'text-purple-600 dark:text-purple-400' : 'text-gray-400 dark:text-gray-600'}`}>
-                <div className={`flex items-center justify-center w-5 h-5 rounded-full border-2 ${currentStep >= step ? 'border-purple-600 bg-purple-600 dark:border-purple-400 dark:bg-purple-400 text-white' : 'border-gray-300 dark:border-gray-600'}`}>
-                  {currentStep > step ? <CheckCircle className="w-3 h-3" /> : <span className="text-xs font-medium">{step}</span>}
+            {[
+              {
+                step: 1,
+                title: 'Upload',
+              },
+              {
+                step: 2,
+                title: 'Categorias',
+              },
+              {
+                step: 3,
+                title: 'Preview',
+              },
+            ].map(({ step, title }) => (
+              <div
+                key={step}
+                className={`flex items-center gap-2 ${currentStep >= step ? 'text-purple-600 dark:text-purple-400' : 'text-gray-400 dark:text-gray-600'}`}
+              >
+                <div
+                  className={`flex items-center justify-center w-5 h-5 rounded-full border-2 ${currentStep >= step ? 'border-purple-600 bg-purple-600 dark:border-purple-400 dark:bg-purple-400 text-white' : 'border-gray-300 dark:border-gray-600'}`}
+                >
+                  {currentStep > step ? (
+                    <CheckCircle className="w-3 h-3" />
+                  ) : (
+                    <span className="text-xs font-medium">{step}</span>
+                  )}
                 </div>
                 <span className="font-medium text-xs">{title}</span>
-              </div>)}
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Content - Scrollable */}
         <div className="flex-1 overflow-y-auto">
           {/* STEP 1: Upload OFX */}
-          {currentStep === 1 && <div className="p-6 space-y-4">
+          {currentStep === 1 && (
+            <div className="p-6 space-y-4">
               {/* Info da Unidade Selecionada */}
-              {selectedUnit && <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+              {selectedUnit && (
+                <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                   <Building2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   <span className="text-sm text-blue-700 dark:text-blue-300">
                     <strong>Unidade:</strong> {selectedUnit.name}
                   </span>
-                </div>}
+                </div>
+              )}
 
               {/* Seleção de Conta */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                   Conta Bancária *
                 </label>
-                <select value={selectedAccount} onChange={e => setSelectedAccount(e.target.value)} className="w-full px-3 py-2 border border-light-border dark:border-dark-border card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500" disabled={!effectiveUnitId}>
+                <select
+                  value={selectedAccount}
+                  onChange={e => setSelectedAccount(e.target.value)}
+                  className="w-full px-3 py-2 border border-light-border dark:border-dark-border card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  disabled={!effectiveUnitId}
+                >
                   <option value="">
-                    {effectiveUnitId ? 'Selecionar conta...' : 'Selecione uma unidade primeiro'}
+                    {effectiveUnitId
+                      ? 'Selecionar conta...'
+                      : 'Selecione uma unidade primeiro'}
                   </option>
-                  {filteredAccounts.map(account => <option key={account.id} value={account.id}>
+                  {filteredAccounts.map(account => (
+                    <option key={account.id} value={account.id}>
                       {account.nome || account.bank_name} -{' '}
                       {account.banco || account.account_number}
-                    </option>)}
+                    </option>
+                  ))}
                 </select>
-                {filteredAccounts.length === 0 && effectiveUnitId && <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
+                {filteredAccounts.length === 0 && effectiveUnitId && (
+                  <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
                     Nenhuma conta cadastrada nesta unidade
-                  </p>}
+                  </p>
+                )}
               </div>
 
               {/* Upload Area - Compacto */}
@@ -394,7 +478,10 @@ const ImportExpensesFromOFXModal = ({
                   Arquivo OFX *
                 </label>
 
-                <div onClick={() => fileInputRef.current?.click()} className="border-2 border-dashed border-light-border dark:border-dark-border rounded-lg p-6 text-center hover:border-purple-400 dark:hover:border-purple-500 cursor-pointer transition-colors bg-light-bg dark:bg-dark-bg dark:bg-dark-surface">
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="border-2 border-dashed border-light-border dark:border-dark-border rounded-lg p-6 text-center hover:border-purple-400 dark:hover:border-purple-500 cursor-pointer transition-colors bg-light-bg dark:bg-dark-bg dark:bg-dark-surface"
+                >
                   <Upload className="w-10 h-10 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary mx-auto mb-3" />
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-theme-primary dark:text-dark-text-primary">
@@ -406,12 +493,19 @@ const ImportExpensesFromOFXModal = ({
                   </div>
                 </div>
 
-                <input ref={fileInputRef} type="file" accept=".ofx" onChange={e => {
-              const selectedFile = e.target.files[0];
-              if (selectedFile) {
-                handleFileUpload(selectedFile);
-              }
-            }} className="hidden" disabled={!selectedAccount} />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".ofx"
+                  onChange={e => {
+                    const selectedFile = e.target.files[0];
+                    if (selectedFile) {
+                      handleFileUpload(selectedFile);
+                    }
+                  }}
+                  className="hidden"
+                  disabled={!selectedAccount}
+                />
               </div>
 
               {/* Info Box - Compacto */}
@@ -443,21 +537,27 @@ const ImportExpensesFromOFXModal = ({
                 </ul>
               </div>
 
-              {!selectedAccount && effectiveUnitId && <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
+              {!selectedAccount && effectiveUnitId && (
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
                   <p className="text-xs text-yellow-800 dark:text-yellow-300">
                     Selecione uma conta bancária para começar
                   </p>
-                </div>}
+                </div>
+              )}
 
-              {!effectiveUnitId && <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
+              {!effectiveUnitId && (
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
                   <p className="text-xs text-yellow-800 dark:text-yellow-300">
                     Selecione uma unidade no menu superior para começar
                   </p>
-                </div>}
-            </div>}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* STEP 2: Seleção de Categorias */}
-          {currentStep === 2 && normalizedData.length > 0 && <div className="p-6 space-y-4">
+          {currentStep === 2 && normalizedData.length > 0 && (
+            <div className="p-6 space-y-4">
               <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
                 <div className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
                   <CheckCircle className="w-4 h-4" />
@@ -490,12 +590,19 @@ const ImportExpensesFromOFXModal = ({
                     </tr>
                   </thead>
                   <tbody className="card-theme dark:bg-dark-surface divide-y divide-gray-200 dark:divide-gray-700">
-                    {normalizedData.map((record, index) => <tr key={index} className="hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700">
+                    {normalizedData.map((record, index) => (
+                      <tr
+                        key={index}
+                        className="hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700"
+                      >
                         <td className="px-2 py-2 text-xs text-theme-primary dark:text-gray-100 whitespace-nowrap">
                           {record.expense.date}
                         </td>
                         <td className="px-2 py-2 text-xs text-theme-primary dark:text-gray-100">
-                          <div className="max-w-xs truncate" title={record.expense.description}>
+                          <div
+                            className="max-w-xs truncate"
+                            title={record.expense.description}
+                          >
                             {record.expense.description}
                           </div>
                         </td>
@@ -503,35 +610,55 @@ const ImportExpensesFromOFXModal = ({
                           <span className="text-red-600 dark:text-red-400 font-medium whitespace-nowrap">
                             R${' '}
                             {record.expense.value.toLocaleString('pt-BR', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                      })}
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
                           </span>
                         </td>
                         <td className="px-2 py-2">
-                          <CategoryHierarchicalDropdown categories={categoriesTree} value={userCategorySelections[index] || record.expense.category_id || ''} onChange={categoryId => handleCategoryChange(index, categoryId)} placeholder="Selecionar..." showIcon={false} className="text-xs" />
+                          <CategoryHierarchicalDropdown
+                            categories={categoriesTree}
+                            value={
+                              userCategorySelections[index] ||
+                              record.expense.category_id ||
+                              ''
+                            }
+                            onChange={categoryId =>
+                              handleCategoryChange(index, categoryId)
+                            }
+                            placeholder="Selecionar..."
+                            showIcon={false}
+                            className="text-xs"
+                          />
                         </td>
-                      </tr>)}
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
 
-              {categoriesLoading && <div className="text-center py-4">
+              {categoriesLoading && (
+                <div className="text-center py-4">
                   <RefreshCw className="w-6 h-6 animate-spin text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary mx-auto" />
                   <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-2">
                     Carregando categorias...
                   </p>
-                </div>}
+                </div>
+              )}
 
-              {categoriesError && <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+              {categoriesError && (
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
                   <p className="text-sm text-red-600 dark:text-red-400">
                     Erro ao carregar categorias: {categoriesError}
                   </p>
-                </div>}
-            </div>}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* STEP 3: Preview e Confirmação */}
-          {currentStep === 3 && enrichedData.length > 0 && previewStats && <div className="p-6 space-y-4">
+          {currentStep === 3 && enrichedData.length > 0 && previewStats && (
+            <div className="p-6 space-y-4">
               {/* Resumo - Compacto */}
               <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
                 <h3 className="text-sm font-semibold text-green-900 dark:text-green-300 mb-2">
@@ -569,9 +696,9 @@ const ImportExpensesFromOFXModal = ({
                     <span className="ml-2 text-green-900 dark:text-green-200 font-bold">
                       R${' '}
                       {previewStats.totalValue.toLocaleString('pt-BR', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                  })}
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </span>
                   </div>
                 </div>
@@ -604,12 +731,16 @@ const ImportExpensesFromOFXModal = ({
                       </tr>
                     </thead>
                     <tbody className="card-theme dark:bg-dark-surface divide-y divide-gray-200 dark:divide-gray-700">
-                      {enrichedData.slice(0, 10).map((record, index) => <tr key={index}>
+                      {enrichedData.slice(0, 10).map((record, index) => (
+                        <tr key={index}>
                           <td className="px-2 py-1.5 text-xs text-theme-primary dark:text-gray-100 whitespace-nowrap">
                             {record.expense.date}
                           </td>
                           <td className="px-2 py-1.5 text-xs text-theme-primary dark:text-gray-100">
-                            <div className="max-w-xs truncate" title={record.expense.description}>
+                            <div
+                              className="max-w-xs truncate"
+                              title={record.expense.description}
+                            >
                               {record.expense.description}
                             </div>
                           </td>
@@ -617,13 +748,18 @@ const ImportExpensesFromOFXModal = ({
                             <span className="text-red-600 dark:text-red-400 font-medium whitespace-nowrap">
                               R${' '}
                               {record.expense.value.toLocaleString('pt-BR', {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2
-                        })}
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}
                             </span>
                           </td>
                           <td className="px-2 py-1.5 text-xs text-theme-primary dark:text-gray-100">
-                            <div className="max-w-xs truncate" title={getCategoryName(record.expense.category_id)}>
+                            <div
+                              className="max-w-xs truncate"
+                              title={getCategoryName(
+                                record.expense.category_id
+                              )}
+                            >
                               {getCategoryName(record.expense.category_id)}
                             </div>
                           </td>
@@ -632,20 +768,25 @@ const ImportExpensesFromOFXModal = ({
                               Paid
                             </span>
                           </td>
-                        </tr>)}
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
 
-                {enrichedData.length > 10 && <p className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-2 text-center">
+                {enrichedData.length > 10 && (
+                  <p className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-2 text-center">
                     ... e mais {enrichedData.length - 10} despesas
-                  </p>}
+                  </p>
+                )}
               </div>
-            </div>}
+            </div>
+          )}
         </div>
 
         {/* Validation Errors */}
-        {validationErrors.length > 0 && <div className="px-6 py-3 bg-red-50 dark:bg-red-900/20 border-t border-red-200 dark:border-red-800">
+        {validationErrors.length > 0 && (
+          <div className="px-6 py-3 bg-red-50 dark:bg-red-900/20 border-t border-red-200 dark:border-red-800">
             <div className="flex items-start gap-2">
               <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400 flex-shrink-0 mt-0.5" />
               <div>
@@ -653,47 +794,80 @@ const ImportExpensesFromOFXModal = ({
                   Problemas encontrados:
                 </h4>
                 <ul className="mt-1 text-sm text-red-700 dark:text-red-400 list-disc list-inside space-y-1">
-                  {validationErrors.map((error, index) => <li key={index}>{error}</li>)}
+                  {validationErrors.map((error, index) => (
+                    <li key={index}>{error}</li>
+                  ))}
                 </ul>
               </div>
             </div>
-          </div>}
+          </div>
+        )}
 
         {/* Footer - Compacto */}
         <div className="flex items-center justify-between px-6 py-4 border-t border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg dark:bg-dark-surface flex-shrink-0">
           <div className="flex items-center text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
-            {file && <span className="truncate max-w-xs">
+            {file && (
+              <span className="truncate max-w-xs">
                 {file.name} ({(file.size / 1024).toFixed(1)} KB)
-              </span>}
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
-            {currentStep > 1 && <button type="button" onClick={() => setCurrentStep(currentStep - 1)} className="px-3 py-1.5 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600 border border-light-border dark:border-dark-border rounded-lg hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700 transition-colors">
+            {currentStep > 1 && (
+              <button
+                type="button"
+                onClick={() => setCurrentStep(currentStep - 1)}
+                className="px-3 py-1.5 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600 border border-light-border dark:border-dark-border rounded-lg hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700 transition-colors"
+              >
                 Voltar
-              </button>}
+              </button>
+            )}
 
-            <button type="button" onClick={handleClose} className="px-3 py-1.5 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600 border border-light-border dark:border-dark-border rounded-lg hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700 transition-colors">
+            <button
+              type="button"
+              onClick={handleClose}
+              className="px-3 py-1.5 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600 border border-light-border dark:border-dark-border rounded-lg hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700 transition-colors"
+            >
               Cancelar
             </button>
 
-            {currentStep === 2 && <button type="button" onClick={handleProceedToPreview} className="px-4 py-1.5 text-sm bg-purple-600 dark:bg-purple-500 text-dark-text-primary rounded-lg hover:bg-purple-700 dark:hover:bg-purple-600 transition-colors flex items-center gap-2">
+            {currentStep === 2 && (
+              <button
+                type="button"
+                onClick={handleProceedToPreview}
+                className="px-4 py-1.5 text-sm bg-purple-600 dark:bg-purple-500 text-dark-text-primary rounded-lg hover:bg-purple-700 dark:hover:bg-purple-600 transition-colors flex items-center gap-2"
+              >
                 Gerar Preview
                 <ArrowRight className="w-3.5 h-3.5" />
-              </button>}
+              </button>
+            )}
 
-            {currentStep === 3 && <button type="button" onClick={handleConfirmImport} disabled={isSubmitting} className="px-4 py-1.5 text-sm bg-green-600 dark:bg-green-500 text-dark-text-primary rounded-lg hover:bg-green-700 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
-                {isSubmitting ? <>
+            {currentStep === 3 && (
+              <button
+                type="button"
+                onClick={handleConfirmImport}
+                disabled={isSubmitting}
+                className="px-4 py-1.5 text-sm bg-green-600 dark:bg-green-500 text-dark-text-primary rounded-lg hover:bg-green-700 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+              >
+                {isSubmitting ? (
+                  <>
                     <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                     Importando...
-                  </> : <>
+                  </>
+                ) : (
+                  <>
                     <CheckCircle className="w-3.5 h-3.5" />
                     Confirmar
-                  </>}
-              </button>}
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 ImportExpensesFromOFXModal.propTypes = {
   /** Se o modal está aberto */
@@ -707,6 +881,6 @@ ImportExpensesFromOFXModal.propTypes = {
   /** ID padrão da conta bancária selecionada */
   defaultAccountId: PropTypes.string,
   /** ID da unidade */
-  unitId: PropTypes.string
+  unitId: PropTypes.string,
 };
 export default ImportExpensesFromOFXModal;

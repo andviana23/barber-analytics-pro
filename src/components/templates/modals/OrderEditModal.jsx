@@ -39,7 +39,7 @@ const OrderEditModal = ({
   professionals = [],
   onAddItem,
   onRemoveItem,
-  onUpdateItem
+  onUpdateItem,
 }) => {
   const [selectedService, setSelectedService] = useState('');
   const [selectedProfessional, setSelectedProfessional] = useState('');
@@ -80,7 +80,7 @@ const OrderEditModal = ({
       await onAddItem(order.id, {
         serviceId: selectedService,
         professionalId: selectedProfessional,
-        quantity: parseInt(quantity)
+        quantity: parseInt(quantity),
       });
 
       // Reset formulário após sucesso
@@ -120,7 +120,8 @@ const OrderEditModal = ({
       return sum + item.unit_price * item.quantity;
     }, 0);
   };
-  return <Modal isOpen={isOpen} onClose={onClose} title="Editar Comanda" size="lg">
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title="Editar Comanda" size="lg">
       {/* Header: Info da comanda */}
       <div className="bg-light-bg dark:bg-dark-bg p-4 rounded-lg mb-4">
         <div className="flex items-center justify-between">
@@ -133,18 +134,29 @@ const OrderEditModal = ({
       </div>
 
       {/* Validação de edição */}
-      {!canEdit && <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+      {!canEdit && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
           <p className="text-yellow-800 text-sm">
             ⚠️ Esta comanda não pode ser editada no status atual.
           </p>
-        </div>}
+        </div>
+      )}
 
       {/* Lista de itens atuais */}
       <div className="mb-6">
         <h3 className="font-semibold mb-3">Itens da Comanda</h3>
 
-        {!order.items || order.items.length === 0 ? <p className="text-theme-secondary text-sm italic">Nenhum item adicionado</p> : <div className="space-y-2">
-            {order.items.map(item => <div key={item.id} className="flex items-center justify-between card-theme border border-light-border dark:border-dark-border rounded-lg p-3">
+        {!order.items || order.items.length === 0 ? (
+          <p className="text-theme-secondary text-sm italic">
+            Nenhum item adicionado
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {order.items.map(item => (
+              <div
+                key={item.id}
+                className="flex items-center justify-between card-theme border border-light-border dark:border-dark-border rounded-lg p-3"
+              >
                 <div className="flex-1">
                   <p className="font-medium">
                     {item.service?.name || 'Serviço'}
@@ -160,42 +172,79 @@ const OrderEditModal = ({
                     {formatCurrency(item.unit_price * item.quantity)}
                   </span>
 
-                  {canEdit && <Button variant="danger" size="sm" onClick={() => handleRemoveItem(item.id)} disabled={isSubmitting}>
+                  {canEdit && (
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => handleRemoveItem(item.id)}
+                      disabled={isSubmitting}
+                    >
                       🗑️
-                    </Button>}
+                    </Button>
+                  )}
                 </div>
-              </div>)}
-          </div>}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Form: Adicionar novo serviço */}
-      {canEdit && <div className="border-t border-light-border dark:border-dark-border pt-4">
+      {canEdit && (
+        <div className="border-t border-light-border dark:border-dark-border pt-4">
           <h3 className="font-semibold mb-3">Adicionar Serviço</h3>
 
           <div className="grid grid-cols-2 gap-3 mb-3">
-            <Select label="Serviço" value={selectedService} onChange={e => setSelectedService(e.target.value)} disabled={isSubmitting}>
+            <Select
+              label="Serviço"
+              value={selectedService}
+              onChange={e => setSelectedService(e.target.value)}
+              disabled={isSubmitting}
+            >
               <option value="">Selecione...</option>
-              {services.map(service => <option key={service.id} value={service.id}>
+              {services.map(service => (
+                <option key={service.id} value={service.id}>
                   {service.name} - {formatCurrency(service.price)}
-                </option>)}
+                </option>
+              ))}
             </Select>
 
-            <Select label="Profissional" value={selectedProfessional} onChange={e => setSelectedProfessional(e.target.value)} disabled={isSubmitting}>
+            <Select
+              label="Profissional"
+              value={selectedProfessional}
+              onChange={e => setSelectedProfessional(e.target.value)}
+              disabled={isSubmitting}
+            >
               <option value="">Selecione...</option>
-              {professionals.map(prof => <option key={prof.id} value={prof.id}>
+              {professionals.map(prof => (
+                <option key={prof.id} value={prof.id}>
                   {prof.name}
-                </option>)}
+                </option>
+              ))}
             </Select>
           </div>
 
           <div className="grid grid-cols-2 gap-3 mb-4">
-            <Input type="number" label="Quantidade" value={quantity} onChange={e => setQuantity(e.target.value)} min="1" disabled={isSubmitting} />
+            <Input
+              type="number"
+              label="Quantidade"
+              value={quantity}
+              onChange={e => setQuantity(e.target.value)}
+              min="1"
+              disabled={isSubmitting}
+            />
           </div>
 
-          <Button variant="primary" onClick={handleAddService} disabled={isSubmitting || !selectedService || !selectedProfessional} className="w-full">
+          <Button
+            variant="primary"
+            onClick={handleAddService}
+            disabled={isSubmitting || !selectedService || !selectedProfessional}
+            className="w-full"
+          >
             {isSubmitting ? 'Adicionando...' : '➕ Adicionar Serviço'}
           </Button>
-        </div>}
+        </div>
+      )}
 
       {/* Footer: Total */}
       <div className="mt-6 pt-4 border-t border-light-border dark:border-dark-border">
@@ -213,7 +262,8 @@ const OrderEditModal = ({
           Fechar
         </Button>
       </div>
-    </Modal>;
+    </Modal>
+  );
 };
 OrderEditModal.propTypes = {
   /** Se o modal está aberto */
@@ -231,6 +281,6 @@ OrderEditModal.propTypes = {
   /** Callback ao remover item */
   onRemoveItem: PropTypes.func.isRequired,
   /** Callback ao atualizar item */
-  onUpdateItem: PropTypes.func
+  onUpdateItem: PropTypes.func,
 };
 export default OrderEditModal;

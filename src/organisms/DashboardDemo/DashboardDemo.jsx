@@ -1,90 +1,123 @@
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+} from 'recharts';
 import { Card, CardHeader, CardTitle, CardContent } from '../../atoms';
 import { useTheme } from '../../context/ThemeContext';
 
 // Tooltip customizado - movido para fora do componente
-const CustomTooltip = ({
-  active,
-  payload,
-  label
-}) => {
+const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
-    return <div className="card-theme border border-light-border dark:border-dark-border rounded-lg p-3 shadow-lg">
+    return (
+      <div className="card-theme border border-light-border dark:border-dark-border rounded-lg p-3 shadow-lg">
         <p className="text-text-light-primary dark:text-text-dark-primary font-medium">{`${label}`}</p>
-        {payload.map((entry, index) => <p key={index} className="text-text-light-secondary dark:text-text-dark-secondary">
+        {payload.map((entry, index) => (
+          <p
+            key={index}
+            className="text-text-light-secondary dark:text-text-dark-secondary"
+          >
             {`${entry.name}: ${entry.value}`}
-          </p>)}
-      </div>;
+          </p>
+        ))}
+      </div>
+    );
   }
   return null;
 };
 
 // Dados de exemplo
-const barData = [{
-  name: 'Jan',
-  faturamento: 4000,
-  lucro: 2400
-}, {
-  name: 'Fev',
-  faturamento: 3000,
-  lucro: 1398
-}, {
-  name: 'Mar',
-  faturamento: 2000,
-  lucro: 9800
-}, {
-  name: 'Abr',
-  faturamento: 2780,
-  lucro: 3908
-}, {
-  name: 'Mai',
-  faturamento: 1890,
-  lucro: 4800
-}, {
-  name: 'Jun',
-  faturamento: 2390,
-  lucro: 3800
-}];
-const lineData = [{
-  name: 'Seg',
-  atendimentos: 12
-}, {
-  name: 'Ter',
-  atendimentos: 19
-}, {
-  name: 'Qua',
-  atendimentos: 15
-}, {
-  name: 'Qui',
-  atendimentos: 22
-}, {
-  name: 'Sex',
-  atendimentos: 28
-}, {
-  name: 'Sab',
-  atendimentos: 35
-}, {
-  name: 'Dom',
-  atendimentos: 18
-}];
-const pieData = [{
-  name: 'Mangabeiras',
-  value: 400,
-  color: '#4DA3FF'
-}, {
-  name: 'Nova Lima',
-  value: 300,
-  color: '#1E8CFF'
-}, {
-  name: 'Centro',
-  value: 200,
-  color: '#E8F3FF'
-}];
+const barData = [
+  {
+    name: 'Jan',
+    faturamento: 4000,
+    lucro: 2400,
+  },
+  {
+    name: 'Fev',
+    faturamento: 3000,
+    lucro: 1398,
+  },
+  {
+    name: 'Mar',
+    faturamento: 2000,
+    lucro: 9800,
+  },
+  {
+    name: 'Abr',
+    faturamento: 2780,
+    lucro: 3908,
+  },
+  {
+    name: 'Mai',
+    faturamento: 1890,
+    lucro: 4800,
+  },
+  {
+    name: 'Jun',
+    faturamento: 2390,
+    lucro: 3800,
+  },
+];
+const lineData = [
+  {
+    name: 'Seg',
+    atendimentos: 12,
+  },
+  {
+    name: 'Ter',
+    atendimentos: 19,
+  },
+  {
+    name: 'Qua',
+    atendimentos: 15,
+  },
+  {
+    name: 'Qui',
+    atendimentos: 22,
+  },
+  {
+    name: 'Sex',
+    atendimentos: 28,
+  },
+  {
+    name: 'Sab',
+    atendimentos: 35,
+  },
+  {
+    name: 'Dom',
+    atendimentos: 18,
+  },
+];
+const pieData = [
+  {
+    name: 'Mangabeiras',
+    value: 400,
+    color: '#4DA3FF',
+  },
+  {
+    name: 'Nova Lima',
+    value: 300,
+    color: '#1E8CFF',
+  },
+  {
+    name: 'Centro',
+    value: 200,
+    color: '#E8F3FF',
+  },
+];
 export function DashboardDemo() {
-  const {
-    actualTheme
-  } = useTheme();
+  const { actualTheme } = useTheme();
 
   // Cores para os gráficos baseadas no tema
   const chartColors = {
@@ -94,9 +127,10 @@ export function DashboardDemo() {
     warning: actualTheme === 'light' ? '#F59E0B' : '#FBBF24',
     text: actualTheme === 'light' ? '#1E293B' : '#F8FAFC',
     textSecondary: actualTheme === 'light' ? '#64748B' : '#94A3B8',
-    grid: actualTheme === 'light' ? '#E2E8F0' : '#334155'
+    grid: actualTheme === 'light' ? '#E2E8F0' : '#334155',
   };
-  return <div className="max-w-7xl mx-auto p-6 space-y-6">
+  return (
+    <div className="max-w-7xl mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-text-light-primary dark:text-text-dark-primary text-3xl font-bold mb-2">
@@ -171,18 +205,34 @@ export function DashboardDemo() {
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={barData}>
-                <CartesianGrid strokeDasharray="3 3" stroke={chartColors.grid} />
-                <XAxis dataKey="name" tick={{
-                fill: chartColors.textSecondary,
-                fontSize: 12
-              }} />
-                <YAxis tick={{
-                fill: chartColors.textSecondary,
-                fontSize: 12
-              }} />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke={chartColors.grid}
+                />
+                <XAxis
+                  dataKey="name"
+                  tick={{
+                    fill: chartColors.textSecondary,
+                    fontSize: 12,
+                  }}
+                />
+                <YAxis
+                  tick={{
+                    fill: chartColors.textSecondary,
+                    fontSize: 12,
+                  }}
+                />
                 <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="faturamento" fill={chartColors.primary} radius={[4, 4, 0, 0]} />
-                <Bar dataKey="lucro" fill={chartColors.success} radius={[4, 4, 0, 0]} />
+                <Bar
+                  dataKey="faturamento"
+                  fill={chartColors.primary}
+                  radius={[4, 4, 0, 0]}
+                />
+                <Bar
+                  dataKey="lucro"
+                  fill={chartColors.success}
+                  radius={[4, 4, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -196,25 +246,40 @@ export function DashboardDemo() {
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={lineData}>
-                <CartesianGrid strokeDasharray="3 3" stroke={chartColors.grid} />
-                <XAxis dataKey="name" tick={{
-                fill: chartColors.textSecondary,
-                fontSize: 12
-              }} />
-                <YAxis tick={{
-                fill: chartColors.textSecondary,
-                fontSize: 12
-              }} />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke={chartColors.grid}
+                />
+                <XAxis
+                  dataKey="name"
+                  tick={{
+                    fill: chartColors.textSecondary,
+                    fontSize: 12,
+                  }}
+                />
+                <YAxis
+                  tick={{
+                    fill: chartColors.textSecondary,
+                    fontSize: 12,
+                  }}
+                />
                 <Tooltip content={<CustomTooltip />} />
-                <Line type="monotone" dataKey="atendimentos" stroke={chartColors.primary} strokeWidth={3} dot={{
-                fill: chartColors.primary,
-                strokeWidth: 2,
-                r: 4
-              }} activeDot={{
-                r: 6,
-                stroke: chartColors.primary,
-                strokeWidth: 2
-              }} />
+                <Line
+                  type="monotone"
+                  dataKey="atendimentos"
+                  stroke={chartColors.primary}
+                  strokeWidth={3}
+                  dot={{
+                    fill: chartColors.primary,
+                    strokeWidth: 2,
+                    r: 4,
+                  }}
+                  activeDot={{
+                    r: 6,
+                    stroke: chartColors.primary,
+                    strokeWidth: 2,
+                  }}
+                />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -228,11 +293,19 @@ export function DashboardDemo() {
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
-                <Pie data={pieData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({
-                name,
-                percent
-              }) => `${name} ${(percent * 100).toFixed(0)}%`}>
-                  {pieData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  dataKey="value"
+                  label={({ name, percent }) =>
+                    `${name} ${(percent * 100).toFixed(0)}%`
+                  }
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
                 </Pie>
                 <Tooltip content={<CustomTooltip />} />
               </PieChart>
@@ -247,23 +320,32 @@ export function DashboardDemo() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {[{
-              name: 'João Silva',
-              atendimentos: 45,
-              receita: 'R$ 4.500'
-            }, {
-              name: 'Carlos Santos',
-              atendimentos: 38,
-              receita: 'R$ 3.800'
-            }, {
-              name: 'Pedro Lima',
-              atendimentos: 32,
-              receita: 'R$ 3.200'
-            }, {
-              name: 'Lucas Oliveira',
-              atendimentos: 28,
-              receita: 'R$ 2.800'
-            }].map((profissional, index) => <div key={index} className="flex items-center justify-between p-3 bg-light-bg dark:bg-dark-bg rounded-lg">
+              {[
+                {
+                  name: 'João Silva',
+                  atendimentos: 45,
+                  receita: 'R$ 4.500',
+                },
+                {
+                  name: 'Carlos Santos',
+                  atendimentos: 38,
+                  receita: 'R$ 3.800',
+                },
+                {
+                  name: 'Pedro Lima',
+                  atendimentos: 32,
+                  receita: 'R$ 3.200',
+                },
+                {
+                  name: 'Lucas Oliveira',
+                  atendimentos: 28,
+                  receita: 'R$ 2.800',
+                },
+              ].map((profissional, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 bg-light-bg dark:bg-dark-bg rounded-lg"
+                >
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-primary text-dark-text-primary rounded-full flex items-center justify-center text-sm font-bold">
                       {index + 1}
@@ -280,7 +362,8 @@ export function DashboardDemo() {
                   <div className="text-primary font-semibold">
                     {profissional.receita}
                   </div>
-                </div>)}
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
@@ -294,5 +377,6 @@ export function DashboardDemo() {
           Gráficos criados com Recharts e sistema de temas personalizado
         </p>
       </div>
-    </div>;
+    </div>
+  );
 }

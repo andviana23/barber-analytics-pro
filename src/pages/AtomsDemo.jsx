@@ -27,7 +27,8 @@ const AtomsDemo = () => {
     setLoading(true);
     setTimeout(() => setLoading(false), 2000);
   };
-  return <div className="min-h-screen bg-light-bg dark:bg-dark-bg p-6">
+  return (
+    <div className="min-h-screen bg-light-bg dark:bg-dark-bg p-6">
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
         <div>
@@ -49,7 +50,14 @@ const AtomsDemo = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Normal */}
             <div>
-              <CurrencyInput label="Saldo Inicial" value={saldoInicial} onChange={setSaldoInicial} placeholder="Digite o saldo inicial" min={0} max={100000} />
+              <CurrencyInput
+                label="Saldo Inicial"
+                value={saldoInicial}
+                onChange={setSaldoInicial}
+                placeholder="Digite o saldo inicial"
+                min={0}
+                max={100000}
+              />
               <p className="mt-2 text-sm text-theme-secondary">
                 Valor atual: R$ {saldoInicial.toFixed(2)}
               </p>
@@ -57,17 +65,34 @@ const AtomsDemo = () => {
 
             {/* Com Required */}
             <div>
-              <CurrencyInput label="Saldo de Fechamento" value={valorComErro} onChange={setValorComErro} required error={valorComErro === 0 ? 'Campo obrigatório' : null} />
+              <CurrencyInput
+                label="Saldo de Fechamento"
+                value={valorComErro}
+                onChange={setValorComErro}
+                required
+                error={valorComErro === 0 ? 'Campo obrigatório' : null}
+              />
             </div>
 
             {/* Desabilitado */}
             <div>
-              <CurrencyInput label="Valor Bloqueado" value={valorDesabilitado} onChange={() => {}} disabled />
+              <CurrencyInput
+                label="Valor Bloqueado"
+                value={valorDesabilitado}
+                onChange={() => {}}
+                disabled
+              />
             </div>
 
             {/* Com Range */}
             <div>
-              <CurrencyInput label="Valor com Limite" value={saldoInicial} onChange={setSaldoInicial} min={100} max={10000} />
+              <CurrencyInput
+                label="Valor com Limite"
+                value={saldoInicial}
+                onChange={setSaldoInicial}
+                min={100}
+                max={10000}
+              />
             </div>
           </div>
 
@@ -99,7 +124,15 @@ const AtomsDemo = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Normal */}
             <div>
-              <TimeInput label="Duração do Serviço" value={duracao} onChange={setDuracao} placeholder="Digite a duração" min={15} max={480} step={15} />
+              <TimeInput
+                label="Duração do Serviço"
+                value={duracao}
+                onChange={setDuracao}
+                placeholder="Digite a duração"
+                min={15}
+                max={480}
+                step={15}
+              />
               <p className="mt-2 text-sm text-theme-secondary">
                 Valor atual: {duracao} minutos ({Math.floor(duracao / 60)}h{' '}
                 {duracao % 60}min)
@@ -108,17 +141,33 @@ const AtomsDemo = () => {
 
             {/* Com Required */}
             <div>
-              <TimeInput label="Tempo de Atendimento" value={duracaoComErro} onChange={setDuracaoComErro} required error={duracaoComErro === 0 ? 'Duração obrigatória' : null} />
+              <TimeInput
+                label="Tempo de Atendimento"
+                value={duracaoComErro}
+                onChange={setDuracaoComErro}
+                required
+                error={duracaoComErro === 0 ? 'Duração obrigatória' : null}
+              />
             </div>
 
             {/* Desabilitado */}
             <div>
-              <TimeInput label="Duração Fixa" value={duracaoDesabilitada} onChange={() => {}} disabled />
+              <TimeInput
+                label="Duração Fixa"
+                value={duracaoDesabilitada}
+                onChange={() => {}}
+                disabled
+              />
             </div>
 
             {/* Sem formatação */}
             <div>
-              <TimeInput label="Apenas Minutos" value={duracao} onChange={setDuracao} showFormatted={false} />
+              <TimeInput
+                label="Apenas Minutos"
+                value={duracao}
+                onChange={setDuracao}
+                showFormatted={false}
+              />
             </div>
           </div>
 
@@ -154,22 +203,40 @@ const AtomsDemo = () => {
                 Variantes
               </h3>
               <div className="flex flex-wrap gap-3">
-                <ProtectedButton variant="primary" onClick={() => alert('Primary clicked')}>
+                <ProtectedButton
+                  variant="primary"
+                  onClick={() => alert('Primary clicked')}
+                >
                   Primary
                 </ProtectedButton>
-                <ProtectedButton variant="secondary" onClick={() => alert('Secondary clicked')}>
+                <ProtectedButton
+                  variant="secondary"
+                  onClick={() => alert('Secondary clicked')}
+                >
                   Secondary
                 </ProtectedButton>
-                <ProtectedButton variant="danger" onClick={() => alert('Danger clicked')}>
+                <ProtectedButton
+                  variant="danger"
+                  onClick={() => alert('Danger clicked')}
+                >
                   Danger
                 </ProtectedButton>
-                <ProtectedButton variant="success" onClick={() => alert('Success clicked')}>
+                <ProtectedButton
+                  variant="success"
+                  onClick={() => alert('Success clicked')}
+                >
                   Success
                 </ProtectedButton>
-                <ProtectedButton variant="ghost" onClick={() => alert('Ghost clicked')}>
+                <ProtectedButton
+                  variant="ghost"
+                  onClick={() => alert('Ghost clicked')}
+                >
                   Ghost
                 </ProtectedButton>
-                <ProtectedButton variant="outline" onClick={() => alert('Outline clicked')}>
+                <ProtectedButton
+                  variant="outline"
+                  onClick={() => alert('Outline clicked')}
+                >
                   Outline
                 </ProtectedButton>
               </div>
@@ -195,7 +262,10 @@ const AtomsDemo = () => {
                 Estados
               </h3>
               <div className="flex flex-wrap gap-3">
-                <ProtectedButton onClick={handleSimularCarregamento} loading={loading}>
+                <ProtectedButton
+                  onClick={handleSimularCarregamento}
+                  loading={loading}
+                >
                   {loading ? 'Carregando...' : 'Simular Loading'}
                 </ProtectedButton>
                 <ProtectedButton disabled>Desabilitado</ProtectedButton>
@@ -208,13 +278,26 @@ const AtomsDemo = () => {
                 Controle de Acesso (Role-based)
               </h3>
               <div className="flex flex-wrap gap-3">
-                <ProtectedButton requiredRoles={['admin', 'gerente']} onClick={() => alert('Apenas Admin/Gerente')} showTooltipWhenHidden={true} tooltipMessage="Apenas Gerentes e Administradores podem executar esta ação">
+                <ProtectedButton
+                  requiredRoles={['admin', 'gerente']}
+                  onClick={() => alert('Apenas Admin/Gerente')}
+                  showTooltipWhenHidden={true}
+                  tooltipMessage="Apenas Gerentes e Administradores podem executar esta ação"
+                >
                   Apenas Admin/Gerente
                 </ProtectedButton>
-                <ProtectedButton requiredRoles={['recepcionista', 'gerente', 'admin']} onClick={() => alert('Abrir Caixa')} showTooltipWhenHidden={true}>
+                <ProtectedButton
+                  requiredRoles={['recepcionista', 'gerente', 'admin']}
+                  onClick={() => alert('Abrir Caixa')}
+                  showTooltipWhenHidden={true}
+                >
                   Abrir Caixa
                 </ProtectedButton>
-                <ProtectedButton requiredRoles={['profissional']} onClick={() => alert('Apenas Profissional')} showTooltipWhenHidden={false}>
+                <ProtectedButton
+                  requiredRoles={['profissional']}
+                  onClick={() => alert('Apenas Profissional')}
+                  showTooltipWhenHidden={false}
+                >
                   Apenas Profissional (esconde se não tiver permissão)
                 </ProtectedButton>
               </div>
@@ -279,6 +362,7 @@ const AtomsDemo = () => {
           </ul>
         </Card>
       </div>
-    </div>;
+    </div>
+  );
 };
 export default AtomsDemo;

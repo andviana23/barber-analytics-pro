@@ -29,13 +29,19 @@ import ConciliacaoTab from '../FinanceiroAdvancedPage/ConciliacaoTab';
  */
 const ConciliacaoPage = () => {
   const navigate = useNavigate();
-  return <div className="min-h-screen bg-light-bg dark:bg-dark-bg">
+  return (
+    <div className="min-h-screen bg-light-bg dark:bg-dark-bg">
       {/* Header */}
       <div className="sticky top-0 z-10 card-theme border-b border-light-border dark:border-dark-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm" onClick={() => navigate('/financial')} className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/financial')}
+                className="flex items-center gap-2"
+              >
                 <ArrowLeft className="w-4 h-4" />
                 Voltar
               </Button>
@@ -56,6 +62,7 @@ const ConciliacaoPage = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <ConciliacaoTab />
       </div>
-    </div>;
+    </div>
+  );
 };
 export default ConciliacaoPage;

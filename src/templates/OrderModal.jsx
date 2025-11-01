@@ -30,7 +30,7 @@ const OrderModal = ({
   order = null,
   mode = 'create',
   // 'create' | 'edit' | 'view'
-  loading = false
+  loading = false,
 }) => {
   const [clientName, setClientName] = useState('');
   const [observations, setObservations] = useState('');
@@ -77,7 +77,7 @@ const OrderModal = ({
       onSave({
         client_name: clientName.trim() || null,
         observations: observations.trim() || null,
-        items
+        items,
       });
     }
   };
@@ -96,10 +96,25 @@ const OrderModal = ({
     }
   };
   const calculateTotal = () => {
-    return items.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
+    return items.reduce(
+      (sum, item) => sum + item.price * (item.quantity || 1),
+      0
+    );
   };
   const total = calculateTotal();
-  return <Modal isOpen={isOpen} onClose={handleClose} title={isCreateMode ? 'Nova Comanda' : mode === 'edit' ? `Editar Comanda #${order?.order_number || ''}` : `Comanda #${order?.order_number || ''}`} maxWidth="3xl">
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title={
+        isCreateMode
+          ? 'Nova Comanda'
+          : mode === 'edit'
+            ? `Editar Comanda #${order?.order_number || ''}`
+            : `Comanda #${order?.order_number || ''}`
+      }
+      maxWidth="3xl"
+    >
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Informações Básicas */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -109,14 +124,25 @@ const OrderModal = ({
               Nome do Cliente
               {isEditMode && <span className="text-red-500 ml-1">*</span>}
             </label>
-            <input type="text" value={clientName} onChange={e => setClientName(e.target.value)} disabled={!isEditMode || loading} placeholder="Digite o nome do cliente" maxLength={100} className={`w-full px-4 py-2.5 rounded-lg border bg-white dark:bg-dark-surface text-theme-primary placeholder-theme-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-60 disabled:cursor-not-allowed ${errors.clientName ? 'border-red-500 dark:border-red-400 focus:border-red-500' : 'border-light-border dark:border-dark-border focus:border-primary'}`} />
-            {errors.clientName && <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+            <input
+              type="text"
+              value={clientName}
+              onChange={e => setClientName(e.target.value)}
+              disabled={!isEditMode || loading}
+              placeholder="Digite o nome do cliente"
+              maxLength={100}
+              className={`w-full px-4 py-2.5 rounded-lg border bg-white dark:bg-dark-surface text-theme-primary placeholder-theme-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-60 disabled:cursor-not-allowed ${errors.clientName ? 'border-red-500 dark:border-red-400 focus:border-red-500' : 'border-light-border dark:border-dark-border focus:border-primary'}`}
+            />
+            {errors.clientName && (
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
                 {errors.clientName}
-              </p>}
+              </p>
+            )}
           </div>
 
           {/* Info Cards (apenas visualização/edição) */}
-          {!isCreateMode && order && <>
+          {!isCreateMode && order && (
+            <>
               <div className="p-4 bg-light-surface dark:bg-dark-hover rounded-lg border border-light-border dark:border-dark-border">
                 <p className="text-xs text-theme-secondary mb-1">Número</p>
                 <p className="text-lg font-bold text-primary">
@@ -125,11 +151,18 @@ const OrderModal = ({
               </div>
               <div className="p-4 bg-light-surface dark:bg-dark-hover rounded-lg border border-light-border dark:border-dark-border">
                 <p className="text-xs text-theme-secondary mb-1">Status</p>
-                <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium ${order.status === 'open' ? 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400' : order.status === 'closed' ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-gray-50 dark:bg-gray-900/20 text-gray-700 dark:text-gray-400'}`}>
-                  {order.status === 'open' ? 'Aberta' : order.status === 'closed' ? 'Fechada' : 'Cancelada'}
+                <span
+                  className={`inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium ${order.status === 'open' ? 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400' : order.status === 'closed' ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-gray-50 dark:bg-gray-900/20 text-gray-700 dark:text-gray-400'}`}
+                >
+                  {order.status === 'open'
+                    ? 'Aberta'
+                    : order.status === 'closed'
+                      ? 'Fechada'
+                      : 'Cancelada'}
                 </span>
               </div>
-            </>}
+            </>
+          )}
         </div>
 
         {/* Observações */}
@@ -138,7 +171,15 @@ const OrderModal = ({
             Observações
             <span className="text-theme-secondary ml-1">(opcional)</span>
           </label>
-          <textarea value={observations} onChange={e => setObservations(e.target.value)} disabled={!isEditMode || loading} rows={3} maxLength={500} placeholder="Informações adicionais sobre a comanda" className="w-full px-4 py-2.5 rounded-lg border border-light-border dark:border-dark-border card-theme dark:bg-dark-surface text-theme-primary placeholder-theme-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary disabled:opacity-60 disabled:cursor-not-allowed resize-none" />
+          <textarea
+            value={observations}
+            onChange={e => setObservations(e.target.value)}
+            disabled={!isEditMode || loading}
+            rows={3}
+            maxLength={500}
+            placeholder="Informações adicionais sobre a comanda"
+            className="w-full px-4 py-2.5 rounded-lg border border-light-border dark:border-dark-border card-theme dark:bg-dark-surface text-theme-primary placeholder-theme-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary disabled:opacity-60 disabled:cursor-not-allowed resize-none"
+          />
           <p className="mt-1 text-xs text-theme-secondary text-right">
             {observations.length}/500
           </p>
@@ -146,14 +187,25 @@ const OrderModal = ({
 
         {/* Tabela de Itens */}
         <div>
-          <OrderItemsTable items={items} onRemoveItem={handleRemoveItemClick} onAddItem={isEditMode ? handleAddItemClick : null} editable={isEditMode} showCommission={true} loading={false} emptyMessage="Nenhum serviço adicionado ainda" />
-          {errors.items && <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+          <OrderItemsTable
+            items={items}
+            onRemoveItem={handleRemoveItemClick}
+            onAddItem={isEditMode ? handleAddItemClick : null}
+            editable={isEditMode}
+            showCommission={true}
+            loading={false}
+            emptyMessage="Nenhum serviço adicionado ainda"
+          />
+          {errors.items && (
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400">
               {errors.items}
-            </p>}
+            </p>
+          )}
         </div>
 
         {/* Resumo do Total */}
-        {items.length > 0 && <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
+        {items.length > 0 && (
+          <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-theme-secondary mb-1">
@@ -167,27 +219,54 @@ const OrderModal = ({
                 R$ {total.toFixed(2).replace('.', ',')}
               </p>
             </div>
-          </div>}
+          </div>
+        )}
 
         {/* Ações */}
         <div className="flex gap-3 pt-4 border-t border-light-border dark:border-dark-border">
-          <button type="button" onClick={handleClose} disabled={loading} className="flex-1 px-4 py-2.5 border border-light-border dark:border-dark-border rounded-lg font-medium text-theme-primary hover:bg-light-surface dark:hover:bg-dark-hover transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+          <button
+            type="button"
+            onClick={handleClose}
+            disabled={loading}
+            className="flex-1 px-4 py-2.5 border border-light-border dark:border-dark-border rounded-lg font-medium text-theme-primary hover:bg-light-surface dark:hover:bg-dark-hover transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          >
             {mode === 'view' ? 'Fechar' : 'Cancelar'}
           </button>
-          {isEditMode && <button type="submit" disabled={loading || items.length === 0} className="flex-1 px-4 py-2.5 bg-primary hover:bg-primary-dark text-dark-text-primary rounded-lg font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2">
-              {loading ? <>
+          {isEditMode && (
+            <button
+              type="submit"
+              disabled={loading || items.length === 0}
+              className="flex-1 px-4 py-2.5 bg-primary hover:bg-primary-dark text-dark-text-primary rounded-lg font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <>
                   <div className="w-5 h-5 border-2 border-light-surface dark:border-dark-surface border-t-transparent rounded-full animate-spin" />
                   Salvando...
-                </> : <>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </>
+              ) : (
+                <>
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                   {isCreateMode ? 'Criar Comanda' : 'Salvar Alterações'}
-                </>}
-            </button>}
+                </>
+              )}
+            </button>
+          )}
         </div>
       </form>
-    </Modal>;
+    </Modal>
+  );
 };
 OrderModal.propTypes = {
   /** Se o modal está aberto */
@@ -206,11 +285,11 @@ OrderModal.propTypes = {
     client_name: PropTypes.string,
     observations: PropTypes.string,
     status: PropTypes.oneOf(['open', 'closed', 'cancelled']),
-    items: PropTypes.array
+    items: PropTypes.array,
   }),
   /** Modo de operação */
   mode: PropTypes.oneOf(['create', 'edit', 'view']),
   /** Estado de carregamento */
-  loading: PropTypes.bool
+  loading: PropTypes.bool,
 };
 export default OrderModal;

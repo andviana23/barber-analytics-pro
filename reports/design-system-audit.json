@@ -210,9 +210,7 @@
           "count": 1,
           "severity": "MEDIUM",
           "description": "Estilos inline (evitar quando possível)",
-          "examples": [
-            "style={{\n        maxHeight: '240px'\n      }}"
-          ]
+          "examples": ["style={{\n        maxHeight: '240px'\n      }}"]
         }
       },
       "totalViolations": 2
@@ -274,9 +272,7 @@
           "count": 1,
           "severity": "MEDIUM",
           "description": "Estilos inline (evitar quando possível)",
-          "examples": [
-            "style={{ overflow: 'hidden' }}"
-          ]
+          "examples": ["style={{ overflow: 'hidden' }}"]
         }
       },
       "totalViolations": 1
@@ -288,9 +284,7 @@
           "count": 1,
           "severity": "MEDIUM",
           "description": "Estilos inline (evitar quando possível)",
-          "examples": [
-            "style={{\n          color: entry.color\n        }}"
-          ]
+          "examples": ["style={{\n          color: entry.color\n        }}"]
         }
       },
       "totalViolations": 1
@@ -344,9 +338,7 @@
           "count": 1,
           "severity": "MEDIUM",
           "description": "Estilos inline (evitar quando possível)",
-          "examples": [
-            "style={{\n        backgroundColor: color.hex\n      }}"
-          ]
+          "examples": ["style={{\n        backgroundColor: color.hex\n      }}"]
         }
       },
       "totalViolations": 1
@@ -400,9 +392,7 @@
           "count": 1,
           "severity": "MEDIUM",
           "description": "Estilos inline (evitar quando possível)",
-          "examples": [
-            "style={{\n      height: height + 100\n    }}"
-          ]
+          "examples": ["style={{\n      height: height + 100\n    }}"]
         }
       },
       "totalViolations": 1

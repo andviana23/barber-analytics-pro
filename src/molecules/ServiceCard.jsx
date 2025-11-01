@@ -28,7 +28,7 @@ const ServiceCard = ({
   readOnly = false,
   selected = false,
   onClick,
-  className = ''
+  className = '',
 }) => {
   const isActive = service?.is_active !== false;
   const handleCardClick = () => {
@@ -44,13 +44,17 @@ const ServiceCard = ({
     e.stopPropagation();
     if (onToggleActive) onToggleActive(service);
   };
-  return <Card className={`
+  return (
+    <Card
+      className={`
         relative overflow-hidden transition-all duration-200
         ${onClick && !readOnly ? 'cursor-pointer hover:shadow-lg hover:-translate-y-0.5' : ''}
         ${selected ? 'ring-2 ring-primary shadow-lg' : ''}
         ${!isActive ? 'opacity-60' : ''}
         ${className}
-      `} onClick={handleCardClick}>
+      `}
+      onClick={handleCardClick}
+    >
       <div className="p-5">
         {/* Header */}
         <div className="flex items-start justify-between mb-3">
@@ -58,13 +62,27 @@ const ServiceCard = ({
             <h3 className="text-lg font-semibold text-theme-primary truncate mb-1">
               {service.name}
             </h3>
-            <StatusBadge status={isActive ? 'active' : 'inactive'} text={isActive ? 'Ativo' : 'Inativo'} size="sm" />
+            <StatusBadge
+              status={isActive ? 'active' : 'inactive'}
+              text={isActive ? 'Ativo' : 'Inativo'}
+              size="sm"
+            />
           </div>
 
           {/* Ícone */}
           <div className="ml-3 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-            <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" />
+            <svg
+              className="w-5 h-5 text-primary"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z"
+              />
             </svg>
           </div>
         </div>
@@ -73,18 +91,40 @@ const ServiceCard = ({
         <div className="space-y-2 mb-4">
           {/* Duração */}
           <div className="flex items-center gap-2 text-sm">
-            <svg className="w-4 h-4 text-theme-secondary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-4 h-4 text-theme-secondary flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
             <span className="text-theme-secondary">
-              {service.duration_minutes >= 60 ? `${Math.floor(service.duration_minutes / 60)}h ${service.duration_minutes % 60}min` : `${service.duration_minutes} min`}
+              {service.duration_minutes >= 60
+                ? `${Math.floor(service.duration_minutes / 60)}h ${service.duration_minutes % 60}min`
+                : `${service.duration_minutes} min`}
             </span>
           </div>
 
           {/* Preço */}
           <div className="flex items-center gap-2 text-sm">
-            <svg className="w-4 h-4 text-theme-secondary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-4 h-4 text-theme-secondary flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
             <span className="font-semibold text-theme-primary">
               {formatCurrency(service.price)}
@@ -93,8 +133,18 @@ const ServiceCard = ({
 
           {/* Comissão */}
           <div className="flex items-center gap-2 text-sm">
-            <svg className="w-4 h-4 text-theme-secondary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            <svg
+              className="w-4 h-4 text-theme-secondary flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              />
             </svg>
             <span className="text-theme-secondary">
               Comissão:{' '}
@@ -106,40 +156,99 @@ const ServiceCard = ({
         </div>
 
         {/* Ações */}
-        {!readOnly && (onEdit || onToggleActive) && <div className="flex gap-2 pt-3 border-t border-light-border dark:border-dark-border">
-            {onEdit && <button onClick={handleEdit} className="flex-1 px-3 py-2 text-sm font-medium text-primary hover:bg-primary/10 rounded-md transition-colors inline-flex items-center justify-center gap-1.5" aria-label="Editar serviço">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        {!readOnly && (onEdit || onToggleActive) && (
+          <div className="flex gap-2 pt-3 border-t border-light-border dark:border-dark-border">
+            {onEdit && (
+              <button
+                onClick={handleEdit}
+                className="flex-1 px-3 py-2 text-sm font-medium text-primary hover:bg-primary/10 rounded-md transition-colors inline-flex items-center justify-center gap-1.5"
+                aria-label="Editar serviço"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
                 </svg>
                 Editar
-              </button>}
+              </button>
+            )}
 
-            {onToggleActive && <button onClick={handleToggle} className={`
+            {onToggleActive && (
+              <button
+                onClick={handleToggle}
+                className={`
                   flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors inline-flex items-center justify-center gap-1.5
                   ${isActive ? 'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20' : 'text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20'}
-                `} aria-label={isActive ? 'Desativar serviço' : 'Ativar serviço'}>
-                {isActive ? <>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                `}
+                aria-label={isActive ? 'Desativar serviço' : 'Ativar serviço'}
+              >
+                {isActive ? (
+                  <>
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+                      />
                     </svg>
                     Desativar
-                  </> : <>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                     Ativar
-                  </>}
-              </button>}
-          </div>}
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Indicador de seleção */}
-      {selected && <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-          <svg className="w-4 h-4 text-dark-text-primary" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+      {selected && (
+        <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+          <svg
+            className="w-4 h-4 text-dark-text-primary"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fillRule="evenodd"
+              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+              clipRule="evenodd"
+            />
           </svg>
-        </div>}
-    </Card>;
+        </div>
+      )}
+    </Card>
+  );
 };
 ServiceCard.propTypes = {
   /** Dados do serviço */
@@ -149,7 +258,7 @@ ServiceCard.propTypes = {
     duration_minutes: PropTypes.number.isRequired,
     price: PropTypes.number.isRequired,
     commission_percentage: PropTypes.number.isRequired,
-    is_active: PropTypes.bool
+    is_active: PropTypes.bool,
   }).isRequired,
   /** Callback para editar */
   onEdit: PropTypes.func,
@@ -162,6 +271,6 @@ ServiceCard.propTypes = {
   /** Callback ao clicar no card */
   onClick: PropTypes.func,
   /** Classes CSS adicionais */
-  className: PropTypes.string
+  className: PropTypes.string,
 };
 export default ServiceCard;

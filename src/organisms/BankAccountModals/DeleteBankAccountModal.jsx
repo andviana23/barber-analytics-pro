@@ -15,28 +15,28 @@ const DeleteBankAccountModal = ({
   isOpen,
   onClose,
   onSuccess,
-  account = null
+  account = null,
 }) => {
-  const {
-    deleteBankAccount,
-    loading
-  } = useBankAccounts();
-  const {
-    showSuccess,
-    showError
-  } = useToast();
+  const { deleteBankAccount, loading } = useBankAccounts();
+  const { showSuccess, showError } = useToast();
   const [confirmText, setConfirmText] = useState('');
   const handleDelete = async () => {
     if (!account) return;
 
     // Verificar confirmação
     if (confirmText !== account.name) {
-      showError('Confirmação inválida', 'Digite exatamente o nome da conta para confirmar a exclusão.');
+      showError(
+        'Confirmação inválida',
+        'Digite exatamente o nome da conta para confirmar a exclusão.'
+      );
       return;
     }
     try {
       await deleteBankAccount(account.id);
-      showSuccess('Conta bancária excluída', `A conta ${account.name} foi excluída com sucesso.`);
+      showSuccess(
+        'Conta bancária excluída',
+        `A conta ${account.name} foi excluída com sucesso.`
+      );
       setConfirmText('');
       onSuccess?.(account);
       onClose();
@@ -51,7 +51,8 @@ const DeleteBankAccountModal = ({
   };
   if (!isOpen || !account) return null;
   const isConfirmValid = confirmText === account.name;
-  return <div className="fixed inset-0 z-50 overflow-y-auto">
+  return (
+    <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Overlay */}
       <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" />
 
@@ -74,7 +75,13 @@ const DeleteBankAccountModal = ({
               </div>
             </div>
 
-            <Button variant="ghost" size="sm" onClick={handleClose} disabled={loading} className="h-8 w-8 p-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClose}
+              disabled={loading}
+              className="h-8 w-8 p-0"
+            >
               <X className="w-4 h-4" />
             </Button>
           </div>
@@ -91,9 +98,11 @@ const DeleteBankAccountModal = ({
                 <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                   {account.bank} • {account.agency}-{account.account_number}
                 </p>
-                {account.units && <p className="text-xs text-theme-secondary dark:text-theme-secondary mt-1">
+                {account.units && (
+                  <p className="text-xs text-theme-secondary dark:text-theme-secondary mt-1">
                     Unidade: {account.units.name}
-                  </p>}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -118,37 +127,63 @@ const DeleteBankAccountModal = ({
                 Para confirmar, digite o nome da conta:{' '}
                 <strong>{account.name}</strong>
               </label>
-              <input type="text" value={confirmText} onChange={e => setConfirmText(e.target.value)} placeholder={account.name} disabled={loading} className={`
+              <input
+                type="text"
+                value={confirmText}
+                onChange={e => setConfirmText(e.target.value)}
+                placeholder={account.name}
+                disabled={loading}
+                className={`
                   w-full px-3 py-2 border rounded-md shadow-sm
                   focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
                   disabled:bg-gray-50 disabled:text-gray-500
                   ${isConfirmValid ? 'border-green-300 bg-green-50 dark:bg-green-900/20 dark:border-green-700' : 'border-gray-300 dark:border-gray-600'}
                   bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                `} />
-              {confirmText && !isConfirmValid && <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                `}
+              />
+              {confirmText && !isConfirmValid && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
                   O texto não confere com o nome da conta
-                </p>}
+                </p>
+              )}
             </div>
 
             {/* Buttons */}
             <div className="flex gap-3 pt-4">
-              <Button type="button" variant="outline" onClick={handleClose} disabled={loading} className="flex-1">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleClose}
+                disabled={loading}
+                className="flex-1"
+              >
                 Cancelar
               </Button>
 
-              <Button type="button" variant="danger" onClick={handleDelete} disabled={loading || !isConfirmValid} className="flex-1">
-                {loading ? <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="danger"
+                onClick={handleDelete}
+                disabled={loading || !isConfirmValid}
+                className="flex-1"
+              >
+                {loading ? (
+                  <div className="flex items-center gap-2">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-light-surface dark:border-dark-surface"></div>
                     Excluindo...
-                  </div> : <div className="flex items-center gap-2">
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
                     <Trash2 className="w-4 h-4" />
                     Excluir Conta
-                  </div>}
+                  </div>
+                )}
               </Button>
             </div>
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 export default DeleteBankAccountModal;

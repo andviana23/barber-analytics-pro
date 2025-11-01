@@ -10,20 +10,13 @@ import { useUnits } from '../../hooks';
 
 // Icons
 import { X, Building2, Check, AlertTriangle } from 'lucide-react';
-const CreateUnitModal = ({
-  isOpen,
-  onClose,
-  onSuccess
-}) => {
-  const {
-    createUnit,
-    creating
-  } = useUnits(false);
+const CreateUnitModal = ({ isOpen, onClose, onSuccess }) => {
+  const { createUnit, creating } = useUnits(false);
 
   // Estado do formulário
   const [formData, setFormData] = useState({
     name: '',
-    status: true
+    status: true,
   });
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
@@ -44,29 +37,24 @@ const CreateUnitModal = ({
 
   // Handlers
   const handleInputChange = e => {
-    const {
-      name,
-      value,
-      type,
-      checked
-    } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
 
     // Limpar erro do campo ao digitar
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
-        [name]: ''
+        [name]: '',
       }));
     }
   };
   const handleInputBlur = field => {
     setTouched(prev => ({
       ...prev,
-      [field]: true
+      [field]: true,
     }));
   };
   const handleSubmit = async e => {
@@ -74,23 +62,28 @@ const CreateUnitModal = ({
 
     // Marcar todos os campos como touched
     const allFields = Object.keys(formData);
-    setTouched(allFields.reduce((acc, field) => ({
-      ...acc,
-      [field]: true
-    }), {}));
+    setTouched(
+      allFields.reduce(
+        (acc, field) => ({
+          ...acc,
+          [field]: true,
+        }),
+        {}
+      )
+    );
     if (!validateForm()) {
       return;
     }
     try {
       await createUnit({
         name: formData.name.trim(),
-        status: formData.status
+        status: formData.status,
       });
 
       // Reset form
       setFormData({
         name: '',
-        status: true
+        status: true,
       });
       setErrors({});
       setTouched({});
@@ -105,17 +98,21 @@ const CreateUnitModal = ({
     // Reset form
     setFormData({
       name: '',
-      status: true
+      status: true,
     });
     setErrors({});
     setTouched({});
     onClose();
   };
   if (!isOpen) return null;
-  return <div className="fixed inset-0 z-50 overflow-y-auto">
+  return (
+    <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-screen items-center justify-center p-4 text-center">
         {/* Overlay */}
-        <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={handleClose} />
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+          onClick={handleClose}
+        />
 
         {/* Modal */}
         <div className="relative transform overflow-hidden rounded-lg card-theme dark:bg-dark-surface px-6 pb-6 pt-5 text-left shadow-xl transition-all w-full max-w-lg">
@@ -134,7 +131,11 @@ const CreateUnitModal = ({
                 </p>
               </div>
             </div>
-            <button onClick={handleClose} disabled={creating} className="p-2 text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary dark:hover:text-gray-200 rounded-lg hover:card-theme dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            <button
+              onClick={handleClose}
+              disabled={creating}
+              className="p-2 text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary dark:hover:text-gray-200 rounded-lg hover:card-theme dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               <X className="h-5 w-5" />
             </button>
           </div>
@@ -143,20 +144,44 @@ const CreateUnitModal = ({
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Nome da Unidade */}
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2"
+              >
                 Nome da Unidade *
               </label>
-              <Input id="name" name="name" type="text" placeholder="Ex: Mangabeiras, Nova Lima..." value={formData.name} onChange={handleInputChange} onBlur={() => handleInputBlur('name')} error={touched.name && errors.name} disabled={creating} className="w-full" autoFocus />
-              {touched.name && errors.name && <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center">
+              <Input
+                id="name"
+                name="name"
+                type="text"
+                placeholder="Ex: Mangabeiras, Nova Lima..."
+                value={formData.name}
+                onChange={handleInputChange}
+                onBlur={() => handleInputBlur('name')}
+                error={touched.name && errors.name}
+                disabled={creating}
+                className="w-full"
+                autoFocus
+              />
+              {touched.name && errors.name && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center">
                   <AlertTriangle className="h-4 w-4 mr-1" />
                   {errors.name}
-                </p>}
+                </p>
+              )}
             </div>
 
             {/* Status */}
             <div>
               <label className="flex items-center">
-                <input type="checkbox" name="status" checked={formData.status} onChange={handleInputChange} disabled={creating} className="rounded border-light-border dark:border-dark-border text-blue-600 focus:ring-blue-500 dark:bg-gray-700 disabled:opacity-50" />
+                <input
+                  type="checkbox"
+                  name="status"
+                  checked={formData.status}
+                  onChange={handleInputChange}
+                  disabled={creating}
+                  className="rounded border-light-border dark:border-dark-border text-blue-600 focus:ring-blue-500 dark:bg-gray-700 disabled:opacity-50"
+                />
                 <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Unidade ativa (habilitada para operação)
                 </span>
@@ -191,11 +216,22 @@ const CreateUnitModal = ({
 
             {/* Actions */}
             <div className="flex items-center justify-end space-x-3 pt-4 border-t border-light-border dark:border-dark-border">
-              <Button type="button" variant="secondary" onClick={handleClose} disabled={creating}>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={handleClose}
+                disabled={creating}
+              >
                 Cancelar
               </Button>
 
-              <Button type="submit" variant="primary" disabled={creating || !formData.name.trim()} loading={creating} loadingText="Criando...">
+              <Button
+                type="submit"
+                variant="primary"
+                disabled={creating || !formData.name.trim()}
+                loading={creating}
+                loadingText="Criando..."
+              >
                 <Check className="h-4 w-4 mr-2" />
                 Criar Unidade
               </Button>
@@ -203,6 +239,7 @@ const CreateUnitModal = ({
           </form>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 export default CreateUnitModal;

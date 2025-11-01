@@ -30,7 +30,7 @@ const OrderItemModal = ({
   professionals = [],
   loading = false,
   servicesLoading = false,
-  professionalsLoading = false
+  professionalsLoading = false,
 }) => {
   const [selectedService, setSelectedService] = useState(null);
   const [selectedProfessional, setSelectedProfessional] = useState(null);
@@ -76,7 +76,7 @@ const OrderItemModal = ({
         price: service.price,
         quantity,
         commission_percentage: service.commission_percentage,
-        duration_minutes: service.duration_minutes
+        duration_minutes: service.duration_minutes,
       });
       handleReset();
     }
@@ -89,21 +89,48 @@ const OrderItemModal = ({
   const calculateCommission = () => {
     if (!selectedService) return 0;
     const service = services.find(s => s.id === selectedService);
-    return service ? service.price * quantity * service.commission_percentage / 100 : 0;
+    return service
+      ? (service.price * quantity * service.commission_percentage) / 100
+      : 0;
   };
   const itemTotal = calculateItemTotal();
   const commission = calculateCommission();
   const selectedServiceData = services.find(s => s.id === selectedService);
-  return <Modal isOpen={isOpen} onClose={handleClose} title="Adicionar Serviço" maxWidth="lg">
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="Adicionar Serviço"
+      maxWidth="lg"
+    >
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Seletor de Serviço */}
         <div>
-          <ServiceSelector services={services} onSelect={service => setSelectedService(service.id)} value={selectedService} loading={servicesLoading} error={errors.service} label="Serviço" required showInactive={false} />
+          <ServiceSelector
+            services={services}
+            onSelect={service => setSelectedService(service.id)}
+            value={selectedService}
+            loading={servicesLoading}
+            error={errors.service}
+            label="Serviço"
+            required
+            showInactive={false}
+          />
         </div>
 
         {/* Seletor de Profissional */}
         <div>
-          <ProfessionalSelector professionals={professionals} onSelect={professional => setSelectedProfessional(professional.id)} value={selectedProfessional} loading={professionalsLoading} error={errors.professional} label="Profissional" required filterByRole="barbeiro" showRole={false} />
+          <ProfessionalSelector
+            professionals={professionals}
+            onSelect={professional => setSelectedProfessional(professional.id)}
+            value={selectedProfessional}
+            loading={professionalsLoading}
+            error={errors.professional}
+            label="Profissional"
+            required
+            filterByRole="barbeiro"
+            showRole={false}
+          />
         </div>
 
         {/* Quantidade */}
@@ -113,27 +140,72 @@ const OrderItemModal = ({
             <span className="text-red-500 ml-1">*</span>
           </label>
           <div className="flex items-center gap-3">
-            <button type="button" onClick={() => setQuantity(Math.max(1, quantity - 1))} disabled={loading || quantity <= 1} className="w-10 h-10 rounded-lg border border-light-border dark:border-dark-border card-theme dark:bg-dark-surface text-theme-primary hover:bg-light-surface dark:hover:bg-dark-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+            <button
+              type="button"
+              onClick={() => setQuantity(Math.max(1, quantity - 1))}
+              disabled={loading || quantity <= 1}
+              className="w-10 h-10 rounded-lg border border-light-border dark:border-dark-border card-theme dark:bg-dark-surface text-theme-primary hover:bg-light-surface dark:hover:bg-dark-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M20 12H4"
+                />
               </svg>
             </button>
 
-            <input type="number" value={quantity} onChange={e => setQuantity(Math.max(1, Math.min(99, parseInt(e.target.value) || 1)))} disabled={loading} min={1} max={99} className={`flex-1 px-4 py-2.5 rounded-lg border bg-white dark:bg-dark-surface text-theme-primary text-center font-semibold text-lg focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-60 disabled:cursor-not-allowed ${errors.quantity ? 'border-red-500 dark:border-red-400 focus:border-red-500' : 'border-light-border dark:border-dark-border focus:border-primary'}`} />
+            <input
+              type="number"
+              value={quantity}
+              onChange={e =>
+                setQuantity(
+                  Math.max(1, Math.min(99, parseInt(e.target.value) || 1))
+                )
+              }
+              disabled={loading}
+              min={1}
+              max={99}
+              className={`flex-1 px-4 py-2.5 rounded-lg border bg-white dark:bg-dark-surface text-theme-primary text-center font-semibold text-lg focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-60 disabled:cursor-not-allowed ${errors.quantity ? 'border-red-500 dark:border-red-400 focus:border-red-500' : 'border-light-border dark:border-dark-border focus:border-primary'}`}
+            />
 
-            <button type="button" onClick={() => setQuantity(Math.min(99, quantity + 1))} disabled={loading || quantity >= 99} className="w-10 h-10 rounded-lg border border-light-border dark:border-dark-border card-theme dark:bg-dark-surface text-theme-primary hover:bg-light-surface dark:hover:bg-dark-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            <button
+              type="button"
+              onClick={() => setQuantity(Math.min(99, quantity + 1))}
+              disabled={loading || quantity >= 99}
+              className="w-10 h-10 rounded-lg border border-light-border dark:border-dark-border card-theme dark:bg-dark-surface text-theme-primary hover:bg-light-surface dark:hover:bg-dark-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
               </svg>
             </button>
           </div>
-          {errors.quantity && <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+          {errors.quantity && (
+            <p className="mt-1 text-sm text-red-600 dark:text-red-400">
               {errors.quantity}
-            </p>}
+            </p>
+          )}
         </div>
 
         {/* Preview do Item */}
-        {selectedServiceData && selectedProfessional && <div className="bg-light-surface dark:bg-dark-hover rounded-lg p-4 border border-light-border dark:border-dark-border">
+        {selectedServiceData && selectedProfessional && (
+          <div className="bg-light-surface dark:bg-dark-hover rounded-lg p-4 border border-light-border dark:border-dark-border">
             <h4 className="font-semibold text-theme-primary mb-4">
               Resumo do Item
             </h4>
@@ -179,13 +251,23 @@ const OrderItemModal = ({
                 </div>
               </div>
             </div>
-          </div>}
+          </div>
+        )}
 
         {/* Alerta quando nenhum serviço/profissional disponível */}
-        {!servicesLoading && services.length === 0 && <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+        {!servicesLoading && services.length === 0 && (
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
             <div className="flex items-start gap-3">
-              <svg className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              <svg
+                className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
               </svg>
               <div className="flex-1">
                 <h4 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-1">
@@ -196,12 +278,22 @@ const OrderItemModal = ({
                 </p>
               </div>
             </div>
-          </div>}
+          </div>
+        )}
 
-        {!professionalsLoading && professionals.length === 0 && <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+        {!professionalsLoading && professionals.length === 0 && (
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
             <div className="flex items-start gap-3">
-              <svg className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              <svg
+                className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
               </svg>
               <div className="flex-1">
                 <h4 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-1">
@@ -212,27 +304,52 @@ const OrderItemModal = ({
                 </p>
               </div>
             </div>
-          </div>}
+          </div>
+        )}
 
         {/* Ações */}
         <div className="flex gap-3 pt-4 border-t border-light-border dark:border-dark-border">
-          <button type="button" onClick={handleClose} disabled={loading} className="flex-1 px-4 py-2.5 border border-light-border dark:border-dark-border rounded-lg font-medium text-theme-primary hover:bg-light-surface dark:hover:bg-dark-hover transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+          <button
+            type="button"
+            onClick={handleClose}
+            disabled={loading}
+            className="flex-1 px-4 py-2.5 border border-light-border dark:border-dark-border rounded-lg font-medium text-theme-primary hover:bg-light-surface dark:hover:bg-dark-hover transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          >
             Cancelar
           </button>
-          <button type="submit" disabled={loading || !selectedService || !selectedProfessional} className="flex-1 px-4 py-2.5 bg-primary hover:bg-primary-dark text-dark-text-primary rounded-lg font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2">
-            {loading ? <>
+          <button
+            type="submit"
+            disabled={loading || !selectedService || !selectedProfessional}
+            className="flex-1 px-4 py-2.5 bg-primary hover:bg-primary-dark text-dark-text-primary rounded-lg font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+          >
+            {loading ? (
+              <>
                 <div className="w-5 h-5 border-2 border-light-surface dark:border-dark-surface border-t-transparent rounded-full animate-spin" />
                 Adicionando...
-              </> : <>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </>
+            ) : (
+              <>
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
                 </svg>
                 Adicionar à Comanda
-              </>}
+              </>
+            )}
           </button>
         </div>
       </form>
-    </Modal>;
+    </Modal>
+  );
 };
 OrderItemModal.propTypes = {
   /** Se o modal está aberto */
@@ -250,6 +367,6 @@ OrderItemModal.propTypes = {
   /** Estado de carregamento de serviços */
   servicesLoading: PropTypes.bool,
   /** Estado de carregamento de profissionais */
-  professionalsLoading: PropTypes.bool
+  professionalsLoading: PropTypes.bool,
 };
 export default OrderItemModal;

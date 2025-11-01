@@ -36,7 +36,7 @@ const ServiceFormModal = ({
   service = null,
   mode = 'create',
   // 'create' | 'edit'
-  loading = false
+  loading = false,
 }) => {
   const [name, setName] = useState('');
   const [price, setPrice] = useState(0);
@@ -54,7 +54,7 @@ const ServiceFormModal = ({
   // 🔄 Carrega categorias quando o modal abre
   useEffect(() => {
     console.log('🎯 ServiceFormModal - useEffect disparado:', {
-      isOpen
+      isOpen,
     });
     if (isOpen) {
       console.log('✅ Modal aberto, carregando categorias...');
@@ -74,7 +74,9 @@ const ServiceFormModal = ({
       console.log('📦 Categorias recebidas:', result);
       if (result && Array.isArray(result)) {
         // Filtra apenas categorias de serviço (não de produto)
-        const serviceCategories = result.filter(cat => cat.revenue_type === 'service');
+        const serviceCategories = result.filter(
+          cat => cat.revenue_type === 'service'
+        );
         console.log('✅ Categorias de serviço filtradas:', serviceCategories);
         setCategories(serviceCategories);
 
@@ -90,7 +92,9 @@ const ServiceFormModal = ({
       }
     } catch (error) {
       console.error('❌ Erro ao carregar categorias:', error);
-      setCategoriesError('Erro ao carregar categorias. Por favor, tente novamente.');
+      setCategoriesError(
+        'Erro ao carregar categorias. Por favor, tente novamente.'
+      );
       setCategories([]);
     } finally {
       setLoadingCategories(false);
@@ -165,21 +169,36 @@ const ServiceFormModal = ({
         duration_minutes: durationMinutes,
         commission_percentage: commissionPercentage,
         category_id: categoryId,
-        unitId // ✅ Inclui unitId no payload
+        unitId, // ✅ Inclui unitId no payload
       });
     }
   };
   const calculateCommission = () => {
-    return price * commissionPercentage / 100;
+    return (price * commissionPercentage) / 100;
   };
   const commission = calculateCommission();
-  return <Modal isOpen={isOpen} onClose={handleClose} title={isEditMode ? 'Editar Serviço' : 'Novo Serviço'} maxWidth="lg">
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title={isEditMode ? 'Editar Serviço' : 'Novo Serviço'}
+      maxWidth="lg"
+    >
       <form onSubmit={handleSubmit} className="space-y-6 p-6">
         {/* Aviso se não houver unitId */}
-        {!unitId && <div className="bg-feedback-light-error/10 dark:bg-feedback-dark-error/10 border border-feedback-light-error/30 dark:border-feedback-dark-error/30 rounded-lg p-4">
+        {!unitId && (
+          <div className="bg-feedback-light-error/10 dark:bg-feedback-dark-error/10 border border-feedback-light-error/30 dark:border-feedback-dark-error/30 rounded-lg p-4">
             <div className="flex items-start gap-3">
-              <svg className="w-5 h-5 text-feedback-light-error dark:text-feedback-dark-error flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              <svg
+                className="w-5 h-5 text-feedback-light-error dark:text-feedback-dark-error flex-shrink-0 mt-0.5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
               </svg>
               <div>
                 <h4 className="font-semibold text-feedback-light-error dark:text-feedback-dark-error mb-1">
@@ -191,13 +210,23 @@ const ServiceFormModal = ({
                 </p>
               </div>
             </div>
-          </div>}
+          </div>
+        )}
 
         {/* Aviso de erro ao carregar categorias */}
-        {categoriesError && <div className="bg-feedback-light-warning/10 dark:bg-feedback-dark-warning/10 border border-feedback-light-warning/30 dark:border-feedback-dark-warning/30 rounded-lg p-4">
+        {categoriesError && (
+          <div className="bg-feedback-light-warning/10 dark:bg-feedback-dark-warning/10 border border-feedback-light-warning/30 dark:border-feedback-dark-warning/30 rounded-lg p-4">
             <div className="flex items-start gap-3">
-              <svg className="w-5 h-5 text-feedback-light-warning dark:text-feedback-dark-warning flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              <svg
+                className="w-5 h-5 text-feedback-light-warning dark:text-feedback-dark-warning flex-shrink-0 mt-0.5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
               </svg>
               <div>
                 <h4 className="font-semibold text-feedback-light-warning dark:text-feedback-dark-warning mb-1">
@@ -206,12 +235,17 @@ const ServiceFormModal = ({
                 <p className="text-sm text-feedback-light-warning dark:text-feedback-dark-warning">
                   {categoriesError}
                 </p>
-                <button type="button" onClick={loadCategories} className="mt-2 text-sm font-medium text-feedback-light-warning dark:text-feedback-dark-warning hover:underline">
+                <button
+                  type="button"
+                  onClick={loadCategories}
+                  className="mt-2 text-sm font-medium text-feedback-light-warning dark:text-feedback-dark-warning hover:underline"
+                >
                   Tentar novamente
                 </button>
               </div>
             </div>
-          </div>}
+          </div>
+        )}
 
         {/* Nome do Serviço */}
         <div>
@@ -221,10 +255,20 @@ const ServiceFormModal = ({
               *
             </span>
           </label>
-          <input type="text" value={name} onChange={e => setName(e.target.value)} disabled={loading} placeholder="Ex: Corte + Barba" maxLength={100} className={`input-theme ${errors.name ? 'border-feedback-light-error dark:border-feedback-dark-error focus:border-feedback-light-error' : ''}`} />
-          {errors.name && <p className="mt-1 text-sm text-feedback-light-error dark:text-feedback-dark-error">
+          <input
+            type="text"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            disabled={loading}
+            placeholder="Ex: Corte + Barba"
+            maxLength={100}
+            className={`input-theme ${errors.name ? 'border-feedback-light-error dark:border-feedback-dark-error focus:border-feedback-light-error' : ''}`}
+          />
+          {errors.name && (
+            <p className="mt-1 text-sm text-feedback-light-error dark:text-feedback-dark-error">
               {errors.name}
-            </p>}
+            </p>
+          )}
         </div>
 
         {/* 📂 Categoria do Serviço */}
@@ -236,56 +280,92 @@ const ServiceFormModal = ({
             </span>
           </label>
           {(() => {
-          console.log('🎨 Renderizando campo categoria:', {
-            loadingCategories,
-            categoriesCount: categories.length,
-            categoriesError,
-            categories
-          });
-          if (loadingCategories) {
-            return <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-light-border dark:border-dark-border bg-light-surface dark:bg-dark-hover">
+            console.log('🎨 Renderizando campo categoria:', {
+              loadingCategories,
+              categoriesCount: categories.length,
+              categoriesError,
+              categories,
+            });
+            if (loadingCategories) {
+              return (
+                <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-light-border dark:border-dark-border bg-light-surface dark:bg-dark-hover">
                   <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                   <span className="text-sm text-theme-secondary">
                     Carregando categorias...
                   </span>
-                </div>;
-          }
-          if (categories.length > 0) {
-            return <>
-                  <select value={categoryId} onChange={e => setCategoryId(e.target.value)} disabled={loading} className={`input-theme ${errors.categoryId ? 'border-feedback-light-error dark:border-feedback-dark-error focus:border-feedback-light-error' : ''}`}>
+                </div>
+              );
+            }
+            if (categories.length > 0) {
+              return (
+                <>
+                  <select
+                    value={categoryId}
+                    onChange={e => setCategoryId(e.target.value)}
+                    disabled={loading}
+                    className={`input-theme ${errors.categoryId ? 'border-feedback-light-error dark:border-feedback-dark-error focus:border-feedback-light-error' : ''}`}
+                  >
                     <option value="">Selecione uma categoria</option>
-                    {categories.map(cat => <option key={cat.id} value={cat.id}>
+                    {categories.map(cat => (
+                      <option key={cat.id} value={cat.id}>
                         {cat.name}
                         {cat.parent?.name ? ` (${cat.parent.name})` : ''}
-                      </option>)}
+                      </option>
+                    ))}
                   </select>
-                  {errors.categoryId && <p className="mt-1 text-sm text-feedback-light-error dark:text-feedback-dark-error">
+                  {errors.categoryId && (
+                    <p className="mt-1 text-sm text-feedback-light-error dark:text-feedback-dark-error">
                       {errors.categoryId}
-                    </p>}
+                    </p>
+                  )}
                   <p className="mt-1 text-xs text-theme-secondary">
                     Apenas categorias de "Receita de Serviço" são exibidas
                   </p>
-                </>;
-          }
-          return <div className="px-4 py-3 rounded-lg border border-feedback-light-warning/30 dark:border-feedback-dark-warning/30 bg-feedback-light-warning/10 dark:bg-feedback-dark-warning/10">
+                </>
+              );
+            }
+            return (
+              <div className="px-4 py-3 rounded-lg border border-feedback-light-warning/30 dark:border-feedback-dark-warning/30 bg-feedback-light-warning/10 dark:bg-feedback-dark-warning/10">
                 <p className="text-sm text-feedback-light-warning dark:text-feedback-dark-warning">
                   ⚠️ Nenhuma categoria de serviço cadastrada. Cadastre
                   categorias na página de Categorias primeiro.
                 </p>
-              </div>;
-        })()}
+              </div>
+            );
+          })()}
         </div>
 
         {/* Preço e Duração */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Preço */}
           <div>
-            <CurrencyInput label="Preço" value={price} onChange={setPrice} min={0} max={10000} error={errors.price} required placeholder="0,00" helperText="Valor cobrado do cliente" />
+            <CurrencyInput
+              label="Preço"
+              value={price}
+              onChange={setPrice}
+              min={0}
+              max={10000}
+              error={errors.price}
+              required
+              placeholder="0,00"
+              helperText="Valor cobrado do cliente"
+            />
           </div>
 
           {/* Duração */}
           <div>
-            <TimeInput label="Duração" value={durationMinutes} onChange={setDurationMinutes} min={5} max={480} step={5} error={errors.durationMinutes} required showFormatted helperText="Tempo médio de execução" />
+            <TimeInput
+              label="Duração"
+              value={durationMinutes}
+              onChange={setDurationMinutes}
+              min={5}
+              max={480}
+              step={5}
+              error={errors.durationMinutes}
+              required
+              showFormatted
+              helperText="Tempo médio de execução"
+            />
           </div>
         </div>
 
@@ -298,7 +378,18 @@ const ServiceFormModal = ({
             </span>
           </label>
           <div className="flex items-center gap-3">
-            <input type="range" value={commissionPercentage} onChange={e => setCommissionPercentage(parseFloat(e.target.value))} disabled={loading} min={0} max={100} step={5} className="flex-1 h-2 bg-light-surface dark:bg-dark-hover rounded-lg appearance-none cursor-pointer accent-primary" />
+            <input
+              type="range"
+              value={commissionPercentage}
+              onChange={e =>
+                setCommissionPercentage(parseFloat(e.target.value))
+              }
+              disabled={loading}
+              min={0}
+              max={100}
+              step={5}
+              className="flex-1 h-2 bg-light-surface dark:bg-dark-hover rounded-lg appearance-none cursor-pointer accent-primary"
+            />
             <div className="w-20 px-3 py-2 rounded-lg border border-light-border dark:border-dark-border bg-light-surface dark:bg-dark-hover text-theme-primary font-semibold text-center">
               {commissionPercentage}%
             </div>
@@ -310,14 +401,16 @@ const ServiceFormModal = ({
             <p className="text-sm font-medium text-feedback-light-success dark:text-feedback-dark-success">
               ={' '}
               {commission.toLocaleString('pt-BR', {
-              style: 'currency',
-              currency: 'BRL'
-            })}
+                style: 'currency',
+                currency: 'BRL',
+              })}
             </p>
           </div>
-          {errors.commissionPercentage && <p className="mt-1 text-sm text-feedback-light-error dark:text-feedback-dark-error">
+          {errors.commissionPercentage && (
+            <p className="mt-1 text-sm text-feedback-light-error dark:text-feedback-dark-error">
               {errors.commissionPercentage}
-            </p>}
+            </p>
+          )}
         </div>
 
         {/* Preview/Resumo */}
@@ -332,9 +425,9 @@ const ServiceFormModal = ({
               </span>
               <span className="text-lg font-bold text-primary">
                 {price.toLocaleString('pt-BR', {
-                style: 'currency',
-                currency: 'BRL'
-              })}
+                  style: 'currency',
+                  currency: 'BRL',
+                })}
               </span>
             </div>
             <div className="flex justify-between items-center">
@@ -343,9 +436,9 @@ const ServiceFormModal = ({
               </span>
               <span className="text-lg font-semibold text-feedback-light-success dark:text-feedback-dark-success">
                 {commission.toLocaleString('pt-BR', {
-                style: 'currency',
-                currency: 'BRL'
-              })}
+                  style: 'currency',
+                  currency: 'BRL',
+                })}
               </span>
             </div>
             <div className="flex justify-between items-center">
@@ -353,7 +446,9 @@ const ServiceFormModal = ({
                 Duração estimada:
               </span>
               <span className="font-medium text-theme-primary">
-                {durationMinutes >= 60 ? `${Math.floor(durationMinutes / 60)}h ${durationMinutes % 60}min` : `${durationMinutes} min`}
+                {durationMinutes >= 60
+                  ? `${Math.floor(durationMinutes / 60)}h ${durationMinutes % 60}min`
+                  : `${durationMinutes} min`}
               </span>
             </div>
           </div>
@@ -362,8 +457,16 @@ const ServiceFormModal = ({
         {/* Dicas */}
         <div className="bg-primary/10 dark:bg-primary/20 border border-primary/30 dark:border-primary/40 rounded-lg p-4">
           <div className="flex items-start gap-3">
-            <svg className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+            <svg
+              className="w-5 h-5 text-primary flex-shrink-0 mt-0.5"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                clipRule="evenodd"
+              />
             </svg>
             <div className="flex-1">
               <h4 className="font-semibold text-theme-primary mb-1">
@@ -380,23 +483,47 @@ const ServiceFormModal = ({
 
         {/* Ações */}
         <div className="flex gap-3 pt-4 border-t border-light-border dark:border-dark-border">
-          <button type="button" onClick={handleClose} disabled={loading} className="btn-theme-secondary flex-1">
+          <button
+            type="button"
+            onClick={handleClose}
+            disabled={loading}
+            className="btn-theme-secondary flex-1"
+          >
             Cancelar
           </button>
-          <button type="submit" disabled={loading} className="btn-theme-primary flex-1 inline-flex items-center justify-center gap-2">
-            {loading ? <>
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn-theme-primary flex-1 inline-flex items-center justify-center gap-2"
+          >
+            {loading ? (
+              <>
                 <div className="w-5 h-5 border-2 border-light-surface dark:border-dark-surface border-t-transparent rounded-full animate-spin" />
                 Salvando...
-              </> : <>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </>
+            ) : (
+              <>
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
                 {isEditMode ? 'Salvar Alterações' : 'Criar Serviço'}
-              </>}
+              </>
+            )}
           </button>
         </div>
       </form>
-    </Modal>;
+    </Modal>
+  );
 };
 ServiceFormModal.propTypes = {
   /** Se o modal está aberto */
@@ -411,13 +538,13 @@ ServiceFormModal.propTypes = {
     price: PropTypes.number,
     duration_minutes: PropTypes.number,
     commission_percentage: PropTypes.number,
-    category_id: PropTypes.string
+    category_id: PropTypes.string,
   }),
   /** Modo de operação */
   mode: PropTypes.oneOf(['create', 'edit']),
   /** Estado de carregamento */
   loading: PropTypes.bool,
   /** ID da unidade (obrigatório para criar/editar serviços) */
-  unitId: PropTypes.string.isRequired
+  unitId: PropTypes.string.isRequired,
 };
 export default ServiceFormModal;

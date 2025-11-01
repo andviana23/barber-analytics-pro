@@ -8,13 +8,16 @@ import PropTypes from 'prop-types';
  * @example
  * <OrderCardSkeleton count={3} />
  */
-const OrderCardSkeleton = ({
-  count = 1
-}) => {
-  return <>
+const OrderCardSkeleton = ({ count = 1 }) => {
+  return (
+    <>
       {Array.from({
-      length: count
-    }).map((_, index) => <div key={index} className="card-theme rounded-lg border border-light-border dark:border-dark-border p-4 animate-pulse">
+        length: count,
+      }).map((_, index) => (
+        <div
+          key={index}
+          className="card-theme rounded-lg border border-light-border dark:border-dark-border p-4 animate-pulse"
+        >
           {/* Cabeçalho */}
           <div className="flex items-center gap-3 mb-4">
             <div className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded"></div>
@@ -50,11 +53,13 @@ const OrderCardSkeleton = ({
               <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded"></div>
             </div>
           </div>
-        </div>)}
-    </>;
+        </div>
+      ))}
+    </>
+  );
 };
 OrderCardSkeleton.propTypes = {
-  count: PropTypes.number
+  count: PropTypes.number,
 };
 
 /**
@@ -64,35 +69,50 @@ OrderCardSkeleton.propTypes = {
  * @example
  * <TableSkeleton rows={5} cols={4} />
  */
-export const TableSkeleton = ({
-  rows = 5,
-  cols = 4
-}) => {
-  return <div className="space-y-3 animate-pulse">
+export const TableSkeleton = ({ rows = 5, cols = 4 }) => {
+  return (
+    <div className="space-y-3 animate-pulse">
       {/* Cabeçalho */}
-      <div className="grid gap-4" style={{
-      gridTemplateColumns: `repeat(${cols}, 1fr)`
-    }}>
+      <div
+        className="grid gap-4"
+        style={{
+          gridTemplateColumns: `repeat(${cols}, 1fr)`,
+        }}
+      >
         {Array.from({
-        length: cols
-      }).map((_, i) => <div key={i} className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>)}
+          length: cols,
+        }).map((_, i) => (
+          <div
+            key={i}
+            className="h-10 bg-gray-200 dark:bg-gray-700 rounded"
+          ></div>
+        ))}
       </div>
 
       {/* Linhas */}
       {Array.from({
-      length: rows
-    }).map((_, rowIndex) => <div key={rowIndex} className="grid gap-4" style={{
-      gridTemplateColumns: `repeat(${cols}, 1fr)`
-    }}>
+        length: rows,
+      }).map((_, rowIndex) => (
+        <div
+          key={rowIndex}
+          className="grid gap-4"
+          style={{
+            gridTemplateColumns: `repeat(${cols}, 1fr)`,
+          }}
+        >
           {Array.from({
-        length: cols
-      }).map((_, colIndex) => <div key={colIndex} className="h-8 card-theme rounded"></div>)}
-        </div>)}
-    </div>;
+            length: cols,
+          }).map((_, colIndex) => (
+            <div key={colIndex} className="h-8 card-theme rounded"></div>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
 };
 TableSkeleton.propTypes = {
   rows: PropTypes.number,
-  cols: PropTypes.number
+  cols: PropTypes.number,
 };
 
 /**
@@ -102,24 +122,29 @@ TableSkeleton.propTypes = {
  * @example
  * <KPISkeleton count={4} />
  */
-export const KPISkeleton = ({
-  count = 4
-}) => {
-  return <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+export const KPISkeleton = ({ count = 4 }) => {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {Array.from({
-      length: count
-    }).map((_, index) => <div key={index} className="card-theme rounded-lg border border-light-border dark:border-dark-border p-4 animate-pulse">
+        length: count,
+      }).map((_, index) => (
+        <div
+          key={index}
+          className="card-theme rounded-lg border border-light-border dark:border-dark-border p-4 animate-pulse"
+        >
           <div className="flex justify-between items-start mb-3">
             <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
             <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
           </div>
           <div className="h-8 w-32 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
           <div className="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded"></div>
-        </div>)}
-    </div>;
+        </div>
+      ))}
+    </div>
+  );
 };
 KPISkeleton.propTypes = {
-  count: PropTypes.number
+  count: PropTypes.number,
 };
 
 /**
@@ -129,23 +154,25 @@ KPISkeleton.propTypes = {
  * @example
  * <FormSkeleton fields={5} />
  */
-export const FormSkeleton = ({
-  fields = 5
-}) => {
-  return <div className="space-y-6 animate-pulse">
+export const FormSkeleton = ({ fields = 5 }) => {
+  return (
+    <div className="space-y-6 animate-pulse">
       {Array.from({
-      length: fields
-    }).map((_, index) => <div key={index}>
+        length: fields,
+      }).map((_, index) => (
+        <div key={index}>
           <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
           <div className="h-10 w-full card-theme rounded"></div>
-        </div>)}
+        </div>
+      ))}
       <div className="flex justify-end gap-3 pt-4">
         <div className="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
         <div className="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
       </div>
-    </div>;
+    </div>
+  );
 };
 FormSkeleton.propTypes = {
-  fields: PropTypes.number
+  fields: PropTypes.number,
 };
 export default OrderCardSkeleton;

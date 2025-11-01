@@ -6,14 +6,8 @@ import { useToast } from '../../../context/ToastContext';
 /**
  * Modal de confirmação para exclusão de profissional
  */
-export function DeleteConfirmModal({
-  professional,
-  onClose,
-  onConfirm
-}) {
-  const {
-    showToast
-  } = useToast();
+export function DeleteConfirmModal({ professional, onClose, onConfirm }) {
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
 
   /**
@@ -26,20 +20,21 @@ export function DeleteConfirmModal({
       showToast({
         type: 'success',
         message: 'Profissional removido',
-        description: `${professional.name} foi removido da equipe.`
+        description: `${professional.name} foi removido da equipe.`,
       });
       onClose();
     } catch (error) {
       showToast({
         type: 'error',
         message: 'Erro ao remover profissional',
-        description: error.message
+        description: error.message,
       });
     } finally {
       setLoading(false);
     }
   };
-  return <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="card-theme rounded-xl shadow-2xl w-full max-w-md">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-light-border dark:border-dark-border">
@@ -85,14 +80,27 @@ export function DeleteConfirmModal({
 
           {/* Ações */}
           <div className="flex gap-3">
-            <Button type="button" variant="outline" onClick={onClose} className="flex-1" disabled={loading}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="flex-1"
+              disabled={loading}
+            >
               Cancelar
             </Button>
-            <Button type="button" variant="danger" onClick={handleConfirm} loading={loading} className="flex-1">
+            <Button
+              type="button"
+              variant="danger"
+              onClick={handleConfirm}
+              loading={loading}
+              className="flex-1"
+            >
               Confirmar Remoção
             </Button>
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 }

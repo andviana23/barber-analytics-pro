@@ -1,5 +1,24 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { FileText, Plus, Filter, X, Search, Package, Users, Phone, Mail, CheckCircle, XCircle, Info, Clock, ArrowUpDown, ChevronLeft, ChevronRight, Briefcase, ArrowUpRight } from 'lucide-react';
+import {
+  FileText,
+  Plus,
+  Filter,
+  X,
+  Search,
+  Package,
+  Users,
+  Phone,
+  Mail,
+  CheckCircle,
+  XCircle,
+  Info,
+  Clock,
+  ArrowUpDown,
+  ChevronLeft,
+  ChevronRight,
+  Briefcase,
+  ArrowUpRight,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -37,12 +56,8 @@ import toast from 'react-hot-toast';
  */
 const OrdersPage = () => {
   const navigate = useNavigate();
-  const {
-    selectedUnit
-  } = useUnit();
-  const {
-    user
-  } = useAuth();
+  const { selectedUnit } = useUnit();
+  const { user } = useAuth();
   const unitId = selectedUnit?.id || null;
   const {
     orders,
@@ -52,32 +67,26 @@ const OrdersPage = () => {
     cancelOrder,
     addServiceToOrder,
     removeServiceFromOrder,
-    fetchOrders
+    fetchOrders,
   } = useOrders(unitId);
-  const {
-    activeServices,
-    fetchActiveServices
-  } = useServices(unitId);
-  const {
-    canCreateOrder,
-    canCloseOrder,
-    canCancelOrder
-  } = useUserPermissions();
+  const { activeServices, fetchActiveServices } = useServices(unitId);
+  const { canCreateOrder, canCloseOrder, canCancelOrder } =
+    useUserPermissions();
   const {
     data: clientsData = [],
     loading: clientsLoading,
     error: clientsError,
-    refetch: refetchClients
+    refetch: refetchClients,
   } = useClients(unitId, {
     includeInactive: true,
-    enableCache: true
+    enableCache: true,
   });
   const {
     profissionais,
     loading: professionalsLoading,
     error: professionalsError,
     updateFilters: updateProfessionalFilters,
-    refresh: refreshProfessionals
+    refresh: refreshProfessionals,
   } = useProfissionais();
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [paymentMethodsLoading, setPaymentMethodsLoading] = useState(false);
@@ -94,7 +103,7 @@ const OrdersPage = () => {
     status: 'all',
     search: '',
     startDate: '',
-    endDate: ''
+    endDate: '',
   });
   const [showFilters, setShowFilters] = useState(false);
   const [clientsSearch, setClientsSearch] = useState('');
@@ -103,7 +112,8 @@ const OrdersPage = () => {
   const [clientsPage, setClientsPage] = useState(1);
   const clientsPerPage = 5;
   const [professionalSearch, setProfessionalSearch] = useState('');
-  const [professionalStatusFilter, setProfessionalStatusFilter] = useState('active');
+  const [professionalStatusFilter, setProfessionalStatusFilter] =
+    useState('active');
   const [specialtyFilter, setSpecialtyFilter] = useState('all');
   const [availabilitySort, setAvailabilitySort] = useState('desc');
 
@@ -111,7 +121,7 @@ const OrdersPage = () => {
   useEffect(() => {
     if (unitId) {
       updateProfessionalFilters({
-        unitId
+        unitId,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -139,14 +149,19 @@ const OrdersPage = () => {
     setPaymentMethodsLoading(true);
     setBankAccountsLoading(true);
     try {
-      const [paymentResult, accountsResult] = await Promise.all([getPaymentMethods(unitId), bankAccountsService.getBankAccounts(unitId)]);
+      const [paymentResult, accountsResult] = await Promise.all([
+        getPaymentMethods(unitId),
+        bankAccountsService.getBankAccounts(unitId),
+      ]);
       if (paymentResult.error) {
         throw paymentResult.error;
       }
       setPaymentMethods(paymentResult.data || []);
       setBankAccounts(accountsResult || []);
     } catch (error) {
-      const message = error?.message || 'Não foi possível carregar dados financeiros para esta unidade.';
+      const message =
+        error?.message ||
+        'Não foi possível carregar dados financeiros para esta unidade.';
       setFinancialError(message);
       toast.error(message);
       setPaymentMethods([]);
@@ -177,24 +192,47 @@ const OrdersPage = () => {
     if (!dateValue) return '—';
     try {
       return format(new Date(dateValue), "dd 'de' MMM", {
-        locale: ptBR
+        locale: ptBR,
       });
     } catch {
       return '—';
     }
   }, []);
   const getProfessionalSpecialty = useCallback(professional => {
-    return professional?.speciality || professional?.specialization || Array.isArray(professional?.specialties) && professional.specialties[0] || professional?.role || 'Barbeiro';
+    return (
+      professional?.speciality ||
+      professional?.specialization ||
+      (Array.isArray(professional?.specialties) &&
+        professional.specialties[0]) ||
+      professional?.role ||
+      'Barbeiro'
+    );
   }, []);
-  const getAvailabilityScore = useCallback(professional => professional?.is_active ? 1 : 0, []);
-  const selectableClients = useMemo(() => (clientsData || []).filter(client => client.is_active), [clientsData]);
-  const activeProfessionals = useMemo(() => (profissionais || []).filter(professional => professional.is_active && (!unitId || professional.unit_id === unitId)), [profissionais, unitId]);
+  const getAvailabilityScore = useCallback(
+    professional => (professional?.is_active ? 1 : 0),
+    []
+  );
+  const selectableClients = useMemo(
+    () => (clientsData || []).filter(client => client.is_active),
+    [clientsData]
+  );
+  const activeProfessionals = useMemo(
+    () =>
+      (profissionais || []).filter(
+        professional =>
+          professional.is_active && (!unitId || professional.unit_id === unitId)
+      ),
+    [profissionais, unitId]
+  );
   const modalProfessionals = useMemo(() => {
-    const currentProfessionalId = selectedOrder?.professional?.id || selectedOrder?.professionalId;
+    const currentProfessionalId =
+      selectedOrder?.professional?.id || selectedOrder?.professionalId;
     if (!currentProfessionalId) {
       return activeProfessionals;
     }
-    const alreadyIncluded = activeProfessionals.some(professional => professional.id === currentProfessionalId);
+    const alreadyIncluded = activeProfessionals.some(
+      professional => professional.id === currentProfessionalId
+    );
     if (alreadyIncluded) {
       return activeProfessionals;
     }
@@ -203,19 +241,20 @@ const OrdersPage = () => {
       name: selectedOrder?.professional?.name || 'Profissional inativo',
       is_active: false,
       unit_id: selectedOrder?.unit_id || unitId,
-      ...selectedOrder?.professional
+      ...selectedOrder?.professional,
     };
     return [...activeProfessionals, fallbackProfessional];
   }, [activeProfessionals, selectedOrder, unitId]);
   const clientMetrics = useMemo(() => {
     const map = new Map();
     (orders || []).forEach(order => {
-      const clientId = order.client?.id || order.client_id || order.clientId || null;
+      const clientId =
+        order.client?.id || order.client_id || order.clientId || null;
       if (!clientId) return;
       const createdAt = order.created_at || order.createdAt;
       const metrics = map.get(clientId) || {
         totalOrders: 0,
-        lastOrderDate: null
+        lastOrderDate: null,
       };
       metrics.totalOrders += 1;
       if (createdAt) {
@@ -231,12 +270,16 @@ const OrdersPage = () => {
   const professionalMetrics = useMemo(() => {
     const map = new Map();
     (orders || []).forEach(order => {
-      const professionalId = order.professional?.id || order.professional_id || order.professionalId || null;
+      const professionalId =
+        order.professional?.id ||
+        order.professional_id ||
+        order.professionalId ||
+        null;
       if (!professionalId) return;
       const metrics = map.get(professionalId) || {
         totalOrders: 0,
         openOrders: 0,
-        closedOrders: 0
+        closedOrders: 0,
       };
       metrics.totalOrders += 1;
       if (order.status === 'open') {
@@ -258,14 +301,25 @@ const OrdersPage = () => {
         const searchLower = filters.search.toLowerCase();
         const clientName = order.client?.name?.toLowerCase() || '';
         const professionalName = order.professional?.name?.toLowerCase() || '';
-        if (!clientName.includes(searchLower) && !professionalName.includes(searchLower)) {
+        if (
+          !clientName.includes(searchLower) &&
+          !professionalName.includes(searchLower)
+        ) {
           return false;
         }
       }
-      if (filters.startDate && new Date(order.created_at || order.createdAt) < new Date(filters.startDate)) {
+      if (
+        filters.startDate &&
+        new Date(order.created_at || order.createdAt) <
+          new Date(filters.startDate)
+      ) {
         return false;
       }
-      if (filters.endDate && new Date(order.created_at || order.createdAt) > new Date(filters.endDate)) {
+      if (
+        filters.endDate &&
+        new Date(order.created_at || order.createdAt) >
+          new Date(filters.endDate)
+      ) {
         return false;
       }
       return true;
@@ -297,15 +351,33 @@ const OrdersPage = () => {
       if (!normalizedSearch) {
         return true;
       }
-      const normalizedPhone = client.telefone?.replace(/\D/g, '') || client.phone?.replace(/\D/g, '') || '';
-      return client.nome?.toLowerCase().includes(normalizedSearch) || client.name?.toLowerCase().includes(normalizedSearch) || client.cpf_cnpj?.includes(normalizedSearch) || normalizedPhone.includes(normalizedSearch.replace(/\D/g, '')) || client.email?.toLowerCase().includes(normalizedSearch);
+      const normalizedPhone =
+        client.telefone?.replace(/\D/g, '') ||
+        client.phone?.replace(/\D/g, '') ||
+        '';
+      return (
+        client.nome?.toLowerCase().includes(normalizedSearch) ||
+        client.name?.toLowerCase().includes(normalizedSearch) ||
+        client.cpf_cnpj?.includes(normalizedSearch) ||
+        normalizedPhone.includes(normalizedSearch.replace(/\D/g, '')) ||
+        client.email?.toLowerCase().includes(normalizedSearch)
+      );
     });
-  }, [clientsData, clientStatusFilter, clientsSearch, clientHistoryFilter, clientMetrics]);
+  }, [
+    clientsData,
+    clientStatusFilter,
+    clientsSearch,
+    clientHistoryFilter,
+    clientMetrics,
+  ]);
   const paginatedClients = useMemo(() => {
     const startIndex = (clientsPage - 1) * clientsPerPage;
     return filteredClients.slice(startIndex, startIndex + clientsPerPage);
   }, [filteredClients, clientsPage, clientsPerPage]);
-  const totalClientPages = Math.max(1, Math.ceil(filteredClients.length / clientsPerPage));
+  const totalClientPages = Math.max(
+    1,
+    Math.ceil(filteredClients.length / clientsPerPage)
+  );
   useEffect(() => {
     setClientsPage(prev => Math.min(prev, totalClientPages));
   }, [totalClientPages]);
@@ -324,37 +396,52 @@ const OrdersPage = () => {
   }, [profissionais, unitId, getProfessionalSpecialty]);
   const filteredProfessionals = useMemo(() => {
     const normalizedSearch = professionalSearch.trim().toLowerCase();
-    return (profissionais || []).filter(professional => {
-      if (unitId && professional.unit_id !== unitId) {
-        return false;
-      }
-      if (professionalStatusFilter === 'active' && !professional.is_active) {
-        return false;
-      }
-      if (professionalStatusFilter === 'inactive' && professional.is_active) {
-        return false;
-      }
-      if (specialtyFilter !== 'all' && getProfessionalSpecialty(professional) !== specialtyFilter) {
-        return false;
-      }
-      if (!normalizedSearch) {
-        return true;
-      }
-      const speciality = getProfessionalSpecialty(professional).toLowerCase();
-      return professional.name?.toLowerCase().includes(normalizedSearch) || professional.role?.toLowerCase().includes(normalizedSearch) || speciality.includes(normalizedSearch);
-    }).sort((a, b) => {
-      const scoreA = getAvailabilityScore(a);
-      const scoreB = getAvailabilityScore(b);
-      if (scoreA === scoreB) {
-        return (a.name || '').localeCompare(b.name || '');
-      }
-      return availabilitySort === 'asc' ? scoreA - scoreB : scoreB - scoreA;
-    });
-  }, [profissionais, unitId, professionalStatusFilter, specialtyFilter, professionalSearch, availabilitySort, getProfessionalSpecialty, getAvailabilityScore]);
-  const handleOrderSubmit = async ({
-    action,
-    data
-  }) => {
+    return (profissionais || [])
+      .filter(professional => {
+        if (unitId && professional.unit_id !== unitId) {
+          return false;
+        }
+        if (professionalStatusFilter === 'active' && !professional.is_active) {
+          return false;
+        }
+        if (professionalStatusFilter === 'inactive' && professional.is_active) {
+          return false;
+        }
+        if (
+          specialtyFilter !== 'all' &&
+          getProfessionalSpecialty(professional) !== specialtyFilter
+        ) {
+          return false;
+        }
+        if (!normalizedSearch) {
+          return true;
+        }
+        const speciality = getProfessionalSpecialty(professional).toLowerCase();
+        return (
+          professional.name?.toLowerCase().includes(normalizedSearch) ||
+          professional.role?.toLowerCase().includes(normalizedSearch) ||
+          speciality.includes(normalizedSearch)
+        );
+      })
+      .sort((a, b) => {
+        const scoreA = getAvailabilityScore(a);
+        const scoreB = getAvailabilityScore(b);
+        if (scoreA === scoreB) {
+          return (a.name || '').localeCompare(b.name || '');
+        }
+        return availabilitySort === 'asc' ? scoreA - scoreB : scoreB - scoreA;
+      });
+  }, [
+    profissionais,
+    unitId,
+    professionalStatusFilter,
+    specialtyFilter,
+    professionalSearch,
+    availabilitySort,
+    getProfessionalSpecialty,
+    getAvailabilityScore,
+  ]);
+  const handleOrderSubmit = async ({ action, data }) => {
     try {
       console.log('🚀 handleOrderSubmit - action:', action);
       console.log('📦 handleOrderSubmit - data:', data);
@@ -364,14 +451,17 @@ const OrdersPage = () => {
           const closePayload = {
             paymentMethodId: data.paymentMethodId,
             accountId: data.accountId || null,
-            closedBy: user?.id || undefined
+            closedBy: user?.id || undefined,
           };
           const result = await closeOrder(selectedOrder.id, closePayload);
           if (result.error) {
             return;
           }
         } else if (action === 'cancel') {
-          const result = await cancelOrder(selectedOrder.id, 'Cancelado pelo usuário');
+          const result = await cancelOrder(
+            selectedOrder.id,
+            'Cancelado pelo usuário'
+          );
           if (result.error) {
             return;
           }
@@ -389,13 +479,17 @@ const OrdersPage = () => {
 
         // ADICIONA OS ITENS (SERVIÇOS) À COMANDA
         if (data.items && data.items.length > 0) {
-          console.log('📦 Adicionando', data.items.length, 'itens à comanda...');
+          console.log(
+            '📦 Adicionando',
+            data.items.length,
+            'itens à comanda...'
+          );
           for (const item of data.items) {
             console.log('➕ Adicionando item:', item);
             const itemResult = await addServiceToOrder(createdOrderId, {
               serviceId: item.serviceId,
               professionalId: item.professionalId || data.professionalId,
-              quantity: item.quantity || 1
+              quantity: item.quantity || 1,
             });
             if (itemResult.error) {
               console.error('❌ Erro ao adicionar item:', itemResult.error);
@@ -412,7 +506,7 @@ const OrdersPage = () => {
           const closePayload = {
             paymentMethodId: data.paymentMethodId,
             accountId: data.accountId || null,
-            closedBy: user?.id || undefined
+            closedBy: user?.id || undefined,
           };
           const closeResult = await closeOrder(createdOrderId, closePayload);
           if (closeResult.error) {
@@ -440,7 +534,9 @@ const OrdersPage = () => {
   };
   const handleAddItemClick = (orderId, defaultProfessionalId) => {
     setCurrentOrderId(orderId || selectedOrder?.id || null);
-    setItemModalProfessionalId(defaultProfessionalId || selectedOrder?.professionalId || '');
+    setItemModalProfessionalId(
+      defaultProfessionalId || selectedOrder?.professionalId || ''
+    );
     setIsOrderItemModalVisible(true);
   };
   const handleItemSubmit = async itemData => {
@@ -451,12 +547,14 @@ const OrdersPage = () => {
       console.log('📦 currentOrderItems ANTES:', currentOrderItems);
       if (!selectedOrder) {
         // Busca o nome do profissional para exibir na tabela
-        const professional = profissionais.find(p => p.id === itemModalProfessionalId);
+        const professional = profissionais.find(
+          p => p.id === itemModalProfessionalId
+        );
         console.log('👤 Profissional encontrado:', professional);
         const newItem = {
           ...itemData,
           id: Date.now(),
-          professionalName: professional?.name || 'Sem profissional'
+          professionalName: professional?.name || 'Sem profissional',
         };
         console.log('➕ Novo item a ser adicionado:', newItem);
         setCurrentOrderItems(prev => {
@@ -468,7 +566,10 @@ const OrdersPage = () => {
         setIsOrderItemModalVisible(false);
         return;
       }
-      const result = await addServiceToOrder(itemData.orderId || selectedOrder.id, itemData);
+      const result = await addServiceToOrder(
+        itemData.orderId || selectedOrder.id,
+        itemData
+      );
       if (!result.error) {
         toast.success('Serviço adicionado à comanda');
         fetchOrders();
@@ -502,13 +603,10 @@ const OrdersPage = () => {
     setIsOrderModalVisible(true);
   };
   const handleFilterChange = e => {
-    const {
-      name,
-      value
-    } = e.target;
+    const { name, value } = e.target;
     setFilters(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
   const handleClearFilters = () => {
@@ -516,7 +614,7 @@ const OrdersPage = () => {
       status: 'all',
       search: '',
       startDate: '',
-      endDate: ''
+      endDate: '',
     });
   };
   const handleNewOrder = () => {
@@ -538,20 +636,29 @@ const OrdersPage = () => {
     navigate(`/queue?professional=${professionalId}`);
   };
   const toggleAvailabilitySort = () => {
-    setAvailabilitySort(prev => prev === 'asc' ? 'desc' : 'asc');
+    setAvailabilitySort(prev => (prev === 'asc' ? 'desc' : 'asc'));
   };
-  const showPaymentWarning = !paymentMethodsLoading && !financialError && paymentMethods.length === 0;
-  const showBankWarning = !bankAccountsLoading && !financialError && bankAccounts.length === 0;
+  const showPaymentWarning =
+    !paymentMethodsLoading && !financialError && paymentMethods.length === 0;
+  const showBankWarning =
+    !bankAccountsLoading && !financialError && bankAccounts.length === 0;
   if (!unitId) {
-    return <div className="container mx-auto px-4 py-8 space-y-6">
+    return (
+      <div className="container mx-auto px-4 py-8 space-y-6">
         <div className="flex items-center gap-3">
           <FileText className="w-8 h-8 text-theme-primary" />
           <h1 className="text-3xl font-bold text-theme-primary">Comandas</h1>
         </div>
-        <Alert type="info" title="Selecione uma unidade" message="Escolha uma unidade no seletor superior para visualizar e gerenciar as comandas." />
-      </div>;
+        <Alert
+          type="info"
+          title="Selecione uma unidade"
+          message="Escolha uma unidade no seletor superior para visualizar e gerenciar as comandas."
+        />
+      </div>
+    );
   }
-  return <div className="container mx-auto px-4 py-8">
+  return (
+    <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
@@ -565,16 +672,34 @@ const OrdersPage = () => {
             </p>
           </div>
 
-          {canCreateOrder && <Button variant="primary" onClick={handleNewOrder} disabled={ordersLoading}>
+          {canCreateOrder && (
+            <Button
+              variant="primary"
+              onClick={handleNewOrder}
+              disabled={ordersLoading}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Nova Comanda
-            </Button>}
+            </Button>
+          )}
         </div>
 
         <div className="space-y-3">
           {financialError && <Alert type="error" message={financialError} />}
-          {showPaymentWarning && <Alert type="warning" icon={Info} message="Nenhuma forma de pagamento ativa encontrada para esta unidade. Cadastre pelo menos uma forma de pagamento antes de fechar comandas." />}
-          {showBankWarning && <Alert type="warning" icon={Info} message="Nenhuma conta bancária ativa vinculada à unidade. Cadastre uma conta para direcionar os recebimentos automáticos." />}
+          {showPaymentWarning && (
+            <Alert
+              type="warning"
+              icon={Info}
+              message="Nenhuma forma de pagamento ativa encontrada para esta unidade. Cadastre pelo menos uma forma de pagamento antes de fechar comandas."
+            />
+          )}
+          {showBankWarning && (
+            <Alert
+              type="warning"
+              icon={Info}
+              message="Nenhuma conta bancária ativa vinculada à unidade. Cadastre uma conta para direcionar os recebimentos automáticos."
+            />
+          )}
         </div>
 
         {/* Barra de Busca e Filtros */}
@@ -583,23 +708,39 @@ const OrdersPage = () => {
           <div className="flex gap-2">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-theme-muted" />
-              <input type="text" name="search" value={filters.search} onChange={handleFilterChange} placeholder="Buscar por cliente ou profissional..." className="w-full pl-10 pr-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <input
+                type="text"
+                name="search"
+                value={filters.search}
+                onChange={handleFilterChange}
+                placeholder="Buscar por cliente ou profissional..."
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
 
-            <Button variant="secondary" onClick={() => setShowFilters(!showFilters)}>
+            <Button
+              variant="secondary"
+              onClick={() => setShowFilters(!showFilters)}
+            >
               <Filter className="w-4 h-4 mr-2" />
               Filtros
             </Button>
           </div>
 
           {/* Filtros Expandidos */}
-          {showFilters && <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-theme-border">
+          {showFilters && (
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-theme-border">
               {/* Status */}
               <div>
                 <label className="block text-sm font-medium text-theme-primary mb-2">
                   Status
                 </label>
-                <select name="status" value={filters.status} onChange={handleFilterChange} className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <select
+                  name="status"
+                  value={filters.status}
+                  onChange={handleFilterChange}
+                  className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
                   <option value="all">Todos</option>
                   <option value="open">Abertas</option>
                   <option value="closed">Fechadas</option>
@@ -612,7 +753,13 @@ const OrdersPage = () => {
                 <label className="block text-sm font-medium text-theme-primary mb-2">
                   Data Inicial
                 </label>
-                <input type="date" name="startDate" value={filters.startDate} onChange={handleFilterChange} className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <input
+                  type="date"
+                  name="startDate"
+                  value={filters.startDate}
+                  onChange={handleFilterChange}
+                  className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
               </div>
 
               {/* Data Final */}
@@ -620,51 +767,92 @@ const OrdersPage = () => {
                 <label className="block text-sm font-medium text-theme-primary mb-2">
                   Data Final
                 </label>
-                <input type="date" name="endDate" value={filters.endDate} onChange={handleFilterChange} className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <input
+                  type="date"
+                  name="endDate"
+                  value={filters.endDate}
+                  onChange={handleFilterChange}
+                  className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
               </div>
 
               {/* Botão Limpar */}
               <div className="flex items-end">
-                <Button variant="secondary" onClick={handleClearFilters} className="w-full">
+                <Button
+                  variant="secondary"
+                  onClick={handleClearFilters}
+                  className="w-full"
+                >
                   <X className="w-4 h-4 mr-2" />
                   Limpar Filtros
                 </Button>
               </div>
-            </div>}
+            </div>
+          )}
         </div>
       </div>
 
       {/* Lista de Comandas */}
       <div className="space-y-3">
-        {ordersLoading ? <div className="card-theme text-center py-12">
+        {ordersLoading ? (
+          <div className="card-theme text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
             <p className="text-theme-muted">Carregando comandas...</p>
-          </div> : filteredOrders.length === 0 ? <div className="card-theme text-center py-12">
+          </div>
+        ) : filteredOrders.length === 0 ? (
+          <div className="card-theme text-center py-12">
             <Package className="w-16 h-16 mx-auto mb-4 text-theme-muted" />
             <h3 className="text-lg font-semibold text-theme-primary mb-2">
               Nenhuma comanda encontrada
             </h3>
             <p className="text-theme-muted mb-6">
-              {filters.search || filters.status !== 'all' || filters.startDate || filters.endDate ? 'Tente ajustar os filtros de busca' : 'Crie uma nova comanda para começar'}
+              {filters.search ||
+              filters.status !== 'all' ||
+              filters.startDate ||
+              filters.endDate
+                ? 'Tente ajustar os filtros de busca'
+                : 'Crie uma nova comanda para começar'}
             </p>
 
-            {canCreateOrder && !filters.search && filters.status === 'all' && <Button variant="primary" onClick={handleNewOrder}>
+            {canCreateOrder && !filters.search && filters.status === 'all' && (
+              <Button variant="primary" onClick={handleNewOrder}>
                 <Plus className="w-4 h-4 mr-2" />
                 Nova Comanda
-              </Button>}
-          </div> : filteredOrders.map(order => <OrderListItem key={order.id} order={order} onClick={() => handleOrderClick(order)} onClose={canCloseOrder ? () => {
-        handleOrderClick(order);
-      } : null} onCancel={canCancelOrder ? () => {
-        setSelectedOrder(order);
-        handleOrderSubmit({
-          action: 'cancel',
-          data: order
-        });
-      } : null} />)}
+              </Button>
+            )}
+          </div>
+        ) : (
+          filteredOrders.map(order => (
+            <OrderListItem
+              key={order.id}
+              order={order}
+              onClick={() => handleOrderClick(order)}
+              onClose={
+                canCloseOrder
+                  ? () => {
+                      handleOrderClick(order);
+                    }
+                  : null
+              }
+              onCancel={
+                canCancelOrder
+                  ? () => {
+                      setSelectedOrder(order);
+                      handleOrderSubmit({
+                        action: 'cancel',
+                        data: order,
+                      });
+                    }
+                  : null
+              }
+            />
+          ))
+        )}
       </div>
 
       {/* Resumo */}
-      {filteredOrders.length > 0 && <div className="card-theme mt-6 p-4">
+      {filteredOrders.length > 0 && (
+        <div className="card-theme mt-6 p-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div>
               <p className="text-sm text-theme-muted mb-1">Total</p>
@@ -691,7 +879,8 @@ const OrdersPage = () => {
               </p>
             </div>
           </div>
-        </div>}
+        </div>
+      )}
 
       <div className="mt-12 grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Clientes */}
@@ -705,7 +894,9 @@ const OrdersPage = () => {
             </div>
             <p className="text-sm text-theme-secondary">
               {filteredClients.length}{' '}
-              {filteredClients.length === 1 ? 'cliente encontrado' : 'clientes encontrados'}
+              {filteredClients.length === 1
+                ? 'cliente encontrado'
+                : 'clientes encontrados'}
               {selectedUnit?.name && ` em ${selectedUnit.name}`}
             </p>
           </div>
@@ -713,13 +904,23 @@ const OrdersPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
             <div className="relative lg:col-span-2">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-theme-muted" />
-              <input type="text" value={clientsSearch} onChange={event => setClientsSearch(event.target.value)} placeholder="Buscar por nome, documento ou contato" className="w-full input-theme pl-10" />
+              <input
+                type="text"
+                value={clientsSearch}
+                onChange={event => setClientsSearch(event.target.value)}
+                placeholder="Buscar por nome, documento ou contato"
+                className="w-full input-theme pl-10"
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-theme-primary mb-1">
                 Status
               </label>
-              <select className="input-theme" value={clientStatusFilter} onChange={event => setClientStatusFilter(event.target.value)}>
+              <select
+                className="input-theme"
+                value={clientStatusFilter}
+                onChange={event => setClientStatusFilter(event.target.value)}
+              >
                 <option value="all">Todos</option>
                 <option value="active">Ativos</option>
                 <option value="inactive">Inativos</option>
@@ -729,7 +930,11 @@ const OrdersPage = () => {
               <label className="block text-sm font-medium text-theme-primary mb-1">
                 Histórico de compras
               </label>
-              <select className="input-theme" value={clientHistoryFilter} onChange={event => setClientHistoryFilter(event.target.value)}>
+              <select
+                className="input-theme"
+                value={clientHistoryFilter}
+                onChange={event => setClientHistoryFilter(event.target.value)}
+              >
                 <option value="all">Todos</option>
                 <option value="recent">Últimos 30 dias</option>
                 <option value="no-history">Sem histórico</option>
@@ -739,26 +944,41 @@ const OrdersPage = () => {
 
           {clientsError && <Alert type="error" message={clientsError} />}
 
-          {clientsLoading ? <div className="flex items-center justify-center py-12">
+          {clientsLoading ? (
+            <div className="flex items-center justify-center py-12">
               <div className="h-10 w-10 rounded-full border-2 border-blue-500 border-t-transparent animate-spin" />
-            </div> : filteredClients.length === 0 ? <div className="text-center py-12 space-y-3">
+            </div>
+          ) : filteredClients.length === 0 ? (
+            <div className="text-center py-12 space-y-3">
               <Users className="w-12 h-12 mx-auto text-theme-muted" />
               <p className="text-theme-secondary">
                 Nenhum cliente encontrado com os filtros selecionados.
               </p>
-              <Button variant="secondary" icon={ArrowUpRight} onClick={() => navigate('/cadastros/clientes')}>
+              <Button
+                variant="secondary"
+                icon={ArrowUpRight}
+                onClick={() => navigate('/cadastros/clientes')}
+              >
                 Gerenciar clientes
               </Button>
-            </div> : <div className="space-y-4">
+            </div>
+          ) : (
+            <div className="space-y-4">
               {paginatedClients.map(client => {
-            const metrics = clientMetrics.get(client.id) || {
-              totalOrders: 0,
-              lastOrderDate: null
-            };
-            const clientName = client.nome || client.name || 'Cliente sem nome';
-            const clientPhone = client.telefone || client.phone || null;
-            const clientEmail = client.email || client.mail || client.contact_email || null;
-            return <div key={client.id} className="card-theme border border-light-border dark:border-dark-border rounded-xl p-4 space-y-4">
+                const metrics = clientMetrics.get(client.id) || {
+                  totalOrders: 0,
+                  lastOrderDate: null,
+                };
+                const clientName =
+                  client.nome || client.name || 'Cliente sem nome';
+                const clientPhone = client.telefone || client.phone || null;
+                const clientEmail =
+                  client.email || client.mail || client.contact_email || null;
+                return (
+                  <div
+                    key={client.id}
+                    className="card-theme border border-light-border dark:border-dark-border rounded-xl p-4 space-y-4"
+                  >
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                       <div className="flex items-start gap-3">
                         <div className="w-12 h-12 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary font-semibold">
@@ -768,26 +988,36 @@ const OrdersPage = () => {
                           <h3 className="text-base font-semibold text-theme-primary">
                             {clientName}
                           </h3>
-                          {clientEmail && <div className="flex items-center gap-2 text-sm text-theme-secondary">
+                          {clientEmail && (
+                            <div className="flex items-center gap-2 text-sm text-theme-secondary">
                               <Mail className="w-4 h-4" />
                               <span className="truncate max-w-[220px]">
                                 {clientEmail}
                               </span>
-                            </div>}
-                          {clientPhone && <div className="flex items-center gap-2 text-sm text-theme-secondary">
+                            </div>
+                          )}
+                          {clientPhone && (
+                            <div className="flex items-center gap-2 text-sm text-theme-secondary">
                               <Phone className="w-4 h-4" />
                               <span>{formatPhone(clientPhone)}</span>
-                            </div>}
+                            </div>
+                          )}
                         </div>
                       </div>
-                      <span className={`inline-flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-full ${client.is_active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'}`}>
-                        {client.is_active ? <>
+                      <span
+                        className={`inline-flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-full ${client.is_active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'}`}
+                      >
+                        {client.is_active ? (
+                          <>
                             <CheckCircle className="w-3 h-3" />
                             Ativo
-                          </> : <>
+                          </>
+                        ) : (
+                          <>
                             <XCircle className="w-3 h-3" />
                             Inativo
-                          </>}
+                          </>
+                        )}
                       </span>
                     </div>
 
@@ -805,36 +1035,66 @@ const OrdersPage = () => {
                           Última visita
                         </p>
                         <p className="text-lg font-semibold text-theme-primary">
-                          {metrics.lastOrderDate ? formatDateShort(metrics.lastOrderDate) : '—'}
+                          {metrics.lastOrderDate
+                            ? formatDateShort(metrics.lastOrderDate)
+                            : '—'}
                         </p>
                       </div>
                     </div>
 
                     <div className="flex flex-wrap gap-2">
-                      <Button variant="ghost" size="sm" icon={ArrowUpRight} onClick={() => handleViewClientHistory(client.id)}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        icon={ArrowUpRight}
+                        onClick={() => handleViewClientHistory(client.id)}
+                      >
                         Ver histórico
                       </Button>
-                      <Button variant="ghost" size="sm" icon={ArrowUpRight} onClick={() => handleOpenClientProfile(client.id)}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        icon={ArrowUpRight}
+                        onClick={() => handleOpenClientProfile(client.id)}
+                      >
                         Ver perfil
                       </Button>
                     </div>
-                  </div>;
-          })}
-            </div>}
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
-          {filteredClients.length > clientsPerPage && <div className="pt-4 border-t border-light-border dark:border-dark-border flex items-center justify-between text-sm">
+          {filteredClients.length > clientsPerPage && (
+            <div className="pt-4 border-t border-light-border dark:border-dark-border flex items-center justify-between text-sm">
               <span className="text-theme-secondary">
                 Página {clientsPage} de {totalClientPages}
               </span>
               <div className="flex items-center gap-2">
-                <Button variant="secondary" size="sm" icon={ChevronLeft} onClick={() => setClientsPage(prev => Math.max(1, prev - 1))} disabled={clientsPage === 1}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  icon={ChevronLeft}
+                  onClick={() => setClientsPage(prev => Math.max(1, prev - 1))}
+                  disabled={clientsPage === 1}
+                >
                   Anterior
                 </Button>
-                <Button variant="secondary" size="sm" icon={ChevronRight} onClick={() => setClientsPage(prev => Math.min(totalClientPages, prev + 1))} disabled={clientsPage === totalClientPages}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  icon={ChevronRight}
+                  onClick={() =>
+                    setClientsPage(prev => Math.min(totalClientPages, prev + 1))
+                  }
+                  disabled={clientsPage === totalClientPages}
+                >
                   Próxima
                 </Button>
               </div>
-            </div>}
+            </div>
+          )}
         </section>
 
         {/* Profissionais */}
@@ -848,7 +1108,9 @@ const OrdersPage = () => {
             </div>
             <p className="text-sm text-theme-secondary">
               {filteredProfessionals.length}{' '}
-              {filteredProfessionals.length === 1 ? 'profissional disponível' : 'profissionais disponíveis'}
+              {filteredProfessionals.length === 1
+                ? 'profissional disponível'
+                : 'profissionais disponíveis'}
               {selectedUnit?.name && ` em ${selectedUnit.name}`}
             </p>
           </div>
@@ -856,13 +1118,25 @@ const OrdersPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
             <div className="relative lg:col-span-2">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-theme-muted" />
-              <input type="text" value={professionalSearch} onChange={event => setProfessionalSearch(event.target.value)} placeholder="Buscar por nome ou especialidade" className="w-full input-theme pl-10" />
+              <input
+                type="text"
+                value={professionalSearch}
+                onChange={event => setProfessionalSearch(event.target.value)}
+                placeholder="Buscar por nome ou especialidade"
+                className="w-full input-theme pl-10"
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-theme-primary mb-1">
                 Status
               </label>
-              <select className="input-theme" value={professionalStatusFilter} onChange={event => setProfessionalStatusFilter(event.target.value)}>
+              <select
+                className="input-theme"
+                value={professionalStatusFilter}
+                onChange={event =>
+                  setProfessionalStatusFilter(event.target.value)
+                }
+              >
                 <option value="active">Disponíveis</option>
                 <option value="inactive">Inativos</option>
                 <option value="all">Todos</option>
@@ -872,44 +1146,70 @@ const OrdersPage = () => {
               <label className="block text-sm font-medium text-theme-primary mb-1">
                 Especialidade
               </label>
-              <select className="input-theme" value={specialtyFilter} onChange={event => setSpecialtyFilter(event.target.value)}>
+              <select
+                className="input-theme"
+                value={specialtyFilter}
+                onChange={event => setSpecialtyFilter(event.target.value)}
+              >
                 <option value="all">Todas</option>
-                {specialties.map(specialty => <option key={specialty} value={specialty}>
+                {specialties.map(specialty => (
+                  <option key={specialty} value={specialty}>
                     {specialty}
-                  </option>)}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="flex flex-col">
               <label className="block text-sm font-medium text-theme-primary mb-1">
                 Ordenação
               </label>
-              <Button variant="secondary" size="sm" icon={ArrowUpDown} onClick={toggleAvailabilitySort}>
+              <Button
+                variant="secondary"
+                size="sm"
+                icon={ArrowUpDown}
+                onClick={toggleAvailabilitySort}
+              >
                 Disponibilidade {availabilitySort === 'asc' ? '↑' : '↓'}
               </Button>
             </div>
           </div>
 
-          {professionalsError && <Alert type="error" message={professionalsError} />}
+          {professionalsError && (
+            <Alert type="error" message={professionalsError} />
+          )}
 
-          {professionalsLoading ? <div className="flex items-center justify-center py-12">
+          {professionalsLoading ? (
+            <div className="flex items-center justify-center py-12">
               <div className="h-10 w-10 rounded-full border-2 border-purple-500 border-t-transparent animate-spin" />
-            </div> : filteredProfessionals.length === 0 ? <div className="text-center py-12 space-y-3">
+            </div>
+          ) : filteredProfessionals.length === 0 ? (
+            <div className="text-center py-12 space-y-3">
               <Briefcase className="w-12 h-12 mx-auto text-theme-muted" />
               <p className="text-theme-secondary">
                 Nenhum profissional encontrado com os filtros selecionados.
               </p>
-              <Button variant="secondary" icon={ArrowUpRight} onClick={() => navigate('/professionals')}>
+              <Button
+                variant="secondary"
+                icon={ArrowUpRight}
+                onClick={() => navigate('/professionals')}
+              >
                 Gerenciar profissionais
               </Button>
-            </div> : <div className="space-y-4">
+            </div>
+          ) : (
+            <div className="space-y-4">
               {filteredProfessionals.map(professional => {
-            const metrics = professionalMetrics.get(professional.id) || {
-              totalOrders: 0,
-              openOrders: 0,
-              closedOrders: 0
-            };
-            const specialty = getProfessionalSpecialty(professional);
-            return <div key={professional.id} className="card-theme border border-light-border dark:border-dark-border rounded-xl p-4 space-y-4">
+                const metrics = professionalMetrics.get(professional.id) || {
+                  totalOrders: 0,
+                  openOrders: 0,
+                  closedOrders: 0,
+                };
+                const specialty = getProfessionalSpecialty(professional);
+                return (
+                  <div
+                    key={professional.id}
+                    className="card-theme border border-light-border dark:border-dark-border rounded-xl p-4 space-y-4"
+                  >
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                       <div className="flex items-start gap-3">
                         <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-700 dark:text-purple-200 font-semibold">
@@ -925,7 +1225,9 @@ const OrdersPage = () => {
                           </p>
                         </div>
                       </div>
-                      <span className={`inline-flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-full ${professional.is_active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'}`}>
+                      <span
+                        className={`inline-flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-full ${professional.is_active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'}`}
+                      >
                         {professional.is_active ? 'Disponível' : 'Inativo'}
                       </span>
                     </div>
@@ -958,47 +1260,85 @@ const OrdersPage = () => {
                     </div>
 
                     <div className="flex flex-wrap gap-2">
-                      <Button variant="ghost" size="sm" icon={Clock} onClick={() => handleOpenProfessionalAgenda(professional.id)}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        icon={Clock}
+                        onClick={() =>
+                          handleOpenProfessionalAgenda(professional.id)
+                        }
+                      >
                         Ver agenda
                       </Button>
-                      <Button variant="ghost" size="sm" icon={ArrowUpRight} onClick={() => handleOpenProfessionalProfile(professional.id)}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        icon={ArrowUpRight}
+                        onClick={() =>
+                          handleOpenProfessionalProfile(professional.id)
+                        }
+                      >
                         Ver perfil
                       </Button>
                     </div>
-                  </div>;
-          })}
-            </div>}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </section>
       </div>
 
       {/* Modals */}
-      <OrderModal isOpen={isOrderModalVisible} onClose={() => {
-      setIsOrderModalVisible(false);
-      setSelectedOrder(null);
-      setCurrentOrderItems([]);
-      setItemModalProfessionalId('');
-    }} onSubmit={handleOrderSubmit} onAddItem={handleAddItemClick} order={selectedOrder} unitId={unitId} clients={(() => {
-      console.log('📤 OrdersPage - Passando clientes para OrderModal:', {
-        selectableClients: selectableClients,
-        totalSelectableClients: selectableClients?.length || 0,
-        clientsData: clientsData,
-        totalClientsData: clientsData?.length || 0,
-        unitId: unitId
-      });
-      return selectableClients;
-    })()} professionals={modalProfessionals} paymentMethods={paymentMethods} bankAccounts={bankAccounts} items={(() => {
-      console.log('📦 OrdersPage - Passando items para OrderModal:', {
-        currentOrderItems: currentOrderItems,
-        totalItems: currentOrderItems?.length || 0
-      });
-      return currentOrderItems;
-    })()} onRemoveItem={handleRemoveItem} />
+      <OrderModal
+        isOpen={isOrderModalVisible}
+        onClose={() => {
+          setIsOrderModalVisible(false);
+          setSelectedOrder(null);
+          setCurrentOrderItems([]);
+          setItemModalProfessionalId('');
+        }}
+        onSubmit={handleOrderSubmit}
+        onAddItem={handleAddItemClick}
+        order={selectedOrder}
+        unitId={unitId}
+        clients={(() => {
+          console.log('📤 OrdersPage - Passando clientes para OrderModal:', {
+            selectableClients: selectableClients,
+            totalSelectableClients: selectableClients?.length || 0,
+            clientsData: clientsData,
+            totalClientsData: clientsData?.length || 0,
+            unitId: unitId,
+          });
+          return selectableClients;
+        })()}
+        professionals={modalProfessionals}
+        paymentMethods={paymentMethods}
+        bankAccounts={bankAccounts}
+        items={(() => {
+          console.log('📦 OrdersPage - Passando items para OrderModal:', {
+            currentOrderItems: currentOrderItems,
+            totalItems: currentOrderItems?.length || 0,
+          });
+          return currentOrderItems;
+        })()}
+        onRemoveItem={handleRemoveItem}
+      />
 
-      <OrderItemModal isOpen={isOrderItemModalVisible} onClose={() => {
-      setIsOrderItemModalVisible(false);
-      setCurrentOrderId(null);
-      setItemModalProfessionalId('');
-    }} onSubmit={handleItemSubmit} orderId={currentOrderId} defaultProfessionalId={itemModalProfessionalId} services={activeServices || []} professionals={modalProfessionals} />
-    </div>;
+      <OrderItemModal
+        isOpen={isOrderItemModalVisible}
+        onClose={() => {
+          setIsOrderItemModalVisible(false);
+          setCurrentOrderId(null);
+          setItemModalProfessionalId('');
+        }}
+        onSubmit={handleItemSubmit}
+        orderId={currentOrderId}
+        defaultProfessionalId={itemModalProfessionalId}
+        services={activeServices || []}
+        professionals={modalProfessionals}
+      />
+    </div>
+  );
 };
 export default OrdersPage;

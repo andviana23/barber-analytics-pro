@@ -1,28 +1,31 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, LogIn, Loader2, Sparkles } from 'lucide-react';
+import {
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  LogIn,
+  Loader2,
+  Sparkles,
+} from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { logger } from '../../utils/secureLogger';
 export function LoginPage() {
   const navigate = useNavigate();
-  const {
-    signIn
-  } = useAuth();
+  const { signIn } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const handleInputChange = e => {
-    const {
-      name,
-      value
-    } = e.target;
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
     // Limpar erro quando usuário começar a digitar
     if (error) setError('');
@@ -54,15 +57,15 @@ export function LoginPage() {
     try {
       // 🛡️ CORREÇÃO BUG-002: Log sanitizado de autenticação
       logger.auth('Tentativa de login', {
-        email: formData.email
+        email: formData.email,
       });
-      const {
-        data,
-        error: authError
-      } = await signIn(formData.email, formData.password);
+      const { data, error: authError } = await signIn(
+        formData.email,
+        formData.password
+      );
       logger.auth('Resultado do login', {
         success: !authError,
-        hasData: !!data
+        hasData: !!data,
       });
       if (authError) {
         logger.error('Erro de autenticação', authError);
@@ -72,9 +75,11 @@ export function LoginPage() {
         if (authError.message?.includes('Invalid login credentials')) {
           errorMessage = 'Email ou senha incorretos';
         } else if (authError.message?.includes('Email not confirmed')) {
-          errorMessage = 'Email não confirmado. Verifique sua caixa de entrada.';
+          errorMessage =
+            'Email não confirmado. Verifique sua caixa de entrada.';
         } else if (authError.message?.includes('Too many requests')) {
-          errorMessage = 'Muitas tentativas. Tente novamente em alguns minutos.';
+          errorMessage =
+            'Muitas tentativas. Tente novamente em alguns minutos.';
         } else if (authError.message) {
           errorMessage = authError.message;
         }
@@ -95,7 +100,8 @@ export function LoginPage() {
       setIsLoading(false);
     }
   };
-  return <div className="h-screen flex items-center justify-center bg-gradient-to-br from-light-bg via-light-surface to-light-bg dark:from-dark-bg dark:via-dark-surface dark:to-dark-bg px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+  return (
+    <div className="h-screen flex items-center justify-center bg-gradient-to-br from-light-bg via-light-surface to-light-bg dark:from-dark-bg dark:via-dark-surface dark:to-dark-bg px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/5 rounded-full blur-3xl animate-pulse" />
@@ -108,10 +114,15 @@ export function LoginPage() {
         <div className="text-center animate-fade-in-down">
           {/* Logo */}
           <div className="flex justify-center mb-4">
-            <img src="/logo.svg" alt="Barber Analytics Pro" className="h-32 sm:h-36 w-auto object-contain" onError={e => {
-            e.target.style.display = 'none';
-            e.target.nextElementSibling.style.display = 'flex';
-          }} />
+            <img
+              src="/logo.svg"
+              alt="Barber Analytics Pro"
+              className="h-32 sm:h-36 w-auto object-contain"
+              onError={e => {
+                e.target.style.display = 'none';
+                e.target.nextElementSibling.style.display = 'flex';
+              }}
+            />
             {/* Fallback Logo */}
             <div className="hidden items-center justify-center">
               <Sparkles className="w-28 h-28 text-primary" />
@@ -133,63 +144,124 @@ export function LoginPage() {
             <form className="space-y-3.5" onSubmit={handleSubmit}>
               {/* Email Field */}
               <div className="space-y-1.5">
-                <label htmlFor="email" className="block text-xs font-semibold text-theme-primary">
+                <label
+                  htmlFor="email"
+                  className="block text-xs font-semibold text-theme-primary"
+                >
                   Email
                 </label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Mail className="h-4 w-4 text-theme-secondary group-focus-within:text-primary transition-colors duration-200" />
                   </div>
-                  <input id="email" name="email" type="email" autoComplete="email" required value={formData.email} onChange={handleInputChange} className="input-theme pl-10 h-10 text-sm transition-all duration-200" placeholder="seu@email.com" data-testid="email" />
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="input-theme pl-10 h-10 text-sm transition-all duration-200"
+                    placeholder="seu@email.com"
+                    data-testid="email"
+                  />
                 </div>
               </div>
 
               {/* Password Field */}
               <div className="space-y-1.5">
-                <label htmlFor="password" className="block text-xs font-semibold text-theme-primary">
+                <label
+                  htmlFor="password"
+                  className="block text-xs font-semibold text-theme-primary"
+                >
                   Senha
                 </label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Lock className="h-4 w-4 text-theme-secondary group-focus-within:text-primary transition-colors duration-200" />
                   </div>
-                  <input id="password" name="password" type={showPassword ? 'text' : 'password'} autoComplete="current-password" required value={formData.password} onChange={handleInputChange} className="input-theme pl-10 pr-10 h-10 text-sm transition-all duration-200" placeholder="••••••••" data-testid="password" />
-                  <button type="button" className="absolute inset-y-0 right-0 pr-3 flex items-center hover:scale-110 transition-transform duration-200" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}>
-                    {showPassword ? <EyeOff className="h-4 w-4 text-theme-secondary hover:text-theme-primary transition-colors duration-200" /> : <Eye className="h-4 w-4 text-theme-secondary hover:text-theme-primary transition-colors duration-200" />}
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="current-password"
+                    required
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    className="input-theme pl-10 pr-10 h-10 text-sm transition-all duration-200"
+                    placeholder="••••••••"
+                    data-testid="password"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center hover:scale-110 transition-transform duration-200"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={
+                      showPassword ? 'Ocultar senha' : 'Mostrar senha'
+                    }
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-theme-secondary hover:text-theme-primary transition-colors duration-200" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-theme-secondary hover:text-theme-primary transition-colors duration-200" />
+                    )}
                   </button>
                 </div>
               </div>
 
               {/* Error Message */}
-              {error && <div className="bg-feedback-light-error/10 dark:bg-feedback-dark-error/10 border border-feedback-light-error/30 dark:border-feedback-dark-error/30 rounded-lg p-2.5 animate-shake">
+              {error && (
+                <div className="bg-feedback-light-error/10 dark:bg-feedback-dark-error/10 border border-feedback-light-error/30 dark:border-feedback-dark-error/30 rounded-lg p-2.5 animate-shake">
                   <div className="flex items-start gap-2">
                     <div className="flex-shrink-0 mt-0.5">
-                      <svg className="w-4 h-4 text-feedback-light-error dark:text-feedback-dark-error" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      <svg
+                        className="w-4 h-4 text-feedback-light-error dark:text-feedback-dark-error"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                     </div>
                     <p className="text-xs font-medium text-feedback-light-error dark:text-feedback-dark-error">
                       {error}
                     </p>
                   </div>
-                </div>}
+                </div>
+              )}
 
               {/* Forgot Password Link */}
               <div className="flex items-center justify-end">
-                <Link to="/forgot-password" className="text-xs font-medium text-primary hover:text-primary-hover transition-colors duration-200 hover:underline">
+                <Link
+                  to="/forgot-password"
+                  className="text-xs font-medium text-primary hover:text-primary-hover transition-colors duration-200 hover:underline"
+                >
                   Esqueceu sua senha?
                 </Link>
               </div>
 
               {/* Submit Button */}
-              <button type="submit" disabled={isLoading} className="btn-theme-primary w-full h-10 rounded-lg font-semibold text-sm shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]" data-testid="submit-login">
-                {isLoading ? <span className="flex items-center justify-center gap-2">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="btn-theme-primary w-full h-10 rounded-lg font-semibold text-sm shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]"
+                data-testid="submit-login"
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center gap-2">
                     <Loader2 className="h-4 w-4 animate-spin" />
                     <span>Entrando...</span>
-                  </span> : <span className="flex items-center justify-center gap-2">
+                  </span>
+                ) : (
+                  <span className="flex items-center justify-center gap-2">
                     <LogIn className="h-4 w-4" />
                     <span>Entrar</span>
-                  </span>}
+                  </span>
+                )}
               </button>
             </form>
 
@@ -209,7 +281,10 @@ export function LoginPage() {
             <div className="text-center">
               <p className="text-xs text-theme-secondary">
                 Não tem uma conta?{' '}
-                <Link to="/signup" className="font-semibold text-primary hover:text-primary-hover transition-colors duration-200 hover:underline">
+                <Link
+                  to="/signup"
+                  className="font-semibold text-primary hover:text-primary-hover transition-colors duration-200 hover:underline"
+                >
                   Criar conta
                 </Link>
               </p>
@@ -296,5 +371,6 @@ export function LoginPage() {
           animation-delay: 1s;
         }
       `}</style>
-    </div>;
+    </div>
+  );
 }

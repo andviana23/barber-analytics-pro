@@ -56,6 +56,7 @@ O **Barber Analytics Pro** é uma aplicação web moderna construída com **Reac
 ### 💼 Módulos Principais
 
 #### 💰 Gestão Financeira
+
 - **DRE Automatizado**: Demonstração de Resultado do Exercício com regime de competência
 - **Fluxo de Caixa**: Visualização detalhada de entradas e saídas
 - **Categorização**: Organização hierárquica de despesas e receitas
@@ -63,18 +64,21 @@ O **Barber Analytics Pro** é uma aplicação web moderna construída com **Reac
 - **Metas Financeiras**: Definição e acompanhamento de metas por categoria
 
 #### 📊 Business Intelligence
+
 - **Dashboard Executivo**: KPIs consolidados com atualização em tempo real
 - **Comparativo de Unidades**: Análise de performance entre diferentes unidades
 - **Ranking de Profissionais**: Performance individual com comissões
 - **Relatórios Customizados**: DRE mensal, análise de atendimentos, receita vs despesa
 
 #### 💈 Operacional
+
 - **Lista da Vez**: Sistema de fila inteligente para distribuição justa de clientes
 - **Gestão de Profissionais**: Cadastro com controle de comissões e permissões
 - **Controle de Serviços**: Catálogo de serviços com preços por unidade
 - **Caixa**: Abertura, fechamento e controle de movimentações
 
 #### 👥 Gestão de Acesso
+
 - **Multi-perfil**: Administrador, Gerente, Barbeiro
 - **RLS Nativo**: Segurança em nível de linha no banco de dados
 - **Audit Trail**: Rastreamento completo de ações críticas
@@ -84,35 +88,38 @@ O **Barber Analytics Pro** é uma aplicação web moderna construída com **Reac
 ## 🛠️ Stack Tecnológica
 
 ### Frontend
-| Tecnologia | Versão | Uso |
-|------------|--------|-----|
-| React | 19.2.0 | Framework principal |
-| Vite | 7.1.9 | Build tool e dev server |
-| Tailwind CSS | 3.4.18 | Estilização |
-| React Router | 7.9.4 | Roteamento |
-| TanStack Query | 5.90.3 | Gerenciamento de estado server |
-| Framer Motion | 12.23.24 | Animações |
-| Recharts | 3.3.0 | Gráficos e visualizações |
-| React Hook Form | 7.65.0 | Formulários |
-| Zod | 4.1.12 | Validação de schemas |
+
+| Tecnologia      | Versão   | Uso                            |
+| --------------- | -------- | ------------------------------ |
+| React           | 19.2.0   | Framework principal            |
+| Vite            | 7.1.9    | Build tool e dev server        |
+| Tailwind CSS    | 3.4.18   | Estilização                    |
+| React Router    | 7.9.4    | Roteamento                     |
+| TanStack Query  | 5.90.3   | Gerenciamento de estado server |
+| Framer Motion   | 12.23.24 | Animações                      |
+| Recharts        | 3.3.0    | Gráficos e visualizações       |
+| React Hook Form | 7.65.0   | Formulários                    |
+| Zod             | 4.1.12   | Validação de schemas           |
 
 ### Backend & Infraestrutura
-| Tecnologia | Uso |
-|------------|-----|
-| Supabase | Backend as a Service (PostgreSQL, Auth, Realtime, Storage) |
-| PostgreSQL | Banco de dados relacional |
-| Row-Level Security | Segurança granular de dados |
-| Edge Functions | Serverless functions (Deno) |
-| Vercel | Hospedagem e CI/CD |
+
+| Tecnologia         | Uso                                                        |
+| ------------------ | ---------------------------------------------------------- |
+| Supabase           | Backend as a Service (PostgreSQL, Auth, Realtime, Storage) |
+| PostgreSQL         | Banco de dados relacional                                  |
+| Row-Level Security | Segurança granular de dados                                |
+| Edge Functions     | Serverless functions (Deno)                                |
+| Vercel             | Hospedagem e CI/CD                                         |
 
 ### Qualidade & Testes
-| Tecnologia | Versão | Uso |
-|------------|--------|-----|
-| Vitest | 3.2.4 | Testes unitários |
+
+| Tecnologia      | Versão | Uso                   |
+| --------------- | ------ | --------------------- |
+| Vitest          | 3.2.4  | Testes unitários      |
 | Testing Library | 16.3.0 | Testes de componentes |
-| Playwright | 1.56.0 | Testes E2E |
-| ESLint | 9.37.0 | Linting |
-| Prettier | 3.6.2 | Formatação de código |
+| Playwright      | 1.56.0 | Testes E2E            |
+| ESLint          | 9.37.0 | Linting               |
+| Prettier        | 3.6.2  | Formatação de código  |
 
 ---
 
@@ -127,33 +134,39 @@ O **Barber Analytics Pro** é uma aplicação web moderna construída com **Reac
 ### Passo a Passo
 
 1. **Clone o repositório**
+
 ```bash
 git clone https://github.com/seu-usuario/barber-analytics-pro.git
 cd barber-analytics-pro
 ```
 
 2. **Instale as dependências**
+
 ```bash
 npm install
 ```
 
 3. **Configure as variáveis de ambiente**
+
 ```bash
 cp .env.example .env
 ```
 
 Edite o arquivo `.env` com suas credenciais do Supabase:
+
 ```env
 VITE_SUPABASE_URL=https://seu-projeto.supabase.co
 VITE_SUPABASE_ANON_KEY=sua-chave-anon-aqui
 ```
 
 4. **Inicie o servidor de desenvolvimento**
+
 ```bash
 npm run dev
 ```
 
 5. **Acesse a aplicação**
+
 ```
 http://localhost:5173
 ```
@@ -161,6 +174,7 @@ http://localhost:5173
 ### Configuração do Banco de Dados
 
 Execute as migrações SQL na ordem correta:
+
 ```bash
 # Conecte-se ao seu projeto Supabase e execute os scripts em:
 supabase/migrations/
@@ -209,6 +223,7 @@ barber-analytics-pro/
 ### Organização por Camadas
 
 #### Camada de Apresentação (UI)
+
 - **Atoms**: Componentes básicos reutilizáveis
 - **Molecules**: Combinações simples de atoms
 - **Organisms**: Seções complexas com lógica de negócio
@@ -216,11 +231,13 @@ barber-analytics-pro/
 - **Pages**: Páginas completas com roteamento
 
 #### Camada de Aplicação
+
 - **Hooks**: Lógica reutilizável e integração com dados
 - **Context**: Estado global da aplicação
 - **Services**: Orquestração de casos de uso
 
 #### Camada de Dados
+
 - **Repositories**: Abstração de acesso ao Supabase
 - **DTOs**: Contratos e validação de dados
 
@@ -254,6 +271,7 @@ npm run test:coverage    # Relatório de cobertura
 ### Workflow de Desenvolvimento
 
 1. **Crie uma branch** para sua feature
+
 ```bash
 git checkout -b feature/nome-da-feature
 ```
@@ -264,6 +282,7 @@ git checkout -b feature/nome-da-feature
    - Implemente testes conforme [Testing Guide](docs/TESTING.md)
 
 3. **Valide** seu código
+
 ```bash
 npm run lint
 npm run test
@@ -271,6 +290,7 @@ npm run build
 ```
 
 4. **Commit** usando Conventional Commits
+
 ```bash
 git commit -m "feat: adiciona nova funcionalidade X"
 ```
@@ -286,6 +306,7 @@ Para mais detalhes, veja o [Guia de Desenvolvimento](docs/guides/DEVELOPMENT.md)
 O projeto utiliza uma estratégia de testes em múltiplas camadas:
 
 ### Testes Unitários (Vitest)
+
 ```bash
 npm run test              # Watch mode
 npm run test:run          # Single run
@@ -293,6 +314,7 @@ npm run test:coverage     # Com cobertura
 ```
 
 ### Testes E2E (Playwright)
+
 ```bash
 npx playwright test              # Executa todos os testes E2E
 npx playwright test --ui         # Interface visual
@@ -300,11 +322,13 @@ npx playwright test --debug      # Modo debug
 ```
 
 ### Estrutura de Testes
+
 - `src/__tests__/` - Testes unitários de componentes e hooks
 - `e2e/` - Testes end-to-end com Playwright
 - `tests/` - Fixtures e utilitários de teste
 
 Cobertura atual:
+
 - ✅ DTOs e validações
 - ✅ Serviços principais (DRE, Financeiro)
 - ✅ Fluxos críticos E2E
@@ -340,6 +364,7 @@ npm run lint
 ### Configuração de Ambiente
 
 Variáveis necessárias em produção:
+
 ```env
 VITE_SUPABASE_URL=https://seu-projeto.supabase.co
 VITE_SUPABASE_ANON_KEY=sua-chave-anon
@@ -374,12 +399,14 @@ Veja mais em [SECURITY.md](docs/guides/SECURITY.md).
 ## 📚 Documentação
 
 ### Documentação Principal
+
 - [📖 Índice de Documentação](docs/README.md)
 - [🏛️ Arquitetura](docs/ARQUITETURA.md)
 - [🗄️ Banco de Dados](docs/DATABASE_SCHEMA.md)
 - [🎨 Design System](docs/DESIGN_SYSTEM.md)
 
 ### Guias Técnicos
+
 - [⚙️ Setup](docs/guides/SETUP.md)
 - [💻 Development](docs/guides/DEVELOPMENT.md)
 - [📝 Code Conventions](docs/guides/CODE_CONVENTIONS.md)
@@ -387,6 +414,7 @@ Veja mais em [SECURITY.md](docs/guides/SECURITY.md).
 - [🔌 API](docs/guides/API_DOCUMENTATION.md)
 
 ### Módulos de Negócio
+
 - [💰 Financial Module](docs/FINANCIAL_MODULE.md)
 - [📊 DRE Module](docs/DRE_MODULE.md)
 - [💈 Lista da Vez](docs/LISTA_DA_VEZ_MODULE.md)

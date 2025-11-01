@@ -1,9 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Download, FileText, Filter, TrendingUp, Calendar, User } from 'lucide-react';
+import {
+  Download,
+  FileText,
+  Filter,
+  TrendingUp,
+  Calendar,
+  User,
+} from 'lucide-react';
 import { Button } from '../atoms/Button/Button';
 import CommissionSummaryCard from '../components/organisms/CommissionSummaryCard';
 import { formatCurrency, formatDate } from '../utils/formatters';
-import { exportCommissionsToCSV, exportCommissionsToPDF } from '../utils/exportCommissions';
+import {
+  exportCommissionsToCSV,
+  exportCommissionsToPDF,
+} from '../utils/exportCommissions';
 import toast from 'react-hot-toast';
 
 /**
@@ -30,7 +40,7 @@ const CommissionReportPage = () => {
     endDate: '',
     status: 'all',
     // all, paid, pending
-    orderId: ''
+    orderId: '',
   });
 
   // Estado de dados
@@ -53,16 +63,20 @@ const CommissionReportPage = () => {
         // setProfessionals(data);
 
         // Mock temporário
-        setProfessionals([{
-          id: '1',
-          name: 'João Silva'
-        }, {
-          id: '2',
-          name: 'Maria Santos'
-        }, {
-          id: '3',
-          name: 'Pedro Costa'
-        }]);
+        setProfessionals([
+          {
+            id: '1',
+            name: 'João Silva',
+          },
+          {
+            id: '2',
+            name: 'Maria Santos',
+          },
+          {
+            id: '3',
+            name: 'Pedro Costa',
+          },
+        ]);
       } catch (error) {
         console.error('Erro ao buscar profissionais:', error);
         toast.error('Erro ao carregar profissionais');
@@ -83,51 +97,55 @@ const CommissionReportPage = () => {
       // setCommissions(data);
 
       // Mock temporário
-      const mockCommissions = [{
-        id: '1',
-        orderId: 'abc-123',
-        orderNumber: '001',
-        professionalId: '1',
-        professionalName: 'João Silva',
-        clientName: 'Cliente A',
-        serviceName: 'Corte de Cabelo',
-        quantity: 1,
-        unitPrice: 50.0,
-        commissionPercentage: 30,
-        commissionValue: 15.0,
-        status: 'paid',
-        date: '2025-01-20',
-        paymentDate: '2025-01-25'
-      }, {
-        id: '2',
-        orderId: 'abc-124',
-        orderNumber: '002',
-        professionalId: '1',
-        professionalName: 'João Silva',
-        clientName: 'Cliente B',
-        serviceName: 'Barba',
-        quantity: 1,
-        unitPrice: 30.0,
-        commissionPercentage: 30,
-        commissionValue: 9.0,
-        status: 'pending',
-        date: '2025-01-22'
-      }, {
-        id: '3',
-        orderId: 'abc-125',
-        orderNumber: '003',
-        professionalId: '2',
-        professionalName: 'Maria Santos',
-        clientName: 'Cliente C',
-        serviceName: 'Corte + Barba',
-        quantity: 1,
-        unitPrice: 80.0,
-        commissionPercentage: 35,
-        commissionValue: 28.0,
-        status: 'paid',
-        date: '2025-01-23',
-        paymentDate: '2025-01-28'
-      }];
+      const mockCommissions = [
+        {
+          id: '1',
+          orderId: 'abc-123',
+          orderNumber: '001',
+          professionalId: '1',
+          professionalName: 'João Silva',
+          clientName: 'Cliente A',
+          serviceName: 'Corte de Cabelo',
+          quantity: 1,
+          unitPrice: 50.0,
+          commissionPercentage: 30,
+          commissionValue: 15.0,
+          status: 'paid',
+          date: '2025-01-20',
+          paymentDate: '2025-01-25',
+        },
+        {
+          id: '2',
+          orderId: 'abc-124',
+          orderNumber: '002',
+          professionalId: '1',
+          professionalName: 'João Silva',
+          clientName: 'Cliente B',
+          serviceName: 'Barba',
+          quantity: 1,
+          unitPrice: 30.0,
+          commissionPercentage: 30,
+          commissionValue: 9.0,
+          status: 'pending',
+          date: '2025-01-22',
+        },
+        {
+          id: '3',
+          orderId: 'abc-125',
+          orderNumber: '003',
+          professionalId: '2',
+          professionalName: 'Maria Santos',
+          clientName: 'Cliente C',
+          serviceName: 'Corte + Barba',
+          quantity: 1,
+          unitPrice: 80.0,
+          commissionPercentage: 35,
+          commissionValue: 28.0,
+          status: 'paid',
+          date: '2025-01-23',
+          paymentDate: '2025-01-28',
+        },
+      ];
       setCommissions(mockCommissions);
     } catch (error) {
       console.error('Erro ao buscar comissões:', error);
@@ -143,7 +161,7 @@ const CommissionReportPage = () => {
   const handleFilterChange = (field, value) => {
     setFilters(prev => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -163,7 +181,7 @@ const CommissionReportPage = () => {
       startDate: '',
       endDate: '',
       status: 'all',
-      orderId: ''
+      orderId: '',
     };
     setFilters(clearedFilters);
     fetchCommissions(clearedFilters);
@@ -214,7 +232,7 @@ const CommissionReportPage = () => {
           items: [],
           total: 0,
           paid: 0,
-          pending: 0
+          pending: 0,
         };
       }
       acc[key].items.push(item);
@@ -233,21 +251,24 @@ const CommissionReportPage = () => {
    * Calcula totais gerais
    */
   const calculateTotals = () => {
-    return commissions.reduce((acc, item) => {
-      acc.total += item.commissionValue;
-      if (item.status === 'paid') {
-        acc.paid += item.commissionValue;
-      } else {
-        acc.pending += item.commissionValue;
+    return commissions.reduce(
+      (acc, item) => {
+        acc.total += item.commissionValue;
+        if (item.status === 'paid') {
+          acc.paid += item.commissionValue;
+        } else {
+          acc.pending += item.commissionValue;
+        }
+        acc.count++;
+        return acc;
+      },
+      {
+        total: 0,
+        paid: 0,
+        pending: 0,
+        count: 0,
       }
-      acc.count++;
-      return acc;
-    }, {
-      total: 0,
-      paid: 0,
-      pending: 0,
-      count: 0
-    });
+    );
   };
   const totals = calculateTotals();
 
@@ -255,7 +276,8 @@ const CommissionReportPage = () => {
   useEffect(() => {
     fetchCommissions();
   }, []);
-  return <div className="min-h-screen bg-gradient-light dark:from-gray-900 dark:to-gray-800 p-6">
+  return (
+    <div className="min-h-screen bg-gradient-light dark:from-gray-900 dark:to-gray-800 p-6">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
@@ -271,11 +293,21 @@ const CommissionReportPage = () => {
 
           {/* Botões de Exportação */}
           <div className="flex gap-3">
-            <Button variant="outline" onClick={handleExportCSV} disabled={exportLoading || commissions.length === 0} className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={handleExportCSV}
+              disabled={exportLoading || commissions.length === 0}
+              className="flex items-center gap-2"
+            >
               <Download className="w-4 h-4" />
               Exportar CSV
             </Button>
-            <Button variant="primary" onClick={handleExportPDF} disabled={exportLoading || commissions.length === 0} className="flex items-center gap-2">
+            <Button
+              variant="primary"
+              onClick={handleExportPDF}
+              disabled={exportLoading || commissions.length === 0}
+              className="flex items-center gap-2"
+            >
               <FileText className="w-4 h-4" />
               Exportar PDF
             </Button>
@@ -285,10 +317,17 @@ const CommissionReportPage = () => {
 
       {/* Summary Card */}
       <div className="mb-8">
-        <CommissionSummaryCard professionals={professionals} onFetchCommissions={fetchCommissions} onExport={handleExportCSV} onViewDetails={() => window.scrollTo({
-        top: 600,
-        behavior: 'smooth'
-      })} />
+        <CommissionSummaryCard
+          professionals={professionals}
+          onFetchCommissions={fetchCommissions}
+          onExport={handleExportCSV}
+          onViewDetails={() =>
+            window.scrollTo({
+              top: 600,
+              behavior: 'smooth',
+            })
+          }
+        />
       </div>
 
       {/* Filtros Avançados */}
@@ -307,11 +346,19 @@ const CommissionReportPage = () => {
               <User className="w-4 h-4 inline mr-1" />
               Profissional
             </label>
-            <select value={filters.professionalId} onChange={e => handleFilterChange('professionalId', e.target.value)} className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-purple-500">
+            <select
+              value={filters.professionalId}
+              onChange={e =>
+                handleFilterChange('professionalId', e.target.value)
+              }
+              className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-purple-500"
+            >
               <option value="">Todos</option>
-              {professionals.map(prof => <option key={prof.id} value={prof.id}>
+              {professionals.map(prof => (
+                <option key={prof.id} value={prof.id}>
                   {prof.name}
-                </option>)}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -321,7 +368,12 @@ const CommissionReportPage = () => {
               <Calendar className="w-4 h-4 inline mr-1" />
               Data Início
             </label>
-            <input type="date" value={filters.startDate} onChange={e => handleFilterChange('startDate', e.target.value)} className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-purple-500" />
+            <input
+              type="date"
+              value={filters.startDate}
+              onChange={e => handleFilterChange('startDate', e.target.value)}
+              className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-purple-500"
+            />
           </div>
 
           {/* Data Fim */}
@@ -330,7 +382,12 @@ const CommissionReportPage = () => {
               <Calendar className="w-4 h-4 inline mr-1" />
               Data Fim
             </label>
-            <input type="date" value={filters.endDate} onChange={e => handleFilterChange('endDate', e.target.value)} className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-purple-500" />
+            <input
+              type="date"
+              value={filters.endDate}
+              onChange={e => handleFilterChange('endDate', e.target.value)}
+              className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-purple-500"
+            />
           </div>
 
           {/* Status */}
@@ -338,7 +395,11 @@ const CommissionReportPage = () => {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
               Status
             </label>
-            <select value={filters.status} onChange={e => handleFilterChange('status', e.target.value)} className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-purple-500">
+            <select
+              value={filters.status}
+              onChange={e => handleFilterChange('status', e.target.value)}
+              className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-purple-500"
+            >
               <option value="all">Todas</option>
               <option value="paid">Pagas</option>
               <option value="pending">Pendentes</option>
@@ -350,7 +411,13 @@ const CommissionReportPage = () => {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
               Nº Comanda
             </label>
-            <input type="text" value={filters.orderId} onChange={e => handleFilterChange('orderId', e.target.value)} placeholder="Ex: 001" className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-purple-500" />
+            <input
+              type="text"
+              value={filters.orderId}
+              onChange={e => handleFilterChange('orderId', e.target.value)}
+              placeholder="Ex: 001"
+              className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-purple-500"
+            />
           </div>
         </div>
 
@@ -363,7 +430,12 @@ const CommissionReportPage = () => {
             Limpar
           </Button>
           <label className="flex items-center gap-2 ml-auto">
-            <input type="checkbox" checked={groupByProfessional} onChange={e => setGroupByProfessional(e.target.checked)} className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500" />
+            <input
+              type="checkbox"
+              checked={groupByProfessional}
+              onChange={e => setGroupByProfessional(e.target.checked)}
+              className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+            />
             <span className="text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600">
               Agrupar por profissional
             </span>
@@ -373,16 +445,21 @@ const CommissionReportPage = () => {
 
       {/* Tabela de Comissões */}
       <div className="card-theme dark:bg-dark-surface rounded-xl shadow-md overflow-hidden">
-        {loading ? <div className="flex items-center justify-center py-12">
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
-          </div> : commissions.length === 0 ? <div className="text-center py-12">
+          </div>
+        ) : commissions.length === 0 ? (
+          <div className="text-center py-12">
             <FileText className="w-16 h-16 text-light-text-muted dark:text-dark-text-muted mx-auto mb-4" />
             <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
               Nenhuma comissão encontrada com os filtros aplicados
             </p>
-          </div> : groupByProfessional ? (/* Visualização Agrupada */
-      <div className="divide-y divide-gray-200 dark:divide-gray-700">
-            {groupedCommissions().map((group, index) => <div key={index} className="p-6">
+          </div>
+        ) : groupByProfessional /* Visualização Agrupada */ ? (
+          <div className="divide-y divide-gray-200 dark:divide-gray-700">
+            {groupedCommissions().map((group, index) => (
+              <div key={index} className="p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
                     {group.professional}
@@ -433,7 +510,11 @@ const CommissionReportPage = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                      {group.items.map(item => <tr key={item.id} className="hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700">
+                      {group.items.map(item => (
+                        <tr
+                          key={item.id}
+                          className="hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700"
+                        >
                           <td className="px-4 py-3 text-sm text-theme-primary dark:text-dark-text-primary">
                             {formatDate(item.date)}
                           </td>
@@ -456,17 +537,22 @@ const CommissionReportPage = () => {
                             {formatCurrency(item.commissionValue)}
                           </td>
                           <td className="px-4 py-3 text-center">
-                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${item.status === 'paid' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'}`}>
+                            <span
+                              className={`px-2 py-1 text-xs font-medium rounded-full ${item.status === 'paid' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'}`}
+                            >
                               {item.status === 'paid' ? 'Paga' : 'Pendente'}
                             </span>
                           </td>
-                        </tr>)}
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
-              </div>)}
-          </div>) : (/* Visualização Normal */
-      <div className="overflow-x-auto">
+              </div>
+            ))}
+          </div> /* Visualização Normal */
+        ) : (
+          <div className="overflow-x-auto">
             <table className="min-w-full">
               <thead className="bg-light-bg dark:bg-dark-bg dark:bg-gray-700">
                 <tr>
@@ -500,7 +586,11 @@ const CommissionReportPage = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {commissions.map(item => <tr key={item.id} className="hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700">
+                {commissions.map(item => (
+                  <tr
+                    key={item.id}
+                    className="hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700"
+                  >
                     <td className="px-6 py-4 text-sm text-theme-primary dark:text-dark-text-primary">
                       {formatDate(item.date)}
                     </td>
@@ -526,17 +616,22 @@ const CommissionReportPage = () => {
                       {formatCurrency(item.commissionValue)}
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <span className={`px-3 py-1 text-xs font-medium rounded-full ${item.status === 'paid' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'}`}>
+                      <span
+                        className={`px-3 py-1 text-xs font-medium rounded-full ${item.status === 'paid' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'}`}
+                      >
                         {item.status === 'paid' ? 'Paga' : 'Pendente'}
                       </span>
                     </td>
-                  </tr>)}
+                  </tr>
+                ))}
               </tbody>
             </table>
-          </div>)}
+          </div>
+        )}
 
         {/* Footer com Totais */}
-        {commissions.length > 0 && <div className="bg-light-bg dark:bg-dark-bg dark:bg-gray-700 px-6 py-4 border-t border-light-border dark:border-dark-border">
+        {commissions.length > 0 && (
+          <div className="bg-light-bg dark:bg-dark-bg dark:bg-gray-700 px-6 py-4 border-t border-light-border dark:border-dark-border">
             <div className="flex justify-between items-center">
               <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 Total de {totals.count} {totals.count === 1 ? 'item' : 'itens'}
@@ -556,8 +651,10 @@ const CommissionReportPage = () => {
                 </span>
               </div>
             </div>
-          </div>}
+          </div>
+        )}
       </div>
-    </div>;
+    </div>
+  );
 };
 export default CommissionReportPage;

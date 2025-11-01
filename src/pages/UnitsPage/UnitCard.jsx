@@ -9,20 +9,21 @@ import { Card, Button } from '../../atoms';
 import { useUnits } from '../../hooks';
 
 // Icons
-import { Building2, Edit, Trash2, Eye, CheckCircle, XCircle, BarChart3, Users, DollarSign } from 'lucide-react';
-const UnitCard = ({
-  unit,
-  onEdit,
-  onDelete,
-  canViewStats = false
-}) => {
+import {
+  Building2,
+  Edit,
+  Trash2,
+  Eye,
+  CheckCircle,
+  XCircle,
+  BarChart3,
+  Users,
+  DollarSign,
+} from 'lucide-react';
+const UnitCard = ({ unit, onEdit, onDelete, canViewStats = false }) => {
   const [stats, setStats] = useState(null);
   const [loadingStats, setLoadingStats] = useState(false);
-  const {
-    getUnitStats,
-    toggleUnitStatus,
-    updating
-  } = useUnits(false);
+  const { getUnitStats, toggleUnitStatus, updating } = useUnits(false);
 
   // Carregar estatísticas da unidade
   useEffect(() => {
@@ -52,23 +53,36 @@ const UnitCard = ({
   const formatCurrency = value => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
-      currency: 'BRL'
+      currency: 'BRL',
     }).format(value || 0);
   };
-  return <Card className={`p-6 transition-all duration-200 hover:shadow-lg ${!unit.status ? 'opacity-60 bg-gray-50 dark:bg-gray-800' : ''}`}>
+  return (
+    <Card
+      className={`p-6 transition-all duration-200 hover:shadow-lg ${!unit.status ? 'opacity-60 bg-gray-50 dark:bg-gray-800' : ''}`}
+    >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center">
-          <div className={`p-3 rounded-lg ${unit.status ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-gray-100 dark:bg-gray-700'}`}>
-            <Building2 className={`h-6 w-6 ${unit.status ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400'}`} />
+          <div
+            className={`p-3 rounded-lg ${unit.status ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-gray-100 dark:bg-gray-700'}`}
+          >
+            <Building2
+              className={`h-6 w-6 ${unit.status ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400'}`}
+            />
           </div>
           <div className="ml-3">
             <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
               {unit.name}
             </h3>
             <div className="flex items-center mt-1">
-              {unit.status ? <CheckCircle className="h-4 w-4 text-green-500 mr-1" /> : <XCircle className="h-4 w-4 text-red-500 mr-1" />}
-              <span className={`text-sm ${unit.status ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+              {unit.status ? (
+                <CheckCircle className="h-4 w-4 text-green-500 mr-1" />
+              ) : (
+                <XCircle className="h-4 w-4 text-red-500 mr-1" />
+              )}
+              <span
+                className={`text-sm ${unit.status ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+              >
                 {unit.status ? 'Ativa' : 'Inativa'}
               </span>
             </div>
@@ -76,17 +90,32 @@ const UnitCard = ({
         </div>
 
         {/* Status Toggle */}
-        <button onClick={handleToggleStatus} disabled={updating} className={`p-2 rounded-lg transition-colors ${unit.status ? 'text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20' : 'text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'} ${updating ? 'opacity-50 cursor-not-allowed' : ''}`} title={unit.status ? 'Desativar unidade' : 'Ativar unidade'}>
-          {unit.status ? <XCircle className="h-5 w-5" /> : <CheckCircle className="h-5 w-5" />}
+        <button
+          onClick={handleToggleStatus}
+          disabled={updating}
+          className={`p-2 rounded-lg transition-colors ${unit.status ? 'text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20' : 'text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'} ${updating ? 'opacity-50 cursor-not-allowed' : ''}`}
+          title={unit.status ? 'Desativar unidade' : 'Ativar unidade'}
+        >
+          {unit.status ? (
+            <XCircle className="h-5 w-5" />
+          ) : (
+            <CheckCircle className="h-5 w-5" />
+          )}
         </button>
       </div>
 
       {/* Estatísticas */}
-      {canViewStats && unit.status && <div className="mb-4">
-          {loadingStats ? <div className="flex items-center justify-center py-4">
+      {canViewStats && unit.status && (
+        <div className="mb-4">
+          {loadingStats ? (
+            <div className="flex items-center justify-center py-4">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-              <span className="ml-2 text-sm text-theme-secondary">Carregando...</span>
-            </div> : stats ? <div className="grid grid-cols-2 gap-3">
+              <span className="ml-2 text-sm text-theme-secondary">
+                Carregando...
+              </span>
+            </div>
+          ) : stats ? (
+            <div className="grid grid-cols-2 gap-3">
               <div className="bg-light-bg dark:bg-dark-bg dark:bg-gray-700 rounded-lg p-3">
                 <div className="flex items-center">
                   <Users className="h-4 w-4 text-blue-600 mr-2" />
@@ -124,10 +153,14 @@ const UnitCard = ({
                   </div>
                 </div>
               </div>
-            </div> : <div className="text-center py-4 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
+            </div>
+          ) : (
+            <div className="text-center py-4 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
               Estatísticas não disponíveis
-            </div>}
-        </div>}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Informações básicas */}
       <div className="space-y-2 mb-4">
@@ -135,35 +168,59 @@ const UnitCard = ({
           <span className="font-medium">Criada em:</span>{' '}
           {new Date(unit.created_at).toLocaleDateString('pt-BR')}
         </div>
-        {unit.updated_at && unit.updated_at !== unit.created_at && <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+        {unit.updated_at && unit.updated_at !== unit.created_at && (
+          <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
             <span className="font-medium">Atualizada em:</span>{' '}
             {new Date(unit.updated_at).toLocaleDateString('pt-BR')}
-          </div>}
+          </div>
+        )}
       </div>
 
       {/* Ações */}
       <div className="flex items-center justify-between pt-4 border-t border-light-border dark:border-dark-border">
         <div className="flex items-center space-x-2">
-          {canViewStats && <Button variant="secondary" size="sm" onClick={() => {
-          /* Implementar visualização detalhada */
-        }} className="text-xs">
+          {canViewStats && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                /* Implementar visualização detalhada */
+              }}
+              className="text-xs"
+            >
               <Eye className="h-4 w-4 mr-1" />
               Ver Detalhes
-            </Button>}
+            </Button>
+          )}
         </div>
 
         <div className="flex items-center space-x-2">
-          {onEdit && <Button variant="secondary" size="sm" onClick={() => onEdit(unit)} className="text-xs">
+          {onEdit && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => onEdit(unit)}
+              className="text-xs"
+            >
               <Edit className="h-4 w-4 mr-1" />
               Editar
-            </Button>}
+            </Button>
+          )}
 
-          {onDelete && <Button variant="danger" size="sm" onClick={() => onDelete(unit)} className="text-xs">
+          {onDelete && (
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={() => onDelete(unit)}
+              className="text-xs"
+            >
               <Trash2 className="h-4 w-4 mr-1" />
               Excluir
-            </Button>}
+            </Button>
+          )}
         </div>
       </div>
-    </Card>;
+    </Card>
+  );
 };
 export default UnitCard;

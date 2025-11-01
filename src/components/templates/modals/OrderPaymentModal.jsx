@@ -39,7 +39,7 @@ const OrderPaymentModal = ({
   paymentMethods = [],
   accounts = [],
   onConfirmPayment,
-  userId
+  userId,
 }) => {
   const [paymentMethodId, setPaymentMethodId] = useState('');
   const [accountId, setAccountId] = useState('');
@@ -65,7 +65,7 @@ const OrderPaymentModal = ({
         subtotal: 0,
         totalCommission: 0,
         total: 0,
-        itemsCount: 0
+        itemsCount: 0,
       };
     }
     const subtotal = order.items.reduce((sum, item) => {
@@ -78,7 +78,7 @@ const OrderPaymentModal = ({
       subtotal,
       totalCommission,
       total: subtotal,
-      itemsCount: order.items.length
+      itemsCount: order.items.length,
     };
   };
   const totals = calculateTotals();
@@ -105,7 +105,7 @@ const OrderPaymentModal = ({
       await onConfirmPayment(order.id, {
         paymentMethodId,
         accountId,
-        userId
+        userId,
       });
 
       // Modal será fechado pelo componente pai após sucesso
@@ -126,7 +126,7 @@ const OrderPaymentModal = ({
         status: ORDER_STATUS.OPEN,
         timestamp: order.created_at,
         user: order.user?.name || 'Sistema',
-        notes: 'Comanda criada'
+        notes: 'Comanda criada',
       });
     }
 
@@ -136,12 +136,13 @@ const OrderPaymentModal = ({
         status: ORDER_STATUS.IN_PROGRESS,
         timestamp: order.updated_at || order.created_at,
         user: order.professional?.name,
-        notes: `${order.items.length} item(ns) adicionado(s)`
+        notes: `${order.items.length} item(ns) adicionado(s)`,
       });
     }
     return history;
   };
-  return <Modal isOpen={isOpen} onClose={onClose} title="Finalizar Venda" size="lg">
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title="Finalizar Venda" size="lg">
       {/* Header: Info da comanda */}
       <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg mb-4">
         <div className="flex items-center justify-between mb-3">
@@ -168,13 +169,20 @@ const OrderPaymentModal = ({
       <div className="mb-6">
         <h3 className="font-semibold mb-3">Itens da Comanda</h3>
 
-        {totals.itemsCount === 0 ? <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        {totals.itemsCount === 0 ? (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <p className="text-yellow-800 text-sm">
               ⚠️ Esta comanda não possui itens. Adicione serviços antes de
               fechar.
             </p>
-          </div> : <div className="space-y-2 max-h-48 overflow-y-auto">
-            {order.items.map(item => <div key={item.id} className="flex items-center justify-between card-theme border border-gray-100 rounded-lg p-3">
+          </div>
+        ) : (
+          <div className="space-y-2 max-h-48 overflow-y-auto">
+            {order.items.map(item => (
+              <div
+                key={item.id}
+                className="flex items-center justify-between card-theme border border-gray-100 rounded-lg p-3"
+              >
                 <div className="flex-1">
                   <p className="font-medium text-sm">{item.service?.name}</p>
                   <p className="text-xs text-theme-secondary">
@@ -184,8 +192,10 @@ const OrderPaymentModal = ({
                 <span className="font-semibold text-green-600">
                   {formatCurrency(item.unit_price * item.quantity)}
                 </span>
-              </div>)}
-          </div>}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Totalizadores */}
@@ -219,40 +229,76 @@ const OrderPaymentModal = ({
         <h3 className="font-semibold mb-3">Dados do Pagamento</h3>
 
         <div className="grid grid-cols-1 gap-4">
-          <Select label="Forma de Pagamento *" value={paymentMethodId} onChange={e => setPaymentMethodId(e.target.value)} disabled={isSubmitting} required>
+          <Select
+            label="Forma de Pagamento *"
+            value={paymentMethodId}
+            onChange={e => setPaymentMethodId(e.target.value)}
+            disabled={isSubmitting}
+            required
+          >
             <option value="">Selecione...</option>
-            {paymentMethods.map(method => <option key={method.id} value={method.id}>
+            {paymentMethods.map(method => (
+              <option key={method.id} value={method.id}>
                 {method.nome}
-              </option>)}
+              </option>
+            ))}
           </Select>
 
-          <Select label="Conta de Destino *" value={accountId} onChange={e => setAccountId(e.target.value)} disabled={isSubmitting} required>
+          <Select
+            label="Conta de Destino *"
+            value={accountId}
+            onChange={e => setAccountId(e.target.value)}
+            disabled={isSubmitting}
+            required
+          >
             <option value="">Selecione...</option>
-            {accounts.map(account => <option key={account.id} value={account.id}>
+            {accounts.map(account => (
+              <option key={account.id} value={account.id}>
                 {account.nome} - {account.tipo_conta}
-              </option>)}
+              </option>
+            ))}
           </Select>
         </div>
       </div>
 
       {/* Timeline (expansível) */}
       <div className="mb-6">
-        <button onClick={() => setShowTimeline(!showTimeline)} className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700">
+        <button
+          onClick={() => setShowTimeline(!showTimeline)}
+          className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700"
+        >
           {showTimeline ? '▼' : '▶'} Histórico da Comanda
         </button>
 
-        {showTimeline && <div className="mt-4">
+        {showTimeline && (
+          <div className="mt-4">
             <OrderTimeline history={getOrderHistory()} compact />
-          </div>}
+          </div>
+        )}
       </div>
 
       {/* Actions */}
       <div className="flex gap-3">
-        <Button variant="secondary" onClick={onClose} disabled={isSubmitting} className="flex-1">
+        <Button
+          variant="secondary"
+          onClick={onClose}
+          disabled={isSubmitting}
+          className="flex-1"
+        >
           Cancelar
         </Button>
 
-        <Button variant="success" onClick={handleConfirmPayment} disabled={isSubmitting || !paymentMethodId || !accountId || totals.itemsCount === 0} className="flex-1">
+        <Button
+          variant="success"
+          onClick={handleConfirmPayment}
+          disabled={
+            isSubmitting ||
+            !paymentMethodId ||
+            !accountId ||
+            totals.itemsCount === 0
+          }
+          className="flex-1"
+        >
           {isSubmitting ? 'Processando...' : '✅ Finalizar Venda'}
         </Button>
       </div>
@@ -264,7 +310,8 @@ const OrderPaymentModal = ({
           erro, a transação será revertida automaticamente.
         </p>
       </div>
-    </Modal>;
+    </Modal>
+  );
 };
 OrderPaymentModal.propTypes = {
   /** Se o modal está aberto */
@@ -280,6 +327,6 @@ OrderPaymentModal.propTypes = {
   /** Callback ao confirmar pagamento */
   onConfirmPayment: PropTypes.func.isRequired,
   /** ID do usuário que está fechando */
-  userId: PropTypes.string
+  userId: PropTypes.string,
 };
 export default OrderPaymentModal;

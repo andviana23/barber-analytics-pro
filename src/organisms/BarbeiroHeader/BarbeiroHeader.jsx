@@ -1,24 +1,32 @@
 import React from 'react';
 import { Bell, MapPin, Sparkles } from 'lucide-react';
-const BarbeiroHeader = React.memo(({
-  barberName = 'Barbeiro',
-  unitName = 'Unidade não informada',
-  greeting = 'Portal do Barbeiro',
-  totalRevenue = 'R$\u00a00,00',
-  totalRevenueLabel = 'Financeiro sincroniza em tempo real',
-  points = 0,
-  pointsLabel = 'Pontua\u00e7\u00e3o atualizada pela Lista da Vez',
-  avatarInitials,
-  notificationsBadge = 0,
-  onNotificationsClick
-}) => {
-  const initials = React.useMemo(() => {
-    if (avatarInitials) {
-      return avatarInitials.toUpperCase().slice(0, 2);
-    }
-    return barberName.split(' ').filter(Boolean).slice(0, 2).map(part => part[0]?.toUpperCase() ?? '').join('').padEnd(2, 'B');
-  }, [avatarInitials, barberName]);
-  return <header className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary-dark to-primary-dark/90 text-dark-text-primary shadow-xl">
+const BarbeiroHeader = React.memo(
+  ({
+    barberName = 'Barbeiro',
+    unitName = 'Unidade não informada',
+    greeting = 'Portal do Barbeiro',
+    totalRevenue = 'R$\u00a00,00',
+    totalRevenueLabel = 'Financeiro sincroniza em tempo real',
+    points = 0,
+    pointsLabel = 'Pontua\u00e7\u00e3o atualizada pela Lista da Vez',
+    avatarInitials,
+    notificationsBadge = 0,
+    onNotificationsClick,
+  }) => {
+    const initials = React.useMemo(() => {
+      if (avatarInitials) {
+        return avatarInitials.toUpperCase().slice(0, 2);
+      }
+      return barberName
+        .split(' ')
+        .filter(Boolean)
+        .slice(0, 2)
+        .map(part => part[0]?.toUpperCase() ?? '')
+        .join('')
+        .padEnd(2, 'B');
+    }, [avatarInitials, barberName]);
+    return (
+      <header className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary-dark to-primary-dark/90 text-dark-text-primary shadow-xl">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute -top-20 right-0 h-56 w-56 rounded-full card-theme/10 blur-3xl" />
           <div className="absolute -bottom-12 left-16 h-32 w-32 rounded-full card-theme/10 blur-2xl" />
@@ -44,11 +52,18 @@ const BarbeiroHeader = React.memo(({
               </div>
             </div>
 
-            <button type="button" onClick={onNotificationsClick} className="relative inline-flex h-12 w-12 items-center justify-center rounded-2xl card-theme/10 text-dark-text-primary transition hover:card-theme/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80" aria-label="Abrir notificações">
+            <button
+              type="button"
+              onClick={onNotificationsClick}
+              className="relative inline-flex h-12 w-12 items-center justify-center rounded-2xl card-theme/10 text-dark-text-primary transition hover:card-theme/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+              aria-label="Abrir notificações"
+            >
               <Bell size={20} />
-              {notificationsBadge > 0 ? <span className="absolute -top-1 -right-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-danger px-1 text-xs font-semibold text-dark-text-primary">
+              {notificationsBadge > 0 ? (
+                <span className="absolute -top-1 -right-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-danger px-1 text-xs font-semibold text-dark-text-primary">
                   {notificationsBadge}
-                </span> : null}
+                </span>
+              ) : null}
             </button>
           </div>
 
@@ -79,7 +94,9 @@ const BarbeiroHeader = React.memo(({
             </div>
           </div>
         </div>
-      </header>;
-});
+      </header>
+    );
+  }
+);
 BarbeiroHeader.displayName = 'BarbeiroHeader';
 export default BarbeiroHeader;

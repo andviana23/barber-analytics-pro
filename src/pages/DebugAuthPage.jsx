@@ -17,7 +17,7 @@ export function DebugAuthPage() {
     adminStatus,
     gerenteStatus,
     receptionistStatus,
-    isAuthenticated
+    isAuthenticated,
   } = useAuth();
 
   // ✅ Usar o hook corrigido
@@ -31,7 +31,7 @@ export function DebugAuthPage() {
     userRole,
     adminStatus,
     gerenteStatus,
-    receptionistStatus
+    receptionistStatus,
   };
   const permissions = {
     canManageCashRegister: userPermissions.canManageCashRegister,
@@ -42,9 +42,10 @@ export function DebugAuthPage() {
     canCloseOrder: userPermissions.canCloseOrder,
     canCancelOrder: userPermissions.canCancelOrder,
     canManageServices: userPermissions.canManageServices,
-    canCreateService: userPermissions.canCreateService
+    canCreateService: userPermissions.canCreateService,
   };
-  return <Layout activeMenuItem="settings">
+  return (
+    <Layout activeMenuItem="settings">
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
@@ -72,15 +73,26 @@ export function DebugAuthPage() {
               </h2>
             </div>
             <div className="space-y-3">
-              {Object.entries(debugInfo).map(([key, value]) => <div key={key} className="flex items-center justify-between py-2 border-b border-light-border dark:border-dark-border last:border-0">
+              {Object.entries(debugInfo).map(([key, value]) => (
+                <div
+                  key={key}
+                  className="flex items-center justify-between py-2 border-b border-light-border dark:border-dark-border last:border-0"
+                >
                   <span className="text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary">
                     {key}:
                   </span>
                   <span className="text-sm font-mono text-text-light-primary dark:text-text-dark-primary flex items-center gap-2">
-                    {typeof value === 'boolean' ? value ? <CheckCircle className="h-4 w-4 text-green-500" /> : <XCircle className="h-4 w-4 text-red-500" /> : null}
+                    {typeof value === 'boolean' ? (
+                      value ? (
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <XCircle className="h-4 w-4 text-red-500" />
+                      )
+                    ) : null}
                     {String(value)}
                   </span>
-                </div>)}
+                </div>
+              ))}
             </div>
           </div>
 
@@ -93,17 +105,26 @@ export function DebugAuthPage() {
               </h2>
             </div>
             <div className="space-y-3">
-              {Object.entries(permissions).map(([key, value]) => <div key={key} className="flex items-center justify-between py-2 border-b border-light-border dark:border-dark-border last:border-0">
+              {Object.entries(permissions).map(([key, value]) => (
+                <div
+                  key={key}
+                  className="flex items-center justify-between py-2 border-b border-light-border dark:border-dark-border last:border-0"
+                >
                   <span className="text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary">
                     {key}:
                   </span>
                   <span className="flex items-center gap-2">
-                    {value ? <CheckCircle className="h-4 w-4 text-green-500" /> : <XCircle className="h-4 w-4 text-red-500" />}
+                    {value ? (
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <XCircle className="h-4 w-4 text-red-500" />
+                    )}
                     <span className="text-sm font-mono text-text-light-primary dark:text-text-dark-primary">
                       {String(value)}
                     </span>
                   </span>
-                </div>)}
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -144,16 +165,25 @@ export function DebugAuthPage() {
             </p>
             <div className="mt-4 p-4 bg-amber-100 dark:bg-amber-900/40 rounded-lg">
               <p className="font-semibold mb-2">Resultado Esperado:</p>
-              {debugInfo.adminStatus ? <p className="text-green-700 dark:text-green-400 flex items-center gap-2">
+              {debugInfo.adminStatus ? (
+                <p className="text-green-700 dark:text-green-400 flex items-center gap-2">
                   <CheckCircle className="h-4 w-4" />
                   ACESSO PERMITIDO (adminStatus = true)
-                </p> : debugInfo.userRole && ['admin', 'gerente', 'recepcionista'].includes(debugInfo.userRole) ? <p className="text-green-700 dark:text-green-400 flex items-center gap-2">
+                </p>
+              ) : debugInfo.userRole &&
+                ['admin', 'gerente', 'recepcionista'].includes(
+                  debugInfo.userRole
+                ) ? (
+                <p className="text-green-700 dark:text-green-400 flex items-center gap-2">
                   <CheckCircle className="h-4 w-4" />
                   ACESSO PERMITIDO (role incluído na lista)
-                </p> : <p className="text-red-700 dark:text-red-400 flex items-center gap-2">
+                </p>
+              ) : (
+                <p className="text-red-700 dark:text-red-400 flex items-center gap-2">
                   <XCircle className="h-4 w-4" />
                   ACESSO NEGADO
-                </p>}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -184,6 +214,7 @@ export function DebugAuthPage() {
           </ol>
         </div>
       </div>
-    </Layout>;
+    </Layout>
+  );
 }
 export default DebugAuthPage;

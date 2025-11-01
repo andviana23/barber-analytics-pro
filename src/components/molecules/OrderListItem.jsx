@@ -8,7 +8,13 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { User, Scissors, DollarSign, Calendar, MoreVertical } from 'lucide-react';
+import {
+  User,
+  Scissors,
+  DollarSign,
+  Calendar,
+  MoreVertical,
+} from 'lucide-react';
 import { StatusBadge } from '../../atoms/StatusBadge';
 import { formatCurrency, formatDateTime } from '../../utils/formatters';
 
@@ -23,11 +29,12 @@ const OrderListItem = ({
   onCancel,
   canClose = false,
   canCancel = false,
-  className = ''
+  className = '',
 }) => {
   const isOpen = order.status === 'open';
   const isClosed = order.status === 'closed';
-  const isCanceled = order.status === 'canceled' || order.status === 'cancelled';
+  const isCanceled =
+    order.status === 'canceled' || order.status === 'cancelled';
   const handleClick = () => {
     if (onClick) {
       onClick(order);
@@ -37,7 +44,9 @@ const OrderListItem = ({
     e.stopPropagation();
     action();
   };
-  return <div className={`
+  return (
+    <div
+      className={`
         group
         card-theme
         p-4
@@ -45,12 +54,17 @@ const OrderListItem = ({
         duration-200
         ${onClick ? 'cursor-pointer hover:shadow-lg hover:scale-[1.01]' : ''}
         ${className}
-      `} onClick={handleClick} role={onClick ? 'button' : 'article'} tabIndex={onClick ? 0 : undefined} onKeyDown={e => {
-    if (onClick && (e.key === 'Enter' || e.key === ' ')) {
-      e.preventDefault();
-      handleClick();
-    }
-  }}>
+      `}
+      onClick={handleClick}
+      role={onClick ? 'button' : 'article'}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={e => {
+        if (onClick && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
+    >
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
@@ -66,11 +80,17 @@ const OrderListItem = ({
         </div>
 
         {/* Menu de ações */}
-        {(canClose || canCancel) && isOpen && <div className="relative">
-            <button className="p-2 rounded-lg hover:card-theme dark:hover:bg-dark-surface transition-colors" onClick={e => e.stopPropagation()} aria-label="Ações">
+        {(canClose || canCancel) && isOpen && (
+          <div className="relative">
+            <button
+              className="p-2 rounded-lg hover:card-theme dark:hover:bg-dark-surface transition-colors"
+              onClick={e => e.stopPropagation()}
+              aria-label="Ações"
+            >
               <MoreVertical size={18} className="text-theme-muted" />
             </button>
-          </div>}
+          </div>
+        )}
       </div>
 
       {/* Informações */}
@@ -91,7 +111,10 @@ const OrderListItem = ({
         {/* Profissional */}
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0">
-            <Scissors size={16} className="text-purple-600 dark:text-purple-400" />
+            <Scissors
+              size={16}
+              className="text-purple-600 dark:text-purple-400"
+            />
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-xs text-theme-muted">Profissional</p>
@@ -105,7 +128,10 @@ const OrderListItem = ({
       {/* Total e Itens */}
       <div className="flex items-center justify-between pt-3 border-t border-theme-border">
         <div className="flex items-center gap-2">
-          <DollarSign size={18} className="text-green-600 dark:text-green-400" />
+          <DollarSign
+            size={18}
+            className="text-green-600 dark:text-green-400"
+          />
           <div>
             <p className="text-xs text-theme-muted">Total</p>
             <p className="text-lg font-bold text-green-600 dark:text-green-400">
@@ -124,50 +150,68 @@ const OrderListItem = ({
       </div>
 
       {/* Data de Fechamento */}
-      {isClosed && order.closed_at && <div className="mt-3 pt-3 border-t border-theme-border">
+      {isClosed && order.closed_at && (
+        <div className="mt-3 pt-3 border-t border-theme-border">
           <div className="flex items-center gap-2 text-xs text-theme-muted">
             <Calendar size={14} />
             <span>Fechado em {formatDateTime(new Date(order.closed_at))}</span>
           </div>
-        </div>}
+        </div>
+      )}
 
       {/* Motivo de Cancelamento */}
-      {isCanceled && order.cancel_reason && <div className="mt-3 pt-3 border-t border-theme-border">
+      {isCanceled && order.cancel_reason && (
+        <div className="mt-3 pt-3 border-t border-theme-border">
           <p className="text-xs font-medium text-red-600 dark:text-red-400 mb-1">
             Motivo do cancelamento:
           </p>
           <p className="text-sm text-theme-muted italic">
             {order.cancel_reason}
           </p>
-        </div>}
+        </div>
+      )}
 
       {/* Ações */}
-      {isOpen && (canClose || canCancel) && <div className="mt-4 flex gap-2">
-          {canClose && onClose && <button onClick={e => handleActionClick(e, () => onClose(order))} className="btn-theme-primary flex-1 text-sm py-2">
+      {isOpen && (canClose || canCancel) && (
+        <div className="mt-4 flex gap-2">
+          {canClose && onClose && (
+            <button
+              onClick={e => handleActionClick(e, () => onClose(order))}
+              className="btn-theme-primary flex-1 text-sm py-2"
+            >
               Fechar Comanda
-            </button>}
-          {canCancel && onCancel && <button onClick={e => handleActionClick(e, () => onCancel(order))} className="btn-theme-danger text-sm py-2 px-4">
+            </button>
+          )}
+          {canCancel && onCancel && (
+            <button
+              onClick={e => handleActionClick(e, () => onCancel(order))}
+              className="btn-theme-danger text-sm py-2 px-4"
+            >
               Cancelar
-            </button>}
-        </div>}
-    </div>;
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
 };
 OrderListItem.propTypes = {
   /** Dados da comanda */
   order: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    status: PropTypes.oneOf(['open', 'closed', 'canceled', 'cancelled']).isRequired,
+    status: PropTypes.oneOf(['open', 'closed', 'canceled', 'cancelled'])
+      .isRequired,
     total_amount: PropTypes.number,
     created_at: PropTypes.string.isRequired,
     closed_at: PropTypes.string,
     cancel_reason: PropTypes.string,
     client: PropTypes.shape({
-      name: PropTypes.string
+      name: PropTypes.string,
     }),
     professional: PropTypes.shape({
-      name: PropTypes.string
+      name: PropTypes.string,
     }),
-    items: PropTypes.array
+    items: PropTypes.array,
   }).isRequired,
   /** Callback ao clicar no item */
   onClick: PropTypes.func,
@@ -180,6 +224,6 @@ OrderListItem.propTypes = {
   /** Se usuário pode cancelar */
   canCancel: PropTypes.bool,
   /** Classes CSS adicionais */
-  className: PropTypes.string
+  className: PropTypes.string,
 };
 export default OrderListItem;

@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { DollarSign, TrendingUp, Calendar, Download, Filter } from 'lucide-react';
+import {
+  DollarSign,
+  TrendingUp,
+  Calendar,
+  Download,
+  Filter,
+} from 'lucide-react';
 import { Button } from '../../atoms/Button/Button';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 
@@ -27,14 +33,14 @@ const CommissionSummaryCard = ({
   professionals = [],
   onFetchCommissions,
   onExport,
-  onViewDetails
+  onViewDetails,
 }) => {
   // Estado dos filtros
   const [filters, setFilters] = useState({
     professionalId: '',
     startDate: '',
     endDate: '',
-    status: 'all' // all, paid, pending
+    status: 'all', // all, paid, pending
   });
 
   // Estado dos dados
@@ -43,7 +49,7 @@ const CommissionSummaryCard = ({
     paidCommissions: 0,
     pendingCommissions: 0,
     itemsCount: 0,
-    loading: false
+    loading: false,
   });
 
   // Carregar dados ao mudar filtros
@@ -58,7 +64,7 @@ const CommissionSummaryCard = ({
     if (!onFetchCommissions) return;
     setCommissionData(prev => ({
       ...prev,
-      loading: true
+      loading: true,
     }));
     try {
       const result = await onFetchCommissions(filters);
@@ -66,7 +72,7 @@ const CommissionSummaryCard = ({
         console.error('Erro ao buscar comissões:', result.error);
         setCommissionData(prev => ({
           ...prev,
-          loading: false
+          loading: false,
         }));
         return;
       }
@@ -75,26 +81,23 @@ const CommissionSummaryCard = ({
         paidCommissions: result.data?.paidCommissions || 0,
         pendingCommissions: result.data?.pendingCommissions || 0,
         itemsCount: result.data?.itemsCount || 0,
-        loading: false
+        loading: false,
       });
     } catch (error) {
       console.error('Erro inesperado:', error);
       setCommissionData(prev => ({
         ...prev,
-        loading: false
+        loading: false,
       }));
     }
   };
 
   // Handler de mudança nos filtros
   const handleFilterChange = e => {
-    const {
-      name,
-      value
-    } = e.target;
+    const { name, value } = e.target;
     setFilters(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -111,7 +114,8 @@ const CommissionSummaryCard = ({
       onViewDetails(filters);
     }
   };
-  return <div className="card-theme">
+  return (
+    <div className="card-theme">
       {/* Header */}
       <div className="flex items-center justify-between mb-6 pb-4 border-b border-theme-border">
         <div className="flex items-center gap-2">
@@ -121,7 +125,12 @@ const CommissionSummaryCard = ({
           </h3>
         </div>
 
-        <Button variant="secondary" size="sm" onClick={handleExport} disabled={commissionData.loading || !commissionData.itemsCount}>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={handleExport}
+          disabled={commissionData.loading || !commissionData.itemsCount}
+        >
           <Download className="w-4 h-4 mr-2" />
           Exportar
         </Button>
@@ -134,11 +143,18 @@ const CommissionSummaryCard = ({
           <label className="block text-sm font-medium text-theme-primary mb-2">
             Profissional
           </label>
-          <select name="professionalId" value={filters.professionalId} onChange={handleFilterChange} className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-purple-500">
+          <select
+            name="professionalId"
+            value={filters.professionalId}
+            onChange={handleFilterChange}
+            className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
             <option value="">Todos os profissionais</option>
-            {professionals.map(prof => <option key={prof.id} value={prof.id}>
+            {professionals.map(prof => (
+              <option key={prof.id} value={prof.id}>
                 {prof.name}
-              </option>)}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -148,7 +164,13 @@ const CommissionSummaryCard = ({
             <Calendar className="w-4 h-4 inline mr-1" />
             Data Inicial
           </label>
-          <input type="date" name="startDate" value={filters.startDate} onChange={handleFilterChange} className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-purple-500" />
+          <input
+            type="date"
+            name="startDate"
+            value={filters.startDate}
+            onChange={handleFilterChange}
+            className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-purple-500"
+          />
         </div>
 
         {/* Data Final */}
@@ -157,7 +179,13 @@ const CommissionSummaryCard = ({
             <Calendar className="w-4 h-4 inline mr-1" />
             Data Final
           </label>
-          <input type="date" name="endDate" value={filters.endDate} onChange={handleFilterChange} className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-purple-500" />
+          <input
+            type="date"
+            name="endDate"
+            value={filters.endDate}
+            onChange={handleFilterChange}
+            className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-purple-500"
+          />
         </div>
 
         {/* Status */}
@@ -166,7 +194,12 @@ const CommissionSummaryCard = ({
             <Filter className="w-4 h-4 inline mr-1" />
             Status
           </label>
-          <select name="status" value={filters.status} onChange={handleFilterChange} className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-purple-500">
+          <select
+            name="status"
+            value={filters.status}
+            onChange={handleFilterChange}
+            className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
             <option value="all">Todas</option>
             <option value="pending">Pendentes</option>
             <option value="paid">Pagas</option>
@@ -175,10 +208,13 @@ const CommissionSummaryCard = ({
       </div>
 
       {/* Estatísticas */}
-      {commissionData.loading ? <div className="text-center py-12">
+      {commissionData.loading ? (
+        <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
           <p className="text-theme-muted">Carregando comissões...</p>
-        </div> : commissionData.itemsCount > 0 ? <div className="space-y-4">
+        </div>
+      ) : commissionData.itemsCount > 0 ? (
+        <div className="space-y-4">
           {/* Cards de Totais */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Total */}
@@ -210,7 +246,9 @@ const CommissionSummaryCard = ({
                 {formatCurrency(commissionData.paidCommissions)}
               </p>
               <p className="text-xs text-green-600 dark:text-green-400 mt-1">
-                {commissionData.totalCommissions > 0 ? `${(commissionData.paidCommissions / commissionData.totalCommissions * 100).toFixed(1)}% do total` : '0% do total'}
+                {commissionData.totalCommissions > 0
+                  ? `${((commissionData.paidCommissions / commissionData.totalCommissions) * 100).toFixed(1)}% do total`
+                  : '0% do total'}
               </p>
             </div>
 
@@ -226,18 +264,26 @@ const CommissionSummaryCard = ({
                 {formatCurrency(commissionData.pendingCommissions)}
               </p>
               <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
-                {commissionData.totalCommissions > 0 ? `${(commissionData.pendingCommissions / commissionData.totalCommissions * 100).toFixed(1)}% do total` : '0% do total'}
+                {commissionData.totalCommissions > 0
+                  ? `${((commissionData.pendingCommissions / commissionData.totalCommissions) * 100).toFixed(1)}% do total`
+                  : '0% do total'}
               </p>
             </div>
           </div>
 
           {/* Botão Ver Detalhes */}
           <div className="pt-4 border-t border-theme-border">
-            <Button variant="primary" onClick={handleViewDetails} className="w-full">
+            <Button
+              variant="primary"
+              onClick={handleViewDetails}
+              className="w-full"
+            >
               Ver Relatório Detalhado
             </Button>
           </div>
-        </div> : <div className="text-center py-12">
+        </div>
+      ) : (
+        <div className="text-center py-12">
           <Filter className="w-16 h-16 mx-auto mb-4 text-theme-muted" />
           <h4 className="text-lg font-semibold text-theme-primary mb-2">
             Nenhuma comissão encontrada
@@ -245,7 +291,9 @@ const CommissionSummaryCard = ({
           <p className="text-theme-muted">
             Selecione um profissional e período para visualizar as comissões
           </p>
-        </div>}
-    </div>;
+        </div>
+      )}
+    </div>
+  );
 };
 export default CommissionSummaryCard;

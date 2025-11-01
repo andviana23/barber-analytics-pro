@@ -8,7 +8,14 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Clock, DollarSign, Percent, Edit2, ToggleLeft, ToggleRight } from 'lucide-react';
+import {
+  Clock,
+  DollarSign,
+  Percent,
+  Edit2,
+  ToggleLeft,
+  ToggleRight,
+} from 'lucide-react';
 import { Card, CardContent } from '../../atoms/Card/Card';
 import { Button } from '../../atoms/Button/Button';
 import { formatCurrency } from '../../utils/formatters';
@@ -22,16 +29,19 @@ const ServiceCard = ({
   onEdit,
   onToggleActive,
   canManage = false,
-  className = ''
+  className = '',
 }) => {
   const isActive = service.active !== false;
-  return <Card className={`
+  return (
+    <Card
+      className={`
         p-5
         transition-all
         duration-200
         ${!isActive ? 'opacity-60' : ''}
         ${className}
-      `}>
+      `}
+    >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1 min-w-0">
@@ -39,7 +49,8 @@ const ServiceCard = ({
             {service.name}
           </h4>
           <div className="flex items-center gap-2">
-            <span className={`
+            <span
+              className={`
                 inline-flex
                 items-center
                 gap-1
@@ -49,21 +60,34 @@ const ServiceCard = ({
                 font-medium
                 rounded-full
                 ${isActive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-300'}
-              `}>
-              {isActive ? <>
+              `}
+            >
+              {isActive ? (
+                <>
                   <ToggleRight size={12} />
                   <span>Ativo</span>
-                </> : <>
+                </>
+              ) : (
+                <>
                   <ToggleLeft size={12} />
                   <span>Inativo</span>
-                </>}
+                </>
+              )}
             </span>
           </div>
         </div>
 
-        {canManage && onEdit && <Button variant="ghost" size="sm" onClick={() => onEdit(service)} className="flex-shrink-0 ml-2" aria-label="Editar serviço">
+        {canManage && onEdit && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onEdit(service)}
+            className="flex-shrink-0 ml-2"
+            aria-label="Editar serviço"
+          >
             <Edit2 size={16} />
-          </Button>}
+          </Button>
+        )}
       </div>
 
       {/* Informações */}
@@ -84,7 +108,10 @@ const ServiceCard = ({
         {/* Preço */}
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
-            <DollarSign size={20} className="text-green-600 dark:text-green-400" />
+            <DollarSign
+              size={20}
+              className="text-green-600 dark:text-green-400"
+            />
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-xs text-theme-muted">Preço</p>
@@ -97,7 +124,10 @@ const ServiceCard = ({
         {/* Comissão */}
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0">
-            <Percent size={20} className="text-purple-600 dark:text-purple-400" />
+            <Percent
+              size={20}
+              className="text-purple-600 dark:text-purple-400"
+            />
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-xs text-theme-muted">Comissão</p>
@@ -115,28 +145,41 @@ const ServiceCard = ({
             Comissão por serviço:
           </span>
           <span className="text-sm font-bold text-purple-600 dark:text-purple-400">
-            {formatCurrency((service.price || 0) * ((service.commission_percentage || 0) / 100))}
+            {formatCurrency(
+              (service.price || 0) *
+                ((service.commission_percentage || 0) / 100)
+            )}
           </span>
         </div>
       </div>
 
       {/* Ações */}
-      {canManage && onToggleActive && <div className="flex gap-2">
-          <Button onClick={() => onToggleActive(service)} variant={isActive ? 'secondary' : 'primary'} size="sm" className="w-full">
+      {canManage && onToggleActive && (
+        <div className="flex gap-2">
+          <Button
+            onClick={() => onToggleActive(service)}
+            variant={isActive ? 'secondary' : 'primary'}
+            size="sm"
+            className="w-full"
+          >
             {isActive ? 'Desativar' : 'Ativar'}
           </Button>
-        </div>}
+        </div>
+      )}
 
       {/* Estatísticas (se disponível) */}
-      {service.usage_count !== undefined && <div className="mt-4 pt-4 border-t border-theme-border">
+      {service.usage_count !== undefined && (
+        <div className="mt-4 pt-4 border-t border-theme-border">
           <div className="flex items-center justify-between text-xs">
             <span className="text-theme-muted">Usado em comandas:</span>
             <span className="font-semibold text-theme-primary">
               {service.usage_count || 0}x
             </span>
           </div>
-        </div>}
-    </Card>;
+        </div>
+      )}
+    </Card>
+  );
 };
 ServiceCard.propTypes = {
   /** Dados do serviço */
@@ -147,7 +190,7 @@ ServiceCard.propTypes = {
     price: PropTypes.number,
     commission_percentage: PropTypes.number,
     active: PropTypes.bool,
-    usage_count: PropTypes.number
+    usage_count: PropTypes.number,
   }).isRequired,
   /** Callback para editar serviço */
   onEdit: PropTypes.func,
@@ -156,6 +199,6 @@ ServiceCard.propTypes = {
   /** Se usuário pode gerenciar serviços */
   canManage: PropTypes.bool,
   /** Classes CSS adicionais */
-  className: PropTypes.string
+  className: PropTypes.string,
 };
 export default ServiceCard;

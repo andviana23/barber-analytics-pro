@@ -10,17 +10,8 @@ import { useUnits } from '../../hooks';
 
 // Icons
 import { X, AlertTriangle, Trash2, Shield } from 'lucide-react';
-const DeleteUnitModal = ({
-  isOpen,
-  onClose,
-  onSuccess,
-  unit
-}) => {
-  const {
-    deleteUnit,
-    deleting,
-    checkDependencies
-  } = useUnits(false);
+const DeleteUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
+  const { deleteUnit, deleting, checkDependencies } = useUnits(false);
   const [dependencies, setDependencies] = useState(null);
   const [loadingDependencies, setLoadingDependencies] = useState(false);
   const [confirmText, setConfirmText] = useState('');
@@ -44,7 +35,7 @@ const DeleteUnitModal = ({
       setDependencies({
         hasDependencies: false,
         dependencies: [],
-        unitName: unit.name
+        unitName: unit.name,
       });
     } finally {
       setLoadingDependencies(false);
@@ -79,10 +70,14 @@ const DeleteUnitModal = ({
     onClose();
   };
   if (!isOpen || !unit) return null;
-  return <div className="fixed inset-0 z-50 overflow-y-auto">
+  return (
+    <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-screen items-center justify-center p-4 text-center">
         {/* Overlay */}
-        <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={handleClose} />
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+          onClick={handleClose}
+        />
 
         {/* Modal */}
         <div className="relative transform overflow-hidden rounded-lg card-theme dark:bg-dark-surface px-6 pb-6 pt-5 text-left shadow-xl transition-all w-full max-w-lg">
@@ -101,7 +96,11 @@ const DeleteUnitModal = ({
                 </p>
               </div>
             </div>
-            <button onClick={handleClose} disabled={deleting} className="p-2 text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary dark:hover:text-gray-200 rounded-lg hover:card-theme dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            <button
+              onClick={handleClose}
+              disabled={deleting}
+              className="p-2 text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary dark:hover:text-gray-200 rounded-lg hover:card-theme dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               <X className="h-5 w-5" />
             </button>
           </div>
@@ -124,13 +123,17 @@ const DeleteUnitModal = ({
             </div>
 
             {/* Verificação de dependências */}
-            {loadingDependencies ? <div className="flex items-center justify-center py-4">
+            {loadingDependencies ? (
+              <div className="flex items-center justify-center py-4">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
                 <span className="ml-2 text-sm text-theme-secondary">
                   Verificando dependências...
                 </span>
-              </div> : dependencies ? <div>
-                {dependencies.hasDependencies ? <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+              </div>
+            ) : dependencies ? (
+              <div>
+                {dependencies.hasDependencies ? (
+                  <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
                     <div className="flex">
                       <Shield className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5 mr-3" />
                       <div className="text-sm">
@@ -138,7 +141,9 @@ const DeleteUnitModal = ({
                           Esta unidade possui dados vinculados:
                         </p>
                         <ul className="text-amber-700 dark:text-amber-400 space-y-1">
-                          {dependencies.dependencies.map((dep, index) => <li key={index}>• {dep}</li>)}
+                          {dependencies.dependencies.map((dep, index) => (
+                            <li key={index}>• {dep}</li>
+                          ))}
                         </ul>
                         <p className="text-amber-800 dark:text-amber-300 font-medium mt-3">
                           A unidade será marcada como inativa, preservando o
@@ -146,7 +151,9 @@ const DeleteUnitModal = ({
                         </p>
                       </div>
                     </div>
-                  </div> : <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                  </div>
+                ) : (
+                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
                     <div className="flex">
                       <AlertTriangle className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5 mr-3" />
                       <div className="text-sm">
@@ -156,8 +163,10 @@ const DeleteUnitModal = ({
                         </p>
                       </div>
                     </div>
-                  </div>}
-              </div> : null}
+                  </div>
+                )}
+              </div>
+            ) : null}
 
             {/* Informações da unidade */}
             <div className="bg-light-bg dark:bg-dark-bg dark:bg-gray-700 rounded-lg p-4 space-y-2">
@@ -170,7 +179,9 @@ const DeleteUnitModal = ({
                 </div>
                 <div>
                   <span className="font-medium">Status:</span>{' '}
-                  <span className={unit.status ? 'text-green-600' : 'text-red-600'}>
+                  <span
+                    className={unit.status ? 'text-green-600' : 'text-red-600'}
+                  >
                     {unit.status ? 'Ativa' : 'Inativa'}
                   </span>
                 </div>
@@ -187,10 +198,19 @@ const DeleteUnitModal = ({
                 Para confirmar, digite o nome da unidade:{' '}
                 <span className="font-bold">{unit.name}</span>
               </label>
-              <input type="text" value={confirmText} onChange={handleConfirmChange} disabled={deleting} placeholder={`Digite "${unit.name}" para confirmar`} className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary placeholder-gray-500 dark:placeholder-gray-400 disabled:opacity-50 disabled:cursor-not-allowed" />
-              {confirmText && !canDelete && <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+              <input
+                type="text"
+                value={confirmText}
+                onChange={handleConfirmChange}
+                disabled={deleting}
+                placeholder={`Digite "${unit.name}" para confirmar`}
+                className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary placeholder-gray-500 dark:placeholder-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+              {confirmText && !canDelete && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
                   O nome não confere. Digite exatamente: {unit.name}
-                </p>}
+                </p>
+              )}
             </div>
 
             {/* Consequências */}
@@ -209,17 +229,30 @@ const DeleteUnitModal = ({
 
           {/* Actions */}
           <div className="flex items-center justify-end space-x-3 pt-6 border-t border-light-border dark:border-dark-border mt-6">
-            <Button type="button" variant="secondary" onClick={handleClose} disabled={deleting}>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleClose}
+              disabled={deleting}
+            >
               Cancelar
             </Button>
 
-            <Button type="button" variant="danger" onClick={handleDelete} disabled={deleting || !canDelete} loading={deleting} loadingText="Excluindo...">
+            <Button
+              type="button"
+              variant="danger"
+              onClick={handleDelete}
+              disabled={deleting || !canDelete}
+              loading={deleting}
+              loadingText="Excluindo..."
+            >
               <Trash2 className="h-4 w-4 mr-2" />
               Excluir Unidade
             </Button>
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 export default DeleteUnitModal;

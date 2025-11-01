@@ -27,9 +27,7 @@ import toast from 'react-hot-toast';
  */
 const ServicesPage = () => {
   // Hooks
-  const {
-    selectedUnit
-  } = useUnit();
+  const { selectedUnit } = useUnit();
   const {
     services,
     loading,
@@ -37,12 +35,9 @@ const ServicesPage = () => {
     updateService,
     deleteService,
     reactivateService,
-    fetchServices
+    fetchServices,
   } = useServices(selectedUnit?.id);
-  const {
-    canManageServices,
-    canCreateService
-  } = useUserPermissions();
+  const { canManageServices, canCreateService } = useUserPermissions();
 
   // Estado dos modais
   const [isServiceModalVisible, setIsServiceModalVisible] = useState(false);
@@ -54,14 +49,14 @@ const ServicesPage = () => {
       selectedUnit: selectedUnit?.id,
       servicesCount: services?.length,
       services,
-      loading
+      loading,
     });
   }, [services, selectedUnit, loading]);
 
   // Estado dos filtros e visualização
   const [filters, setFilters] = useState({
     search: '',
-    status: 'all' // all, active, inactive
+    status: 'all', // all, active, inactive
   });
 
   // Carrega serviços ao montar
@@ -94,7 +89,7 @@ const ServicesPage = () => {
   const stats = {
     total: services.length,
     active: services.filter(s => s.active).length,
-    inactive: services.filter(s => !s.active).length
+    inactive: services.filter(s => !s.active).length,
   };
 
   // Handler de criação/edição
@@ -165,19 +160,16 @@ const ServicesPage = () => {
 
   // Handler de filtros
   const handleFilterChange = e => {
-    const {
-      name,
-      value
-    } = e.target;
+    const { name, value } = e.target;
     setFilters(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
   const handleClearSearch = () => {
     setFilters(prev => ({
       ...prev,
-      search: ''
+      search: '',
     }));
   };
 
@@ -190,7 +182,8 @@ const ServicesPage = () => {
     setSelectedService(null);
     setIsServiceModalVisible(true);
   };
-  return <div className="container mx-auto px-4 py-8">
+  return (
+    <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
@@ -200,14 +193,22 @@ const ServicesPage = () => {
               Serviços
             </h1>
             <p className="text-theme-muted">
-              {canManageServices ? 'Gerencie o catálogo de serviços e comissões' : 'Visualize os serviços disponíveis'}
+              {canManageServices
+                ? 'Gerencie o catálogo de serviços e comissões'
+                : 'Visualize os serviços disponíveis'}
             </p>
           </div>
 
-          {canCreateService && <Button variant="primary" onClick={handleNewService} disabled={loading}>
+          {canCreateService && (
+            <Button
+              variant="primary"
+              onClick={handleNewService}
+              disabled={loading}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Novo Serviço
-            </Button>}
+            </Button>
+          )}
         </div>
 
         {/* Barra de Busca e Filtros */}
@@ -216,12 +217,24 @@ const ServicesPage = () => {
             {/* Busca */}
             <div className="md:col-span-2 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-theme-muted" />
-              <input type="text" name="search" value={filters.search} onChange={handleFilterChange} placeholder="Buscar serviço por nome..." className="w-full pl-10 pr-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <input
+                type="text"
+                name="search"
+                value={filters.search}
+                onChange={handleFilterChange}
+                placeholder="Buscar serviço por nome..."
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
 
             {/* Status */}
             <div>
-              <select name="status" value={filters.status} onChange={handleFilterChange} className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <select
+                name="status"
+                value={filters.status}
+                onChange={handleFilterChange}
+                className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
                 <option value="all">Todos os Status</option>
                 <option value="active">Ativos</option>
                 <option value="inactive">Inativos</option>
@@ -252,24 +265,32 @@ const ServicesPage = () => {
       </div>
 
       {/* Lista/Grid de Serviços */}
-      {loading ? <div className="card-theme text-center py-12">
+      {loading ? (
+        <div className="card-theme text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
           <p className="text-theme-muted">Carregando serviços...</p>
-        </div> : filteredServices.length === 0 ? <div className="card-theme text-center py-12">
+        </div>
+      ) : filteredServices.length === 0 ? (
+        <div className="card-theme text-center py-12">
           <Scissors className="w-16 h-16 mx-auto mb-4 text-theme-muted" />
           <h3 className="text-lg font-semibold text-theme-primary mb-2">
             Nenhum serviço encontrado
           </h3>
           <p className="text-theme-muted mb-6">
-            {filters.search || filters.status !== 'all' ? 'Tente ajustar os filtros de busca' : 'Cadastre um novo serviço para começar'}
+            {filters.search || filters.status !== 'all'
+              ? 'Tente ajustar os filtros de busca'
+              : 'Cadastre um novo serviço para começar'}
           </p>
 
-          {canCreateService && !filters.search && filters.status === 'all' && <Button variant="primary" onClick={handleNewService}>
+          {canCreateService && !filters.search && filters.status === 'all' && (
+            <Button variant="primary" onClick={handleNewService}>
               <Plus className="w-4 h-4 mr-2" />
               Novo Serviço
-            </Button>}
-        </div> : (/* Tabela de Serviços */
-    <div className="card-theme overflow-hidden">
+            </Button>
+          )}
+        </div> /* Tabela de Serviços */
+      ) : (
+        <div className="card-theme overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-light-bg dark:bg-dark-bg dark:bg-dark-surface border-b border-theme-border">
@@ -289,15 +310,22 @@ const ServicesPage = () => {
                   <th className="px-6 py-3 text-center text-xs font-medium text-theme-muted uppercase tracking-wider">
                     Status
                   </th>
-                  {canManageServices && <th className="px-6 py-3 text-center text-xs font-medium text-theme-muted uppercase tracking-wider">
+                  {canManageServices && (
+                    <th className="px-6 py-3 text-center text-xs font-medium text-theme-muted uppercase tracking-wider">
                       Ações
-                    </th>}
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody className="divide-y divide-theme-border">
                 {filteredServices.map(service => {
-              const commissionValue = service.price * service.commission_percentage / 100;
-              return <tr key={service.id} className="hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-dark-surface/50 transition-colors">
+                  const commissionValue =
+                    (service.price * service.commission_percentage) / 100;
+                  return (
+                    <tr
+                      key={service.id}
+                      className="hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-dark-surface/50 transition-colors"
+                    >
                       {/* Nome do Serviço */}
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
@@ -338,34 +366,59 @@ const ServicesPage = () => {
 
                       {/* Status */}
                       <td className="px-6 py-4 text-center">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${service.active || service.is_active ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200' : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300'}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${service.active || service.is_active ? 'bg-green-600 dark:bg-green-400' : 'bg-gray-600 dark:bg-gray-400'}`} />
-                          {service.active || service.is_active ? 'Ativo' : 'Inativo'}
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${service.active || service.is_active ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200' : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300'}`}
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${service.active || service.is_active ? 'bg-green-600 dark:bg-green-400' : 'bg-gray-600 dark:bg-gray-400'}`}
+                          />
+                          {service.active || service.is_active
+                            ? 'Ativo'
+                            : 'Inativo'}
                         </span>
                       </td>
 
                       {/* Ações */}
-                      {canManageServices && <td className="px-6 py-4">
+                      {canManageServices && (
+                        <td className="px-6 py-4">
                           <div className="flex items-center justify-center gap-2">
-                            <button onClick={() => handleEdit(service)} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors" title="Editar serviço">
+                            <button
+                              onClick={() => handleEdit(service)}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
+                              title="Editar serviço"
+                            >
                               <Edit2 className="w-3.5 h-3.5" />
                               Editar
                             </button>
-                            <button onClick={() => handleToggleActive(service)} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${service.active || service.is_active ? 'text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40' : 'text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/40'}`} title={service.active || service.is_active ? 'Desativar serviço' : 'Ativar serviço'}>
+                            <button
+                              onClick={() => handleToggleActive(service)}
+                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${service.active || service.is_active ? 'text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40' : 'text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/40'}`}
+                              title={
+                                service.active || service.is_active
+                                  ? 'Desativar serviço'
+                                  : 'Ativar serviço'
+                              }
+                            >
                               <Power className="w-3.5 h-3.5" />
-                              {service.active || service.is_active ? 'Desativar' : 'Ativar'}
+                              {service.active || service.is_active
+                                ? 'Desativar'
+                                : 'Ativar'}
                             </button>
                           </div>
-                        </td>}
-                    </tr>;
-            })}
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
-        </div>)}
+        </div>
+      )}
 
       {/* Aviso para profissionais */}
-      {!canManageServices && services.length > 0 && <div className="card-theme bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4 mt-6">
+      {!canManageServices && services.length > 0 && (
+        <div className="card-theme bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4 mt-6">
           <div className="flex items-start gap-3">
             <Lock className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
             <div>
@@ -378,13 +431,21 @@ const ServicesPage = () => {
               </p>
             </div>
           </div>
-        </div>}
+        </div>
+      )}
 
       {/* Modal */}
-      <ServiceFormModal isOpen={isServiceModalVisible} onClose={() => {
-      setIsServiceModalVisible(false);
-      setSelectedService(null);
-    }} onSubmit={handleServiceSubmit} service={selectedService} unitId={selectedUnit?.id} />
-    </div>;
+      <ServiceFormModal
+        isOpen={isServiceModalVisible}
+        onClose={() => {
+          setIsServiceModalVisible(false);
+          setSelectedService(null);
+        }}
+        onSubmit={handleServiceSubmit}
+        service={selectedService}
+        unitId={selectedUnit?.id}
+      />
+    </div>
+  );
 };
 export default ServicesPage;

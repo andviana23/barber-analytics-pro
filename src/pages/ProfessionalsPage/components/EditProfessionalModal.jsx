@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, Mail, Percent, Edit, Settings, DollarSign } from 'lucide-react';
+import {
+  X,
+  User,
+  Mail,
+  Percent,
+  Edit,
+  Settings,
+  DollarSign,
+} from 'lucide-react';
 import { Button } from '../../../atoms/Button/Button';
 import { Input } from '../../../atoms/Input/Input';
 import { ProfissionaisService } from '../../../services/profissionaisService';
@@ -10,14 +18,8 @@ import { useProfessionalCommissions } from '../../../hooks/useProfessionalCommis
 /**
  * Modal para editar profissional existente
  */
-export function EditProfessionalModal({
-  professional,
-  onClose,
-  onSuccess
-}) {
-  const {
-    showToast
-  } = useToast();
+export function EditProfessionalModal({ professional, onClose, onSuccess }) {
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('basic'); // 'basic' ou 'commissions'
 
@@ -25,10 +27,13 @@ export function EditProfessionalModal({
   const [formData, setFormData] = useState({
     name: professional.name || '',
     // ✅ FIX: Garantir que unit_id seja null se vazio ou inválido
-    unit_id: professional.unit_id && professional.unit_id.trim() !== '' ? professional.unit_id : null,
+    unit_id:
+      professional.unit_id && professional.unit_id.trim() !== ''
+        ? professional.unit_id
+        : null,
     role: professional.role || 'barbeiro',
     commission_rate: professional.commission_rate || 0,
-    is_active: professional.is_active ?? true
+    is_active: professional.is_active ?? true,
   });
   const [errors, setErrors] = useState({});
 
@@ -38,12 +43,16 @@ export function EditProfessionalModal({
     loading: commissionsLoading,
     error: commissionsError,
     fetchCommissions,
-    saveCommission
+    saveCommission,
   } = useProfessionalCommissions(professional.id, professional.unit_id);
 
   // Carregar comissões quando a aba for ativada
   useEffect(() => {
-    if (activeTab === 'commissions' && professional.id && professional.unit_id) {
+    if (
+      activeTab === 'commissions' &&
+      professional.id &&
+      professional.unit_id
+    ) {
       fetchCommissions();
     }
   }, [activeTab, professional.id, professional.unit_id, fetchCommissions]);
@@ -55,7 +64,7 @@ export function EditProfessionalModal({
     setFormData(prev => {
       const updated = {
         ...prev,
-        [field]: value
+        [field]: value,
       };
 
       // Se mudou para admin, limpar unit_id
@@ -69,7 +78,7 @@ export function EditProfessionalModal({
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,
-        [field]: null
+        [field]: null,
       }));
     }
   };
@@ -115,7 +124,7 @@ export function EditProfessionalModal({
         name: formData.name.trim(),
         role: formData.role,
         commission_rate: formData.commission_rate,
-        is_active: formData.is_active
+        is_active: formData.is_active,
       };
 
       // ✅ CORRIGIDO: Garantir que unit_id seja null para admin ou UUID válido (nunca string vazia)
@@ -140,7 +149,7 @@ export function EditProfessionalModal({
       showToast({
         type: 'success',
         message: 'Profissional atualizado com sucesso!',
-        description: `As informações de ${formData.name} foram atualizadas.`
+        description: `As informações de ${formData.name} foram atualizadas.`,
       });
       onSuccess();
     } catch (error) {
@@ -148,13 +157,14 @@ export function EditProfessionalModal({
       showToast({
         type: 'error',
         message: 'Erro ao atualizar profissional',
-        description: error.message
+        description: error.message,
       });
     } finally {
       setLoading(false);
     }
   };
-  return <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="card-theme rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-light-border dark:border-dark-border">
@@ -177,27 +187,37 @@ export function EditProfessionalModal({
         {/* Tabs Navigation */}
         <div className="border-b border-light-border dark:border-dark-border">
           <nav className="flex space-x-8 px-6">
-            {[{
-            id: 'basic',
-            label: 'Informações Básicas',
-            icon: User
-          }, {
-            id: 'commissions',
-            label: 'Comissões por Serviço',
-            icon: DollarSign
-          }].map(tab => {
-            const TabIcon = tab.icon;
-            return <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 py-4 px-2 text-sm font-medium border-b-2 transition-colors ${activeTab === tab.id ? 'border-primary text-primary' : 'border-transparent text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary hover:border-light-border dark:hover:border-dark-border'}`}>
+            {[
+              {
+                id: 'basic',
+                label: 'Informações Básicas',
+                icon: User,
+              },
+              {
+                id: 'commissions',
+                label: 'Comissões por Serviço',
+                icon: DollarSign,
+              },
+            ].map(tab => {
+              const TabIcon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 py-4 px-2 text-sm font-medium border-b-2 transition-colors ${activeTab === tab.id ? 'border-primary text-primary' : 'border-transparent text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary hover:border-light-border dark:hover:border-dark-border'}`}
+                >
                   <TabIcon className="h-4 w-4" />
                   {tab.label}
-                </button>;
-          })}
+                </button>
+              );
+            })}
           </nav>
         </div>
 
         {/* Tab Content */}
         <div className="p-6">
-          {activeTab === 'basic' && <form onSubmit={handleSubmit} className="space-y-6">
+          {activeTab === 'basic' && (
+            <form onSubmit={handleSubmit} className="space-y-6">
               {/* Informações Básicas */}
               <div>
                 <h3 className="text-lg font-medium text-text-light-primary dark:text-text-dark-primary mb-4">
@@ -205,10 +225,18 @@ export function EditProfessionalModal({
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="md:col-span-2">
-                    <Input label="Nome Completo *" icon={User} value={formData.name} onChange={e => handleInputChange('name', e.target.value)} error={errors.name} placeholder="Ex: João Silva" />
+                    <Input
+                      label="Nome Completo *"
+                      icon={User}
+                      value={formData.name}
+                      onChange={e => handleInputChange('name', e.target.value)}
+                      error={errors.name}
+                      placeholder="Ex: João Silva"
+                    />
                   </div>
 
-                  {professional.user?.email && <div className="md:col-span-2">
+                  {professional.user?.email && (
+                    <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-2">
                         Email (não editável)
                       </label>
@@ -218,27 +246,41 @@ export function EditProfessionalModal({
                           {professional.user.email}
                         </span>
                       </div>
-                    </div>}
+                    </div>
+                  )}
 
                   <div>
                     <label className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2">
                       Cargo *
                     </label>
-                    <select className="w-full px-3 py-2 rounded-lg border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-300" value={formData.role} onChange={e => handleInputChange('role', e.target.value)}>
+                    <select
+                      className="w-full px-3 py-2 rounded-lg border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-300"
+                      value={formData.role}
+                      onChange={e => handleInputChange('role', e.target.value)}
+                    >
                       <option value="barbeiro">Barbeiro</option>
                       <option value="gerente">Gerente</option>
                       <option value="admin">Administrador</option>
                     </select>
-                    {errors.role && <p className="text-feedback-light-error dark:text-feedback-dark-error text-xs mt-1">
+                    {errors.role && (
+                      <p className="text-feedback-light-error dark:text-feedback-dark-error text-xs mt-1">
                         {errors.role}
-                      </p>}
+                      </p>
+                    )}
                   </div>
 
-                  {formData.role !== 'admin' && <div>
+                  {formData.role !== 'admin' && (
+                    <div>
                       <label className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2">
                         Unidade *
                       </label>
-                      <select className="w-full px-3 py-2 rounded-lg border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-300" value={formData.unit_id || ''} onChange={e => handleInputChange('unit_id', e.target.value || null)}>
+                      <select
+                        className="w-full px-3 py-2 rounded-lg border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-300"
+                        value={formData.unit_id || ''}
+                        onChange={e =>
+                          handleInputChange('unit_id', e.target.value || null)
+                        }
+                      >
                         <option value="">Selecione uma unidade</option>
                         <option value="0db46613-5273-4625-a41d-b4a0dec7dfe7">
                           Mangabeiras
@@ -247,10 +289,13 @@ export function EditProfessionalModal({
                           Nova Lima
                         </option>
                       </select>
-                      {errors.unit_id && <p className="text-feedback-light-error dark:text-feedback-dark-error text-xs mt-1">
+                      {errors.unit_id && (
+                        <p className="text-feedback-light-error dark:text-feedback-dark-error text-xs mt-1">
                           {errors.unit_id}
-                        </p>}
-                    </div>}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -260,11 +305,38 @@ export function EditProfessionalModal({
                   Configurações do Trabalho
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Input label="Comissão (%)" type="number" icon={Percent} min="0" max="100" step="0.01" value={formData.commission_rate} onChange={e => handleInputChange('commission_rate', parseFloat(e.target.value) || 0)} error={errors.commission_rate} placeholder="0.00" />
+                  <Input
+                    label="Comissão (%)"
+                    type="number"
+                    icon={Percent}
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    value={formData.commission_rate}
+                    onChange={e =>
+                      handleInputChange(
+                        'commission_rate',
+                        parseFloat(e.target.value) || 0
+                      )
+                    }
+                    error={errors.commission_rate}
+                    placeholder="0.00"
+                  />
 
                   <div className="flex items-center gap-2 mt-8">
-                    <input type="checkbox" id="is_active" checked={formData.is_active} onChange={e => handleInputChange('is_active', e.target.checked)} className="rounded border-light-border dark:border-dark-border" />
-                    <label htmlFor="is_active" className="text-sm text-text-light-primary dark:text-text-dark-primary cursor-pointer">
+                    <input
+                      type="checkbox"
+                      id="is_active"
+                      checked={formData.is_active}
+                      onChange={e =>
+                        handleInputChange('is_active', e.target.checked)
+                      }
+                      className="rounded border-light-border dark:border-dark-border"
+                    />
+                    <label
+                      htmlFor="is_active"
+                      className="text-sm text-text-light-primary dark:text-text-dark-primary cursor-pointer"
+                    >
                       Profissional ativo
                     </label>
                   </div>
@@ -273,16 +345,29 @@ export function EditProfessionalModal({
 
               {/* Ações */}
               <div className="flex gap-3 pt-4">
-                <Button type="button" variant="outline" onClick={onClose} className="flex-1" disabled={loading}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onClose}
+                  className="flex-1"
+                  disabled={loading}
+                >
                   Cancelar
                 </Button>
-                <Button type="submit" variant="primary" loading={loading} className="flex-1">
+                <Button
+                  type="submit"
+                  variant="primary"
+                  loading={loading}
+                  className="flex-1"
+                >
                   Salvar Alterações
                 </Button>
               </div>
-            </form>}
+            </form>
+          )}
 
-          {activeTab === 'commissions' && <div className="space-y-6">
+          {activeTab === 'commissions' && (
+            <div className="space-y-6">
               <div>
                 <h3 className="text-lg font-medium text-text-light-primary dark:text-text-dark-primary mb-4">
                   Comissões por Serviço
@@ -292,41 +377,62 @@ export function EditProfessionalModal({
                   recebe por cada serviço realizado.
                 </p>
                 {/* Se não há unidade associada, instruir usuário a preencher na aba "Informações Básicas" */}
-                {!professional.unit_id && <div className="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                {!professional.unit_id && (
+                  <div className="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
                     <p className="text-sm text-yellow-800 dark:text-yellow-200">
                       Este profissional não possui uma unidade associada. Para
                       configurar comissões por serviço, primeiro selecione a
                       unidade na aba "Informações Básicas".
                     </p>
-                  </div>}
+                  </div>
+                )}
 
-                {commissionsError && <div className="mb-4 p-4 bg-feedback-light-error/10 dark:bg-feedback-dark-error/10 border border-feedback-light-error/20 dark:border-feedback-dark-error/20 rounded-lg">
+                {commissionsError && (
+                  <div className="mb-4 p-4 bg-feedback-light-error/10 dark:bg-feedback-dark-error/10 border border-feedback-light-error/20 dark:border-feedback-dark-error/20 rounded-lg">
                     <p className="text-feedback-light-error dark:text-feedback-dark-error text-sm">
                       Erro ao carregar comissões: {commissionsError}
                     </p>
-                  </div>}
+                  </div>
+                )}
 
-                {commissionsLoading ? <div className="flex items-center justify-center py-8">
+                {commissionsLoading ? (
+                  <div className="flex items-center justify-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                     <span className="ml-3 text-text-light-secondary dark:text-text-dark-secondary">
                       Carregando comissões...
                     </span>
-                  </div> : commissions.length > 0 ? <CommissionsTable commissions={commissions} onSave={saveCommission} loading={commissionsLoading} /> : <div className="text-center py-8">
+                  </div>
+                ) : commissions.length > 0 ? (
+                  <CommissionsTable
+                    commissions={commissions}
+                    onSave={saveCommission}
+                    loading={commissionsLoading}
+                  />
+                ) : (
+                  <div className="text-center py-8">
                     <DollarSign className="h-12 w-12 text-text-light-secondary dark:text-text-dark-secondary mx-auto mb-4" />
                     <p className="text-text-light-secondary dark:text-text-dark-secondary">
                       Nenhum serviço encontrado para esta unidade.
                     </p>
-                  </div>}
+                  </div>
+                )}
               </div>
 
               {/* Ações da aba de comissões */}
               <div className="flex gap-3 pt-4">
-                <Button type="button" variant="outline" onClick={onClose} className="flex-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onClose}
+                  className="flex-1"
+                >
                   Fechar
                 </Button>
               </div>
-            </div>}
+            </div>
+          )}
         </div>
       </div>
-    </div>;
+    </div>
+  );
 }

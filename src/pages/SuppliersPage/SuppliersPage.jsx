@@ -15,7 +15,17 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import { Plus, Search, Package, Info, Edit2, Trash2, CheckCircle, XCircle, Loader } from 'lucide-react';
+import {
+  Plus,
+  Search,
+  Package,
+  Info,
+  Edit2,
+  Trash2,
+  CheckCircle,
+  XCircle,
+  Loader,
+} from 'lucide-react';
 import { Layout } from '../../components/Layout/Layout';
 import { useAuth } from '../../context/AuthContext';
 import { useUnit } from '../../context/UnitContext';
@@ -25,15 +35,9 @@ import CreateSupplierModalRefactored from '../../molecules/SupplierModals/Create
 import EditSupplierModal from '../../molecules/SupplierModals/EditSupplierModal';
 import SupplierInfoModal from '../../molecules/SupplierModals/SupplierInfoModal';
 const SuppliersPage = () => {
-  const {
-    user
-  } = useAuth();
-  const {
-    selectedUnit
-  } = useUnit();
-  const {
-    showToast
-  } = useToast();
+  const { user } = useAuth();
+  const { selectedUnit } = useUnit();
+  const { showToast } = useToast();
 
   // Estados
   const [searchTerm, setSearchTerm] = useState('');
@@ -55,10 +59,10 @@ const SuppliersPage = () => {
     createSupplier,
     updateSupplier,
     deleteSupplier,
-    activateSupplier
+    activateSupplier,
   } = useSuppliers(selectedUnit?.id, {
     includeInactive: showInactive,
-    enableCache: true
+    enableCache: true,
   });
 
   // Verificar permissões - Admin e Gerente podem gerenciar
@@ -70,7 +74,11 @@ const SuppliersPage = () => {
   // Filtrar fornecedores
   const filteredSuppliers = useMemo(() => {
     return suppliers.filter(supplier => {
-      const matchesSearch = searchTerm === '' || supplier.nome?.toLowerCase().includes(searchTerm.toLowerCase()) || supplier.cpf_cnpj?.includes(searchTerm) || supplier.email?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch =
+        searchTerm === '' ||
+        supplier.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        supplier.cpf_cnpj?.includes(searchTerm) ||
+        supplier.email?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus = showInactive || supplier.is_active;
       return matchesSearch && matchesStatus;
     });
@@ -98,31 +106,33 @@ const SuppliersPage = () => {
     setIsInfoModalOpen(true);
   };
   const handleDelete = async supplier => {
-    if (!window.confirm(`Deseja realmente excluir o fornecedor "${supplier.nome}"?`)) {
+    if (
+      !window.confirm(
+        `Deseja realmente excluir o fornecedor "${supplier.nome}"?`
+      )
+    ) {
       return;
     }
     setDeletingId(supplier.id);
     try {
-      const {
-        error
-      } = await deleteSupplier(supplier.id);
+      const { error } = await deleteSupplier(supplier.id);
       if (error) {
         showToast({
           type: 'error',
           message: 'Erro ao excluir fornecedor',
-          description: error
+          description: error,
         });
       } else {
         showToast({
           type: 'success',
-          message: 'Fornecedor excluído com sucesso'
+          message: 'Fornecedor excluído com sucesso',
         });
       }
     } catch (err) {
       showToast({
         type: 'error',
         message: 'Erro inesperado',
-        description: err.message
+        description: err.message,
       });
     } finally {
       setDeletingId(null);
@@ -130,26 +140,24 @@ const SuppliersPage = () => {
   };
   const handleActivate = async supplier => {
     try {
-      const {
-        error
-      } = await activateSupplier(supplier.id);
+      const { error } = await activateSupplier(supplier.id);
       if (error) {
         showToast({
           type: 'error',
           message: 'Erro ao ativar fornecedor',
-          description: error
+          description: error,
         });
       } else {
         showToast({
           type: 'success',
-          message: 'Fornecedor ativado com sucesso'
+          message: 'Fornecedor ativado com sucesso',
         });
       }
     } catch (err) {
       showToast({
         type: 'error',
         message: 'Erro inesperado',
-        description: err.message
+        description: err.message,
       });
     }
   };
@@ -160,12 +168,16 @@ const SuppliersPage = () => {
       return cnpj.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
     }
     // CNPJ: 00.000.000/0000-00
-    return cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+    return cnpj.replace(
+      /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
+      '$1.$2.$3/$4-$5'
+    );
   };
 
   // UI Loading/Error
   if (!selectedUnit) {
-    return <Layout>
+    return (
+      <Layout>
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <Package className="w-16 h-16 mx-auto text-light-text-muted dark:text-dark-text-muted mb-4" />
@@ -174,9 +186,11 @@ const SuppliersPage = () => {
             </p>
           </div>
         </div>
-      </Layout>;
+      </Layout>
+    );
   }
-  return <Layout>
+  return (
+    <Layout>
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-6">
@@ -190,10 +204,15 @@ const SuppliersPage = () => {
             </p>
           </div>
 
-          {canManage && <button onClick={handleCreate} className="btn-primary flex items-center gap-2">
+          {canManage && (
+            <button
+              onClick={handleCreate}
+              className="btn-primary flex items-center gap-2"
+            >
               <Plus className="w-5 h-5" />
               Fornecedor
-            </button>}
+            </button>
+          )}
         </div>
 
         {/* KPIs */}
@@ -248,19 +267,29 @@ const SuppliersPage = () => {
           {/* Busca */}
           <div className="relative flex-1 w-full md:w-auto">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-text-muted dark:text-dark-text-muted w-5 h-5" />
-            <input type="text" placeholder="Pesquisar por nome, CNPJ ou email..." value={searchTerm} onChange={e => {
-            setSearchTerm(e.target.value);
-            setCurrentPage(1);
-          }} className="w-full pl-10 pr-4 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-primary-500 focus:border-transparent" />
+            <input
+              type="text"
+              placeholder="Pesquisar por nome, CNPJ ou email..."
+              value={searchTerm}
+              onChange={e => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-full pl-10 pr-4 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            />
           </div>
 
           {/* Controles */}
           <div className="flex items-center gap-4">
             {/* Items por página */}
-            <select value={itemsPerPage} onChange={e => {
-            setItemsPerPage(Number(e.target.value));
-            setCurrentPage(1);
-          }} className="border border-light-border dark:border-dark-border rounded-lg px-3 py-2 card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary">
+            <select
+              value={itemsPerPage}
+              onChange={e => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="border border-light-border dark:border-dark-border rounded-lg px-3 py-2 card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary"
+            >
               <option value={10}>10</option>
               <option value={25}>25</option>
               <option value={50}>50</option>
@@ -272,10 +301,15 @@ const SuppliersPage = () => {
 
             {/* Mostrar inativos */}
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={showInactive} onChange={e => {
-              setShowInactive(e.target.checked);
-              setCurrentPage(1);
-            }} className="w-4 h-4 text-primary-600 border-light-border dark:border-dark-border rounded focus:ring-primary-500" />
+              <input
+                type="checkbox"
+                checked={showInactive}
+                onChange={e => {
+                  setShowInactive(e.target.checked);
+                  setCurrentPage(1);
+                }}
+                className="w-4 h-4 text-primary-600 border-light-border dark:border-dark-border rounded focus:ring-primary-500"
+              />
               <span className="text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600">
                 Mostrar inativos
               </span>
@@ -286,18 +320,27 @@ const SuppliersPage = () => {
 
       {/* Tabela */}
       <div className="card-theme dark:bg-dark-surface rounded-lg shadow-sm border border-light-border dark:border-dark-border overflow-hidden">
-        {loading ? <div className="flex items-center justify-center py-12">
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
             <Loader className="w-8 h-8 animate-spin text-primary-600" />
-          </div> : error ? <div className="flex items-center justify-center py-12">
+          </div>
+        ) : error ? (
+          <div className="flex items-center justify-center py-12">
             <p className="text-red-600">
               Erro ao carregar fornecedores: {error}
             </p>
-          </div> : filteredSuppliers.length === 0 ? <div className="flex flex-col items-center justify-center py-12">
+          </div>
+        ) : filteredSuppliers.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12">
             <Package className="w-16 h-16 text-light-text-muted dark:text-dark-text-muted mb-4" />
             <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
-              {searchTerm ? 'Nenhum fornecedor encontrado' : 'Nenhum fornecedor cadastrado'}
+              {searchTerm
+                ? 'Nenhum fornecedor encontrado'
+                : 'Nenhum fornecedor cadastrado'}
             </p>
-          </div> : <>
+          </div>
+        ) : (
+          <>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-light-bg dark:bg-dark-bg dark:bg-gray-700">
@@ -317,16 +360,22 @@ const SuppliersPage = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {paginatedSuppliers.map(supplier => <tr key={supplier.id} className={`hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${!supplier.is_active ? 'opacity-60' : ''}`}>
+                  {paginatedSuppliers.map(supplier => (
+                    <tr
+                      key={supplier.id}
+                      className={`hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${!supplier.is_active ? 'opacity-60' : ''}`}
+                    >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div>
                             <div className="text-sm font-medium text-theme-primary dark:text-dark-text-primary">
                               {supplier.nome}
                             </div>
-                            {supplier.razao_social && <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                            {supplier.razao_social && (
+                              <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                                 {supplier.razao_social}
-                              </div>}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </td>
@@ -343,74 +392,134 @@ const SuppliersPage = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex items-center justify-end gap-2">
                           {/* Info */}
-                          <button onClick={() => handleInfo(supplier)} className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20" title="Informações">
+                          <button
+                            onClick={() => handleInfo(supplier)}
+                            className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                            title="Informações"
+                          >
                             <Info className="w-4 h-4" />
                           </button>
 
                           {/* Editar */}
-                          {canManage && supplier.is_active && <button onClick={() => handleEdit(supplier)} className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 p-1 rounded hover:bg-green-50 dark:hover:bg-green-900/20" title="Editar">
+                          {canManage && supplier.is_active && (
+                            <button
+                              onClick={() => handleEdit(supplier)}
+                              className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 p-1 rounded hover:bg-green-50 dark:hover:bg-green-900/20"
+                              title="Editar"
+                            >
                               <Edit2 className="w-4 h-4" />
-                            </button>}
+                            </button>
+                          )}
 
                           {/* Excluir/Ativar */}
-                          {canManage && (supplier.is_active ? <button onClick={() => handleDelete(supplier)} disabled={deletingId === supplier.id} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-50" title="Excluir">
-                                {deletingId === supplier.id ? <Loader className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                              </button> : <button onClick={() => handleActivate(supplier)} className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 p-1 rounded hover:bg-green-50 dark:hover:bg-green-900/20" title="Ativar">
+                          {canManage &&
+                            (supplier.is_active ? (
+                              <button
+                                onClick={() => handleDelete(supplier)}
+                                disabled={deletingId === supplier.id}
+                                className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-50"
+                                title="Excluir"
+                              >
+                                {deletingId === supplier.id ? (
+                                  <Loader className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <Trash2 className="w-4 h-4" />
+                                )}
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => handleActivate(supplier)}
+                                className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 p-1 rounded hover:bg-green-50 dark:hover:bg-green-900/20"
+                                title="Ativar"
+                              >
                                 <CheckCircle className="w-4 h-4" />
-                              </button>)}
+                              </button>
+                            ))}
                         </div>
                       </td>
-                    </tr>)}
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
 
             {/* Paginação */}
-            {totalPages > 1 && <div className="px-6 py-4 border-t border-light-border dark:border-dark-border">
+            {totalPages > 1 && (
+              <div className="px-6 py-4 border-t border-light-border dark:border-dark-border">
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                     Mostrando {(currentPage - 1) * itemsPerPage + 1} a{' '}
-                    {Math.min(currentPage * itemsPerPage, filteredSuppliers.length)}{' '}
+                    {Math.min(
+                      currentPage * itemsPerPage,
+                      filteredSuppliers.length
+                    )}{' '}
                     de {filteredSuppliers.length} resultados
                   </p>
                   <div className="flex gap-2">
-                    <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-3 py-1 border border-light-border dark:border-dark-border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700">
+                    <button
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="px-3 py-1 border border-light-border dark:border-dark-border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700"
+                    >
                       Anterior
                     </button>
                     <span className="px-3 py-1 text-gray-700 dark:text-gray-300 dark:text-gray-600">
                       Página {currentPage} de {totalPages}
                     </span>
-                    <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-3 py-1 border border-light-border dark:border-dark-border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700">
+                    <button
+                      onClick={() =>
+                        setCurrentPage(p => Math.min(totalPages, p + 1))
+                      }
+                      disabled={currentPage === totalPages}
+                      className="px-3 py-1 border border-light-border dark:border-dark-border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700"
+                    >
                       Próxima
                     </button>
                   </div>
                 </div>
-              </div>}
-          </>}
+              </div>
+            )}
+          </>
+        )}
       </div>
 
       {/* Modals */}
-      <CreateSupplierModalRefactored isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} onSave={async data => {
-      const result = await createSupplier(data);
-      if (result.error) {
-        throw new Error(result.error);
-      }
-    }} unitId={selectedUnit?.id} />
+      <CreateSupplierModalRefactored
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSave={async data => {
+          const result = await createSupplier(data);
+          if (result.error) {
+            throw new Error(result.error);
+          }
+        }}
+        unitId={selectedUnit?.id}
+      />
 
-      <EditSupplierModal isOpen={isEditModalOpen} onClose={() => {
-      setIsEditModalOpen(false);
-      setSelectedSupplier(null);
-    }} onSave={async data => {
-      const result = await updateSupplier(selectedSupplier.id, data);
-      if (result.error) {
-        throw new Error(result.error);
-      }
-    }} supplier={selectedSupplier} />
+      <EditSupplierModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedSupplier(null);
+        }}
+        onSave={async data => {
+          const result = await updateSupplier(selectedSupplier.id, data);
+          if (result.error) {
+            throw new Error(result.error);
+          }
+        }}
+        supplier={selectedSupplier}
+      />
 
-      <SupplierInfoModal isOpen={isInfoModalOpen} onClose={() => {
-      setIsInfoModalOpen(false);
-      setSelectedSupplier(null);
-    }} supplier={selectedSupplier} />
-    </Layout>;
+      <SupplierInfoModal
+        isOpen={isInfoModalOpen}
+        onClose={() => {
+          setIsInfoModalOpen(false);
+          setSelectedSupplier(null);
+        }}
+        supplier={selectedSupplier}
+      />
+    </Layout>
+  );
 };
 export default SuppliersPage;

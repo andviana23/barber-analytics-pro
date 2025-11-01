@@ -22,23 +22,23 @@ const OpenCashModal = ({
   onClose,
   onConfirm,
   unitId,
-  loading = false
+  loading = false,
 }) => {
   const [formData, setFormData] = useState({
     openingBalance: '',
-    observations: ''
+    observations: '',
   });
   const [errors, setErrors] = useState({});
   const handleChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
     // Limpa erro do campo ao digitar
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,
-        [field]: null
+        [field]: null,
       }));
     }
   };
@@ -46,26 +46,26 @@ const OpenCashModal = ({
     e.preventDefault();
     console.log('📝 OpenCashModal - handleSubmit CHAMADO', {
       formData,
-      unitId
+      unitId,
     });
 
     // ✅ Validação simples (só os campos do form)
     const openingBalance = parseFloat(formData.openingBalance) || 0;
     if (openingBalance < 0) {
       setErrors({
-        form: 'Saldo inicial não pode ser negativo'
+        form: 'Saldo inicial não pode ser negativo',
       });
       return;
     }
     if (!unitId) {
       setErrors({
-        form: 'Unidade não identificada'
+        form: 'Unidade não identificada',
       });
       return;
     }
     const dataToSend = {
       openingBalance,
-      observations: formData.observations || ''
+      observations: formData.observations || '',
     };
     console.log('🚀 Chamando onConfirm com:', dataToSend);
 
@@ -75,7 +75,7 @@ const OpenCashModal = ({
     // Reseta form
     setFormData({
       openingBalance: '',
-      observations: ''
+      observations: '',
     });
     setErrors({});
   };
@@ -83,7 +83,7 @@ const OpenCashModal = ({
     if (!loading) {
       setFormData({
         openingBalance: '',
-        observations: ''
+        observations: '',
       });
       setErrors({});
       onClose();
@@ -91,7 +91,8 @@ const OpenCashModal = ({
   };
   if (!isOpen) return null;
   const openingBalanceNumber = parseFloat(formData.openingBalance) || 0;
-  return <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="card-theme w-full max-w-md max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-theme-border">
@@ -103,7 +104,12 @@ const OpenCashModal = ({
               Informe o saldo inicial do caixa
             </p>
           </div>
-          <button onClick={handleClose} disabled={loading} className="p-2 rounded-lg hover:card-theme dark:hover:bg-dark-surface transition-colors disabled:opacity-50" aria-label="Fechar modal">
+          <button
+            onClick={handleClose}
+            disabled={loading}
+            className="p-2 rounded-lg hover:card-theme dark:hover:bg-dark-surface transition-colors disabled:opacity-50"
+            aria-label="Fechar modal"
+          >
             <X size={20} className="text-theme-muted" />
           </button>
         </div>
@@ -119,11 +125,23 @@ const OpenCashModal = ({
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <DollarSign size={18} className="text-theme-muted" />
               </div>
-              <Input type="number" step="0.01" min="0" value={formData.openingBalance} onChange={e => handleChange('openingBalance', e.target.value)} placeholder="0,00" className="pl-10" disabled={loading} required />
+              <Input
+                type="number"
+                step="0.01"
+                min="0"
+                value={formData.openingBalance}
+                onChange={e => handleChange('openingBalance', e.target.value)}
+                placeholder="0,00"
+                className="pl-10"
+                disabled={loading}
+                required
+              />
             </div>
-            {openingBalanceNumber > 0 && <p className="text-xs text-theme-muted mt-1">
+            {openingBalanceNumber > 0 && (
+              <p className="text-xs text-theme-muted mt-1">
                 {formatCurrency(openingBalanceNumber)}
-              </p>}
+              </p>
+            )}
           </div>
 
           {/* Observações */}
@@ -131,18 +149,27 @@ const OpenCashModal = ({
             <label className="block text-sm font-medium text-theme-primary mb-2">
               Observações
             </label>
-            <textarea value={formData.observations} onChange={e => handleChange('observations', e.target.value)} placeholder="Observações sobre a abertura do caixa (opcional)" rows={4} disabled={loading} className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary placeholder-theme-muted focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed resize-none" />
+            <textarea
+              value={formData.observations}
+              onChange={e => handleChange('observations', e.target.value)}
+              placeholder="Observações sobre a abertura do caixa (opcional)"
+              rows={4}
+              disabled={loading}
+              className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary placeholder-theme-muted focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed resize-none"
+            />
             <p className="text-xs text-theme-muted mt-1">
               {formData.observations.length}/500 caracteres
             </p>
           </div>
 
           {/* Erro de validação */}
-          {errors.form && <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          {errors.form && (
+            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
               <p className="text-sm text-red-600 dark:text-red-400">
                 {errors.form}
               </p>
-            </div>}
+            </div>
+          )}
 
           {/* Info */}
           <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
@@ -154,16 +181,28 @@ const OpenCashModal = ({
 
           {/* Actions */}
           <div className="flex gap-3">
-            <Button type="button" variant="secondary" onClick={handleClose} disabled={loading} className="flex-1">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleClose}
+              disabled={loading}
+              className="flex-1"
+            >
               Cancelar
             </Button>
-            <Button type="submit" variant="primary" disabled={loading || !formData.openingBalance} className="flex-1">
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={loading || !formData.openingBalance}
+              className="flex-1"
+            >
               {loading ? 'Abrindo...' : 'Abrir Caixa'}
             </Button>
           </div>
         </form>
       </div>
-    </div>;
+    </div>
+  );
 };
 OpenCashModal.propTypes = {
   /** Se o modal está aberto */
@@ -175,6 +214,6 @@ OpenCashModal.propTypes = {
   /** ID da unidade */
   unitId: PropTypes.string.isRequired,
   /** Estado de loading */
-  loading: PropTypes.bool
+  loading: PropTypes.bool,
 };
 export default OpenCashModal;

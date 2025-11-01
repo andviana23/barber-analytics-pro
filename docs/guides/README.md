@@ -11,6 +11,7 @@ Esta pasta contém guias completos e práticos para desenvolvedores trabalhando 
 ### 🚀 Começando
 
 #### [⚙️ SETUP.md](./SETUP.md)
+
 **Configuração completa do ambiente de desenvolvimento**
 
 - ✅ Pré-requisitos detalhados (Node, npm, Supabase CLI)
@@ -27,6 +28,7 @@ Esta pasta contém guias completos e práticos para desenvolvedores trabalhando 
 ---
 
 #### [💻 DEVELOPMENT.md](./DEVELOPMENT.md)
+
 **Workflow diário de desenvolvimento**
 
 - 🔄 Workflow diário
@@ -46,6 +48,7 @@ Esta pasta contém guias completos e práticos para desenvolvedores trabalhando 
 ### 📏 Padrões e Qualidade
 
 #### [📝 CODE_CONVENTIONS.md](./CODE_CONVENTIONS.md)
+
 **Padrões de código do projeto**
 
 - 🎯 Princípios fundamentais (SOLID, DRY, KISS)
@@ -64,6 +67,7 @@ Esta pasta contém guias completos e práticos para desenvolvedores trabalhando 
 ---
 
 #### [🤝 CONTRIBUTING.md](./CONTRIBUTING.md)
+
 **Guia completo para contribuir com o projeto**
 
 - 🚀 Como fazer fork e setup
@@ -84,6 +88,7 @@ Esta pasta contém guias completos e práticos para desenvolvedores trabalhando 
 ### 🔧 Solução de Problemas
 
 #### [🛠️ TROUBLESHOOTING.md](./TROUBLESHOOTING.md)
+
 **Soluções para problemas comuns**
 
 - 📦 Problemas de instalação
@@ -102,6 +107,7 @@ Esta pasta contém guias completos e práticos para desenvolvedores trabalhando 
 ---
 
 #### [❓ FAQ.md](./FAQ.md)
+
 **Perguntas frequentes**
 
 - 🏗️ Arquitetura e tecnologia
@@ -122,6 +128,7 @@ Esta pasta contém guias completos e práticos para desenvolvedores trabalhando 
 ## 🗺️ Mapa de Uso por Situação
 
 ### "Estou começando no projeto"
+
 1. 📖 [SETUP.md](./SETUP.md) - Configure o ambiente
 2. 📖 [DEVELOPMENT.md](./DEVELOPMENT.md) - Entenda a estrutura
 3. 📖 [CODE_CONVENTIONS.md](./CODE_CONVENTIONS.md) - Aprenda os padrões
@@ -130,6 +137,7 @@ Esta pasta contém guias completos e práticos para desenvolvedores trabalhando 
 ---
 
 ### "Vou desenvolver uma feature"
+
 1. 📖 [DEVELOPMENT.md](./DEVELOPMENT.md) - Workflow e estrutura
 2. 📖 [CODE_CONVENTIONS.md](./CODE_CONVENTIONS.md) - Padrões a seguir
 3. 📖 [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) - Se encontrar problemas
@@ -137,6 +145,7 @@ Esta pasta contém guias completos e práticos para desenvolvedores trabalhando 
 ---
 
 ### "Vou abrir um Pull Request"
+
 1. 📖 [CONTRIBUTING.md](./CONTRIBUTING.md) - Processo completo
 2. 📖 [CODE_CONVENTIONS.md](./CODE_CONVENTIONS.md) - Revisar padrões
 3. ✅ Checklist do PR
@@ -144,6 +153,7 @@ Esta pasta contém guias completos e práticos para desenvolvedores trabalhando 
 ---
 
 ### "Encontrei um bug"
+
 1. 📖 [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) - Soluções conhecidas
 2. 📖 [FAQ.md](./FAQ.md) - Perguntas comuns
 3. 📖 [CONTRIBUTING.md](./CONTRIBUTING.md#-reporting-bugs) - Como reportar
@@ -151,6 +161,7 @@ Esta pasta contém guias completos e práticos para desenvolvedores trabalhando 
 ---
 
 ### "Tenho uma dúvida"
+
 1. 📖 [FAQ.md](./FAQ.md) - Perguntas frequentes
 2. 📖 Guia específico relevante
 3. 📖 [CONTRIBUTING.md](./CONTRIBUTING.md#-como-obter-ajuda) - Onde pedir ajuda
@@ -159,15 +170,15 @@ Esta pasta contém guias completos e práticos para desenvolvedores trabalhando 
 
 ## 📊 Estatísticas dos Guias
 
-| Guia | Linhas | Tamanho | Tópicos | Nível |
-|------|--------|---------|---------|-------|
-| SETUP.md | 563 | 12KB | 7 | 🟢 Iniciante |
-| DEVELOPMENT.md | 894 | 21KB | 8 | 🟡 Intermediário |
-| CODE_CONVENTIONS.md | 790 | 17KB | 8 | 🟡 Intermediário |
-| CONTRIBUTING.md | 607 | 14KB | 7 | 🟢 Iniciante |
-| TROUBLESHOOTING.md | 974 | 18KB | 8 | 🟠 Avançado |
-| FAQ.md | 919 | 19KB | 9 | 🟢 Todos |
-| **Total** | **4,747** | **101KB** | **47** | - |
+| Guia                | Linhas    | Tamanho   | Tópicos | Nível            |
+| ------------------- | --------- | --------- | ------- | ---------------- |
+| SETUP.md            | 563       | 12KB      | 7       | 🟢 Iniciante     |
+| DEVELOPMENT.md      | 894       | 21KB      | 8       | 🟡 Intermediário |
+| CODE_CONVENTIONS.md | 790       | 17KB      | 8       | 🟡 Intermediário |
+| CONTRIBUTING.md     | 607       | 14KB      | 7       | 🟢 Iniciante     |
+| TROUBLESHOOTING.md  | 974       | 18KB      | 8       | 🟠 Avançado      |
+| FAQ.md              | 919       | 19KB      | 9       | 🟢 Todos         |
+| **Total**           | **4,747** | **101KB** | **47**  | -                |
 
 ---
 
@@ -183,9 +194,11 @@ Todos os guias seguem uma estrutura consistente:
 > **Objetivo**: Descrição clara do propósito
 
 ## 📋 Índice
+
 [Links para seções principais]
 
 ## 🎯 Seções Principais
+
 [Conteúdo organizado]
 
 ---
@@ -196,14 +209,14 @@ Todos os guias seguem uma estrutura consistente:
 
 ### Elementos Visuais
 
-| Elemento | Significado |
-|----------|-------------|
-| ✅ | Bom exemplo / Recomendado |
-| ❌ | Mau exemplo / Evitar |
-| 💡 | Dica importante |
-| ⚠️ | Atenção / Cuidado |
-| 📝 | Nota informativa |
-| 🔍 | Diagnóstico / Debug |
+| Elemento | Significado               |
+| -------- | ------------------------- |
+| ✅       | Bom exemplo / Recomendado |
+| ❌       | Mau exemplo / Evitar      |
+| 💡       | Dica importante           |
+| ⚠️       | Atenção / Cuidado         |
+| 📝       | Nota informativa          |
+| 🔍       | Diagnóstico / Debug       |
 
 ### Blocos de Código
 
@@ -224,18 +237,21 @@ const t = i.reduce((s, x) => s + x.p, 0);
 Estes guias complementam outras documentações do projeto:
 
 ### Documentação Principal
+
 - 📖 [README.md](../../README.md) - Overview do projeto
 - 🏛️ [ARQUITETURA.md](../ARQUITETURA.md) - Arquitetura do sistema
 - 🗄️ [DATABASE_SCHEMA.md](../DATABASE_SCHEMA.md) - Schema do banco
 - 🎨 [DESIGN_SYSTEM.md](../DESIGN_SYSTEM.md) - Componentes UI
 
 ### Módulos de Negócio
+
 - 💰 [FINANCIAL_MODULE.md](../FINANCIAL_MODULE.md) - Módulo financeiro
 - 📊 [DRE_MODULE.md](../DRE_MODULE.md) - DRE
 - 💈 [LISTA_DA_VEZ_MODULE.md](../LISTA_DA_VEZ_MODULE.md) - Lista da Vez
 - 💵 [CASH_REGISTER_MODULE.md](../CASH_REGISTER_MODULE.md) - Caixa
 
 ### Guias Técnicos
+
 - 🧪 [TESTING.md](../TESTING.md) - Guia de testes
 - 🚀 [DEPLOY.md](../DEPLOY.md) - Deploy e CI/CD
 - 🔒 [Segurança](../SECURITY.md) - Práticas de segurança

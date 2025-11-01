@@ -3,14 +3,12 @@ import { Mail, Lock, Eye, EyeOff, UserPlus, Loader2, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 export function SignUpPage() {
-  const {
-    signUp
-  } = useAuth();
+  const { signUp } = useAuth();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -18,13 +16,10 @@ export function SignUpPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const handleInputChange = e => {
-    const {
-      name,
-      value
-    } = e.target;
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
     // Limpar erro quando usuário começar a digitar
     if (error) setError('');
@@ -66,12 +61,13 @@ export function SignUpPage() {
     setIsLoading(true);
     setError('');
     try {
-      const {
-        data,
-        error: authError
-      } = await signUp(formData.email, formData.password, {
-        full_name: formData.fullName
-      });
+      const { data, error: authError } = await signUp(
+        formData.email,
+        formData.password,
+        {
+          full_name: formData.fullName,
+        }
+      );
       if (authError) {
         setError(authError.message || 'Erro ao criar conta. Tente novamente.');
         return;
@@ -86,7 +82,8 @@ export function SignUpPage() {
     }
   };
   if (success) {
-    return <div className="min-h-screen flex items-center justify-center bg-light-bg dark:bg-dark-bg px-4">
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-light-bg dark:bg-dark-bg px-4">
         <div className="max-w-md w-full text-center">
           <div className="card-theme p-8 rounded-xl border border-light-border dark:border-dark-border shadow-lg">
             <div className="mx-auto w-16 h-16 bg-success rounded-xl flex items-center justify-center mb-4">
@@ -98,14 +95,19 @@ export function SignUpPage() {
             <p className="text-text-light-secondary dark:text-text-dark-secondary mb-6">
               Verifique seu email para confirmar sua conta antes de fazer login.
             </p>
-            <Link to="/login" className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-dark-text-primary rounded-lg hover:bg-primary-600 transition-colors duration-300">
+            <Link
+              to="/login"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-dark-text-primary rounded-lg hover:bg-primary-600 transition-colors duration-300"
+            >
               Ir para Login
             </Link>
           </div>
         </div>
-      </div>;
+      </div>
+    );
   }
-  return <div className="min-h-screen flex items-center justify-center bg-light-bg dark:bg-dark-bg px-4 py-8">
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-light-bg dark:bg-dark-bg px-4 py-8">
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
@@ -125,76 +127,154 @@ export function SignUpPage() {
           <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Full Name Field */}
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2">
+              <label
+                htmlFor="fullName"
+                className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2"
+              >
                 Nome Completo
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <User className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary" />
                 </div>
-                <input id="fullName" name="fullName" type="text" autoComplete="name" required value={formData.fullName} onChange={handleInputChange} className="block w-full pl-10 pr-3 py-3 border border-light-border dark:border-dark-border rounded-lg bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary placeholder-text-light-secondary dark:placeholder-text-dark-secondary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-300" placeholder="Seu nome completo" />
+                <input
+                  id="fullName"
+                  name="fullName"
+                  type="text"
+                  autoComplete="name"
+                  required
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  className="block w-full pl-10 pr-3 py-3 border border-light-border dark:border-dark-border rounded-lg bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary placeholder-text-light-secondary dark:placeholder-text-dark-secondary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-300"
+                  placeholder="Seu nome completo"
+                />
               </div>
             </div>
 
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2"
+              >
                 Email
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Mail className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary" />
                 </div>
-                <input id="email" name="email" type="email" autoComplete="email" required value={formData.email} onChange={handleInputChange} className="block w-full pl-10 pr-3 py-3 border border-light-border dark:border-dark-border rounded-lg bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary placeholder-text-light-secondary dark:placeholder-text-dark-secondary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-300" placeholder="seu@email.com" />
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="block w-full pl-10 pr-3 py-3 border border-light-border dark:border-dark-border rounded-lg bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary placeholder-text-light-secondary dark:placeholder-text-dark-secondary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-300"
+                  placeholder="seu@email.com"
+                />
               </div>
             </div>
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2"
+              >
                 Senha
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary" />
                 </div>
-                <input id="password" name="password" type={showPassword ? 'text' : 'password'} autoComplete="new-password" required value={formData.password} onChange={handleInputChange} className="block w-full pl-10 pr-12 py-3 border border-light-border dark:border-dark-border rounded-lg bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary placeholder-text-light-secondary dark:placeholder-text-dark-secondary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-300" placeholder="Mínimo 6 caracteres" />
-                <button type="button" className="absolute inset-y-0 right-0 pr-3 flex items-center" onClick={() => setShowPassword(!showPassword)}>
-                  {showPassword ? <EyeOff className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary transition-colors duration-300" /> : <Eye className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary transition-colors duration-300" />}
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  required
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  className="block w-full pl-10 pr-12 py-3 border border-light-border dark:border-dark-border rounded-lg bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary placeholder-text-light-secondary dark:placeholder-text-dark-secondary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-300"
+                  placeholder="Mínimo 6 caracteres"
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary transition-colors duration-300" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary transition-colors duration-300" />
+                  )}
                 </button>
               </div>
             </div>
 
             {/* Confirm Password Field */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2"
+              >
                 Confirmar Senha
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary" />
                 </div>
-                <input id="confirmPassword" name="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} autoComplete="new-password" required value={formData.confirmPassword} onChange={handleInputChange} className="block w-full pl-10 pr-12 py-3 border border-light-border dark:border-dark-border rounded-lg bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary placeholder-text-light-secondary dark:placeholder-text-dark-secondary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-300" placeholder="Confirme sua senha" />
-                <button type="button" className="absolute inset-y-0 right-0 pr-3 flex items-center" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                  {showConfirmPassword ? <EyeOff className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary transition-colors duration-300" /> : <Eye className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary transition-colors duration-300" />}
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  required
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  className="block w-full pl-10 pr-12 py-3 border border-light-border dark:border-dark-border rounded-lg bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary placeholder-text-light-secondary dark:placeholder-text-dark-secondary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-300"
+                  placeholder="Confirme sua senha"
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary transition-colors duration-300" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary transition-colors duration-300" />
+                  )}
                 </button>
               </div>
             </div>
 
             {/* Error Message */}
-            {error && <div className="bg-danger/10 border border-danger/20 rounded-lg p-3">
+            {error && (
+              <div className="bg-danger/10 border border-danger/20 rounded-lg p-3">
                 <p className="text-danger text-sm">{error}</p>
-              </div>}
+              </div>
+            )}
 
             {/* Submit Button */}
-            <button type="submit" disabled={isLoading} className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-dark-text-primary bg-primary hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300">
-              {isLoading ? <>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-dark-text-primary bg-primary hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
+            >
+              {isLoading ? (
+                <>
                   <Loader2 className="h-5 w-5 animate-spin" />
                   Criando conta...
-                </> : <>
+                </>
+              ) : (
+                <>
                   <UserPlus className="h-5 w-5" />
                   Criar conta
-                </>}
+                </>
+              )}
             </button>
           </form>
 
@@ -202,7 +282,10 @@ export function SignUpPage() {
           <div className="mt-6 text-center">
             <p className="text-text-light-secondary dark:text-text-dark-secondary">
               Já tem uma conta?{' '}
-              <Link to="/login" className="text-primary hover:text-primary-600 font-medium transition-colors duration-300">
+              <Link
+                to="/login"
+                className="text-primary hover:text-primary-600 font-medium transition-colors duration-300"
+              >
                 Fazer login
               </Link>
             </p>
@@ -213,15 +296,22 @@ export function SignUpPage() {
         <div className="text-center">
           <p className="text-xs text-text-light-secondary dark:text-text-dark-secondary">
             Ao criar uma conta, você concorda com nossos{' '}
-            <Link to="/terms" className="text-primary hover:text-primary-600 transition-colors duration-300">
+            <Link
+              to="/terms"
+              className="text-primary hover:text-primary-600 transition-colors duration-300"
+            >
               Termos de Uso
             </Link>{' '}
             e{' '}
-            <Link to="/privacy" className="text-primary hover:text-primary-600 transition-colors duration-300">
+            <Link
+              to="/privacy"
+              className="text-primary hover:text-primary-600 transition-colors duration-300"
+            >
               Política de Privacidade
             </Link>
           </p>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 }

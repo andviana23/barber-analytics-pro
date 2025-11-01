@@ -69,7 +69,8 @@ const toastVariants = {
   },
 };
 
-function Toast({ id, type, title, message, onRemove, duration = 2000 }) {
+function Toast({ id, type, title, message, onRemove, duration = 2000, ...rest }) {
+  // Ignorar propriedades adicionais do spread
   const config = toastTypes[type];
   const Icon = config.icon;
 

@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart3, Download, FileText, TrendingUp } from 'lucide-react';
 import { Card, Button } from '../../../atoms';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 import { exportToPDF, exportToExcel } from '../../../utils/exportUtils';
-const RelatorioComparativoUnidades = ({
-  filters
-}) => {
+const RelatorioComparativoUnidades = ({ filters }) => {
   const [dados, setDados] = useState(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -21,26 +27,29 @@ const RelatorioComparativoUnidades = ({
           lucro: 15600,
           atendimentos: 180,
           ticketMedio: 288.89,
-          crescimento: 12.5
+          crescimento: 12.5,
         },
         novaLima: {
           receita: 48000,
           lucro: 14400,
           atendimentos: 165,
           ticketMedio: 290.91,
-          crescimento: 8.3
+          crescimento: 8.3,
         },
-        comparacao: [{
-          unidade: 'Mangabeiras',
-          receita: 52000,
-          lucro: 15600,
-          atendimentos: 180
-        }, {
-          unidade: 'Nova Lima',
-          receita: 48000,
-          lucro: 14400,
-          atendimentos: 165
-        }]
+        comparacao: [
+          {
+            unidade: 'Mangabeiras',
+            receita: 52000,
+            lucro: 15600,
+            atendimentos: 180,
+          },
+          {
+            unidade: 'Nova Lima',
+            receita: 48000,
+            lucro: 14400,
+            atendimentos: 165,
+          },
+        ],
       });
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
@@ -48,38 +57,52 @@ const RelatorioComparativoUnidades = ({
     setLoading(false);
   };
   const handleExportPDF = async () => {
-    const result = await exportToPDF('relatorio-comparativo', `Comparativo_Unidades_${filters.periodo.mes}_${filters.periodo.ano}`, `Comparativo entre Unidades - ${filters.periodo.mes}/${filters.periodo.ano}`);
+    const result = await exportToPDF(
+      'relatorio-comparativo',
+      `Comparativo_Unidades_${filters.periodo.mes}_${filters.periodo.ano}`,
+      `Comparativo entre Unidades - ${filters.periodo.mes}/${filters.periodo.ano}`
+    );
     if (result.success) {
       alert('PDF exportado com sucesso!');
     }
   };
   const handleExportExcel = () => {
     if (!dados) return;
-    const dadosExcel = [{
-      Métrica: 'Receita Total',
-      Mangabeiras: dados.mangabeiras.receita,
-      'Nova Lima': dados.novaLima.receita
-    }, {
-      Métrica: 'Lucro Líquido',
-      Mangabeiras: dados.mangabeiras.lucro,
-      'Nova Lima': dados.novaLima.lucro
-    }, {
-      Métrica: 'Total Atendimentos',
-      Mangabeiras: dados.mangabeiras.atendimentos,
-      'Nova Lima': dados.novaLima.atendimentos
-    }, {
-      Métrica: 'Ticket Médio',
-      Mangabeiras: dados.mangabeiras.ticketMedio,
-      'Nova Lima': dados.novaLima.ticketMedio
-    }, {
-      Métrica: 'Crescimento %',
-      Mangabeiras: dados.mangabeiras.crescimento,
-      'Nova Lima': dados.novaLima.crescimento
-    }];
-    exportToExcel(dadosExcel, `Comparativo_Unidades_${filters.periodo.mes}_${filters.periodo.ano}`);
+    const dadosExcel = [
+      {
+        Métrica: 'Receita Total',
+        Mangabeiras: dados.mangabeiras.receita,
+        'Nova Lima': dados.novaLima.receita,
+      },
+      {
+        Métrica: 'Lucro Líquido',
+        Mangabeiras: dados.mangabeiras.lucro,
+        'Nova Lima': dados.novaLima.lucro,
+      },
+      {
+        Métrica: 'Total Atendimentos',
+        Mangabeiras: dados.mangabeiras.atendimentos,
+        'Nova Lima': dados.novaLima.atendimentos,
+      },
+      {
+        Métrica: 'Ticket Médio',
+        Mangabeiras: dados.mangabeiras.ticketMedio,
+        'Nova Lima': dados.novaLima.ticketMedio,
+      },
+      {
+        Métrica: 'Crescimento %',
+        Mangabeiras: dados.mangabeiras.crescimento,
+        'Nova Lima': dados.novaLima.crescimento,
+      },
+    ];
+    exportToExcel(
+      dadosExcel,
+      `Comparativo_Unidades_${filters.periodo.mes}_${filters.periodo.ano}`
+    );
   };
   if (loading) {
-    return <div className="p-6">
+    return (
+      <div className="p-6">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -87,14 +110,20 @@ const RelatorioComparativoUnidades = ({
             <div className="h-40 bg-gray-200 dark:bg-gray-700 rounded"></div>
           </div>
         </div>
-      </div>;
+      </div>
+    );
   }
   if (!dados) {
-    return <div className="p-6 text-center">
-        <p className="text-theme-secondary">Erro ao carregar dados do comparativo</p>
-      </div>;
+    return (
+      <div className="p-6 text-center">
+        <p className="text-theme-secondary">
+          Erro ao carregar dados do comparativo
+        </p>
+      </div>
+    );
   }
-  return <div className="p-6" id="relatorio-comparativo">
+  return (
+    <div className="p-6" id="relatorio-comparativo">
       {/* Header com botões de exportação */}
       <div className="flex justify-between items-center mb-6">
         <div>
@@ -102,15 +131,25 @@ const RelatorioComparativoUnidades = ({
             Comparativo entre Unidades
           </h2>
           <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
-            {filters.periodo.tipo === 'mes' ? `${filters.periodo.mes}/${filters.periodo.ano}` : 'Período selecionado'}
+            {filters.periodo.tipo === 'mes'
+              ? `${filters.periodo.mes}/${filters.periodo.ano}`
+              : 'Período selecionado'}
           </p>
         </div>
         <div className="flex space-x-2">
-          <Button variant="secondary" onClick={handleExportPDF} className="flex items-center">
+          <Button
+            variant="secondary"
+            onClick={handleExportPDF}
+            className="flex items-center"
+          >
             <FileText size={16} className="mr-2" />
             PDF
           </Button>
-          <Button variant="secondary" onClick={handleExportExcel} className="flex items-center">
+          <Button
+            variant="secondary"
+            onClick={handleExportExcel}
+            className="flex items-center"
+          >
             <Download size={16} className="mr-2" />
             Excel
           </Button>
@@ -234,7 +273,20 @@ const RelatorioComparativoUnidades = ({
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="unidade" />
             <YAxis />
-            <Tooltip formatter={(value, name) => [name === 'receita' ? `R$ ${value.toLocaleString()}` : name === 'lucro' ? `R$ ${value.toLocaleString()}` : value, name === 'receita' ? 'Receita' : name === 'lucro' ? 'Lucro' : 'Atendimentos']} />
+            <Tooltip
+              formatter={(value, name) => [
+                name === 'receita'
+                  ? `R$ ${value.toLocaleString()}`
+                  : name === 'lucro'
+                    ? `R$ ${value.toLocaleString()}`
+                    : value,
+                name === 'receita'
+                  ? 'Receita'
+                  : name === 'lucro'
+                    ? 'Lucro'
+                    : 'Atendimentos',
+              ]}
+            />
             <Bar dataKey="receita" fill="#3B82F6" name="receita" />
             <Bar dataKey="lucro" fill="#10B981" name="lucro" />
             <Bar dataKey="atendimentos" fill="#F59E0B" name="atendimentos" />
@@ -250,13 +302,18 @@ const RelatorioComparativoUnidades = ({
         <div className="space-y-3 text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
           <p>
             • <strong>Mangabeiras</strong> apresenta receita{' '}
-            {((dados.mangabeiras.receita / dados.novaLima.receita - 1) * 100).toFixed(1)}
+            {(
+              (dados.mangabeiras.receita / dados.novaLima.receita - 1) *
+              100
+            ).toFixed(1)}
             % superior à Nova Lima
           </p>
           <p>
             • <strong>Nova Lima</strong> tem ticket médio ligeiramente superior
             (R${' '}
-            {(dados.novaLima.ticketMedio - dados.mangabeiras.ticketMedio).toFixed(2)}{' '}
+            {(
+              dados.novaLima.ticketMedio - dados.mangabeiras.ticketMedio
+            ).toFixed(2)}{' '}
             a mais)
           </p>
           <p>
@@ -267,12 +324,15 @@ const RelatorioComparativoUnidades = ({
             • Total combinado:{' '}
             <strong>
               R${' '}
-              {(dados.mangabeiras.receita + dados.novaLima.receita).toLocaleString()}
+              {(
+                dados.mangabeiras.receita + dados.novaLima.receita
+              ).toLocaleString()}
             </strong>{' '}
             em receita
           </p>
         </div>
       </Card>
-    </div>;
+    </div>
+  );
 };
 export default RelatorioComparativoUnidades;

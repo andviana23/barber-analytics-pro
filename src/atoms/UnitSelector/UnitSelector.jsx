@@ -8,13 +8,8 @@
 import React from 'react';
 import { useUnit } from '../../context/UnitContext';
 import { useAuth } from '../../context/AuthContext';
-const UnitSelector = ({
-  className = ''
-}) => {
-  const {
-    user,
-    receptionistStatus
-  } = useAuth();
+const UnitSelector = ({ className = '' }) => {
+  const { user, receptionistStatus } = useAuth();
   const {
     selectedUnit,
     allUnits,
@@ -23,7 +18,7 @@ const UnitSelector = ({
     selectUnit,
     selectAllUnits,
     getSelectedUnitName,
-    hasMultipleUnits
+    hasMultipleUnits,
   } = useUnit();
 
   // Debug desabilitado - descomentar se necessário
@@ -45,14 +40,18 @@ const UnitSelector = ({
   // O seletor deve sempre aparecer para dar contexto ao usuário
 
   if (loading) {
-    return <div className={`animate-pulse ${className}`}>
+    return (
+      <div className={`animate-pulse ${className}`}>
         <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-      </div>;
+      </div>
+    );
   }
   if (error) {
-    return <div className={`text-sm text-red-600 dark:text-red-400 ${className}`}>
+    return (
+      <div className={`text-sm text-red-600 dark:text-red-400 ${className}`}>
         Erro ao carregar unidades
-      </div>;
+      </div>
+    );
   }
   const handleUnitChange = unitId => {
     if (unitId === 'all' || unitId === '') {
@@ -64,23 +63,38 @@ const UnitSelector = ({
       }
     }
   };
-  return <div className={`flex flex-col gap-1.5 ${className}`}>
-      <select id="unit-select" value={selectedUnit?.id || 'all'} onChange={e => handleUnitChange(e.target.value)} className="w-full px-3 py-2.5 text-sm font-medium card-theme dark:bg-dark-surface border-2 border-primary/20 dark:border-primary/30 rounded-lg shadow-sm text-theme-primary dark:text-gray-100 focus:ring-2 focus:ring-primary focus:border-primary hover:border-primary/40 dark:hover:border-primary/50 transition-all duration-200 cursor-pointer">
+  return (
+    <div className={`flex flex-col gap-1.5 ${className}`}>
+      <select
+        id="unit-select"
+        value={selectedUnit?.id || 'all'}
+        onChange={e => handleUnitChange(e.target.value)}
+        className="w-full px-3 py-2.5 text-sm font-medium card-theme dark:bg-dark-surface border-2 border-primary/20 dark:border-primary/30 rounded-lg shadow-sm text-theme-primary dark:text-gray-100 focus:ring-2 focus:ring-primary focus:border-primary hover:border-primary/40 dark:hover:border-primary/50 transition-all duration-200 cursor-pointer"
+      >
         <option value="all">📍 Todas as Unidades</option>
-        {allUnits.map(unit => <option key={unit.id} value={unit.id}>
+        {allUnits.map(unit => (
+          <option key={unit.id} value={unit.id}>
             🏢 {unit.name}
-          </option>)}
+          </option>
+        ))}
       </select>
 
       {/* Indicador da seleção atual */}
       <div className="text-[10px] text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-1">
-        {selectedUnit ? <span className="flex items-center gap-1">
+        {selectedUnit ? (
+          <span className="flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
             <span className="font-medium text-primary">
               {selectedUnit.name}
             </span>
-          </span> : <span className="text-light-text-muted dark:text-dark-text-muted">Visualizando todas</span>}
+          </span>
+        ) : (
+          <span className="text-light-text-muted dark:text-dark-text-muted">
+            Visualizando todas
+          </span>
+        )}
       </div>
-    </div>;
+    </div>
+  );
 };
 export default UnitSelector;

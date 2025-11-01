@@ -1,6 +1,15 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { X, Search, Filter, CheckCircle, AlertTriangle, TrendingUp, Eye, RefreshCw } from 'lucide-react';
+import {
+  X,
+  Search,
+  Filter,
+  CheckCircle,
+  AlertTriangle,
+  TrendingUp,
+  Eye,
+  RefreshCw,
+} from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ReconciliationMatchCard } from '../molecules/ReconciliationMatchCard';
@@ -21,179 +30,214 @@ const ManualReconciliationModal = ({
   bankTransactions = [],
   internalTransactions = [],
   existingMatches = [],
-  loading = false
+  loading = false,
 }) => {
   // Estados principais
   const [selectedTab, setSelectedTab] = useState('matches');
   const [searchTerm, setSearchTerm] = useState('');
   const [dateRange, setDateRange] = useState({
     start: null,
-    end: null
+    end: null,
   });
   const [confidenceFilter, setConfidenceFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedBankTransaction, setSelectedBankTransaction] = useState(null);
-  const [selectedInternalTransaction, setSelectedInternalTransaction] = useState(null);
+  const [selectedInternalTransaction, setSelectedInternalTransaction] =
+    useState(null);
   const [processingMatches, setProcessingMatches] = useState([]);
 
   // Opções de filtros
-  const confidenceOptions = [{
-    value: 'all',
-    label: 'Todas as Confianças'
-  }, {
-    value: 'high',
-    label: 'Alta (>80%)'
-  }, {
-    value: 'medium',
-    label: 'Média (50-80%)'
-  }, {
-    value: 'low',
-    label: 'Baixa (<50%)'
-  }];
-  const statusOptions = [{
-    value: 'all',
-    label: 'Todos os Status'
-  }, {
-    value: 'matched',
-    label: 'Reconciliadas'
-  }, {
-    value: 'pending',
-    label: 'Pendentes'
-  }, {
-    value: 'rejected',
-    label: 'Rejeitadas'
-  }];
+  const confidenceOptions = [
+    {
+      value: 'all',
+      label: 'Todas as Confianças',
+    },
+    {
+      value: 'high',
+      label: 'Alta (>80%)',
+    },
+    {
+      value: 'medium',
+      label: 'Média (50-80%)',
+    },
+    {
+      value: 'low',
+      label: 'Baixa (<50%)',
+    },
+  ];
+  const statusOptions = [
+    {
+      value: 'all',
+      label: 'Todos os Status',
+    },
+    {
+      value: 'matched',
+      label: 'Reconciliadas',
+    },
+    {
+      value: 'pending',
+      label: 'Pendentes',
+    },
+    {
+      value: 'rejected',
+      label: 'Rejeitadas',
+    },
+  ];
 
   // Função auxiliar para calcular distância de Levenshtein (definida ANTES de ser usada)
   const levenshteinDistance = useCallback((str1, str2) => {
-    const matrix = Array(str2.length + 1).fill(null).map(() => Array(str1.length + 1).fill(null));
+    const matrix = Array(str2.length + 1)
+      .fill(null)
+      .map(() => Array(str1.length + 1).fill(null));
     for (let i = 0; i <= str1.length; i++) matrix[0][i] = i;
     for (let j = 0; j <= str2.length; j++) matrix[j][0] = j;
     for (let j = 1; j <= str2.length; j++) {
       for (let i = 1; i <= str1.length; i++) {
         const indicator = str1[i - 1] === str2[j - 1] ? 0 : 1;
-        matrix[j][i] = Math.min(matrix[j][i - 1] + 1, matrix[j - 1][i] + 1, matrix[j - 1][i - 1] + indicator);
+        matrix[j][i] = Math.min(
+          matrix[j][i - 1] + 1,
+          matrix[j - 1][i] + 1,
+          matrix[j - 1][i - 1] + indicator
+        );
       }
     }
     return matrix[str2.length][str1.length];
   }, []);
 
   // Função auxiliar para calcular similaridade de strings
-  const calculateStringSimilarity = useCallback((str1, str2) => {
-    const longer = str1.length > str2.length ? str1 : str2;
-    const shorter = str1.length > str2.length ? str2 : str1;
-    if (longer.length === 0) return 1.0;
-    const editDistance = levenshteinDistance(longer, shorter);
-    return (longer.length - editDistance) / longer.length;
-  }, [levenshteinDistance]);
+  const calculateStringSimilarity = useCallback(
+    (str1, str2) => {
+      const longer = str1.length > str2.length ? str1 : str2;
+      const shorter = str1.length > str2.length ? str2 : str1;
+      if (longer.length === 0) return 1.0;
+      const editDistance = levenshteinDistance(longer, shorter);
+      return (longer.length - editDistance) / longer.length;
+    },
+    [levenshteinDistance]
+  );
 
   // Função para calcular confiança de match
-  const calculateMatchConfidence = useCallback((bankTxn, internalTxn) => {
-    let confidence = 0;
-    const factors = [];
+  const calculateMatchConfidence = useCallback(
+    (bankTxn, internalTxn) => {
+      let confidence = 0;
+      const factors = [];
 
-    // Fator 1: Valor exato (peso 40%)
-    if (Math.abs(bankTxn.valor - internalTxn.valor) === 0) {
-      confidence += 40;
-      factors.push({
-        factor: 'Valor exato',
-        points: 40
-      });
-    } else if (Math.abs(bankTxn.valor - internalTxn.valor) <= 0.01) {
-      confidence += 35;
-      factors.push({
-        factor: 'Valor quase exato',
-        points: 35
-      });
-    } else if (Math.abs(bankTxn.valor - internalTxn.valor) <= bankTxn.valor * 0.05) {
-      confidence += 20;
-      factors.push({
-        factor: 'Valor similar (±5%)',
-        points: 20
-      });
-    }
-
-    // Fator 2: Data próxima (peso 25%)
-    const dateDiff = Math.abs(new Date(bankTxn.data) - new Date(internalTxn.data)) / (1000 * 60 * 60 * 24);
-    if (dateDiff === 0) {
-      confidence += 25;
-      factors.push({
-        factor: 'Mesma data',
-        points: 25
-      });
-    } else if (dateDiff <= 1) {
-      confidence += 20;
-      factors.push({
-        factor: 'Data próxima (1 dia)',
-        points: 20
-      });
-    } else if (dateDiff <= 3) {
-      confidence += 15;
-      factors.push({
-        factor: 'Data próxima (3 dias)',
-        points: 15
-      });
-    } else if (dateDiff <= 7) {
-      confidence += 10;
-      factors.push({
-        factor: 'Data próxima (7 dias)',
-        points: 10
-      });
-    }
-
-    // Fator 3: Descrição similar (peso 20%)
-    const bankDesc = bankTxn.descricao?.toLowerCase().trim() || '';
-    const internalDesc = internalTxn.descricao?.toLowerCase().trim() || '';
-    if (bankDesc && internalDesc) {
-      const similarity = calculateStringSimilarity(bankDesc, internalDesc);
-      if (similarity > 0.8) {
+      // Fator 1: Valor exato (peso 40%)
+      if (Math.abs(bankTxn.valor - internalTxn.valor) === 0) {
+        confidence += 40;
+        factors.push({
+          factor: 'Valor exato',
+          points: 40,
+        });
+      } else if (Math.abs(bankTxn.valor - internalTxn.valor) <= 0.01) {
+        confidence += 35;
+        factors.push({
+          factor: 'Valor quase exato',
+          points: 35,
+        });
+      } else if (
+        Math.abs(bankTxn.valor - internalTxn.valor) <=
+        bankTxn.valor * 0.05
+      ) {
         confidence += 20;
         factors.push({
-          factor: 'Descrição muito similar',
-          points: 20
+          factor: 'Valor similar (±5%)',
+          points: 20,
         });
-      } else if (similarity > 0.6) {
+      }
+
+      // Fator 2: Data próxima (peso 25%)
+      const dateDiff =
+        Math.abs(new Date(bankTxn.data) - new Date(internalTxn.data)) /
+        (1000 * 60 * 60 * 24);
+      if (dateDiff === 0) {
+        confidence += 25;
+        factors.push({
+          factor: 'Mesma data',
+          points: 25,
+        });
+      } else if (dateDiff <= 1) {
+        confidence += 20;
+        factors.push({
+          factor: 'Data próxima (1 dia)',
+          points: 20,
+        });
+      } else if (dateDiff <= 3) {
         confidence += 15;
         factors.push({
-          factor: 'Descrição similar',
-          points: 15
+          factor: 'Data próxima (3 dias)',
+          points: 15,
         });
-      } else if (similarity > 0.4) {
+      } else if (dateDiff <= 7) {
         confidence += 10;
         factors.push({
-          factor: 'Descrição parcialmente similar',
-          points: 10
+          factor: 'Data próxima (7 dias)',
+          points: 10,
         });
       }
-    }
 
-    // Fator 4: Documento/Referência (peso 10%)
-    if (bankTxn.documento && internalTxn.documento && bankTxn.documento === internalTxn.documento) {
-      confidence += 10;
-      factors.push({
-        factor: 'Documento idêntico',
-        points: 10
-      });
-    }
-
-    // Fator 5: Tipo de transação (peso 5%)
-    if (bankTxn.tipo === internalTxn.tipo) {
-      confidence += 5;
-      factors.push({
-        factor: 'Mesmo tipo',
-        points: 5
-      });
-    }
-    return {
-      confidence: Math.min(confidence, 100),
-      factors,
-      breakdown: {
-        valor: Math.abs(bankTxn.valor - internalTxn.valor),
-        dateDiff: dateDiff,
-        descSimilarity: bankDesc && internalDesc ? calculateStringSimilarity(bankDesc, internalDesc) : 0
+      // Fator 3: Descrição similar (peso 20%)
+      const bankDesc = bankTxn.descricao?.toLowerCase().trim() || '';
+      const internalDesc = internalTxn.descricao?.toLowerCase().trim() || '';
+      if (bankDesc && internalDesc) {
+        const similarity = calculateStringSimilarity(bankDesc, internalDesc);
+        if (similarity > 0.8) {
+          confidence += 20;
+          factors.push({
+            factor: 'Descrição muito similar',
+            points: 20,
+          });
+        } else if (similarity > 0.6) {
+          confidence += 15;
+          factors.push({
+            factor: 'Descrição similar',
+            points: 15,
+          });
+        } else if (similarity > 0.4) {
+          confidence += 10;
+          factors.push({
+            factor: 'Descrição parcialmente similar',
+            points: 10,
+          });
+        }
       }
-    };
-  }, [calculateStringSimilarity]);
+
+      // Fator 4: Documento/Referência (peso 10%)
+      if (
+        bankTxn.documento &&
+        internalTxn.documento &&
+        bankTxn.documento === internalTxn.documento
+      ) {
+        confidence += 10;
+        factors.push({
+          factor: 'Documento idêntico',
+          points: 10,
+        });
+      }
+
+      // Fator 5: Tipo de transação (peso 5%)
+      if (bankTxn.tipo === internalTxn.tipo) {
+        confidence += 5;
+        factors.push({
+          factor: 'Mesmo tipo',
+          points: 5,
+        });
+      }
+      return {
+        confidence: Math.min(confidence, 100),
+        factors,
+        breakdown: {
+          valor: Math.abs(bankTxn.valor - internalTxn.valor),
+          dateDiff: dateDiff,
+          descSimilarity:
+            bankDesc && internalDesc
+              ? calculateStringSimilarity(bankDesc, internalDesc)
+              : 0,
+        },
+      };
+    },
+    [calculateStringSimilarity]
+  );
 
   // Funções auxiliares removidas (duplicadas)
 
@@ -203,16 +247,20 @@ const ManualReconciliationModal = ({
     const usedInternalIds = new Set();
     bankTransactions.forEach(bankTxn => {
       // Já tem match? Pular
-      if (existingMatches.some(m => m.bank_transaction_id === bankTxn.id)) return;
-      const potentialMatches = internalTransactions.filter(internalTxn => !usedInternalIds.has(internalTxn.id)).map(internalTxn => {
-        const matchData = calculateMatchConfidence(bankTxn, internalTxn);
-        return {
-          bankTransaction: bankTxn,
-          internalTransaction: internalTxn,
-          ...matchData
-        };
-      }).filter(match => match.confidence > 30) // Filtrar apenas matches com confiança mínima
-      .sort((a, b) => b.confidence - a.confidence);
+      if (existingMatches.some(m => m.bank_transaction_id === bankTxn.id))
+        return;
+      const potentialMatches = internalTransactions
+        .filter(internalTxn => !usedInternalIds.has(internalTxn.id))
+        .map(internalTxn => {
+          const matchData = calculateMatchConfidence(bankTxn, internalTxn);
+          return {
+            bankTransaction: bankTxn,
+            internalTransaction: internalTxn,
+            ...matchData,
+          };
+        })
+        .filter(match => match.confidence > 30) // Filtrar apenas matches com confiança mínima
+        .sort((a, b) => b.confidence - a.confidence);
       if (potentialMatches.length > 0) {
         const bestMatch = potentialMatches[0];
         matches.push({
@@ -222,16 +270,26 @@ const ManualReconciliationModal = ({
           confidence: bestMatch.confidence,
           factors: bestMatch.factors,
           breakdown: bestMatch.breakdown,
-          status: bestMatch.confidence > 80 ? 'high_confidence' : bestMatch.confidence > 50 ? 'medium_confidence' : 'low_confidence',
+          status:
+            bestMatch.confidence > 80
+              ? 'high_confidence'
+              : bestMatch.confidence > 50
+                ? 'medium_confidence'
+                : 'low_confidence',
           bankTransaction: bankTxn,
           internalTransaction: bestMatch.internalTransaction,
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         });
         usedInternalIds.add(bestMatch.internalTransaction.id);
       }
     });
     return matches;
-  }, [bankTransactions, internalTransactions, existingMatches, calculateMatchConfidence]);
+  }, [
+    bankTransactions,
+    internalTransactions,
+    existingMatches,
+    calculateMatchConfidence,
+  ]);
 
   // Matches gerados automaticamente
   const autoMatches = useMemo(() => {
@@ -250,15 +308,21 @@ const ManualReconciliationModal = ({
       if (searchTerm) {
         const searchLower = searchTerm.toLowerCase();
         const bankDesc = match.bankTransaction?.descricao?.toLowerCase() || '';
-        const internalDesc = match.internalTransaction?.descricao?.toLowerCase() || '';
-        if (!bankDesc.includes(searchLower) && !internalDesc.includes(searchLower)) {
+        const internalDesc =
+          match.internalTransaction?.descricao?.toLowerCase() || '';
+        if (
+          !bankDesc.includes(searchLower) &&
+          !internalDesc.includes(searchLower)
+        ) {
           return false;
         }
       }
 
       // Filtro de data
       if (dateRange.start && dateRange.end) {
-        const matchDate = new Date(match.bankTransaction?.data || match.created_at);
+        const matchDate = new Date(
+          match.bankTransaction?.data || match.created_at
+        );
         if (matchDate < dateRange.start || matchDate > dateRange.end) {
           return false;
         }
@@ -284,7 +348,8 @@ const ManualReconciliationModal = ({
       if (statusFilter !== 'all') {
         if (statusFilter === 'matched' && !match.reconciled) return false;
         if (statusFilter === 'pending' && match.reconciled) return false;
-        if (statusFilter === 'rejected' && match.status !== 'rejected') return false;
+        if (statusFilter === 'rejected' && match.status !== 'rejected')
+          return false;
       }
       return true;
     });
@@ -296,7 +361,9 @@ const ManualReconciliationModal = ({
     return bankTransactions.filter(txn => !reconciledIds.has(txn.id));
   }, [bankTransactions, allMatches]);
   const unreconciledInternalTransactions = useMemo(() => {
-    const reconciledIds = new Set(allMatches.map(m => m.internal_transaction_id));
+    const reconciledIds = new Set(
+      allMatches.map(m => m.internal_transaction_id)
+    );
     return internalTransactions.filter(txn => !reconciledIds.has(txn.id));
   }, [internalTransactions, allMatches]);
 
@@ -304,60 +371,83 @@ const ManualReconciliationModal = ({
   const statistics = useMemo(() => {
     const total = bankTransactions.length;
     const reconciled = allMatches.filter(m => m.reconciled).length;
-    const pending = allMatches.filter(m => !m.reconciled && m.status !== 'rejected').length;
-    const highConfidence = allMatches.filter(m => (m.confidence || 0) > 80).length;
+    const pending = allMatches.filter(
+      m => !m.reconciled && m.status !== 'rejected'
+    ).length;
+    const highConfidence = allMatches.filter(
+      m => (m.confidence || 0) > 80
+    ).length;
     return {
       total,
       reconciled,
       pending,
       unmatched: total - reconciled - pending,
       highConfidence,
-      reconciliationRate: total > 0 ? (reconciled / total * 100).toFixed(1) : 0
+      reconciliationRate:
+        total > 0 ? ((reconciled / total) * 100).toFixed(1) : 0,
     };
   }, [bankTransactions.length, allMatches]);
 
   // Função para reconciliar match
-  const handleReconcile = useCallback(async (matchId, adjustments = {}) => {
-    setProcessingMatches(prev => [...prev, matchId]);
-    try {
-      await onReconcile(matchId, adjustments);
-    } finally {
-      setProcessingMatches(prev => prev.filter(id => id !== matchId));
-    }
-  }, [onReconcile]);
+  const handleReconcile = useCallback(
+    async (matchId, adjustments = {}) => {
+      setProcessingMatches(prev => [...prev, matchId]);
+      try {
+        await onReconcile(matchId, adjustments);
+      } finally {
+        setProcessingMatches(prev => prev.filter(id => id !== matchId));
+      }
+    },
+    [onReconcile]
+  );
 
   // Função para rejeitar match
-  const handleReject = useCallback(async (matchId, reason = '') => {
-    setProcessingMatches(prev => [...prev, matchId]);
-    try {
-      await onReject(matchId, reason);
-    } finally {
-      setProcessingMatches(prev => prev.filter(id => id !== matchId));
-    }
-  }, [onReject]);
+  const handleReject = useCallback(
+    async (matchId, reason = '') => {
+      setProcessingMatches(prev => [...prev, matchId]);
+      try {
+        await onReject(matchId, reason);
+      } finally {
+        setProcessingMatches(prev => prev.filter(id => id !== matchId));
+      }
+    },
+    [onReject]
+  );
 
   // Função para criar match manual
   const handleCreateManualMatch = useCallback(async () => {
     if (!selectedBankTransaction || !selectedInternalTransaction) return;
-    const matchData = calculateMatchConfidence(selectedBankTransaction, selectedInternalTransaction);
+    const matchData = calculateMatchConfidence(
+      selectedBankTransaction,
+      selectedInternalTransaction
+    );
     const manualMatch = {
       bank_transaction_id: selectedBankTransaction.id,
       internal_transaction_id: selectedInternalTransaction.id,
       confidence: matchData.confidence,
-      factors: [...matchData.factors, {
-        factor: 'Match manual',
-        points: 0
-      }],
-      manual: true
+      factors: [
+        ...matchData.factors,
+        {
+          factor: 'Match manual',
+          points: 0,
+        },
+      ],
+      manual: true,
     };
     await onCreateMatch(manualMatch);
 
     // Reset seleções
     setSelectedBankTransaction(null);
     setSelectedInternalTransaction(null);
-  }, [selectedBankTransaction, selectedInternalTransaction, calculateMatchConfidence, onCreateMatch]);
+  }, [
+    selectedBankTransaction,
+    selectedInternalTransaction,
+    calculateMatchConfidence,
+    onCreateMatch,
+  ]);
   if (!isOpen) return null;
-  return <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="card-theme rounded-lg shadow-xl w-full max-w-7xl max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-light-border dark:border-dark-border">
@@ -404,7 +494,10 @@ const ManualReconciliationModal = ({
               </div>
             </div>
 
-            <button onClick={onClose} className="flex items-center justify-center w-8 h-8 text-text-light-secondary dark:text-text-dark-secondary hover:text-theme-primary rounded-lg hover:bg-light-bg dark:hover:bg-dark-hover transition-colors">
+            <button
+              onClick={onClose}
+              className="flex items-center justify-center w-8 h-8 text-text-light-secondary dark:text-text-dark-secondary hover:text-theme-primary rounded-lg hover:bg-light-bg dark:hover:bg-dark-hover transition-colors"
+            >
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -413,91 +506,153 @@ const ManualReconciliationModal = ({
         {/* Tabs Navigation */}
         <div className="border-b border-light-border dark:border-dark-border">
           <nav className="flex space-x-8 px-6">
-            {[{
-            id: 'matches',
-            label: 'Matches Sugeridos',
-            icon: TrendingUp,
-            count: filteredMatches.length
-          }, {
-            id: 'manual',
-            label: 'Match Manual',
-            icon: Eye,
-            count: null
-          }, {
-            id: 'unmatched',
-            label: 'Não Reconciliadas',
-            icon: AlertTriangle,
-            count: unreconciledBankTransactions.length
-          }].map(tab => {
-            const TabIcon = tab.icon;
-            return <button key={tab.id} onClick={() => setSelectedTab(tab.id)} className={`flex items-center gap-2 py-4 px-2 text-sm font-medium border-b-2 transition-colors ${selectedTab === tab.id ? 'border-primary text-primary' : 'border-transparent text-theme-secondary hover:text-theme-primary hover:border-light-border dark:hover:border-dark-border'}`}>
+            {[
+              {
+                id: 'matches',
+                label: 'Matches Sugeridos',
+                icon: TrendingUp,
+                count: filteredMatches.length,
+              },
+              {
+                id: 'manual',
+                label: 'Match Manual',
+                icon: Eye,
+                count: null,
+              },
+              {
+                id: 'unmatched',
+                label: 'Não Reconciliadas',
+                icon: AlertTriangle,
+                count: unreconciledBankTransactions.length,
+              },
+            ].map(tab => {
+              const TabIcon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setSelectedTab(tab.id)}
+                  className={`flex items-center gap-2 py-4 px-2 text-sm font-medium border-b-2 transition-colors ${selectedTab === tab.id ? 'border-primary text-primary' : 'border-transparent text-theme-secondary hover:text-theme-primary hover:border-light-border dark:hover:border-dark-border'}`}
+                >
                   <TabIcon className="w-4 h-4" />
                   <span>{tab.label}</span>
-                  {tab.count !== null && <span className={`px-2 py-1 text-xs rounded-full ${selectedTab === tab.id ? 'bg-primary/10 dark:bg-primary/20 text-primary' : 'bg-light-bg dark:bg-dark-hover text-theme-secondary'}`}>
+                  {tab.count !== null && (
+                    <span
+                      className={`px-2 py-1 text-xs rounded-full ${selectedTab === tab.id ? 'bg-primary/10 dark:bg-primary/20 text-primary' : 'bg-light-bg dark:bg-dark-hover text-theme-secondary'}`}
+                    >
                       {tab.count}
-                    </span>}
-                </button>;
-          })}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </nav>
         </div>
 
         {/* Filters */}
-        {selectedTab === 'matches' && <div className="p-4 bg-light-bg dark:bg-dark-bg border-b border-light-border dark:border-dark-border">
+        {selectedTab === 'matches' && (
+          <div className="p-4 bg-light-bg dark:bg-dark-bg border-b border-light-border dark:border-dark-border">
             <div className="flex items-center gap-4">
               {/* Search */}
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-light-secondary dark:text-text-dark-secondary" />
-                <input type="text" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder="Buscar por descrição..." className="input-theme w-full pl-10" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  placeholder="Buscar por descrição..."
+                  className="input-theme w-full pl-10"
+                />
               </div>
 
               {/* Date Range */}
               <div className="w-64">
-                <DateRangePicker value={dateRange} onChange={setDateRange} placeholder="Filtrar por período" />
+                <DateRangePicker
+                  value={dateRange}
+                  onChange={setDateRange}
+                  placeholder="Filtrar por período"
+                />
               </div>
 
               {/* Confidence Filter */}
-              <select value={confidenceFilter} onChange={e => setConfidenceFilter(e.target.value)} className="input-theme">
-                {confidenceOptions.map(option => <option key={option.value} value={option.value}>
+              <select
+                value={confidenceFilter}
+                onChange={e => setConfidenceFilter(e.target.value)}
+                className="input-theme"
+              >
+                {confidenceOptions.map(option => (
+                  <option key={option.value} value={option.value}>
                     {option.label}
-                  </option>)}
+                  </option>
+                ))}
               </select>
 
               {/* Status Filter */}
-              <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="input-theme">
-                {statusOptions.map(option => <option key={option.value} value={option.value}>
+              <select
+                value={statusFilter}
+                onChange={e => setStatusFilter(e.target.value)}
+                className="input-theme"
+              >
+                {statusOptions.map(option => (
+                  <option key={option.value} value={option.value}>
                     {option.label}
-                  </option>)}
+                  </option>
+                ))}
               </select>
 
-              <button onClick={() => {
-            setSearchTerm('');
-            setDateRange({
-              start: null,
-              end: null
-            });
-            setConfidenceFilter('all');
-            setStatusFilter('all');
-          }} className="btn-theme-secondary p-2">
+              <button
+                onClick={() => {
+                  setSearchTerm('');
+                  setDateRange({
+                    start: null,
+                    end: null,
+                  });
+                  setConfidenceFilter('all');
+                  setStatusFilter('all');
+                }}
+                className="btn-theme-secondary p-2"
+              >
                 <Filter className="w-4 h-4" />
               </button>
             </div>
-          </div>}
+          </div>
+        )}
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto max-h-[60vh]">
-          {selectedTab === 'matches' && <div className="p-6 space-y-4">
-              {filteredMatches.length > 0 ? filteredMatches.map(match => <ReconciliationMatchCard key={match.id} match={match} onAccept={() => handleReconcile(match.id)} onReject={() => handleReject(match.id)} onAdjust={adjustments => handleReconcile(match.id, adjustments)} loading={processingMatches.includes(match.id)} expanded={false} />) : <div className="text-center py-12">
+          {selectedTab === 'matches' && (
+            <div className="p-6 space-y-4">
+              {filteredMatches.length > 0 ? (
+                filteredMatches.map(match => (
+                  <ReconciliationMatchCard
+                    key={match.id}
+                    match={match}
+                    onAccept={() => handleReconcile(match.id)}
+                    onReject={() => handleReject(match.id)}
+                    onAdjust={adjustments =>
+                      handleReconcile(match.id, adjustments)
+                    }
+                    loading={processingMatches.includes(match.id)}
+                    expanded={false}
+                  />
+                ))
+              ) : (
+                <div className="text-center py-12">
                   <Eye className="w-12 h-12 text-text-light-secondary dark:text-text-dark-secondary mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-theme-primary mb-2">
                     Nenhum match encontrado
                   </h3>
                   <p className="text-theme-secondary">
-                    {allMatches.length === 0 ? 'Nenhuma correspondência foi gerada automaticamente.' : 'Tente ajustar os filtros para ver mais resultados.'}
+                    {allMatches.length === 0
+                      ? 'Nenhuma correspondência foi gerada automaticamente.'
+                      : 'Tente ajustar os filtros para ver mais resultados.'}
                   </p>
-                </div>}
-            </div>}
+                </div>
+              )}
+            </div>
+          )}
 
-          {selectedTab === 'manual' && <div className="p-6">
+          {selectedTab === 'manual' && (
+            <div className="p-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Transações Bancárias */}
                 <div>
@@ -509,28 +664,40 @@ const ManualReconciliationModal = ({
                   </h3>
 
                   <div className="space-y-3 max-h-96 overflow-y-auto">
-                    {unreconciledBankTransactions.map(txn => <div key={txn.id} onClick={() => setSelectedBankTransaction(selectedBankTransaction?.id === txn.id ? null : txn)} className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedBankTransaction?.id === txn.id ? 'border-primary bg-primary/10 dark:bg-primary/20' : 'border-light-border dark:border-dark-border hover:border-primary/50 hover:bg-light-bg dark:hover:bg-dark-hover'}`}>
+                    {unreconciledBankTransactions.map(txn => (
+                      <div
+                        key={txn.id}
+                        onClick={() =>
+                          setSelectedBankTransaction(
+                            selectedBankTransaction?.id === txn.id ? null : txn
+                          )
+                        }
+                        className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedBankTransaction?.id === txn.id ? 'border-primary bg-primary/10 dark:bg-primary/20' : 'border-light-border dark:border-dark-border hover:border-primary/50 hover:bg-light-bg dark:hover:bg-dark-hover'}`}
+                      >
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-medium text-theme-primary">
                             {txn.descricao}
                           </span>
-                          <span className={`font-medium ${txn.valor >= 0 ? 'text-feedback-light-success dark:text-feedback-dark-success' : 'text-feedback-light-error dark:text-feedback-dark-error'}`}>
+                          <span
+                            className={`font-medium ${txn.valor >= 0 ? 'text-feedback-light-success dark:text-feedback-dark-success' : 'text-feedback-light-error dark:text-feedback-dark-error'}`}
+                          >
                             R${' '}
                             {Math.abs(txn.valor).toLocaleString('pt-BR', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                      })}
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
                           </span>
                         </div>
                         <div className="flex items-center justify-between text-sm text-theme-secondary">
                           <span>
                             {format(parseISO(txn.data), 'dd/MM/yyyy', {
-                        locale: ptBR
-                      })}
+                              locale: ptBR,
+                            })}
                           </span>
                           <span>{txn.documento || 'Sem documento'}</span>
                         </div>
-                      </div>)}
+                      </div>
+                    ))}
                   </div>
                 </div>
 
@@ -545,34 +712,49 @@ const ManualReconciliationModal = ({
                   </h3>
 
                   <div className="space-y-3 max-h-96 overflow-y-auto">
-                    {unreconciledInternalTransactions.map(txn => <div key={txn.id} onClick={() => setSelectedInternalTransaction(selectedInternalTransaction?.id === txn.id ? null : txn)} className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedInternalTransaction?.id === txn.id ? 'border-primary bg-primary/10 dark:bg-primary/20' : 'border-light-border dark:border-dark-border hover:border-primary/50 hover:bg-light-bg dark:hover:bg-dark-hover'}`}>
+                    {unreconciledInternalTransactions.map(txn => (
+                      <div
+                        key={txn.id}
+                        onClick={() =>
+                          setSelectedInternalTransaction(
+                            selectedInternalTransaction?.id === txn.id
+                              ? null
+                              : txn
+                          )
+                        }
+                        className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedInternalTransaction?.id === txn.id ? 'border-primary bg-primary/10 dark:bg-primary/20' : 'border-light-border dark:border-dark-border hover:border-primary/50 hover:bg-light-bg dark:hover:bg-dark-hover'}`}
+                      >
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-medium text-theme-primary">
                             {txn.descricao}
                           </span>
-                          <span className={`font-medium ${txn.valor >= 0 ? 'text-feedback-light-success dark:text-feedback-dark-success' : 'text-feedback-light-error dark:text-feedback-dark-error'}`}>
+                          <span
+                            className={`font-medium ${txn.valor >= 0 ? 'text-feedback-light-success dark:text-feedback-dark-success' : 'text-feedback-light-error dark:text-feedback-dark-error'}`}
+                          >
                             R${' '}
                             {Math.abs(txn.valor).toLocaleString('pt-BR', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                      })}
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
                           </span>
                         </div>
                         <div className="flex items-center justify-between text-sm text-theme-secondary">
                           <span>
                             {format(parseISO(txn.data), 'dd/MM/yyyy', {
-                        locale: ptBR
-                      })}
+                              locale: ptBR,
+                            })}
                           </span>
                           <StatusBadge status={txn.status} size="sm" />
                         </div>
-                      </div>)}
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
 
               {/* Match Preview */}
-              {selectedBankTransaction && selectedInternalTransaction && <div className="mt-6 p-4 bg-primary/10 dark:bg-primary/20 border border-primary/30 dark:border-primary/40 rounded-lg">
+              {selectedBankTransaction && selectedInternalTransaction && (
+                <div className="mt-6 p-4 bg-primary/10 dark:bg-primary/20 border border-primary/30 dark:border-primary/40 rounded-lg">
                   <h4 className="text-sm font-medium text-theme-primary mb-3">
                     Preview do Match Manual
                   </h4>
@@ -583,7 +765,10 @@ const ManualReconciliationModal = ({
                         Confiança:
                       </span>
                       <span className="ml-2 text-theme-primary">
-                        {calculateMatchConfidence(selectedBankTransaction, selectedInternalTransaction).confidence.toFixed(1)}
+                        {calculateMatchConfidence(
+                          selectedBankTransaction,
+                          selectedInternalTransaction
+                        ).confidence.toFixed(1)}
                         %
                       </span>
                     </div>
@@ -593,10 +778,13 @@ const ManualReconciliationModal = ({
                       </span>
                       <span className="ml-2 text-theme-primary">
                         R${' '}
-                        {Math.abs(selectedBankTransaction.valor - selectedInternalTransaction.valor).toLocaleString('pt-BR', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                  })}
+                        {Math.abs(
+                          selectedBankTransaction.valor -
+                            selectedInternalTransaction.valor
+                        ).toLocaleString('pt-BR', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
                       </span>
                     </div>
                     <div>
@@ -606,10 +794,13 @@ const ManualReconciliationModal = ({
                       </span>
                     </div>
                   </div>
-                </div>}
-            </div>}
+                </div>
+              )}
+            </div>
+          )}
 
-          {selectedTab === 'unmatched' && <div className="p-6">
+          {selectedTab === 'unmatched' && (
+            <div className="p-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Bank Transactions */}
                 <div>
@@ -619,26 +810,33 @@ const ManualReconciliationModal = ({
                   </h3>
 
                   <div className="space-y-3">
-                    {unreconciledBankTransactions.map(txn => <div key={txn.id} className="p-4 border border-light-border dark:border-dark-border rounded-lg">
+                    {unreconciledBankTransactions.map(txn => (
+                      <div
+                        key={txn.id}
+                        className="p-4 border border-light-border dark:border-dark-border rounded-lg"
+                      >
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-medium text-theme-primary">
                             {txn.descricao}
                           </span>
-                          <span className={`font-medium ${txn.valor >= 0 ? 'text-feedback-light-success dark:text-feedback-dark-success' : 'text-feedback-light-error dark:text-feedback-dark-error'}`}>
+                          <span
+                            className={`font-medium ${txn.valor >= 0 ? 'text-feedback-light-success dark:text-feedback-dark-success' : 'text-feedback-light-error dark:text-feedback-dark-error'}`}
+                          >
                             R${' '}
                             {Math.abs(txn.valor).toLocaleString('pt-BR', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                      })}
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
                           </span>
                         </div>
                         <div className="text-sm text-theme-secondary">
                           {format(parseISO(txn.data), 'dd/MM/yyyy', {
-                      locale: ptBR
-                    })}
+                            locale: ptBR,
+                          })}
                           {txn.documento && ` • ${txn.documento}`}
                         </div>
-                      </div>)}
+                      </div>
+                    ))}
                   </div>
                 </div>
 
@@ -650,60 +848,91 @@ const ManualReconciliationModal = ({
                   </h3>
 
                   <div className="space-y-3">
-                    {unreconciledInternalTransactions.map(txn => <div key={txn.id} className="p-4 border border-light-border dark:border-dark-border rounded-lg">
+                    {unreconciledInternalTransactions.map(txn => (
+                      <div
+                        key={txn.id}
+                        className="p-4 border border-light-border dark:border-dark-border rounded-lg"
+                      >
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-medium text-theme-primary">
                             {txn.descricao}
                           </span>
-                          <span className={`font-medium ${txn.valor >= 0 ? 'text-feedback-light-success dark:text-feedback-dark-success' : 'text-feedback-light-error dark:text-feedback-dark-error'}`}>
+                          <span
+                            className={`font-medium ${txn.valor >= 0 ? 'text-feedback-light-success dark:text-feedback-dark-success' : 'text-feedback-light-error dark:text-feedback-dark-error'}`}
+                          >
                             R${' '}
                             {Math.abs(txn.valor).toLocaleString('pt-BR', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                      })}
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-theme-secondary">
                             {format(parseISO(txn.data), 'dd/MM/yyyy', {
-                        locale: ptBR
-                      })}
+                              locale: ptBR,
+                            })}
                           </span>
                           <StatusBadge status={txn.status} size="sm" />
                         </div>
-                      </div>)}
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
-            </div>}
+            </div>
+          )}
         </div>
 
         {/* Footer */}
         <div className="flex items-center justify-between p-6 border-t border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg">
           <div className="text-sm text-theme-secondary">
-            {selectedTab === 'matches' && `${filteredMatches.length} de ${allMatches.length} matches`}
-            {selectedTab === 'manual' && 'Selecione uma transação de cada lado para criar um match manual'}
-            {selectedTab === 'unmatched' && `${unreconciledBankTransactions.length + unreconciledInternalTransactions.length} transações sem match`}
+            {selectedTab === 'matches' &&
+              `${filteredMatches.length} de ${allMatches.length} matches`}
+            {selectedTab === 'manual' &&
+              'Selecione uma transação de cada lado para criar um match manual'}
+            {selectedTab === 'unmatched' &&
+              `${unreconciledBankTransactions.length + unreconciledInternalTransactions.length} transações sem match`}
           </div>
 
           <div className="flex items-center gap-3">
-            {selectedTab === 'manual' && <button type="button" onClick={handleCreateManualMatch} disabled={!selectedBankTransaction || !selectedInternalTransaction || loading} className="btn-theme-primary px-6 py-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
-                {loading ? <>
+            {selectedTab === 'manual' && (
+              <button
+                type="button"
+                onClick={handleCreateManualMatch}
+                disabled={
+                  !selectedBankTransaction ||
+                  !selectedInternalTransaction ||
+                  loading
+                }
+                className="btn-theme-primary px-6 py-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {loading ? (
+                  <>
                     <RefreshCw className="w-4 h-4 animate-spin" />
                     Criando...
-                  </> : <>
+                  </>
+                ) : (
+                  <>
                     <CheckCircle className="w-4 h-4" />
                     Criar Match Manual
-                  </>}
-              </button>}
+                  </>
+                )}
+              </button>
+            )}
 
-            <button type="button" onClick={onClose} className="btn-theme-secondary px-4 py-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn-theme-secondary px-4 py-2"
+            >
               Fechar
             </button>
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 ManualReconciliationModal.propTypes = {
   /** Se o modal está aberto */
@@ -725,7 +954,7 @@ ManualReconciliationModal.propTypes = {
   /** Se está carregando */
   loading: PropTypes.bool,
   /** Se auto-match está habilitado */
-  autoMatchEnabled: PropTypes.bool
+  autoMatchEnabled: PropTypes.bool,
 };
 export default ManualReconciliationModal;
 
@@ -735,69 +964,83 @@ export const ManualReconciliationModalPreview = () => {
   const [loading, setLoading] = React.useState(false);
 
   // Mock data
-  const mockBankTransactions = [{
-    id: 'bank-1',
-    data: '2024-12-01T00:00:00Z',
-    descricao: 'Transferência recebida - João Silva',
-    valor: 1500.0,
-    tipo: 'C',
-    documento: 'TED123456'
-  }, {
-    id: 'bank-2',
-    data: '2024-12-02T00:00:00Z',
-    descricao: 'Pagamento conta de luz',
-    valor: -85.5,
-    tipo: 'D',
-    documento: 'BOL789123'
-  }, {
-    id: 'bank-3',
-    data: '2024-12-03T00:00:00Z',
-    descricao: 'Depósito em dinheiro',
-    valor: 200.0,
-    tipo: 'C',
-    documento: 'DEP456789'
-  }];
-  const mockInternalTransactions = [{
-    id: 'internal-1',
-    data: '2024-12-01T00:00:00Z',
-    descricao: 'Receita de serviços - João Silva',
-    valor: 1500.0,
-    status: 'confirmada',
-    categoria: 'Serviços'
-  }, {
-    id: 'internal-2',
-    data: '2024-12-02T00:00:00Z',
-    descricao: 'Despesa com energia elétrica',
-    valor: -85.5,
-    status: 'pendente',
-    categoria: 'Utilidades'
-  }, {
-    id: 'internal-3',
-    data: '2024-12-04T00:00:00Z',
-    descricao: 'Venda de produtos',
-    valor: 180.0,
-    status: 'confirmada',
-    categoria: 'Vendas'
-  }];
-  const mockExistingMatches = [{
-    id: 'match-1',
-    bank_transaction_id: 'bank-1',
-    internal_transaction_id: 'internal-1',
-    confidence: 95,
-    reconciled: true,
-    factors: [{
-      factor: 'Valor exato',
-      points: 40
-    }, {
-      factor: 'Mesma data',
-      points: 25
-    }, {
-      factor: 'Descrição similar',
-      points: 20
-    }],
-    bankTransaction: mockBankTransactions[0],
-    internalTransaction: mockInternalTransactions[0]
-  }];
+  const mockBankTransactions = [
+    {
+      id: 'bank-1',
+      data: '2024-12-01T00:00:00Z',
+      descricao: 'Transferência recebida - João Silva',
+      valor: 1500.0,
+      tipo: 'C',
+      documento: 'TED123456',
+    },
+    {
+      id: 'bank-2',
+      data: '2024-12-02T00:00:00Z',
+      descricao: 'Pagamento conta de luz',
+      valor: -85.5,
+      tipo: 'D',
+      documento: 'BOL789123',
+    },
+    {
+      id: 'bank-3',
+      data: '2024-12-03T00:00:00Z',
+      descricao: 'Depósito em dinheiro',
+      valor: 200.0,
+      tipo: 'C',
+      documento: 'DEP456789',
+    },
+  ];
+  const mockInternalTransactions = [
+    {
+      id: 'internal-1',
+      data: '2024-12-01T00:00:00Z',
+      descricao: 'Receita de serviços - João Silva',
+      valor: 1500.0,
+      status: 'confirmada',
+      categoria: 'Serviços',
+    },
+    {
+      id: 'internal-2',
+      data: '2024-12-02T00:00:00Z',
+      descricao: 'Despesa com energia elétrica',
+      valor: -85.5,
+      status: 'pendente',
+      categoria: 'Utilidades',
+    },
+    {
+      id: 'internal-3',
+      data: '2024-12-04T00:00:00Z',
+      descricao: 'Venda de produtos',
+      valor: 180.0,
+      status: 'confirmada',
+      categoria: 'Vendas',
+    },
+  ];
+  const mockExistingMatches = [
+    {
+      id: 'match-1',
+      bank_transaction_id: 'bank-1',
+      internal_transaction_id: 'internal-1',
+      confidence: 95,
+      reconciled: true,
+      factors: [
+        {
+          factor: 'Valor exato',
+          points: 40,
+        },
+        {
+          factor: 'Mesma data',
+          points: 25,
+        },
+        {
+          factor: 'Descrição similar',
+          points: 20,
+        },
+      ],
+      bankTransaction: mockBankTransactions[0],
+      internalTransaction: mockInternalTransactions[0],
+    },
+  ];
   const handleReconcile = async matchId => {
     setLoading(true);
     await new Promise(resolve => setTimeout(resolve, 1500));
@@ -808,7 +1051,9 @@ export const ManualReconciliationModalPreview = () => {
     setLoading(true);
     await new Promise(resolve => setTimeout(resolve, 1000));
     setLoading(false);
-    alert(`Match ${matchId} rejeitado! Motivo: ${reason || 'Não especificado'}`);
+    alert(
+      `Match ${matchId} rejeitado! Motivo: ${reason || 'Não especificado'}`
+    );
   };
   const handleCreateMatch = async () => {
     setLoading(true);
@@ -816,7 +1061,8 @@ export const ManualReconciliationModalPreview = () => {
     setLoading(false);
     alert('Match manual criado com sucesso!');
   };
-  return <div className="p-6 card-theme min-h-screen">
+  return (
+    <div className="p-6 card-theme min-h-screen">
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="card-theme p-6 rounded-lg shadow">
           <h2 className="text-2xl font-bold text-theme-primary mb-4">
@@ -828,13 +1074,28 @@ export const ManualReconciliationModalPreview = () => {
             do ReconciliationMatchCard.
           </p>
 
-          <button onClick={() => setIsOpen(true)} className="px-4 py-2 bg-purple-600 text-dark-text-primary rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2">
+          <button
+            onClick={() => setIsOpen(true)}
+            className="px-4 py-2 bg-purple-600 text-dark-text-primary rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+          >
             <Eye className="w-4 h-4" />
             Abrir Reconciliação Manual
           </button>
         </div>
 
-        <ManualReconciliationModal isOpen={isOpen} onClose={() => setIsOpen(false)} onReconcile={handleReconcile} onReject={handleReject} onCreateMatch={handleCreateMatch} bankTransactions={mockBankTransactions} internalTransactions={mockInternalTransactions} existingMatches={mockExistingMatches} loading={loading} autoMatchEnabled={true} />
+        <ManualReconciliationModal
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          onReconcile={handleReconcile}
+          onReject={handleReject}
+          onCreateMatch={handleCreateMatch}
+          bankTransactions={mockBankTransactions}
+          internalTransactions={mockInternalTransactions}
+          existingMatches={mockExistingMatches}
+          loading={loading}
+          autoMatchEnabled={true}
+        />
       </div>
-    </div>;
+    </div>
+  );
 };
