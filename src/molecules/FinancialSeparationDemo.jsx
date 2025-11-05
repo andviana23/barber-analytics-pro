@@ -5,9 +5,10 @@ import FinancialSeparationCard from '../organisms/FinancialSeparationCard';
  * Wrapper para demonstrar a separação financeira na página de contas bancárias
  * @param {Object} props - Props do componente
  * @param {Array} props.accounts - Lista de contas bancárias
+ * @param {string} props.unitId - ID da unidade
  */
-const FinancialSeparationDemo = ({ accounts }) => {
-  if (!accounts || accounts.length === 0) {
+const FinancialSeparationDemo = ({ accounts, unitId }) => {
+  if (!accounts || accounts.length === 0 || !unitId) {
     return null;
   }
 
@@ -30,6 +31,7 @@ const FinancialSeparationDemo = ({ accounts }) => {
         <FinancialSeparationCard
           accountId={firstActiveAccount.id}
           accountName={firstActiveAccount.name}
+          unitId={unitId}
         />
       </div>
     </div>
@@ -44,6 +46,7 @@ FinancialSeparationDemo.propTypes = {
       is_active: PropTypes.bool.isRequired,
     })
   ),
+  unitId: PropTypes.string.isRequired,
 };
 
 FinancialSeparationDemo.defaultProps = {

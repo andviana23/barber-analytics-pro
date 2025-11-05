@@ -19,6 +19,7 @@ import {
   XCircle,
   Zap,
 } from 'lucide-react';
+import PropTypes from 'prop-types';
 import { useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import useBankAccounts from '../../hooks/useBankAccounts';
@@ -736,7 +737,10 @@ const ContasBancariasTab = ({ globalFilters }) => {
       </div>
 
       {/* Separação Financeira - Demonstração para primeira conta ativa */}
-      <FinancialSeparationDemo accounts={filteredAndSortedAccounts} />
+      <FinancialSeparationDemo
+        accounts={filteredAndSortedAccounts}
+        unitId={globalFilters?.unitId}
+      />
 
       {/* Filtros e Controles */}
       <div className="card-theme rounded-xl border border-light-border p-6 dark:border-dark-border dark:bg-dark-surface">
@@ -936,4 +940,15 @@ const ContasBancariasTab = ({ globalFilters }) => {
     </div>
   );
 };
+
+ContasBancariasTab.propTypes = {
+  globalFilters: PropTypes.shape({
+    unitId: PropTypes.string,
+  }),
+};
+
+ContasBancariasTab.defaultProps = {
+  globalFilters: {},
+};
+
 export default ContasBancariasTab;

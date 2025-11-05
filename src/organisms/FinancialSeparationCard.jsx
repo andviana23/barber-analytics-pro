@@ -6,6 +6,7 @@ import {
   Settings,
   TrendingUp,
 } from 'lucide-react';
+import PropTypes from 'prop-types';
 import { useCallback, useEffect, useState } from 'react';
 import { bankAccountsService } from '../services';
 import { formatCurrency } from '../utils/formatters';
@@ -16,8 +17,9 @@ import { formatCurrency } from '../utils/formatters';
  * @param {Object} props - Props do componente
  * @param {string} props.accountId - ID da conta bancária
  * @param {string} props.accountName - Nome da conta bancária
+ * @param {string} props.unitId - ID da unidade
  */
-const FinancialSeparationCard = ({ accountId, accountName }) => {
+const FinancialSeparationCard = ({ accountId, accountName, unitId }) => {
   const [data, setData] = useState({
     operationalRevenues: 0,
     balanceAdjustments: 0,
@@ -35,7 +37,7 @@ const FinancialSeparationCard = ({ accountId, accountName }) => {
 
       // Buscar dados da view separada
       const { data: summaryData, error: summaryError } =
-        await bankAccountsService.getFinancialSummarySeparated();
+        await bankAccountsService.getFinancialSummarySeparated(unitId);
 
       if (summaryError) throw new Error(summaryError);
 
@@ -60,13 +62,13 @@ const FinancialSeparationCard = ({ accountId, accountName }) => {
     } finally {
       setLoading(false);
     }
-  }, [accountId]);
+  }, [accountId, unitId]);
 
   useEffect(() => {
-    if (accountId) {
+    if (accountId && unitId) {
       loadFinancialData();
     }
-  }, [accountId, loadFinancialData]);
+  }, [accountId, unitId, loadFinancialData]);
 
   if (loading) {
     return (
@@ -239,6 +241,12 @@ const FinancialSeparationCard = ({ accountId, accountName }) => {
       </div>
     </div>
   );
+};
+
+FinancialSeparationCard.propTypes = {
+  accountId: PropTypes.string.isRequired,
+  accountName: PropTypes.string.isRequired,
+  unitId: PropTypes.string.isRequired,
 };
 
 export default FinancialSeparationCard;
