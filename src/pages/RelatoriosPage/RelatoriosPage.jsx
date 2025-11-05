@@ -476,16 +476,18 @@ const RelatoriosPage = () => {
             startDate = startOfMonth(lastMonth);
             endDate = endOfMonth(lastMonth);
             break;
-          case 'trimestre-atual':
+          case 'trimestre-atual': {
             const quarter = Math.floor(now.getMonth() / 3);
             startDate = new Date(now.getFullYear(), quarter * 3, 1);
             endDate = new Date(now.getFullYear(), quarter * 3 + 3, 0);
             break;
-          case 'semestre-atual':
+          }
+          case 'semestre-atual': {
             const semester = now.getMonth() < 6 ? 0 : 6;
             startDate = new Date(now.getFullYear(), semester, 1);
             endDate = new Date(now.getFullYear(), semester + 6, 0);
             break;
+          }
           case 'ano-atual':
             startDate = new Date(now.getFullYear(), 0, 1);
             endDate = new Date(now.getFullYear(), 11, 31);

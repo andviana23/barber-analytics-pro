@@ -7,8 +7,8 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
-import { bankAccountsService } from '../../services';
-import { formatCurrency } from '../../utils/formatters';
+import { bankAccountsService } from '../services';
+import { formatCurrency } from '../utils/formatters';
 
 /**
  * Componente que mostra claramente a separação entre receitas operacionais e ajustes de saldo
