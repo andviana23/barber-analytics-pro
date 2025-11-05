@@ -62,7 +62,7 @@ const FiltrosAvancados = ({
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {/* Período */}
         <div>
-          <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+          <label className="text-theme-secondary mb-2 block text-sm font-medium">
             Período
           </label>
           <select
@@ -86,7 +86,7 @@ const FiltrosAvancados = ({
 
         {/* Unidade */}
         <div>
-          <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+          <label className="text-theme-secondary mb-2 block text-sm font-medium">
             Unidade
           </label>
           <select
@@ -110,7 +110,7 @@ const FiltrosAvancados = ({
 
         {/* Tipo de Relatório */}
         <div>
-          <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+          <label className="text-theme-secondary mb-2 block text-sm font-medium">
             Formato
           </label>
           <select
@@ -488,11 +488,12 @@ const RelatoriosPage = () => {
             endDate = new Date(now.getFullYear(), semester + 6, 0);
             break;
           }
-          case 'ano-atual':
+          case 'ano-atual': {
             startDate = new Date(now.getFullYear(), 0, 1);
             endDate = new Date(now.getFullYear(), 11, 31);
             break;
-          case 'personalizado':
+          }
+          case 'personalizado': {
             if (filters.dataInicio && filters.dataFim) {
               startDate = parseISO(filters.dataInicio);
               endDate = parseISO(filters.dataFim);
@@ -501,9 +502,12 @@ const RelatoriosPage = () => {
               endDate = endOfMonth(now);
             }
             break;
-          default:
+          }
+          default: {
             startDate = startOfMonth(now);
             endDate = endOfMonth(now);
+            break;
+          }
         }
 
         // Garantir que as datas estão corretas (sem problemas de timezone)
@@ -729,7 +733,7 @@ const RelatoriosPage = () => {
     );
   };
   return (
-    <div className="min-h-screen bg-light-bg dark:bg-dark-bg dark:bg-dark-surface">
+    <div className="min-h-screen bg-light-bg dark:bg-dark-bg">
       {/* Header */}
       <div className="card-theme border-b border-light-border px-6 py-4 dark:border-dark-border dark:bg-dark-surface">
         <div className="flex items-center justify-between">
