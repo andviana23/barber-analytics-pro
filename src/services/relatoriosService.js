@@ -1,8 +1,403 @@
-// Serviços para Relatórios e Análises
+/**
+ * RELATÓRIOS SERVICE
+ *
+ * Serviço responsável por orquestrar regras de negócio dos relatórios usando DTOs e repositories.
+ * Segue os padrões Clean Architecture - Service Layer.
+ */
+
 /* eslint-disable no-console */
+import {
+  ComparativoUnidadesRequestDTO,
+  PeriodFiltersDTO,
+  RankingUnidadesRequestDTO,
+  UnitsComparisonResponseDTO,
+} from '../dtos/relatoriosDTO';
+import relatoriosRepository from '../repositories/relatoriosRepository';
 import { supabase } from './supabase';
 
-// Função para buscar dados do DRE mensal
+/**
+ * Utilitários para tratamento de erros
+ */
+const buildError = (message, code = null) => ({
+  message,
+  code,
+  timestamp: new Date().toISOString(),
+});
+
+/**
+ * Utilitários para formatação de valores
+ */
+const formatCurrency = value => {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(value || 0);
+};
+
+/**
+ * Classe principal do serviço de relatórios
+ */
+class RelatoriosService {
+  /**
+   * Gerar comparativo entre unidades
+   */
+  async getComparativoUnidades(filters = {}) {
+    console.log(
+      '🔍 [relatoriosService] getComparativoUnidades - filters:',
+      filters
+    );
+
+    // Validar entrada com DTO
+    const requestDTO = new ComparativoUnidadesRequestDTO(filters);
+
+    if (!requestDTO.isValid()) {
+      console.error(
+        '❌ [relatoriosService] DTO inválido:',
+        requestDTO.getErrorMessage()
+      );
+      return {
+        data: null,
+        error: buildError(requestDTO.getErrorMessage(), 'VALIDATION_ERROR'),
+      };
+    }
+
+    try {
+      console.log(
+        '🔍 [relatoriosService] Chamando repository.getUnitsComparisonData...'
+      );
+
+      const params = requestDTO.toRepositoryParams();
+      const { data, error } = await relatoriosRepository.getUnitsComparisonData(
+        params.month,
+        params.year
+      );
+
+      if (error) {
+        console.error('❌ [relatoriosService] Erro do repository:', error);
+        return { data: null, error };
+      }
+
+      // Processar dados com DTO de resposta
+      const responseDTO = new UnitsComparisonResponseDTO(data);
+      const processedData = responseDTO.toObject();
+
+      console.log(
+        '✅ [relatoriosService] getComparativoUnidades - sucesso:',
+        processedData.summary
+      );
+
+      return {
+        data: processedData,
+        error: null,
+        metadata: {
+          period: requestDTO.period.getPeriodDisplayName(),
+          filters: params,
+          generated_at: new Date().toISOString(),
+        },
+      };
+    } catch (error) {
+      console.error(
+        '❌ [relatoriosService] getComparativoUnidades - catch error:',
+        error
+      );
+      return {
+        data: null,
+        error: buildError(
+          `Falha ao gerar comparativo: ${error.message}`,
+          'PROCESSING_ERROR'
+        ),
+      };
+    }
+  }
+
+  /**
+   * Gerar ranking de unidades
+   */
+  async getRankingUnidades(filters = {}) {
+    console.log(
+      '🔍 [relatoriosService] getRankingUnidades - filters:',
+      filters
+    );
+
+    // Validar entrada com DTO
+    const requestDTO = new RankingUnidadesRequestDTO(filters);
+
+    if (!requestDTO.isValid()) {
+      console.error(
+        '❌ [relatoriosService] DTO inválido:',
+        requestDTO.getErrorMessage()
+      );
+      return {
+        data: null,
+        error: buildError(requestDTO.getErrorMessage(), 'VALIDATION_ERROR'),
+      };
+    }
+
+    try {
+      const params = requestDTO.toRepositoryParams();
+      const { data, error } = await relatoriosRepository.getUnitsRanking(
+        params.metric,
+        params.month,
+        params.year,
+        params.limit
+      );
+
+      if (error) {
+        console.error('❌ [relatoriosService] Erro do repository:', error);
+        return { data: null, error };
+      }
+
+      console.log(
+        '✅ [relatoriosService] getRankingUnidades - sucesso:',
+        data?.length || 0,
+        'unidades'
+      );
+
+      return {
+        data: {
+          ranking: data || [],
+          metric: requestDTO.getMetricDisplayName(),
+          period: requestDTO.period.getPeriodDisplayName(),
+        },
+        error: null,
+        metadata: {
+          filters: params,
+          generated_at: new Date().toISOString(),
+        },
+      };
+    } catch (error) {
+      console.error(
+        '❌ [relatoriosService] getRankingUnidades - catch error:',
+        error
+      );
+      return {
+        data: null,
+        error: buildError(
+          `Falha ao gerar ranking: ${error.message}`,
+          'PROCESSING_ERROR'
+        ),
+      };
+    }
+  }
+
+  /**
+   * Gerar dados para dashboard de unidade específica
+   */
+  async getUnitDashboard(unitId, filters = {}) {
+    console.log(
+      '🔍 [relatoriosService] getUnitDashboard - unitId:',
+      unitId,
+      'filters:',
+      filters
+    );
+
+    try {
+      // Validar período
+      const periodDTO = new PeriodFiltersDTO(filters);
+      if (!periodDTO.isValid()) {
+        return {
+          data: null,
+          error: buildError(periodDTO.getErrorMessage(), 'VALIDATION_ERROR'),
+        };
+      }
+
+      const params = periodDTO.toRepositoryParams();
+
+      // Buscar dados específicos da unidade
+      const [
+        financialResult,
+        attendanceResult,
+        professionalsResult,
+        dreResult,
+      ] = await Promise.all([
+        relatoriosRepository.getUnitFinancialStats(
+          unitId,
+          params.month,
+          params.year
+        ),
+        relatoriosRepository.getUnitAttendanceStats(
+          unitId,
+          params.month,
+          params.year
+        ),
+        relatoriosRepository.getUnitProfessionalsStats(unitId),
+        relatoriosRepository.getUnitDREData(unitId, params.month, params.year),
+      ]);
+
+      // Verificar erros
+      const errors = [
+        financialResult.error,
+        attendanceResult.error,
+        professionalsResult.error,
+        dreResult.error,
+      ].filter(Boolean);
+
+      if (errors.length > 0) {
+        console.error(
+          '❌ [relatoriosService] Erros ao buscar dados da unidade:',
+          errors
+        );
+        return { data: null, error: errors[0] };
+      }
+
+      // Processar dados
+      const financial = financialResult.data;
+      const attendance = attendanceResult.data;
+      const professionals = professionalsResult.data;
+      const dre = dreResult.data;
+
+      const totalRevenue = (financial?.revenues || []).reduce(
+        (sum, revenue) => sum + (revenue.value || 0),
+        0
+      );
+
+      const totalExpenses = (financial?.expenses || []).reduce(
+        (sum, expense) => sum + (expense.value || 0),
+        0
+      );
+
+      const profit = totalRevenue - totalExpenses;
+      const attendanceCount = (attendance || []).length;
+      const professionalsCount = (professionals || []).length;
+
+      console.log('✅ [relatoriosService] getUnitDashboard - sucesso');
+
+      return {
+        data: {
+          financial: {
+            totalRevenue,
+            totalExpenses,
+            profit,
+            profitMargin: totalRevenue > 0 ? (profit / totalRevenue) * 100 : 0,
+            formatted: {
+              totalRevenue: formatCurrency(totalRevenue),
+              totalExpenses: formatCurrency(totalExpenses),
+              profit: formatCurrency(profit),
+            },
+          },
+          operations: {
+            attendanceCount,
+            professionalsCount,
+            averageTicket:
+              attendanceCount > 0 ? totalRevenue / attendanceCount : 0,
+            formatted: {
+              averageTicket: formatCurrency(
+                attendanceCount > 0 ? totalRevenue / attendanceCount : 0
+              ),
+            },
+          },
+          dre: dre || [],
+          period: periodDTO.getPeriodDisplayName(),
+        },
+        error: null,
+        metadata: {
+          unitId,
+          period: params,
+          generated_at: new Date().toISOString(),
+        },
+      };
+    } catch (error) {
+      console.error(
+        '❌ [relatoriosService] getUnitDashboard - catch error:',
+        error
+      );
+      return {
+        data: null,
+        error: buildError(
+          `Falha ao gerar dashboard: ${error.message}`,
+          'PROCESSING_ERROR'
+        ),
+      };
+    }
+  }
+
+  /**
+   * Exportar dados para Excel
+   */
+  async exportToExcel(type, filters = {}) {
+    console.log(
+      '🔍 [relatoriosService] exportToExcel - type:',
+      type,
+      'filters:',
+      filters
+    );
+
+    try {
+      let data = null;
+      let filename = '';
+
+      switch (type) {
+        case 'comparativo-unidades': {
+          const comparativoResult = await this.getComparativoUnidades(filters);
+          if (comparativoResult.error) return comparativoResult;
+
+          data = comparativoResult.data.tableData;
+          filename = `Comparativo_Unidades_${new Date().toISOString().split('T')[0]}`;
+          break;
+        }
+
+        case 'ranking-unidades': {
+          const rankingResult = await this.getRankingUnidades(filters);
+          if (rankingResult.error) return rankingResult;
+
+          data = rankingResult.data.ranking.map(unit => ({
+            posicao: unit.ranking?.position,
+            unidade: unit.name,
+            valor: unit.metrics[filters.metric] || 0,
+            metrica: rankingResult.data.metric,
+          }));
+          filename = `Ranking_Unidades_${new Date().toISOString().split('T')[0]}`;
+          break;
+        }
+
+        default:
+          return {
+            data: null,
+            error: buildError(
+              'Tipo de relatório não suportado para exportação',
+              'EXPORT_ERROR'
+            ),
+          };
+      }
+
+      console.log(
+        '✅ [relatoriosService] exportToExcel - dados preparados:',
+        data?.length || 0,
+        'registros'
+      );
+
+      return {
+        data: {
+          filename,
+          data,
+          type,
+        },
+        error: null,
+      };
+    } catch (error) {
+      console.error(
+        '❌ [relatoriosService] exportToExcel - catch error:',
+        error
+      );
+      return {
+        data: null,
+        error: buildError(
+          `Falha ao exportar: ${error.message}`,
+          'EXPORT_ERROR'
+        ),
+      };
+    }
+  }
+}
+
+/**
+ * Instância singleton do serviço
+ */
+const relatoriosService = new RelatoriosService();
+
+/**
+ * Funções legadas mantidas para compatibilidade (serão depreciadas)
+ */
 export const getDREMensal = async (mes, ano, unidadeId = null) => {
   try {
     const { data, error } = await supabase
@@ -309,6 +704,10 @@ export const calcularPeriodoAnterior = periodo => {
 };
 
 export default {
+  // Novo serviço refatorado
+  relatoriosService,
+
+  // Funções legadas mantidas para compatibilidade
   getDREMensal,
   getComparativoUnidades,
   getAnaliseReceitaDespesa,
@@ -321,7 +720,8 @@ export default {
   formatarValor,
   formatarPercentual,
   calcularPeriodoAnterior,
-  // Novos métodos para views SQL otimizadas
+
+  // Métodos para views SQL otimizadas
   getKPIs,
   getComparativos,
   getRankingProfissionais,
@@ -329,6 +729,9 @@ export default {
   getCurrentPeriodSummary,
   getRevenueTrend,
 };
+
+// Export individual do novo serviço
+export { relatoriosService };
 
 // =========================================================================
 // NOVOS MÉTODOS - Views SQL Otimizadas (2025-10-22)

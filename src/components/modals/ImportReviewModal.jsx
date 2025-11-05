@@ -1,16 +1,16 @@
-import { useState, useMemo, useEffect } from 'react';
+import { format } from 'date-fns';
 import {
-  X,
+  AlertCircle,
   AlertTriangle,
   CheckCircle,
-  AlertCircle,
   Download,
+  X,
 } from 'lucide-react';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { useEffect, useMemo, useState } from 'react';
 import categoriesService from '../../services/categoriesService';
 import paymentMethodsService from '../../services/paymentMethodsService';
 import { addCalendarDaysAndAdjustToBusinessDay } from '../../utils/businessDays';
+import { formatDate, formatDateForDB } from '../../utils/formatters';
 
 /**
  * Modal de Revisão de Importação de Receitas
@@ -139,10 +139,7 @@ const ImportReviewModal = ({
               return {
                 ...r,
                 payment_method_id: exactMatch.id,
-                expected_receipt_date: format(
-                  expectedReceiptDate,
-                  'yyyy-MM-dd'
-                ),
+                expected_receipt_date: formatDateForDB(expectedReceiptDate),
                 fees: feeAmount,
                 gross_amount: r.value,
                 net_amount: r.value - feeAmount,
@@ -182,10 +179,7 @@ const ImportReviewModal = ({
               return {
                 ...r,
                 payment_method_id: partialMatch.id,
-                expected_receipt_date: format(
-                  expectedReceiptDate,
-                  'yyyy-MM-dd'
-                ),
+                expected_receipt_date: formatDateForDB(expectedReceiptDate),
                 fees: feeAmount,
                 gross_amount: r.value,
                 net_amount: r.value - feeAmount,
@@ -393,13 +387,13 @@ const ImportReviewModal = ({
           '| Dias:',
           receiptDays,
           '| Nova data:',
-          format(expectedReceiptDate, 'dd/MM/yyyy')
+          formatDate(expectedReceiptDate)
         );
         return {
           ...r,
           payment_method_id: selectedMethod.id,
           paymentMethodName: selectedMethod.name || selectedMethod.nome,
-          expected_receipt_date: format(expectedReceiptDate, 'yyyy-MM-dd'),
+          expected_receipt_date: formatDateForDB(expectedReceiptDate),
           fees: feeAmount,
           gross_amount: r.value,
           net_amount: r.value - feeAmount,
@@ -497,7 +491,7 @@ const ImportReviewModal = ({
       ...editedRecords.map(r =>
         [
           r.lineNumber,
-          format(new Date(r.date), 'dd/MM/yyyy'),
+          formatDate(r.date),
           r.source,
           `R$ ${r.value.toFixed(2)}`,
           r.type === 'service' ? 'Serviço' : 'Produto',
@@ -524,33 +518,33 @@ const ImportReviewModal = ({
   };
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="bg-dark-surface rounded-xl shadow-2xl w-full max-w-7xl max-h-[90vh] flex flex-col border border-dark-border">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
+      <div className="flex max-h-[90vh] w-full max-w-7xl flex-col rounded-xl border border-dark-border bg-dark-surface shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-dark-border bg-dark-surface">
+        <div className="flex items-center justify-between border-b border-dark-border bg-dark-surface p-6">
           <div>
-            <h2 className="text-2xl font-bold text-text-dark-primary flex items-center gap-2">
-              <CheckCircle className="w-7 h-7 text-primary" />
+            <h2 className="flex items-center gap-2 text-2xl font-bold text-text-dark-primary">
+              <CheckCircle className="h-7 w-7 text-primary" />
               Revisão de Importação — Extrato Bancário
             </h2>
-            <p className="text-sm text-text-dark-secondary mt-2">
+            <p className="mt-2 text-sm text-text-dark-secondary">
               Revise e aprove as receitas identificadas antes de importar
             </p>
           </div>
           <button
             onClick={onClose}
             disabled={loading}
-            className="p-2 hover:bg-dark-bg rounded-lg transition-colors"
+            className="rounded-lg p-2 transition-colors hover:bg-dark-bg"
             aria-label="Fechar"
           >
-            <X className="w-6 h-6 text-text-dark-secondary hover:text-text-dark-primary" />
+            <X className="h-6 w-6 text-text-dark-secondary hover:text-text-dark-primary" />
           </button>
         </div>
 
         {/* Stats Summary */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 p-6 bg-dark-bg border-b border-dark-border">
+        <div className="grid grid-cols-2 gap-4 border-b border-dark-border bg-dark-bg p-6 md:grid-cols-4 lg:grid-cols-7">
           <div className="text-center">
-            <p className="text-xs text-text-dark-secondary font-medium mb-1">
+            <p className="mb-1 text-xs font-medium text-text-dark-secondary">
               Total
             </p>
             <p className="text-3xl font-bold text-text-dark-primary">
@@ -558,7 +552,7 @@ const ImportReviewModal = ({
             </p>
           </div>
           <div className="text-center">
-            <p className="text-xs text-text-dark-secondary font-medium mb-1">
+            <p className="mb-1 text-xs font-medium text-text-dark-secondary">
               Aprovados
             </p>
             <p className="text-3xl font-bold text-feedback-dark-success">
@@ -566,13 +560,13 @@ const ImportReviewModal = ({
             </p>
           </div>
           <div className="text-center">
-            <p className="text-xs text-text-dark-secondary font-medium mb-1">
+            <p className="mb-1 text-xs font-medium text-text-dark-secondary">
               Serviços
             </p>
             <p className="text-3xl font-bold text-primary">{stats.services}</p>
           </div>
           <div className="text-center">
-            <p className="text-xs text-text-dark-secondary font-medium mb-1">
+            <p className="mb-1 text-xs font-medium text-text-dark-secondary">
               Produtos
             </p>
             <p className="text-3xl font-bold text-primary-hover">
@@ -580,7 +574,7 @@ const ImportReviewModal = ({
             </p>
           </div>
           <div className="text-center">
-            <p className="text-xs text-text-dark-secondary font-medium mb-1">
+            <p className="mb-1 text-xs font-medium text-text-dark-secondary">
               Novos
             </p>
             <p className="text-3xl font-bold text-feedback-dark-warning">
@@ -588,7 +582,7 @@ const ImportReviewModal = ({
             </p>
           </div>
           <div className="text-center">
-            <p className="text-xs text-text-dark-secondary font-medium mb-1">
+            <p className="mb-1 text-xs font-medium text-text-dark-secondary">
               S/ Prof.
             </p>
             <p className="text-3xl font-bold text-feedback-dark-error">
@@ -596,7 +590,7 @@ const ImportReviewModal = ({
             </p>
           </div>
           <div className="text-center">
-            <p className="text-xs text-text-dark-secondary font-medium mb-1">
+            <p className="mb-1 text-xs font-medium text-text-dark-secondary">
               Valor Total
             </p>
             <p className="text-2xl font-bold text-feedback-dark-success">
@@ -607,23 +601,23 @@ const ImportReviewModal = ({
 
         {/* Bulk Actions */}
         {selectedRows.size > 0 && (
-          <div className="p-4 bg-primary/10 border-b border-primary/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <p className="text-sm text-primary font-semibold">
+          <div className="flex flex-col items-start justify-between gap-3 border-b border-primary/30 bg-primary/10 p-4 sm:flex-row sm:items-center">
+            <p className="text-sm font-semibold text-primary">
               {selectedRows.size}{' '}
               {selectedRows.size === 1
                 ? 'registro selecionado'
                 : 'registros selecionados'}
             </p>
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => changeBulkType('service')}
-                className="px-4 py-2 bg-primary text-dark-bg rounded-lg hover:bg-primary-hover text-sm font-semibold transition-all"
+                className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-dark-bg transition-all hover:bg-primary-hover"
               >
                 Marcar como Serviço
               </button>
               <button
                 onClick={() => changeBulkType('product')}
-                className="px-4 py-2 bg-primary-hover text-dark-text-primary rounded-lg hover:bg-primary text-sm font-semibold transition-all"
+                className="text-dark-text-primary rounded-lg bg-primary-hover px-4 py-2 text-sm font-semibold transition-all hover:bg-primary"
               >
                 Marcar como Produto
               </button>
@@ -632,10 +626,10 @@ const ImportReviewModal = ({
         )}
 
         {/* Table */}
-        <div className="flex-1 overflow-auto p-4 sm:p-6 bg-dark-bg">
+        <div className="flex-1 overflow-auto bg-dark-bg p-4 sm:p-6">
           <div className="min-w-[1200px]">
             <table className="w-full text-sm">
-              <thead className="sticky top-0 bg-dark-surface z-10 border-b-2 border-dark-border shadow-lg">
+              <thead className="sticky top-0 z-10 border-b-2 border-dark-border bg-dark-surface shadow-lg">
                 <tr className="text-text-dark-primary">
                   <th className="p-2 text-left">
                     <input
@@ -647,7 +641,7 @@ const ImportReviewModal = ({
                   </th>
                   <th className="p-2 text-left font-semibold">Linha</th>
                   <th className="p-2 text-left font-semibold">Data</th>
-                  <th className="p-2 text-left font-semibold w-1/4">
+                  <th className="w-1/4 p-2 text-left font-semibold">
                     Descrição
                   </th>
                   <th className="p-2 text-right font-semibold">Valor</th>
@@ -662,7 +656,7 @@ const ImportReviewModal = ({
                 {editedRecords.map((record, index) => (
                   <tr
                     key={index}
-                    className={`border-b border-dark-border transition-colors ${!record.approved ? 'opacity-60 bg-dark-surface/50' : 'bg-dark-surface hover:bg-dark-bg'}`}
+                    className={`border-b border-dark-border transition-colors ${!record.approved ? 'bg-dark-surface/50 opacity-60' : 'bg-dark-surface hover:bg-dark-bg'}`}
                   >
                     <td className="p-2">
                       <input
@@ -672,26 +666,24 @@ const ImportReviewModal = ({
                         className="rounded"
                       />
                     </td>
-                    <td className="p-2 text-text-dark-secondary font-medium">
+                    <td className="p-2 font-medium text-text-dark-secondary">
                       {record.lineNumber}
                     </td>
-                    <td className="p-2 text-text-dark-primary whitespace-nowrap font-medium">
-                      {format(new Date(record.date), 'dd/MM/yyyy', {
-                        locale: ptBR,
-                      })}
+                    <td className="whitespace-nowrap p-2 font-medium text-text-dark-primary">
+                      {formatDate(record.date)}
                     </td>
                     <td className="p-2 text-text-dark-primary">
                       <div className="max-w-xs truncate" title={record.source}>
                         {record.source}
                       </div>
                     </td>
-                    <td className="p-2 text-right font-bold text-feedback-dark-success whitespace-nowrap text-base">
+                    <td className="whitespace-nowrap p-2 text-right text-base font-bold text-feedback-dark-success">
                       R$ {record.value.toFixed(2)}
                     </td>
                     <td className="p-2">
                       <div className="flex items-center gap-1.5">
                         {record.hasProfessionalWarning && (
-                          <AlertCircle className="w-4 h-4 text-feedback-dark-error flex-shrink-0" />
+                          <AlertCircle className="h-4 w-4 flex-shrink-0 text-feedback-dark-error" />
                         )}
                         <span
                           className={`text-sm font-medium ${record.hasProfessionalWarning ? 'text-feedback-dark-error' : 'text-text-dark-primary'}`}
@@ -703,7 +695,7 @@ const ImportReviewModal = ({
                     <td className="p-2">
                       <div className="flex items-center gap-1.5">
                         {record.isNewClient && (
-                          <AlertTriangle className="w-4 h-4 text-feedback-dark-warning flex-shrink-0" />
+                          <AlertTriangle className="h-4 w-4 flex-shrink-0 text-feedback-dark-warning" />
                         )}
                         <span
                           className={`text-sm font-medium ${record.isNewClient ? 'text-feedback-dark-warning' : 'text-text-dark-primary'}`}
@@ -718,7 +710,7 @@ const ImportReviewModal = ({
                         onChange={e =>
                           changePaymentMethod(index, e.target.value)
                         }
-                        className="px-3 py-1.5 rounded-lg border border-dark-border bg-dark-bg text-text-dark-primary text-sm font-semibold focus:ring-2 focus:ring-primary outline-none transition-all w-full"
+                        className="w-full rounded-lg border border-dark-border bg-dark-bg px-3 py-1.5 text-sm font-semibold text-text-dark-primary outline-none transition-all focus:ring-2 focus:ring-primary"
                         disabled={loadingPaymentMethods}
                       >
                         <option value="" className="bg-dark-surface">
@@ -741,7 +733,7 @@ const ImportReviewModal = ({
                       <select
                         value={record.category_id || ''}
                         onChange={e => changeType(index, e.target.value)}
-                        className="px-3 py-1.5 rounded-lg border border-dark-border bg-dark-bg text-text-dark-primary text-sm font-semibold focus:ring-2 focus:ring-primary outline-none transition-all"
+                        className="rounded-lg border border-dark-border bg-dark-bg px-3 py-1.5 text-sm font-semibold text-text-dark-primary outline-none transition-all focus:ring-2 focus:ring-primary"
                         disabled={loadingCategories}
                       >
                         <option value="" className="bg-dark-surface">
@@ -763,7 +755,7 @@ const ImportReviewModal = ({
                         type="checkbox"
                         checked={record.approved}
                         onChange={() => toggleApproval(index)}
-                        className="w-5 h-5 rounded"
+                        className="h-5 w-5 rounded"
                       />
                     </td>
                   </tr>
@@ -774,54 +766,54 @@ const ImportReviewModal = ({
         </div>
 
         {/* Footer Actions */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between p-4 sm:p-6 border-t border-dark-border bg-dark-surface gap-3">
-          <div className="flex gap-2 flex-wrap">
+        <div className="flex flex-col items-stretch justify-between gap-3 border-t border-dark-border bg-dark-surface p-4 sm:flex-row sm:items-center sm:p-6">
+          <div className="flex flex-wrap gap-2">
             <button
               onClick={approveAll}
               disabled={loading}
-              className="px-4 py-2.5 text-sm bg-feedback-dark-success text-dark-text-primary rounded-lg hover:bg-feedback-dark-success/80 disabled:opacity-50 flex items-center gap-2 font-semibold transition-all"
+              className="text-dark-text-primary flex items-center gap-2 rounded-lg bg-feedback-dark-success px-4 py-2.5 text-sm font-semibold transition-all hover:bg-feedback-dark-success/80 disabled:opacity-50"
             >
-              <CheckCircle className="w-4 h-4" />
+              <CheckCircle className="h-4 w-4" />
               Aprovar Todos
             </button>
             <button
               onClick={rejectAll}
               disabled={loading}
-              className="px-4 py-2.5 text-sm bg-feedback-dark-error text-dark-text-primary rounded-lg hover:bg-feedback-dark-error/80 disabled:opacity-50 font-semibold transition-all"
+              className="text-dark-text-primary rounded-lg bg-feedback-dark-error px-4 py-2.5 text-sm font-semibold transition-all hover:bg-feedback-dark-error/80 disabled:opacity-50"
             >
               Rejeitar Todos
             </button>
             <button
               onClick={exportValidationReport}
               disabled={loading}
-              className="px-4 py-2.5 text-sm bg-dark-border text-text-dark-primary rounded-lg hover:bg-dark-bg disabled:opacity-50 flex items-center gap-2 font-semibold transition-all"
+              className="flex items-center gap-2 rounded-lg bg-dark-border px-4 py-2.5 text-sm font-semibold text-text-dark-primary transition-all hover:bg-dark-bg disabled:opacity-50"
             >
-              <Download className="w-4 h-4" />
+              <Download className="h-4 w-4" />
               Exportar
             </button>
           </div>
 
-          <div className="flex gap-3 flex-col sm:flex-row">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <button
               onClick={onClose}
               disabled={loading}
-              className="px-6 py-2.5 text-text-dark-primary border-2 border-dark-border rounded-lg hover:bg-dark-bg disabled:opacity-50 font-semibold transition-all"
+              className="rounded-lg border-2 border-dark-border px-6 py-2.5 font-semibold text-text-dark-primary transition-all hover:bg-dark-bg disabled:opacity-50"
             >
               Cancelar
             </button>
             <button
               onClick={handleConfirm}
               disabled={loading || stats.approved === 0}
-              className="px-6 py-2.5 bg-primary text-dark-bg rounded-lg hover:bg-primary-hover disabled:opacity-50 flex items-center justify-center gap-2 font-bold transition-all shadow-lg shadow-primary/30"
+              className="flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-2.5 font-bold text-dark-bg shadow-lg shadow-primary/30 transition-all hover:bg-primary-hover disabled:opacity-50"
             >
               {loading ? (
                 <>
-                  <div className="w-5 h-5 border-3 border-dark-bg border-t-transparent rounded-full animate-spin" />
+                  <div className="border-3 h-5 w-5 animate-spin rounded-full border-dark-bg border-t-transparent" />
                   Importando...
                 </>
               ) : (
                 <>
-                  <CheckCircle className="w-5 h-5" />
+                  <CheckCircle className="h-5 w-5" />
                   Confirmar Importação ({stats.approved})
                 </>
               )}

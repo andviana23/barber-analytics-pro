@@ -34,7 +34,20 @@ export const formatDate = (date, pattern = 'dd/MM/yyyy') => {
   }
 
   try {
-    const dateObj = typeof date === 'string' ? parseISO(date) : date;
+    let dateObj;
+
+    if (typeof date === 'string') {
+      // Se é uma string no formato 'YYYY-MM-DD', criar data local explicitamente
+      if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        const [year, month, day] = date.split('-').map(Number);
+        dateObj = new Date(year, month - 1, day); // Cria data local, não UTC
+      } else {
+        dateObj = parseISO(date);
+      }
+    } else {
+      dateObj = date;
+    }
+
     return format(dateObj, pattern, { locale: ptBR });
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -53,6 +66,36 @@ export const formatDateTime = date => {
 };
 
 /**
+ * Converte data para formato ISO (yyyy-MM-dd) preservando a data original
+ * @param {Date|string} date - Data para converter
+ * @returns {string} Data em formato ISO
+ */
+export const formatDateForDB = date => {
+  if (!date) return null;
+
+  let dateObj;
+
+  if (typeof date === 'string') {
+    // Se é uma string no formato 'YYYY-MM-DD', criar data local explicitamente
+    if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      const [year, month, day] = date.split('-').map(Number);
+      dateObj = new Date(year, month - 1, day); // Cria data local, não UTC
+    } else {
+      dateObj = parseISO(date);
+    }
+  } else {
+    dateObj = date;
+  }
+
+  if (isNaN(dateObj.getTime())) return null;
+
+  // Usar componentes locais da data (não UTC) para manter a data correta
+  const year = dateObj.getFullYear();
+  const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const day = String(dateObj.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}; /**
  * Formata percentual
  * @param {number} value - Valor decimal (ex: 0.15 para 15%)
  * @param {number} decimals - Número de casas decimais (padrão: 2)

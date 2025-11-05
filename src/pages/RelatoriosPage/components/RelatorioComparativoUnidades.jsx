@@ -1,338 +1,464 @@
-import React, { useState, useEffect } from 'react';
-import { BarChart3, Download, FileText, TrendingUp } from 'lucide-react';
-import { Card, Button } from '../../../atoms';
+/**
+ * RELATÓRIO COMPARATIVO UNIDADES
+ *
+ * Componente para comparação visual e analítica entre unidades.
+ * Refatorado seguindo Clean Architecture e padrões do sistema.
+ */
+
 import {
-  BarChart,
+  Building2,
+  DollarSign,
+  Download,
+  FileText,
+  Target,
+  TrendingUp,
+  Users,
+} from 'lucide-react';
+import { useMemo } from 'react';
+import {
   Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from 'recharts';
-import { exportToPDF, exportToExcel } from '../../../utils/exportUtils';
+import { Button, Card } from '../../../atoms';
+import KPICard from '../../../atoms/KPICard';
+import {
+  useComparativoUnidades,
+  useExportRelatorio,
+} from '../../../hooks/useRelatorios';
+import ChartContainer from '../../../molecules/ChartContainer';
+import MetricCard from '../../../molecules/MetricCard';
+import { exportToPDF } from '../../../utils/exportUtils';
+
+/**
+ * Componente principal do relatório comparativo
+ */
 const RelatorioComparativoUnidades = ({ filters }) => {
-  const [dados, setDados] = useState(null);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    carregarDados();
-  }, []);
-  const carregarDados = async () => {
-    setLoading(true);
-    try {
-      // Dados mockados para demonstração
-      setDados({
-        mangabeiras: {
-          receita: 52000,
-          lucro: 15600,
-          atendimentos: 180,
-          ticketMedio: 288.89,
-          crescimento: 12.5,
-        },
-        novaLima: {
-          receita: 48000,
-          lucro: 14400,
-          atendimentos: 165,
-          ticketMedio: 290.91,
-          crescimento: 8.3,
-        },
-        comparacao: [
-          {
-            unidade: 'Mangabeiras',
-            receita: 52000,
-            lucro: 15600,
-            atendimentos: 180,
-          },
-          {
-            unidade: 'Nova Lima',
-            receita: 48000,
-            lucro: 14400,
-            atendimentos: 165,
-          },
-        ],
-      });
-    } catch (error) {
-      console.error('Erro ao carregar dados:', error);
+  // Hooks
+  const {
+    data: comparativoData,
+    isLoading,
+    error,
+    refetch,
+  } = useComparativoUnidades(filters, {
+    enabled: Boolean(filters?.period),
+  });
+
+  const { mutate: exportRelatorio, isLoading: isExporting } =
+    useExportRelatorio();
+
+  /**
+   * Processamento dos dados para diferentes visualizações
+   */
+  const processedData = useMemo(() => {
+    if (!comparativoData?.units) return null;
+
+    const units = comparativoData.units;
+    const totals = comparativoData.totals;
+
+    // Dados para gráficos
+    const chartData = units.map(unit => ({
+      name: unit.name,
+      receita: unit.metrics.revenue,
+      lucro: unit.metrics.profit,
+      atendimentos: unit.metrics.attendances,
+      profissionais: unit.metrics.professionals,
+    }));
+
+    // Dados para gráfico de pizza
+    const pieData = units
+      .filter(unit => unit.metrics.revenue > 0)
+      .map((unit, index) => ({
+        name: unit.name,
+        value: unit.metrics.revenue,
+        percentage:
+          totals.revenue > 0
+            ? (unit.metrics.revenue / totals.revenue) * 100
+            : 0,
+        color: index === 0 ? '#3B82F6' : index === 1 ? '#10B981' : '#F59E0B',
+      }));
+
+    // Top performer
+    const topPerformer = units.reduce(
+      (top, unit) => (unit.metrics.revenue > top.metrics.revenue ? unit : top),
+      units[0] || {}
+    );
+
+    // Insights automáticos
+    const insights = generateInsights(units, totals);
+
+    return {
+      units,
+      totals,
+      chartData,
+      pieData,
+      topPerformer,
+      insights,
+    };
+  }, [comparativoData]);
+
+  /**
+   * Geração de insights automáticos
+   */
+  const generateInsights = (units, totals) => {
+    if (!units || units.length < 2) return [];
+
+    const insights = [];
+    const [first, second] = units.sort(
+      (a, b) => b.metrics.revenue - a.metrics.revenue
+    );
+
+    // Comparação de receita
+    if (first && second) {
+      const difference =
+        ((first.metrics.revenue - second.metrics.revenue) /
+          second.metrics.revenue) *
+        100;
+      insights.push(
+        `${first.name} apresenta receita ${difference.toFixed(1)}% superior à ${second.name}`
+      );
     }
-    setLoading(false);
+
+    // Ticket médio
+    const unitsByTicket = units.sort(
+      (a, b) => b.metrics.averageTicket - a.metrics.averageTicket
+    );
+    if (unitsByTicket[0] && unitsByTicket[1]) {
+      const ticketDiff =
+        unitsByTicket[0].metrics.averageTicket -
+        unitsByTicket[1].metrics.averageTicket;
+      insights.push(
+        `${unitsByTicket[0].name} tem ticket médio R$ ${ticketDiff.toFixed(2)} superior`
+      );
+    }
+
+    // Crescimento
+    const positiveGrowth = units.filter(unit => unit.metrics.growth > 0);
+    if (positiveGrowth.length === units.length) {
+      insights.push('Todas as unidades apresentam crescimento positivo');
+    } else if (positiveGrowth.length > 0) {
+      insights.push(
+        `${positiveGrowth.length} de ${units.length} unidades em crescimento`
+      );
+    }
+
+    // Total combinado
+    insights.push(
+      `Total combinado: R$ ${totals.revenue.toLocaleString('pt-BR')} em receita`
+    );
+
+    return insights;
   };
+
+  /**
+   * Handlers para exportação
+   */
   const handleExportPDF = async () => {
-    const result = await exportToPDF(
-      'relatorio-comparativo',
-      `Comparativo_Unidades_${filters.periodo.mes}_${filters.periodo.ano}`,
-      `Comparativo entre Unidades - ${filters.periodo.mes}/${filters.periodo.ano}`
-    );
-    if (result.success) {
-      alert('PDF exportado com sucesso!');
+    if (!processedData) return;
+
+    try {
+      const result = await exportToPDF(
+        'relatorio-comparativo',
+        `Comparativo_Unidades_${new Date().toISOString().split('T')[0]}`,
+        `Comparativo entre Unidades - ${filters?.period || 'Período selecionado'}`
+      );
+
+      if (result.success) {
+        console.log('PDF exportado com sucesso');
+      }
+    } catch (error) {
+      console.error('Erro ao exportar PDF:', error);
     }
   };
+
   const handleExportExcel = () => {
-    if (!dados) return;
-    const dadosExcel = [
-      {
-        Métrica: 'Receita Total',
-        Mangabeiras: dados.mangabeiras.receita,
-        'Nova Lima': dados.novaLima.receita,
-      },
-      {
-        Métrica: 'Lucro Líquido',
-        Mangabeiras: dados.mangabeiras.lucro,
-        'Nova Lima': dados.novaLima.lucro,
-      },
-      {
-        Métrica: 'Total Atendimentos',
-        Mangabeiras: dados.mangabeiras.atendimentos,
-        'Nova Lima': dados.novaLima.atendimentos,
-      },
-      {
-        Métrica: 'Ticket Médio',
-        Mangabeiras: dados.mangabeiras.ticketMedio,
-        'Nova Lima': dados.novaLima.ticketMedio,
-      },
-      {
-        Métrica: 'Crescimento %',
-        Mangabeiras: dados.mangabeiras.crescimento,
-        'Nova Lima': dados.novaLima.crescimento,
-      },
-    ];
-    exportToExcel(
-      dadosExcel,
-      `Comparativo_Unidades_${filters.periodo.mes}_${filters.periodo.ano}`
-    );
+    if (!processedData) return;
+
+    exportRelatorio({
+      type: 'comparativo-unidades',
+      filters,
+    });
   };
-  if (loading) {
+
+  /**
+   * Estados de loading e erro
+   */
+  if (isLoading) {
     return (
       <div className="p-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="h-40 bg-gray-200 dark:bg-gray-700 rounded"></div>
-            <div className="h-40 bg-gray-200 dark:bg-gray-700 rounded"></div>
+        <div className="animate-pulse space-y-6">
+          <div className="h-8 w-1/2 rounded bg-light-bg dark:bg-dark-bg"></div>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {[1, 2, 3].map(i => (
+              <div
+                key={i}
+                className="h-32 rounded bg-light-bg dark:bg-dark-bg"
+              ></div>
+            ))}
           </div>
+          <div className="h-80 rounded bg-light-bg dark:bg-dark-bg"></div>
         </div>
       </div>
     );
   }
-  if (!dados) {
+
+  if (error) {
     return (
-      <div className="p-6 text-center">
-        <p className="text-theme-secondary">
-          Erro ao carregar dados do comparativo
-        </p>
+      <div className="p-6">
+        <Card className="p-8 text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-feedback-light-error/10 dark:bg-feedback-dark-error/10">
+            <TrendingUp className="h-8 w-8 text-feedback-light-error dark:text-feedback-dark-error" />
+          </div>
+          <h3 className="text-theme-primary mb-2 text-lg font-semibold">
+            Erro ao carregar comparativo
+          </h3>
+          <p className="text-theme-secondary mb-4">
+            {error.message ||
+              'Falha ao buscar dados do comparativo entre unidades'}
+          </p>
+          <Button onClick={refetch} variant="primary">
+            Tentar novamente
+          </Button>
+        </Card>
       </div>
     );
   }
+
+  if (!processedData || !processedData.units.length) {
+    return (
+      <div className="p-6">
+        <Card className="p-8 text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-light-bg dark:bg-dark-bg">
+            <Building2 className="text-theme-secondary h-8 w-8" />
+          </div>
+          <h3 className="text-theme-primary mb-2 text-lg font-semibold">
+            Nenhuma unidade encontrada
+          </h3>
+          <p className="text-theme-secondary">
+            Não há dados disponíveis para o período selecionado
+          </p>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6" id="relatorio-comparativo">
-      {/* Header com botões de exportação */}
-      <div className="flex justify-between items-center mb-6">
+      {/* Header com título e ações */}
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary">
+          <h2 className="text-theme-primary text-2xl font-bold">
             Comparativo entre Unidades
           </h2>
-          <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
-            {filters.periodo.tipo === 'mes'
-              ? `${filters.periodo.mes}/${filters.periodo.ano}`
-              : 'Período selecionado'}
+          <p className="text-theme-secondary mt-1">
+            {comparativoData?.metadata?.period || 'Período selecionado'}
           </p>
         </div>
-        <div className="flex space-x-2">
+
+        <div className="mt-4 flex space-x-2 sm:mt-0">
           <Button
             variant="secondary"
             onClick={handleExportPDF}
             className="flex items-center"
+            disabled={isExporting}
           >
-            <FileText size={16} className="mr-2" />
+            <FileText className="mr-2 h-4 w-4" />
             PDF
           </Button>
           <Button
             variant="secondary"
             onClick={handleExportExcel}
             className="flex items-center"
+            disabled={isExporting}
           >
-            <Download size={16} className="mr-2" />
+            <Download className="mr-2 h-4 w-4" />
             Excel
           </Button>
         </div>
       </div>
 
-      {/* Cards de Comparação */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        {/* Mangabeiras */}
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-4">
-            Mangabeiras
-          </h3>
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
-                Receita Total
-              </span>
-              <span className="font-semibold">
-                R$ {dados.mangabeiras.receita.toLocaleString()}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
-                Lucro Líquido
-              </span>
-              <span className="font-semibold text-green-600">
-                R$ {dados.mangabeiras.lucro.toLocaleString()}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
-                Atendimentos
-              </span>
-              <span className="font-semibold">
-                {dados.mangabeiras.atendimentos}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
-                Ticket Médio
-              </span>
-              <span className="font-semibold">
-                R$ {dados.mangabeiras.ticketMedio.toFixed(2)}
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
-                Crescimento
-              </span>
-              <div className="flex items-center text-green-600">
-                <TrendingUp size={16} className="mr-1" />
-                <span className="font-semibold">
-                  {dados.mangabeiras.crescimento}%
-                </span>
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Nova Lima */}
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-4">
-            Nova Lima
-          </h3>
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
-                Receita Total
-              </span>
-              <span className="font-semibold">
-                R$ {dados.novaLima.receita.toLocaleString()}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
-                Lucro Líquido
-              </span>
-              <span className="font-semibold text-green-600">
-                R$ {dados.novaLima.lucro.toLocaleString()}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
-                Atendimentos
-              </span>
-              <span className="font-semibold">
-                {dados.novaLima.atendimentos}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
-                Ticket Médio
-              </span>
-              <span className="font-semibold">
-                R$ {dados.novaLima.ticketMedio.toFixed(2)}
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
-                Crescimento
-              </span>
-              <div className="flex items-center text-green-600">
-                <TrendingUp size={16} className="mr-1" />
-                <span className="font-semibold">
-                  {dados.novaLima.crescimento}%
-                </span>
-              </div>
-            </div>
-          </div>
-        </Card>
+      {/* KPIs Resumo */}
+      <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-4">
+        <KPICard
+          title="Receita Total"
+          value={processedData.totals.revenue}
+          type="currency"
+          icon={DollarSign}
+          variant="primary"
+        />
+        <KPICard
+          title="Lucro Total"
+          value={processedData.totals.profit}
+          type="currency"
+          icon={TrendingUp}
+          variant="success"
+        />
+        <KPICard
+          title="Total Atendimentos"
+          value={processedData.totals.attendances}
+          type="number"
+          icon={Target}
+        />
+        <KPICard
+          title="Total Profissionais"
+          value={processedData.totals.professionals}
+          type="number"
+          icon={Users}
+        />
       </div>
 
-      {/* Gráfico Comparativo */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-4">
-          Comparação Visual
-        </h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={dados.comparacao}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="unidade" />
-            <YAxis />
-            <Tooltip
-              formatter={(value, name) => [
-                name === 'receita'
-                  ? `R$ ${value.toLocaleString()}`
-                  : name === 'lucro'
-                    ? `R$ ${value.toLocaleString()}`
-                    : value,
-                name === 'receita'
-                  ? 'Receita'
-                  : name === 'lucro'
-                    ? 'Lucro'
-                    : 'Atendimentos',
-              ]}
-            />
-            <Bar dataKey="receita" fill="#3B82F6" name="receita" />
-            <Bar dataKey="lucro" fill="#10B981" name="lucro" />
-            <Bar dataKey="atendimentos" fill="#F59E0B" name="atendimentos" />
-          </BarChart>
-        </ResponsiveContainer>
-      </Card>
+      {/* Cards de Comparação Individual */}
+      <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {processedData.units.map(unit => (
+          <MetricCard
+            key={unit.id}
+            title={unit.name}
+            subtitle={`${unit.metrics.professionals} profissionais`}
+            variant={
+              unit.id === processedData.topPerformer?.id
+                ? 'highlighted'
+                : 'default'
+            }
+            metrics={[
+              {
+                label: 'Receita Total',
+                value: unit.metrics.revenue,
+                type: 'currency',
+                trend: unit.metrics.growth,
+              },
+              {
+                label: 'Lucro Líquido',
+                value: unit.metrics.profit,
+                type: 'currency',
+              },
+              {
+                label: 'Atendimentos',
+                value: unit.metrics.attendances,
+                type: 'number',
+              },
+              {
+                label: 'Ticket Médio',
+                value: unit.metrics.averageTicket,
+                type: 'currency',
+              },
+              {
+                label: 'Profissionais',
+                value: unit.metrics.professionals,
+                type: 'number',
+              },
+            ]}
+          />
+        ))}
+      </div>
+
+      {/* Gráficos */}
+      <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* Gráfico de Barras Comparativo */}
+        <ChartContainer
+          title="Comparação de Métricas"
+          subtitle="Receita, lucro e atendimentos por unidade"
+          height={350}
+          onExport={handleExportExcel}
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={processedData.chartData}>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="#374151"
+                opacity={0.3}
+              />
+              <XAxis
+                dataKey="name"
+                stroke="#6B7280"
+                fontSize={12}
+                angle={-45}
+                textAnchor="end"
+                height={80}
+              />
+              <YAxis stroke="#6B7280" fontSize={12} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'var(--color-surface)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: '8px',
+                }}
+                formatter={(value, name) => [
+                  name === 'receita' || name === 'lucro'
+                    ? `R$ ${value.toLocaleString('pt-BR')}`
+                    : value.toLocaleString('pt-BR'),
+                  name === 'receita'
+                    ? 'Receita'
+                    : name === 'lucro'
+                      ? 'Lucro'
+                      : 'Atendimentos',
+                ]}
+              />
+              <Bar dataKey="receita" fill="#3B82F6" name="receita" />
+              <Bar dataKey="lucro" fill="#10B981" name="lucro" />
+              <Bar dataKey="atendimentos" fill="#F59E0B" name="atendimentos" />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+
+        {/* Gráfico de Pizza - Distribuição de Receita */}
+        <ChartContainer
+          title="Distribuição de Receita"
+          subtitle="Participação de cada unidade no faturamento total"
+          height={350}
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={processedData.pieData}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={120}
+                label={({ name, percentage }) =>
+                  `${name}: ${percentage.toFixed(1)}%`
+                }
+              >
+                {processedData.pieData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip
+                formatter={value => [
+                  `R$ ${value.toLocaleString('pt-BR')}`,
+                  'Receita',
+                ]}
+              />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+      </div>
 
       {/* Análise e Insights */}
-      <Card className="p-6 mt-6">
-        <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-4">
+      <Card className="p-6">
+        <h3 className="text-theme-primary mb-4 text-lg font-semibold">
           Análise e Insights
         </h3>
-        <div className="space-y-3 text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
-          <p>
-            • <strong>Mangabeiras</strong> apresenta receita{' '}
-            {(
-              (dados.mangabeiras.receita / dados.novaLima.receita - 1) *
-              100
-            ).toFixed(1)}
-            % superior à Nova Lima
-          </p>
-          <p>
-            • <strong>Nova Lima</strong> tem ticket médio ligeiramente superior
-            (R${' '}
-            {(
-              dados.novaLima.ticketMedio - dados.mangabeiras.ticketMedio
-            ).toFixed(2)}{' '}
-            a mais)
-          </p>
-          <p>
-            • Ambas as unidades apresentam crescimento positivo, com Mangabeiras
-            liderando
-          </p>
-          <p>
-            • Total combinado:{' '}
-            <strong>
-              R${' '}
-              {(
-                dados.mangabeiras.receita + dados.novaLima.receita
-              ).toLocaleString()}
-            </strong>{' '}
-            em receita
-          </p>
+        <div className="text-theme-secondary space-y-3 text-sm">
+          {processedData.insights.map((insight, index) => (
+            <p key={index}>
+              • <strong>{insight.split(':')[0]}:</strong>{' '}
+              {insight.split(':')[1] || insight}
+            </p>
+          ))}
         </div>
       </Card>
     </div>
   );
 };
+
 export default RelatorioComparativoUnidades;

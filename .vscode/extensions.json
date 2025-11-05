@@ -1,3 +1,77 @@
 {
-  "recommendations": ["denoland.vscode-deno"]
+  "recommendations": [
+    // ============================================================================
+    // ESSENCIAIS PARA REACT + VITE + TAILWIND
+    // ============================================================================
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "bradlc.vscode-tailwindcss",
+
+    // ============================================================================
+    // DESENVOLVIMENTO E PRODUTIVIDADE
+    // ============================================================================
+    "pkief.material-icon-theme",
+    "usernamehw.errorlens",
+    "wix.vscode-import-cost",
+    "wayou.vscode-todo-highlight",
+    "streetsidesoftware.code-spell-checker",
+    "editorconfig.editorconfig",
+
+    // ============================================================================
+    // GIT E VERSIONAMENTO
+    // ============================================================================
+    "eamodio.gitlens",
+
+    // ============================================================================
+    // THEMES (ESCOLHA UM)
+    // ============================================================================
+    "dracula-theme.theme-dracula",
+    "bceskavich.theme-dracula-at-night",
+    "josemurilloc.aura-spirit-dracula",
+    "vira.vsc-vira-theme",
+
+    // ============================================================================
+    // DATABASE E BACKEND
+    // ============================================================================
+    "ms-ossdata.vscode-pgsql",
+    "humao.rest-client",
+
+    // ============================================================================
+    // YAML E CONFIGURAÇÕES
+    // ============================================================================
+    "redhat.vscode-yaml",
+    "mikestead.dotenv",
+
+    // ============================================================================
+    // QUALIDADE DE CÓDIGO
+    // ============================================================================
+    "sonarsource.sonarlint-vscode",
+
+    // ============================================================================
+    // AI E AUTOMAÇÃO
+    // ============================================================================
+    "github.copilot",
+    "github.copilot-chat",
+
+    // ============================================================================
+    // CONTAINERS E DEPLOY
+    // ============================================================================
+    "ms-azuretools.vscode-docker",
+    "ms-azuretools.vscode-containers",
+
+    // ============================================================================
+    // LINGUAGENS ESPECÍFICAS
+    // ============================================================================
+    "ms-ceintl.vscode-language-pack-pt-br",
+
+    // ============================================================================
+    // CSS E POSTCSS
+    // ============================================================================
+    "csstools.postcss"
+  ],
+  "unwantedRecommendations": [
+    "hookyqr.beautify",
+    "ms-vscode.vscode-typescript-next",
+    "bradgashler.htmltagwrap"
+  ]
 }

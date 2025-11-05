@@ -5,7 +5,7 @@
   "type": "module",
   "engines": {
     "node": ">=20.19.0",
-    "npm": ">=10.0.0"
+    "pnpm": ">=8.0.0"
   },
   "scripts": {
     "dev": "vite",
@@ -26,7 +26,7 @@
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:report": "playwright show-report",
     "test:a11y": "playwright test tests/accessibility",
-    "test:all": "npm run test:unit && npm run test:integration && npm run test:e2e && npm run test:a11y",
+    "test:all": "pnpm run test:unit && pnpm run test:integration && pnpm run test:e2e && pnpm run test:a11y",
     "audit:design-system": "node scripts/audit-design-system.js",
     "migrate:design-system": "node scripts/migrate-design-system.js",
     "migrate:dry-run": "node scripts/migrate-design-system.js --dry-run --verbose",
@@ -35,8 +35,11 @@
   },
   "lint-staged": {
     "src/**/*.{js,jsx}": [
-      "eslint --fix --max-warnings=200",
-      "prettier --write"
+      "pnpm exec eslint --fix --max-warnings=200",
+      "pnpm exec prettier --write"
+    ],
+    "src/**/*.{css,scss,json,md}": [
+      "pnpm exec prettier --write"
     ]
   },
   "dependencies": {
@@ -51,22 +54,33 @@
     "axios": "^1.13.1",
     "chalk": "^5.6.2",
     "chart.js": "^4.5.1",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
     "clsx": "^2.1.1",
     "crypto-js": "^4.2.0",
+    "currency.js": "^2.0.4",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
+    "dayjs": "^1.11.19",
+    "decimal.js": "^10.6.0",
+    "dompurify": "^3.3.0",
     "dotenv": "^17.2.3",
     "fast-xml-parser": "^5.3.0",
     "file-type": "^21.0.0",
     "framer-motion": "^12.23.24",
     "html2canvas": "^1.4.1",
     "iconv-lite": "^0.7.0",
+    "immer": "^10.2.0",
     "jspdf": "^3.0.3",
     "jspdf-autotable": "^5.0.2",
+    "lodash": "^4.17.21",
     "lucide-react": "^0.545.0",
     "multer": "^2.0.2",
+    "nanoid": "^5.1.6",
     "object-hash": "^3.0.0",
     "pino": "^10.1.0",
+    "pino-pretty": "^13.1.2",
+    "prop-types": "^15.8.1",
     "react": "^19.2.0",
     "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.2.0",
@@ -78,6 +92,8 @@
     "react-tooltip": "^5.30.0",
     "recharts": "^3.3.0",
     "tailwind-merge": "^3.3.1",
+    "uuid": "^13.0.0",
+    "validator": "^13.15.20",
     "xlsx": "^0.18.5",
     "zod": "^4.1.12"
   },
@@ -86,17 +102,24 @@
     "@babel/generator": "^7.28.5",
     "@babel/parser": "^7.28.5",
     "@babel/traverse": "^7.28.5",
+    "@commitlint/cli": "^20.1.0",
+    "@commitlint/config-conventional": "^20.0.0",
     "@eslint/js": "^9.39.0",
     "@playwright/test": "^1.56.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
+    "@types/node": "^24.10.0",
+    "@types/react": "^19.2.2",
     "@typescript-eslint/eslint-plugin": "^8.46.2",
     "@typescript-eslint/parser": "^8.46.2",
     "@vitejs/plugin-react": "^5.1.0",
     "@vitest/ui": "^3.2.4",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.39.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "globals": "^16.5.0",
@@ -110,7 +133,9 @@
     "supabase": "^2.54.11",
     "supertest": "^7.1.4",
     "tailwindcss": "^3.4.18",
+    "ts-node": "^10.9.2",
     "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
     "vite": "^7.1.12",
     "vitest": "^3.2.4"
   }

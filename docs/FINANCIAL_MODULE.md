@@ -2,8 +2,8 @@
 
 > **Sistema financeiro avançado com contabilidade por competência, conciliação bancária e geração de DRE integrada.**
 >
-> **Criado em:** 2024-10-17  
-> **Atualizado em:** 2025-10-22  
+> **Criado em:** 2024-10-17
+> **Atualizado em:** 2025-10-22
 > **Autor:** Codex (IA)
 
 ---
@@ -554,7 +554,7 @@ const report = ImportExpensesFromOFXService.generateReport(results, enriched, st
 
 ### SQL-08: Padronização `services.active` → `services.is_active`
 
-**Data:** 31 de outubro de 2025  
+**Data:** 31 de outubro de 2025
 **Objetivo:** Unificar nomenclatura de colunas booleanas de status
 
 #### Alterações no Banco de Dados
@@ -589,7 +589,7 @@ COMMENT ON COLUMN services.is_active IS
 
 ### SQL-09: Padronização `bank_accounts.saldo_disponivel` → `bank_accounts.available_balance`
 
-**Data:** 31 de outubro de 2025  
+**Data:** 31 de outubro de 2025
 **Objetivo:** Unificar nomenclatura em inglês e documentar diferença semântica
 
 #### Decisão Arquitetural: MANTER AMBAS AS COLUNAS
@@ -816,19 +816,29 @@ Os triggers `trigger_recalculate_account_balance_on_revenue` e `trigger_recalcul
 - ✅ Frontend atualizado para usar `available_balance`
 - ✅ View sem aliases desnecessários
 
-#### Regras de Negócio
+#### Regras de Negócio (ATUALIZADA - 04/11/2025)
 
 **current_balance (Saldo Atual):**
 
 - ✅ Usado para contabilidade oficial
-- ✅ Representa dinheiro já compensado
+- ✅ Representa dinheiro já compensado (receitas recebidas - despesas pagas)
 - ✅ Base para relatórios contábeis e DRE
+- ✅ Fórmula: `saldo_inicial + receitas_pagas - despesas_pagas`
 
 **available_balance (Saldo Disponível):**
 
 - ✅ Usado para projeções de fluxo de caixa
-- ✅ Alerta de saldo insuficiente considerando pendências
+- ✅ Representa o que está realmente disponível para uso
 - ✅ Base para dashboards operacionais
+- ✅ **CORREÇÃO IMPORTANTE**: Despesas pendentes **NÃO** são deduzidas
+- ✅ Fórmula: `saldo_atual + receitas_pendentes`
+- 🔥 **MUDANÇA**: Despesas só impactam quando confirmadas (status = 'Paid')
+
+**Justificativa da Mudança:**
+
+- Despesas pendentes são apenas compromissos futuros
+- O saldo disponível deve mostrar o que pode ser usado hoje
+- Despesas só devem ser descontadas quando efetivamente pagas
 
 ---
 

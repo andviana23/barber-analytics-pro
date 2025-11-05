@@ -501,6 +501,79 @@ class BankAccountsService {
   }
 
   /**
+   * 🆕 BUSCAR RESUMO FINANCEIRO SEPARADO (Receitas Operacionais vs Ajustes)
+   * @param {string} unitId - ID da unidade
+   * @returns {Promise<Object>} Resumo financeiro separado
+   */
+  async getFinancialSummarySeparated(unitId) {
+    try {
+      const { data, error } = await supabase
+        .from('vw_financial_summary_separated')
+        .select('*')
+        .eq('unit_id', unitId);
+
+      if (error) throw error;
+
+      return { data: data || [], error: null };
+    } catch (error) {
+      return {
+        data: [],
+        error: 'Falha ao buscar resumo financeiro: ' + error.message,
+      };
+    }
+  }
+
+  /**
+   * 🆕 BUSCAR RECEITAS OPERACIONAIS (excluindo ajustes de saldo)
+   * @param {string} accountId - ID da conta bancária
+   * @returns {Promise<Object>} Total de receitas operacionais
+   */
+  async getOperationalRevenuesTotal(accountId) {
+    try {
+      const { data, error } = await supabase.rpc(
+        'get_operational_revenues_total',
+        {
+          p_account_id: accountId,
+        }
+      );
+
+      if (error) throw error;
+
+      return { data: data || 0, error: null };
+    } catch (error) {
+      return {
+        data: 0,
+        error: 'Falha ao buscar receitas operacionais: ' + error.message,
+      };
+    }
+  }
+
+  /**
+   * 🆕 BUSCAR AJUSTES DE SALDO (separado das receitas)
+   * @param {string} accountId - ID da conta bancária
+   * @returns {Promise<Object>} Total de ajustes de saldo
+   */
+  async getBalanceAdjustmentsTotal(accountId) {
+    try {
+      const { data, error } = await supabase.rpc(
+        'get_balance_adjustments_total',
+        {
+          p_account_id: accountId,
+        }
+      );
+
+      if (error) throw error;
+
+      return { data: data || 0, error: null };
+    } catch (error) {
+      return {
+        data: 0,
+        error: 'Falha ao buscar ajustes de saldo: ' + error.message,
+      };
+    }
+  }
+
+  /**
    * 🆕 RECALCULAR SALDO DE UMA CONTA
    * Útil para corrigir inconsistências
    * @param {string} accountId - ID da conta bancária

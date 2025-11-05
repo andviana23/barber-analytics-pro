@@ -1,7 +1,6 @@
 import * as XLSX from 'xlsx';
-import { format } from 'date-fns';
-import { PartiesService } from './partiesService';
 import revenueRepository from '../repositories/revenueRepository';
+import { PartiesService } from './partiesService';
 
 /**
  * Serviço de Importação de Receitas a partir de Extratos Bancários
@@ -491,7 +490,7 @@ class ImportRevenueFromStatementService {
 
         // Gerar source_hash para dedupe (usando data + valor + profissional + cliente)
         const sourceHash = this.generateSourceHash(
-          format(parsedDate, 'yyyy-MM-dd'),
+          this.formatDateForDB(parsedDate),
           parsedValue,
           `${profissionalNome}-${clienteNome}-${item}`
         );
@@ -515,14 +514,14 @@ class ImportRevenueFromStatementService {
           },
 
           // Dados normalizados
-          date: format(parsedDate, 'yyyy-MM-dd'),
+          date: this.formatDateForDB(parsedDate),
           source: titulo,
           value: parsedValue,
           gross_amount: parsedValue,
           net_amount: parsedValue,
           fees: 0,
           status: 'Pending', // Será atualizado no enrichData baseado na forma de pagamento
-          expected_receipt_date: format(parsedDate, 'yyyy-MM-dd'), // Será atualizado no enrichData
+          expected_receipt_date: this.formatDateForDB(parsedDate), // Será atualizado no enrichData
           actual_receipt_date: null, // Será atualizado no enrichData
           source_hash: sourceHash,
           observations: `${context.bankName || 'Banco não identificado'} | Qtd: ${parsedQtd} | Valor Unit: R$ ${parsedValorUnitario.toFixed(2)}`,
@@ -657,10 +656,8 @@ class ImportRevenueFromStatementService {
             expectedReceiptDate.getDate() + receiptDays
           );
 
-          record.expected_receipt_date = format(
-            expectedReceiptDate,
-            'yyyy-MM-dd'
-          );
+          record.expected_receipt_date =
+            this.formatDateForDB(expectedReceiptDate);
 
           // Se a forma de pagamento for instantânea (0 dias), marcar como recebido
           if (receiptDays === 0) {
@@ -827,8 +824,20 @@ class ImportRevenueFromStatementService {
   // ========================================
 
   /**
-   * Parsear data de diferentes formatos
+   * Converte data para formato ISO (yyyy-MM-dd) preservando timezone brasileiro
+   * @param {Date} date - Data para converter
+   * @returns {string} Data em formato ISO
    */
+  static formatDateForDB(date) {
+    if (!date || isNaN(date.getTime())) return null;
+
+    // Usar componentes locais da data (não UTC) para manter a data correta
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
   static parseDate(dateStr) {
     if (!dateStr) return null;
 
@@ -877,7 +886,9 @@ class ImportRevenueFromStatementService {
             const date = new Date(
               parseInt(year),
               parseInt(month) - 1,
-              parseInt(day)
+              parseInt(day),
+              12, // Meio-dia para evitar mudança de data por timezone
+              0
             );
             console.log('📅 Data parseada (sem hora):', date);
             return date;
@@ -899,7 +910,9 @@ class ImportRevenueFromStatementService {
             const date = new Date(
               parseInt(year),
               parseInt(month) - 1,
-              parseInt(day)
+              parseInt(day),
+              12, // Meio-dia para evitar mudança de data por timezone
+              0
             );
             console.log('📅 Data parseada (ISO sem hora):', date);
             return date;
@@ -921,7 +934,9 @@ class ImportRevenueFromStatementService {
             const date = new Date(
               parseInt(year),
               parseInt(month) - 1,
-              parseInt(day)
+              parseInt(day),
+              12, // Meio-dia para evitar mudança de data por timezone
+              0
             );
             console.log('📅 Data parseada (DD-MM-YYYY sem hora):', date);
             return date;

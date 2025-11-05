@@ -1,39 +1,36 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Card, Button, UnitSelector } from '../../atoms';
 import {
-  FileText,
-  TrendingUp,
-  BarChart3,
-  PieChart,
-  Users,
-  Calendar,
-  Download,
-  Filter,
-  ChevronLeft,
-  RefreshCw,
-  Eye,
-  Printer,
-  Share2,
-  Settings,
-  AlertCircle,
-  CheckCircle,
-  DollarSign,
-  Target,
-  Activity,
-  Clock,
-} from 'lucide-react';
-import { useUnit } from '../../context/UnitContext';
-import { useToast } from '../../context/ToastContext';
-import { supabase } from '../../services/supabase';
-import DREDynamicView from '../../components/finance/DREDynamicView';
-import {
-  format,
-  startOfMonth,
   endOfMonth,
-  subMonths,
+  format,
   parseISO,
+  startOfMonth,
+  subMonths,
 } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import {
+  Activity,
+  BarChart3,
+  Calendar,
+  ChevronLeft,
+  DollarSign,
+  Download,
+  Eye,
+  FileText,
+  Filter,
+  PieChart,
+  Printer,
+  RefreshCw,
+  Settings,
+  Share2,
+  Target,
+  TrendingUp,
+  Users,
+} from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Button, UnitSelector } from '../../atoms';
+import DREDynamicView from '../../components/finance/DREDynamicView';
+import { useToast } from '../../context/ToastContext';
+import { useUnit } from '../../context/UnitContext';
+import { supabase } from '../../services/supabase';
+import RelatorioComparativoUnidades from './components/RelatorioComparativoUnidades';
 
 // Componente de filtros avançados
 const FiltrosAvancados = ({
@@ -44,11 +41,11 @@ const FiltrosAvancados = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   return (
-    <div className="card-theme dark:bg-dark-surface rounded-lg border border-light-border dark:border-dark-border p-4">
-      <div className="flex items-center justify-between mb-4">
+    <div className="card-theme rounded-lg border border-light-border p-4 dark:border-dark-border dark:bg-dark-surface">
+      <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <Filter className="w-5 h-5 text-theme-secondary" />
-          <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+          <Filter className="text-theme-secondary h-5 w-5" />
+          <h3 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
             Filtros de Relatório
           </h3>
         </div>
@@ -56,16 +53,16 @@ const FiltrosAvancados = ({
           variant="ghost"
           size="sm"
           onClick={() => setIsExpanded(!isExpanded)}
-          className="text-theme-secondary hover:text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-light-text-muted dark:text-dark-text-muted dark:hover:text-gray-200"
+          className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted hover:text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:hover:text-gray-200"
         >
-          <Settings className="w-4 h-4" />
+          <Settings className="h-4 w-4" />
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {/* Período */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+          <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
             Período
           </label>
           <select
@@ -76,7 +73,7 @@ const FiltrosAvancados = ({
                 periodo: e.target.value,
               })
             }
-            className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
           >
             <option value="mes-atual">Mês Atual</option>
             <option value="mes-anterior">Mês Anterior</option>
@@ -89,7 +86,7 @@ const FiltrosAvancados = ({
 
         {/* Unidade */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+          <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
             Unidade
           </label>
           <select
@@ -100,7 +97,7 @@ const FiltrosAvancados = ({
                 unidade: e.target.value,
               })
             }
-            className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
           >
             <option value="todas">Todas as Unidades</option>
             {units?.map(unit => (
@@ -113,7 +110,7 @@ const FiltrosAvancados = ({
 
         {/* Tipo de Relatório */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+          <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
             Formato
           </label>
           <select
@@ -124,7 +121,7 @@ const FiltrosAvancados = ({
                 formato: e.target.value,
               })
             }
-            className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
           >
             <option value="visual">Visualização</option>
             <option value="pdf">PDF</option>
@@ -135,10 +132,10 @@ const FiltrosAvancados = ({
       </div>
 
       {isExpanded && (
-        <div className="mt-4 pt-4 border-t border-light-border dark:border-dark-border">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="mt-4 border-t border-light-border pt-4 dark:border-dark-border">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                 Data Início
               </label>
               <input
@@ -150,11 +147,11 @@ const FiltrosAvancados = ({
                     dataInicio: e.target.value,
                   })
                 }
-                className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                 Data Fim
               </label>
               <input
@@ -166,7 +163,7 @@ const FiltrosAvancados = ({
                     dataFim: e.target.value,
                   })
                 }
-                className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
               />
             </div>
           </div>
@@ -174,12 +171,12 @@ const FiltrosAvancados = ({
       )}
 
       {/* Botão Aplicar Filtros */}
-      <div className="mt-4 pt-4 border-t border-light-border dark:border-dark-border">
+      <div className="mt-4 border-t border-light-border pt-4 dark:border-dark-border">
         <Button
           onClick={onApplyFilters}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-dark-text-primary font-medium py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+          className="text-dark-text-primary flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-2.5 font-medium transition-colors hover:bg-blue-700"
         >
-          <RefreshCw className="w-4 h-4" />
+          <RefreshCw className="h-4 w-4" />
           Aplicar Filtros
         </Button>
       </div>
@@ -193,39 +190,39 @@ const RelatorioCard = ({ report, isActive, onClick, loading = false }) => {
   return (
     <div
       onClick={onClick}
-      className={`relative p-6 rounded-xl border-2 cursor-pointer transition-all duration-200 ${isActive ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md'}`}
+      className={`relative cursor-pointer rounded-xl border-2 p-6 transition-all duration-200 ${isActive ? 'border-blue-500 bg-blue-50 shadow-lg dark:bg-blue-900/20' : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-gray-600'}`}
     >
       {loading && (
-        <div className="absolute inset-0 card-theme/80 dark:bg-dark-surface/80 rounded-xl flex items-center justify-center">
-          <RefreshCw className="w-6 h-6 animate-spin text-blue-500" />
+        <div className="card-theme/80 absolute inset-0 flex items-center justify-center rounded-xl dark:bg-dark-surface/80">
+          <RefreshCw className="h-6 w-6 animate-spin text-blue-500" />
         </div>
       )}
 
       <div className="flex items-start space-x-4">
         <div
-          className={`p-3 rounded-lg ${report.color} text-white flex-shrink-0`}
+          className={`rounded-lg p-3 ${report.color} flex-shrink-0 text-white`}
         >
           <IconComponent size={24} />
         </div>
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           <h3
             className={`text-lg font-semibold ${isActive ? 'text-blue-900 dark:text-blue-100' : 'text-gray-900 dark:text-white'}`}
           >
             {report.title}
           </h3>
           <p
-            className={`text-sm mt-1 ${isActive ? 'text-blue-700 dark:text-blue-300' : 'text-gray-600 dark:text-gray-400'}`}
+            className={`mt-1 text-sm ${isActive ? 'text-blue-700 dark:text-blue-300' : 'text-gray-600 dark:text-gray-400'}`}
           >
             {report.description}
           </p>
-          <div className="flex items-center mt-3 space-x-2">
+          <div className="mt-3 flex items-center space-x-2">
             <span
-              className={`px-2 py-1 rounded-full text-xs font-medium ${report.category === 'financeiro' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' : report.category === 'operacional' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400' : 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'}`}
+              className={`rounded-full px-2 py-1 text-xs font-medium ${report.category === 'financeiro' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' : report.category === 'operacional' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400' : 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'}`}
             >
               {report.category}
             </span>
             {report.featured && (
-              <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400">
+              <span className="rounded-full bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400">
                 Destacado
               </span>
             )}
@@ -240,15 +237,15 @@ const RelatorioCard = ({ report, isActive, onClick, loading = false }) => {
 const MetricasRapidas = ({ data, loading }) => {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         {[...Array(4)].map((_, i) => (
           <div
             key={i}
-            className="card-theme dark:bg-dark-surface rounded-lg p-4 border border-light-border dark:border-dark-border"
+            className="card-theme rounded-lg border border-light-border p-4 dark:border-dark-border dark:bg-dark-surface"
           >
             <div className="animate-pulse">
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+              <div className="mb-2 h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700"></div>
+              <div className="h-8 w-1/2 rounded bg-gray-200 dark:bg-gray-700"></div>
             </div>
           </div>
         ))}
@@ -304,24 +301,24 @@ const MetricasRapidas = ({ data, loading }) => {
     return value;
   };
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
       {metrics.map((metric, index) => {
         const IconComponent = metric.icon;
         return (
           <div
             key={index}
-            className={`${metric.bgColor} rounded-lg p-4 border border-gray-200 dark:border-gray-700`}
+            className={`${metric.bgColor} rounded-lg border border-gray-200 p-4 dark:border-gray-700`}
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm font-medium">
                   {metric.title}
                 </p>
                 <p className={`text-2xl font-bold ${metric.color}`}>
                   {formatValue(metric.value, metric.format)}
                 </p>
               </div>
-              <IconComponent className={`w-8 h-8 ${metric.color}`} />
+              <IconComponent className={`h-8 w-8 ${metric.color}`} />
             </div>
           </div>
         );
@@ -404,7 +401,7 @@ const RelatoriosPage = () => {
         icon: TrendingUp,
         color: 'bg-purple-500',
         category: 'operacional',
-        featured: false,
+        featured: true,
       },
       {
         id: 'performance-profissionais',
@@ -628,9 +625,9 @@ const RelatoriosPage = () => {
   const renderReportContent = () => {
     if (!activeReport) {
       return (
-        <div className="text-center py-12">
-          <Calendar className="w-16 h-16 text-light-text-muted dark:text-dark-text-muted mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-theme-primary dark:text-dark-text-primary mb-2">
+        <div className="py-12 text-center">
+          <Calendar className="text-light-text-muted dark:text-dark-text-muted mx-auto mb-4 h-16 w-16" />
+          <h3 className="text-theme-primary dark:text-dark-text-primary mb-2 text-xl font-semibold">
             Selecione um Relatório
           </h3>
           <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
@@ -645,11 +642,11 @@ const RelatoriosPage = () => {
         {/* Header do relatório */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className={`p-3 rounded-lg ${report.color} text-white`}>
+            <div className={`rounded-lg p-3 ${report.color} text-white`}>
               <report.icon size={24} />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary">
+              <h2 className="text-theme-primary dark:text-dark-text-primary text-2xl font-bold">
                 {report.title}
               </h2>
               <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
@@ -665,7 +662,7 @@ const RelatoriosPage = () => {
               onClick={() => exportReport('pdf')}
               className="flex items-center"
             >
-              <Printer className="w-4 h-4 mr-2" />
+              <Printer className="mr-2 h-4 w-4" />
               PDF
             </Button>
             <Button
@@ -674,7 +671,7 @@ const RelatoriosPage = () => {
               onClick={() => exportReport('excel')}
               className="flex items-center"
             >
-              <Download className="w-4 h-4 mr-2" />
+              <Download className="mr-2 h-4 w-4" />
               Excel
             </Button>
             <Button
@@ -683,7 +680,7 @@ const RelatoriosPage = () => {
               onClick={() => exportReport('csv')}
               className="flex items-center"
             >
-              <Share2 className="w-4 h-4 mr-2" />
+              <Share2 className="mr-2 h-4 w-4" />
               CSV
             </Button>
           </div>
@@ -693,20 +690,31 @@ const RelatoriosPage = () => {
         <MetricasRapidas data={reportData} loading={loading} />
 
         {/* Conteúdo específico do relatório */}
-        <div className="card-theme dark:bg-dark-surface rounded-lg border border-light-border dark:border-dark-border p-6">
+        <div className="card-theme rounded-lg border border-light-border dark:border-dark-border dark:bg-dark-surface">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <RefreshCw className="w-8 h-8 animate-spin text-blue-500 mr-3" />
+              <RefreshCw className="mr-3 h-8 w-8 animate-spin text-blue-500" />
               <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 Carregando dados...
               </span>
             </div>
           ) : activeReport === 'dre-mensal' ? (
-            <DREDynamicView dreData={dreData} isLoading={loading} />
+            <div className="p-6">
+              <DREDynamicView dreData={dreData} isLoading={loading} />
+            </div>
+          ) : activeReport === 'comparativo-unidades' ? (
+            <RelatorioComparativoUnidades
+              filters={{
+                period: filters.periodo,
+                unitId: filters.unidade,
+                startDate: filters.dataInicio,
+                endDate: filters.dataFim,
+              }}
+            />
           ) : (
-            <div className="text-center py-12">
-              <Eye className="w-16 h-16 text-light-text-muted dark:text-dark-text-muted mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-2">
+            <div className="py-12 text-center">
+              <Eye className="text-light-text-muted dark:text-dark-text-muted mx-auto mb-4 h-16 w-16" />
+              <h3 className="text-theme-primary dark:text-dark-text-primary mb-2 text-lg font-semibold">
                 Conteúdo do Relatório
               </h3>
               <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
@@ -721,10 +729,10 @@ const RelatoriosPage = () => {
   return (
     <div className="min-h-screen bg-light-bg dark:bg-dark-bg dark:bg-dark-surface">
       {/* Header */}
-      <div className="card-theme dark:bg-dark-surface border-b border-light-border dark:border-dark-border px-6 py-4">
+      <div className="card-theme border-b border-light-border px-6 py-4 dark:border-dark-border dark:bg-dark-surface">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-theme-primary dark:text-dark-text-primary">
+            <h1 className="text-theme-primary dark:text-dark-text-primary text-3xl font-bold">
               Relatórios Gerenciais
             </h1>
             <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
@@ -740,7 +748,7 @@ const RelatoriosPage = () => {
                 onClick={() => setActiveReport(null)}
                 className="flex items-center"
               >
-                <ChevronLeft className="w-4 h-4 mr-2" />
+                <ChevronLeft className="mr-2 h-4 w-4" />
                 Voltar
               </Button>
             )}
@@ -750,8 +758,8 @@ const RelatoriosPage = () => {
 
       <div className="flex flex-col lg:flex-row">
         {/* Sidebar com tipos de relatórios */}
-        <div className="w-full lg:w-80 card-theme dark:bg-dark-surface border-r border-light-border dark:border-dark-border p-6">
-          <h2 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-4">
+        <div className="card-theme w-full border-r border-light-border p-6 dark:border-dark-border dark:bg-dark-surface lg:w-80">
+          <h2 className="text-theme-primary dark:text-dark-text-primary mb-4 text-lg font-semibold">
             Tipos de Relatórios
           </h2>
 
@@ -769,7 +777,7 @@ const RelatoriosPage = () => {
         </div>
 
         {/* Conteúdo principal */}
-        <div className="flex-1 min-w-0 p-6">
+        <div className="min-w-0 flex-1 p-6">
           {/* Filtros */}
           <div className="mb-6">
             <FiltrosAvancados

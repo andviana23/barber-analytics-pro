@@ -4,10 +4,11 @@
 
 Você está colaborando no desenvolvimento do sistema **Barber Analytics Pro** — um sistema completo de gestão para barbearias premium, desenvolvido por **Andrey Viana**, com arquitetura limpa, modular e escalável.
 
-O sistema é **React 19 + Vite + TailwindCSS** no frontend, com **Supabase (PostgreSQL + Auth + Realtime + Edge Functions)** no backend.  
+O sistema é **React 19 + Vite + TailwindCSS** no frontend, com **Supabase (PostgreSQL + Auth + Realtime + Edge Functions)** no backend.
 Adota **Clean Architecture**, **Domain-Driven Design (DDD)** e **Atomic Design**.
+**Package Manager**: **pnpm** (substituindo npm para melhor performance e cache).
 
-**Data atual:** 30 de outubro de 2025
+**Data atual:** 4 de novembro de 2025
 
 ---
 
@@ -538,10 +539,10 @@ import { TrendingUp } from 'lucide-react';
 
 function KPICard({ title, value, trend }) {
   return (
-    <div className="card-theme p-6 rounded-xl border hover:shadow-lg transition-shadow">
-      <div className="flex items-center justify-between mb-4">
-        <div className="p-2 rounded-lg bg-light-bg dark:bg-dark-hover">
-          <TrendingUp className="w-5 h-5 text-primary" />
+    <div className="card-theme rounded-xl border p-6 transition-shadow hover:shadow-lg">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="rounded-lg bg-light-bg p-2 dark:bg-dark-hover">
+          <TrendingUp className="h-5 w-5 text-primary" />
         </div>
         {trend && (
           <span className="text-sm font-medium text-feedback-light-success dark:text-feedback-dark-success">
@@ -550,7 +551,7 @@ function KPICard({ title, value, trend }) {
         )}
       </div>
       <p className="text-theme-secondary text-sm font-medium">{title}</p>
-      <p className="text-theme-primary text-2xl font-bold mt-1">{value}</p>
+      <p className="text-theme-primary mt-1 text-2xl font-bold">{value}</p>
     </div>
   );
 }
@@ -570,6 +571,65 @@ function KPICard({ title, value, trend }) {
 
 ---
 
+## 📦 Comandos e Scripts (pnpm)
+
+### ⚠️ IMPORTANTE: Usamos PNPM, não npm
+
+**SEMPRE use `pnpm` nos comandos e scripts:**
+
+```bash
+# ✅ CORRETO
+pnpm install
+pnpm dev
+pnpm build
+pnpm test
+pnpm lint
+
+# ❌ ERRADO
+npm install
+npm run dev
+npm run build
+```
+
+### 🔧 Scripts Principais
+
+```bash
+# Desenvolvimento
+pnpm dev                    # Servidor dev (localhost:5173)
+pnpm build                  # Build produção
+pnpm preview                # Preview build
+
+# Qualidade
+pnpm lint                   # ESLint check
+pnpm lint:fix               # ESLint fix
+pnpm format                 # Prettier format
+pnpm format:check           # Prettier check
+
+# Testes
+pnpm test                   # Vitest unit tests
+pnpm test:e2e               # Playwright E2E
+pnpm test:all               # Todos os testes
+
+# Design System
+pnpm audit:design-system    # Audita classes hardcoded
+pnpm migrate:design-system  # Migra para design system
+```
+
+### 🛠️ Quando gerar comandos para o usuário:
+
+```bash
+# ✅ Sempre usar pnpm
+"Execute: pnpm install"
+"Execute: pnpm dev"
+"Execute: pnpm lint:fix"
+
+# ❌ Nunca usar npm
+"Execute: npm install"  # ERRADO
+"Execute: npm run dev"  # ERRADO
+```
+
+---
+
 ## ✨ Resultado Esperado
 
 O Copilot deve:
@@ -582,6 +642,7 @@ O Copilot deve:
 ✅ Evitar redundância e manter alta legibilidade
 ✅ **SEMPRE usar classes utilitárias do Design System**
 ✅ **NUNCA usar classes CSS hardcoded**
+✅ **SEMPRE usar pnpm em vez de npm**
 ✅ Respeitar as RLS policies e permissões
 ✅ Validar dados com DTOs
 ✅ Retornar `{ data, error }`
@@ -591,9 +652,9 @@ O Copilot deve:
 
 ✨ **Autor & Contexto**
 
-**Autor:** Andrey Viana  
-**Projeto:** Barber Analytics Pro  
-**Estilo:** Enterprise, Clean Code, Atomic, Multi-tenant, Supabase-first  
+**Autor:** Andrey Viana
+**Projeto:** Barber Analytics Pro
+**Estilo:** Enterprise, Clean Code, Atomic, Multi-tenant, Supabase-first
 **Meta:** Sistema de gestão de barbearia completo, modular e escalável.
 
-**Última atualização:** 30 de outubro de 2025
+**Última atualização:** 4 de novembro de 2025
