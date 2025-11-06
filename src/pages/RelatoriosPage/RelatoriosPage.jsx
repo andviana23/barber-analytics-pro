@@ -31,6 +31,7 @@ import { useToast } from '../../context/ToastContext';
 import { useUnit } from '../../context/UnitContext';
 import { supabase } from '../../services/supabase';
 import RelatorioComparativoUnidades from './components/RelatorioComparativoUnidades';
+import RelatorioFluxoCaixa from './components/RelatorioFluxoCaixa';
 
 // Componente de filtros avançados
 const FiltrosAvancados = ({
@@ -708,6 +709,11 @@ const RelatoriosPage = () => {
             <div className="p-6">
               <DREDynamicView dreData={dreData} isLoading={loading} />
             </div>
+          ) : activeReport === 'fluxo-caixa' ? (
+            <RelatorioFluxoCaixa 
+              filters={filters} 
+              units={allUnits || []} 
+            />
           ) : activeReport === 'comparativo-unidades' ? (
             <RelatorioComparativoUnidades
               filters={{
