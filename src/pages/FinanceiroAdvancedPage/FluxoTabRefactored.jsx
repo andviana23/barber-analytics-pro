@@ -47,6 +47,33 @@ import { PieChartCard } from '../../molecules/PieChartCard';
 import EditInitialBalanceModal from '../../organisms/EditInitialBalanceModal/EditInitialBalanceModal';
 
 /**
+ * ✅ FUNÇÃO HELPER: Verifica se uma data é final de semana (timezone-safe)
+ * @param {string} dateString - Data no formato 'YYYY-MM-DD'
+ * @returns {boolean} - true se sábado ou domingo
+ */
+const isWeekend = dateString => {
+  const dayOfWeek = new Date(dateString + 'T12:00:00').getDay();
+  return dayOfWeek === 0 || dayOfWeek === 6;
+};
+
+/**
+ * ✅ FUNÇÃO HELPER: Move data de fim de semana para próxima segunda-feira
+ * @param {Date} date - Data a ser ajustada
+ * @returns {Date} - Data ajustada (segunda se for fim de semana, original caso contrário)
+ */
+const moveWeekendToMonday = date => {
+  const dayOfWeek = date.getDay();
+  if (dayOfWeek === 0) {
+    // Domingo → +1 dia
+    return addDays(date, 1);
+  } else if (dayOfWeek === 6) {
+    // Sábado → +2 dias
+    return addDays(date, 2);
+  }
+  return date;
+};
+
+/**
  * 📊 Tab do Fluxo de Caixa - 100% REFATORADO COM DESIGN SYSTEM
  *
  * Features:
@@ -60,6 +87,7 @@ import EditInitialBalanceModal from '../../organisms/EditInitialBalanceModal/Edi
  * - ✅ Análise completa de entradas/saídas
  * - ✅ UI ultra moderna com hover effects
  * - ✅ Dark mode completo
+ * - ✅ Funções helper timezone-safe para finais de semana
  */
 const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
   const { showToast } = useToast();
@@ -473,76 +501,24 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
       // 🎯 NORMALIZAR DATA PARA EVITAR PROBLEMAS DE TIMEZONE
       const expectedDate = revenue.expected_receipt_date || revenue.date;
 
-      // ✅ USAR parseISO + startOfDay + format para garantir data absolutamente limpa
+      // ✅ USAR parseISO + startOfDay para garantir data absolutamente limpa
       let cleanDate = startOfDay(parseISO(expectedDate));
 
-      // 🚫 REGRA DE NEGÓCIO: Não há trabalho em fins de semana (sábado=6, domingo=0)
-      // Se a data cair em fim de semana, mover para a próxima segunda-feira
-      // ✅ FIX: Usar Date constructor com timezone forçado para evitar bug de getDay()
-      const dayOfWeek = new Date(expectedDate + 'T12:00:00').getDay();
-
-      // 🔍 DEBUG: Log apenas para domingos para rastrear bug
-      if (dayOfWeek === 0) {
-        console.log(
-          `[REVENUE-WEEKEND-DEBUG] Domingo detectado: ${expectedDate}`,
-          {
-            dayOfWeek,
-            isWeekend: true,
-            willMoveToMonday: true,
-          }
-        );
-      }
-
-      if (dayOfWeek === 0) {
-        // Domingo
-        cleanDate = addDays(cleanDate, 1); // Move para segunda-feira
-        console.log(
-          `📅 Data movida de domingo para segunda: ${expectedDate} → ${format(cleanDate, 'yyyy-MM-dd')}`
-        );
-      } else if (dayOfWeek === 6) {
-        // Sábado
-        cleanDate = addDays(cleanDate, 2); // Move para segunda-feira
-        console.log(
-          `📅 Data movida de sábado para segunda: ${expectedDate} → ${format(cleanDate, 'yyyy-MM-dd')}`
-        );
-      }
+      // 🚫 REGRA DE NEGÓCIO: Não há trabalho em fins de semana
+      // Se a data cair em fim de semana, mover para a próxima segunda-feira usando helper
+      cleanDate = moveWeekendToMonday(cleanDate);
 
       const date = format(cleanDate, 'yyyy-MM-dd');
       const category = revenue.status === 'Received' ? 'received' : 'pending';
-
-      console.log(
-        `💰 Processando receita: ${date} - ${revenue.status} - R$ ${revenue.value}`,
-        {
-          id: revenue.id,
-          originalExpectedDate: revenue.expected_receipt_date,
-          originalDate: revenue.date,
-          cleanDateISO: cleanDate.toISOString(),
-          normalizedDate: date,
-          category,
-          grossValue: revenue.value,
-          fees: revenue.fees || 0,
-          dayOfWeek: format(cleanDate, 'EEEE', { locale: ptBR }),
-          wasWeekendAdjusted: dayOfWeek === 0 || dayOfWeek === 6,
-        }
-      );
 
       // ✅ FILTRAR APENAS DATAS DO MÊS VIGENTE - VALIDAÇÃO RIGOROSA
       const revenueDate = cleanDate; // Usar a data já limpa
       const filterStartDate = startOfDay(parseISO(dateRange.startDate));
       const filterEndDate = startOfDay(parseISO(dateRange.endDate));
 
-      // Debug para verificar se está no range correto
       const isInRange =
         revenueDate >= filterStartDate && revenueDate <= filterEndDate;
       const hasDateEntry = dailyMap.has(date);
-
-      console.log(`🔍 Validação de data para ${date}:`, {
-        isInRange,
-        hasDateEntry,
-        revenueDate: revenueDate.toISOString(),
-        filterStart: filterStartDate.toISOString(),
-        filterEnd: filterEndDate.toISOString(),
-      });
 
       if (isInRange && hasDateEntry) {
         const dayData = dailyMap.get(date);
@@ -567,31 +543,8 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
           dayData.revenues.pending.push(revenue);
         }
         dayData.transaction_count++;
-      } else {
-        console.log('🚫 Receita filtrada fora do mês vigente:', {
-          revenueId: revenue.id,
-          date: date,
-          expectedDate: revenue.expected_receipt_date,
-          status: revenue.status,
-          monthRange: `${dateRange.startDate} - ${dateRange.endDate}`,
-        });
       }
     });
-
-    // 🔍 DEBUG: Verificar estado do dailyMap após processamento de receitas
-    console.log('🔍 DEBUG: Estado do dailyMap após receitas:');
-    Array.from(dailyMap.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .forEach(([dateKey, dayData]) => {
-        const dayOfWeek = format(parseISO(dateKey), 'EEEE', { locale: ptBR });
-        console.log(`📅 ${dateKey} (${dayOfWeek}):`, {
-          received_inflows: dayData.received_inflows,
-          pending_inflows: dayData.pending_inflows,
-          total_inflows: dayData.total_inflows,
-          receivedCount: dayData.revenues.received.length,
-          pendingCount: dayData.revenues.pending.length,
-        });
-      });
 
     // ✅ PROCESSAR DESPESAS COM SEPARAÇÃO POR STATUS - REGIME DE COMPETÊNCIA
     // 💡 SEMPRE usa expected_payment_date para alocação no fluxo (regime de competência)
@@ -686,64 +639,25 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
       dayNumber: 0, // Dia 0 = Saldo Inicial
     };
 
-    // 🔍 DEBUG: Verificar dados de sábado e domingo especificamente
-    console.log('🔍 DEBUG: Verificando dados do final de semana...');
-    for (const [dateKey, data] of dailyMap.entries()) {
-      const date = startOfDay(parseISO(dateKey)); // Usar mesmo padrão das receitas
-      const dayOfWeek = format(date, 'EEEE', { locale: ptBR });
-      const dayNumber = date.getDay(); // 0=domingo, 6=sábado
-
-      if (dayOfWeek === 'sábado' || dayOfWeek === 'domingo') {
-        console.log(`📅 ${dayOfWeek} (${dateKey}) - DOW=${dayNumber}:`, {
-          received_inflows: data.received_inflows,
-          revenues_count: data.revenues.received.length,
-          revenues: data.revenues.received.map(r => ({
-            value: r.value,
-            expected_receipt_date: r.expected_receipt_date,
-            date: r.date,
-          })),
-        });
-      }
-    }
-
     const finalResult = [saldoInicialRow, ...result];
 
     // 🚫 LIMPEZA FINAL: Garantir que fins de semana estejam zerados
     const cleanedResult = finalResult.map(day => {
-      if (!day.isSaldoInicial) {
-        // ✅ FIX: Usar Date constructor com timezone forçado para evitar bug de getDay()
-        const dayOfWeek = new Date(day.date + 'T12:00:00').getDay(); // 0=domingo, 6=sábado
-
-        // 🔍 DEBUG: Log para rastrear limpeza de finais de semana
-        if (dayOfWeek === 0 || dayOfWeek === 6) {
-          console.log(
-            `[CLEANUP-LAYER] Zerando final de semana: ${day.date} (DOW=${dayOfWeek})`,
-            {
-              before: {
-                received_inflows: day.received_inflows,
-                total_outflows: day.total_outflows,
-              },
-              after: { received_inflows: 0, total_outflows: 0 },
-            }
-          );
-        }
-
-        if (dayOfWeek === 0 || dayOfWeek === 6) {
-          // Forçar zeramento completo de fins de semana
-          return {
-            ...day,
-            received_inflows: 0,
-            pending_inflows: 0,
-            total_inflows: 0,
-            paid_outflows: 0,
-            pending_outflows: 0,
-            total_outflows: 0,
-            dailyBalance: 0,
-            transaction_count: 0,
-            revenues: { received: [], pending: [] },
-            expenses: { paid: [], pending: [] },
-          };
-        }
+      if (!day.isSaldoInicial && isWeekend(day.date)) {
+        // Forçar zeramento completo de fins de semana
+        return {
+          ...day,
+          received_inflows: 0,
+          pending_inflows: 0,
+          total_inflows: 0,
+          paid_outflows: 0,
+          pending_outflows: 0,
+          total_outflows: 0,
+          dailyBalance: 0,
+          transaction_count: 0,
+          revenues: { received: [], pending: [] },
+          expenses: { paid: [], pending: [] },
+        };
       }
       return day;
     });
