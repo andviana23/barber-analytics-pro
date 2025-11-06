@@ -195,7 +195,7 @@ const ProductsPage = () => {
   if (!selectedUnit) {
     return (
       <Layout>
-        <div className="flex justify-center items-center h-full">
+        <div className="flex h-full items-center justify-center">
           <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
             Selecione uma unidade para gerenciar produtos.
           </p>
@@ -205,11 +205,11 @@ const ProductsPage = () => {
   }
   return (
     <Layout activeMenuItem="cadastros" subMenuItem="products">
-      <div className="flex flex-col flex-1 p-6 space-y-6">
+      <div className="flex flex-1 flex-col space-y-6 p-6">
         {/* 📊 Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-theme-primary mb-2">
+            <h1 className="text-theme-primary mb-2 text-3xl font-bold">
               Controle de Estoque
             </h1>
             <p className="text-theme-secondary">
@@ -219,17 +219,17 @@ const ProductsPage = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={() => {}}
-              className="p-2.5 text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary hover:card-theme dark:hover:bg-gray-700 rounded-xl transition-all"
+              className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary hover:card-theme rounded-xl p-2.5 transition-all dark:hover:bg-gray-700"
               title="Atualizar"
             >
-              <RefreshCw className="w-5 h-5" />
+              <RefreshCw className="h-5 w-5" />
             </button>
             {canManage && (
               <button
                 onClick={handleCreateClick}
-                className="btn-theme-primary px-5 py-2.5 rounded-xl flex items-center gap-2 shadow-lg hover:shadow-xl transition-all"
+                className="btn-theme-primary flex items-center gap-2 rounded-xl px-5 py-2.5 shadow-lg transition-all hover:shadow-xl"
               >
-                <Plus className="w-5 h-5" />
+                <Plus className="h-5 w-5" />
                 Novo Produto
               </button>
             )}
@@ -237,120 +237,120 @@ const ProductsPage = () => {
         </div>
 
         {/* 📈 KPIs Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
           {/* Total de Produtos */}
-          <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-blue-300 dark:hover:border-blue-600 transition-all">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-3 bg-gradient-primary rounded-xl">
-                <Package className="w-6 h-6 text-dark-text-primary" />
+          <div className="card-theme rounded-xl border-2 border-transparent p-5 transition-all hover:border-blue-300 dark:hover:border-blue-600">
+            <div className="mb-3 flex items-center justify-between">
+              <div className="rounded-xl bg-gradient-primary p-3">
+                <Package className="text-dark-text-primary h-6 w-6" />
               </div>
             </div>
-            <p className="text-xs font-semibold text-theme-secondary uppercase tracking-wide mb-1">
+            <p className="text-theme-secondary mb-1 text-xs font-semibold uppercase tracking-wide">
               Total de Produtos
             </p>
-            <p className="text-3xl font-bold text-theme-primary">
+            <p className="text-theme-primary text-3xl font-bold">
               {stats.totalProducts}
             </p>
           </div>
 
           {/* Valor Total */}
-          <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-green-300 dark:hover:border-green-600 transition-all">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-3 bg-gradient-success rounded-xl">
-                <DollarSign className="w-6 h-6 text-dark-text-primary" />
+          <div className="card-theme rounded-xl border-2 border-transparent p-5 transition-all hover:border-green-300 dark:hover:border-green-600">
+            <div className="mb-3 flex items-center justify-between">
+              <div className="rounded-xl bg-gradient-success p-3">
+                <DollarSign className="text-dark-text-primary h-6 w-6" />
               </div>
             </div>
-            <p className="text-xs font-semibold text-theme-secondary uppercase tracking-wide mb-1">
+            <p className="text-theme-secondary mb-1 text-xs font-semibold uppercase tracking-wide">
               Valor Total
             </p>
-            <p className="text-2xl font-bold text-theme-primary">
+            <p className="text-theme-primary text-2xl font-bold">
               {formatCurrency(stats.totalValue)}
             </p>
           </div>
 
           {/* Estoque Baixo */}
-          <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-yellow-300 dark:hover:border-yellow-600 transition-all">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-3 bg-gradient-warning rounded-xl">
-                <AlertTriangle className="w-6 h-6 text-dark-text-primary" />
+          <div className="card-theme rounded-xl border-2 border-transparent p-5 transition-all hover:border-yellow-300 dark:hover:border-yellow-600">
+            <div className="mb-3 flex items-center justify-between">
+              <div className="rounded-xl bg-gradient-warning p-3">
+                <AlertTriangle className="text-dark-text-primary h-6 w-6" />
               </div>
             </div>
-            <p className="text-xs font-semibold text-theme-secondary uppercase tracking-wide mb-1">
+            <p className="text-theme-secondary mb-1 text-xs font-semibold uppercase tracking-wide">
               Estoque Baixo
             </p>
-            <p className="text-3xl font-bold text-theme-primary">
+            <p className="text-theme-primary text-3xl font-bold">
               {stats.lowStockProducts}
             </p>
           </div>
 
           {/* Sem Estoque */}
-          <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-red-300 dark:hover:border-red-600 transition-all">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-3 bg-gradient-danger rounded-xl">
-                <XCircle className="w-6 h-6 text-dark-text-primary" />
+          <div className="card-theme rounded-xl border-2 border-transparent p-5 transition-all hover:border-red-300 dark:hover:border-red-600">
+            <div className="mb-3 flex items-center justify-between">
+              <div className="bg-gradient-danger rounded-xl p-3">
+                <XCircle className="text-dark-text-primary h-6 w-6" />
               </div>
             </div>
-            <p className="text-xs font-semibold text-theme-secondary uppercase tracking-wide mb-1">
+            <p className="text-theme-secondary mb-1 text-xs font-semibold uppercase tracking-wide">
               Sem Estoque
             </p>
-            <p className="text-3xl font-bold text-theme-primary">
+            <p className="text-theme-primary text-3xl font-bold">
               {stats.outOfStockProducts}
             </p>
           </div>
 
           {/* Valor de Venda */}
-          <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-purple-300 dark:hover:border-purple-600 transition-all">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-3 bg-gradient-secondary rounded-xl">
-                <ShoppingBag className="w-6 h-6 text-dark-text-primary" />
+          <div className="card-theme rounded-xl border-2 border-transparent p-5 transition-all hover:border-purple-300 dark:hover:border-purple-600">
+            <div className="mb-3 flex items-center justify-between">
+              <div className="bg-gradient-secondary rounded-xl p-3">
+                <ShoppingBag className="text-dark-text-primary h-6 w-6" />
               </div>
             </div>
-            <p className="text-xs font-semibold text-theme-secondary uppercase tracking-wide mb-1">
+            <p className="text-theme-secondary mb-1 text-xs font-semibold uppercase tracking-wide">
               Valor de Venda
             </p>
-            <p className="text-2xl font-bold text-theme-primary">
+            <p className="text-theme-primary text-2xl font-bold">
               {formatCurrency(stats.totalStockValue)}
             </p>
           </div>
         </div>
 
         {/* 🔍 Barra de Ferramentas */}
-        <div className="card-theme p-5 rounded-xl">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+        <div className="card-theme rounded-xl p-5">
+          <div className="flex flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
             {/* Busca e Filtros */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 flex-1 w-full">
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-light-text-muted dark:text-dark-text-muted" />
+            <div className="flex w-full flex-1 flex-col items-start gap-3 sm:flex-row sm:items-center">
+              <div className="relative max-w-md flex-1">
+                <Search className="text-light-text-muted dark:text-dark-text-muted absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
                 <input
                   type="text"
                   placeholder="Pesquisar produtos..."
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
-                  className="w-full pl-11 pr-4 py-2.5 border border-light-border dark:border-dark-border rounded-xl card-theme dark:bg-gray-700 text-theme-primary placeholder-gray-400 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                  className="card-theme text-theme-primary w-full rounded-xl border border-light-border py-2.5 pl-11 pr-4 placeholder-gray-400 transition-all focus:border-primary focus:ring-2 focus:ring-primary/50 dark:border-dark-border dark:bg-gray-700"
                 />
               </div>
 
               <div className="flex items-center gap-3">
-                <label className="flex items-center gap-2 cursor-pointer group">
+                <label className="group flex cursor-pointer items-center gap-2">
                   <input
                     type="checkbox"
                     checked={showInactive}
                     onChange={() => setShowInactive(!showInactive)}
-                    className="form-checkbox h-4 w-4 text-primary rounded border-light-border dark:border-dark-border focus:ring-primary"
+                    className="form-checkbox h-4 w-4 rounded border-light-border text-primary focus:ring-primary dark:border-dark-border"
                   />
-                  <span className="text-sm font-medium text-theme-secondary group-hover:text-theme-primary transition-colors">
+                  <span className="text-theme-secondary group-hover:text-theme-primary text-sm font-medium transition-colors">
                     Mostrar Inativos
                   </span>
                 </label>
 
-                <label className="flex items-center gap-2 cursor-pointer group">
+                <label className="group flex cursor-pointer items-center gap-2">
                   <input
                     type="checkbox"
                     checked={lowStockOnly}
                     onChange={() => setLowStockOnly(!lowStockOnly)}
-                    className="form-checkbox h-4 w-4 text-yellow-500 rounded border-light-border dark:border-dark-border focus:ring-yellow-500"
+                    className="form-checkbox h-4 w-4 rounded border-light-border text-yellow-500 focus:ring-yellow-500 dark:border-dark-border"
                   />
-                  <span className="text-sm font-medium text-theme-secondary group-hover:text-theme-primary transition-colors">
+                  <span className="text-theme-secondary group-hover:text-theme-primary text-sm font-medium transition-colors">
                     Estoque Baixo
                   </span>
                 </label>
@@ -359,12 +359,12 @@ const ProductsPage = () => {
 
             {/* Ações */}
             <div className="flex items-center gap-2">
-              <button className="flex items-center gap-2 px-4 py-2.5 text-theme-secondary border border-light-border dark:border-dark-border rounded-xl hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700 hover:text-theme-primary transition-all">
-                <Filter className="w-4 h-4" />
+              <button className="text-theme-secondary hover:text-theme-primary flex items-center gap-2 rounded-xl border border-light-border px-4 py-2.5 transition-all hover:bg-light-bg dark:border-dark-border dark:bg-dark-bg dark:hover:bg-gray-700">
+                <Filter className="h-4 w-4" />
                 <span className="hidden sm:inline">Filtros</span>
               </button>
-              <button className="flex items-center gap-2 px-4 py-2.5 text-theme-secondary border border-light-border dark:border-dark-border rounded-xl hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700 hover:text-theme-primary transition-all">
-                <Download className="w-4 h-4" />
+              <button className="text-theme-secondary hover:text-theme-primary flex items-center gap-2 rounded-xl border border-light-border px-4 py-2.5 transition-all hover:bg-light-bg dark:border-dark-border dark:bg-dark-bg dark:hover:bg-gray-700">
+                <Download className="h-4 w-4" />
                 <span className="hidden sm:inline">Exportar</span>
               </button>
             </div>
@@ -372,11 +372,11 @@ const ProductsPage = () => {
         </div>
 
         {/* 📋 Tabela de Produtos */}
-        <div className="card-theme rounded-xl overflow-hidden flex-1">
+        <div className="card-theme flex-1 overflow-hidden rounded-xl">
           {loading ? (
             <div className="flex items-center justify-center py-24">
               <div className="flex flex-col items-center gap-4">
-                <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
                 <p className="text-theme-secondary font-medium">
                   Carregando produtos...
                 </p>
@@ -384,7 +384,7 @@ const ProductsPage = () => {
             </div>
           ) : error ? (
             <div className="flex flex-col items-center justify-center py-24">
-              <AlertTriangle className="w-16 h-16 text-red-400 mb-4" />
+              <AlertTriangle className="mb-4 h-16 w-16 text-red-400" />
               <p className="text-xl font-semibold text-red-600 dark:text-red-400">
                 Erro ao carregar produtos
               </p>
@@ -392,8 +392,8 @@ const ProductsPage = () => {
             </div>
           ) : paginatedProducts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24">
-              <Package className="w-16 h-16 text-gray-300 dark:text-gray-600 dark:text-theme-secondary mb-4" />
-              <p className="text-xl font-semibold text-theme-primary mb-2">
+              <Package className="dark:text-theme-secondary mb-4 h-16 w-16 text-gray-300 dark:text-gray-600" />
+              <p className="text-theme-primary mb-2 text-xl font-semibold">
                 Nenhum produto encontrado
               </p>
               <p className="text-theme-secondary">
@@ -404,9 +404,9 @@ const ProductsPage = () => {
               {canManage && !searchTerm && (
                 <button
                   onClick={handleCreateClick}
-                  className="mt-6 btn-theme-primary px-6 py-3 rounded-xl flex items-center gap-2"
+                  className="btn-theme-primary mt-6 flex items-center gap-2 rounded-xl px-6 py-3"
                 >
-                  <Plus className="w-5 h-5" />
+                  <Plus className="h-5 w-5" />
                   Criar Primeiro Produto
                 </button>
               )}
@@ -415,25 +415,25 @@ const ProductsPage = () => {
             <>
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gradient-light dark:from-gray-800 dark:to-gray-700 border-b-2 border-light-border dark:border-dark-border">
+                  <thead className="border-b-2 border-light-border bg-gradient-light dark:border-dark-border dark:from-gray-800 dark:to-gray-700">
                     <tr>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                      <th className="text-theme-secondary px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                         Produto
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                      <th className="text-theme-secondary px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                         Categoria/Marca
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                      <th className="text-theme-secondary px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                         Estoque
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                      <th className="text-theme-secondary px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                         Preços
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                      <th className="text-theme-secondary px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                         Status
                       </th>
                       {canManage && (
-                        <th className="px-6 py-4 text-right text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                        <th className="text-theme-secondary px-6 py-4 text-right text-xs font-bold uppercase tracking-wider">
                           Ações
                         </th>
                       )}
@@ -445,20 +445,20 @@ const ProductsPage = () => {
                       return (
                         <tr
                           key={product.id}
-                          className="group hover:bg-light-hover dark:hover:bg-dark-hover transition-all duration-200"
+                          className="group transition-all duration-200 hover:bg-light-hover dark:hover:bg-dark-hover"
                         >
                           {/* Produto */}
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          <td className="whitespace-nowrap px-6 py-4">
                             <div className="flex items-center gap-3">
-                              <div className="p-2.5 bg-blue-100 dark:bg-blue-900/30 rounded-xl group-hover:scale-110 transition-transform">
-                                <Box className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                              <div className="rounded-xl bg-blue-100 p-2.5 transition-transform group-hover:scale-110 dark:bg-blue-900/30">
+                                <Box className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                               </div>
                               <div>
-                                <p className="font-semibold text-theme-primary">
+                                <p className="text-theme-primary font-semibold">
                                   {product.name}
                                 </p>
                                 {product.sku && (
-                                  <p className="text-xs text-theme-secondary">
+                                  <p className="text-theme-secondary text-xs">
                                     SKU: {product.sku}
                                   </p>
                                 )}
@@ -467,29 +467,29 @@ const ProductsPage = () => {
                           </td>
 
                           {/* Categoria / Marca */}
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-theme-primary">
+                          <td className="whitespace-nowrap px-6 py-4">
+                            <div className="text-theme-primary text-sm">
                               {product.category || '-'}
                             </div>
-                            <div className="text-sm text-theme-secondary">
+                            <div className="text-theme-secondary text-sm">
                               {product.brand || '-'}
                             </div>
                           </td>
 
                           {/* Estoque */}
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-theme-primary font-semibold">
+                          <td className="whitespace-nowrap px-6 py-4">
+                            <div className="text-theme-primary text-sm font-semibold">
                               {product.current_stock} {product.unit_of_measure}
                             </div>
-                            <div className="text-sm text-theme-secondary">
+                            <div className="text-theme-secondary text-sm">
                               Mín: {product.min_stock} | Máx:{' '}
                               {product.max_stock}
                             </div>
                           </td>
 
                           {/* Preços */}
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-theme-primary">
+                          <td className="whitespace-nowrap px-6 py-4">
+                            <div className="text-theme-primary text-sm">
                               <span className="font-medium">Custo:</span>{' '}
                               {formatCurrency(product.cost_price)}
                             </div>
@@ -500,24 +500,24 @@ const ProductsPage = () => {
                           </td>
 
                           {/* Status */}
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          <td className="whitespace-nowrap px-6 py-4">
                             <div className="flex flex-col gap-1.5">
                               {/* Status Ativo/Inativo */}
                               {product.is_active ? (
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full text-xs font-semibold w-fit">
-                                  <CheckCircle className="w-3.5 h-3.5" />
+                                <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700 dark:bg-green-900/30 dark:text-green-300">
+                                  <CheckCircle className="h-3.5 w-3.5" />
                                   Ativo
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 card-theme dark:bg-gray-700 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted rounded-full text-xs font-semibold w-fit">
-                                  <EyeOff className="w-3.5 h-3.5" />
+                                <span className="card-theme text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold dark:bg-gray-700">
+                                  <EyeOff className="h-3.5 w-3.5" />
                                   Inativo
                                 </span>
                               )}
 
                               {/* Status Estoque */}
                               <span
-                                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold w-fit ${stockStatus.color === 'green' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : stockStatus.color === 'yellow' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'}`}
+                                className={`inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${stockStatus.color === 'green' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : stockStatus.color === 'yellow' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'}`}
                               >
                                 {stockStatus.text}
                               </span>
@@ -526,32 +526,32 @@ const ProductsPage = () => {
 
                           {/* Ações */}
                           {canManage && (
-                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                               <div className="flex items-center justify-end gap-2">
                                 <button
                                   onClick={() => handleMovementClick(product)}
-                                  className="p-2 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-all"
+                                  className="rounded-lg p-2 text-blue-600 transition-all hover:bg-blue-100 dark:hover:bg-blue-900/30"
                                   title="Movimentação de Estoque"
                                 >
-                                  <Boxes className="w-4 h-4" />
+                                  <Boxes className="h-4 w-4" />
                                 </button>
                                 <button
                                   onClick={() => handleEditClick(product)}
-                                  className="p-2 text-green-600 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-all"
+                                  className="rounded-lg p-2 text-green-600 transition-all hover:bg-green-100 dark:hover:bg-green-900/30"
                                   title="Editar Produto"
                                 >
-                                  <Edit2 className="w-4 h-4" />
+                                  <Edit2 className="h-4 w-4" />
                                 </button>
                                 <button
                                   onClick={() => handleDeleteClick(product.id)}
-                                  className="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-all"
+                                  className="rounded-lg p-2 text-red-600 transition-all hover:bg-red-100 dark:hover:bg-red-900/30"
                                   title="Excluir Produto"
                                   disabled={deletingId === product.id}
                                 >
                                   {deletingId === product.id ? (
-                                    <Loader className="w-4 h-4 animate-spin" />
+                                    <Loader className="h-4 w-4 animate-spin" />
                                   ) : (
-                                    <Trash2 className="w-4 h-4" />
+                                    <Trash2 className="h-4 w-4" />
                                   )}
                                 </button>
                               </div>
@@ -566,8 +566,8 @@ const ProductsPage = () => {
 
               {/* Paginação */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-between px-6 py-4 border-t border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50">
-                  <div className="flex items-center gap-2 text-sm text-theme-secondary">
+                <div className="flex items-center justify-between border-t border-light-border bg-light-bg px-6 py-4 dark:border-dark-border dark:bg-dark-bg dark:bg-dark-surface/50">
+                  <div className="text-theme-secondary flex items-center gap-2 text-sm">
                     <span className="font-medium">
                       Mostrando {(currentPage - 1) * itemsPerPage + 1} a{' '}
                       {Math.min(
@@ -583,9 +583,9 @@ const ProductsPage = () => {
                         setCurrentPage(prev => Math.max(prev - 1, 1))
                       }
                       disabled={currentPage === 1}
-                      className="p-2 text-theme-secondary hover:text-theme-primary hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-700 rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="text-theme-secondary hover:text-theme-primary rounded-lg p-2 transition-all hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-gray-700 dark:hover:bg-gray-700"
                     >
-                      <ChevronLeft className="w-5 h-5" />
+                      <ChevronLeft className="h-5 w-5" />
                     </button>
 
                     <div className="flex items-center gap-1">
@@ -604,7 +604,7 @@ const ProductsPage = () => {
                             <button
                               key={page}
                               onClick={() => setCurrentPage(page)}
-                              className={`min-w-[2.5rem] h-10 rounded-lg font-semibold transition-all ${currentPage === page ? 'bg-primary text-white shadow-lg' : 'text-theme-secondary hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                              className={`h-10 min-w-[2.5rem] rounded-lg font-semibold transition-all ${currentPage === page ? 'bg-primary text-white shadow-lg' : 'text-theme-secondary hover:bg-gray-200 dark:hover:bg-gray-700'}`}
                             >
                               {page}
                             </button>
@@ -616,7 +616,7 @@ const ProductsPage = () => {
                           return (
                             <span
                               key={page}
-                              className="px-2 text-theme-secondary"
+                              className="text-theme-secondary px-2"
                             >
                               ...
                             </span>
@@ -631,9 +631,9 @@ const ProductsPage = () => {
                         setCurrentPage(prev => Math.min(prev + 1, totalPages))
                       }
                       disabled={currentPage === totalPages}
-                      className="p-2 text-theme-secondary hover:text-theme-primary hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-700 rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="text-theme-secondary hover:text-theme-primary rounded-lg p-2 transition-all hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-gray-700 dark:hover:bg-gray-700"
                     >
-                      <ChevronRight className="w-5 h-5" />
+                      <ChevronRight className="h-5 w-5" />
                     </button>
                   </div>
                 </div>

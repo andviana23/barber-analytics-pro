@@ -145,27 +145,27 @@ const DiscountModal = ({
             Tipo de {isDiscount ? 'Desconto' : 'Taxa'}
           </label>
           <div className="flex gap-4">
-            <label className="flex items-center cursor-pointer">
+            <label className="flex cursor-pointer items-center">
               <input
                 type="radio"
                 name="valueType"
                 value="percentage"
                 checked={valueType === 'percentage'}
                 onChange={e => setValueType(e.target.value)}
-                className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500"
               />
               <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600">
                 Percentual (%)
               </span>
             </label>
-            <label className="flex items-center cursor-pointer">
+            <label className="flex cursor-pointer items-center">
               <input
                 type="radio"
                 name="valueType"
                 value="fixed"
                 checked={valueType === 'fixed'}
                 onChange={e => setValueType(e.target.value)}
-                className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500"
               />
               <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600">
                 Valor Fixo (R$)
@@ -191,7 +191,7 @@ const DiscountModal = ({
 
         {/* Motivo */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+          <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
             Motivo *
           </label>
           <textarea
@@ -199,19 +199,19 @@ const DiscountModal = ({
             onChange={e => setReason(e.target.value)}
             placeholder={`Descreva o motivo ${isDiscount ? 'do desconto' : 'da taxa'}...`}
             rows={3}
-            className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            className="w-full resize-none rounded-lg border border-light-border px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-dark-border"
             required
             minLength={3}
           />
-          <p className="mt-1 text-xs text-theme-secondary">
+          <p className="text-theme-secondary mt-1 text-xs">
             Obrigatório para auditoria (mínimo 3 caracteres)
           </p>
         </div>
 
         {/* Resumo de Valores */}
         {value && parseFloat(value) > 0 && (
-          <div className="bg-light-bg dark:bg-dark-bg p-4 rounded-lg border border-light-border dark:border-dark-border space-y-2">
-            <h4 className="font-medium text-theme-primary mb-3">Resumo</h4>
+          <div className="space-y-2 rounded-lg border border-light-border bg-light-bg p-4 dark:border-dark-border dark:bg-dark-bg">
+            <h4 className="text-theme-primary mb-3 font-medium">Resumo</h4>
 
             <div className="flex justify-between text-sm">
               <span className="text-theme-secondary">Subtotal:</span>
@@ -260,7 +260,7 @@ const DiscountModal = ({
               </div>
             )}
 
-            <div className="pt-2 border-t border-light-border dark:border-dark-border">
+            <div className="border-t border-light-border pt-2 dark:border-dark-border">
               <div className="flex justify-between text-base font-bold">
                 <span>Total Final:</span>
                 <span className="text-blue-600">
@@ -272,7 +272,7 @@ const DiscountModal = ({
         )}
 
         {/* Ações */}
-        <div className="flex justify-end gap-3 pt-4 border-t border-light-border dark:border-dark-border">
+        <div className="flex justify-end gap-3 border-t border-light-border pt-4 dark:border-dark-border">
           <Button
             type="button"
             variant="secondary"

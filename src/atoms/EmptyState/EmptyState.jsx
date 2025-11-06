@@ -95,20 +95,12 @@ export function EmptyState({
       variants={emptyStateVariants}
       initial="initial"
       animate="animate"
-      className={`
-        flex flex-col items-center text-center max-w-md mx-auto
-        ${classes.container} ${className}
-      `}
+      className={`mx-auto flex max-w-md flex-col items-center text-center ${classes.container} ${className} `}
     >
       {/* Icon ou Illustration */}
       <motion.div
         variants={illustrationVariants}
-        className={`
-          flex items-center justify-center rounded-full mb-6
-          ${classes.icon}
-          bg-light-bg dark:bg-dark-bg
-          border-2 border-light-border dark:border-dark-border
-        `}
+        className={`mb-6 flex items-center justify-center rounded-full ${classes.icon} border-2 border-light-border bg-light-bg dark:border-dark-border dark:bg-dark-bg`}
       >
         {illustration ? (
           <div className="text-4xl">{illustration}</div>
@@ -122,10 +114,7 @@ export function EmptyState({
       {/* Title */}
       {title && (
         <h3
-          className={`
-          font-semibold text-text-light-primary dark:text-text-dark-primary mb-2
-          ${classes.title}
-        `}
+          className={`mb-2 font-semibold text-text-light-primary dark:text-text-dark-primary ${classes.title} `}
         >
           {title}
         </h3>
@@ -134,10 +123,7 @@ export function EmptyState({
       {/* Description */}
       {description && (
         <p
-          className={`
-          text-text-light-secondary dark:text-text-dark-secondary mb-6 leading-relaxed
-          ${classes.description}
-        `}
+          className={`mb-6 leading-relaxed text-text-light-secondary dark:text-text-dark-secondary ${classes.description} `}
         >
           {description}
         </p>
@@ -147,13 +133,9 @@ export function EmptyState({
       {actionLabel && onAction && (
         <AnimatedButton
           onClick={onAction}
-          className={`
-            bg-primary hover:bg-primary-hover text-white font-medium rounded-lg
-            transition-colors duration-200 flex items-center gap-2
-            ${classes.button}
-          `}
+          className={`flex items-center gap-2 rounded-lg bg-primary font-medium text-white transition-colors duration-200 hover:bg-primary-hover ${classes.button} `}
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="h-4 w-4" />
           {actionLabel}
         </AnimatedButton>
       )}
@@ -185,18 +167,18 @@ export function NoDataState({
         {onRefresh && (
           <AnimatedButton
             onClick={onRefresh}
-            className="flex items-center gap-2 px-4 py-2 border border-light-border dark:border-dark-border rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition-colors"
+            className="flex items-center gap-2 rounded-lg border border-light-border px-4 py-2 transition-colors hover:bg-light-bg dark:border-dark-border dark:hover:bg-dark-bg"
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className="h-4 w-4" />
             Atualizar
           </AnimatedButton>
         )}
         {onAdd && (
           <AnimatedButton
             onClick={onAdd}
-            className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-hover text-dark-text-primary rounded-lg transition-colors"
+            className="text-dark-text-primary flex items-center gap-2 rounded-lg bg-primary px-4 py-2 transition-colors hover:bg-primary-hover"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="h-4 w-4" />
             {addLabel}
           </AnimatedButton>
         )}
@@ -236,16 +218,16 @@ export function ErrorState({
         {onRetry && (
           <AnimatedButton
             onClick={onRetry}
-            className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-hover text-dark-text-primary rounded-lg transition-colors"
+            className="text-dark-text-primary flex items-center gap-2 rounded-lg bg-primary px-4 py-2 transition-colors hover:bg-primary-hover"
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className="h-4 w-4" />
             Tentar novamente
           </AnimatedButton>
         )}
         {onSupport && (
           <AnimatedButton
             onClick={onSupport}
-            className="flex items-center gap-2 px-4 py-2 border border-light-border dark:border-dark-border rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition-colors"
+            className="flex items-center gap-2 rounded-lg border border-light-border px-4 py-2 transition-colors hover:bg-light-bg dark:border-dark-border dark:hover:bg-dark-bg"
           >
             Suporte
           </AnimatedButton>
@@ -274,9 +256,9 @@ export function LoadingState({ message = 'Carregando...' }) {
           repeat: Infinity,
           ease: 'linear',
         }}
-        className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full mb-4"
+        className="mb-4 h-8 w-8 rounded-full border-2 border-primary border-t-transparent"
       />
-      <p className="text-text-light-secondary dark:text-text-dark-secondary text-sm">
+      <p className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
         {message}
       </p>
     </motion.div>

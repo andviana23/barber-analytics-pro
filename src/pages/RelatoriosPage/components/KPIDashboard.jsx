@@ -42,34 +42,34 @@ const KPICard = ({
     if (!status) return null;
     switch (status) {
       case 'excellent':
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'good':
-        return <CheckCircle className="w-4 h-4 text-blue-500" />;
+        return <CheckCircle className="h-4 w-4 text-blue-500" />;
       case 'attention':
-        return <AlertCircle className="w-4 h-4 text-yellow-500" />;
+        return <AlertCircle className="h-4 w-4 text-yellow-500" />;
       case 'critical':
-        return <XCircle className="w-4 h-4 text-red-500" />;
+        return <XCircle className="h-4 w-4 text-red-500" />;
       default:
-        return <Clock className="w-4 h-4 text-theme-secondary" />;
+        return <Clock className="text-theme-secondary h-4 w-4" />;
     }
   };
   const getTrendIcon = () => {
     if (!trend) return null;
     return trend > 0 ? (
-      <TrendingUp className="w-4 h-4 text-green-500" />
+      <TrendingUp className="h-4 w-4 text-green-500" />
     ) : (
-      <TrendingDown className="w-4 h-4 text-red-500" />
+      <TrendingDown className="h-4 w-4 text-red-500" />
     );
   };
   return (
     <div
-      className={`${bgColor} rounded-lg p-4 border border-gray-200 dark:border-gray-700 transition-all hover:shadow-md`}
+      className={`${bgColor} rounded-lg border border-gray-200 p-4 transition-all hover:shadow-md dark:border-gray-700`}
       data-testid={testId}
     >
-      <div className="flex items-center justify-between mb-2">
+      <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <Icon className={`w-5 h-5 ${color}`} />
-          <p className="text-sm font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+          <Icon className={`h-5 w-5 ${color}`} />
+          <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm font-medium">
             {title}
           </p>
         </div>
@@ -109,17 +109,17 @@ const KPIDashboard = ({ kpis = [], loading = false }) => {
   if (loading) {
     return (
       <div
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+        className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4"
         data-testid="kpi-dashboard-loading"
       >
         {[...Array(8)].map((_, i) => (
           <div
             key={i}
-            className="card-theme dark:bg-dark-surface rounded-lg p-4 border border-light-border dark:border-dark-border"
+            className="card-theme rounded-lg border border-light-border p-4 dark:border-dark-border dark:bg-dark-surface"
           >
             <div className="animate-pulse">
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-3"></div>
-              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+              <div className="mb-3 h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700"></div>
+              <div className="h-8 w-1/2 rounded bg-gray-200 dark:bg-gray-700"></div>
             </div>
           </div>
         ))}
@@ -129,11 +129,11 @@ const KPIDashboard = ({ kpis = [], loading = false }) => {
   if (!kpis || kpis.length === 0) {
     return (
       <div
-        className="card-theme dark:bg-dark-surface rounded-lg border border-light-border dark:border-dark-border p-8 text-center"
+        className="card-theme rounded-lg border border-light-border p-8 text-center dark:border-dark-border dark:bg-dark-surface"
         data-testid="kpi-dashboard-empty"
       >
-        <Activity className="w-12 h-12 text-light-text-muted dark:text-dark-text-muted mx-auto mb-3" />
-        <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-2">
+        <Activity className="text-light-text-muted dark:text-dark-text-muted mx-auto mb-3 h-12 w-12" />
+        <h3 className="text-theme-primary dark:text-dark-text-primary mb-2 text-lg font-semibold">
           Nenhum dado disponível
         </h3>
         <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
@@ -228,7 +228,7 @@ const KPIDashboard = ({ kpis = [], loading = false }) => {
   ];
   return (
     <div
-      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+      className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4"
       data-testid="kpi-dashboard"
     >
       {metrics.map((metric, index) => (

@@ -45,16 +45,16 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
     // Mostrar modal vazio com mensagem
     return (
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn"
+        className="fixed inset-0 z-50 flex animate-fadeIn items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
         onClick={onClose}
       >
         <div
-          className="card-theme max-w-md w-full rounded-2xl shadow-2xl p-8"
+          className="card-theme w-full max-w-md rounded-2xl p-8 shadow-2xl"
           onClick={e => e.stopPropagation()}
         >
           <div className="text-center">
-            <XCircle className="w-16 h-16 mx-auto text-red-500 mb-4" />
-            <h3 className="text-xl font-bold text-theme-primary mb-2">
+            <XCircle className="mx-auto mb-4 h-16 w-16 text-red-500" />
+            <h3 className="text-theme-primary mb-2 text-xl font-bold">
               Erro ao Carregar Fornecedor
             </h3>
             <p className="text-theme-secondary mb-6">
@@ -62,7 +62,7 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
             </p>
             <button
               onClick={onClose}
-              className="px-6 py-2.5 rounded-xl font-semibold bg-gradient-primary text-dark-text-primary hover:opacity-90 transition-all"
+              className="text-dark-text-primary rounded-xl bg-gradient-primary px-6 py-2.5 font-semibold transition-all hover:opacity-90"
             >
               Fechar
             </button>
@@ -114,16 +114,16 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
     }
   };
   const InfoRow = ({ icon: Icon, label, value, multiline = false }) => (
-    <div className="flex items-start gap-4 py-4 border-b-2 border-gray-100 dark:border-dark-border last:border-0 hover:bg-light-bg dark:bg-dark-bg/50 dark:hover:bg-gray-750/50 transition-colors px-4 rounded-lg">
-      <div className="flex-shrink-0 p-2.5 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-        <Icon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+    <div className="dark:hover:bg-gray-750/50 flex items-start gap-4 rounded-lg border-b-2 border-gray-100 px-4 py-4 transition-colors last:border-0 hover:bg-light-bg dark:border-dark-border dark:bg-dark-bg/50">
+      <div className="flex-shrink-0 rounded-lg bg-blue-100 p-2.5 dark:bg-blue-900/30">
+        <Icon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
       </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-xs font-bold text-theme-secondary uppercase tracking-wide mb-1">
+      <div className="min-w-0 flex-1">
+        <p className="text-theme-secondary mb-1 text-xs font-bold uppercase tracking-wide">
           {label}
         </p>
         <p
-          className={`text-sm font-medium text-theme-primary ${multiline ? 'whitespace-pre-wrap' : ''}`}
+          className={`text-theme-primary text-sm font-medium ${multiline ? 'whitespace-pre-wrap' : ''}`}
         >
           {value || (
             <span className="text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary italic">
@@ -136,54 +136,54 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
   );
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn"
+      className="fixed inset-0 z-50 flex animate-fadeIn items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className="card-theme max-w-3xl w-full max-h-[90vh] overflow-hidden rounded-2xl shadow-2xl animate-slideUp"
+        className="card-theme animate-slideUp max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-2xl shadow-2xl"
         onClick={e => e.stopPropagation()}
       >
         {/* 🎯 Header Premium - DESIGN SYSTEM */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 px-6 py-5 border-b-2 border-light-border dark:border-dark-border">
+        <div className="border-b-2 border-light-border bg-blue-50 px-6 py-5 dark:border-dark-border dark:bg-blue-900/20">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-gradient-primary rounded-xl shadow-lg">
-                <Info className="w-6 h-6 text-dark-text-primary" />
+              <div className="rounded-xl bg-gradient-primary p-3 shadow-lg">
+                <Info className="text-dark-text-primary h-6 w-6" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-theme-primary">
+                <h2 className="text-theme-primary text-2xl font-bold">
                   Detalhes do Fornecedor
                 </h2>
-                <p className="text-sm text-theme-secondary mt-1">
+                <p className="text-theme-secondary mt-1 text-sm">
                   Informações completas do cadastro
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="flex-shrink-0 p-2 rounded-lg hover:bg-light-surface dark:hover:bg-dark-surface transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50"
+              className="flex-shrink-0 rounded-lg p-2 transition-colors hover:bg-light-surface focus:outline-none focus:ring-2 focus:ring-primary/50 dark:hover:bg-dark-surface"
               aria-label="Fechar modal"
             >
-              <X className="w-6 h-6 text-theme-secondary hover:text-theme-primary transition-colors" />
+              <X className="text-theme-secondary hover:text-theme-primary h-6 w-6 transition-colors" />
             </button>
           </div>
         </div>
 
         {/* 📊 Conteúdo Scrollável - DESIGN SYSTEM */}
-        <div className="flex-1 overflow-y-auto px-6 py-6 max-h-[calc(90vh-180px)]">
+        <div className="max-h-[calc(90vh-180px)] flex-1 overflow-y-auto px-6 py-6">
           {/* Badge de Status Premium */}
           <div className="mb-6 flex items-center gap-3">
             <div
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm shadow-lg transition-all duration-200 ${supplierData.is_active ? 'bg-gradient-success text-white shadow-green-500/30' : 'bg-gradient-danger text-white shadow-red-500/30'}`}
+              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold shadow-lg transition-all duration-200 ${supplierData.is_active ? 'bg-gradient-success text-white shadow-green-500/30' : 'bg-gradient-danger text-white shadow-red-500/30'}`}
             >
               {supplierData.is_active ? (
                 <>
-                  <CheckCircle className="w-5 h-5" />
+                  <CheckCircle className="h-5 w-5" />
                   Fornecedor Ativo
                 </>
               ) : (
                 <>
-                  <XCircle className="w-5 h-5" />
+                  <XCircle className="h-5 w-5" />
                   Fornecedor Inativo
                 </>
               )}
@@ -192,9 +192,9 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
 
           {/* Seção: Dados Cadastrais */}
           <div className="space-y-6">
-            <div className="flex items-center gap-3 pb-3 border-b-2 border-light-border dark:border-dark-border">
-              <Building2 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              <h3 className="text-lg font-bold text-theme-primary">
+            <div className="flex items-center gap-3 border-b-2 border-light-border pb-3 dark:border-dark-border">
+              <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              <h3 className="text-theme-primary text-lg font-bold">
                 Dados Cadastrais
               </h3>
             </div>
@@ -219,10 +219,10 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
           </div>
 
           {/* Seção: Contato */}
-          <div className="space-y-6 mt-8">
-            <div className="flex items-center gap-3 pb-3 border-b-2 border-light-border dark:border-dark-border">
-              <Mail className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              <h3 className="text-lg font-bold text-theme-primary">
+          <div className="mt-8 space-y-6">
+            <div className="flex items-center gap-3 border-b-2 border-light-border pb-3 dark:border-dark-border">
+              <Mail className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              <h3 className="text-theme-primary text-lg font-bold">
                 Informações de Contato
               </h3>
             </div>
@@ -235,7 +235,7 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
                   supplierData.email ? (
                     <a
                       href={`mailto:${supplierData.email}`}
-                      className="text-blue-600 dark:text-blue-400 hover:underline"
+                      className="text-blue-600 hover:underline dark:text-blue-400"
                     >
                       {supplierData.email}
                     </a>
@@ -253,7 +253,7 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
                   supplierData.telefone ? (
                     <a
                       href={`tel:${supplierData.telefone}`}
-                      className="text-blue-600 dark:text-blue-400 hover:underline"
+                      className="text-blue-600 hover:underline dark:text-blue-400"
                     >
                       {formatPhone(supplierData.telefone)}
                     </a>
@@ -280,23 +280,23 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
           </div>
 
           {/* Seção: Observações - SEMPRE VISÍVEL */}
-          <div className="space-y-6 mt-8">
-            <div className="flex items-center gap-3 pb-3 border-b-2 border-light-border dark:border-dark-border">
-              <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              <h3 className="text-lg font-bold text-theme-primary">
+          <div className="mt-8 space-y-6">
+            <div className="flex items-center gap-3 border-b-2 border-light-border pb-3 dark:border-dark-border">
+              <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              <h3 className="text-theme-primary text-lg font-bold">
                 Observações
               </h3>
             </div>
 
             {supplierData.observacoes ? (
-              <div className="bg-blue-50 dark:bg-blue-900/10 rounded-xl p-4 border-2 border-blue-200 dark:border-blue-800">
-                <p className="text-sm text-theme-primary whitespace-pre-wrap">
+              <div className="rounded-xl border-2 border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/10">
+                <p className="text-theme-primary whitespace-pre-wrap text-sm">
                   {supplierData.observacoes}
                 </p>
               </div>
             ) : (
-              <div className="bg-gray-50 dark:bg-gray-800/30 rounded-xl p-4 border-2 border-light-border dark:border-dark-border">
-                <p className="text-sm text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary italic text-center">
+              <div className="rounded-xl border-2 border-light-border bg-gray-50 p-4 dark:border-dark-border dark:bg-gray-800/30">
+                <p className="text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary text-center text-sm italic">
                   Nenhuma observação cadastrada para este fornecedor
                 </p>
               </div>
@@ -304,30 +304,30 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
           </div>
 
           {/* Seção: Auditoria */}
-          <div className="space-y-6 mt-8">
-            <div className="flex items-center gap-3 pb-3 border-b-2 border-light-border dark:border-dark-border">
-              <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              <h3 className="text-lg font-bold text-theme-primary">
+          <div className="mt-8 space-y-6">
+            <div className="flex items-center gap-3 border-b-2 border-light-border pb-3 dark:border-dark-border">
+              <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              <h3 className="text-theme-primary text-lg font-bold">
                 Informações de Auditoria
               </h3>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 bg-gradient-light dark:from-gray-800 dark:to-gray-750 rounded-xl border-2 border-light-border dark:border-dark-border">
-                <p className="text-xs font-bold text-theme-secondary uppercase tracking-wide mb-2">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="dark:to-gray-750 rounded-xl border-2 border-light-border bg-gradient-light p-4 dark:border-dark-border dark:from-gray-800">
+                <p className="text-theme-secondary mb-2 text-xs font-bold uppercase tracking-wide">
                   Cadastrado em
                 </p>
-                <p className="text-sm font-semibold text-theme-primary">
+                <p className="text-theme-primary text-sm font-semibold">
                   {formatDate(supplierData.created_at)}
                 </p>
               </div>
 
               {supplierData.updated_at && (
-                <div className="p-4 bg-gradient-light dark:from-gray-800 dark:to-gray-750 rounded-xl border-2 border-light-border dark:border-dark-border">
-                  <p className="text-xs font-bold text-theme-secondary uppercase tracking-wide mb-2">
+                <div className="dark:to-gray-750 rounded-xl border-2 border-light-border bg-gradient-light p-4 dark:border-dark-border dark:from-gray-800">
+                  <p className="text-theme-secondary mb-2 text-xs font-bold uppercase tracking-wide">
                     Última Atualização
                   </p>
-                  <p className="text-sm font-semibold text-theme-primary">
+                  <p className="text-theme-primary text-sm font-semibold">
                     {formatDate(supplierData.updated_at)}
                   </p>
                 </div>
@@ -337,13 +337,13 @@ const SupplierInfoModal = ({ isOpen, onClose, supplier }) => {
         </div>
 
         {/* 🎬 Footer com Ações - DESIGN SYSTEM */}
-        <div className="px-6 py-4 border-t-2 border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-surface">
+        <div className="border-t-2 border-light-border bg-light-bg px-6 py-4 dark:border-dark-border dark:bg-dark-surface">
           <div className="flex items-center justify-end gap-3">
             <button
               onClick={onClose}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold transition-all duration-200 bg-gradient-primary hover:opacity-90 text-dark-text-primary shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-dark-bg transform hover:scale-105"
+              className="text-dark-text-primary flex transform items-center gap-2 rounded-xl bg-gradient-primary px-6 py-2.5 font-semibold shadow-lg shadow-blue-500/30 transition-all duration-200 hover:scale-105 hover:opacity-90 hover:shadow-blue-500/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-dark-bg"
             >
-              <X className="w-5 h-5" />
+              <X className="h-5 w-5" />
               Fechar
             </button>
           </div>

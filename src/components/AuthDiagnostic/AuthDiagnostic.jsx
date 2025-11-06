@@ -79,7 +79,7 @@ export function AuthDiagnostic() {
   }, [user]);
   if (!user) {
     return (
-      <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+      <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
         <h3 className="font-semibold text-yellow-800">
           ⚠️ Usuário não autenticado
         </h3>
@@ -91,47 +91,47 @@ export function AuthDiagnostic() {
   }
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold mb-4">
+      <h2 className="mb-4 text-2xl font-bold">
         🔍 Diagnóstico de Autenticação
       </h2>
 
       {/* AuthContext */}
-      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <h3 className="font-semibold text-blue-800 mb-2">1. AuthContext</h3>
-        <pre className="text-sm text-blue-700 whitespace-pre-wrap">
+      <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+        <h3 className="mb-2 font-semibold text-blue-800">1. AuthContext</h3>
+        <pre className="whitespace-pre-wrap text-sm text-blue-700">
           {JSON.stringify(diagnostics.authContext, null, 2)}
         </pre>
       </div>
 
       {/* Supabase Session */}
-      <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-        <h3 className="font-semibold text-green-800 mb-2">
+      <div className="rounded-lg border border-green-200 bg-green-50 p-4">
+        <h3 className="mb-2 font-semibold text-green-800">
           2. Sessão Supabase
         </h3>
-        <pre className="text-sm text-green-700 whitespace-pre-wrap">
+        <pre className="whitespace-pre-wrap text-sm text-green-700">
           {JSON.stringify(diagnostics.supabaseSession, null, 2)}
         </pre>
       </div>
 
       {/* RLS Test */}
-      <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
-        <h3 className="font-semibold text-purple-800 mb-2">3. Teste RLS</h3>
-        <pre className="text-sm text-purple-700 whitespace-pre-wrap">
+      <div className="rounded-lg border border-purple-200 bg-purple-50 p-4">
+        <h3 className="mb-2 font-semibold text-purple-800">3. Teste RLS</h3>
+        <pre className="whitespace-pre-wrap text-sm text-purple-700">
           {JSON.stringify(diagnostics.rlsTest, null, 2)}
         </pre>
       </div>
 
       {/* Professional Query */}
-      <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
-        <h3 className="font-semibold text-orange-800 mb-2">
+      <div className="rounded-lg border border-orange-200 bg-orange-50 p-4">
+        <h3 className="mb-2 font-semibold text-orange-800">
           4. Query de Profissionais
         </h3>
-        <pre className="text-sm text-orange-700 whitespace-pre-wrap">
+        <pre className="whitespace-pre-wrap text-sm text-orange-700">
           {JSON.stringify(diagnostics.professionalQuery, null, 2)}
         </pre>
         {diagnostics.professionalQuery?.error && (
-          <div className="mt-2 p-2 bg-red-100 border border-red-300 rounded">
-            <p className="text-red-800 font-semibold">❌ Erro identificado:</p>
+          <div className="mt-2 rounded border border-red-300 bg-red-100 p-2">
+            <p className="font-semibold text-red-800">❌ Erro identificado:</p>
             <p className="text-red-700">
               {diagnostics.professionalQuery.error.message}
             </p>
@@ -140,11 +140,11 @@ export function AuthDiagnostic() {
       </div>
 
       {/* Recomendações */}
-      <div className="p-4 bg-light-bg dark:bg-dark-bg border border-light-border dark:border-dark-border rounded-lg">
-        <h3 className="font-semibold text-theme-primary mb-2">
+      <div className="rounded-lg border border-light-border bg-light-bg p-4 dark:border-dark-border dark:bg-dark-bg">
+        <h3 className="text-theme-primary mb-2 font-semibold">
           🎯 Recomendações
         </h3>
-        <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300 dark:text-gray-600">
+        <ul className="list-inside list-disc space-y-1 text-gray-700 dark:text-gray-300 dark:text-gray-600">
           <li>
             Se RLS Test falhar: Problema nas políticas RLS ou usuário sem perfil
           </li>

@@ -90,7 +90,7 @@ Aplica estilos de card com suporte automático a dark mode.
 
 ```jsx
 // ✅ USAR
-<div className="card-theme p-6 rounded-lg">Conteúdo do card</div>
+<div className="card-theme rounded-lg p-6">Conteúdo do card</div>
 
 // Equivale a:
 // bg-light-surface dark:bg-dark-surface
@@ -135,7 +135,7 @@ Botão primário com cores principais.
 
 ```jsx
 // ✅ USAR
-<button className="btn-theme-primary px-4 py-2 rounded-lg">Salvar</button>
+<button className="btn-theme-primary rounded-lg px-4 py-2">Salvar</button>
 
 // Equivale a:
 // bg-primary hover:bg-primary-hover text-white
@@ -147,7 +147,7 @@ Botão secundário com estilo neutro.
 
 ```jsx
 // ✅ USAR
-<button className="btn-theme-secondary px-4 py-2 rounded-lg">Cancelar</button>
+<button className="btn-theme-secondary rounded-lg px-4 py-2">Cancelar</button>
 
 // Equivale a:
 // bg-light-surface dark:bg-dark-surface
@@ -260,10 +260,10 @@ import { TrendingUp } from 'lucide-react';
 
 function KPICard({ title, value, trend }) {
   return (
-    <div className="card-theme p-6 rounded-xl border hover:shadow-lg transition-shadow">
-      <div className="flex items-center justify-between mb-4">
-        <div className="p-2 rounded-lg bg-light-bg dark:bg-dark-hover">
-          <TrendingUp className="w-5 h-5 text-primary" />
+    <div className="card-theme rounded-xl border p-6 transition-shadow hover:shadow-lg">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="rounded-lg bg-light-bg p-2 dark:bg-dark-hover">
+          <TrendingUp className="h-5 w-5 text-primary" />
         </div>
         {trend && (
           <span className="text-sm font-medium text-feedback-light-success dark:text-feedback-dark-success">
@@ -272,7 +272,7 @@ function KPICard({ title, value, trend }) {
         )}
       </div>
       <p className="text-theme-secondary text-sm font-medium">{title}</p>
-      <p className="text-theme-primary text-2xl font-bold mt-1">{value}</p>
+      <p className="text-theme-primary mt-1 text-2xl font-bold">{value}</p>
     </div>
   );
 }
@@ -289,9 +289,9 @@ import { Modal } from '@/atoms/Modal';
 function CreateUserModal({ isOpen, onClose }) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Novo Usuário">
-      <div className="p-6 space-y-4">
+      <div className="space-y-4 p-6">
         <div>
-          <label className="block text-sm font-medium text-theme-primary mb-1">
+          <label className="text-theme-primary mb-1 block text-sm font-medium">
             Nome
           </label>
           <input
@@ -302,7 +302,7 @@ function CreateUserModal({ isOpen, onClose }) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-theme-primary mb-1">
+          <label className="text-theme-primary mb-1 block text-sm font-medium">
             Email
           </label>
           <input
@@ -329,17 +329,17 @@ function CreateUserModal({ isOpen, onClose }) {
 ```jsx
 function UsersTable({ users }) {
   return (
-    <div className="card-theme rounded-lg overflow-hidden">
+    <div className="card-theme overflow-hidden rounded-lg">
       <table className="w-full">
         <thead className="bg-light-bg dark:bg-dark-hover">
           <tr>
-            <th className="px-6 py-3 text-left text-theme-primary text-sm font-semibold">
+            <th className="text-theme-primary px-6 py-3 text-left text-sm font-semibold">
               Nome
             </th>
-            <th className="px-6 py-3 text-left text-theme-primary text-sm font-semibold">
+            <th className="text-theme-primary px-6 py-3 text-left text-sm font-semibold">
               Email
             </th>
-            <th className="px-6 py-3 text-left text-theme-primary text-sm font-semibold">
+            <th className="text-theme-primary px-6 py-3 text-left text-sm font-semibold">
               Status
             </th>
           </tr>
@@ -348,12 +348,12 @@ function UsersTable({ users }) {
           {users.map(user => (
             <tr
               key={user.id}
-              className="hover:bg-light-bg dark:hover:bg-dark-hover transition-colors"
+              className="transition-colors hover:bg-light-bg dark:hover:bg-dark-hover"
             >
-              <td className="px-6 py-4 text-theme-primary">{user.name}</td>
-              <td className="px-6 py-4 text-theme-secondary">{user.email}</td>
+              <td className="text-theme-primary px-6 py-4">{user.name}</td>
+              <td className="text-theme-secondary px-6 py-4">{user.email}</td>
               <td className="px-6 py-4">
-                <span className="px-2 py-1 rounded-full text-xs font-medium bg-feedback-light-success/10 text-feedback-light-success dark:bg-feedback-dark-success/10 dark:text-feedback-dark-success">
+                <span className="rounded-full bg-feedback-light-success/10 px-2 py-1 text-xs font-medium text-feedback-light-success dark:bg-feedback-dark-success/10 dark:text-feedback-dark-success">
                   Ativo
                 </span>
               </td>

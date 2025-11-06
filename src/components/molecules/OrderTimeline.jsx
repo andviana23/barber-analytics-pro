@@ -39,7 +39,7 @@ import OrderStatusBadge from '../atoms/OrderStatusBadge';
 const OrderTimeline = ({ history = [], compact = false, className = '' }) => {
   if (!history || history.length === 0) {
     return (
-      <div className={`text-gray-500 text-sm italic ${className}`}>
+      <div className={`text-sm italic text-gray-500 ${className}`}>
         Nenhum histórico disponível
       </div>
     );
@@ -67,7 +67,7 @@ const OrderTimeline = ({ history = [], compact = false, className = '' }) => {
   return (
     <div className={`relative ${className}`}>
       {/* Linha vertical conectora */}
-      <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700" />
+      <div className="absolute bottom-0 left-4 top-0 w-0.5 bg-gray-200 dark:bg-gray-700" />
 
       {/* Eventos da timeline */}
       <div className="space-y-4">
@@ -76,26 +76,22 @@ const OrderTimeline = ({ history = [], compact = false, className = '' }) => {
             {/* Marcador circular */}
             <div className="relative z-10 flex-shrink-0">
               <div
-                className={`
-                w-8 h-8 rounded-full border-4 border-white
-                flex items-center justify-center
-                ${event.status === ORDER_STATUS.CLOSED ? 'bg-green-500' : event.status === ORDER_STATUS.CANCELED ? 'bg-red-500' : event.status === ORDER_STATUS.IN_PROGRESS ? 'bg-blue-500' : event.status === ORDER_STATUS.AWAITING_PAYMENT ? 'bg-yellow-500' : 'bg-gray-400'}
-              `}
+                className={`flex h-8 w-8 items-center justify-center rounded-full border-4 border-white ${event.status === ORDER_STATUS.CLOSED ? 'bg-green-500' : event.status === ORDER_STATUS.CANCELED ? 'bg-red-500' : event.status === ORDER_STATUS.IN_PROGRESS ? 'bg-blue-500' : event.status === ORDER_STATUS.AWAITING_PAYMENT ? 'bg-yellow-500' : 'bg-gray-400'} `}
               >
-                <div className="w-2 h-2 card-theme rounded-full" />
+                <div className="card-theme h-2 w-2 rounded-full" />
               </div>
             </div>
 
             {/* Conteúdo do evento */}
             <div className="flex-1 pb-4">
-              <div className="card-theme rounded-lg border border-light-border dark:border-dark-border p-4 shadow-sm">
+              <div className="card-theme rounded-lg border border-light-border p-4 shadow-sm dark:border-dark-border">
                 {/* Status */}
-                <div className="flex items-center justify-between mb-2">
+                <div className="mb-2 flex items-center justify-between">
                   <OrderStatusBadge
                     status={event.status}
                     size={compact ? 'sm' : 'md'}
                   />
-                  <span className="text-xs text-theme-secondary">
+                  <span className="text-theme-secondary text-xs">
                     {formatTimestamp(event.timestamp)}
                   </span>
                 </div>
@@ -104,19 +100,19 @@ const OrderTimeline = ({ history = [], compact = false, className = '' }) => {
                 {!compact && (
                   <>
                     {event.user && (
-                      <p className="text-sm text-theme-secondary mt-2">
+                      <p className="text-theme-secondary mt-2 text-sm">
                         👤 <span className="font-medium">{event.user}</span>
                       </p>
                     )}
 
                     {event.notes && (
-                      <p className="text-sm text-theme-secondary mt-1 italic">
+                      <p className="text-theme-secondary mt-1 text-sm italic">
                         📝 {event.notes}
                       </p>
                     )}
 
                     {event.amount && (
-                      <p className="text-sm text-theme-secondary mt-1">
+                      <p className="text-theme-secondary mt-1 text-sm">
                         💵 R$ {parseFloat(event.amount).toFixed(2)}
                       </p>
                     )}

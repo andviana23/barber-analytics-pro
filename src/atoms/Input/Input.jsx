@@ -10,13 +10,35 @@ const Input = ({ label, error, helperText, className = '', ...props }) => {
   // Filtrar apenas atributos válidos para input
   const validInputProps = {};
   const validInputAttributes = [
-    'type', 'id', 'name', 'value', 'placeholder', 'disabled',
-    'readonly', 'required', 'minLength', 'maxLength', 'pattern',
-    'min', 'max', 'step', 'onChange', 'onBlur', 'onFocus',
-    'onClick', 'onKeyDown', 'onKeyUp', 'onPaste', 'autoComplete',
-    'autoFocus', 'defaultValue', 'title', 'aria-label', 'aria-describedby'
+    'type',
+    'id',
+    'name',
+    'value',
+    'placeholder',
+    'disabled',
+    'readonly',
+    'required',
+    'minLength',
+    'maxLength',
+    'pattern',
+    'min',
+    'max',
+    'step',
+    'onChange',
+    'onBlur',
+    'onFocus',
+    'onClick',
+    'onKeyDown',
+    'onKeyUp',
+    'onPaste',
+    'autoComplete',
+    'autoFocus',
+    'defaultValue',
+    'title',
+    'aria-label',
+    'aria-describedby',
   ];
-  
+
   Object.keys(props).forEach(key => {
     if (validInputAttributes.includes(key)) {
       validInputProps[key] = props[key];
@@ -32,12 +54,12 @@ const Input = ({ label, error, helperText, className = '', ...props }) => {
       )}
       <input className={inputClasses} {...validInputProps} />
       {error && (
-        <p className="text-feedback-light-error dark:text-feedback-dark-error text-sm">
+        <p className="text-sm text-feedback-light-error dark:text-feedback-dark-error">
           {error}
         </p>
       )}
       {helperText && !error && (
-        <p className="text-text-light-secondary dark:text-text-dark-secondary text-sm">
+        <p className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
           {helperText}
         </p>
       )}
@@ -63,13 +85,30 @@ const Textarea = ({
   // Filtrar apenas atributos válidos para textarea
   const validTextareaProps = {};
   const validTextareaAttributes = [
-    'id', 'name', 'value', 'placeholder', 'disabled',
-    'readonly', 'required', 'minLength', 'maxLength',
-    'onChange', 'onBlur', 'onFocus', 'onClick',
-    'onKeyDown', 'onKeyUp', 'onPaste', 'autoComplete',
-    'autoFocus', 'defaultValue', 'title', 'aria-label', 'aria-describedby'
+    'id',
+    'name',
+    'value',
+    'placeholder',
+    'disabled',
+    'readonly',
+    'required',
+    'minLength',
+    'maxLength',
+    'onChange',
+    'onBlur',
+    'onFocus',
+    'onClick',
+    'onKeyDown',
+    'onKeyUp',
+    'onPaste',
+    'autoComplete',
+    'autoFocus',
+    'defaultValue',
+    'title',
+    'aria-label',
+    'aria-describedby',
   ];
-  
+
   Object.keys(props).forEach(key => {
     if (validTextareaAttributes.includes(key)) {
       validTextareaProps[key] = props[key];
@@ -83,14 +122,18 @@ const Textarea = ({
           {label}
         </label>
       )}
-      <textarea className={textareaClasses} rows={rows} {...validTextareaProps} />
+      <textarea
+        className={textareaClasses}
+        rows={rows}
+        {...validTextareaProps}
+      />
       {error && (
-        <p className="text-feedback-light-error dark:text-feedback-dark-error text-sm">
+        <p className="text-sm text-feedback-light-error dark:text-feedback-dark-error">
           {error}
         </p>
       )}
       {helperText && !error && (
-        <p className="text-text-light-secondary dark:text-text-dark-secondary text-sm">
+        <p className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
           {helperText}
         </p>
       )}
@@ -116,12 +159,26 @@ const Select = ({
   // Filtrar apenas atributos válidos para select
   const validSelectProps = {};
   const validSelectAttributes = [
-    'id', 'name', 'value', 'disabled', 'required',
-    'onChange', 'onBlur', 'onFocus', 'onClick',
-    'onKeyDown', 'onKeyUp', 'autoComplete', 'autoFocus',
-    'defaultValue', 'title', 'aria-label', 'aria-describedby', 'multiple'
+    'id',
+    'name',
+    'value',
+    'disabled',
+    'required',
+    'onChange',
+    'onBlur',
+    'onFocus',
+    'onClick',
+    'onKeyDown',
+    'onKeyUp',
+    'autoComplete',
+    'autoFocus',
+    'defaultValue',
+    'title',
+    'aria-label',
+    'aria-describedby',
+    'multiple',
   ];
-  
+
   Object.keys(props).forEach(key => {
     if (validSelectAttributes.includes(key)) {
       validSelectProps[key] = props[key];
@@ -144,12 +201,12 @@ const Select = ({
         ))}
       </select>
       {error && (
-        <p className="text-feedback-light-error dark:text-feedback-dark-error text-sm">
+        <p className="text-sm text-feedback-light-error dark:text-feedback-dark-error">
           {error}
         </p>
       )}
       {helperText && !error && (
-        <p className="text-text-light-secondary dark:text-text-dark-secondary text-sm">
+        <p className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
           {helperText}
         </p>
       )}

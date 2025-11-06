@@ -172,19 +172,19 @@ const CreateProductModal = ({ isOpen, onClose, onCreate, loading = false }) => {
   };
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="card-theme dark:bg-dark-surface rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+      <div className="card-theme max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-lg shadow-xl dark:bg-dark-surface">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-light-border dark:border-dark-border">
+        <div className="flex items-center justify-between border-b border-light-border p-6 dark:border-dark-border">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg">
-              <Package className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900">
+              <Package className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-theme-primary dark:text-dark-text-primary">
+              <h2 className="text-theme-primary dark:text-dark-text-primary text-xl font-semibold">
                 Novo Produto
               </h2>
-              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                 Cadastrar novo produto no estoque
               </p>
             </div>
@@ -192,36 +192,36 @@ const CreateProductModal = ({ isOpen, onClose, onCreate, loading = false }) => {
 
           <button
             onClick={handleClose}
-            className="flex items-center justify-center w-8 h-8 text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary dark:hover:text-gray-300 dark:text-gray-600 rounded-lg hover:card-theme dark:hover:bg-gray-700 transition-colors"
+            className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary hover:card-theme flex h-8 w-8 items-center justify-center rounded-lg transition-colors dark:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
           >
-            <X className="w-5 h-5" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 p-6">
           {/* Informações Básicas */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-theme-primary dark:text-dark-text-primary flex items-center gap-2">
-              <Package className="w-5 h-5" />
+            <h3 className="text-theme-primary dark:text-dark-text-primary flex items-center gap-2 text-lg font-medium">
+              <Package className="h-5 w-5" />
               Informações Básicas
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {/* Nome - OBRIGATÓRIO */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Nome do Produto <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <Package className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-light-text-muted dark:text-dark-text-muted" />
+                  <Package className="text-light-text-muted dark:text-dark-text-muted absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
                   <input
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
                     placeholder="Digite o nome do produto"
-                    className={`w-full pl-10 pr-3 py-2 border ${errors.name ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                    className={`w-full border py-2 pl-10 pr-3 ${errors.name ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white`}
                   />
                 </div>
                 {errors.name && (
@@ -231,25 +231,25 @@ const CreateProductModal = ({ isOpen, onClose, onCreate, loading = false }) => {
 
               {/* SKU */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Código (SKU)
                 </label>
                 <div className="relative">
-                  <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-light-text-muted dark:text-dark-text-muted" />
+                  <Hash className="text-light-text-muted dark:text-dark-text-muted absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
                   <input
                     type="text"
                     name="sku"
                     value={formData.sku}
                     onChange={handleChange}
                     placeholder="Ex: SHM001"
-                    className="w-full pl-10 pr-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary"
+                    className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border py-2 pl-10 pr-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
                   />
                 </div>
               </div>
 
               {/* Código de Barras */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Código de Barras
                 </label>
                 <input
@@ -258,49 +258,49 @@ const CreateProductModal = ({ isOpen, onClose, onCreate, loading = false }) => {
                   value={formData.barcode}
                   onChange={handleChange}
                   placeholder="7891234567890"
-                  className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary"
+                  className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
                 />
               </div>
 
               {/* Categoria */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Categoria
                 </label>
                 <div className="relative">
-                  <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-light-text-muted dark:text-dark-text-muted" />
+                  <Tag className="text-light-text-muted dark:text-dark-text-muted absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
                   <input
                     type="text"
                     name="category"
                     value={formData.category}
                     onChange={handleChange}
                     placeholder="Ex: Shampoo, Condicionador"
-                    className="w-full pl-10 pr-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary"
+                    className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border py-2 pl-10 pr-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
                   />
                 </div>
               </div>
 
               {/* Marca */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Marca
                 </label>
                 <div className="relative">
-                  <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-light-text-muted dark:text-dark-text-muted" />
+                  <Building className="text-light-text-muted dark:text-dark-text-muted absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
                   <input
                     type="text"
                     name="brand"
                     value={formData.brand}
                     onChange={handleChange}
                     placeholder="Ex: L'Oréal, Schwarzkopf"
-                    className="w-full pl-10 pr-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary"
+                    className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border py-2 pl-10 pr-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
                   />
                 </div>
               </div>
 
               {/* Descrição */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Descrição
                 </label>
                 <textarea
@@ -309,7 +309,7 @@ const CreateProductModal = ({ isOpen, onClose, onCreate, loading = false }) => {
                   onChange={handleChange}
                   placeholder="Descrição detalhada do produto"
                   rows={3}
-                  className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary"
+                  className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
                 />
               </div>
             </div>
@@ -317,19 +317,19 @@ const CreateProductModal = ({ isOpen, onClose, onCreate, loading = false }) => {
 
           {/* Preços e Estoque */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-theme-primary dark:text-dark-text-primary flex items-center gap-2">
-              <DollarSign className="w-5 h-5" />
+            <h3 className="text-theme-primary dark:text-dark-text-primary flex items-center gap-2 text-lg font-medium">
+              <DollarSign className="h-5 w-5" />
               Preços e Estoque
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               {/* Preço de Custo */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Preço de Custo
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-theme-secondary">
+                  <span className="text-theme-secondary absolute left-3 top-1/2 -translate-y-1/2 transform">
                     R$
                   </span>
                   <input
@@ -340,7 +340,7 @@ const CreateProductModal = ({ isOpen, onClose, onCreate, loading = false }) => {
                     placeholder="0,00"
                     step="0.01"
                     min="0"
-                    className={`w-full pl-8 pr-3 py-2 border ${errors.costPrice ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                    className={`w-full border py-2 pl-8 pr-3 ${errors.costPrice ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white`}
                   />
                 </div>
                 {errors.costPrice && (
@@ -352,11 +352,11 @@ const CreateProductModal = ({ isOpen, onClose, onCreate, loading = false }) => {
 
               {/* Preço de Venda */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Preço de Venda
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-theme-secondary">
+                  <span className="text-theme-secondary absolute left-3 top-1/2 -translate-y-1/2 transform">
                     R$
                   </span>
                   <input
@@ -367,7 +367,7 @@ const CreateProductModal = ({ isOpen, onClose, onCreate, loading = false }) => {
                     placeholder="0,00"
                     step="0.01"
                     min="0"
-                    className={`w-full pl-8 pr-3 py-2 border ${errors.sellingPrice ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                    className={`w-full border py-2 pl-8 pr-3 ${errors.sellingPrice ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white`}
                   />
                 </div>
                 {errors.sellingPrice && (
@@ -379,14 +379,14 @@ const CreateProductModal = ({ isOpen, onClose, onCreate, loading = false }) => {
 
               {/* Unidade de Medida */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Unidade de Medida
                 </label>
                 <select
                   name="unitOfMeasure"
                   value={formData.unitOfMeasure}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary"
+                  className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
                 >
                   {unitOptions.map(option => (
                     <option key={option.value} value={option.value}>
@@ -398,7 +398,7 @@ const CreateProductModal = ({ isOpen, onClose, onCreate, loading = false }) => {
 
               {/* Estoque Atual */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Estoque Atual
                 </label>
                 <input
@@ -408,7 +408,7 @@ const CreateProductModal = ({ isOpen, onClose, onCreate, loading = false }) => {
                   onChange={handleChange}
                   placeholder="0"
                   min="0"
-                  className={`w-full px-3 py-2 border ${errors.currentStock ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                  className={`w-full border px-3 py-2 ${errors.currentStock ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white`}
                 />
                 {errors.currentStock && (
                   <p className="mt-1 text-sm text-red-500">
@@ -419,7 +419,7 @@ const CreateProductModal = ({ isOpen, onClose, onCreate, loading = false }) => {
 
               {/* Estoque Mínimo */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Estoque Mínimo
                 </label>
                 <input
@@ -429,7 +429,7 @@ const CreateProductModal = ({ isOpen, onClose, onCreate, loading = false }) => {
                   onChange={handleChange}
                   placeholder="0"
                   min="0"
-                  className={`w-full px-3 py-2 border ${errors.minStock ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                  className={`w-full border px-3 py-2 ${errors.minStock ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white`}
                 />
                 {errors.minStock && (
                   <p className="mt-1 text-sm text-red-500">{errors.minStock}</p>
@@ -438,7 +438,7 @@ const CreateProductModal = ({ isOpen, onClose, onCreate, loading = false }) => {
 
               {/* Estoque Máximo */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Estoque Máximo
                 </label>
                 <input
@@ -448,7 +448,7 @@ const CreateProductModal = ({ isOpen, onClose, onCreate, loading = false }) => {
                   onChange={handleChange}
                   placeholder="0"
                   min="0"
-                  className={`w-full px-3 py-2 border ${errors.maxStock ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                  className={`w-full border px-3 py-2 ${errors.maxStock ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white`}
                 />
                 {errors.maxStock && (
                   <p className="mt-1 text-sm text-red-500">{errors.maxStock}</p>
@@ -459,33 +459,33 @@ const CreateProductModal = ({ isOpen, onClose, onCreate, loading = false }) => {
 
           {/* Informações Adicionais */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-theme-primary dark:text-dark-text-primary flex items-center gap-2">
-              <MapPin className="w-5 h-5" />
+            <h3 className="text-theme-primary dark:text-dark-text-primary flex items-center gap-2 text-lg font-medium">
+              <MapPin className="h-5 w-5" />
               Informações Adicionais
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {/* Localização */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Localização no Estoque
                 </label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-light-text-muted dark:text-dark-text-muted" />
+                  <MapPin className="text-light-text-muted dark:text-dark-text-muted absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
                   <input
                     type="text"
                     name="location"
                     value={formData.location}
                     onChange={handleChange}
                     placeholder="Ex: Prateleira A1, Gaveta 3"
-                    className="w-full pl-10 pr-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary"
+                    className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border py-2 pl-10 pr-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
                   />
                 </div>
               </div>
 
               {/* Fornecedor */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Fornecedor
                 </label>
                 <input
@@ -494,13 +494,13 @@ const CreateProductModal = ({ isOpen, onClose, onCreate, loading = false }) => {
                   value={formData.supplierId}
                   onChange={handleChange}
                   placeholder="ID do fornecedor (opcional)"
-                  className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary"
+                  className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
                 />
               </div>
 
               {/* Observações */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Observações
                 </label>
                 <textarea
@@ -509,21 +509,21 @@ const CreateProductModal = ({ isOpen, onClose, onCreate, loading = false }) => {
                   onChange={handleChange}
                   placeholder="Observações adicionais sobre o produto"
                   rows={2}
-                  className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary"
+                  className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
                 />
               </div>
             </div>
           </div>
 
           {/* Info sobre campos obrigatórios */}
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+          <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
             <div className="flex items-start gap-2">
-              <AlertTriangle className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+              <AlertTriangle className="mt-0.5 h-5 w-5 text-blue-600 dark:text-blue-400" />
               <div>
                 <p className="text-sm text-blue-700 dark:text-blue-300">
                   <span className="text-red-500">*</span> Campos obrigatórios
                 </p>
-                <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                <p className="mt-1 text-xs text-blue-600 dark:text-blue-400">
                   O sistema calculará automaticamente o valor total do estoque
                   baseado no preço de custo.
                 </p>
@@ -532,11 +532,11 @@ const CreateProductModal = ({ isOpen, onClose, onCreate, loading = false }) => {
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-light-border dark:border-dark-border">
+          <div className="flex items-center justify-end gap-3 border-t border-light-border pt-4 dark:border-dark-border">
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2 text-gray-700 dark:text-gray-300 dark:text-gray-600 border border-light-border dark:border-dark-border rounded-lg hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700 transition-colors"
+              className="rounded-lg border border-light-border px-4 py-2 text-gray-700 transition-colors hover:bg-light-bg dark:border-dark-border dark:bg-dark-bg dark:text-gray-300 dark:text-gray-600 dark:hover:bg-gray-700"
               disabled={loading}
             >
               Cancelar
@@ -545,11 +545,11 @@ const CreateProductModal = ({ isOpen, onClose, onCreate, loading = false }) => {
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 bg-blue-600 text-dark-text-primary rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+              className="text-dark-text-primary flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2 transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? (
                 <>
-                  <Loader className="w-4 h-4 animate-spin" />
+                  <Loader className="h-4 w-4 animate-spin" />
                   Cadastrando...
                 </>
               ) : (

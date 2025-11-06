@@ -92,22 +92,22 @@ const OpenCashModal = ({
   if (!isOpen) return null;
   const openingBalanceNumber = parseFloat(formData.openingBalance) || 0;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="card-theme w-full max-w-md max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+      <div className="card-theme max-h-[90vh] w-full max-w-md overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-theme-border">
+        <div className="border-theme-border flex items-center justify-between border-b p-6">
           <div>
-            <h2 className="text-xl font-bold text-theme-primary">
+            <h2 className="text-theme-primary text-xl font-bold">
               Abrir Caixa
             </h2>
-            <p className="text-sm text-theme-muted mt-1">
+            <p className="text-theme-muted mt-1 text-sm">
               Informe o saldo inicial do caixa
             </p>
           </div>
           <button
             onClick={handleClose}
             disabled={loading}
-            className="p-2 rounded-lg hover:card-theme dark:hover:bg-dark-surface transition-colors disabled:opacity-50"
+            className="hover:card-theme rounded-lg p-2 transition-colors disabled:opacity-50 dark:hover:bg-dark-surface"
             aria-label="Fechar modal"
           >
             <X size={20} className="text-theme-muted" />
@@ -115,14 +115,14 @@ const OpenCashModal = ({
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 p-6">
           {/* Saldo Inicial */}
           <div>
-            <label className="block text-sm font-medium text-theme-primary mb-2">
+            <label className="text-theme-primary mb-2 block text-sm font-medium">
               Saldo Inicial *
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                 <DollarSign size={18} className="text-theme-muted" />
               </div>
               <Input
@@ -138,7 +138,7 @@ const OpenCashModal = ({
               />
             </div>
             {openingBalanceNumber > 0 && (
-              <p className="text-xs text-theme-muted mt-1">
+              <p className="text-theme-muted mt-1 text-xs">
                 {formatCurrency(openingBalanceNumber)}
               </p>
             )}
@@ -146,7 +146,7 @@ const OpenCashModal = ({
 
           {/* Observações */}
           <div>
-            <label className="block text-sm font-medium text-theme-primary mb-2">
+            <label className="text-theme-primary mb-2 block text-sm font-medium">
               Observações
             </label>
             <textarea
@@ -155,16 +155,16 @@ const OpenCashModal = ({
               placeholder="Observações sobre a abertura do caixa (opcional)"
               rows={4}
               disabled={loading}
-              className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary placeholder-theme-muted focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed resize-none"
+              className="border-theme-border card-theme text-theme-primary placeholder-theme-muted focus:ring-primary-500 w-full resize-none rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-dark-surface"
             />
-            <p className="text-xs text-theme-muted mt-1">
+            <p className="text-theme-muted mt-1 text-xs">
               {formData.observations.length}/500 caracteres
             </p>
           </div>
 
           {/* Erro de validação */}
           {errors.form && (
-            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <div className="rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/20">
               <p className="text-sm text-red-600 dark:text-red-400">
                 {errors.form}
               </p>
@@ -172,7 +172,7 @@ const OpenCashModal = ({
           )}
 
           {/* Info */}
-          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
             <p className="text-sm text-blue-800 dark:text-blue-200">
               <strong>Atenção:</strong> Certifique-se de contar o dinheiro em
               caixa antes de abrir. Apenas um caixa pode estar aberto por vez.

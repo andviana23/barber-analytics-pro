@@ -20,9 +20,9 @@ const ImportExpensesFromOFXButton = ({ onImportSuccess, className = '' }) => {
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className={`inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors duration-200 ${className}`}
+        className={`inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-blue-700 ${className}`}
       >
-        <Upload className="h-4 w-4 mr-2" />
+        <Upload className="mr-2 h-4 w-4" />
         Importar OFX
       </button>
 

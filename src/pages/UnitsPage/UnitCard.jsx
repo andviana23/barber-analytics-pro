@@ -58,27 +58,27 @@ const UnitCard = ({ unit, onEdit, onDelete, canViewStats = false }) => {
   };
   return (
     <Card
-      className={`p-6 transition-all duration-200 hover:shadow-lg ${!unit.status ? 'opacity-60 bg-gray-50 dark:bg-gray-800' : ''}`}
+      className={`p-6 transition-all duration-200 hover:shadow-lg ${!unit.status ? 'bg-gray-50 opacity-60 dark:bg-gray-800' : ''}`}
     >
       {/* Header */}
-      <div className="flex items-start justify-between mb-4">
+      <div className="mb-4 flex items-start justify-between">
         <div className="flex items-center">
           <div
-            className={`p-3 rounded-lg ${unit.status ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-gray-100 dark:bg-gray-700'}`}
+            className={`rounded-lg p-3 ${unit.status ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-gray-100 dark:bg-gray-700'}`}
           >
             <Building2
               className={`h-6 w-6 ${unit.status ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400'}`}
             />
           </div>
           <div className="ml-3">
-            <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+            <h3 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
               {unit.name}
             </h3>
-            <div className="flex items-center mt-1">
+            <div className="mt-1 flex items-center">
               {unit.status ? (
-                <CheckCircle className="h-4 w-4 text-green-500 mr-1" />
+                <CheckCircle className="mr-1 h-4 w-4 text-green-500" />
               ) : (
-                <XCircle className="h-4 w-4 text-red-500 mr-1" />
+                <XCircle className="mr-1 h-4 w-4 text-red-500" />
               )}
               <span
                 className={`text-sm ${unit.status ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
@@ -93,7 +93,7 @@ const UnitCard = ({ unit, onEdit, onDelete, canViewStats = false }) => {
         <button
           onClick={handleToggleStatus}
           disabled={updating}
-          className={`p-2 rounded-lg transition-colors ${unit.status ? 'text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20' : 'text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'} ${updating ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`rounded-lg p-2 transition-colors ${unit.status ? 'text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20' : 'text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'} ${updating ? 'cursor-not-allowed opacity-50' : ''}`}
           title={unit.status ? 'Desativar unidade' : 'Ativar unidade'}
         >
           {unit.status ? (
@@ -109,42 +109,42 @@ const UnitCard = ({ unit, onEdit, onDelete, canViewStats = false }) => {
         <div className="mb-4">
           {loadingStats ? (
             <div className="flex items-center justify-center py-4">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-              <span className="ml-2 text-sm text-theme-secondary">
+              <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-blue-600"></div>
+              <span className="text-theme-secondary ml-2 text-sm">
                 Carregando...
               </span>
             </div>
           ) : stats ? (
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-light-bg dark:bg-dark-bg dark:bg-gray-700 rounded-lg p-3">
+              <div className="rounded-lg bg-light-bg p-3 dark:bg-dark-bg dark:bg-gray-700">
                 <div className="flex items-center">
-                  <Users className="h-4 w-4 text-blue-600 mr-2" />
-                  <span className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                  <Users className="mr-2 h-4 w-4 text-blue-600" />
+                  <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-xs">
                     Profissionais
                   </span>
                 </div>
-                <div className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+                <div className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
                   {stats.professionals.total}
                 </div>
               </div>
 
-              <div className="bg-light-bg dark:bg-dark-bg dark:bg-gray-700 rounded-lg p-3">
+              <div className="rounded-lg bg-light-bg p-3 dark:bg-dark-bg dark:bg-gray-700">
                 <div className="flex items-center">
-                  <BarChart3 className="h-4 w-4 text-green-600 mr-2" />
-                  <span className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                  <BarChart3 className="mr-2 h-4 w-4 text-green-600" />
+                  <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-xs">
                     Atendimentos
                   </span>
                 </div>
-                <div className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+                <div className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
                   {stats.attendances.count}
                 </div>
               </div>
 
-              <div className="col-span-2 bg-light-bg dark:bg-dark-bg dark:bg-gray-700 rounded-lg p-3">
+              <div className="col-span-2 rounded-lg bg-light-bg p-3 dark:bg-dark-bg dark:bg-gray-700">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <DollarSign className="h-4 w-4 text-green-600 mr-2" />
-                    <span className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                    <DollarSign className="mr-2 h-4 w-4 text-green-600" />
+                    <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-xs">
                       Faturamento do Mês
                     </span>
                   </div>
@@ -155,7 +155,7 @@ const UnitCard = ({ unit, onEdit, onDelete, canViewStats = false }) => {
               </div>
             </div>
           ) : (
-            <div className="text-center py-4 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
+            <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted py-4 text-center text-sm">
               Estatísticas não disponíveis
             </div>
           )}
@@ -163,13 +163,13 @@ const UnitCard = ({ unit, onEdit, onDelete, canViewStats = false }) => {
       )}
 
       {/* Informações básicas */}
-      <div className="space-y-2 mb-4">
-        <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+      <div className="mb-4 space-y-2">
+        <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
           <span className="font-medium">Criada em:</span>{' '}
           {new Date(unit.created_at).toLocaleDateString('pt-BR')}
         </div>
         {unit.updated_at && unit.updated_at !== unit.created_at && (
-          <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+          <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
             <span className="font-medium">Atualizada em:</span>{' '}
             {new Date(unit.updated_at).toLocaleDateString('pt-BR')}
           </div>
@@ -177,7 +177,7 @@ const UnitCard = ({ unit, onEdit, onDelete, canViewStats = false }) => {
       </div>
 
       {/* Ações */}
-      <div className="flex items-center justify-between pt-4 border-t border-light-border dark:border-dark-border">
+      <div className="flex items-center justify-between border-t border-light-border pt-4 dark:border-dark-border">
         <div className="flex items-center space-x-2">
           {canViewStats && (
             <Button
@@ -188,7 +188,7 @@ const UnitCard = ({ unit, onEdit, onDelete, canViewStats = false }) => {
               }}
               className="text-xs"
             >
-              <Eye className="h-4 w-4 mr-1" />
+              <Eye className="mr-1 h-4 w-4" />
               Ver Detalhes
             </Button>
           )}
@@ -202,7 +202,7 @@ const UnitCard = ({ unit, onEdit, onDelete, canViewStats = false }) => {
               onClick={() => onEdit(unit)}
               className="text-xs"
             >
-              <Edit className="h-4 w-4 mr-1" />
+              <Edit className="mr-1 h-4 w-4" />
               Editar
             </Button>
           )}
@@ -214,7 +214,7 @@ const UnitCard = ({ unit, onEdit, onDelete, canViewStats = false }) => {
               onClick={() => onDelete(unit)}
               className="text-xs"
             >
-              <Trash2 className="h-4 w-4 mr-1" />
+              <Trash2 className="mr-1 h-4 w-4" />
               Excluir
             </Button>
           )}

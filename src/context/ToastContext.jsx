@@ -69,7 +69,15 @@ const toastVariants = {
   },
 };
 
-function Toast({ id, type, title, message, onRemove, duration = 2000, ...rest }) {
+function Toast({
+  id,
+  type,
+  title,
+  message,
+  onRemove,
+  duration = 2000,
+  ...rest
+}) {
   // Ignorar propriedades adicionais do spread
   const config = toastTypes[type];
   const Icon = config.icon;
@@ -89,25 +97,22 @@ function Toast({ id, type, title, message, onRemove, duration = 2000, ...rest })
       initial="initial"
       animate="animate"
       exit="exit"
-      className={`
-        flex items-start gap-3 p-4 rounded-lg border shadow-lg max-w-sm w-full
-        ${config.bgColor} ${config.borderColor}
-      `}
+      className={`flex w-full max-w-sm items-start gap-3 rounded-lg border p-4 shadow-lg ${config.bgColor} ${config.borderColor} `}
     >
-      <Icon className={`h-5 w-5 flex-shrink-0 mt-0.5 ${config.iconColor}`} />
-      <div className="flex-1 min-w-0">
+      <Icon className={`mt-0.5 h-5 w-5 flex-shrink-0 ${config.iconColor}`} />
+      <div className="min-w-0 flex-1">
         {title && (
           <p className={`text-sm font-medium ${config.textColor}`}>{title}</p>
         )}
         {message && (
-          <p className={`text-sm mt-1 ${config.textColor} opacity-90`}>
+          <p className={`mt-1 text-sm ${config.textColor} opacity-90`}>
             {message}
           </p>
         )}
       </div>
       <button
         onClick={() => onRemove(id)}
-        className={`flex-shrink-0 p-1 rounded hover:bg-black/5 dark:hover:bg-white/5 transition-colors ${config.iconColor}`}
+        className={`flex-shrink-0 rounded p-1 transition-colors hover:bg-black/5 dark:hover:bg-white/5 ${config.iconColor}`}
       >
         <X className="h-4 w-4" />
       </button>
@@ -117,7 +122,7 @@ function Toast({ id, type, title, message, onRemove, duration = 2000, ...rest })
 
 function ToastContainer({ toasts, onRemove }) {
   return (
-    <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
+    <div className="fixed right-4 top-4 z-50 flex flex-col gap-2">
       <AnimatePresence mode="popLayout">
         {toasts.map(toast => (
           <Toast key={toast.id} {...toast} onRemove={onRemove} />

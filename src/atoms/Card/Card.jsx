@@ -36,11 +36,21 @@ const Card = ({
   // Filtrar apenas atributos válidos para div
   const validDivProps = {};
   const validDivAttributes = [
-    'id', 'title', 'onClick', 'onMouseEnter', 'onMouseLeave', 'onFocus',
-    'onBlur', 'onKeyDown', 'onKeyUp', 'aria-label', 'aria-describedby',
-    'role', 'tabIndex'
+    'id',
+    'title',
+    'onClick',
+    'onMouseEnter',
+    'onMouseLeave',
+    'onFocus',
+    'onBlur',
+    'onKeyDown',
+    'onKeyUp',
+    'aria-label',
+    'aria-describedby',
+    'role',
+    'tabIndex',
   ];
-  
+
   Object.keys(props).forEach(key => {
     if (validDivAttributes.includes(key)) {
       validDivProps[key] = props[key];
@@ -58,10 +68,16 @@ const CardHeader = ({ children, className = '', ...props }) => {
   // Filtrar props válidas
   const validProps = {};
   const validAttributes = [
-    'id', 'title', 'onClick', 'onMouseEnter', 'onMouseLeave',
-    'aria-label', 'aria-describedby', 'role'
+    'id',
+    'title',
+    'onClick',
+    'onMouseEnter',
+    'onMouseLeave',
+    'aria-label',
+    'aria-describedby',
+    'role',
   ];
-  
+
   Object.keys(props).forEach(key => {
     if (validAttributes.includes(key)) {
       validProps[key] = props[key];
@@ -70,7 +86,7 @@ const CardHeader = ({ children, className = '', ...props }) => {
 
   return (
     <div
-      className={`border-b border-light-border dark:border-dark-border pb-4 mb-4 ${className}`}
+      className={`mb-4 border-b border-light-border pb-4 dark:border-dark-border ${className}`}
       {...validProps}
     >
       {children}
@@ -82,9 +98,14 @@ const CardTitle = ({ children, className = '', ...props }) => {
   // Filtrar props válidas
   const validProps = {};
   const validAttributes = [
-    'id', 'title', 'onClick', 'aria-label', 'aria-describedby', 'role'
+    'id',
+    'title',
+    'onClick',
+    'aria-label',
+    'aria-describedby',
+    'role',
   ];
-  
+
   Object.keys(props).forEach(key => {
     if (validAttributes.includes(key)) {
       validProps[key] = props[key];
@@ -93,7 +114,7 @@ const CardTitle = ({ children, className = '', ...props }) => {
 
   return (
     <h3
-      className={`text-text-light-primary dark:text-text-dark-primary text-lg font-semibold ${className}`}
+      className={`text-lg font-semibold text-text-light-primary dark:text-text-dark-primary ${className}`}
       {...validProps}
     >
       {children}
@@ -105,10 +126,16 @@ const CardContent = ({ children, className = '', ...props }) => {
   // Filtrar props válidas
   const validProps = {};
   const validAttributes = [
-    'id', 'title', 'onClick', 'onMouseEnter', 'onMouseLeave',
-    'aria-label', 'aria-describedby', 'role'
+    'id',
+    'title',
+    'onClick',
+    'onMouseEnter',
+    'onMouseLeave',
+    'aria-label',
+    'aria-describedby',
+    'role',
   ];
-  
+
   Object.keys(props).forEach(key => {
     if (validAttributes.includes(key)) {
       validProps[key] = props[key];
@@ -129,10 +156,16 @@ const CardFooter = ({ children, className = '', ...props }) => {
   // Filtrar props válidas
   const validProps = {};
   const validAttributes = [
-    'id', 'title', 'onClick', 'onMouseEnter', 'onMouseLeave',
-    'aria-label', 'aria-describedby', 'role'
+    'id',
+    'title',
+    'onClick',
+    'onMouseEnter',
+    'onMouseLeave',
+    'aria-label',
+    'aria-describedby',
+    'role',
   ];
-  
+
   Object.keys(props).forEach(key => {
     if (validAttributes.includes(key)) {
       validProps[key] = props[key];
@@ -141,7 +174,7 @@ const CardFooter = ({ children, className = '', ...props }) => {
 
   return (
     <div
-      className={`border-t border-light-border dark:border-dark-border pt-4 mt-4 ${className}`}
+      className={`mt-4 border-t border-light-border pt-4 dark:border-dark-border ${className}`}
       {...validProps}
     >
       {children}

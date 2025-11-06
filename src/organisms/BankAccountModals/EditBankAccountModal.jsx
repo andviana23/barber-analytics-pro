@@ -190,18 +190,18 @@ const EditBankAccountModal = ({
 
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative w-full max-w-lg transform rounded-lg card-theme dark:bg-dark-surface shadow-xl transition-all">
+        <div className="card-theme relative w-full max-w-lg transform rounded-lg shadow-xl transition-all dark:bg-dark-surface">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-light-border dark:border-dark-border">
+          <div className="flex items-center justify-between border-b border-light-border p-6 dark:border-dark-border">
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                <CreditCard className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900">
+                <CreditCard className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+                <h3 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
                   Editar Conta Bancária
                 </h3>
-                <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                   Atualize os dados da conta bancária
                 </p>
               </div>
@@ -214,12 +214,12 @@ const EditBankAccountModal = ({
               disabled={loading}
               className="h-8 w-8 p-0"
             >
-              <X className="w-4 h-4" />
+              <X className="h-4 w-4" />
             </Button>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4 p-6">
             {/* Nome da conta */}
             <div>
               <Input
@@ -287,7 +287,7 @@ const EditBankAccountModal = ({
 
             {/* Unidade */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                 Unidade *
               </label>
               <select
@@ -296,13 +296,7 @@ const EditBankAccountModal = ({
                 onChange={handleInputChange}
                 onBlur={() => handleBlur('unit_id')}
                 disabled={loading}
-                className={`
-                  w-full px-3 py-2 border rounded-md shadow-sm
-                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                  disabled:bg-gray-50 disabled:text-gray-500
-                  ${touched.unit_id && errors.unit_id ? 'border-red-300 bg-red-50' : 'border-gray-300 dark:border-gray-600'}
-                  bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                `}
+                className={`w-full rounded-md border px-3 py-2 shadow-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500 ${touched.unit_id && errors.unit_id ? 'border-red-300 bg-red-50' : 'border-gray-300 dark:border-gray-600'} bg-white text-gray-900 dark:bg-gray-700 dark:text-white`}
               >
                 <option value="">Selecione uma unidade</option>
                 {units.map(unit => (
@@ -312,8 +306,8 @@ const EditBankAccountModal = ({
                 ))}
               </select>
               {touched.unit_id && errors.unit_id && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                  <AlertTriangle className="w-4 h-4" />
+                <p className="mt-1 flex items-center gap-1 text-sm text-red-600 dark:text-red-400">
+                  <AlertTriangle className="h-4 w-4" />
                   {errors.unit_id}
                 </p>
               )}
@@ -338,7 +332,7 @@ const EditBankAccountModal = ({
             </div>
 
             {/* Status da conta */}
-            <div className="flex items-center gap-3 p-4 bg-light-bg dark:bg-dark-bg dark:bg-gray-700 rounded-lg">
+            <div className="flex items-center gap-3 rounded-lg bg-light-bg p-4 dark:bg-dark-bg dark:bg-gray-700">
               <input
                 type="checkbox"
                 name="is_active"
@@ -346,15 +340,15 @@ const EditBankAccountModal = ({
                 checked={formData.is_active}
                 onChange={handleInputChange}
                 disabled={loading}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-light-border dark:border-dark-border rounded"
+                className="h-4 w-4 rounded border-light-border text-blue-600 focus:ring-blue-500 dark:border-dark-border"
               />
               <label
                 htmlFor="is_active"
-                className="text-sm font-medium text-theme-primary dark:text-dark-text-primary"
+                className="text-theme-primary dark:text-dark-text-primary text-sm font-medium"
               >
                 Conta ativa
               </label>
-              <p className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-xs">
                 Desmarque para desativar a conta
               </p>
             </div>
@@ -362,7 +356,7 @@ const EditBankAccountModal = ({
             {/* Indicador de verificação */}
             {checking && (
               <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-blue-600"></div>
                 Verificando se a conta já existe...
               </div>
             )}
@@ -386,12 +380,12 @@ const EditBankAccountModal = ({
               >
                 {loading ? (
                   <div className="flex items-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-light-surface dark:border-dark-surface"></div>
+                    <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-light-surface dark:border-dark-surface"></div>
                     Salvando...
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <Check className="w-4 h-4" />
+                    <Check className="h-4 w-4" />
                     Salvar Alterações
                   </div>
                 )}

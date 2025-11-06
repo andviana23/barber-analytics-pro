@@ -42,7 +42,7 @@ const UnitSelector = ({ className = '' }) => {
   if (loading) {
     return (
       <div className={`animate-pulse ${className}`}>
-        <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+        <div className="h-10 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
       </div>
     );
   }
@@ -69,7 +69,7 @@ const UnitSelector = ({ className = '' }) => {
         id="unit-select"
         value={selectedUnit?.id || 'all'}
         onChange={e => handleUnitChange(e.target.value)}
-        className="w-full px-3 py-2.5 text-sm font-medium card-theme dark:bg-dark-surface border-2 border-primary/20 dark:border-primary/30 rounded-lg shadow-sm text-theme-primary dark:text-gray-100 focus:ring-2 focus:ring-primary focus:border-primary hover:border-primary/40 dark:hover:border-primary/50 transition-all duration-200 cursor-pointer"
+        className="card-theme text-theme-primary w-full cursor-pointer rounded-lg border-2 border-primary/20 px-3 py-2.5 text-sm font-medium shadow-sm transition-all duration-200 hover:border-primary/40 focus:border-primary focus:ring-2 focus:ring-primary dark:border-primary/30 dark:bg-dark-surface dark:text-gray-100 dark:hover:border-primary/50"
       >
         <option value="all">📍 Todas as Unidades</option>
         {allUnits.map(unit => (
@@ -80,10 +80,10 @@ const UnitSelector = ({ className = '' }) => {
       </select>
 
       {/* Indicador da seleção atual */}
-      <div className="text-[10px] text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-1">
+      <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-1 text-[10px]">
         {selectedUnit ? (
           <span className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500"></span>
             <span className="font-medium text-primary">
               {selectedUnit.name}
             </span>

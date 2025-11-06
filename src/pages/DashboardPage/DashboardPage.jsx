@@ -267,8 +267,8 @@ export function DashboardPage() {
   const CustomTooltip = ({ active, payload }) => {
     if (!active || !payload || !payload.length) return null;
     return (
-      <div className="p-4 border-2 shadow-xl card-theme dark:bg-dark-surface border-light-border dark:border-dark-border rounded-xl">
-        <p className="mb-2 font-bold text-theme-primary dark:text-dark-text-primary">
+      <div className="card-theme rounded-xl border-2 border-light-border p-4 shadow-xl dark:border-dark-border dark:bg-dark-surface">
+        <p className="text-theme-primary dark:text-dark-text-primary mb-2 font-bold">
           {payload[0].payload.month}
         </p>
         {payload.map((entry, index) => (
@@ -278,14 +278,14 @@ export function DashboardPage() {
           >
             <div className="flex items-center gap-2">
               <div
-                className="w-3 h-3 rounded-full"
+                className="h-3 w-3 rounded-full"
                 style={{
                   backgroundColor: entry.color,
                 }}
               ></div>
               <span className="text-theme-secondary">{entry.name}:</span>
             </div>
-            <span className="font-bold text-theme-primary">
+            <span className="text-theme-primary font-bold">
               {formatCurrency(entry.value)}
             </span>
           </div>
@@ -294,13 +294,13 @@ export function DashboardPage() {
     );
   };
   return (
-    <div className="min-h-screen p-6 bg-light-bg dark:bg-dark-bg">
+    <div className="min-h-screen bg-light-bg p-6 dark:bg-dark-bg">
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="flex items-center gap-3 mb-2 text-4xl font-bold text-text-light-primary dark:text-text-dark-primary">
-              <Activity className="w-9 h-9 text-primary" />
+            <h1 className="mb-2 flex items-center gap-3 text-4xl font-bold text-text-light-primary dark:text-text-dark-primary">
+              <Activity className="h-9 w-9 text-primary" />
               Dashboard Financeiro
             </h1>
             <p className="text-lg text-text-light-secondary dark:text-text-dark-secondary">
@@ -313,10 +313,10 @@ export function DashboardPage() {
             <button
               onClick={fetchDashboardData}
               disabled={loading}
-              className="flex items-center gap-2 px-5 py-3 transition-all shadow-lg btn-theme-primary rounded-xl hover:shadow-xl disabled:opacity-50"
+              className="btn-theme-primary flex items-center gap-2 rounded-xl px-5 py-3 shadow-lg transition-all hover:shadow-xl disabled:opacity-50"
             >
               <RefreshCw
-                className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`}
+                className={`h-5 w-5 ${loading ? 'animate-spin' : ''}`}
               />
               Atualizar
             </button>
@@ -324,8 +324,8 @@ export function DashboardPage() {
         </div>
 
         {selectedUnit && (
-          <div className="inline-flex items-center gap-2 px-4 py-2 border-2 rounded-lg bg-primary-light dark:bg-primary/20 border-primary/30">
-            <Calendar className="w-4 h-4 text-primary" />
+          <div className="inline-flex items-center gap-2 rounded-lg border-2 border-primary/30 bg-primary-light px-4 py-2 dark:bg-primary/20">
+            <Calendar className="h-4 w-4 text-primary" />
             <span className="font-semibold text-text-light-primary dark:text-text-dark-primary">
               Unidade:
             </span>
@@ -335,7 +335,7 @@ export function DashboardPage() {
       </div>
 
       {/* 3 Cards de Metas Principais */}
-      <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-3">
+      <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
         <MetaCard
           title="Faturamento Geral"
           icon={DollarSign}
@@ -379,11 +379,11 @@ export function DashboardPage() {
       </div>
 
       {/* Gráfico de Linha - 3 Meses */}
-      <div className="p-8 mb-8 shadow-2xl card-theme rounded-3xl">
-        <div className="flex items-center justify-between mb-6">
+      <div className="card-theme mb-8 rounded-3xl p-8 shadow-2xl">
+        <div className="mb-6 flex items-center justify-between">
           <div>
             <h2 className="flex items-center gap-2 text-2xl font-bold text-text-light-primary dark:text-text-dark-primary">
-              <TrendingUp className="w-7 h-7 text-primary" />
+              <TrendingUp className="h-7 w-7 text-primary" />
               Evolução Trimestral
             </h2>
             <p className="mt-1 text-text-light-secondary dark:text-text-dark-secondary">
@@ -391,8 +391,8 @@ export function DashboardPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-primary-light dark:bg-primary/20">
-            <Calendar className="w-4 h-4 text-primary" />
+          <div className="flex items-center gap-3 rounded-lg bg-primary-light px-4 py-2 dark:bg-primary/20">
+            <Calendar className="h-4 w-4 text-primary" />
             <span className="text-sm font-semibold text-text-light-primary dark:text-text-dark-primary">
               3 Meses
             </span>
@@ -400,9 +400,9 @@ export function DashboardPage() {
         </div>
 
         {loading ? (
-          <div className="h-[400px] flex items-center justify-center">
+          <div className="flex h-[400px] items-center justify-center">
             <div className="text-center">
-              <RefreshCw className="w-12 h-12 mx-auto mb-4 text-primary animate-spin" />
+              <RefreshCw className="mx-auto mb-4 h-12 w-12 animate-spin text-primary" />
               <p className="text-text-light-secondary dark:text-text-dark-secondary">
                 Carregando dados...
               </p>
@@ -530,22 +530,22 @@ const MetaCard = ({
   const isOnTrack = percentage >= 80;
   if (loading) {
     return (
-      <div className="p-6 shadow-lg card-theme rounded-2xl animate-pulse">
-        <div className="h-16 mb-4 bg-light-surface dark:bg-dark-hover rounded-xl"></div>
-        <div className="h-10 mb-3 rounded bg-light-surface dark:bg-dark-hover"></div>
+      <div className="card-theme animate-pulse rounded-2xl p-6 shadow-lg">
+        <div className="mb-4 h-16 rounded-xl bg-light-surface dark:bg-dark-hover"></div>
+        <div className="mb-3 h-10 rounded bg-light-surface dark:bg-dark-hover"></div>
         <div className="h-3 rounded bg-light-surface dark:bg-dark-hover"></div>
       </div>
     );
   }
   return (
     <div
-      className={`card-theme p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 ${isAchieved ? 'border-green-300 dark:border-green-700' : 'border-light-border dark:border-dark-border'}`}
+      className={`card-theme rounded-2xl border-2 p-6 shadow-lg transition-all duration-300 hover:shadow-2xl ${isAchieved ? 'border-green-300 dark:border-green-700' : 'border-light-border dark:border-dark-border'}`}
     >
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className={`p-3 rounded-xl ${iconBg} shadow-md`}>
-            <Icon className={`w-6 h-6 ${iconColor}`} />
+          <div className={`rounded-xl p-3 ${iconBg} shadow-md`}>
+            <Icon className={`h-6 w-6 ${iconColor}`} />
           </div>
           <div>
             <h3 className="font-bold text-text-light-primary dark:text-text-dark-primary">
@@ -560,7 +560,7 @@ const MetaCard = ({
         </div>
 
         {isAchieved && (
-          <Award className="w-6 h-6 text-green-500 animate-pulse" />
+          <Award className="h-6 w-6 animate-pulse text-green-500" />
         )}
       </div>
 
@@ -587,7 +587,7 @@ const MetaCard = ({
 
       {/* Progress Bar */}
       <div className="mb-4">
-        <div className="flex justify-between mb-1 text-xs">
+        <div className="mb-1 flex justify-between text-xs">
           <span className="font-medium text-text-light-secondary dark:text-text-dark-secondary">
             Progresso
           </span>
@@ -597,7 +597,7 @@ const MetaCard = ({
             {(percentage || 0).toFixed(1)}%
           </span>
         </div>
-        <div className="w-full h-2.5 bg-light-surface dark:bg-dark-hover rounded-full overflow-hidden">
+        <div className="h-2.5 w-full overflow-hidden rounded-full bg-light-surface dark:bg-dark-hover">
           <div
             className={`h-full ${color} rounded-full transition-all duration-1000`}
             style={{
@@ -610,9 +610,9 @@ const MetaCard = ({
       {/* Trend */}
       <div className="flex items-center gap-2">
         {(trend || 0) >= 0 ? (
-          <ArrowUpRight className="w-4 h-4 text-green-600 dark:text-green-400" />
+          <ArrowUpRight className="h-4 w-4 text-green-600 dark:text-green-400" />
         ) : (
-          <ArrowDownRight className="w-4 h-4 text-red-600 dark:text-red-400" />
+          <ArrowDownRight className="h-4 w-4 text-red-600 dark:text-red-400" />
         )}
         <span
           className={`text-sm font-semibold ${(trend || 0) >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
@@ -682,10 +682,10 @@ const InsightCard = ({ title, value, description, type }) => {
   const IconComponent = config.icon;
 
   return (
-    <div className="p-6 transition-shadow shadow-lg card-theme rounded-2xl hover:shadow-xl">
-      <div className="flex items-center gap-3 mb-3">
-        <div className={`p-3 rounded-xl ${config.bgColor}`}>
-          <IconComponent className={`w-6 h-6 ${config.color}`} />
+    <div className="card-theme rounded-2xl p-6 shadow-lg transition-shadow hover:shadow-xl">
+      <div className="mb-3 flex items-center gap-3">
+        <div className={`rounded-xl p-3 ${config.bgColor}`}>
+          <IconComponent className={`h-6 w-6 ${config.color}`} />
         </div>
         <h3 className="font-bold text-text-light-primary dark:text-text-dark-primary">
           {title}

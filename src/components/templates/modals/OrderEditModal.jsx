@@ -123,10 +123,10 @@ const OrderEditModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Editar Comanda" size="lg">
       {/* Header: Info da comanda */}
-      <div className="bg-light-bg dark:bg-dark-bg p-4 rounded-lg mb-4">
+      <div className="mb-4 rounded-lg bg-light-bg p-4 dark:bg-dark-bg">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-theme-secondary">Cliente</p>
+            <p className="text-theme-secondary text-sm">Cliente</p>
             <p className="font-medium">{order.client?.nome || 'N/A'}</p>
           </div>
           <OrderStatusBadge status={order.status} />
@@ -135,8 +135,8 @@ const OrderEditModal = ({
 
       {/* Validação de edição */}
       {!canEdit && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-          <p className="text-yellow-800 text-sm">
+        <div className="mb-4 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+          <p className="text-sm text-yellow-800">
             ⚠️ Esta comanda não pode ser editada no status atual.
           </p>
         </div>
@@ -144,7 +144,7 @@ const OrderEditModal = ({
 
       {/* Lista de itens atuais */}
       <div className="mb-6">
-        <h3 className="font-semibold mb-3">Itens da Comanda</h3>
+        <h3 className="mb-3 font-semibold">Itens da Comanda</h3>
 
         {!order.items || order.items.length === 0 ? (
           <p className="text-theme-secondary text-sm italic">
@@ -155,13 +155,13 @@ const OrderEditModal = ({
             {order.items.map(item => (
               <div
                 key={item.id}
-                className="flex items-center justify-between card-theme border border-light-border dark:border-dark-border rounded-lg p-3"
+                className="card-theme flex items-center justify-between rounded-lg border border-light-border p-3 dark:border-dark-border"
               >
                 <div className="flex-1">
                   <p className="font-medium">
                     {item.service?.name || 'Serviço'}
                   </p>
-                  <p className="text-sm text-theme-secondary">
+                  <p className="text-theme-secondary text-sm">
                     {item.professional?.name || 'Profissional'} · Qtd:{' '}
                     {item.quantity} ·{formatCurrency(item.unit_price)} cada
                   </p>
@@ -191,10 +191,10 @@ const OrderEditModal = ({
 
       {/* Form: Adicionar novo serviço */}
       {canEdit && (
-        <div className="border-t border-light-border dark:border-dark-border pt-4">
-          <h3 className="font-semibold mb-3">Adicionar Serviço</h3>
+        <div className="border-t border-light-border pt-4 dark:border-dark-border">
+          <h3 className="mb-3 font-semibold">Adicionar Serviço</h3>
 
-          <div className="grid grid-cols-2 gap-3 mb-3">
+          <div className="mb-3 grid grid-cols-2 gap-3">
             <Select
               label="Serviço"
               value={selectedService}
@@ -224,7 +224,7 @@ const OrderEditModal = ({
             </Select>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="mb-4 grid grid-cols-2 gap-3">
             <Input
               type="number"
               label="Quantidade"
@@ -247,7 +247,7 @@ const OrderEditModal = ({
       )}
 
       {/* Footer: Total */}
-      <div className="mt-6 pt-4 border-t border-light-border dark:border-dark-border">
+      <div className="mt-6 border-t border-light-border pt-4 dark:border-dark-border">
         <div className="flex items-center justify-between">
           <span className="text-lg font-semibold">Total:</span>
           <span className="text-2xl font-bold text-green-600">

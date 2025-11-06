@@ -26,7 +26,7 @@ export function Layout({ children, activeMenuItem = 'dashboard' }) {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex flex-1 flex-col overflow-hidden">
         {/* Navbar */}
         <Navbar onSidebarToggle={handleSidebarToggle} />
 

@@ -52,7 +52,7 @@ const CashRegisterHistory = ({
     if (sortField !== field) {
       return (
         <svg
-          className="w-4 h-4 text-theme-secondary/50"
+          className="text-theme-secondary/50 h-4 w-4"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -68,7 +68,7 @@ const CashRegisterHistory = ({
     }
     return sortDirection === 'asc' ? (
       <svg
-        className="w-4 h-4 text-primary"
+        className="h-4 w-4 text-primary"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -82,7 +82,7 @@ const CashRegisterHistory = ({
       </svg>
     ) : (
       <svg
-        className="w-4 h-4 text-primary"
+        className="h-4 w-4 text-primary"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -100,10 +100,10 @@ const CashRegisterHistory = ({
   if (loading) {
     return (
       <div
-        className={`bg-white dark:bg-dark-surface rounded-lg border border-light-border dark:border-dark-border ${className}`}
+        className={`rounded-lg border border-light-border bg-white dark:border-dark-border dark:bg-dark-surface ${className}`}
       >
         <div className="p-8 text-center">
-          <div className="inline-block w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin mb-3" />
+          <div className="border-3 mb-3 inline-block h-8 w-8 animate-spin rounded-full border-primary border-t-transparent" />
           <p className="text-theme-secondary">Carregando histórico...</p>
         </div>
       </div>
@@ -113,11 +113,11 @@ const CashRegisterHistory = ({
   if (history.length === 0) {
     return (
       <div
-        className={`bg-white dark:bg-dark-surface rounded-lg border border-light-border dark:border-dark-border ${className}`}
+        className={`rounded-lg border border-light-border bg-white dark:border-dark-border dark:bg-dark-surface ${className}`}
       >
         <div className="p-12 text-center">
           <svg
-            className="w-16 h-16 mx-auto text-theme-secondary/50 mb-4"
+            className="text-theme-secondary/50 mx-auto mb-4 h-16 w-16"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -129,7 +129,7 @@ const CashRegisterHistory = ({
               d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
             />
           </svg>
-          <h3 className="text-lg font-semibold text-theme-primary mb-2">
+          <h3 className="text-theme-primary mb-2 text-lg font-semibold">
             Nenhum histórico encontrado
           </h3>
           <p className="text-theme-secondary">
@@ -142,17 +142,17 @@ const CashRegisterHistory = ({
 
   return (
     <div
-      className={`bg-white dark:bg-dark-surface rounded-lg border border-light-border dark:border-dark-border overflow-hidden ${className}`}
+      className={`overflow-hidden rounded-lg border border-light-border bg-white dark:border-dark-border dark:bg-dark-surface ${className}`}
     >
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-light-surface dark:bg-dark-hover border-b border-light-border dark:border-dark-border">
+          <thead className="border-b border-light-border bg-light-surface dark:border-dark-border dark:bg-dark-hover">
             <tr>
               <th className="px-6 py-3 text-left">
                 <button
                   onClick={() => handleSort('opened_at')}
-                  className="flex items-center gap-2 font-semibold text-sm text-theme-primary hover:text-primary transition-colors"
+                  className="text-theme-primary flex items-center gap-2 text-sm font-semibold transition-colors hover:text-primary"
                 >
                   Abertura
                   <SortIcon field="opened_at" />
@@ -161,21 +161,21 @@ const CashRegisterHistory = ({
               <th className="px-6 py-3 text-left">
                 <button
                   onClick={() => handleSort('closed_at')}
-                  className="flex items-center gap-2 font-semibold text-sm text-theme-primary hover:text-primary transition-colors"
+                  className="text-theme-primary flex items-center gap-2 text-sm font-semibold transition-colors hover:text-primary"
                 >
                   Fechamento
                   <SortIcon field="closed_at" />
                 </button>
               </th>
               <th className="px-6 py-3 text-left">
-                <span className="font-semibold text-sm text-theme-primary">
+                <span className="text-theme-primary text-sm font-semibold">
                   Responsável
                 </span>
               </th>
               <th className="px-6 py-3 text-right">
                 <button
                   onClick={() => handleSort('opening_balance')}
-                  className="flex items-center gap-2 font-semibold text-sm text-theme-primary hover:text-primary transition-colors ml-auto"
+                  className="text-theme-primary ml-auto flex items-center gap-2 text-sm font-semibold transition-colors hover:text-primary"
                 >
                   Saldo Inicial
                   <SortIcon field="opening_balance" />
@@ -184,19 +184,19 @@ const CashRegisterHistory = ({
               <th className="px-6 py-3 text-right">
                 <button
                   onClick={() => handleSort('closing_balance')}
-                  className="flex items-center gap-2 font-semibold text-sm text-theme-primary hover:text-primary transition-colors ml-auto"
+                  className="text-theme-primary ml-auto flex items-center gap-2 text-sm font-semibold transition-colors hover:text-primary"
                 >
                   Saldo Final
                   <SortIcon field="closing_balance" />
                 </button>
               </th>
               <th className="px-6 py-3 text-center">
-                <span className="font-semibold text-sm text-theme-primary">
+                <span className="text-theme-primary text-sm font-semibold">
                   Status
                 </span>
               </th>
               <th className="px-6 py-3 text-right">
-                <span className="font-semibold text-sm text-theme-primary">
+                <span className="text-theme-primary text-sm font-semibold">
                   Ações
                 </span>
               </th>
@@ -206,48 +206,48 @@ const CashRegisterHistory = ({
             {sortedHistory.map(cash => (
               <tr
                 key={cash.id}
-                className="hover:bg-light-surface/50 dark:hover:bg-dark-hover/50 transition-colors"
+                className="transition-colors hover:bg-light-surface/50 dark:hover:bg-dark-hover/50"
               >
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-theme-primary font-medium">
+                <td className="whitespace-nowrap px-6 py-4">
+                  <div className="text-theme-primary text-sm font-medium">
                     {formatDateTime(cash.opened_at, 'short')}
                   </div>
-                  <div className="text-xs text-theme-secondary">
+                  <div className="text-theme-secondary text-xs">
                     {cash.opened_by_name}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="whitespace-nowrap px-6 py-4">
                   {cash.closed_at ? (
                     <>
-                      <div className="text-sm text-theme-primary font-medium">
+                      <div className="text-theme-primary text-sm font-medium">
                         {formatDateTime(cash.closed_at, 'short')}
                       </div>
-                      <div className="text-xs text-theme-secondary">
+                      <div className="text-theme-secondary text-xs">
                         {cash.closed_by_name}
                       </div>
                     </>
                   ) : (
-                    <span className="text-sm text-theme-secondary italic">
+                    <span className="text-theme-secondary text-sm italic">
                       Em aberto
                     </span>
                   )}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="whitespace-nowrap px-6 py-4">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold flex items-center justify-center text-sm">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
                       {cash.opened_by_name?.charAt(0)?.toUpperCase() || '?'}
                     </div>
-                    <span className="text-sm text-theme-primary">
+                    <span className="text-theme-primary text-sm">
                       {cash.opened_by_name}
                     </span>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right">
-                  <span className="text-sm font-medium text-theme-primary">
+                <td className="whitespace-nowrap px-6 py-4 text-right">
+                  <span className="text-theme-primary text-sm font-medium">
                     {formatCurrency(cash.opening_balance || 0)}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right">
+                <td className="whitespace-nowrap px-6 py-4 text-right">
                   {cash.closing_balance !== null &&
                   cash.closing_balance !== undefined ? (
                     <span
@@ -260,28 +260,28 @@ const CashRegisterHistory = ({
                       {formatCurrency(cash.closing_balance)}
                     </span>
                   ) : (
-                    <span className="text-sm text-theme-secondary">-</span>
+                    <span className="text-theme-secondary text-sm">-</span>
                   )}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center">
+                <td className="whitespace-nowrap px-6 py-4 text-center">
                   <span
-                    className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                    className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${
                       cash.status === 'open'
-                        ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
-                        : 'bg-gray-50 dark:bg-gray-900/20 text-gray-700 dark:text-gray-400'
+                        ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400'
+                        : 'bg-gray-50 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400'
                     }`}
                   >
                     {cash.status === 'open' ? 'Aberto' : 'Fechado'}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right">
+                <td className="whitespace-nowrap px-6 py-4 text-right">
                   <button
                     onClick={() => onViewDetails && onViewDetails(cash)}
-                    className="text-primary hover:text-primary-dark font-medium text-sm inline-flex items-center gap-1"
+                    className="hover:text-primary-dark inline-flex items-center gap-1 text-sm font-medium text-primary"
                   >
                     Ver detalhes
                     <svg
-                      className="w-4 h-4"
+                      className="h-4 w-4"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -303,9 +303,9 @@ const CashRegisterHistory = ({
 
       {/* Pagination */}
       {pagination && pagination.totalPages > 1 && (
-        <div className="px-6 py-4 border-t border-light-border dark:border-dark-border bg-light-surface/50 dark:bg-dark-hover/50">
+        <div className="border-t border-light-border bg-light-surface/50 px-6 py-4 dark:border-dark-border dark:bg-dark-hover/50">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-theme-secondary">
+            <p className="text-theme-secondary text-sm">
               Mostrando {pagination.from || 1} a{' '}
               {pagination.to || history.length} de{' '}
               {pagination.total || history.length} registros
@@ -316,11 +316,11 @@ const CashRegisterHistory = ({
                   onPageChange && onPageChange(pagination.currentPage - 1)
                 }
                 disabled={pagination.currentPage === 1}
-                className="px-3 py-1.5 rounded-md border border-light-border dark:border-dark-border text-sm font-medium text-theme-primary hover:bg-light-surface dark:hover:bg-dark-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="text-theme-primary rounded-md border border-light-border px-3 py-1.5 text-sm font-medium transition-colors hover:bg-light-surface disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-border dark:hover:bg-dark-hover"
               >
                 Anterior
               </button>
-              <span className="px-3 py-1.5 text-sm text-theme-secondary">
+              <span className="text-theme-secondary px-3 py-1.5 text-sm">
                 Página {pagination.currentPage} de {pagination.totalPages}
               </span>
               <button
@@ -328,7 +328,7 @@ const CashRegisterHistory = ({
                   onPageChange && onPageChange(pagination.currentPage + 1)
                 }
                 disabled={pagination.currentPage === pagination.totalPages}
-                className="px-3 py-1.5 rounded-md border border-light-border dark:border-dark-border text-sm font-medium text-theme-primary hover:bg-light-surface dark:hover:bg-dark-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="text-theme-primary rounded-md border border-light-border px-3 py-1.5 text-sm font-medium transition-colors hover:bg-light-surface disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-border dark:hover:bg-dark-hover"
               >
                 Próxima
               </button>

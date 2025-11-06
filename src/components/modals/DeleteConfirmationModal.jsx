@@ -52,39 +52,39 @@ const DeleteConfirmationModal = ({ expense, isOpen, onClose, onDelete }) => {
   };
   if (!isOpen || !expense) return null;
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="card-theme dark:bg-dark-surface rounded-lg p-6 w-full max-w-md mx-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="card-theme mx-4 w-full max-w-md rounded-lg p-6 dark:bg-dark-surface">
         {/* Header */}
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
             Confirmar Exclusão
           </h3>
           <button
             onClick={onClose}
             className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary dark:hover:text-theme-primary transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Conteúdo */}
         <div className="space-y-4">
           {/* Informações da Despesa */}
-          <div className="bg-light-bg dark:bg-dark-bg rounded-md p-4">
+          <div className="rounded-md bg-light-bg p-4 dark:bg-dark-bg">
             <div className="flex items-start space-x-3">
-              <DollarSign className="w-5 h-5 text-light-text-muted dark:text-dark-text-muted mt-1" />
+              <DollarSign className="text-light-text-muted dark:text-dark-text-muted mt-1 h-5 w-5" />
               <div>
-                <p className="font-medium text-theme-primary dark:text-dark-text-primary">
+                <p className="text-theme-primary dark:text-dark-text-primary font-medium">
                   {expense.description || 'Sem descrição'}
                 </p>
-                <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                   {expense.value?.toLocaleString('pt-BR', {
                     style: 'currency',
                     currency: 'BRL',
                   }) || 'R$ 0,00'}
                 </p>
                 {expense.expected_payment_date && (
-                  <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                  <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                     Vencimento:{' '}
                     {new Date(expense.expected_payment_date).toLocaleDateString(
                       'pt-BR'
@@ -97,14 +97,14 @@ const DeleteConfirmationModal = ({ expense, isOpen, onClose, onDelete }) => {
 
           {/* Aviso de Recorrência */}
           {expense.is_recurring && (
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-4">
+            <div className="rounded-md border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
               <div className="flex items-start space-x-3">
-                <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-1" />
+                <AlertTriangle className="mt-1 h-5 w-5 text-yellow-600 dark:text-yellow-400" />
                 <div>
                   <h4 className="font-medium text-yellow-800 dark:text-yellow-300">
                     Despesa Recorrente Detectada
                   </h4>
-                  <p className="text-sm text-yellow-700 dark:text-yellow-400 mt-1">
+                  <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-400">
                     Esta é uma despesa recorrente. Escolha como deseja proceder:
                   </p>
                 </div>
@@ -127,7 +127,7 @@ const DeleteConfirmationModal = ({ expense, isOpen, onClose, onDelete }) => {
                 />
                 <label
                   htmlFor="single"
-                  className="text-sm text-theme-primary dark:text-dark-text-primary"
+                  className="text-theme-primary dark:text-dark-text-primary text-sm"
                 >
                   <span className="font-medium">
                     Excluir apenas esta ocorrência
@@ -150,7 +150,7 @@ const DeleteConfirmationModal = ({ expense, isOpen, onClose, onDelete }) => {
                 />
                 <label
                   htmlFor="series"
-                  className="text-sm text-theme-primary dark:text-dark-text-primary"
+                  className="text-theme-primary dark:text-dark-text-primary text-sm"
                 >
                   <span className="font-medium">
                     Excluir toda a série recorrente
@@ -164,14 +164,14 @@ const DeleteConfirmationModal = ({ expense, isOpen, onClose, onDelete }) => {
           )}
 
           {/* Aviso Final */}
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
+          <div className="rounded-md border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
             <div className="flex items-start space-x-3">
-              <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 mt-1" />
+              <AlertTriangle className="mt-1 h-5 w-5 text-red-600 dark:text-red-400" />
               <div>
                 <h4 className="font-medium text-red-800 dark:text-red-300">
                   Atenção: Esta ação não pode ser desfeita
                 </h4>
-                <p className="text-sm text-red-700 dark:text-red-400 mt-1">
+                <p className="mt-1 text-sm text-red-700 dark:text-red-400">
                   A exclusão da despesa é permanente e não pode ser revertida.
                 </p>
               </div>
@@ -183,23 +183,23 @@ const DeleteConfirmationModal = ({ expense, isOpen, onClose, onDelete }) => {
         <div className="mt-6 flex justify-end space-x-3">
           <button
             onClick={onClose}
-            className="btn-theme-secondary px-4 py-2 rounded-md transition-colors"
+            className="btn-theme-secondary rounded-md px-4 py-2 transition-colors"
           >
             Cancelar
           </button>
           <button
             onClick={handleDelete}
             disabled={loading}
-            className="flex items-center px-4 py-2 bg-red-600 dark:bg-red-700 text-dark-text-primary rounded-md hover:bg-red-700 dark:hover:bg-red-800 transition-colors disabled:opacity-50"
+            className="text-dark-text-primary flex items-center rounded-md bg-red-600 px-4 py-2 transition-colors hover:bg-red-700 disabled:opacity-50 dark:bg-red-700 dark:hover:bg-red-800"
           >
             {loading ? (
               <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-light-surface dark:border-dark-surface mr-2"></div>
+                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-light-surface dark:border-dark-surface"></div>
                 Excluindo...
               </>
             ) : (
               <>
-                <Trash2 className="w-4 h-4 mr-2" />
+                <Trash2 className="mr-2 h-4 w-4" />
                 Confirmar Exclusão
               </>
             )}

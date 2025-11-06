@@ -173,7 +173,7 @@ const TurnHistoryPage = () => {
     return 'bg-red-100 dark:bg-red-900/30';
   };
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6 p-6">
       {/* Header */}
       <Card className="p-4">
         <div className="flex items-center justify-between">
@@ -187,10 +187,10 @@ const TurnHistoryPage = () => {
               Voltar
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary">
+              <h1 className="text-theme-primary dark:text-dark-text-primary text-2xl font-bold">
                 Histórico da Lista da Vez
               </h1>
-              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                 {userRole === 'barbeiro'
                   ? 'Visualize seu histórico de atendimentos'
                   : 'Visualize o histórico completo de atendimentos'}
@@ -221,7 +221,7 @@ const TurnHistoryPage = () => {
             <select
               value={selectedMonth}
               onChange={e => setSelectedMonth(Number(e.target.value))}
-              className="px-3 py-2 text-sm card-theme dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg"
+              className="card-theme rounded-lg border border-light-border px-3 py-2 text-sm dark:border-dark-border dark:bg-dark-surface"
             >
               {Array.from(
                 {
@@ -245,7 +245,7 @@ const TurnHistoryPage = () => {
             <select
               value={selectedYear}
               onChange={e => setSelectedYear(Number(e.target.value))}
-              className="px-3 py-2 text-sm card-theme dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg"
+              className="card-theme rounded-lg border border-light-border px-3 py-2 text-sm dark:border-dark-border dark:bg-dark-surface"
             >
               {Array.from(
                 {
@@ -272,17 +272,17 @@ const TurnHistoryPage = () => {
             <LoadingSpinner />
           </div>
         ) : !selectedUnit ? (
-          <div className="text-center py-8 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+          <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted py-8 text-center">
             Selecione uma unidade para visualizar o histórico
           </div>
         ) : tableData.length === 0 ? (
-          <div className="text-center py-8 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+          <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted py-8 text-center">
             Nenhum dado encontrado para este período
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="text-xs uppercase card-theme dark:bg-dark-surface">
+            <table className="w-full text-left text-sm">
+              <thead className="card-theme text-xs uppercase dark:bg-dark-surface">
                 <tr>
                   <th className="px-4 py-3 text-gray-700 dark:text-gray-300 dark:text-gray-600">
                     Dia
@@ -290,12 +290,12 @@ const TurnHistoryPage = () => {
                   {professionals.map(prof => (
                     <th
                       key={prof}
-                      className="px-4 py-3 text-center text-gray-700 dark:text-gray-300 dark:text-gray-600 card-theme dark:bg-dark-surface"
+                      className="card-theme px-4 py-3 text-center text-gray-700 dark:bg-dark-surface dark:text-gray-300 dark:text-gray-600"
                     >
                       {prof}
                     </th>
                   ))}
-                  <th className="px-4 py-3 text-center font-bold text-theme-primary dark:text-dark-text-primary bg-gray-200 dark:bg-gray-700">
+                  <th className="text-theme-primary dark:text-dark-text-primary bg-gray-200 px-4 py-3 text-center font-bold dark:bg-gray-700">
                     Total
                   </th>
                 </tr>
@@ -304,9 +304,9 @@ const TurnHistoryPage = () => {
                 {tableData.map((row, index) => (
                   <tr
                     key={row.date}
-                    className="border-b dark:border-dark-border hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-dark-surface"
+                    className="border-b hover:bg-light-bg dark:border-dark-border dark:bg-dark-bg dark:hover:bg-dark-surface"
                   >
-                    <td className="px-4 py-3 font-medium text-theme-primary dark:text-dark-text-primary whitespace-nowrap">
+                    <td className="text-theme-primary dark:text-dark-text-primary whitespace-nowrap px-4 py-3 font-medium">
                       {formatDate(row.date)}
                     </td>
                     {professionals.map(prof => (
@@ -317,26 +317,26 @@ const TurnHistoryPage = () => {
                         {row[prof] || ''}
                       </td>
                     ))}
-                    <td className="px-4 py-3 text-center font-bold text-theme-primary dark:text-dark-text-primary">
+                    <td className="text-theme-primary dark:text-dark-text-primary px-4 py-3 text-center font-bold">
                       {row.total}
                     </td>
                   </tr>
                 ))}
 
                 {/* Linha de Total */}
-                <tr className="bg-gray-200 dark:bg-gray-700 font-bold">
-                  <td className="px-4 py-3 text-theme-primary dark:text-dark-text-primary">
+                <tr className="bg-gray-200 font-bold dark:bg-gray-700">
+                  <td className="text-theme-primary dark:text-dark-text-primary px-4 py-3">
                     Total
                   </td>
                   {professionals.map(prof => (
                     <td
                       key={prof}
-                      className="px-4 py-3 text-center text-theme-primary dark:text-dark-text-primary"
+                      className="text-theme-primary dark:text-dark-text-primary px-4 py-3 text-center"
                     >
                       {totals[prof] || 0}
                     </td>
                   ))}
-                  <td className="px-4 py-3 text-center text-theme-primary dark:text-dark-text-primary bg-gray-300 dark:bg-gray-600">
+                  <td className="text-theme-primary dark:text-dark-text-primary bg-gray-300 px-4 py-3 text-center dark:bg-gray-600">
                     {totals.total || 0}
                   </td>
                 </tr>

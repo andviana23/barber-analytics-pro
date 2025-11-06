@@ -34,33 +34,17 @@ const ServiceCard = ({
   const isActive = service.active !== false;
   return (
     <Card
-      className={`
-        p-5
-        transition-all
-        duration-200
-        ${!isActive ? 'opacity-60' : ''}
-        ${className}
-      `}
+      className={`p-5 transition-all duration-200 ${!isActive ? 'opacity-60' : ''} ${className} `}
     >
       {/* Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1 min-w-0">
-          <h4 className="text-lg font-semibold text-theme-primary truncate mb-1">
+      <div className="mb-4 flex items-start justify-between">
+        <div className="min-w-0 flex-1">
+          <h4 className="text-theme-primary mb-1 truncate text-lg font-semibold">
             {service.name}
           </h4>
           <div className="flex items-center gap-2">
             <span
-              className={`
-                inline-flex
-                items-center
-                gap-1
-                px-2
-                py-0.5
-                text-xs
-                font-medium
-                rounded-full
-                ${isActive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-300'}
-              `}
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${isActive ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300'} `}
             >
               {isActive ? (
                 <>
@@ -82,7 +66,7 @@ const ServiceCard = ({
             variant="ghost"
             size="sm"
             onClick={() => onEdit(service)}
-            className="flex-shrink-0 ml-2"
+            className="ml-2 flex-shrink-0"
             aria-label="Editar serviço"
           >
             <Edit2 size={16} />
@@ -91,15 +75,15 @@ const ServiceCard = ({
       </div>
 
       {/* Informações */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+      <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
         {/* Duração */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
             <Clock size={20} className="text-blue-600 dark:text-blue-400" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-xs text-theme-muted">Duração</p>
-            <p className="text-base font-semibold text-theme-primary">
+            <p className="text-theme-muted text-xs">Duração</p>
+            <p className="text-theme-primary text-base font-semibold">
               {service.duration_minutes || 0} min
             </p>
           </div>
@@ -107,14 +91,14 @@ const ServiceCard = ({
 
         {/* Preço */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/30">
             <DollarSign
               size={20}
               className="text-green-600 dark:text-green-400"
             />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-xs text-theme-muted">Preço</p>
+            <p className="text-theme-muted text-xs">Preço</p>
             <p className="text-base font-bold text-green-600 dark:text-green-400">
               {formatCurrency(service.price || 0)}
             </p>
@@ -123,15 +107,15 @@ const ServiceCard = ({
 
         {/* Comissão */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0">
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/30">
             <Percent
               size={20}
               className="text-purple-600 dark:text-purple-400"
             />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-xs text-theme-muted">Comissão</p>
-            <p className="text-base font-semibold text-theme-primary">
+            <p className="text-theme-muted text-xs">Comissão</p>
+            <p className="text-theme-primary text-base font-semibold">
               {service.commission_percentage || 0}%
             </p>
           </div>
@@ -139,9 +123,9 @@ const ServiceCard = ({
       </div>
 
       {/* Cálculo de Comissão */}
-      <div className="p-3 bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50 rounded-lg border border-light-border dark:border-dark-border mb-4">
+      <div className="mb-4 rounded-lg border border-light-border bg-light-bg p-3 dark:border-dark-border dark:bg-dark-bg dark:bg-dark-surface/50">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-medium text-theme-muted">
+          <span className="text-theme-muted text-xs font-medium">
             Comissão por serviço:
           </span>
           <span className="text-sm font-bold text-purple-600 dark:text-purple-400">
@@ -169,10 +153,10 @@ const ServiceCard = ({
 
       {/* Estatísticas (se disponível) */}
       {service.usage_count !== undefined && (
-        <div className="mt-4 pt-4 border-t border-theme-border">
+        <div className="border-theme-border mt-4 border-t pt-4">
           <div className="flex items-center justify-between text-xs">
             <span className="text-theme-muted">Usado em comandas:</span>
-            <span className="font-semibold text-theme-primary">
+            <span className="text-theme-primary font-semibold">
               {service.usage_count || 0}x
             </span>
           </div>

@@ -121,7 +121,7 @@ const FiltrosRelatorio = ({ filters, onFiltersChange }) => {
     (_, i) => anoAtual - 5 + i
   );
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
       <div className="space-y-2">
         <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
           <Calendar size={16} />
@@ -130,7 +130,7 @@ const FiltrosRelatorio = ({ filters, onFiltersChange }) => {
         <select
           value={localFilters.periodo.tipo}
           onChange={e => handlePeriodoChange('tipo', e.target.value)}
-          className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-md card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-blue-500"
+          className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-md border border-light-border px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
           data-testid="filtro-periodo-tipo"
         >
           <option value="mes">Mensal</option>
@@ -145,7 +145,7 @@ const FiltrosRelatorio = ({ filters, onFiltersChange }) => {
               onChange={e =>
                 handlePeriodoChange('mes', parseInt(e.target.value))
               }
-              className="px-2 py-1 border border-light-border dark:border-dark-border rounded-md card-theme dark:bg-gray-700 text-sm"
+              className="card-theme rounded-md border border-light-border px-2 py-1 text-sm dark:border-dark-border dark:bg-gray-700"
               data-testid="filtro-mes"
             >
               {meses.map(m => (
@@ -159,7 +159,7 @@ const FiltrosRelatorio = ({ filters, onFiltersChange }) => {
               onChange={e =>
                 handlePeriodoChange('ano', parseInt(e.target.value))
               }
-              className="px-2 py-1 border border-light-border dark:border-dark-border rounded-md card-theme dark:bg-gray-700 text-sm"
+              className="card-theme rounded-md border border-light-border px-2 py-1 text-sm dark:border-dark-border dark:bg-gray-700"
               data-testid="filtro-ano"
             >
               {anos.map(a => (
@@ -197,7 +197,7 @@ const FiltrosRelatorio = ({ filters, onFiltersChange }) => {
           value={localFilters.unidade}
           onChange={e => handleUnidadeChange(e.target.value)}
           disabled={loadingUnits}
-          className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-md card-theme dark:bg-gray-700 disabled:opacity-50"
+          className="card-theme w-full rounded-md border border-light-border px-3 py-2 disabled:opacity-50 dark:border-dark-border dark:bg-gray-700"
           data-testid="filtro-unidade"
         >
           <option value="todas">Todas as Unidades</option>
@@ -220,7 +220,7 @@ const FiltrosRelatorio = ({ filters, onFiltersChange }) => {
           value={localFilters.profissional}
           onChange={e => handleProfissionalChange(e.target.value)}
           disabled={loadingProfessionals}
-          className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-md card-theme dark:bg-gray-700 disabled:opacity-50"
+          className="card-theme w-full rounded-md border border-light-border px-3 py-2 disabled:opacity-50 dark:border-dark-border dark:bg-gray-700"
           data-testid="filtro-profissional"
         >
           <option value="todos">Todos os Profissionais</option>
@@ -249,7 +249,7 @@ const FiltrosRelatorio = ({ filters, onFiltersChange }) => {
             setLocalFilters(d);
             onFiltersChange(d);
           }}
-          className="w-full px-3 py-2 text-sm border border-light-border dark:border-dark-border rounded-md card-theme dark:bg-gray-700 hover:bg-light-bg dark:bg-dark-bg"
+          className="card-theme w-full rounded-md border border-light-border px-3 py-2 text-sm hover:bg-light-bg dark:border-dark-border dark:bg-dark-bg dark:bg-gray-700"
           data-testid="btn-limpar-filtros"
         >
           Limpar Filtros

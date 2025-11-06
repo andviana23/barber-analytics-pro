@@ -164,17 +164,17 @@ const TimeInput = ({
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-sm font-medium text-theme-primary mb-1.5"
+          className="text-theme-primary mb-1.5 block text-sm font-medium"
         >
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className="ml-1 text-red-500">*</span>}
         </label>
       )}
 
       <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
           <svg
-            className="w-4 h-4 text-theme-secondary"
+            className="text-theme-secondary h-4 w-4"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -205,24 +205,15 @@ const TimeInput = ({
           aria-label={label || 'Duração em minutos'}
           aria-invalid={error ? 'true' : 'false'}
           aria-describedby={error ? `${inputId}-error` : `${inputId}-helper`}
-          className={`
-            w-full pl-10 pr-4 py-2.5 
-            rounded-md border
-            text-theme-primary
-            placeholder:text-theme-secondary/50
-            transition-all duration-200
-            focus:outline-none focus:ring-2
-            ${
-              error
-                ? 'border-red-500 focus:ring-red-500/20 bg-red-50 dark:bg-red-950/10'
-                : 'border-light-border dark:border-dark-border focus:ring-primary/20 bg-light-surface dark:bg-dark-surface'
-            }
-            ${
-              disabled
-                ? 'opacity-50 cursor-not-allowed bg-light-bg dark:bg-dark-bg'
-                : 'hover:border-primary/50'
-            }
-          `}
+          className={`text-theme-primary placeholder:text-theme-secondary/50 w-full rounded-md border py-2.5 pl-10 pr-4 transition-all duration-200 focus:outline-none focus:ring-2 ${
+            error
+              ? 'border-red-500 bg-red-50 focus:ring-red-500/20 dark:bg-red-950/10'
+              : 'border-light-border bg-light-surface focus:ring-primary/20 dark:border-dark-border dark:bg-dark-surface'
+          } ${
+            disabled
+              ? 'cursor-not-allowed bg-light-bg opacity-50 dark:bg-dark-bg'
+              : 'hover:border-primary/50'
+          } `}
         />
 
         {/* Botões de increment/decrement */}
@@ -231,11 +222,11 @@ const TimeInput = ({
             <button
               type="button"
               onClick={() => onChange(Math.min((value || 0) + step, max))}
-              className="px-2 py-1 text-theme-secondary hover:text-primary hover:bg-primary/5 transition-colors rounded-tr-md"
+              className="text-theme-secondary rounded-tr-md px-2 py-1 transition-colors hover:bg-primary/5 hover:text-primary"
               aria-label="Aumentar tempo"
               tabIndex={-1}
             >
-              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
                   d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
@@ -246,11 +237,11 @@ const TimeInput = ({
             <button
               type="button"
               onClick={() => onChange(Math.max((value || 0) - step, min))}
-              className="px-2 py-1 text-theme-secondary hover:text-primary hover:bg-primary/5 transition-colors rounded-br-md"
+              className="text-theme-secondary rounded-br-md px-2 py-1 transition-colors hover:bg-primary/5 hover:text-primary"
               aria-label="Diminuir tempo"
               tabIndex={-1}
             >
-              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
                   d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
@@ -265,10 +256,10 @@ const TimeInput = ({
       {error && (
         <p
           id={`${inputId}-error`}
-          className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1"
+          className="mt-1.5 flex items-center gap-1 text-sm text-red-600 dark:text-red-400"
           role="alert"
         >
-          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
             <path
               fillRule="evenodd"
               d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
@@ -283,7 +274,7 @@ const TimeInput = ({
       {!error && (
         <p
           id={`${inputId}-helper`}
-          className="mt-1 text-xs text-theme-secondary"
+          className="text-theme-secondary mt-1 text-xs"
         >
           {min !== null && max !== null
             ? `Entre ${min} e ${max} minutos (use ↑↓ para ajustar)`

@@ -166,29 +166,29 @@ function ColorSwatch({ color, onCopy }) {
     setTimeout(() => setCopied(false), 2000);
   };
   return (
-    <div className="card-theme rounded-lg p-4 hover:shadow-lg theme-transition">
-      <div className="flex items-center gap-3 mb-3">
+    <div className="card-theme theme-transition rounded-lg p-4 hover:shadow-lg">
+      <div className="mb-3 flex items-center gap-3">
         <div
-          className="w-12 h-12 rounded-lg border-2 border-light-border dark:border-dark-border flex-shrink-0"
+          className="h-12 w-12 flex-shrink-0 rounded-lg border-2 border-light-border dark:border-dark-border"
           style={{
             backgroundColor: color.hex,
           }}
         />
-        <div className="flex-1 min-w-0">
-          <h3 className="text-theme-primary font-medium text-sm truncate">
+        <div className="min-w-0 flex-1">
+          <h3 className="text-theme-primary truncate text-sm font-medium">
             {color.name}
           </h3>
-          <p className="text-theme-secondary text-xs mt-1">{color.usage}</p>
+          <p className="text-theme-secondary mt-1 text-xs">{color.usage}</p>
         </div>
       </div>
 
       <div className="flex items-center justify-between">
-        <code className="text-theme-primary font-mono text-sm bg-light-bg dark:bg-dark-bg px-2 py-1 rounded">
+        <code className="text-theme-primary rounded bg-light-bg px-2 py-1 font-mono text-sm dark:bg-dark-bg">
           {color.hex}
         </code>
         <button
           onClick={handleCopy}
-          className="p-1.5 rounded hover:bg-primary/10 text-theme-secondary hover:text-primary theme-transition"
+          className="text-theme-secondary theme-transition rounded p-1.5 hover:bg-primary/10 hover:text-primary"
           title="Copiar cor"
         >
           {copied ? (
@@ -206,13 +206,13 @@ function ColorSwatch({ color, onCopy }) {
 function ColorSection({ title, colors, onCopy }) {
   return (
     <div className="mb-8">
-      <h2 className="text-theme-primary text-lg font-semibold mb-4 flex items-center gap-2">
+      <h2 className="text-theme-primary mb-4 flex items-center gap-2 text-lg font-semibold">
         {title}
         <span className="text-theme-secondary text-sm font-normal">
           ({colors.length} cores)
         </span>
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {colors.map((color, index) => (
           <ColorSwatch key={index} color={color} onCopy={onCopy} />
         ))}
@@ -224,26 +224,26 @@ function ColorSection({ title, colors, onCopy }) {
 // Componente de demonstração prática
 function ThemeDemo() {
   return (
-    <div className="card-theme rounded-xl p-6 mb-8">
-      <h2 className="text-theme-primary text-xl font-semibold mb-6">
+    <div className="card-theme mb-8 rounded-xl p-6">
+      <h2 className="text-theme-primary mb-6 text-xl font-semibold">
         🎨 Demonstração Prática
       </h2>
 
       <div className="space-y-6">
         {/* Botões */}
         <div>
-          <h3 className="text-theme-primary font-medium mb-3">Botões</h3>
+          <h3 className="text-theme-primary mb-3 font-medium">Botões</h3>
           <div className="flex flex-wrap gap-3">
-            <button className="btn-theme-primary px-4 py-2 rounded-lg font-medium">
+            <button className="btn-theme-primary rounded-lg px-4 py-2 font-medium">
               Botão Primário
             </button>
-            <button className="btn-theme-secondary px-4 py-2 rounded-lg font-medium">
+            <button className="btn-theme-secondary rounded-lg px-4 py-2 font-medium">
               Botão Secundário
             </button>
-            <button className="bg-feedback-light-success dark:bg-feedback-dark-success text-dark-text-primary px-4 py-2 rounded-lg font-medium">
+            <button className="text-dark-text-primary rounded-lg bg-feedback-light-success px-4 py-2 font-medium dark:bg-feedback-dark-success">
               Sucesso
             </button>
-            <button className="bg-feedback-light-error dark:bg-feedback-dark-error text-dark-text-primary px-4 py-2 rounded-lg font-medium">
+            <button className="text-dark-text-primary rounded-lg bg-feedback-light-error px-4 py-2 font-medium dark:bg-feedback-dark-error">
               Erro
             </button>
           </div>
@@ -251,20 +251,20 @@ function ThemeDemo() {
 
         {/* Cards */}
         <div>
-          <h3 className="text-theme-primary font-medium mb-3">
+          <h3 className="text-theme-primary mb-3 font-medium">
             Cards e Superfícies
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="card-theme rounded-lg p-4">
-              <h4 className="text-theme-primary font-medium mb-2">
+              <h4 className="text-theme-primary mb-2 font-medium">
                 Card de Exemplo
               </h4>
               <p className="text-theme-secondary text-sm">
                 Este é um exemplo de como os cards ficam com o tema atual.
               </p>
             </div>
-            <div className="card-theme rounded-lg p-4 border-l-4 border-primary">
-              <h4 className="text-theme-primary font-medium mb-2">
+            <div className="card-theme rounded-lg border-l-4 border-primary p-4">
+              <h4 className="text-theme-primary mb-2 font-medium">
                 Card com Destaque
               </h4>
               <p className="text-theme-secondary text-sm">
@@ -276,7 +276,7 @@ function ThemeDemo() {
 
         {/* Tipografia */}
         <div>
-          <h3 className="text-theme-primary font-medium mb-3">Tipografia</h3>
+          <h3 className="text-theme-primary mb-3 font-medium">Tipografia</h3>
           <div className="space-y-2">
             <h1 className="text-theme-primary text-3xl font-bold">
               Título Principal (H1)
@@ -308,11 +308,11 @@ export function PalettePreview() {
     setTimeout(() => setCopiedColor(''), 3000);
   };
   return (
-    <div className="max-w-7xl mx-auto p-6">
+    <div className="mx-auto max-w-7xl p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-theme-primary text-3xl font-bold mb-2">
+          <h1 className="text-theme-primary mb-2 text-3xl font-bold">
             Barber Analytics Pro - Paleta de Cores
           </h1>
           <p className="text-theme-secondary">
@@ -322,7 +322,7 @@ export function PalettePreview() {
 
         <button
           onClick={() => setShowDemo(!showDemo)}
-          className="btn-theme-secondary px-4 py-2 rounded-lg font-medium flex items-center gap-2"
+          className="btn-theme-secondary flex items-center gap-2 rounded-lg px-4 py-2 font-medium"
         >
           {showDemo ? (
             <EyeOff className="h-4 w-4" />
@@ -335,7 +335,7 @@ export function PalettePreview() {
 
       {/* Notificação de cópia */}
       {copiedColor && (
-        <div className="fixed top-4 right-4 card-theme rounded-lg p-3 shadow-lg z-50 border-l-4 border-primary">
+        <div className="card-theme fixed right-4 top-4 z-50 rounded-lg border-l-4 border-primary p-3 shadow-lg">
           <p className="text-theme-primary text-sm font-medium">
             Cor copiada: <code className="font-mono">{copiedColor}</code>
           </p>
@@ -373,7 +373,7 @@ export function PalettePreview() {
       </div>
 
       {/* Footer */}
-      <div className="mt-12 pt-8 border-t border-light-border dark:border-dark-border">
+      <div className="mt-12 border-t border-light-border pt-8 dark:border-dark-border">
         <p className="text-theme-secondary text-center text-sm">
           🎨 Sistema de Design - Barber Analytics Pro © 2025
           <br />

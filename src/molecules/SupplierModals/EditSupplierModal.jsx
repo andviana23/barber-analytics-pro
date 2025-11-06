@@ -159,35 +159,35 @@ const EditSupplierModal = ({ isOpen, onClose, onSave, supplier }) => {
   };
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn"
+      className="fixed inset-0 z-50 flex animate-fadeIn items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className="card-theme max-w-3xl w-full max-h-[90vh] overflow-hidden rounded-2xl shadow-2xl animate-slideUp"
+        className="card-theme animate-slideUp max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-2xl shadow-2xl"
         onClick={e => e.stopPropagation()}
       >
         {/* 🎯 Header Premium - DESIGN SYSTEM */}
-        <div className="bg-blue-600/10 dark:bg-blue-600/20 px-6 py-5 border-b-2 border-light-border dark:border-dark-border">
+        <div className="border-b-2 border-light-border bg-blue-600/10 px-6 py-5 dark:border-dark-border dark:bg-blue-600/20">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-500 dark:bg-indigo-600 rounded-xl shadow-lg">
-                <Edit3 className="w-6 h-6 text-dark-text-primary" />
+              <div className="rounded-xl bg-blue-500 p-3 shadow-lg dark:bg-indigo-600">
+                <Edit3 className="text-dark-text-primary h-6 w-6" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-theme-primary">
+                <h2 className="text-theme-primary text-2xl font-bold">
                   Editar Fornecedor
                 </h2>
-                <p className="text-sm text-theme-secondary mt-1">
+                <p className="text-theme-secondary mt-1 text-sm">
                   Atualize as informações do fornecedor
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="flex-shrink-0 p-2 rounded-lg hover:bg-light-surface dark:hover:bg-dark-surface transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50"
+              className="flex-shrink-0 rounded-lg p-2 transition-colors hover:bg-light-surface focus:outline-none focus:ring-2 focus:ring-primary/50 dark:hover:bg-dark-surface"
               aria-label="Fechar modal"
             >
-              <X className="w-6 h-6 text-theme-secondary hover:text-theme-primary transition-colors" />
+              <X className="text-theme-secondary hover:text-theme-primary h-6 w-6 transition-colors" />
             </button>
           </div>
         </div>
@@ -195,35 +195,35 @@ const EditSupplierModal = ({ isOpen, onClose, onSave, supplier }) => {
         {/* 📊 Formulário Scrollável - DESIGN SYSTEM */}
         <form
           onSubmit={handleSubmit}
-          className="flex-1 overflow-y-auto px-6 py-6 max-h-[calc(90vh-180px)]"
+          className="max-h-[calc(90vh-180px)] flex-1 overflow-y-auto px-6 py-6"
         >
           <div className="space-y-6">
-            <div className="flex items-center gap-3 pb-3 border-b-2 border-light-border dark:border-dark-border">
-              <Building2 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              <h3 className="text-lg font-bold text-theme-primary">
+            <div className="flex items-center gap-3 border-b-2 border-light-border pb-3 dark:border-dark-border">
+              <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              <h3 className="text-theme-primary text-lg font-bold">
                 Dados Cadastrais
               </h3>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {/* Nome/Descrição */}
               <div className="md:col-span-1">
-                <label className="block text-sm font-bold text-theme-primary mb-2">
+                <label className="text-theme-primary mb-2 block text-sm font-bold">
                   Descrição <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <Package className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary w-5 h-5" />
+                  <Package className="text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
                   <input
                     type="text"
                     placeholder="Nome do fornecedor"
                     value={formData.nome}
                     onChange={e => handleChange('nome', e.target.value)}
-                    className={`w-full pl-11 pr-4 py-3 border-2 rounded-xl bg-white dark:bg-gray-800 text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${errors.nome ? 'border-red-500 focus:border-red-500' : 'border-gray-300 dark:border-gray-600 focus:border-blue-500'}`}
+                    className={`text-theme-primary w-full rounded-xl border-2 bg-white py-3 pl-11 pr-4 placeholder-gray-400 transition-all duration-200 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:placeholder-gray-500 ${errors.nome ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-blue-500 dark:border-gray-600'}`}
                   />
                 </div>
                 {errors.nome && (
-                  <p className="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1">
-                    <span className="inline-block w-1 h-1 bg-red-500 rounded-full"></span>
+                  <p className="mt-1.5 flex items-center gap-1 text-xs font-medium text-red-500">
+                    <span className="inline-block h-1 w-1 rounded-full bg-red-500"></span>
                     {errors.nome}
                   </p>
                 )}
@@ -231,11 +231,11 @@ const EditSupplierModal = ({ isOpen, onClose, onSave, supplier }) => {
 
               {/* CNPJ */}
               <div className="md:col-span-1">
-                <label className="block text-sm font-bold text-theme-primary mb-2">
+                <label className="text-theme-primary mb-2 block text-sm font-bold">
                   CNPJ <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary w-5 h-5" />
+                  <FileText className="text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
                   <input
                     type="text"
                     placeholder="00.000.000/0000-00"
@@ -244,12 +244,12 @@ const EditSupplierModal = ({ isOpen, onClose, onSave, supplier }) => {
                       handleChange('cpf_cnpj', formatCNPJ(e.target.value))
                     }
                     maxLength={18}
-                    className={`w-full pl-11 pr-4 py-3 border-2 rounded-xl bg-white dark:bg-gray-800 text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 transition-all duration-200 font-mono ${errors.cpf_cnpj ? 'border-red-500 focus:border-red-500' : 'border-gray-300 dark:border-gray-600 focus:border-blue-500'}`}
+                    className={`text-theme-primary w-full rounded-xl border-2 bg-white py-3 pl-11 pr-4 font-mono placeholder-gray-400 transition-all duration-200 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:placeholder-gray-500 ${errors.cpf_cnpj ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-blue-500 dark:border-gray-600'}`}
                   />
                 </div>
                 {errors.cpf_cnpj && (
-                  <p className="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1">
-                    <span className="inline-block w-1 h-1 bg-red-500 rounded-full"></span>
+                  <p className="mt-1.5 flex items-center gap-1 text-xs font-medium text-red-500">
+                    <span className="inline-block h-1 w-1 rounded-full bg-red-500"></span>
                     {errors.cpf_cnpj}
                   </p>
                 )}
@@ -257,39 +257,39 @@ const EditSupplierModal = ({ isOpen, onClose, onSave, supplier }) => {
 
               {/* Razão Social */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-bold text-theme-primary mb-2">
+                <label className="text-theme-primary mb-2 block text-sm font-bold">
                   Razão Social
                 </label>
                 <div className="relative">
-                  <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary w-5 h-5" />
+                  <Building2 className="text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
                   <input
                     type="text"
                     placeholder="Razão Social da empresa"
                     value={formData.razao_social}
                     onChange={e => handleChange('razao_social', e.target.value)}
-                    className="w-full pl-11 pr-4 py-3 border-2 border-light-border dark:border-dark-border rounded-xl card-theme dark:bg-dark-surface text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                    className="card-theme text-theme-primary w-full rounded-xl border-2 border-light-border py-3 pl-11 pr-4 placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-dark-surface dark:placeholder-gray-500"
                   />
                 </div>
               </div>
 
               {/* Email */}
               <div className="md:col-span-1">
-                <label className="block text-sm font-bold text-theme-primary mb-2">
+                <label className="text-theme-primary mb-2 block text-sm font-bold">
                   Email
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary w-5 h-5" />
+                  <Mail className="text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
                   <input
                     type="email"
                     placeholder="email@exemplo.com"
                     value={formData.email}
                     onChange={e => handleChange('email', e.target.value)}
-                    className={`w-full pl-11 pr-4 py-3 border-2 rounded-xl bg-white dark:bg-gray-800 text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${errors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-300 dark:border-gray-600 focus:border-blue-500'}`}
+                    className={`text-theme-primary w-full rounded-xl border-2 bg-white py-3 pl-11 pr-4 placeholder-gray-400 transition-all duration-200 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:placeholder-gray-500 ${errors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-blue-500 dark:border-gray-600'}`}
                   />
                 </div>
                 {errors.email && (
-                  <p className="text-red-500 text-xs font-medium mt-1.5 flex items-center gap-1">
-                    <span className="inline-block w-1 h-1 bg-red-500 rounded-full"></span>
+                  <p className="mt-1.5 flex items-center gap-1 text-xs font-medium text-red-500">
+                    <span className="inline-block h-1 w-1 rounded-full bg-red-500"></span>
                     {errors.email}
                   </p>
                 )}
@@ -297,11 +297,11 @@ const EditSupplierModal = ({ isOpen, onClose, onSave, supplier }) => {
 
               {/* Telefone */}
               <div className="md:col-span-1">
-                <label className="block text-sm font-bold text-theme-primary mb-2">
+                <label className="text-theme-primary mb-2 block text-sm font-bold">
                   Telefone
                 </label>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary w-5 h-5" />
+                  <Phone className="text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
                   <input
                     type="text"
                     placeholder="(00) 00000-0000"
@@ -310,31 +310,31 @@ const EditSupplierModal = ({ isOpen, onClose, onSave, supplier }) => {
                       handleChange('telefone', formatPhone(e.target.value))
                     }
                     maxLength={15}
-                    className="w-full pl-11 pr-4 py-3 border-2 border-light-border dark:border-dark-border rounded-xl card-theme dark:bg-dark-surface text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-mono"
+                    className="card-theme text-theme-primary w-full rounded-xl border-2 border-light-border py-3 pl-11 pr-4 font-mono placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-dark-surface dark:placeholder-gray-500"
                   />
                 </div>
               </div>
 
               {/* Endereço */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-bold text-theme-primary mb-2">
+                <label className="text-theme-primary mb-2 block text-sm font-bold">
                   Endereço
                 </label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-3 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary w-5 h-5" />
+                  <MapPin className="text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary absolute left-3 top-3 h-5 w-5" />
                   <input
                     type="text"
                     placeholder="Endereço completo"
                     value={formData.endereco}
                     onChange={e => handleChange('endereco', e.target.value)}
-                    className="w-full pl-11 pr-4 py-3 border-2 border-light-border dark:border-dark-border rounded-xl card-theme dark:bg-dark-surface text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                    className="card-theme text-theme-primary w-full rounded-xl border-2 border-light-border py-3 pl-11 pr-4 placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-dark-surface dark:placeholder-gray-500"
                   />
                 </div>
               </div>
 
               {/* Observações */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-bold text-theme-primary mb-2">
+                <label className="text-theme-primary mb-2 block text-sm font-bold">
                   Observações
                 </label>
                 <textarea
@@ -342,7 +342,7 @@ const EditSupplierModal = ({ isOpen, onClose, onSave, supplier }) => {
                   value={formData.observacoes}
                   onChange={e => handleChange('observacoes', e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-3 border-2 border-light-border dark:border-dark-border rounded-xl card-theme dark:bg-dark-surface text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none"
+                  className="card-theme text-theme-primary w-full resize-none rounded-xl border-2 border-light-border px-4 py-3 placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-dark-surface dark:placeholder-gray-500"
                 />
               </div>
             </div>
@@ -350,29 +350,29 @@ const EditSupplierModal = ({ isOpen, onClose, onSave, supplier }) => {
         </form>
 
         {/* 🎬 Footer com Ações - DESIGN SYSTEM */}
-        <div className="px-6 py-4 border-t-2 border-light-border dark:border-dark-border bg-gradient-light dark:from-gray-800 dark:to-gray-750">
+        <div className="dark:to-gray-750 border-t-2 border-light-border bg-gradient-light px-6 py-4 dark:border-dark-border dark:from-gray-800">
           <div className="flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-5 py-2.5 text-sm font-semibold text-theme-primary hover:bg-light-surface dark:hover:bg-dark-surface rounded-xl transition-all duration-200 border-2 border-transparent hover:border-light-border dark:border-dark-border dark:hover:border-dark-border disabled:opacity-50"
+              className="text-theme-primary rounded-xl border-2 border-transparent px-5 py-2.5 text-sm font-semibold transition-all duration-200 hover:border-light-border hover:bg-light-surface disabled:opacity-50 dark:border-dark-border dark:hover:border-dark-border dark:hover:bg-dark-surface"
             >
               Cancelar
             </button>
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold transition-all duration-200 bg-gradient-primary hover:from-blue-700 hover:to-indigo-700 text-dark-text-primary shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-dark-bg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transform hover:scale-105"
+              className="text-dark-text-primary flex transform items-center gap-2 rounded-xl bg-gradient-primary px-6 py-2.5 font-semibold shadow-lg shadow-blue-500/30 transition-all duration-200 hover:scale-105 hover:from-blue-700 hover:to-indigo-700 hover:shadow-blue-500/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none dark:focus:ring-offset-dark-bg"
             >
               {loading ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-light-surface dark:border-dark-surface/30 border-t-white rounded-full animate-spin" />
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-light-surface border-t-white dark:border-dark-surface/30" />
                   Salvando...
                 </>
               ) : (
                 <>
-                  <Save className="w-5 h-5" />
+                  <Save className="h-5 w-5" />
                   Salvar Alterações
                 </>
               )}

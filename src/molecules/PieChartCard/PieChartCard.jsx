@@ -161,12 +161,12 @@ const PieChartCard = ({
   // Estado vazio
   if (!data || data.length === 0) {
     return (
-      <div className="card-theme rounded-2xl p-6 border border-light-border dark:border-dark-border shadow-sm hover:shadow-md transition-all duration-300">
-        <div className="flex items-center justify-center h-80 text-theme-secondary">
+      <div className="card-theme rounded-2xl border border-light-border p-6 shadow-sm transition-all duration-300 hover:shadow-md dark:border-dark-border">
+        <div className="text-theme-secondary flex h-80 items-center justify-center">
           <div className="text-center">
-            <PieChartIcon className="w-16 h-16 mx-auto mb-3 opacity-20" />
+            <PieChartIcon className="mx-auto mb-3 h-16 w-16 opacity-20" />
             <p className="text-sm font-medium">Sem dados para exibir</p>
-            <p className="text-xs mt-1 opacity-60">
+            <p className="mt-1 text-xs opacity-60">
               Aguardando informações do período selecionado
             </p>
           </div>
@@ -175,42 +175,42 @@ const PieChartCard = ({
     );
   }
   return (
-    <div className="card-theme rounded-2xl p-6 border border-light-border dark:border-dark-border shadow-sm hover:shadow-lg transition-all duration-300">
+    <div className="card-theme rounded-2xl border border-light-border p-6 shadow-sm transition-all duration-300 hover:shadow-lg dark:border-dark-border">
       {/* Header Premium */}
-      <div className="flex items-center justify-between mb-6 pb-4 border-b border-light-border dark:border-dark-border">
+      <div className="mb-6 flex items-center justify-between border-b border-light-border pb-4 dark:border-dark-border">
         <div className="flex items-center gap-3">
           <div
             className={`relative p-3 ${config.iconBg} rounded-xl shadow-lg ring-4 ${config.iconRing} ${config.glowColor}`}
           >
             <config.Icon
-              className="w-5 h-5 text-dark-text-primary"
+              className="text-dark-text-primary h-5 w-5"
               strokeWidth={2.5}
             />
             {/* Glow effect */}
-            <div className="absolute inset-0 rounded-xl card-theme/20 blur-sm" />
+            <div className="card-theme/20 absolute inset-0 rounded-xl blur-sm" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-theme-primary tracking-tight">
+            <h3 className="text-theme-primary text-base font-bold tracking-tight">
               {title}
             </h3>
-            <p className="text-xs text-theme-secondary mt-0.5">{subtitle}</p>
+            <p className="text-theme-secondary mt-0.5 text-xs">{subtitle}</p>
           </div>
         </div>
         <div className="text-right">
-          <p className="text-xs text-theme-secondary font-medium">Total</p>
+          <p className="text-theme-secondary text-xs font-medium">Total</p>
           <p className={`text-lg font-bold ${config.accentColor} tabular-nums`}>
             {formatValue(total)}
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
         {/* Gráfico de Pizza SVG - Lado Esquerdo */}
-        <div className="lg:col-span-2 flex items-center justify-center">
+        <div className="flex items-center justify-center lg:col-span-2">
           <div className="relative">
             <svg
               viewBox="0 0 200 200"
-              className="w-52 h-52 drop-shadow-xl transition-transform duration-500 hover:scale-105"
+              className="h-52 w-52 drop-shadow-xl transition-transform duration-500 hover:scale-105"
             >
               {/* Fundo do círculo */}
               <circle
@@ -220,7 +220,7 @@ const PieChartCard = ({
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1"
-                className="text-light-border dark:text-dark-border opacity-10"
+                className="text-light-border opacity-10 dark:text-dark-border"
               />
 
               {/* Segmentos do gráfico */}
@@ -229,7 +229,7 @@ const PieChartCard = ({
                   <path
                     d={segment.path}
                     fill={segment.color.light}
-                    className={`transition-all duration-300 cursor-pointer ${hoveredIndex === index ? 'opacity-100 drop-shadow-2xl scale-105' : hoveredIndex === null ? 'opacity-90' : 'opacity-40'}`}
+                    className={`cursor-pointer transition-all duration-300 ${hoveredIndex === index ? 'scale-105 opacity-100 drop-shadow-2xl' : hoveredIndex === null ? 'opacity-90' : 'opacity-40'}`}
                     strokeWidth="2"
                     stroke="white"
                     onMouseEnter={() => setHoveredIndex(index)}
@@ -254,7 +254,7 @@ const PieChartCard = ({
                 x="100"
                 y="95"
                 textAnchor="middle"
-                className="text-xs fill-theme-secondary font-medium"
+                className="fill-theme-secondary text-xs font-medium"
               >
                 {data.length}
               </text>
@@ -262,7 +262,7 @@ const PieChartCard = ({
                 x="100"
                 y="110"
                 textAnchor="middle"
-                className="text-[10px] fill-theme-secondary opacity-60"
+                className="fill-theme-secondary text-[10px] opacity-60"
               >
                 categorias
               </text>
@@ -271,22 +271,22 @@ const PieChartCard = ({
         </div>
 
         {/* Lista de Categorias - Lado Direito */}
-        <div className="lg:col-span-3 space-y-2 max-h-80 overflow-y-auto pr-1 custom-scrollbar">
+        <div className="custom-scrollbar max-h-80 space-y-2 overflow-y-auto pr-1 lg:col-span-3">
           {data.map((item, index) => {
             const isHovered = hoveredIndex === index;
             const colorObj = colors[index % colors.length];
             return (
               <div
                 key={item.name || index}
-                className={`group relative p-3 rounded-xl border transition-all duration-300 ${isHovered ? 'bg-light-bg dark:bg-dark-hover border-light-border dark:border-dark-border shadow-md scale-[1.02]' : 'bg-light-surface dark:bg-dark-surface border-transparent hover:border-light-border dark:hover:border-dark-border'}`}
+                className={`group relative rounded-xl border p-3 transition-all duration-300 ${isHovered ? 'scale-[1.02] border-light-border bg-light-bg shadow-md dark:border-dark-border dark:bg-dark-hover' : 'border-transparent bg-light-surface hover:border-light-border dark:bg-dark-surface dark:hover:border-dark-border'}`}
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}
               >
-                <div className="flex items-center justify-between mb-2">
+                <div className="mb-2 flex items-center justify-between">
                   {/* Nome da categoria com indicador de cor */}
-                  <div className="flex items-center gap-2.5 flex-1">
+                  <div className="flex flex-1 items-center gap-2.5">
                     <div
-                      className={`w-2.5 h-2.5 rounded-full shadow-sm transition-transform duration-300 ${isHovered ? 'scale-150 shadow-lg' : ''}`}
+                      className={`h-2.5 w-2.5 rounded-full shadow-sm transition-transform duration-300 ${isHovered ? 'scale-150 shadow-lg' : ''}`}
                       style={{
                         backgroundColor: colorObj.light,
                         boxShadow: isHovered
@@ -294,18 +294,18 @@ const PieChartCard = ({
                           : undefined,
                       }}
                     />
-                    <span className="text-sm font-semibold text-theme-primary truncate">
+                    <span className="text-theme-primary truncate text-sm font-semibold">
                       {item.name}
                     </span>
                   </div>
 
                   {/* Valor e Percentual */}
-                  <div className="flex items-center gap-3 ml-2">
-                    <span className="text-xs font-medium text-theme-secondary tabular-nums">
+                  <div className="ml-2 flex items-center gap-3">
+                    <span className="text-theme-secondary text-xs font-medium tabular-nums">
                       {formatValue(item.value)}
                     </span>
                     <span
-                      className={`text-sm font-bold ${config.accentColor} tabular-nums min-w-[3rem] text-right`}
+                      className={`text-sm font-bold ${config.accentColor} min-w-[3rem] text-right tabular-nums`}
                     >
                       {item.percentage?.toFixed(1) || '0.0'}%
                     </span>
@@ -313,7 +313,7 @@ const PieChartCard = ({
                 </div>
 
                 {/* Barra de progresso */}
-                <div className="relative w-full h-1.5 bg-light-border dark:bg-dark-border rounded-full overflow-hidden">
+                <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-light-border dark:bg-dark-border">
                   <div
                     className={`absolute inset-y-0 left-0 rounded-full transition-all duration-500 ease-out ${isHovered ? 'shadow-lg' : ''}`}
                     style={{

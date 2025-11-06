@@ -115,9 +115,9 @@ const ProfessionalSelector = ({
     <div ref={containerRef} className={`relative ${className}`}>
       {/* Label */}
       {label && (
-        <label className="block text-sm font-medium text-theme-primary mb-2">
+        <label className="text-theme-primary mb-2 block text-sm font-medium">
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className="ml-1 text-red-500">*</span>}
         </label>
       )}
 
@@ -126,29 +126,24 @@ const ProfessionalSelector = ({
         type="button"
         onClick={handleToggle}
         disabled={disabled || loading}
-        className={`
-          w-full px-4 py-3 rounded-lg border text-left transition-all
-          flex items-center justify-between gap-2
-          ${disabled || loading ? 'bg-light-surface/50 dark:bg-dark-surface/50 cursor-not-allowed opacity-60' : 'bg-white dark:bg-dark-surface hover:border-primary cursor-pointer'}
-          ${error ? 'border-red-500 dark:border-red-400' : isOpen ? 'border-primary ring-2 ring-primary/20' : 'border-light-border dark:border-dark-border'}
-        `}
+        className={`flex w-full items-center justify-between gap-2 rounded-lg border px-4 py-3 text-left transition-all ${disabled || loading ? 'cursor-not-allowed bg-light-surface/50 opacity-60 dark:bg-dark-surface/50' : 'cursor-pointer bg-white hover:border-primary dark:bg-dark-surface'} ${error ? 'border-red-500 dark:border-red-400' : isOpen ? 'border-primary ring-2 ring-primary/20' : 'border-light-border dark:border-dark-border'} `}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-label={label}
       >
-        <div className="flex items-center gap-3 flex-1 min-w-0">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
           {selectedProfessional ? (
             <>
               {/* Avatar */}
-              <div className="w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold flex items-center justify-center flex-shrink-0 text-sm">
+              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
                 {getInitials(selectedProfessional.name)}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-medium text-theme-primary truncate">
+                <p className="text-theme-primary truncate font-medium">
                   {selectedProfessional.name}
                 </p>
                 {showRole && selectedProfessional.role && (
-                  <p className="text-sm text-theme-secondary">
+                  <p className="text-theme-secondary text-sm">
                     {getRoleLabel(selectedProfessional.role)}
                   </p>
                 )}
@@ -161,7 +156,7 @@ const ProfessionalSelector = ({
 
         {/* Icon */}
         <svg
-          className={`w-5 h-5 text-theme-secondary transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
+          className={`text-theme-secondary h-5 w-5 flex-shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -182,9 +177,9 @@ const ProfessionalSelector = ({
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute z-50 w-full mt-2 card-theme dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg shadow-lg max-h-80 flex flex-col">
+        <div className="card-theme absolute z-50 mt-2 flex max-h-80 w-full flex-col rounded-lg border border-light-border shadow-lg dark:border-dark-border dark:bg-dark-surface">
           {/* Search Input */}
-          <div className="p-3 border-b border-light-border dark:border-dark-border">
+          <div className="border-b border-light-border p-3 dark:border-dark-border">
             <div className="relative">
               <input
                 ref={searchInputRef}
@@ -193,10 +188,10 @@ const ProfessionalSelector = ({
                 onChange={e => setSearchTerm(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Buscar profissional..."
-                className="w-full pl-10 pr-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-surface dark:bg-dark-hover text-theme-primary placeholder-theme-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                className="text-theme-primary placeholder-theme-secondary w-full rounded-md border border-light-border bg-light-surface py-2 pl-10 pr-4 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-dark-border dark:bg-dark-hover"
               />
               <svg
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-theme-secondary"
+                className="text-theme-secondary absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -212,18 +207,18 @@ const ProfessionalSelector = ({
           </div>
 
           {/* Professionals List */}
-          <div className="overflow-y-auto flex-1">
+          <div className="flex-1 overflow-y-auto">
             {loading ? (
               <div className="p-4 text-center">
-                <div className="inline-block w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                <p className="mt-2 text-sm text-theme-secondary">
+                <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                <p className="text-theme-secondary mt-2 text-sm">
                   Carregando profissionais...
                 </p>
               </div>
             ) : filteredProfessionals.length === 0 ? (
               <div className="p-8 text-center">
                 <svg
-                  className="w-12 h-12 mx-auto text-theme-secondary/50 mb-2"
+                  className="text-theme-secondary/50 mx-auto mb-2 h-12 w-12"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -235,7 +230,7 @@ const ProfessionalSelector = ({
                     d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                   />
                 </svg>
-                <p className="text-sm text-theme-secondary">
+                <p className="text-theme-secondary text-sm">
                   {searchTerm
                     ? 'Nenhum profissional encontrado'
                     : 'Nenhum profissional disponível'}
@@ -248,27 +243,23 @@ const ProfessionalSelector = ({
                     key={professional.id}
                     type="button"
                     onClick={() => handleSelect(professional)}
-                    className={`
-                      w-full px-4 py-3 text-left transition-colors border-b border-light-border/50 dark:border-dark-border/50 last:border-b-0
-                      hover:bg-light-surface dark:hover:bg-dark-hover
-                      ${value === professional.id ? 'bg-primary/5' : ''}
-                    `}
+                    className={`w-full border-b border-light-border/50 px-4 py-3 text-left transition-colors last:border-b-0 hover:bg-light-surface dark:border-dark-border/50 dark:hover:bg-dark-hover ${value === professional.id ? 'bg-primary/5' : ''} `}
                     role="option"
                     aria-selected={value === professional.id}
                   >
                     <div className="flex items-center gap-3">
                       {/* Avatar */}
-                      <div className="w-10 h-10 rounded-full bg-primary/10 text-primary font-semibold flex items-center justify-center flex-shrink-0">
+                      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">
                         {getInitials(professional.name)}
                       </div>
 
                       {/* Info */}
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-theme-primary truncate">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-theme-primary truncate font-medium">
                           {professional.name}
                         </p>
                         {showRole && professional.role && (
-                          <p className="text-sm text-theme-secondary">
+                          <p className="text-theme-secondary text-sm">
                             {getRoleLabel(professional.role)}
                           </p>
                         )}
@@ -277,7 +268,7 @@ const ProfessionalSelector = ({
                       {/* Checkmark if selected */}
                       {value === professional.id && (
                         <svg
-                          className="w-5 h-5 text-primary flex-shrink-0"
+                          className="h-5 w-5 flex-shrink-0 text-primary"
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >

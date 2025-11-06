@@ -25,13 +25,13 @@ const RankingProfissionais = ({
         return <Crown className="h-5 w-5 text-yellow-500" />;
       case 2:
         return (
-          <Medal className="h-5 w-5 text-light-text-muted dark:text-dark-text-muted" />
+          <Medal className="text-light-text-muted dark:text-dark-text-muted h-5 w-5" />
         );
       case 3:
         return <Award className="h-5 w-5 text-amber-600" />;
       default:
         return (
-          <User className="h-5 w-5 text-light-text-muted dark:text-dark-text-muted" />
+          <User className="text-light-text-muted dark:text-dark-text-muted h-5 w-5" />
         );
     }
   };
@@ -45,17 +45,17 @@ const RankingProfissionais = ({
   };
   if (loading) {
     return (
-      <div className="card-theme dark:bg-dark-surface p-6 rounded-xl border border-light-border dark:border-dark-border">
-        <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 rounded mb-6"></div>
+      <div className="card-theme rounded-xl border border-light-border p-6 dark:border-dark-border dark:bg-dark-surface">
+        <div className="mb-6 h-6 w-48 rounded bg-gray-200 dark:bg-gray-700"></div>
         <div className="space-y-4">
           {[...Array(5)].map((_, index) => (
-            <div key={index} className="flex items-center gap-4 animate-pulse">
-              <div className="h-12 w-12 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+            <div key={index} className="flex animate-pulse items-center gap-4">
+              <div className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700"></div>
               <div className="flex-1">
-                <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-                <div className="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <div className="mb-2 h-4 w-32 rounded bg-gray-200 dark:bg-gray-700"></div>
+                <div className="h-3 w-24 rounded bg-gray-200 dark:bg-gray-700"></div>
               </div>
-              <div className="h-6 w-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              <div className="h-6 w-16 rounded bg-gray-200 dark:bg-gray-700"></div>
             </div>
           ))}
         </div>
@@ -64,20 +64,20 @@ const RankingProfissionais = ({
   }
   if (!data || data.length === 0) {
     return (
-      <div className="card-theme dark:bg-dark-surface p-6 rounded-xl border border-light-border dark:border-dark-border">
-        <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-4">
+      <div className="card-theme rounded-xl border border-light-border p-6 dark:border-dark-border dark:bg-dark-surface">
+        <h3 className="text-theme-primary dark:text-dark-text-primary mb-4 text-lg font-semibold">
           {title}
         </h3>
-        <div className="text-center py-8 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
-          <User className="h-12 w-12 mx-auto mb-3 opacity-50" />
+        <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted py-8 text-center">
+          <User className="mx-auto mb-3 h-12 w-12 opacity-50" />
           <p>Nenhum dado de profissional encontrado</p>
         </div>
       </div>
     );
   }
   return (
-    <div className="card-theme dark:bg-dark-surface p-6 rounded-xl border border-light-border dark:border-dark-border">
-      <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-6">
+    <div className="card-theme rounded-xl border border-light-border p-6 dark:border-dark-border dark:bg-dark-surface">
+      <h3 className="text-theme-primary dark:text-dark-text-primary mb-6 text-lg font-semibold">
         {title}
       </h3>
 
@@ -87,12 +87,12 @@ const RankingProfissionais = ({
           return (
             <div
               key={professional.id || index}
-              className={`flex items-center gap-4 p-3 rounded-lg transition-colors ${position <= 3 ? 'bg-light-surface/50 dark:bg-dark-surface/50' : 'bg-light-surface dark:bg-dark-surface'}`}
+              className={`flex items-center gap-4 rounded-lg p-3 transition-colors ${position <= 3 ? 'bg-light-surface/50 dark:bg-dark-surface/50' : 'bg-light-surface dark:bg-dark-surface'}`}
             >
               {/* Posição e ícone */}
-              <div className="flex items-center gap-2 min-w-0">
+              <div className="flex min-w-0 items-center gap-2">
                 <span
-                  className={`inline-flex items-center justify-center w-8 h-8 text-sm font-bold border rounded-full ${getRankBadge(position)}`}
+                  className={`inline-flex h-8 w-8 items-center justify-center rounded-full border text-sm font-bold ${getRankBadge(position)}`}
                 >
                   {position}
                 </span>
@@ -100,19 +100,19 @@ const RankingProfissionais = ({
               </div>
 
               {/* Informações do profissional */}
-              <div className="flex-1 min-w-0">
+              <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <h4 className="font-semibold text-theme-primary dark:text-dark-text-primary truncate">
+                  <h4 className="text-theme-primary dark:text-dark-text-primary truncate font-semibold">
                     {professional.name}
                   </h4>
                   {position <= 3 && (
-                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                    <span className="rounded-full bg-blue-100 px-2 py-1 text-xs text-blue-800">
                       Top {position}
                     </span>
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mt-2 text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-2 grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <span className="font-medium">Atendimentos:</span>{' '}
                     {professional.attendances || 0}
@@ -126,10 +126,10 @@ const RankingProfissionais = ({
 
               {/* Faturamento total */}
               <div className="text-right">
-                <div className="text-lg font-bold text-theme-primary dark:text-dark-text-primary">
+                <div className="text-theme-primary dark:text-dark-text-primary text-lg font-bold">
                   {formatCurrency(professional.totalRevenue || 0)}
                 </div>
-                <div className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-xs">
                   Faturamento
                 </div>
               </div>
@@ -140,7 +140,7 @@ const RankingProfissionais = ({
 
       {/* Mostrar apenas top 10 */}
       {data.length > 10 && (
-        <div className="mt-4 text-center text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+        <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-4 text-center text-sm">
           Mostrando top 10 profissionais
         </div>
       )}

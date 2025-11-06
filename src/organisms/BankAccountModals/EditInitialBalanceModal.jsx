@@ -131,18 +131,18 @@ const EditInitialBalanceModal = ({ isOpen, onClose, onSuccess, account }) => {
 
       {/* Modal */}
       <div className="flex min-h-screen items-center justify-center p-4">
-        <div className="relative card-theme dark:bg-dark-surface rounded-2xl shadow-2xl max-w-2xl w-full p-6 transform transition-all">
+        <div className="card-theme relative w-full max-w-2xl transform rounded-2xl p-6 shadow-2xl transition-all dark:bg-dark-surface">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6 pb-4 border-b border-light-border dark:border-dark-border">
+          <div className="mb-6 flex items-center justify-between border-b border-light-border pb-4 dark:border-dark-border">
             <div className="flex items-center space-x-3">
-              <div className="p-3 bg-blue-500 dark:bg-indigo-600 rounded-xl">
-                <Edit3 className="w-6 h-6 text-dark-text-primary" />
+              <div className="rounded-xl bg-blue-500 p-3 dark:bg-indigo-600">
+                <Edit3 className="text-dark-text-primary h-6 w-6" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary">
+                <h2 className="text-theme-primary dark:text-dark-text-primary text-2xl font-bold">
                   Editar Saldo Inicial
                 </h2>
-                <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-0.5">
+                <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-0.5 text-sm">
                   {account.name} - {account.bank_name || account.bank}
                 </p>
               </div>
@@ -150,15 +150,15 @@ const EditInitialBalanceModal = ({ isOpen, onClose, onSuccess, account }) => {
             <button
               onClick={handleClose}
               disabled={loading}
-              className="p-2 text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary dark:hover:text-gray-300 dark:text-gray-600 transition-colors rounded-lg hover:card-theme dark:hover:bg-gray-700"
+              className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary hover:card-theme rounded-lg p-2 transition-colors dark:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
             >
-              <X className="w-5 h-5" />
+              <X className="h-5 w-5" />
             </button>
           </div>
 
           {/* Info Atual */}
-          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800/30">
-            <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide mb-2">
+          <div className="mb-6 rounded-xl border border-blue-100 bg-blue-50 p-4 dark:border-blue-800/30 dark:bg-blue-900/20">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400">
               Saldo Inicial Atual
             </p>
             <p className="text-3xl font-bold text-blue-700 dark:text-blue-300">
@@ -169,12 +169,12 @@ const EditInitialBalanceModal = ({ isOpen, onClose, onSuccess, account }) => {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Novo Saldo */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+              <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600">
                 Novo Saldo Inicial *
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <DollarSign className="h-5 w-5 text-light-text-muted dark:text-dark-text-muted" />
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                  <DollarSign className="text-light-text-muted dark:text-dark-text-muted h-5 w-5" />
                 </div>
                 <input
                   type="number"
@@ -184,11 +184,11 @@ const EditInitialBalanceModal = ({ isOpen, onClose, onSuccess, account }) => {
                   onChange={handleChange}
                   disabled={loading}
                   placeholder="0,00"
-                  className="pl-11 w-full px-4 py-3 border border-light-border dark:border-dark-border rounded-xl card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-lg font-semibold"
+                  className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-xl border border-light-border px-4 py-3 pl-11 text-lg font-semibold placeholder-gray-400 transition-all focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
                   required
                 />
               </div>
-              <p className="mt-1.5 text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1.5 text-xs">
                 Digite o valor correto do saldo inicial da conta
               </p>
             </div>
@@ -196,13 +196,13 @@ const EditInitialBalanceModal = ({ isOpen, onClose, onSuccess, account }) => {
             {/* Preview da Diferença */}
             {difference !== 0 && !isNaN(difference) && (
               <div
-                className={`p-4 rounded-xl border ${isIncrease ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'}`}
+                className={`rounded-xl border p-4 ${isIncrease ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20' : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'}`}
               >
                 <div className="flex items-center space-x-3">
                   {isIncrease ? (
-                    <TrendingUp className="w-5 h-5 text-green-600 dark:text-green-400" />
+                    <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
                   ) : (
-                    <TrendingDown className="w-5 h-5 text-red-600 dark:text-red-400" />
+                    <TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
                   )}
                   <div>
                     <p
@@ -222,7 +222,7 @@ const EditInitialBalanceModal = ({ isOpen, onClose, onSuccess, account }) => {
 
             {/* Motivo */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+              <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600">
                 Motivo da Alteração *
               </label>
               <textarea
@@ -232,20 +232,20 @@ const EditInitialBalanceModal = ({ isOpen, onClose, onSuccess, account }) => {
                 disabled={loading}
                 rows={4}
                 placeholder="Ex: Ajuste de saldo para conciliação bancária, correção de valor inicial, etc."
-                className="w-full px-4 py-3 border border-light-border dark:border-dark-border rounded-xl card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                className="card-theme text-theme-primary dark:text-dark-text-primary w-full resize-none rounded-xl border border-light-border px-4 py-3 placeholder-gray-400 transition-all focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
                 required
               />
-              <p className="mt-1.5 text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1.5 text-xs">
                 Informe o motivo desta alteração para fins de auditoria
               </p>
             </div>
 
             {/* Aviso */}
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-4">
+            <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
               <div className="flex items-start space-x-3">
-                <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-600 dark:text-yellow-400" />
                 <div>
-                  <p className="text-sm font-semibold text-yellow-800 dark:text-yellow-300 mb-1">
+                  <p className="mb-1 text-sm font-semibold text-yellow-800 dark:text-yellow-300">
                     Atenção
                   </p>
                   <p className="text-sm text-yellow-700 dark:text-yellow-400">
@@ -259,9 +259,9 @@ const EditInitialBalanceModal = ({ isOpen, onClose, onSuccess, account }) => {
 
             {/* Erro */}
             {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
+              <div className="rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
                 <div className="flex items-start space-x-3">
-                  <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+                  <AlertCircle className="h-5 w-5 flex-shrink-0 text-red-600 dark:text-red-400" />
                   <p className="text-sm text-red-700 dark:text-red-300">
                     {error}
                   </p>
@@ -270,12 +270,12 @@ const EditInitialBalanceModal = ({ isOpen, onClose, onSuccess, account }) => {
             )}
 
             {/* Botões */}
-            <div className="flex items-center justify-end space-x-3 pt-4 border-t border-light-border dark:border-dark-border">
+            <div className="flex items-center justify-end space-x-3 border-t border-light-border pt-4 dark:border-dark-border">
               <button
                 type="button"
                 onClick={handleClose}
                 disabled={loading}
-                className="px-6 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 card-theme dark:bg-gray-700 border border-light-border dark:border-dark-border rounded-xl hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="card-theme rounded-xl border border-light-border px-6 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-light-bg disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-border dark:bg-dark-bg dark:bg-gray-700 dark:text-gray-300 dark:text-gray-600 dark:hover:bg-gray-600"
               >
                 Cancelar
               </button>
@@ -286,16 +286,16 @@ const EditInitialBalanceModal = ({ isOpen, onClose, onSuccess, account }) => {
                   !formData.reason.trim() ||
                   isNaN(parseFloat(formData.newBalance))
                 }
-                className="inline-flex items-center px-6 py-2.5 text-sm font-semibold text-dark-text-primary bg-gradient-primary rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                className="text-dark-text-primary inline-flex items-center rounded-xl bg-gradient-primary px-6 py-2.5 text-sm font-semibold shadow-lg transition-all hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-light-surface dark:border-dark-surface mr-2"></div>
+                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-light-surface dark:border-dark-surface"></div>
                     Salvando...
                   </>
                 ) : (
                   <>
-                    <Save className="w-4 h-4 mr-2" />
+                    <Save className="mr-2 h-4 w-4" />
                     Salvar Alteração
                   </>
                 )}

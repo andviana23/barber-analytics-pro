@@ -19,6 +19,7 @@ Quando o usuário fazia logout no sistema hospedado no **Vercel**, a aplicação
 7. Loading ficava travado infinitamente
 
 **Por que só acontecia no Vercel?**
+
 - Latência de rede maior na produção
 - Race condition mais evidente com delays maiores
 - Em desenvolvimento local, tudo era muito rápido e o bug não aparecia
@@ -112,6 +113,7 @@ const fetchUserRole = async userSession => {
 ## 🧪 Como Testar
 
 ### Teste Local
+
 ```bash
 npm run dev
 # 1. Fazer login
@@ -120,6 +122,7 @@ npm run dev
 ```
 
 ### Teste em Produção (Vercel)
+
 ```bash
 git add .
 git commit -m "fix: Corrige loading infinito no logout (race condition)"
@@ -136,11 +139,13 @@ git push origin main
 ## ✨ Resultado
 
 ### ❌ Antes
+
 ```
 Click "Sair" → Loading infinito → Precisa limpar cache
 ```
 
 ### ✅ Depois
+
 ```
 Click "Sair" → Redirecionamento imediato → Login funciona normalmente
 ```

@@ -70,20 +70,15 @@ export const Alert = ({ type = 'info', message, title, icon: CustomIcon }) => {
   return (
     <div
       role="alert"
-      className={`
-        flex items-start gap-3 rounded-lg p-4 border
-        ${config.bgLight} ${config.bgDark}
-        ${config.borderLight} ${config.borderDark}
-        ${config.textLight} ${config.textDark}
-      `}
+      className={`flex items-start gap-3 rounded-lg border p-4 ${config.bgLight} ${config.bgDark} ${config.borderLight} ${config.borderDark} ${config.textLight} ${config.textDark} `}
     >
       {/* Ícone */}
-      <Icon className={`w-5 h-5 flex-shrink-0 mt-0.5 ${config.iconColor}`} />
+      <Icon className={`mt-0.5 h-5 w-5 flex-shrink-0 ${config.iconColor}`} />
 
       {/* Conteúdo */}
       <div className="flex-1 space-y-1">
         {title && (
-          <p className="font-semibold text-sm leading-tight">{title}</p>
+          <p className="text-sm font-semibold leading-tight">{title}</p>
         )}
         <p
           className={`text-sm leading-relaxed ${title ? '' : 'leading-tight'}`}

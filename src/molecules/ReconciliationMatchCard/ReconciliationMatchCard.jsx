@@ -153,10 +153,10 @@ const ReconciliationMatchCard = ({
   return (
     <div className={cardClasses}>
       {/* Header */}
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center min-w-0 flex-1">
+      <div className="mb-3 flex items-start justify-between">
+        <div className="flex min-w-0 flex-1 items-center">
           <Link
-            className={`w-5 h-5 mr-2 flex-shrink-0 text-${confidence.color}-500`}
+            className={`mr-2 h-5 w-5 flex-shrink-0 text-${confidence.color}-500`}
           />
           <div className="min-w-0 flex-1">
             <h3
@@ -164,13 +164,13 @@ const ReconciliationMatchCard = ({
             >
               Match #{id?.slice(0, 8)}
             </h3>
-            <p className="text-xs text-theme-secondary">
+            <p className="text-theme-secondary text-xs">
               Criado em {formatDateTime(created_at)}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center ml-2 flex-shrink-0 space-x-2">
+        <div className="ml-2 flex flex-shrink-0 items-center space-x-2">
           <StatusBadge
             status={
               matchStatus.color === 'green'
@@ -186,10 +186,10 @@ const ReconciliationMatchCard = ({
             <button
               type="button"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="p-1 hover:card-theme rounded"
+              className="hover:card-theme rounded p-1"
             >
               <ChevronRight
-                className={`w-4 h-4 text-gray-400 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                className={`h-4 w-4 text-gray-400 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
               />
             </button>
           )}
@@ -198,7 +198,7 @@ const ReconciliationMatchCard = ({
 
       {/* Confidence Score */}
       <div className="mb-3">
-        <div className="flex items-center justify-between mb-1">
+        <div className="mb-1 flex items-center justify-between">
           <span className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
             Confiança
           </span>
@@ -208,7 +208,7 @@ const ReconciliationMatchCard = ({
             {confidence_score}% - {confidence.label}
           </span>
         </div>
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+        <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
           <div
             className={confidenceBarClasses}
             style={{
@@ -219,14 +219,14 @@ const ReconciliationMatchCard = ({
       </div>
 
       {/* Resumo do Match */}
-      <div className="grid grid-cols-2 gap-3 mb-3">
+      <div className="mb-3 grid grid-cols-2 gap-3">
         {/* Transação Interna */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-          <div className="flex items-center mb-2">
+        <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
+          <div className="mb-2 flex items-center">
             {internal_transaction?.type === 'receita' ? (
-              <TrendingUp className="w-4 h-4 text-blue-500 mr-1" />
+              <TrendingUp className="mr-1 h-4 w-4 text-blue-500" />
             ) : (
-              <TrendingDown className="w-4 h-4 text-blue-500 mr-1" />
+              <TrendingDown className="mr-1 h-4 w-4 text-blue-500" />
             )}
             <span className="text-sm font-medium text-blue-700">
               Transação Interna
@@ -242,7 +242,7 @@ const ReconciliationMatchCard = ({
             </div>
             {internal_transaction?.description && (
               <div
-                className="text-xs text-blue-600 truncate"
+                className="truncate text-xs text-blue-600"
                 title={internal_transaction.description}
               >
                 {internal_transaction.description}
@@ -251,9 +251,9 @@ const ReconciliationMatchCard = ({
             {internal_transaction?.party_name && (
               <div className="flex items-center text-xs text-blue-600">
                 {internal_transaction.party_type === 'cliente' ? (
-                  <User className="w-3 h-3 mr-1" />
+                  <User className="mr-1 h-3 w-3" />
                 ) : (
-                  <Building className="w-3 h-3 mr-1" />
+                  <Building className="mr-1 h-3 w-3" />
                 )}
                 <span className="truncate">
                   {internal_transaction.party_name}
@@ -264,31 +264,31 @@ const ReconciliationMatchCard = ({
         </div>
 
         {/* Extrato Bancário */}
-        <div className="bg-light-bg dark:bg-dark-bg border border-light-border dark:border-dark-border rounded-lg p-3">
-          <div className="flex items-center mb-2">
-            <DollarSign className="w-4 h-4 text-theme-secondary mr-1" />
+        <div className="rounded-lg border border-light-border bg-light-bg p-3 dark:border-dark-border dark:bg-dark-bg">
+          <div className="mb-2 flex items-center">
+            <DollarSign className="text-theme-secondary mr-1 h-4 w-4" />
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
               Extrato Bancário
             </span>
           </div>
 
           <div className="space-y-1">
-            <div className="font-semibold text-theme-primary">
+            <div className="text-theme-primary font-semibold">
               {formatCurrency(bank_statement?.amount)}
             </div>
-            <div className="text-xs text-theme-secondary">
+            <div className="text-theme-secondary text-xs">
               {formatDate(bank_statement?.transaction_date)}
             </div>
             {bank_statement?.description && (
               <div
-                className="text-xs text-theme-secondary truncate"
+                className="text-theme-secondary truncate text-xs"
                 title={bank_statement.description}
               >
                 {bank_statement.description}
               </div>
             )}
             {bank_statement?.balance_after && (
-              <div className="text-xs text-theme-secondary">
+              <div className="text-theme-secondary text-xs">
                 Saldo: {formatCurrency(bank_statement.balance_after)}
               </div>
             )}
@@ -298,9 +298,9 @@ const ReconciliationMatchCard = ({
 
       {/* Diferenças (se houver) */}
       {hasSignificantDifferences && (
-        <div className="mb-3 p-2 bg-amber-50 border border-amber-200 rounded-lg">
-          <div className="flex items-center mb-1">
-            <AlertTriangle className="w-4 h-4 text-amber-500 mr-1" />
+        <div className="mb-3 rounded-lg border border-amber-200 bg-amber-50 p-2">
+          <div className="mb-1 flex items-center">
+            <AlertTriangle className="mr-1 h-4 w-4 text-amber-500" />
             <span className="text-sm font-medium text-amber-700">
               Diferenças Identificadas
             </span>
@@ -309,14 +309,14 @@ const ReconciliationMatchCard = ({
           <div className="space-y-1">
             {Math.abs(valueDifference) > 0.01 && (
               <div className="flex items-center text-xs text-amber-600">
-                <ArrowUpDown className="w-3 h-3 mr-1" />
+                <ArrowUpDown className="mr-1 h-3 w-3" />
                 Valor: {valueDifference > 0 ? '+' : ''}
                 {formatCurrency(valueDifference)}
               </div>
             )}
             {Math.abs(dateDifference) > 0 && (
               <div className="flex items-center text-xs text-amber-600">
-                <Calendar className="w-3 h-3 mr-1" />
+                <Calendar className="mr-1 h-3 w-3" />
                 Data: {dateDifference > 0 ? '+' : ''}
                 {dateDifference} dias
               </div>
@@ -327,14 +327,14 @@ const ReconciliationMatchCard = ({
 
       {/* Detalhes Expandidos */}
       {isExpanded && (
-        <div className="border-t border-light-border dark:border-dark-border pt-3 mt-3">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <div className="mt-3 border-t border-light-border pt-3 dark:border-dark-border">
+          <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
             {/* Detalhes da Transação Interna */}
             <div>
-              <h4 className="font-medium text-theme-primary mb-2">
+              <h4 className="text-theme-primary mb-2 font-medium">
                 Transação Interna
               </h4>
-              <div className="space-y-1 text-theme-secondary">
+              <div className="text-theme-secondary space-y-1">
                 <div>ID: {internal_transaction?.id?.slice(0, 16)}...</div>
                 <div>Tipo: {internal_transaction?.type || 'N/A'}</div>
                 <div>Status: {internal_transaction?.status || 'N/A'}</div>
@@ -349,10 +349,10 @@ const ReconciliationMatchCard = ({
 
             {/* Detalhes do Extrato */}
             <div>
-              <h4 className="font-medium text-theme-primary mb-2">
+              <h4 className="text-theme-primary mb-2 font-medium">
                 Extrato Bancário
               </h4>
-              <div className="space-y-1 text-theme-secondary">
+              <div className="text-theme-secondary space-y-1">
                 <div>ID: {bank_statement?.id?.slice(0, 16)}...</div>
                 <div>Tipo: {bank_statement?.type || 'N/A'}</div>
                 <div>Hash: {bank_statement?.source_hash?.slice(0, 16)}...</div>
@@ -365,12 +365,12 @@ const ReconciliationMatchCard = ({
 
           {/* Algoritmo de Match */}
           {differences && Object.keys(differences).length > 0 && (
-            <div className="mt-4 p-3 bg-light-bg dark:bg-dark-bg rounded-lg">
-              <h4 className="font-medium text-theme-primary mb-2 flex items-center">
-                <Target className="w-4 h-4 mr-1" />
+            <div className="mt-4 rounded-lg bg-light-bg p-3 dark:bg-dark-bg">
+              <h4 className="text-theme-primary mb-2 flex items-center font-medium">
+                <Target className="mr-1 h-4 w-4" />
                 Análise do Match
               </h4>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+              <div className="grid grid-cols-2 gap-2 text-xs md:grid-cols-4">
                 {differences.amount_match && (
                   <div>
                     <span className="text-theme-secondary">Valor:</span>
@@ -419,14 +419,14 @@ const ReconciliationMatchCard = ({
 
       {/* Ações */}
       {showActions && status === 'Pendente' && (
-        <div className="flex items-center justify-end space-x-2 mt-3 pt-3 border-t border-light-border dark:border-dark-border">
+        <div className="mt-3 flex items-center justify-end space-x-2 border-t border-light-border pt-3 dark:border-dark-border">
           {onViewDetails && (
             <button
               type="button"
               onClick={() => onViewDetails(match)}
-              className="px-3 py-1.5 text-sm text-theme-secondary hover:text-theme-primary hover:card-theme rounded-md flex items-center"
+              className="text-theme-secondary hover:text-theme-primary hover:card-theme flex items-center rounded-md px-3 py-1.5 text-sm"
             >
-              <Eye className="w-4 h-4 mr-1" />
+              <Eye className="mr-1 h-4 w-4" />
               Detalhes
             </button>
           )}
@@ -435,9 +435,9 @@ const ReconciliationMatchCard = ({
             <button
               type="button"
               onClick={() => onAdjust(match)}
-              className="px-3 py-1.5 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-md flex items-center"
+              className="flex items-center rounded-md px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 hover:text-blue-800"
             >
-              <Edit3 className="w-4 h-4 mr-1" />
+              <Edit3 className="mr-1 h-4 w-4" />
               Ajustar
             </button>
           )}
@@ -446,9 +446,9 @@ const ReconciliationMatchCard = ({
             <button
               type="button"
               onClick={() => onReject(match)}
-              className="px-3 py-1.5 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md flex items-center"
+              className="flex items-center rounded-md px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 hover:text-red-800"
             >
-              <X className="w-4 h-4 mr-1" />
+              <X className="mr-1 h-4 w-4" />
               Rejeitar
             </button>
           )}
@@ -457,9 +457,9 @@ const ReconciliationMatchCard = ({
             <button
               type="button"
               onClick={() => onConfirm(match)}
-              className="px-3 py-1.5 text-sm bg-green-600 text-dark-text-primary hover:bg-green-700 rounded-md flex items-center"
+              className="text-dark-text-primary flex items-center rounded-md bg-green-600 px-3 py-1.5 text-sm hover:bg-green-700"
             >
-              <Check className="w-4 h-4 mr-1" />
+              <Check className="mr-1 h-4 w-4" />
               Confirmar
             </button>
           )}
@@ -646,7 +646,7 @@ export const ReconciliationMatchCardPreview = () => {
     );
   };
   return (
-    <div className="space-y-4 p-4 max-w-4xl">
+    <div className="max-w-4xl space-y-4 p-4">
       <h3 className="text-lg font-semibold">ReconciliationMatchCard Preview</h3>
 
       {mockMatches.map(match => (
@@ -661,7 +661,7 @@ export const ReconciliationMatchCardPreview = () => {
       ))}
 
       <div className="mt-6">
-        <h4 className="text-md font-medium mb-2">Modo Compacto:</h4>
+        <h4 className="text-md mb-2 font-medium">Modo Compacto:</h4>
         <ReconciliationMatchCard
           match={mockMatches[0]}
           onConfirm={m => handleAction('Confirmar', m)}

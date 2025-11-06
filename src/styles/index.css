@@ -46,7 +46,7 @@
   }
 
   body {
-    @apply bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary;
+    @apply bg-light-bg text-text-light-primary dark:bg-dark-bg dark:text-text-dark-primary;
     @apply transition-colors duration-300;
   }
 
@@ -57,11 +57,11 @@
   }
 
   .custom-scrollbar::-webkit-scrollbar-track {
-    @apply bg-dark-bg rounded-lg;
+    @apply rounded-lg bg-dark-bg;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-dark-border hover:bg-primary/50 rounded-lg transition-colors;
+    @apply rounded-lg bg-dark-border transition-colors hover:bg-primary/50;
   }
 
   /* Scrollbar para overflow geral em dark mode */
@@ -75,7 +75,7 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-gray-300 dark:bg-dark-border hover:bg-gray-400 dark:hover:bg-primary/50 rounded-full transition-colors;
+    @apply rounded-full bg-gray-300 transition-colors hover:bg-gray-400 dark:bg-dark-border dark:hover:bg-primary/50;
   }
 }
 
@@ -86,7 +86,7 @@
   }
 
   .card-theme {
-    @apply bg-light-surface dark:bg-dark-surface border border-light-border dark:border-dark-border;
+    @apply border border-light-border bg-light-surface dark:border-dark-border dark:bg-dark-surface;
   }
 
   .text-theme-primary {
@@ -98,7 +98,7 @@
   }
 
   .btn-theme-primary {
-    @apply bg-primary hover:bg-primary-hover text-white;
+    @apply bg-primary text-white hover:bg-primary-hover;
     @apply transition-colors duration-300;
   }
 
@@ -106,19 +106,19 @@
     @apply bg-light-surface dark:bg-dark-surface;
     @apply border border-light-border dark:border-dark-border;
     @apply text-text-light-primary dark:text-text-dark-primary;
-    @apply hover:bg-primary/10 hover:border-primary/20;
+    @apply hover:border-primary/20 hover:bg-primary/10;
   }
 
   /* Inputs e selects com tema */
   .input-theme {
-    @apply w-full px-3 py-2.5 rounded-lg;
+    @apply w-full rounded-lg px-3 py-2.5;
     @apply bg-light-surface dark:bg-dark-surface;
     @apply border border-light-border dark:border-dark-border;
     @apply text-text-light-primary dark:text-text-dark-primary;
     @apply placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary;
-    @apply focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary;
+    @apply focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/50;
     @apply transition-all duration-200;
-    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .input-theme:hover:not(:disabled) {
@@ -133,7 +133,7 @@
   /* Select com tema - melhorar aparência */
   select.input-theme {
     @apply cursor-pointer;
-    @apply bg-no-repeat bg-right;
+    @apply bg-right bg-no-repeat;
   }
 
   /* Custom Scrollbar - Premium Style */

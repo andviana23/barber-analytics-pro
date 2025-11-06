@@ -9,6 +9,7 @@
 ## 🔍 Análise do Problema
 
 ### Sintomas
+
 1. Usuário clica em "Sair"
 2. Sistema fica preso em tela de loading "Verificando permissões..."
 3. Única solução: limpar cache do navegador
@@ -23,8 +24,8 @@
 ```javascript
 // 1. Usuário clica em "Sair"
 const signOut = async () => {
-  setLoading(true);  // ✅ Loading ativado
-  await supabase.auth.signOut();  // ✅ Logout no Supabase
+  setLoading(true); // ✅ Loading ativado
+  await supabase.auth.signOut(); // ✅ Logout no Supabase
   // ❌ NUNCA executa setLoading(false) PORQUE:
   // setLoading(false) está no finally
 };
@@ -55,12 +56,13 @@ supabase.auth.onAuthStateChange(async (event, session) => {
 
 **Diferenças entre Dev e Produção:**
 
-| Ambiente       | Latência Supabase | Latência Evento | Resultado                           |
-|----------------|-------------------|-----------------|-------------------------------------|
-| **Local (Dev)**| ~10-50ms          | Instantâneo     | Race condition não ocorre          |
-| **Vercel**     | ~200-500ms        | Lento           | Race condition **sempre** ocorre   |
+| Ambiente        | Latência Supabase | Latência Evento | Resultado                        |
+| --------------- | ----------------- | --------------- | -------------------------------- |
+| **Local (Dev)** | ~10-50ms          | Instantâneo     | Race condition não ocorre        |
+| **Vercel**      | ~200-500ms        | Lento           | Race condition **sempre** ocorre |
 
 **No Vercel:**
+
 - Latência de rede maior → `supabase.auth.signOut()` demora mais
 - Evento `SIGNED_OUT` demora para propagar
 - `signOut()` termina e seta `loading=false` ANTES do evento
@@ -112,7 +114,7 @@ const fetchUserRole = async userSession => {
     setReceptionistStatus(false);
     return; // ← NÃO tentar buscar dados do banco
   }
-  
+
   // ... resto do código
 };
 ```
@@ -151,6 +153,7 @@ supabase.auth.onAuthStateChange(async (event, session) => {
 ## 🧪 Testes de Validação
 
 ### Teste 1: Logout Local
+
 ```bash
 # 1. Fazer login
 # 2. Clicar em "Sair"
@@ -158,6 +161,7 @@ supabase.auth.onAuthStateChange(async (event, session) => {
 ```
 
 ### Teste 2: Logout em Produção (Vercel)
+
 ```bash
 # 1. Deploy no Vercel
 # 2. Fazer login como Admin/Gerente
@@ -167,6 +171,7 @@ supabase.auth.onAuthStateChange(async (event, session) => {
 ```
 
 ### Teste 3: Verificar Console
+
 ```javascript
 // Deve aparecer:
 // 🔔 Auth State Change: SIGNED_OUT Session exists: false
@@ -247,14 +252,16 @@ const fetchUserRole = async userSession => {
 ## 🎯 Resultado Esperado
 
 ### Antes (BUGADO)
+
 ```
-1. Click "Sair" 
+1. Click "Sair"
    → Loading infinito
    → "Verificando permissões..."
    → Usuário precisa limpar cache
 ```
 
 ### Depois (CORRIGIDO)
+
 ```
 1. Click "Sair"
    → Estado limpo imediatamente

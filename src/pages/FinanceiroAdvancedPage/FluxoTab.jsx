@@ -169,12 +169,12 @@ const FluxoTab = ({ globalFilters, units = [] }) => {
   return (
     <div className="space-y-6">
       {/* Controles - Dark Mode */}
-      <div className="card-theme dark:bg-dark-surface rounded-lg shadow-sm border border-light-border dark:border-dark-border p-6">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+      <div className="card-theme rounded-lg border border-light-border p-6 shadow-sm dark:border-dark-border dark:bg-dark-surface">
+        <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
           {/* Filtros de período */}
-          <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:space-x-4 sm:space-y-0">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                 Período de Análise
               </label>
               <DateRangePicker
@@ -189,13 +189,13 @@ const FluxoTab = ({ globalFilters, units = [] }) => {
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => handlePeriodNavigation('prev')}
-                className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 card-theme dark:bg-gray-700 border border-light-border dark:border-dark-border rounded-md hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="card-theme rounded-md border border-light-border px-3 py-2 text-sm font-medium text-gray-700 hover:bg-light-bg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-dark-bg dark:bg-gray-700 dark:text-gray-300 dark:text-gray-600 dark:hover:bg-gray-600"
               >
                 ← Anterior
               </button>
               <button
                 onClick={() => handlePeriodNavigation('next')}
-                className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 card-theme dark:bg-gray-700 border border-light-border dark:border-dark-border rounded-md hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                className="card-theme rounded-md border border-light-border px-3 py-2 text-sm font-medium text-gray-700 hover:bg-light-bg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 dark:border-dark-border dark:bg-dark-bg dark:bg-gray-700 dark:text-gray-300 dark:text-gray-600 dark:hover:bg-gray-600"
                 disabled={new Date(dateRange.endDate) >= new Date()}
               >
                 Próximo →
@@ -208,7 +208,7 @@ const FluxoTab = ({ globalFilters, units = [] }) => {
             <button
               onClick={refreshSummary}
               disabled={loading}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 card-theme dark:bg-gray-700 border border-light-border dark:border-dark-border rounded-md hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              className="card-theme rounded-md border border-light-border px-4 py-2 text-sm font-medium text-gray-700 hover:bg-light-bg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 dark:border-dark-border dark:bg-dark-bg dark:bg-gray-700 dark:text-gray-300 dark:text-gray-600 dark:hover:bg-gray-600"
             >
               Atualizar
             </button>
@@ -218,14 +218,14 @@ const FluxoTab = ({ globalFilters, units = [] }) => {
               <button
                 onClick={() => handleExport('csv')}
                 disabled={exporting || !entries || entries.length === 0}
-                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 card-theme dark:bg-gray-700 border border-light-border dark:border-dark-border rounded-md hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                className="card-theme flex items-center gap-2 rounded-md border border-light-border px-3 py-2 text-sm font-medium text-gray-700 hover:bg-light-bg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 dark:border-dark-border dark:bg-dark-bg dark:bg-gray-700 dark:text-gray-300 dark:text-gray-600 dark:hover:bg-gray-600"
                 data-testid="btn-export-csv"
                 title="Exportar como CSV"
               >
                 {exporting ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <FileText className="w-4 h-4" />
+                  <FileText className="h-4 w-4" />
                 )}
                 CSV
               </button>
@@ -233,14 +233,14 @@ const FluxoTab = ({ globalFilters, units = [] }) => {
               <button
                 onClick={() => handleExport('excel')}
                 disabled={exporting || !entries || entries.length === 0}
-                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 card-theme dark:bg-gray-700 border border-light-border dark:border-dark-border rounded-md hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                className="card-theme flex items-center gap-2 rounded-md border border-light-border px-3 py-2 text-sm font-medium text-gray-700 hover:bg-light-bg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 dark:border-dark-border dark:bg-dark-bg dark:bg-gray-700 dark:text-gray-300 dark:text-gray-600 dark:hover:bg-gray-600"
                 data-testid="btn-export-excel"
                 title="Exportar como Excel"
               >
                 {exporting ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <FileSpreadsheet className="w-4 h-4" />
+                  <FileSpreadsheet className="h-4 w-4" />
                 )}
                 Excel
               </button>
@@ -248,14 +248,14 @@ const FluxoTab = ({ globalFilters, units = [] }) => {
               <button
                 onClick={() => handleExport('pdf')}
                 disabled={exporting || !entries || entries.length === 0}
-                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-dark-text-primary bg-blue-600 dark:bg-blue-500 rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                className="text-dark-text-primary flex items-center gap-2 rounded-md bg-blue-600 px-3 py-2 text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 dark:bg-blue-500 dark:hover:bg-blue-600"
                 data-testid="btn-export-pdf"
                 title="Exportar como PDF"
               >
                 {exporting ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <Download className="w-4 h-4" />
+                  <Download className="h-4 w-4" />
                 )}
                 PDF
               </button>
@@ -264,16 +264,16 @@ const FluxoTab = ({ globalFilters, units = [] }) => {
         </div>
 
         {/* Info do período selecionado */}
-        <div className="mt-4 pt-4 border-t border-light-border dark:border-dark-border">
-          <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+        <div className="mt-4 border-t border-light-border pt-4 dark:border-dark-border">
+          <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
             Analisando período de{' '}
-            <span className="font-medium text-theme-primary dark:text-dark-text-primary">
+            <span className="text-theme-primary dark:text-dark-text-primary font-medium">
               {format(new Date(dateRange.startDate), 'dd/MM/yyyy', {
                 locale: ptBR,
               })}
             </span>{' '}
             até{' '}
-            <span className="font-medium text-theme-primary dark:text-dark-text-primary">
+            <span className="text-theme-primary dark:text-dark-text-primary font-medium">
               {format(new Date(dateRange.endDate), 'dd/MM/yyyy', {
                 locale: ptBR,
               })}
@@ -301,26 +301,26 @@ const FluxoTab = ({ globalFilters, units = [] }) => {
       />
 
       {/* Gráfico do Fluxo - Dark Mode */}
-      <div className="card-theme dark:bg-dark-surface rounded-lg shadow-sm border border-light-border dark:border-dark-border p-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-          <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+      <div className="card-theme rounded-lg border border-light-border p-6 shadow-sm dark:border-dark-border dark:bg-dark-surface">
+        <div className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+          <h3 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
             Fluxo de Caixa Acumulado
           </h3>
           <div className="flex flex-wrap items-center gap-4 text-sm">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-green-500 dark:bg-green-400 rounded-full"></div>
+              <div className="h-3 w-3 rounded-full bg-green-500 dark:bg-green-400"></div>
               <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 Entradas
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-red-500 dark:bg-red-400 rounded-full"></div>
+              <div className="h-3 w-3 rounded-full bg-red-500 dark:bg-red-400"></div>
               <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 Saídas
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-blue-500 dark:bg-blue-400 rounded-full"></div>
+              <div className="h-3 w-3 rounded-full bg-blue-500 dark:bg-blue-400"></div>
               <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 Saldo
               </span>
@@ -329,10 +329,10 @@ const FluxoTab = ({ globalFilters, units = [] }) => {
         </div>
 
         {error ? (
-          <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-            <div className="w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-4">
+          <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
               <svg
-                className="w-6 h-6 text-red-600 dark:text-red-400"
+                className="h-6 w-6 text-red-600 dark:text-red-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -345,15 +345,15 @@ const FluxoTab = ({ globalFilters, units = [] }) => {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-2">
+            <h3 className="text-theme-primary dark:text-dark-text-primary mb-2 text-lg font-semibold">
               Erro ao carregar fluxo
             </h3>
-            <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-4">
+            <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-4 text-sm">
               {error}
             </p>
             <button
               onClick={refetch}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-dark-text-primary rounded-lg text-sm font-medium transition-colors"
+              className="text-dark-text-primary rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium transition-colors hover:bg-blue-700"
             >
               Tentar novamente
             </button>
@@ -375,10 +375,10 @@ const FluxoTab = ({ globalFilters, units = [] }) => {
 
       {/* Loading Overlay - Dark Mode */}
       {loading && (
-        <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm">
-          <div className="card-theme dark:bg-dark-surface rounded-lg p-6 shadow-xl border border-light-border dark:border-dark-border">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm dark:bg-black/70">
+          <div className="card-theme rounded-lg border border-light-border p-6 shadow-xl dark:border-dark-border dark:bg-dark-surface">
             <div className="flex items-center gap-3">
-              <div className="animate-spin rounded-full h-6 w-6 border-2 border-light-border dark:border-dark-border border-t-blue-600 dark:border-t-blue-400"></div>
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-light-border border-t-blue-600 dark:border-dark-border dark:border-t-blue-400"></div>
               <span className="text-theme-primary dark:text-dark-text-primary font-medium">
                 Carregando fluxo de caixa...
               </span>

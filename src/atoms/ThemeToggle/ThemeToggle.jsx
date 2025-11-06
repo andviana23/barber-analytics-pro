@@ -20,20 +20,17 @@ export function ThemeToggle() {
       {/* Botão de toggle rápido */}
       <button
         onClick={toggleTheme}
-        className="p-2 rounded-lg transition-colors duration-300 card-theme border border-light-border dark:border-dark-border hover:bg-primary/10 text-text-light-primary dark:text-text-dark-primary"
+        className="card-theme rounded-lg border border-light-border p-2 text-text-light-primary transition-colors duration-300 hover:bg-primary/10 dark:border-dark-border dark:text-text-dark-primary"
         title={`Alternar tema (atual: ${theme})`}
       >
         {getIcon()}
       </button>
 
       {/* Seletor de tema completo */}
-      <div className="flex items-center rounded-lg card-theme border border-light-border dark:border-dark-border p-1">
+      <div className="card-theme flex items-center rounded-lg border border-light-border p-1 dark:border-dark-border">
         <button
           onClick={() => setTheme('light')}
-          className={`
-            p-2 rounded-md transition-colors duration-300
-            ${theme === 'light' ? 'bg-primary text-white' : 'text-text-light-secondary dark:text-text-dark-secondary hover:bg-primary/10'}
-          `}
+          className={`rounded-md p-2 transition-colors duration-300 ${theme === 'light' ? 'bg-primary text-white' : 'text-text-light-secondary hover:bg-primary/10 dark:text-text-dark-secondary'} `}
           title="Modo claro"
         >
           <Sun className="h-4 w-4" />
@@ -41,10 +38,7 @@ export function ThemeToggle() {
 
         <button
           onClick={() => setTheme('dark')}
-          className={`
-            p-2 rounded-md transition-colors duration-300
-            ${theme === 'dark' ? 'bg-primary text-white' : 'text-text-light-secondary dark:text-text-dark-secondary hover:bg-primary/10'}
-          `}
+          className={`rounded-md p-2 transition-colors duration-300 ${theme === 'dark' ? 'bg-primary text-white' : 'text-text-light-secondary hover:bg-primary/10 dark:text-text-dark-secondary'} `}
           title="Modo escuro"
         >
           <Moon className="h-4 w-4" />
@@ -52,10 +46,7 @@ export function ThemeToggle() {
 
         <button
           onClick={() => setTheme('system')}
-          className={`
-            p-2 rounded-md transition-colors duration-300
-            ${theme === 'system' ? 'bg-primary text-white' : 'text-text-light-secondary dark:text-text-dark-secondary hover:bg-primary/10'}
-          `}
+          className={`rounded-md p-2 transition-colors duration-300 ${theme === 'system' ? 'bg-primary text-white' : 'text-text-light-secondary hover:bg-primary/10 dark:text-text-dark-secondary'} `}
           title="Seguir sistema"
         >
           <Monitor className="h-4 w-4" />
@@ -71,7 +62,7 @@ export function ThemeToggleCompact() {
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-lg transition-all duration-300 card-theme border border-light-border dark:border-dark-border hover:bg-primary/10 hover:border-primary/20 text-text-light-primary dark:text-text-dark-primary hover:text-primary shadow-sm hover:shadow-md"
+      className="card-theme rounded-lg border border-light-border p-2 text-text-light-primary shadow-sm transition-all duration-300 hover:border-primary/20 hover:bg-primary/10 hover:text-primary hover:shadow-md dark:border-dark-border dark:text-text-dark-primary"
       title={`Alternar para modo ${actualTheme === 'light' ? 'escuro' : 'claro'}`}
     >
       {actualTheme === 'light' ? (

@@ -111,11 +111,11 @@ export function ProfessionalCard({
       className={`p-6 transition-all duration-300 hover:shadow-lg ${!professional.is_active ? 'opacity-60' : ''}`}
     >
       {/* Header do Card */}
-      <div className="flex items-start justify-between mb-4">
+      <div className="mb-4 flex items-start justify-between">
         <div className="flex items-center gap-3">
           {/* Avatar */}
-          <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
-            <User className="h-6 w-6 text-dark-text-primary" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary">
+            <User className="text-dark-text-primary h-6 w-6" />
           </div>
 
           {/* Nome e Status */}
@@ -123,17 +123,17 @@ export function ProfessionalCard({
             <h3 className="font-semibold text-text-light-primary dark:text-text-dark-primary">
               {professional.name}
             </h3>
-            <div className="flex items-center gap-2 mt-1">
+            <div className="mt-1 flex items-center gap-2">
               <span
-                className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(professional.role)}`}
+                className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${getRoleColor(professional.role)}`}
               >
                 {professional.role === 'admin' && (
-                  <Crown className="h-3 w-3 mr-1" />
+                  <Crown className="mr-1 h-3 w-3" />
                 )}
                 {getRoleDisplay(professional.role)}
               </span>
               {!professional.is_active && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-200">
                   Inativo
                 </span>
               )}
@@ -179,7 +179,7 @@ export function ProfessionalCard({
       </div>
 
       {/* Informações Básicas */}
-      <div className="space-y-3 mb-4">
+      <div className="mb-4 space-y-3">
         {professional.user?.email && (
           <div className="flex items-center gap-2 text-sm">
             <Mail className="h-4 w-4 text-text-light-secondary dark:text-text-dark-secondary" />
@@ -210,22 +210,22 @@ export function ProfessionalCard({
 
       {/* Estatísticas de Performance */}
       {professional.is_active && (
-        <div className="border-t border-light-border dark:border-dark-border pt-4">
-          <h4 className="font-medium text-text-light-primary dark:text-text-dark-primary mb-3 text-sm">
+        <div className="border-t border-light-border pt-4 dark:border-dark-border">
+          <h4 className="mb-3 text-sm font-medium text-text-light-primary dark:text-text-dark-primary">
             Performance do Mês
           </h4>
 
           {loadingStats ? (
-            <div className="text-center py-4">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary mx-auto"></div>
-              <p className="text-xs text-text-light-secondary dark:text-text-dark-secondary mt-2">
+            <div className="py-4 text-center">
+              <div className="mx-auto h-5 w-5 animate-spin rounded-full border-b-2 border-primary"></div>
+              <p className="mt-2 text-xs text-text-light-secondary dark:text-text-dark-secondary">
                 Carregando...
               </p>
             </div>
           ) : stats ? (
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center">
-                <div className="flex items-center justify-center gap-1 mb-1">
+                <div className="mb-1 flex items-center justify-center gap-1">
                   <Calendar className="h-3 w-3 text-primary" />
                   <span className="text-xs text-text-light-secondary dark:text-text-dark-secondary">
                     Atendimentos
@@ -237,13 +237,13 @@ export function ProfessionalCard({
               </div>
 
               <div className="text-center">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <DollarSign className="h-3 w-3 text-success" />
+                <div className="mb-1 flex items-center justify-center gap-1">
+                  <DollarSign className="text-success h-3 w-3" />
                   <span className="text-xs text-text-light-secondary dark:text-text-dark-secondary">
                     Faturamento
                   </span>
                 </div>
-                <p className="font-semibold text-success">
+                <p className="text-success font-semibold">
                   R${' '}
                   {stats.faturamentoGerado.toLocaleString('pt-BR', {
                     minimumFractionDigits: 2,
@@ -252,13 +252,13 @@ export function ProfessionalCard({
               </div>
 
               <div className="text-center">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <DollarSign className="h-3 w-3 text-info" />
+                <div className="mb-1 flex items-center justify-center gap-1">
+                  <DollarSign className="text-info h-3 w-3" />
                   <span className="text-xs text-text-light-secondary dark:text-text-dark-secondary">
                     Ticket Médio
                   </span>
                 </div>
-                <p className="font-semibold text-info">
+                <p className="text-info font-semibold">
                   R${' '}
                   {stats.ticketMedio.toLocaleString('pt-BR', {
                     minimumFractionDigits: 2,
@@ -267,19 +267,19 @@ export function ProfessionalCard({
               </div>
 
               <div className="text-center">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <Clock className="h-3 w-3 text-warning" />
+                <div className="mb-1 flex items-center justify-center gap-1">
+                  <Clock className="text-warning h-3 w-3" />
                   <span className="text-xs text-text-light-secondary dark:text-text-dark-secondary">
                     Tempo Médio
                   </span>
                 </div>
-                <p className="font-semibold text-warning">
+                <p className="text-warning font-semibold">
                   {stats.tempoMedioAtendimento}min
                 </p>
               </div>
             </div>
           ) : (
-            <div className="text-center py-2">
+            <div className="py-2 text-center">
               <p className="text-xs text-text-light-secondary dark:text-text-dark-secondary">
                 Sem dados de performance
               </p>
@@ -290,7 +290,7 @@ export function ProfessionalCard({
 
       {/* Status da Fila (apenas para profissionais ativos) */}
       {professional.is_active && stats && (
-        <div className="border-t border-light-border dark:border-dark-border pt-3 mt-3">
+        <div className="mt-3 border-t border-light-border pt-3 dark:border-dark-border">
           <div className="flex items-center justify-between">
             <span className="text-xs text-text-light-secondary dark:text-text-dark-secondary">
               Status na Fila:
@@ -300,7 +300,7 @@ export function ProfessionalCard({
             </span>
           </div>
           {stats.atendimentosHoje > 0 && (
-            <div className="flex items-center justify-between mt-1">
+            <div className="mt-1 flex items-center justify-between">
               <span className="text-xs text-text-light-secondary dark:text-text-dark-secondary">
                 Hoje:
               </span>

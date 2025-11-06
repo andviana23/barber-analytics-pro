@@ -101,23 +101,23 @@ export function LoginPage() {
     }
   };
   return (
-    <div className="h-screen flex items-center justify-center bg-gradient-to-br from-light-bg via-light-surface to-light-bg dark:from-dark-bg dark:via-dark-surface dark:to-dark-bg px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="relative flex h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-light-bg via-light-surface to-light-bg px-4 dark:from-dark-bg dark:via-dark-surface dark:to-dark-bg sm:px-6 lg:px-8">
       {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/5 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-primary/5 rounded-full blur-3xl animate-pulse delay-1000" />
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -right-40 -top-40 h-80 w-80 animate-pulse rounded-full bg-primary/5 blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 h-80 w-80 animate-pulse rounded-full bg-primary/5 blur-3xl delay-1000" />
       </div>
 
       {/* Login Container */}
-      <div className="w-full max-w-md space-y-4 relative z-10">
+      <div className="relative z-10 w-full max-w-md space-y-4">
         {/* Header with Logo */}
-        <div className="text-center animate-fade-in-down">
+        <div className="animate-fade-in-down text-center">
           {/* Logo */}
-          <div className="flex justify-center mb-4">
+          <div className="mb-4 flex justify-center">
             <img
               src="/logo.svg"
               alt="Barber Analytics Pro"
-              className="h-32 sm:h-36 w-auto object-contain"
+              className="h-32 w-auto object-contain sm:h-36"
               onError={e => {
                 e.target.style.display = 'none';
                 e.target.nextElementSibling.style.display = 'flex';
@@ -125,12 +125,12 @@ export function LoginPage() {
             />
             {/* Fallback Logo */}
             <div className="hidden items-center justify-center">
-              <Sparkles className="w-28 h-28 text-primary" />
+              <Sparkles className="h-28 w-28 text-primary" />
             </div>
           </div>
 
           {/* Title & Subtitle */}
-          <h1 className="text-xl sm:text-2xl font-bold text-theme-primary mb-1.5 tracking-tight">
+          <h1 className="text-theme-primary mb-1.5 text-xl font-bold tracking-tight sm:text-2xl">
             Bem-vindo de volta
           </h1>
           <p className="text-theme-secondary text-xs">
@@ -139,20 +139,20 @@ export function LoginPage() {
         </div>
 
         {/* Login Form Card */}
-        <div className="card-theme rounded-2xl shadow-2xl border animate-fade-in-up">
-          <div className="p-5 sm:p-6 space-y-4">
+        <div className="card-theme animate-fade-in-up rounded-2xl border shadow-2xl">
+          <div className="space-y-4 p-5 sm:p-6">
             <form className="space-y-3.5" onSubmit={handleSubmit}>
               {/* Email Field */}
               <div className="space-y-1.5">
                 <label
                   htmlFor="email"
-                  className="block text-xs font-semibold text-theme-primary"
+                  className="text-theme-primary block text-xs font-semibold"
                 >
                   Email
                 </label>
-                <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-4 w-4 text-theme-secondary group-focus-within:text-primary transition-colors duration-200" />
+                <div className="group relative">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <Mail className="text-theme-secondary h-4 w-4 transition-colors duration-200 group-focus-within:text-primary" />
                   </div>
                   <input
                     id="email"
@@ -162,7 +162,7 @@ export function LoginPage() {
                     required
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="input-theme pl-10 h-10 text-sm transition-all duration-200"
+                    className="input-theme h-10 pl-10 text-sm transition-all duration-200"
                     placeholder="seu@email.com"
                     data-testid="email"
                   />
@@ -173,13 +173,13 @@ export function LoginPage() {
               <div className="space-y-1.5">
                 <label
                   htmlFor="password"
-                  className="block text-xs font-semibold text-theme-primary"
+                  className="text-theme-primary block text-xs font-semibold"
                 >
                   Senha
                 </label>
-                <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-4 w-4 text-theme-secondary group-focus-within:text-primary transition-colors duration-200" />
+                <div className="group relative">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <Lock className="text-theme-secondary h-4 w-4 transition-colors duration-200 group-focus-within:text-primary" />
                   </div>
                   <input
                     id="password"
@@ -189,22 +189,22 @@ export function LoginPage() {
                     required
                     value={formData.password}
                     onChange={handleInputChange}
-                    className="input-theme pl-10 pr-10 h-10 text-sm transition-all duration-200"
+                    className="input-theme h-10 pl-10 pr-10 text-sm transition-all duration-200"
                     placeholder="••••••••"
                     data-testid="password"
                   />
                   <button
                     type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center hover:scale-110 transition-transform duration-200"
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 transition-transform duration-200 hover:scale-110"
                     onClick={() => setShowPassword(!showPassword)}
                     aria-label={
                       showPassword ? 'Ocultar senha' : 'Mostrar senha'
                     }
                   >
                     {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-theme-secondary hover:text-theme-primary transition-colors duration-200" />
+                      <EyeOff className="text-theme-secondary hover:text-theme-primary h-4 w-4 transition-colors duration-200" />
                     ) : (
-                      <Eye className="h-4 w-4 text-theme-secondary hover:text-theme-primary transition-colors duration-200" />
+                      <Eye className="text-theme-secondary hover:text-theme-primary h-4 w-4 transition-colors duration-200" />
                     )}
                   </button>
                 </div>
@@ -212,11 +212,11 @@ export function LoginPage() {
 
               {/* Error Message */}
               {error && (
-                <div className="bg-feedback-light-error/10 dark:bg-feedback-dark-error/10 border border-feedback-light-error/30 dark:border-feedback-dark-error/30 rounded-lg p-2.5 animate-shake">
+                <div className="animate-shake rounded-lg border border-feedback-light-error/30 bg-feedback-light-error/10 p-2.5 dark:border-feedback-dark-error/30 dark:bg-feedback-dark-error/10">
                   <div className="flex items-start gap-2">
-                    <div className="flex-shrink-0 mt-0.5">
+                    <div className="mt-0.5 flex-shrink-0">
                       <svg
-                        className="w-4 h-4 text-feedback-light-error dark:text-feedback-dark-error"
+                        className="h-4 w-4 text-feedback-light-error dark:text-feedback-dark-error"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -238,7 +238,7 @@ export function LoginPage() {
               <div className="flex items-center justify-end">
                 <Link
                   to="/forgot-password"
-                  className="text-xs font-medium text-primary hover:text-primary-hover transition-colors duration-200 hover:underline"
+                  className="text-xs font-medium text-primary transition-colors duration-200 hover:text-primary-hover hover:underline"
                 >
                   Esqueceu sua senha?
                 </Link>
@@ -248,7 +248,7 @@ export function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="btn-theme-primary w-full h-10 rounded-lg font-semibold text-sm shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]"
+                className="btn-theme-primary h-10 w-full transform rounded-lg text-sm font-semibold shadow-lg shadow-primary/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
                 data-testid="submit-login"
               >
                 {isLoading ? (
@@ -271,7 +271,7 @@ export function LoginPage() {
                 <div className="w-full border-t border-light-border dark:border-dark-border" />
               </div>
               <div className="relative flex justify-center text-xs">
-                <span className="px-2 card-theme text-theme-secondary font-medium">
+                <span className="card-theme text-theme-secondary px-2 font-medium">
                   OU
                 </span>
               </div>
@@ -279,11 +279,11 @@ export function LoginPage() {
 
             {/* Sign Up Link */}
             <div className="text-center">
-              <p className="text-xs text-theme-secondary">
+              <p className="text-theme-secondary text-xs">
                 Não tem uma conta?{' '}
                 <Link
                   to="/signup"
-                  className="font-semibold text-primary hover:text-primary-hover transition-colors duration-200 hover:underline"
+                  className="font-semibold text-primary transition-colors duration-200 hover:text-primary-hover hover:underline"
                 >
                   Criar conta
                 </Link>
@@ -293,7 +293,7 @@ export function LoginPage() {
         </div>
 
         {/* Footer Info */}
-        <div className="text-center text-[10px] text-theme-secondary/70 animate-fade-in">
+        <div className="text-theme-secondary/70 animate-fade-in text-center text-[10px]">
           <p>© 2025 Barber Analytics Pro</p>
         </div>
       </div>

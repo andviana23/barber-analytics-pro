@@ -47,18 +47,18 @@ const MainKPI = ({
   const isPositive = percentage >= 0;
   const isAboveTarget = percentage >= 100;
   return (
-    <div className="card-theme dark:bg-dark-surface rounded-2xl border border-light-border dark:border-dark-border p-6 shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between mb-4">
+    <div className="card-theme rounded-2xl border border-light-border p-6 shadow-sm transition-shadow hover:shadow-md dark:border-dark-border dark:bg-dark-surface">
+      <div className="mb-4 flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className={`p-3 rounded-xl ${color}`}>
-            <Icon className="w-6 h-6 text-dark-text-primary" />
+          <div className={`rounded-xl p-3 ${color}`}>
+            <Icon className="text-dark-text-primary h-6 w-6" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wide">
+            <h3 className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm font-semibold uppercase tracking-wide">
               {title}
             </h3>
             {subtitle && (
-              <p className="text-xs text-theme-secondary dark:text-theme-secondary mt-1">
+              <p className="text-theme-secondary dark:text-theme-secondary mt-1 text-xs">
                 {subtitle}
               </p>
             )}
@@ -66,16 +66,16 @@ const MainKPI = ({
         </div>
 
         <div
-          className={`px-3 py-1 rounded-full text-sm font-bold ${isAboveTarget ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}`}
+          className={`rounded-full px-3 py-1 text-sm font-bold ${isAboveTarget ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}`}
         >
           {percentage}%
         </div>
       </div>
 
       <div className="space-y-3">
-        <div className="text-3xl font-bold text-theme-primary dark:text-dark-text-primary">
+        <div className="text-theme-primary dark:text-dark-text-primary text-3xl font-bold">
           {loading ? (
-            <div className="h-8 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            <div className="h-8 w-32 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
           ) : (
             new Intl.NumberFormat('pt-BR', {
               style: 'currency',
@@ -92,7 +92,7 @@ const MainKPI = ({
               <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 Meta:
               </span>
-              <span className="font-medium text-theme-primary dark:text-dark-text-primary">
+              <span className="text-theme-primary dark:text-dark-text-primary font-medium">
                 {new Intl.NumberFormat('pt-BR', {
                   style: 'currency',
                   currency: 'BRL',
@@ -103,7 +103,7 @@ const MainKPI = ({
             </div>
 
             {/* Barra de progresso */}
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
               <div
                 className={`h-2 rounded-full transition-all duration-500 ${isAboveTarget ? 'bg-green-500' : 'bg-red-500'}`}
                 style={{
@@ -120,9 +120,9 @@ const MainKPI = ({
             className={`flex items-center gap-1 text-sm ${trend > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
           >
             {trend > 0 ? (
-              <ArrowUpRight className="w-4 h-4" />
+              <ArrowUpRight className="h-4 w-4" />
             ) : (
-              <ArrowDownRight className="w-4 h-4" />
+              <ArrowDownRight className="h-4 w-4" />
             )}
             <span>{Math.abs(trend)}% vs. mês anterior</span>
           </div>
@@ -144,9 +144,9 @@ const LineChartCard = ({
 }) => {
   if (loading) {
     return (
-      <div className="card-theme dark:bg-dark-surface rounded-2xl border border-light-border dark:border-dark-border p-6">
-        <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4"></div>
-        <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+      <div className="card-theme rounded-2xl border border-light-border p-6 dark:border-dark-border dark:bg-dark-surface">
+        <div className="mb-4 h-6 w-48 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+        <div className="h-64 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
       </div>
     );
   }
@@ -154,8 +154,8 @@ const LineChartCard = ({
   const minValue = Math.min(...data.map(d => d.value), targetLine || 0);
   const range = maxValue - minValue;
   return (
-    <div className="card-theme dark:bg-dark-surface rounded-2xl border border-light-border dark:border-dark-border p-6">
-      <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-6">
+    <div className="card-theme rounded-2xl border border-light-border p-6 dark:border-dark-border dark:bg-dark-surface">
+      <h3 className="text-theme-primary dark:text-dark-text-primary mb-6 text-lg font-semibold">
         {title}
       </h3>
 
@@ -174,7 +174,7 @@ const LineChartCard = ({
               borderColor: targetColor,
             }}
           >
-            <span className="absolute -top-6 left-0 text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+            <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted absolute -top-6 left-0 text-xs">
               Meta:{' '}
               {new Intl.NumberFormat('pt-BR', {
                 style: 'currency',
@@ -187,7 +187,7 @@ const LineChartCard = ({
         )}
 
         {/* Gráfico de linha */}
-        <svg className="w-full h-full" viewBox="0 0 400 200">
+        <svg className="h-full w-full" viewBox="0 0 400 200">
           {data.map((point, index) => {
             if (index === 0) return null;
             const prevPoint = data[index - 1];
@@ -227,7 +227,7 @@ const LineChartCard = ({
         </svg>
 
         {/* Labels do eixo X */}
-        <div className="flex justify-between mt-4 text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+        <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-4 flex justify-between text-xs">
           {data.map((point, index) => (
             <span key={index}>{point.label}</span>
           ))}
@@ -242,16 +242,16 @@ const AlertCard = ({ type, title, message, action }) => {
   const isPositive = type === 'success';
   return (
     <div
-      className={`p-4 rounded-xl border-l-4 ${isPositive ? 'bg-green-50 dark:bg-green-900/20 border-green-500' : 'bg-red-50 dark:bg-red-900/20 border-red-500'}`}
+      className={`rounded-xl border-l-4 p-4 ${isPositive ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 'border-red-500 bg-red-50 dark:bg-red-900/20'}`}
     >
       <div className="flex items-start gap-3">
         <div
-          className={`p-1 rounded-full ${isPositive ? 'bg-green-100 dark:bg-green-900/30' : 'bg-red-100 dark:bg-red-900/30'}`}
+          className={`rounded-full p-1 ${isPositive ? 'bg-green-100 dark:bg-green-900/30' : 'bg-red-100 dark:bg-red-900/30'}`}
         >
           {isPositive ? (
-            <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+            <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
           ) : (
-            <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
+            <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
           )}
         </div>
         <div className="flex-1">
@@ -261,7 +261,7 @@ const AlertCard = ({ type, title, message, action }) => {
             {title}
           </h4>
           <p
-            className={`text-sm mt-1 ${isPositive ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}
+            className={`mt-1 text-sm ${isPositive ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}
           >
             {message}
           </p>
@@ -498,12 +498,12 @@ export function DashboardPage() {
     }
   }, [selectedUnit]);
   return (
-    <div className="min-h-screen bg-light-bg dark:bg-dark-bg dark:bg-dark-surface p-6">
+    <div className="min-h-screen bg-light-bg p-6 dark:bg-dark-bg dark:bg-dark-surface">
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-theme-primary dark:text-dark-text-primary mb-2">
+            <h1 className="text-theme-primary dark:text-dark-text-primary mb-2 text-3xl font-bold">
               Dashboard Financeiro Geral
             </h1>
             <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
@@ -515,16 +515,16 @@ export function DashboardPage() {
             <UnitSelector userId="current-user" />
             <button
               onClick={fetchDashboardData}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-dark-text-primary rounded-lg hover:bg-blue-700 transition-colors"
+              className="text-dark-text-primary flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 transition-colors hover:bg-blue-700"
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="h-4 w-4" />
               Atualizar
             </button>
           </div>
         </div>
 
         {selectedUnit && (
-          <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+          <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
             Visualizando:{' '}
             <span className="font-semibold">{selectedUnit.name}</span>
           </div>
@@ -532,7 +532,7 @@ export function DashboardPage() {
       </div>
 
       {/* 1. Indicadores Principais - Linha Superior */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <MainKPI
           title="Meta de Receita Geral"
           value={dashboardData.kpis.revenue.value}
@@ -594,7 +594,7 @@ export function DashboardPage() {
       </div>
 
       {/* 3. Visualização Gráfica - Bloco do Meio */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <LineChartCard
           title="Receita Realizada vs. Meta Mensal"
           data={dashboardData.monthlyData?.map(item => ({
@@ -622,7 +622,7 @@ export function DashboardPage() {
 
       {/* 3. Insights e Ações Rápidas - Base do Dashboard */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+        <h3 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
           Insights e Alertas Automáticos
         </h3>
 
@@ -631,10 +631,10 @@ export function DashboardPage() {
             {[...Array(2)].map((_, index) => (
               <div
                 key={index}
-                className="card-theme dark:bg-dark-surface rounded-xl p-6 animate-pulse"
+                className="card-theme animate-pulse rounded-xl p-6 dark:bg-dark-surface"
               >
-                <div className="h-4 w-48 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-                <div className="h-3 w-96 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <div className="mb-2 h-4 w-48 rounded bg-gray-200 dark:bg-gray-700"></div>
+                <div className="h-3 w-96 rounded bg-gray-200 dark:bg-gray-700"></div>
               </div>
             ))}
           </div>
@@ -651,9 +651,9 @@ export function DashboardPage() {
             ))}
           </div>
         ) : (
-          <div className="card-theme dark:bg-dark-surface rounded-xl border border-light-border dark:border-dark-border p-6 text-center">
-            <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
-            <h4 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-2">
+          <div className="card-theme rounded-xl border border-light-border p-6 text-center dark:border-dark-border dark:bg-dark-surface">
+            <CheckCircle className="mx-auto mb-4 h-12 w-12 text-green-500" />
+            <h4 className="text-theme-primary dark:text-dark-text-primary mb-2 text-lg font-semibold">
               Tudo nos Trilhos! 🎉
             </h4>
             <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">

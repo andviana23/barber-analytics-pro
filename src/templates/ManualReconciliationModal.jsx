@@ -447,19 +447,19 @@ const ManualReconciliationModal = ({
   ]);
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="card-theme rounded-lg shadow-xl w-full max-w-7xl max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+      <div className="card-theme max-h-[90vh] w-full max-w-7xl overflow-hidden rounded-lg shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-light-border dark:border-dark-border">
+        <div className="flex items-center justify-between border-b border-light-border p-6 dark:border-dark-border">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 bg-primary/10 dark:bg-primary/20 rounded-lg">
-              <Eye className="w-5 h-5 text-primary" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 dark:bg-primary/20">
+              <Eye className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-theme-primary">
+              <h2 className="text-theme-primary text-xl font-semibold">
                 Reconciliação Manual
               </h2>
-              <p className="text-sm text-theme-secondary">
+              <p className="text-theme-secondary text-sm">
                 Reconcilie transações bancárias com registros internos
               </p>
             </div>
@@ -469,7 +469,7 @@ const ManualReconciliationModal = ({
             {/* Statistics Summary */}
             <div className="flex items-center gap-6 text-sm">
               <div className="text-center">
-                <div className="font-semibold text-theme-primary">
+                <div className="text-theme-primary font-semibold">
                   {statistics.reconciliationRate}%
                 </div>
                 <div className="text-theme-secondary">Reconciliadas</div>
@@ -496,9 +496,9 @@ const ManualReconciliationModal = ({
 
             <button
               onClick={onClose}
-              className="flex items-center justify-center w-8 h-8 text-text-light-secondary dark:text-text-dark-secondary hover:text-theme-primary rounded-lg hover:bg-light-bg dark:hover:bg-dark-hover transition-colors"
+              className="hover:text-theme-primary flex h-8 w-8 items-center justify-center rounded-lg text-text-light-secondary transition-colors hover:bg-light-bg dark:text-text-dark-secondary dark:hover:bg-dark-hover"
             >
-              <X className="w-5 h-5" />
+              <X className="h-5 w-5" />
             </button>
           </div>
         </div>
@@ -531,13 +531,13 @@ const ManualReconciliationModal = ({
                 <button
                   key={tab.id}
                   onClick={() => setSelectedTab(tab.id)}
-                  className={`flex items-center gap-2 py-4 px-2 text-sm font-medium border-b-2 transition-colors ${selectedTab === tab.id ? 'border-primary text-primary' : 'border-transparent text-theme-secondary hover:text-theme-primary hover:border-light-border dark:hover:border-dark-border'}`}
+                  className={`flex items-center gap-2 border-b-2 px-2 py-4 text-sm font-medium transition-colors ${selectedTab === tab.id ? 'border-primary text-primary' : 'text-theme-secondary hover:text-theme-primary border-transparent hover:border-light-border dark:hover:border-dark-border'}`}
                 >
-                  <TabIcon className="w-4 h-4" />
+                  <TabIcon className="h-4 w-4" />
                   <span>{tab.label}</span>
                   {tab.count !== null && (
                     <span
-                      className={`px-2 py-1 text-xs rounded-full ${selectedTab === tab.id ? 'bg-primary/10 dark:bg-primary/20 text-primary' : 'bg-light-bg dark:bg-dark-hover text-theme-secondary'}`}
+                      className={`rounded-full px-2 py-1 text-xs ${selectedTab === tab.id ? 'bg-primary/10 text-primary dark:bg-primary/20' : 'text-theme-secondary bg-light-bg dark:bg-dark-hover'}`}
                     >
                       {tab.count}
                     </span>
@@ -550,11 +550,11 @@ const ManualReconciliationModal = ({
 
         {/* Filters */}
         {selectedTab === 'matches' && (
-          <div className="p-4 bg-light-bg dark:bg-dark-bg border-b border-light-border dark:border-dark-border">
+          <div className="border-b border-light-border bg-light-bg p-4 dark:border-dark-border dark:bg-dark-bg">
             <div className="flex items-center gap-4">
               {/* Search */}
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-light-secondary dark:text-text-dark-secondary" />
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-text-light-secondary dark:text-text-dark-secondary" />
                 <input
                   type="text"
                   value={searchTerm}
@@ -611,16 +611,16 @@ const ManualReconciliationModal = ({
                 }}
                 className="btn-theme-secondary p-2"
               >
-                <Filter className="w-4 h-4" />
+                <Filter className="h-4 w-4" />
               </button>
             </div>
           </div>
         )}
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto max-h-[60vh]">
+        <div className="max-h-[60vh] flex-1 overflow-y-auto">
           {selectedTab === 'matches' && (
-            <div className="p-6 space-y-4">
+            <div className="space-y-4 p-6">
               {filteredMatches.length > 0 ? (
                 filteredMatches.map(match => (
                   <ReconciliationMatchCard
@@ -636,9 +636,9 @@ const ManualReconciliationModal = ({
                   />
                 ))
               ) : (
-                <div className="text-center py-12">
-                  <Eye className="w-12 h-12 text-text-light-secondary dark:text-text-dark-secondary mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-theme-primary mb-2">
+                <div className="py-12 text-center">
+                  <Eye className="mx-auto mb-4 h-12 w-12 text-text-light-secondary dark:text-text-dark-secondary" />
+                  <h3 className="text-theme-primary mb-2 text-lg font-medium">
                     Nenhum match encontrado
                   </h3>
                   <p className="text-theme-secondary">
@@ -653,17 +653,17 @@ const ManualReconciliationModal = ({
 
           {selectedTab === 'manual' && (
             <div className="p-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 {/* Transações Bancárias */}
                 <div>
-                  <h3 className="text-lg font-medium text-theme-primary mb-4">
+                  <h3 className="text-theme-primary mb-4 text-lg font-medium">
                     Transações Bancárias
-                    <span className="ml-2 text-sm text-theme-secondary">
+                    <span className="text-theme-secondary ml-2 text-sm">
                       ({unreconciledBankTransactions.length} não reconciliadas)
                     </span>
                   </h3>
 
-                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                  <div className="max-h-96 space-y-3 overflow-y-auto">
                     {unreconciledBankTransactions.map(txn => (
                       <div
                         key={txn.id}
@@ -672,10 +672,10 @@ const ManualReconciliationModal = ({
                             selectedBankTransaction?.id === txn.id ? null : txn
                           )
                         }
-                        className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedBankTransaction?.id === txn.id ? 'border-primary bg-primary/10 dark:bg-primary/20' : 'border-light-border dark:border-dark-border hover:border-primary/50 hover:bg-light-bg dark:hover:bg-dark-hover'}`}
+                        className={`cursor-pointer rounded-lg border p-4 transition-colors ${selectedBankTransaction?.id === txn.id ? 'border-primary bg-primary/10 dark:bg-primary/20' : 'border-light-border hover:border-primary/50 hover:bg-light-bg dark:border-dark-border dark:hover:bg-dark-hover'}`}
                       >
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium text-theme-primary">
+                        <div className="mb-2 flex items-center justify-between">
+                          <span className="text-theme-primary font-medium">
                             {txn.descricao}
                           </span>
                           <span
@@ -688,7 +688,7 @@ const ManualReconciliationModal = ({
                             })}
                           </span>
                         </div>
-                        <div className="flex items-center justify-between text-sm text-theme-secondary">
+                        <div className="text-theme-secondary flex items-center justify-between text-sm">
                           <span>
                             {format(parseISO(txn.data), 'dd/MM/yyyy', {
                               locale: ptBR,
@@ -703,15 +703,15 @@ const ManualReconciliationModal = ({
 
                 {/* Transações Internas */}
                 <div>
-                  <h3 className="text-lg font-medium text-theme-primary mb-4">
+                  <h3 className="text-theme-primary mb-4 text-lg font-medium">
                     Transações Internas
-                    <span className="ml-2 text-sm text-theme-secondary">
+                    <span className="text-theme-secondary ml-2 text-sm">
                       ({unreconciledInternalTransactions.length} não
                       reconciliadas)
                     </span>
                   </h3>
 
-                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                  <div className="max-h-96 space-y-3 overflow-y-auto">
                     {unreconciledInternalTransactions.map(txn => (
                       <div
                         key={txn.id}
@@ -722,10 +722,10 @@ const ManualReconciliationModal = ({
                               : txn
                           )
                         }
-                        className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedInternalTransaction?.id === txn.id ? 'border-primary bg-primary/10 dark:bg-primary/20' : 'border-light-border dark:border-dark-border hover:border-primary/50 hover:bg-light-bg dark:hover:bg-dark-hover'}`}
+                        className={`cursor-pointer rounded-lg border p-4 transition-colors ${selectedInternalTransaction?.id === txn.id ? 'border-primary bg-primary/10 dark:bg-primary/20' : 'border-light-border hover:border-primary/50 hover:bg-light-bg dark:border-dark-border dark:hover:bg-dark-hover'}`}
                       >
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium text-theme-primary">
+                        <div className="mb-2 flex items-center justify-between">
+                          <span className="text-theme-primary font-medium">
                             {txn.descricao}
                           </span>
                           <span
@@ -738,7 +738,7 @@ const ManualReconciliationModal = ({
                             })}
                           </span>
                         </div>
-                        <div className="flex items-center justify-between text-sm text-theme-secondary">
+                        <div className="text-theme-secondary flex items-center justify-between text-sm">
                           <span>
                             {format(parseISO(txn.data), 'dd/MM/yyyy', {
                               locale: ptBR,
@@ -754,17 +754,17 @@ const ManualReconciliationModal = ({
 
               {/* Match Preview */}
               {selectedBankTransaction && selectedInternalTransaction && (
-                <div className="mt-6 p-4 bg-primary/10 dark:bg-primary/20 border border-primary/30 dark:border-primary/40 rounded-lg">
-                  <h4 className="text-sm font-medium text-theme-primary mb-3">
+                <div className="mt-6 rounded-lg border border-primary/30 bg-primary/10 p-4 dark:border-primary/40 dark:bg-primary/20">
+                  <h4 className="text-theme-primary mb-3 text-sm font-medium">
                     Preview do Match Manual
                   </h4>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-3">
                     <div>
-                      <span className="text-primary font-medium">
+                      <span className="font-medium text-primary">
                         Confiança:
                       </span>
-                      <span className="ml-2 text-theme-primary">
+                      <span className="text-theme-primary ml-2">
                         {calculateMatchConfidence(
                           selectedBankTransaction,
                           selectedInternalTransaction
@@ -773,10 +773,10 @@ const ManualReconciliationModal = ({
                       </span>
                     </div>
                     <div>
-                      <span className="text-primary font-medium">
+                      <span className="font-medium text-primary">
                         Diferença:
                       </span>
-                      <span className="ml-2 text-theme-primary">
+                      <span className="text-theme-primary ml-2">
                         R${' '}
                         {Math.abs(
                           selectedBankTransaction.valor -
@@ -788,8 +788,8 @@ const ManualReconciliationModal = ({
                       </span>
                     </div>
                     <div>
-                      <span className="text-primary font-medium">Status:</span>
-                      <span className="ml-2 text-theme-primary">
+                      <span className="font-medium text-primary">Status:</span>
+                      <span className="text-theme-primary ml-2">
                         Match Manual
                       </span>
                     </div>
@@ -801,10 +801,10 @@ const ManualReconciliationModal = ({
 
           {selectedTab === 'unmatched' && (
             <div className="p-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 {/* Bank Transactions */}
                 <div>
-                  <h3 className="text-lg font-medium text-theme-primary mb-4">
+                  <h3 className="text-theme-primary mb-4 text-lg font-medium">
                     Transações Bancárias sem Match (
                     {unreconciledBankTransactions.length})
                   </h3>
@@ -813,10 +813,10 @@ const ManualReconciliationModal = ({
                     {unreconciledBankTransactions.map(txn => (
                       <div
                         key={txn.id}
-                        className="p-4 border border-light-border dark:border-dark-border rounded-lg"
+                        className="rounded-lg border border-light-border p-4 dark:border-dark-border"
                       >
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium text-theme-primary">
+                        <div className="mb-2 flex items-center justify-between">
+                          <span className="text-theme-primary font-medium">
                             {txn.descricao}
                           </span>
                           <span
@@ -829,7 +829,7 @@ const ManualReconciliationModal = ({
                             })}
                           </span>
                         </div>
-                        <div className="text-sm text-theme-secondary">
+                        <div className="text-theme-secondary text-sm">
                           {format(parseISO(txn.data), 'dd/MM/yyyy', {
                             locale: ptBR,
                           })}
@@ -842,7 +842,7 @@ const ManualReconciliationModal = ({
 
                 {/* Internal Transactions */}
                 <div>
-                  <h3 className="text-lg font-medium text-theme-primary mb-4">
+                  <h3 className="text-theme-primary mb-4 text-lg font-medium">
                     Transações Internas sem Match (
                     {unreconciledInternalTransactions.length})
                   </h3>
@@ -851,10 +851,10 @@ const ManualReconciliationModal = ({
                     {unreconciledInternalTransactions.map(txn => (
                       <div
                         key={txn.id}
-                        className="p-4 border border-light-border dark:border-dark-border rounded-lg"
+                        className="rounded-lg border border-light-border p-4 dark:border-dark-border"
                       >
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium text-theme-primary">
+                        <div className="mb-2 flex items-center justify-between">
+                          <span className="text-theme-primary font-medium">
                             {txn.descricao}
                           </span>
                           <span
@@ -868,7 +868,7 @@ const ManualReconciliationModal = ({
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-theme-secondary">
+                          <span className="text-theme-secondary text-sm">
                             {format(parseISO(txn.data), 'dd/MM/yyyy', {
                               locale: ptBR,
                             })}
@@ -885,8 +885,8 @@ const ManualReconciliationModal = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-6 border-t border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg">
-          <div className="text-sm text-theme-secondary">
+        <div className="flex items-center justify-between border-t border-light-border bg-light-bg p-6 dark:border-dark-border dark:bg-dark-bg">
+          <div className="text-theme-secondary text-sm">
             {selectedTab === 'matches' &&
               `${filteredMatches.length} de ${allMatches.length} matches`}
             {selectedTab === 'manual' &&
@@ -905,16 +905,16 @@ const ManualReconciliationModal = ({
                   !selectedInternalTransaction ||
                   loading
                 }
-                className="btn-theme-primary px-6 py-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="btn-theme-primary flex items-center gap-2 px-6 py-2 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading ? (
                   <>
-                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <RefreshCw className="h-4 w-4 animate-spin" />
                     Criando...
                   </>
                 ) : (
                   <>
-                    <CheckCircle className="w-4 h-4" />
+                    <CheckCircle className="h-4 w-4" />
                     Criar Match Manual
                   </>
                 )}
@@ -1062,10 +1062,10 @@ export const ManualReconciliationModalPreview = () => {
     alert('Match manual criado com sucesso!');
   };
   return (
-    <div className="p-6 card-theme min-h-screen">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div className="card-theme p-6 rounded-lg shadow">
-          <h2 className="text-2xl font-bold text-theme-primary mb-4">
+    <div className="card-theme min-h-screen p-6">
+      <div className="mx-auto max-w-4xl space-y-6">
+        <div className="card-theme rounded-lg p-6 shadow">
+          <h2 className="text-theme-primary mb-4 text-2xl font-bold">
             Manual Reconciliation Modal - Preview
           </h2>
           <p className="text-theme-secondary mb-6">
@@ -1076,9 +1076,9 @@ export const ManualReconciliationModalPreview = () => {
 
           <button
             onClick={() => setIsOpen(true)}
-            className="px-4 py-2 bg-purple-600 text-dark-text-primary rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+            className="text-dark-text-primary flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 transition-colors hover:bg-purple-700"
           >
-            <Eye className="w-4 h-4" />
+            <Eye className="h-4 w-4" />
             Abrir Reconciliação Manual
           </button>
         </div>

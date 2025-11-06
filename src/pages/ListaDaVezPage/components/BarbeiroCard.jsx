@@ -163,15 +163,10 @@ export default function BarbeiroCard({
   const actions = getAvailableActions();
   return (
     <div
-      className={`
-      relative p-4 rounded-lg border transition-all duration-200
-      ${statusConfig.bg} ${statusConfig.border}
-      ${barbeiro.status === 'attending' ? 'ring-2 ring-blue-200 dark:ring-blue-800' : ''}
-      ${posicao === 1 && barbeiro.status === 'active' ? 'ring-2 ring-yellow-200 dark:ring-yellow-800' : ''}
-    `}
+      className={`relative rounded-lg border p-4 transition-all duration-200 ${statusConfig.bg} ${statusConfig.border} ${barbeiro.status === 'attending' ? 'ring-2 ring-blue-200 dark:ring-blue-800' : ''} ${posicao === 1 && barbeiro.status === 'active' ? 'ring-2 ring-yellow-200 dark:ring-yellow-800' : ''} `}
     >
       {/* Badge de posição */}
-      <div className="absolute -top-2 -left-2 w-8 h-8 rounded-full card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border flex items-center justify-center">
+      <div className="card-theme absolute -left-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full border-2 border-light-border dark:border-dark-border dark:bg-dark-surface">
         {posicao === 1 && barbeiro.status === 'active' ? (
           <Trophy className="h-4 w-4 text-yellow-600" />
         ) : (
@@ -183,25 +178,22 @@ export default function BarbeiroCard({
 
       <div className="flex items-start justify-between">
         {/* Informações do barbeiro */}
-        <div className="flex items-start gap-3 flex-1">
+        <div className="flex flex-1 items-start gap-3">
           {/* Avatar */}
-          <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 dark:bg-gray-600 flex items-center justify-center">
-            <User className="h-6 w-6 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-600 dark:bg-gray-700">
+            <User className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted h-6 w-6" />
           </div>
 
           {/* Dados */}
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-semibold text-theme-primary dark:text-dark-text-primary">
+            <div className="mb-1 flex items-center gap-2">
+              <h3 className="text-theme-primary dark:text-dark-text-primary font-semibold">
                 {barbeiro.barbeiro_nome}
               </h3>
 
               {/* Badge de status */}
               <span
-                className={`
-                inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium
-                ${statusConfig.color} ${statusConfig.bg} ${statusConfig.border} border
-              `}
+                className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium ${statusConfig.color} ${statusConfig.bg} ${statusConfig.border} border`}
               >
                 {statusConfig.icon}
                 {statusConfig.label}
@@ -209,7 +201,7 @@ export default function BarbeiroCard({
             </div>
 
             {/* Estatísticas */}
-            <div className="flex items-center gap-4 text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+            <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted flex items-center gap-4 text-sm">
               <div className="flex items-center gap-1">
                 <Clock className="h-3 w-3" />
                 {barbeiro.total_atendimentos} atendimento(s)
@@ -224,17 +216,14 @@ export default function BarbeiroCard({
         </div>
 
         {/* Ações */}
-        <div className="flex items-center gap-2 ml-4">
+        <div className="ml-4 flex items-center gap-2">
           {actions.map(action => (
             <Button
               key={action.key}
               onClick={() => handleAction(action.key)}
               disabled={loading}
               variant={action.variant}
-              className={`
-                flex items-center gap-1 text-xs px-3 py-1
-                ${action.color || ''}
-              `}
+              className={`flex items-center gap-1 px-3 py-1 text-xs ${action.color || ''} `}
             >
               {action.icon}
               <span className="hidden sm:inline">{action.label}</span>
@@ -245,22 +234,22 @@ export default function BarbeiroCard({
 
       {/* Mensagem de erro */}
       {error && (
-        <div className="mt-3 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-sm text-red-600 dark:text-red-400 flex items-start gap-2">
-          <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+        <div className="mt-3 flex items-start gap-2 rounded border border-red-200 bg-red-50 p-2 text-sm text-red-600 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
+          <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Indicador de próximo */}
       {posicao === 1 && barbeiro.status === 'active' && (
-        <div className="mt-3 text-xs font-medium text-yellow-700 dark:text-yellow-300 text-center">
+        <div className="mt-3 text-center text-xs font-medium text-yellow-700 dark:text-yellow-300">
           🎯 Próximo da fila
         </div>
       )}
 
       {/* Indicador de atendendo */}
       {barbeiro.status === 'attending' && (
-        <div className="mt-3 text-xs font-medium text-blue-700 dark:text-blue-300 text-center animate-pulse">
+        <div className="mt-3 animate-pulse text-center text-xs font-medium text-blue-700 dark:text-blue-300">
           🔵 Atendendo cliente
         </div>
       )}

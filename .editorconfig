@@ -1,0 +1,60 @@
+# EditorConfig - Barber Analytics Pro
+# https://editorconfig.org
+
+# Top-most EditorConfig file
+root = true
+
+# Configuração padrão para todos os arquivos
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# JavaScript e TypeScript
+[*.{js,jsx,ts,tsx}]
+indent_size = 2
+quote_type = single
+
+# JSON
+[*.json]
+indent_size = 2
+
+# YAML
+[*.{yml,yaml}]
+indent_size = 2
+
+# Markdown (preservar espaços duplos no final da linha)
+[*.md]
+trim_trailing_whitespace = false
+
+# CSS e SCSS
+[*.{css,scss}]
+indent_size = 2
+
+# HTML
+[*.html]
+indent_size = 2
+
+# Shell scripts
+[*.sh]
+indent_size = 2
+end_of_line = lf
+
+# Python
+[*.py]
+indent_size = 4
+
+# SQL
+[*.sql]
+indent_size = 2
+
+# Arquivos de configuração
+[{package.json,tsconfig*.json,.prettierrc,.eslintrc*}]
+indent_size = 2
+
+# Makefiles (usar tabs)
+[Makefile]
+indent_style = tab

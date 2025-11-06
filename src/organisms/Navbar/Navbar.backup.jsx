@@ -53,15 +53,15 @@ export function Navbar({ onMenuToggle }) {
     return roles[role] || 'Usuário';
   };
   return (
-    <nav className="sticky top-0 z-50 bg-light-surface/80 dark:bg-dark-surface/80 backdrop-blur-sm border-b border-light-border dark:border-dark-border transition-colors duration-300">
+    <nav className="sticky top-0 z-50 border-b border-light-border bg-light-surface/80 backdrop-blur-sm transition-colors duration-300 dark:border-dark-border dark:bg-dark-surface/80">
       <div className="px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex h-16 items-center justify-between">
           {/* Left section */}
           <div className="flex items-center gap-4">
             {/* Mobile menu button */}
             <button
               onClick={onMenuToggle}
-              className="lg:hidden p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-dark-bg transition-colors duration-300"
+              className="rounded-lg p-2 text-text-light-secondary transition-colors duration-300 hover:bg-light-bg dark:text-text-dark-secondary dark:hover:bg-dark-bg lg:hidden"
               aria-label="Toggle menu"
             >
               <Menu className="h-5 w-5" />
@@ -69,16 +69,16 @@ export function Navbar({ onMenuToggle }) {
 
             {/* Logo */}
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-dark-text-primary font-bold text-sm">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+                <span className="text-dark-text-primary text-sm font-bold">
                   TB
                 </span>
               </div>
               <div className="hidden sm:block">
-                <h1 className="text-text-light-primary dark:text-text-dark-primary font-semibold text-lg">
+                <h1 className="text-lg font-semibold text-text-light-primary dark:text-text-dark-primary">
                   Gestão Trato de Barbados
                 </h1>
-                <p className="text-text-light-secondary dark:text-text-dark-secondary text-xs">
+                <p className="text-xs text-text-light-secondary dark:text-text-dark-secondary">
                   Sistema de Gestão
                 </p>
               </div>
@@ -86,13 +86,13 @@ export function Navbar({ onMenuToggle }) {
           </div>
 
           {/* Center section - Search */}
-          <div className="hidden md:flex flex-1 max-w-md mx-8">
+          <div className="mx-8 hidden max-w-md flex-1 md:flex">
             <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-text-light-secondary dark:text-text-dark-secondary" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-text-light-secondary dark:text-text-dark-secondary" />
               <input
                 type="text"
                 placeholder="Buscar..."
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-300"
+                className="w-full rounded-lg border border-light-border bg-light-bg py-2 pl-10 pr-4 text-text-light-primary transition-colors duration-300 placeholder:text-text-light-secondary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/50 dark:border-dark-border dark:bg-dark-bg dark:text-text-dark-primary dark:placeholder:text-text-dark-secondary"
               />
             </div>
           </div>
@@ -100,14 +100,14 @@ export function Navbar({ onMenuToggle }) {
           {/* Right section */}
           <div className="flex items-center gap-3">
             {/* Search button (mobile) */}
-            <button className="md:hidden p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-dark-bg transition-colors duration-300">
+            <button className="rounded-lg p-2 text-text-light-secondary transition-colors duration-300 hover:bg-light-bg dark:text-text-dark-secondary dark:hover:bg-dark-bg md:hidden">
               <Search className="h-5 w-5" />
             </button>
 
             {/* Notifications */}
-            <button className="relative p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-dark-bg transition-colors duration-300">
+            <button className="relative rounded-lg p-2 text-text-light-secondary transition-colors duration-300 hover:bg-light-bg dark:text-text-dark-secondary dark:hover:bg-dark-bg">
               <Bell className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 w-3 h-3 bg-feedback-light-error dark:bg-feedback-dark-error rounded-full"></span>
+              <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-feedback-light-error dark:bg-feedback-dark-error"></span>
             </button>
 
             {/* Theme toggle */}
@@ -117,41 +117,41 @@ export function Navbar({ onMenuToggle }) {
             <div className="relative" ref={userMenuRef}>
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="flex items-center gap-2 p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-dark-bg transition-colors duration-300"
+                className="flex items-center gap-2 rounded-lg p-2 text-text-light-secondary transition-colors duration-300 hover:bg-light-bg dark:text-text-dark-secondary dark:hover:bg-dark-bg"
               >
-                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary">
                   {user?.user_metadata?.avatar_url ? (
                     <img
                       src={user.user_metadata.avatar_url}
                       alt="Avatar"
-                      className="w-full h-full rounded-full object-cover"
+                      className="h-full w-full rounded-full object-cover"
                     />
                   ) : (
-                    <User className="h-4 w-4 text-dark-text-primary" />
+                    <User className="text-dark-text-primary h-4 w-4" />
                   )}
                 </div>
-                <div className="hidden sm:block text-left">
-                  <p className="text-text-light-primary dark:text-text-dark-primary text-sm font-medium">
+                <div className="hidden text-left sm:block">
+                  <p className="text-sm font-medium text-text-light-primary dark:text-text-dark-primary">
                     {getUserDisplayName()}
                   </p>
-                  <p className="text-text-light-secondary dark:text-text-dark-secondary text-xs">
+                  <p className="text-xs text-text-light-secondary dark:text-text-dark-secondary">
                     {getUserRole()}
                   </p>
                 </div>
-                <ChevronDown className="hidden sm:block h-4 w-4" />
+                <ChevronDown className="hidden h-4 w-4 sm:block" />
               </button>
 
               {/* Dropdown menu */}
               {isUserMenuOpen && (
-                <div className="absolute right-0 mt-2 w-56 card-theme border border-light-border dark:border-dark-border rounded-lg shadow-lg z-50">
-                  <div className="p-4 border-b border-light-border dark:border-dark-border">
+                <div className="card-theme absolute right-0 z-50 mt-2 w-56 rounded-lg border border-light-border shadow-lg dark:border-dark-border">
+                  <div className="border-b border-light-border p-4 dark:border-dark-border">
                     <p className="font-medium text-text-light-primary dark:text-text-dark-primary">
                       {getUserDisplayName()}
                     </p>
                     <p className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
                       {user?.email}
                     </p>
-                    <span className="inline-flex items-center gap-1 px-2 py-1 mt-2 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                    <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
                       {getUserRole()}
                     </span>
                   </div>
@@ -159,7 +159,7 @@ export function Navbar({ onMenuToggle }) {
                   <div className="py-2">
                     <button
                       onClick={handleProfileClick}
-                      className="flex items-center gap-3 w-full px-4 py-2 text-sm text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-dark-bg transition-colors duration-200"
+                      className="flex w-full items-center gap-3 px-4 py-2 text-sm text-text-light-secondary transition-colors duration-200 hover:bg-light-bg dark:text-text-dark-secondary dark:hover:bg-dark-bg"
                     >
                       <UserCircle className="h-4 w-4" />
                       Meu Perfil
@@ -170,17 +170,17 @@ export function Navbar({ onMenuToggle }) {
                         navigate('/settings');
                         setIsUserMenuOpen(false);
                       }}
-                      className="flex items-center gap-3 w-full px-4 py-2 text-sm text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-dark-bg transition-colors duration-200"
+                      className="flex w-full items-center gap-3 px-4 py-2 text-sm text-text-light-secondary transition-colors duration-200 hover:bg-light-bg dark:text-text-dark-secondary dark:hover:bg-dark-bg"
                     >
                       <Settings className="h-4 w-4" />
                       Configurações
                     </button>
                   </div>
 
-                  <div className="border-t border-light-border dark:border-dark-border py-2">
+                  <div className="border-t border-light-border py-2 dark:border-dark-border">
                     <button
                       onClick={handleSignOut}
-                      className="flex items-center gap-3 w-full px-4 py-2 text-sm text-feedback-light-error dark:text-feedback-dark-error hover:bg-feedback-light-error/10 dark:hover:bg-feedback-dark-error/10 transition-colors duration-200"
+                      className="flex w-full items-center gap-3 px-4 py-2 text-sm text-feedback-light-error transition-colors duration-200 hover:bg-feedback-light-error/10 dark:text-feedback-dark-error dark:hover:bg-feedback-dark-error/10"
                     >
                       <LogOut className="h-4 w-4" />
                       Sair

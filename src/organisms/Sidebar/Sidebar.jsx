@@ -292,7 +292,7 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
       {/* Overlay para mobile - Design System compliant */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300"
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300 lg:hidden"
           onClick={onClose}
           aria-label="Fechar menu"
         />
@@ -300,15 +300,7 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
 
       {/* Sidebar - Usando tokens do Design System */}
       <aside
-        className={`
-          fixed lg:static inset-y-0 left-0 z-50 lg:z-auto
-          w-64 h-full 
-          bg-light-surface dark:bg-dark-surface 
-          border-r border-light-border dark:border-dark-border
-          flex-shrink-0
-          transform transition-transform duration-300 ease-in-out lg:transform-none
-          ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        `}
+        className={`fixed inset-y-0 left-0 z-50 h-full w-64 flex-shrink-0 transform border-r border-light-border bg-light-surface transition-transform duration-300 ease-in-out dark:border-dark-border dark:bg-dark-surface lg:static lg:z-auto lg:transform-none ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} `}
         aria-label="Menu de navegação principal"
       >
         {/* Custom Scrollbar - Design System */}
@@ -337,27 +329,27 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
           }
         `}</style>
 
-        <div className="flex flex-col h-full">
+        <div className="flex h-full flex-col">
           {/* Header Mobile - Design System Typography */}
-          <div className="flex items-center justify-between p-4 border-b border-light-border dark:border-dark-border lg:hidden">
+          <div className="flex items-center justify-between border-b border-light-border p-4 dark:border-dark-border lg:hidden">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center shadow-md">
-                <span className="text-dark-text-primary font-bold text-base">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary shadow-md">
+                <span className="text-dark-text-primary text-base font-bold">
                   TB
                 </span>
               </div>
               <div>
-                <h2 className="text-text-light-primary dark:text-text-dark-primary font-semibold text-sm">
+                <h2 className="text-sm font-semibold text-text-light-primary dark:text-text-dark-primary">
                   Gestão Trato de Barbados
                 </h2>
-                <p className="text-text-light-secondary dark:text-text-dark-secondary text-xs">
+                <p className="text-xs text-text-light-secondary dark:text-text-dark-secondary">
                   Sistema de Gestão
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-dark-bg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-surface"
+              className="rounded-lg p-2 text-text-light-secondary transition-all duration-200 hover:bg-light-bg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:text-text-dark-secondary dark:hover:bg-dark-bg dark:focus:ring-offset-dark-surface"
               aria-label="Fechar menu"
             >
               <X className="h-5 w-5" />
@@ -365,21 +357,21 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
           </div>
 
           {/* Unit Selector - Design System Card Theme */}
-          <div className="px-4 py-4 border-b border-light-border dark:border-dark-border bg-primary-light dark:bg-primary/5">
-            <label className="block text-xs text-text-light-secondary dark:text-text-dark-secondary mb-2 font-medium uppercase tracking-wide">
+          <div className="border-b border-light-border bg-primary-light px-4 py-4 dark:border-dark-border dark:bg-primary/5">
+            <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-text-light-secondary dark:text-text-dark-secondary">
               Unidade:
             </label>
             <UnitSelector className="w-full" />
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 overflow-y-auto sidebar-scroll">
+          <nav className="sidebar-scroll flex-1 overflow-y-auto p-4">
             {filteredMenuGroups.map((group, groupIndex) => (
               <div key={group.id} className={groupIndex > 0 ? 'mt-6' : ''}>
                 {/* Group Title - Design System Typography */}
                 {group.title && (
-                  <div className="px-3 mb-2 mt-4 first:mt-0">
-                    <h3 className="text-xs font-semibold tracking-wider text-text-light-secondary dark:text-text-dark-secondary uppercase opacity-70">
+                  <div className="mb-2 mt-4 px-3 first:mt-0">
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-text-light-secondary opacity-70 dark:text-text-dark-secondary">
                       {group.title}
                     </h3>
                   </div>
@@ -398,29 +390,23 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
                           onClick={() => handleItemClick(item)}
                           aria-label={item.label}
                           aria-current={isActive ? 'page' : undefined}
-                          className={`
-                            group relative w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
-                            text-left text-sm font-medium cursor-pointer
-                            transition-all duration-200 ease-in-out
-                            focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-surface
-                            ${isActive ? 'bg-primary/10 dark:bg-primary/15 text-primary shadow-sm' : 'text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-white/5 hover:text-text-light-primary dark:hover:text-text-dark-primary'}
-                          `}
+                          className={`group relative flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-surface ${isActive ? 'bg-primary/10 text-primary shadow-sm dark:bg-primary/15' : 'text-text-light-secondary hover:bg-light-bg hover:text-text-light-primary dark:text-text-dark-secondary dark:hover:bg-white/5 dark:hover:text-text-dark-primary'} `}
                         >
                           <Icon
-                            className={`h-5 w-5 flex-shrink-0 transition-all duration-200 ${isActive ? 'opacity-100 scale-110' : 'opacity-70 group-hover:opacity-100 group-hover:scale-105'}`}
+                            className={`h-5 w-5 flex-shrink-0 transition-all duration-200 ${isActive ? 'scale-110 opacity-100' : 'opacity-70 group-hover:scale-105 group-hover:opacity-100'}`}
                           />
                           <span className="flex-1">{item.label}</span>
 
                           {/* Badge - Design System */}
                           {item.badge && !item.hasSubmenu && (
-                            <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-primary/15 text-primary">
+                            <span className="rounded-full bg-primary/15 px-2 py-0.5 text-xs font-semibold text-primary">
                               {item.badge}
                             </span>
                           )}
 
                           {/* Active Indicator */}
                           {isActive && !item.hasSubmenu && (
-                            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                            <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
                           )}
 
                           {/* Submenu Chevron - Design System */}
@@ -433,7 +419,7 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
 
                         {/* Submenu - Design System */}
                         {item.hasSubmenu && isSubmenuOpen && item.submenu && (
-                          <div className="ml-4 mt-1 mb-2 space-y-0.5 border-l-2 border-primary/20 dark:border-primary/15 pl-3">
+                          <div className="mb-2 ml-4 mt-1 space-y-0.5 border-l-2 border-primary/20 pl-3 dark:border-primary/15">
                             {item.submenu.map(subItem => {
                               const SubIcon = subItem.icon;
                               const isSubActive = activeItem === subItem.id;
@@ -445,16 +431,10 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
                                   aria-current={
                                     isSubActive ? 'page' : undefined
                                   }
-                                  className={`
-                                    group relative w-full flex items-center gap-2.5 px-3 py-2 rounded-lg
-                                    text-left text-sm font-medium cursor-pointer
-                                    transition-all duration-200 ease-in-out
-                                    focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-surface
-                                    ${isSubActive ? 'bg-primary/10 dark:bg-primary/15 text-primary' : 'text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:bg-white/5 hover:text-text-light-primary dark:hover:text-text-dark-primary'}
-                                  `}
+                                  className={`group relative flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm font-medium transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-surface ${isSubActive ? 'bg-primary/10 text-primary dark:bg-primary/15' : 'text-text-light-secondary hover:bg-light-bg hover:text-text-light-primary dark:text-text-dark-secondary dark:hover:bg-white/5 dark:hover:text-text-dark-primary'} `}
                                 >
                                   <SubIcon
-                                    className={`h-4 w-4 flex-shrink-0 transition-all duration-200 ${isSubActive ? 'opacity-100 scale-105' : 'opacity-70 group-hover:opacity-100'}`}
+                                    className={`h-4 w-4 flex-shrink-0 transition-all duration-200 ${isSubActive ? 'scale-105 opacity-100' : 'opacity-70 group-hover:opacity-100'}`}
                                   />
                                   <span className="flex-1">
                                     {subItem.label}
@@ -473,7 +453,7 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
           </nav>
 
           {/* Bottom Menu - Design System */}
-          <div className="px-3 py-4 border-t border-light-border dark:border-dark-border bg-light-bg/50 dark:bg-dark-bg/30">
+          <div className="border-t border-light-border bg-light-bg/50 px-3 py-4 dark:border-dark-border dark:bg-dark-bg/30">
             {bottomMenuItems.map(item => {
               const Icon = item.icon;
               return (
@@ -481,11 +461,11 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
                   key={item.id}
                   onClick={() => handleItemClick(item)}
                   aria-label={item.label}
-                  className="group w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-sm font-medium cursor-pointer text-text-light-secondary dark:text-text-dark-secondary hover:bg-red-500/10 hover:text-red-500 dark:hover:text-red-400 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-dark-surface"
+                  className="group flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-text-light-secondary transition-all duration-200 ease-in-out hover:bg-red-500/10 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:text-text-dark-secondary dark:hover:text-red-400 dark:focus:ring-offset-dark-surface"
                 >
                   <Icon className="h-5 w-5 flex-shrink-0 transition-all duration-200 group-hover:scale-110" />
                   <span className="flex-1">{item.label}</span>
-                  <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                  <ChevronRight className="h-4 w-4 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
                 </button>
               );
             })}

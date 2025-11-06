@@ -42,10 +42,10 @@ const CashRegisterCard = ({
   if (!cashRegister && !loading) {
     return (
       <Card className={`p-6 ${className}`}>
-        <div className="text-center py-8">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-light-bg dark:bg-dark-bg flex items-center justify-center">
+        <div className="py-8 text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-light-bg dark:bg-dark-bg">
             <svg
-              className="w-8 h-8 text-theme-secondary"
+              className="text-theme-secondary h-8 w-8"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -58,19 +58,19 @@ const CashRegisterCard = ({
               />
             </svg>
           </div>
-          <h3 className="text-lg font-medium text-theme-primary mb-2">
+          <h3 className="text-theme-primary mb-2 text-lg font-medium">
             Nenhum caixa aberto
           </h3>
-          <p className="text-sm text-theme-secondary mb-6">
+          <p className="text-theme-secondary mb-6 text-sm">
             Abra o caixa para começar a registrar movimentações
           </p>
           {onOpen && (
             <button
               onClick={onOpen}
-              className="btn-theme-primary px-6 py-2.5 rounded-md inline-flex items-center gap-2"
+              className="btn-theme-primary inline-flex items-center gap-2 rounded-md px-6 py-2.5"
             >
               <svg
-                className="w-5 h-5"
+                className="h-5 w-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -95,9 +95,9 @@ const CashRegisterCard = ({
     return (
       <Card className={`p-6 ${className}`}>
         <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-light-bg dark:bg-dark-bg rounded w-1/3" />
-          <div className="h-4 bg-light-bg dark:bg-dark-bg rounded w-1/2" />
-          <div className="h-4 bg-light-bg dark:bg-dark-bg rounded w-2/3" />
+          <div className="h-6 w-1/3 rounded bg-light-bg dark:bg-dark-bg" />
+          <div className="h-4 w-1/2 rounded bg-light-bg dark:bg-dark-bg" />
+          <div className="h-4 w-2/3 rounded bg-light-bg dark:bg-dark-bg" />
         </div>
       </Card>
     );
@@ -106,10 +106,10 @@ const CashRegisterCard = ({
   return (
     <Card className={`p-6 ${className}`}>
       {/* Header */}
-      <div className="flex items-start justify-between mb-6">
+      <div className="mb-6 flex items-start justify-between">
         <div className="flex-1">
-          <div className="flex items-center gap-3 mb-2">
-            <h3 className="text-xl font-semibold text-theme-primary">
+          <div className="mb-2 flex items-center gap-3">
+            <h3 className="text-theme-primary text-xl font-semibold">
               Caixa #{cashRegister.id?.slice(0, 8)}
             </h3>
             <StatusBadge
@@ -117,20 +117,17 @@ const CashRegisterCard = ({
               text={isOpen ? 'Aberto' : 'Fechado'}
             />
           </div>
-          <p className="text-sm text-theme-secondary">
+          <p className="text-theme-secondary text-sm">
             {isOpen ? 'Caixa em operação' : 'Caixa finalizado'}
           </p>
         </div>
 
         {/* Ícone de status */}
         <div
-          className={`
-          w-12 h-12 rounded-full flex items-center justify-center
-          ${isOpen ? 'bg-green-100 dark:bg-green-900/20' : 'bg-gray-100 dark:bg-gray-800'}
-        `}
+          className={`flex h-12 w-12 items-center justify-center rounded-full ${isOpen ? 'bg-green-100 dark:bg-green-900/20' : 'bg-gray-100 dark:bg-gray-800'} `}
         >
           <svg
-            className={`w-6 h-6 ${isOpen ? 'text-green-600 dark:text-green-400' : 'text-theme-secondary'}`}
+            className={`h-6 w-6 ${isOpen ? 'text-green-600 dark:text-green-400' : 'text-theme-secondary'}`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -146,29 +143,29 @@ const CashRegisterCard = ({
       </div>
 
       {/* Informações do caixa */}
-      <div className="space-y-3 mb-6">
+      <div className="mb-6 space-y-3">
         {/* Abertura */}
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-theme-secondary">Aberto em:</span>
-          <span className="text-sm font-medium text-theme-primary">
+        <div className="flex items-center justify-between">
+          <span className="text-theme-secondary text-sm">Aberto em:</span>
+          <span className="text-theme-primary text-sm font-medium">
             {formatDateTime(cashRegister.opening_time)}
           </span>
         </div>
 
         {/* Aberto por */}
         {cashRegister.opened_by_name && (
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-theme-secondary">Por:</span>
-            <span className="text-sm font-medium text-theme-primary">
+          <div className="flex items-center justify-between">
+            <span className="text-theme-secondary text-sm">Por:</span>
+            <span className="text-theme-primary text-sm font-medium">
               {cashRegister.opened_by_name}
             </span>
           </div>
         )}
 
         {/* Saldo inicial */}
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-theme-secondary">Saldo Inicial:</span>
-          <span className="text-sm font-semibold text-theme-primary">
+        <div className="flex items-center justify-between">
+          <span className="text-theme-secondary text-sm">Saldo Inicial:</span>
+          <span className="text-theme-primary text-sm font-semibold">
             {formatCurrency(cashRegister.opening_balance)}
           </span>
         </div>
@@ -176,20 +173,20 @@ const CashRegisterCard = ({
         {/* Se fechado, mostra info de fechamento */}
         {isClosed && (
           <>
-            <div className="border-t border-light-border dark:border-dark-border pt-3 mt-3">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-theme-secondary">
+            <div className="mt-3 border-t border-light-border pt-3 dark:border-dark-border">
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-theme-secondary text-sm">
                   Fechado em:
                 </span>
-                <span className="text-sm font-medium text-theme-primary">
+                <span className="text-theme-primary text-sm font-medium">
                   {formatDateTime(cashRegister.closing_time)}
                 </span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-theme-secondary">
+              <div className="flex items-center justify-between">
+                <span className="text-theme-secondary text-sm">
                   Saldo Final:
                 </span>
-                <span className="text-sm font-semibold text-theme-primary">
+                <span className="text-theme-primary text-sm font-semibold">
                   {formatCurrency(cashRegister.closing_balance)}
                 </span>
               </div>
@@ -199,9 +196,9 @@ const CashRegisterCard = ({
 
         {/* Observações */}
         {cashRegister.observations && (
-          <div className="pt-3 border-t border-light-border dark:border-dark-border">
-            <p className="text-xs text-theme-secondary mb-1">Observações:</p>
-            <p className="text-sm text-theme-primary italic">
+          <div className="border-t border-light-border pt-3 dark:border-dark-border">
+            <p className="text-theme-secondary mb-1 text-xs">Observações:</p>
+            <p className="text-theme-primary text-sm italic">
               {cashRegister.observations}
             </p>
           </div>
@@ -213,10 +210,10 @@ const CashRegisterCard = ({
         {isOpen && onClose && (
           <button
             onClick={onClose}
-            className="flex-1 btn-theme-primary px-4 py-2.5 rounded-md text-sm font-medium inline-flex items-center justify-center gap-2"
+            className="btn-theme-primary inline-flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium"
           >
             <svg
-              className="w-4 h-4"
+              className="h-4 w-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -235,10 +232,10 @@ const CashRegisterCard = ({
         {isClosed && onViewReport && (
           <button
             onClick={onViewReport}
-            className="flex-1 btn-theme-secondary px-4 py-2.5 rounded-md text-sm font-medium inline-flex items-center justify-center gap-2"
+            className="btn-theme-secondary inline-flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium"
           >
             <svg
-              className="w-4 h-4"
+              className="h-4 w-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

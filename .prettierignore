@@ -1,9 +1,49 @@
+# Dependencies
 node_modules
+.pnpm-store
+
+# Build outputs
 dist
 build
+.output
+.vercel
+
+# Logs
 *.log
+
+# Environment files
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+
+# Lock files
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Generated files
+*.tsbuildinfo
+coverage/
+playwright-report/
+playwright-artifacts/
+
+# Cache
+.cache
+.vite
+.eslintcache
+
+# IDE
+.vscode/
+.idea/
+
+# Temporary
+tmp/
+temp/
+
+# Database
+*.sql.backup
+*.db
+*.dump
+
+# Documentation (opcional)
+# CHANGELOG.md
+# docs/generated/

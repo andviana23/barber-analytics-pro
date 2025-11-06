@@ -40,7 +40,7 @@ const CashReportModal = ({
       maxWidth="full"
       fullHeight
     >
-      <div className="h-full flex flex-col">
+      <div className="flex h-full flex-col">
         {/* Print Styles */}
         <style>
           {`

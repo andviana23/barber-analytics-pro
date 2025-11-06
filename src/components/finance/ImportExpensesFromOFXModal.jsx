@@ -305,19 +305,19 @@ const ImportExpensesFromOFXModal = ({ isOpen, onClose, onSuccess }) => {
           <div className="space-y-6">
             {/* Upload Area */}
             <div className="text-center">
-              <div className="mx-auto w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-4">
-                <Upload className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
+                <Upload className="h-8 w-8 text-blue-600 dark:text-blue-400" />
               </div>
-              <h3 className="text-lg font-semibold text-theme-primary dark:text-gray-100 mb-2">
+              <h3 className="text-theme-primary mb-2 text-lg font-semibold dark:text-gray-100">
                 Importar Despesas do Extrato OFX
               </h3>
-              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                 Selecione o arquivo OFX exportado do seu banco
               </p>
             </div>
 
             {/* File Input */}
-            <div className="border-2 border-dashed border-light-border dark:border-dark-border rounded-lg p-8 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors">
+            <div className="rounded-lg border-2 border-dashed border-light-border p-8 text-center transition-colors hover:border-blue-500 dark:border-dark-border dark:hover:border-blue-400">
               <input
                 type="file"
                 accept=".ofx"
@@ -328,25 +328,25 @@ const ImportExpensesFromOFXModal = ({ isOpen, onClose, onSuccess }) => {
               />
               <label
                 htmlFor="ofx-file-input"
-                className="cursor-pointer flex flex-col items-center"
+                className="flex cursor-pointer flex-col items-center"
               >
-                <FileText className="w-12 h-12 text-light-text-muted dark:text-dark-text-muted mb-3" />
-                <span className="text-sm font-medium text-theme-primary dark:text-dark-text-primary mb-1">
+                <FileText className="text-light-text-muted dark:text-dark-text-muted mb-3 h-12 w-12" />
+                <span className="text-theme-primary dark:text-dark-text-primary mb-1 text-sm font-medium">
                   Clique para selecionar o arquivo
                 </span>
-                <span className="text-xs text-theme-secondary dark:text-dark-text-muted">
+                <span className="text-theme-secondary dark:text-dark-text-muted text-xs">
                   Formato: .ofx (máx. 5MB)
                 </span>
               </label>
             </div>
 
             {/* Info Card */}
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2 flex items-center">
-                <AlertCircle className="w-4 h-4 mr-2" />
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+              <h4 className="mb-2 flex items-center text-sm font-semibold text-blue-900 dark:text-blue-100">
+                <AlertCircle className="mr-2 h-4 w-4" />
                 Informações Importantes
               </h4>
-              <ul className="text-xs text-blue-800 dark:text-blue-200 space-y-1">
+              <ul className="space-y-1 text-xs text-blue-800 dark:text-blue-200">
                 <li>• Apenas transações de débito (saídas) serão importadas</li>
                 <li>
                   • Categorias serão atribuídas automaticamente quando possível
@@ -361,8 +361,8 @@ const ImportExpensesFromOFXModal = ({ isOpen, onClose, onSuccess }) => {
         // PREVIEW/REVISÃO DAS DESPESAS
         return (
           <div className="space-y-4">
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+              <h4 className="mb-2 text-sm font-semibold text-blue-900 dark:text-blue-100">
                 📋 Revisão das Despesas
               </h4>
               <p className="text-xs text-blue-800 dark:text-blue-200">
@@ -372,9 +372,9 @@ const ImportExpensesFromOFXModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
 
             {/* Tabela de Preview */}
-            <div className="max-h-96 overflow-y-auto border border-light-border dark:border-dark-border rounded-lg">
+            <div className="max-h-96 overflow-y-auto rounded-lg border border-light-border dark:border-dark-border">
               <table className="w-full text-sm">
-                <thead className="card-theme dark:bg-dark-surface sticky top-0">
+                <thead className="card-theme sticky top-0 dark:bg-dark-surface">
                   <tr>
                     <th className="p-2 text-left">
                       <input
@@ -390,13 +390,13 @@ const ImportExpensesFromOFXModal = ({ isOpen, onClose, onSuccess }) => {
                         className="rounded"
                       />
                     </th>
-                    <th className="p-2 text-left text-theme-primary dark:text-dark-text-primary">
+                    <th className="text-theme-primary dark:text-dark-text-primary p-2 text-left">
                       Data
                     </th>
-                    <th className="p-2 text-left text-theme-primary dark:text-dark-text-primary">
+                    <th className="text-theme-primary dark:text-dark-text-primary p-2 text-left">
                       Descrição
                     </th>
-                    <th className="p-2 text-right text-theme-primary dark:text-dark-text-primary">
+                    <th className="text-theme-primary dark:text-dark-text-primary p-2 text-right">
                       Valor
                     </th>
                   </tr>
@@ -423,12 +423,12 @@ const ImportExpensesFromOFXModal = ({ isOpen, onClose, onSuccess }) => {
                           className="rounded"
                         />
                       </td>
-                      <td className="p-2 text-theme-primary dark:text-gray-100">
+                      <td className="text-theme-primary p-2 dark:text-gray-100">
                         {new Date(
                           transaction.transaction_date
                         ).toLocaleDateString('pt-BR')}
                       </td>
-                      <td className="p-2 text-theme-primary dark:text-gray-100 max-w-xs truncate">
+                      <td className="text-theme-primary max-w-xs truncate p-2 dark:text-gray-100">
                         {transaction.description}
                       </td>
                       <td className="p-2 text-right font-semibold text-red-600 dark:text-red-400">
@@ -441,21 +441,21 @@ const ImportExpensesFromOFXModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
 
             {/* Botões de Ação */}
-            <div className="flex justify-between items-center pt-4">
+            <div className="flex items-center justify-between pt-4">
               <button
                 onClick={() => {
                   setCurrentStep(1);
                   setPreviewData([]);
                   setSelectedRows([]);
                 }}
-                className="px-4 py-2 text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-gray-100"
+                className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary px-4 py-2 text-sm dark:hover:text-gray-100"
               >
                 Voltar
               </button>
               <button
                 onClick={handleConfirmImport}
                 disabled={selectedRows.length === 0}
-                className="px-6 py-2 bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 disabled:bg-gray-400 dark:disabled:bg-gray-600 text-dark-text-primary rounded-lg font-medium transition-colors"
+                className="text-dark-text-primary rounded-lg bg-blue-600 px-6 py-2 font-medium transition-colors hover:bg-blue-700 disabled:bg-gray-400 dark:bg-blue-700 dark:hover:bg-blue-800 dark:disabled:bg-gray-600"
               >
                 Importar {selectedRows.length} despesa(s)
               </button>
@@ -467,13 +467,13 @@ const ImportExpensesFromOFXModal = ({ isOpen, onClose, onSuccess }) => {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <div className="mx-auto w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-4">
-                <Loader2 className="w-8 h-8 text-blue-600 dark:text-blue-400 animate-spin" />
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-600 dark:text-blue-400" />
               </div>
-              <h3 className="text-lg font-semibold text-theme-primary dark:text-gray-100 mb-2">
+              <h3 className="text-theme-primary mb-2 text-lg font-semibold dark:text-gray-100">
                 Importando Despesas
               </h3>
-              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                 Aguarde enquanto cadastramos as despesas...
               </p>
             </div>
@@ -484,20 +484,20 @@ const ImportExpensesFromOFXModal = ({ isOpen, onClose, onSuccess }) => {
           <div className="space-y-6">
             <div className="text-center">
               <div
-                className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4 ${importResult?.sucesso > 0 ? 'bg-green-100 dark:bg-green-900/30' : 'bg-red-100 dark:bg-red-900/30'}`}
+                className={`mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full ${importResult?.sucesso > 0 ? 'bg-green-100 dark:bg-green-900/30' : 'bg-red-100 dark:bg-red-900/30'}`}
               >
                 {importResult?.sucesso > 0 ? (
-                  <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
+                  <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
                 ) : (
-                  <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-400" />
+                  <AlertCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
                 )}
               </div>
-              <h3 className="text-lg font-semibold text-theme-primary dark:text-gray-100 mb-2">
+              <h3 className="text-theme-primary mb-2 text-lg font-semibold dark:text-gray-100">
                 {importResult?.sucesso > 0
                   ? 'Importação Concluída!'
                   : 'Importação com Erros'}
               </h3>
-              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                 {importResult?.sucesso > 0
                   ? 'As despesas foram importadas com sucesso'
                   : 'Ocorreram erros durante a importação'}
@@ -509,7 +509,7 @@ const ImportExpensesFromOFXModal = ({ isOpen, onClose, onSuccess }) => {
               <div className="space-y-3">
                 {/* Sucessos */}
                 {importResult.sucesso > 0 && (
-                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                  <div className="rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium text-green-900 dark:text-green-100">
                         ✅ Despesas Importadas
@@ -523,7 +523,7 @@ const ImportExpensesFromOFXModal = ({ isOpen, onClose, onSuccess }) => {
 
                 {/* Duplicatas */}
                 {importResult.duplicatas > 0 && (
-                  <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                  <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium text-yellow-900 dark:text-yellow-100">
                         ⚠️ Duplicatas Ignoradas
@@ -537,7 +537,7 @@ const ImportExpensesFromOFXModal = ({ isOpen, onClose, onSuccess }) => {
 
                 {/* Erros */}
                 {importResult.erros > 0 && (
-                  <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                  <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium text-red-900 dark:text-red-100">
                         ❌ Erros de Validação
@@ -550,12 +550,12 @@ const ImportExpensesFromOFXModal = ({ isOpen, onClose, onSuccess }) => {
                 )}
 
                 {/* Total Processado */}
-                <div className="bg-light-bg dark:bg-dark-bg border border-light-border dark:border-dark-border rounded-lg p-4">
+                <div className="rounded-lg border border-light-border bg-light-bg p-4 dark:border-dark-border dark:bg-dark-bg">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-theme-primary dark:text-dark-text-primary">
+                    <span className="text-theme-primary dark:text-dark-text-primary text-sm font-medium">
                       📊 Total Processado
                     </span>
-                    <span className="text-lg font-bold text-theme-primary dark:text-dark-text-primary">
+                    <span className="text-theme-primary dark:text-dark-text-primary text-lg font-bold">
                       {importResult.total}
                     </span>
                   </div>
@@ -566,18 +566,18 @@ const ImportExpensesFromOFXModal = ({ isOpen, onClose, onSuccess }) => {
             {/* Detalhes dos Erros (se houver) */}
             {importResult?.errorsList && importResult.errorsList.length > 0 && (
               <div className="mt-6 space-y-3">
-                <h4 className="text-sm font-semibold text-theme-primary dark:text-gray-100">
+                <h4 className="text-theme-primary text-sm font-semibold dark:text-gray-100">
                   📋 Detalhes dos Erros:
                 </h4>
-                <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-lg p-4 max-h-48 overflow-y-auto">
+                <div className="max-h-48 overflow-y-auto rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/10">
                   <div className="space-y-3">
                     {importResult.errorsList.map((error, idx) => (
                       <div
                         key={idx}
-                        className="text-sm border-l-4 border-red-500 pl-3 py-2"
+                        className="border-l-4 border-red-500 py-2 pl-3 text-sm"
                       >
                         <div className="flex items-start gap-2">
-                          <span className="font-semibold text-red-700 dark:text-red-400 min-w-[60px]">
+                          <span className="min-w-[60px] font-semibold text-red-700 dark:text-red-400">
                             Linha {error.line}:
                           </span>
                           <span className="text-red-900 dark:text-red-200">
@@ -585,7 +585,7 @@ const ImportExpensesFromOFXModal = ({ isOpen, onClose, onSuccess }) => {
                           </span>
                         </div>
                         {error.details && (
-                          <div className="mt-1 ml-[68px] text-xs text-red-600 dark:text-red-400">
+                          <div className="ml-[68px] mt-1 text-xs text-red-600 dark:text-red-400">
                             {error.details}
                           </div>
                         )}
@@ -603,21 +603,21 @@ const ImportExpensesFromOFXModal = ({ isOpen, onClose, onSuccess }) => {
   };
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="card-theme dark:bg-dark-surface rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+      <div className="card-theme max-h-[90vh] w-full max-w-2xl overflow-hidden rounded-xl shadow-2xl dark:bg-dark-surface">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-light-border dark:border-dark-border">
+        <div className="flex items-center justify-between border-b border-light-border p-6 dark:border-dark-border">
           <div>
-            <h2 className="text-xl font-bold text-theme-primary dark:text-gray-100">
+            <h2 className="text-theme-primary text-xl font-bold dark:text-gray-100">
               Importar Despesas - OFX
             </h2>
-            <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
+            <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-sm">
               {steps[currentStep - 1]?.title}
             </p>
           </div>
           <button
             onClick={handleClose}
-            className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary dark:hover:text-gray-200 transition-colors"
+            className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary transition-colors dark:hover:text-gray-200"
             disabled={isLoading && currentStep === 2}
           >
             <X className="h-6 w-6" />
@@ -625,7 +625,7 @@ const ImportExpensesFromOFXModal = ({ isOpen, onClose, onSuccess }) => {
         </div>
 
         {/* Progress Steps */}
-        <div className="px-6 py-4 bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50 border-b border-light-border dark:border-dark-border">
+        <div className="border-b border-light-border bg-light-bg px-6 py-4 dark:border-dark-border dark:bg-dark-bg dark:bg-dark-surface/50">
           <div className="flex items-center justify-between">
             {steps.map((step, index) => {
               const Icon = step.icon;
@@ -635,13 +635,13 @@ const ImportExpensesFromOFXModal = ({ isOpen, onClose, onSuccess }) => {
                 <React.Fragment key={step.id}>
                   <div className="flex items-center">
                     <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isActive ? 'bg-blue-600 dark:bg-blue-500 text-white' : isCompleted ? 'bg-green-600 dark:bg-green-500 text-white' : 'bg-light-surface/50 dark:bg-dark-surface/50 text-theme-secondary dark:text-dark-text-muted'}`}
+                      className={`flex h-10 w-10 items-center justify-center rounded-full transition-all ${isActive ? 'bg-blue-600 text-white dark:bg-blue-500' : isCompleted ? 'bg-green-600 text-white dark:bg-green-500' : 'text-theme-secondary dark:text-dark-text-muted bg-light-surface/50 dark:bg-dark-surface/50'}`}
                     >
                       {isCompleted ? (
-                        <CheckCircle className="w-5 h-5" />
+                        <CheckCircle className="h-5 w-5" />
                       ) : (
                         <Icon
-                          className={`w-5 h-5 ${isActive && step.id === 2 ? 'animate-spin' : ''}`}
+                          className={`h-5 w-5 ${isActive && step.id === 2 ? 'animate-spin' : ''}`}
                         />
                       )}
                     </div>
@@ -652,7 +652,7 @@ const ImportExpensesFromOFXModal = ({ isOpen, onClose, onSuccess }) => {
                     </span>
                   </div>
                   {index < steps.length - 1 && (
-                    <ChevronRight className="w-5 h-5 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary mx-2" />
+                    <ChevronRight className="text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary mx-2 h-5 w-5" />
                   )}
                 </React.Fragment>
               );
@@ -661,16 +661,16 @@ const ImportExpensesFromOFXModal = ({ isOpen, onClose, onSuccess }) => {
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+        <div className="max-h-[calc(90vh-200px)] overflow-y-auto p-6">
           {renderStepContent()}
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 p-6 border-t border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50">
+        <div className="flex items-center justify-end gap-3 border-t border-light-border bg-light-bg p-6 dark:border-dark-border dark:bg-dark-bg dark:bg-dark-surface/50">
           {currentStep === 3 && (
             <button
               onClick={handleClose}
-              className="px-6 py-2.5 bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 text-dark-text-primary font-medium rounded-lg transition-colors"
+              className="text-dark-text-primary rounded-lg bg-blue-600 px-6 py-2.5 font-medium transition-colors hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
             >
               Fechar
             </button>
@@ -679,7 +679,7 @@ const ImportExpensesFromOFXModal = ({ isOpen, onClose, onSuccess }) => {
           {currentStep === 1 && (
             <button
               onClick={handleClose}
-              className="btn-theme-secondary px-6 py-2.5 font-medium rounded-lg transition-colors"
+              className="btn-theme-secondary rounded-lg px-6 py-2.5 font-medium transition-colors"
             >
               Cancelar
             </button>

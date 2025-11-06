@@ -401,20 +401,20 @@ const ImportRevenuesFromStatementModal = ({
   return (
     <>
       {/* Overlay */}
-      <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+      <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
         {/* Modal Container */}
-        <div className="bg-dark-surface rounded-2xl shadow-2xl w-full max-w-[520px] overflow-hidden border border-dark-border">
+        <div className="w-full max-w-[520px] overflow-hidden rounded-2xl border border-dark-border bg-dark-surface shadow-2xl">
           {/* === HEADER === */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-dark-border">
+          <div className="flex items-center justify-between border-b border-dark-border px-5 py-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <FileSpreadsheet className="w-5 h-5 text-primary" />
+              <div className="rounded-lg bg-primary/10 p-2">
+                <FileSpreadsheet className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <h2 className="text-lg font-bold text-text-dark-primary">
                   Importar Extrato Bancário
                 </h2>
-                <p className="text-[11px] text-text-dark-secondary mt-0.5 opacity-70">
+                <p className="mt-0.5 text-[11px] text-text-dark-secondary opacity-70">
                   Transforme seu extrato em receitas automaticamente
                 </p>
               </div>
@@ -422,31 +422,31 @@ const ImportRevenuesFromStatementModal = ({
             <button
               onClick={handleClose}
               disabled={processing}
-              className="p-1.5 hover:bg-dark-bg rounded-lg transition-all disabled:opacity-50"
+              className="rounded-lg p-1.5 transition-all hover:bg-dark-bg disabled:opacity-50"
               aria-label="Fechar"
             >
-              <X className="w-4 h-4 text-text-dark-secondary hover:text-text-dark-primary transition-colors" />
+              <X className="h-4 w-4 text-text-dark-secondary transition-colors hover:text-text-dark-primary" />
             </button>
           </div>
 
           {/* === CONTENT === */}
-          <div className="p-5 space-y-4">
+          <div className="space-y-4 p-5">
             {/* Step 1: Upload e Configuração */}
             {currentStep === 1 && (
               <div className="space-y-4">
                 {/* === ZONA 1: CONFIGURAÇÃO (Card Único) === */}
-                <div className="bg-dark-bg rounded-xl p-4 border border-dark-border space-y-4">
+                <div className="space-y-4 rounded-xl border border-dark-border bg-dark-bg p-4">
                   {/* Conta bancária */}
                   <div>
-                    <label className="flex items-center gap-2 text-xs font-semibold text-text-dark-primary mb-2">
-                      <Building2 className="w-4 h-4 text-primary" />
+                    <label className="mb-2 flex items-center gap-2 text-xs font-semibold text-text-dark-primary">
+                      <Building2 className="h-4 w-4 text-primary" />
                       Conta de Origem
                     </label>
                     <div className="relative">
                       <select
                         value={selectedBankAccount}
                         onChange={e => setSelectedBankAccount(e.target.value)}
-                        className="w-full pl-3 pr-8 py-2.5 text-sm border border-dark-border rounded-lg bg-dark-surface text-text-dark-primary focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none appearance-none cursor-pointer hover:border-primary/50"
+                        className="w-full cursor-pointer appearance-none rounded-lg border border-dark-border bg-dark-surface py-2.5 pl-3 pr-8 text-sm text-text-dark-primary outline-none transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/50"
                       >
                         <option value="">Selecione a conta bancária</option>
                         {bankAccounts.map(bank => (
@@ -456,21 +456,21 @@ const ImportRevenuesFromStatementModal = ({
                           </option>
                         ))}
                       </select>
-                      <ChevronDown className="w-4 h-4 text-text-dark-secondary absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-dark-secondary" />
                     </div>
                   </div>
 
                   {/* Upload de arquivo */}
                   <div>
-                    <label className="flex items-center gap-2 text-xs font-semibold text-text-dark-primary mb-2">
-                      <FileSpreadsheet className="w-4 h-4 text-primary" />
+                    <label className="mb-2 flex items-center gap-2 text-xs font-semibold text-text-dark-primary">
+                      <FileSpreadsheet className="h-4 w-4 text-primary" />
                       Arquivo do Extrato
                     </label>
 
                     {!file ? (
                       /* Estado: Sem arquivo */
                       <div
-                        className="border-2 border-dashed border-dark-border rounded-lg p-6 text-center hover:border-primary hover:bg-primary/5 transition-all cursor-pointer group"
+                        className="group cursor-pointer rounded-lg border-2 border-dashed border-dark-border p-6 text-center transition-all hover:border-primary hover:bg-primary/5"
                         onClick={() =>
                           document.getElementById('file-upload').click()
                         }
@@ -483,8 +483,8 @@ const ImportRevenuesFromStatementModal = ({
                           className="hidden"
                           disabled={!selectedBankAccount}
                         />
-                        <Upload className="w-9 h-9 text-text-dark-secondary group-hover:text-primary mx-auto mb-2.5 transition-colors" />
-                        <p className="text-sm font-medium text-text-dark-primary mb-1">
+                        <Upload className="mx-auto mb-2.5 h-9 w-9 text-text-dark-secondary transition-colors group-hover:text-primary" />
+                        <p className="mb-1 text-sm font-medium text-text-dark-primary">
                           {selectedBankAccount
                             ? 'Arraste ou clique aqui'
                             : 'Selecione uma conta primeiro'}
@@ -495,34 +495,34 @@ const ImportRevenuesFromStatementModal = ({
                       </div>
                     ) : (
                       /* Estado: Com arquivo + Preview */
-                      <div className="border border-dark-border rounded-lg p-3 bg-dark-surface space-y-3">
+                      <div className="space-y-3 rounded-lg border border-dark-border bg-dark-surface p-3">
                         {/* Info do arquivo */}
                         <div className="flex items-start justify-between gap-2">
-                          <div className="flex items-start gap-2.5 flex-1 min-w-0">
+                          <div className="flex min-w-0 flex-1 items-start gap-2.5">
                             <div
-                              className={`p-1.5 rounded-lg ${uploadSuccess ? 'bg-feedback-dark-success/10' : 'bg-primary/10'}`}
+                              className={`rounded-lg p-1.5 ${uploadSuccess ? 'bg-feedback-dark-success/10' : 'bg-primary/10'}`}
                             >
                               {uploadSuccess ? (
-                                <CheckCircle className="w-4 h-4 text-feedback-dark-success" />
+                                <CheckCircle className="h-4 w-4 text-feedback-dark-success" />
                               ) : (
-                                <FileSpreadsheet className="w-4 h-4 text-primary" />
+                                <FileSpreadsheet className="h-4 w-4 text-primary" />
                               )}
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-semibold text-text-dark-primary truncate">
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-xs font-semibold text-text-dark-primary">
                                 {file.name}
                               </p>
-                              <p className="text-[11px] text-text-dark-secondary mt-0.5">
+                              <p className="mt-0.5 text-[11px] text-text-dark-secondary">
                                 {(file.size / 1024).toFixed(1)} KB
                               </p>
                             </div>
                           </div>
                           <button
                             onClick={handleRemoveFile}
-                            className="p-1.5 hover:bg-dark-bg rounded-lg transition-colors group"
+                            className="group rounded-lg p-1.5 transition-colors hover:bg-dark-bg"
                             title="Remover arquivo"
                           >
-                            <Trash2 className="w-4 h-4 text-text-dark-secondary group-hover:text-feedback-dark-error transition-colors" />
+                            <Trash2 className="h-4 w-4 text-text-dark-secondary transition-colors group-hover:text-feedback-dark-error" />
                           </button>
                         </div>
 
@@ -530,24 +530,24 @@ const ImportRevenuesFromStatementModal = ({
                         {filePreview && filePreview.length > 0 && (
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                              <p className="text-[11px] font-semibold text-text-dark-secondary uppercase tracking-wide">
+                              <p className="text-[11px] font-semibold uppercase tracking-wide text-text-dark-secondary">
                                 Preview
                               </p>
-                              <p className="text-[11px] text-primary font-semibold">
+                              <p className="text-[11px] font-semibold text-primary">
                                 {recordCount} registros
                               </p>
                             </div>
-                            <div className="bg-dark-bg rounded-lg overflow-hidden border border-dark-border">
+                            <div className="overflow-hidden rounded-lg border border-dark-border bg-dark-bg">
                               <table className="w-full text-[11px]">
                                 <thead className="bg-dark-border/30">
                                   <tr>
-                                    <th className="px-2 py-1.5 text-left text-text-dark-secondary font-semibold">
+                                    <th className="px-2 py-1.5 text-left font-semibold text-text-dark-secondary">
                                       Profissional
                                     </th>
-                                    <th className="px-2 py-1.5 text-right text-text-dark-secondary font-semibold">
+                                    <th className="px-2 py-1.5 text-right font-semibold text-text-dark-secondary">
                                       Valor
                                     </th>
-                                    <th className="px-2 py-1.5 text-left text-text-dark-secondary font-semibold">
+                                    <th className="px-2 py-1.5 text-left font-semibold text-text-dark-secondary">
                                       Cliente
                                     </th>
                                   </tr>
@@ -561,7 +561,7 @@ const ImportRevenuesFromStatementModal = ({
                                       <td className="px-2 py-1.5 text-text-dark-primary">
                                         {row.profissional}
                                       </td>
-                                      <td className="px-2 py-1.5 text-right text-feedback-dark-success font-medium">
+                                      <td className="px-2 py-1.5 text-right font-medium text-feedback-dark-success">
                                         {row.valor}
                                       </td>
                                       <td className="px-2 py-1.5 text-text-dark-primary">
@@ -580,35 +580,35 @@ const ImportRevenuesFromStatementModal = ({
                 </div>
 
                 {/* === ZONA 2: INFORMAÇÕES COLAPSÁVEIS === */}
-                <div className="border border-dark-border rounded-lg overflow-hidden">
+                <div className="overflow-hidden rounded-lg border border-dark-border">
                   <button
                     onClick={() => setShowColumnInfo(!showColumnInfo)}
-                    className="w-full px-4 py-3 flex items-center justify-between bg-dark-bg hover:bg-dark-surface transition-colors group"
+                    className="group flex w-full items-center justify-between bg-dark-bg px-4 py-3 transition-colors hover:bg-dark-surface"
                   >
                     <div className="flex items-center gap-2">
-                      <FileSpreadsheet className="w-4 h-4 text-primary" />
+                      <FileSpreadsheet className="h-4 w-4 text-primary" />
                       <span className="text-xs font-semibold text-text-dark-primary">
                         Colunas obrigatórias
                       </span>
-                      <span className="text-[10px] text-text-dark-secondary bg-dark-border px-1.5 py-0.5 rounded">
+                      <span className="rounded bg-dark-border px-1.5 py-0.5 text-[10px] text-text-dark-secondary">
                         8 campos
                       </span>
                     </div>
                     {showColumnInfo ? (
-                      <ChevronUp className="w-4 h-4 text-text-dark-secondary group-hover:text-primary transition-colors" />
+                      <ChevronUp className="h-4 w-4 text-text-dark-secondary transition-colors group-hover:text-primary" />
                     ) : (
-                      <ChevronDown className="w-4 h-4 text-text-dark-secondary group-hover:text-primary transition-colors" />
+                      <ChevronDown className="h-4 w-4 text-text-dark-secondary transition-colors group-hover:text-primary" />
                     )}
                   </button>
 
                   {/* Conteúdo colapsável */}
                   <div
-                    className={`transition-all duration-300 ease-in-out ${showColumnInfo ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}
+                    className={`transition-all duration-300 ease-in-out ${showColumnInfo ? 'max-h-96 opacity-100' : 'max-h-0 overflow-hidden opacity-0'}`}
                   >
-                    <div className="px-4 py-3 bg-dark-surface border-t border-dark-border">
+                    <div className="border-t border-dark-border bg-dark-surface px-4 py-3">
                       <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-[11px]">
                         <div className="flex items-start gap-2">
-                          <User className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
+                          <User className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-primary" />
                           <div>
                             <p className="font-semibold text-text-dark-primary">
                               Profissional
@@ -619,7 +619,7 @@ const ImportRevenuesFromStatementModal = ({
                           </div>
                         </div>
                         <div className="flex items-start gap-2">
-                          <Package className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
+                          <Package className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-primary" />
                           <div>
                             <p className="font-semibold text-text-dark-primary">
                               Item
@@ -630,7 +630,7 @@ const ImportRevenuesFromStatementModal = ({
                           </div>
                         </div>
                         <div className="flex items-start gap-2">
-                          <DollarSign className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
+                          <DollarSign className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-primary" />
                           <div>
                             <p className="font-semibold text-text-dark-primary">
                               Valor Unitário
@@ -641,7 +641,7 @@ const ImportRevenuesFromStatementModal = ({
                           </div>
                         </div>
                         <div className="flex items-start gap-2">
-                          <DollarSign className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
+                          <DollarSign className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-primary" />
                           <div>
                             <p className="font-semibold text-text-dark-primary">
                               Valor
@@ -652,7 +652,7 @@ const ImportRevenuesFromStatementModal = ({
                           </div>
                         </div>
                         <div className="flex items-start gap-2">
-                          <Hash className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
+                          <Hash className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-primary" />
                           <div>
                             <p className="font-semibold text-text-dark-primary">
                               Qtd
@@ -663,7 +663,7 @@ const ImportRevenuesFromStatementModal = ({
                           </div>
                         </div>
                         <div className="flex items-start gap-2">
-                          <Calendar className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
+                          <Calendar className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-primary" />
                           <div>
                             <p className="font-semibold text-text-dark-primary">
                               Data
@@ -674,7 +674,7 @@ const ImportRevenuesFromStatementModal = ({
                           </div>
                         </div>
                         <div className="flex items-start gap-2">
-                          <CreditCard className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
+                          <CreditCard className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-primary" />
                           <div>
                             <p className="font-semibold text-text-dark-primary">
                               Pagamento
@@ -685,7 +685,7 @@ const ImportRevenuesFromStatementModal = ({
                           </div>
                         </div>
                         <div className="flex items-start gap-2">
-                          <Users className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
+                          <Users className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-primary" />
                           <div>
                             <p className="font-semibold text-text-dark-primary">
                               Cliente
@@ -702,20 +702,20 @@ const ImportRevenuesFromStatementModal = ({
 
                 {/* Erros */}
                 {errors.length > 0 && (
-                  <div className="bg-feedback-dark-error/10 border border-feedback-dark-error/30 rounded-lg p-3">
-                    <div className="flex items-center gap-2 mb-2">
-                      <AlertTriangle className="w-4 h-4 text-feedback-dark-error" />
-                      <h4 className="font-bold text-feedback-dark-error text-xs">
+                  <div className="rounded-lg border border-feedback-dark-error/30 bg-feedback-dark-error/10 p-3">
+                    <div className="mb-2 flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4 text-feedback-dark-error" />
+                      <h4 className="text-xs font-bold text-feedback-dark-error">
                         {errors.length} Erros Encontrados
                       </h4>
                     </div>
-                    <ul className="text-[11px] text-text-dark-primary space-y-1.5 max-h-24 overflow-y-auto custom-scrollbar">
+                    <ul className="custom-scrollbar max-h-24 space-y-1.5 overflow-y-auto text-[11px] text-text-dark-primary">
                       {errors.slice(0, 5).map((err, idx) => (
                         <li
                           key={idx}
-                          className="flex items-start gap-1.5 bg-dark-surface p-1.5 rounded"
+                          className="flex items-start gap-1.5 rounded bg-dark-surface p-1.5"
                         >
-                          <span className="text-feedback-dark-error font-bold">
+                          <span className="font-bold text-feedback-dark-error">
                             L{err.line}:
                           </span>
                           <span className="flex-1 text-text-dark-secondary">
@@ -724,7 +724,7 @@ const ImportRevenuesFromStatementModal = ({
                         </li>
                       ))}
                       {errors.length > 5 && (
-                        <li className="text-text-dark-secondary text-center pt-1">
+                        <li className="pt-1 text-center text-text-dark-secondary">
                           +{errors.length - 5} erros adicionais
                         </li>
                       )}
@@ -737,8 +737,8 @@ const ImportRevenuesFromStatementModal = ({
             {/* Step 2: Processing */}
             {currentStep === 2 && (
               <div className="flex flex-col items-center justify-center py-10">
-                <div className="w-14 h-14 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4" />
-                <p className="text-base font-bold text-text-dark-primary mb-1">
+                <div className="mb-4 h-14 w-14 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                <p className="mb-1 text-base font-bold text-text-dark-primary">
                   Processando extrato...
                 </p>
                 <p className="text-xs text-text-dark-secondary">
@@ -751,56 +751,56 @@ const ImportRevenuesFromStatementModal = ({
             {currentStep === 4 && importReport && (
               <div className="space-y-3 py-2">
                 <div className="flex items-center justify-center">
-                  <div className="w-14 h-14 bg-feedback-dark-success/20 rounded-full flex items-center justify-center animate-pulse">
-                    <CheckCircle className="w-9 h-9 text-feedback-dark-success" />
+                  <div className="flex h-14 w-14 animate-pulse items-center justify-center rounded-full bg-feedback-dark-success/20">
+                    <CheckCircle className="h-9 w-9 text-feedback-dark-success" />
                   </div>
                 </div>
 
                 <div className="text-center">
-                  <h3 className="text-lg font-bold text-text-dark-primary mb-1">
+                  <h3 className="mb-1 text-lg font-bold text-text-dark-primary">
                     Importação Concluída!
                   </h3>
-                  <p className="text-text-dark-secondary text-xs">
+                  <p className="text-xs text-text-dark-secondary">
                     As receitas foram importadas com sucesso ✨
                   </p>
                 </div>
 
                 {/* Report */}
-                <div className="bg-dark-surface rounded-lg p-3 space-y-2 border border-dark-border text-sm">
-                  <div className="flex justify-between items-center py-1 border-b border-dark-border">
-                    <span className="text-text-dark-secondary font-medium text-xs">
+                <div className="space-y-2 rounded-lg border border-dark-border bg-dark-surface p-3 text-sm">
+                  <div className="flex items-center justify-between border-b border-dark-border py-1">
+                    <span className="text-xs font-medium text-text-dark-secondary">
                       Total lidos:
                     </span>
                     <span className="font-bold text-text-dark-primary">
                       {importReport.total_lidos}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center py-1 border-b border-dark-border">
-                    <span className="text-text-dark-secondary font-medium text-xs">
+                  <div className="flex items-center justify-between border-b border-dark-border py-1">
+                    <span className="text-xs font-medium text-text-dark-secondary">
                       Aprovados:
                     </span>
                     <span className="font-bold text-feedback-dark-success">
                       {importReport.total_aprovados}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center py-1 border-b border-dark-border">
-                    <span className="text-text-dark-secondary font-medium text-xs">
+                  <div className="flex items-center justify-between border-b border-dark-border py-1">
+                    <span className="text-xs font-medium text-text-dark-secondary">
                       Duplicatas ignoradas:
                     </span>
                     <span className="font-bold text-feedback-dark-warning">
                       {importReport.duplicatas_ignoradas}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center py-1 border-b border-dark-border">
-                    <span className="text-text-dark-secondary font-medium text-xs">
+                  <div className="flex items-center justify-between border-b border-dark-border py-1">
+                    <span className="text-xs font-medium text-text-dark-secondary">
                       Clientes criados:
                     </span>
                     <span className="font-bold text-primary">
                       {importReport.clientes_criados}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center py-1">
-                    <span className="text-text-dark-secondary font-medium text-xs">
+                  <div className="flex items-center justify-between py-1">
+                    <span className="text-xs font-medium text-text-dark-secondary">
                       Tempo de execução:
                     </span>
                     <span className="font-bold text-text-dark-primary">
@@ -811,7 +811,7 @@ const ImportRevenuesFromStatementModal = ({
 
                 <button
                   onClick={handleClose}
-                  className="w-full px-4 py-2.5 bg-primary text-dark-bg rounded-lg hover:bg-primary-hover font-bold text-sm transition-all shadow-lg shadow-primary/30"
+                  className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-bold text-dark-bg shadow-lg shadow-primary/30 transition-all hover:bg-primary-hover"
                 >
                   Fechar
                 </button>
@@ -823,9 +823,9 @@ const ImportRevenuesFromStatementModal = ({
           {currentStep === 1 && (
             <div className="border-t border-dark-border bg-dark-surface px-5 py-4">
               {/* Status */}
-              <div className="flex items-center justify-between mb-3">
+              <div className="mb-3 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs">
-                  <FileSpreadsheet className="w-4 h-4 text-primary" />
+                  <FileSpreadsheet className="h-4 w-4 text-primary" />
                   <span className="font-semibold text-text-dark-primary">
                     {recordCount > 0
                       ? `${recordCount} registros detectados`
@@ -834,8 +834,8 @@ const ImportRevenuesFromStatementModal = ({
                 </div>
                 {selectedBankAccount && bankAccounts.length > 0 && (
                   <div className="flex items-center gap-1.5 text-[11px] text-text-dark-secondary">
-                    <Building2 className="w-3.5 h-3.5" />
-                    <span className="truncate max-w-[200px]">
+                    <Building2 className="h-3.5 w-3.5" />
+                    <span className="max-w-[200px] truncate">
                       {bankAccounts.find(b => b.id === selectedBankAccount)
                         ?.bank_name || 'Conta selecionada'}
                     </span>
@@ -848,7 +848,7 @@ const ImportRevenuesFromStatementModal = ({
                 <button
                   onClick={handleClose}
                   disabled={processing}
-                  className="px-4 py-2.5 border border-dark-border rounded-lg hover:bg-dark-bg transition-all disabled:opacity-50 text-sm font-semibold text-text-dark-primary"
+                  className="rounded-lg border border-dark-border px-4 py-2.5 text-sm font-semibold text-text-dark-primary transition-all hover:bg-dark-bg disabled:opacity-50"
                 >
                   Cancelar
                 </button>
@@ -860,18 +860,18 @@ const ImportRevenuesFromStatementModal = ({
                     processing ||
                     recordCount === 0
                   }
-                  className="flex-1 px-4 py-2.5 bg-primary text-dark-bg rounded-lg hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-bold text-sm transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30 disabled:shadow-none relative overflow-hidden group"
+                  className="group relative flex flex-1 items-center justify-center gap-2 overflow-hidden rounded-lg bg-primary px-4 py-2.5 text-sm font-bold text-dark-bg shadow-lg shadow-primary/20 transition-all hover:bg-primary-hover hover:shadow-primary/30 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
                 >
                   {processing ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-dark-bg border-t-transparent rounded-full animate-spin" />
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-dark-bg border-t-transparent" />
                       Processando...
                     </>
                   ) : (
                     <>
                       <span>Processar Extrato</span>
                       <svg
-                        className="w-4 h-4 transition-transform group-hover:translate-x-0.5"
+                        className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -886,7 +886,7 @@ const ImportRevenuesFromStatementModal = ({
                     </>
                   )}
                   {!processing && file && recordCount > 0 && (
-                    <div className="absolute inset-0 bg-primary-hover opacity-0 group-hover:opacity-10 transition-opacity" />
+                    <div className="absolute inset-0 bg-primary-hover opacity-0 transition-opacity group-hover:opacity-10" />
                   )}
                 </button>
               </div>

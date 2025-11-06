@@ -115,18 +115,18 @@ const CreateUnitModal = ({ isOpen, onClose, onSuccess }) => {
         />
 
         {/* Modal */}
-        <div className="relative transform overflow-hidden rounded-lg card-theme dark:bg-dark-surface px-6 pb-6 pt-5 text-left shadow-xl transition-all w-full max-w-lg">
+        <div className="card-theme relative w-full max-w-lg transform overflow-hidden rounded-lg px-6 pb-6 pt-5 text-left shadow-xl transition-all dark:bg-dark-surface">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
+          <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center">
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg mr-3">
+              <div className="mr-3 rounded-lg bg-blue-100 p-2 dark:bg-blue-900/30">
                 <Building2 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+                <h3 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
                   Nova Unidade
                 </h3>
-                <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                   Cadastre uma nova unidade da rede
                 </p>
               </div>
@@ -134,7 +134,7 @@ const CreateUnitModal = ({ isOpen, onClose, onSuccess }) => {
             <button
               onClick={handleClose}
               disabled={creating}
-              className="p-2 text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary dark:hover:text-gray-200 rounded-lg hover:card-theme dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary hover:card-theme rounded-lg p-2 transition-colors disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700 dark:hover:text-gray-200"
             >
               <X className="h-5 w-5" />
             </button>
@@ -146,7 +146,7 @@ const CreateUnitModal = ({ isOpen, onClose, onSuccess }) => {
             <div>
               <label
                 htmlFor="name"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2"
+                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600"
               >
                 Nome da Unidade *
               </label>
@@ -164,8 +164,8 @@ const CreateUnitModal = ({ isOpen, onClose, onSuccess }) => {
                 autoFocus
               />
               {touched.name && errors.name && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center">
-                  <AlertTriangle className="h-4 w-4 mr-1" />
+                <p className="mt-1 flex items-center text-sm text-red-600 dark:text-red-400">
+                  <AlertTriangle className="mr-1 h-4 w-4" />
                   {errors.name}
                 </p>
               )}
@@ -180,26 +180,26 @@ const CreateUnitModal = ({ isOpen, onClose, onSuccess }) => {
                   checked={formData.status}
                   onChange={handleInputChange}
                   disabled={creating}
-                  className="rounded border-light-border dark:border-dark-border text-blue-600 focus:ring-blue-500 dark:bg-gray-700 disabled:opacity-50"
+                  className="rounded border-light-border text-blue-600 focus:ring-blue-500 disabled:opacity-50 dark:border-dark-border dark:bg-gray-700"
                 />
                 <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Unidade ativa (habilitada para operação)
                 </span>
               </label>
-              <p className="mt-1 text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-xs">
                 Unidades inativas não aparecerão nas listas de seleção
               </p>
             </div>
 
             {/* Info Box */}
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
               <div className="flex">
-                <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-3" />
+                <Building2 className="mr-3 mt-0.5 h-5 w-5 text-blue-600 dark:text-blue-400" />
                 <div className="text-sm">
-                  <p className="text-blue-800 dark:text-blue-300 font-medium mb-1">
+                  <p className="mb-1 font-medium text-blue-800 dark:text-blue-300">
                     Informações importantes:
                   </p>
-                  <ul className="text-blue-700 dark:text-blue-400 space-y-1">
+                  <ul className="space-y-1 text-blue-700 dark:text-blue-400">
                     <li>
                       • A unidade será disponibilizada para cadastro de
                       profissionais
@@ -215,7 +215,7 @@ const CreateUnitModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
 
             {/* Actions */}
-            <div className="flex items-center justify-end space-x-3 pt-4 border-t border-light-border dark:border-dark-border">
+            <div className="flex items-center justify-end space-x-3 border-t border-light-border pt-4 dark:border-dark-border">
               <Button
                 type="button"
                 variant="secondary"
@@ -232,7 +232,7 @@ const CreateUnitModal = ({ isOpen, onClose, onSuccess }) => {
                 loading={creating}
                 loadingText="Criando..."
               >
-                <Check className="h-4 w-4 mr-2" />
+                <Check className="mr-2 h-4 w-4" />
                 Criar Unidade
               </Button>
             </div>

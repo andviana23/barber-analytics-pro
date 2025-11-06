@@ -93,19 +93,7 @@ const StatusBadge = ({
 
   return (
     <span
-      className={`
-        inline-flex items-center ${sizeStyles.gap}
-        ${sizeStyles.padding}
-        ${sizeStyles.text}
-        font-medium
-        rounded-full
-        border
-        ${config.bgClass}
-        ${config.textClass}
-        ${config.borderClass}
-        transition-colors
-        ${className}
-      `}
+      className={`inline-flex items-center ${sizeStyles.gap} ${sizeStyles.padding} ${sizeStyles.text} rounded-full border font-medium ${config.bgClass} ${config.textClass} ${config.borderClass} transition-colors ${className} `}
       role="status"
       aria-label={config.ariaLabel}
     >

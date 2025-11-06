@@ -127,18 +127,18 @@ const EditUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
         />
 
         {/* Modal */}
-        <div className="relative transform overflow-hidden rounded-lg card-theme dark:bg-dark-surface px-6 pb-6 pt-5 text-left shadow-xl transition-all w-full max-w-lg">
+        <div className="card-theme relative w-full max-w-lg transform overflow-hidden rounded-lg px-6 pb-6 pt-5 text-left shadow-xl transition-all dark:bg-dark-surface">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
+          <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center">
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg mr-3">
+              <div className="mr-3 rounded-lg bg-blue-100 p-2 dark:bg-blue-900/30">
                 <Building2 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+                <h3 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
                   Editar Unidade
                 </h3>
-                <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                   Altere as informações da unidade
                 </p>
               </div>
@@ -146,7 +146,7 @@ const EditUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
             <button
               onClick={handleClose}
               disabled={updating}
-              className="p-2 text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary dark:hover:text-gray-200 rounded-lg hover:card-theme dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary hover:card-theme rounded-lg p-2 transition-colors disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700 dark:hover:text-gray-200"
             >
               <X className="h-5 w-5" />
             </button>
@@ -158,7 +158,7 @@ const EditUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
             <div>
               <label
                 htmlFor="name"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2"
+                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600"
               >
                 Nome da Unidade *
               </label>
@@ -176,8 +176,8 @@ const EditUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
                 autoFocus
               />
               {touched.name && errors.name && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center">
-                  <AlertTriangle className="h-4 w-4 mr-1" />
+                <p className="mt-1 flex items-center text-sm text-red-600 dark:text-red-400">
+                  <AlertTriangle className="mr-1 h-4 w-4" />
                   {errors.name}
                 </p>
               )}
@@ -192,27 +192,27 @@ const EditUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
                   checked={formData.status}
                   onChange={handleInputChange}
                   disabled={updating}
-                  className="rounded border-light-border dark:border-dark-border text-blue-600 focus:ring-blue-500 dark:bg-gray-700 disabled:opacity-50"
+                  className="rounded border-light-border text-blue-600 focus:ring-blue-500 disabled:opacity-50 dark:border-dark-border dark:bg-gray-700"
                 />
                 <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Unidade ativa (habilitada para operação)
                 </span>
               </label>
-              <p className="mt-1 text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-xs">
                 Desativar removerá a unidade das listas de seleção
               </p>
             </div>
 
             {/* Info sobre alterações */}
             {hasChanges && (
-              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+              <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20">
                 <div className="flex">
-                  <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5 mr-3" />
+                  <AlertTriangle className="mr-3 mt-0.5 h-5 w-5 text-amber-600 dark:text-amber-400" />
                   <div className="text-sm">
-                    <p className="text-amber-800 dark:text-amber-300 font-medium mb-1">
+                    <p className="mb-1 font-medium text-amber-800 dark:text-amber-300">
                       Alterações detectadas:
                     </p>
-                    <ul className="text-amber-700 dark:text-amber-400 space-y-1">
+                    <ul className="space-y-1 text-amber-700 dark:text-amber-400">
                       {formData.name !== unit.name && (
                         <li>
                           • Nome: "{unit.name}" → "{formData.name}"
@@ -231,11 +231,11 @@ const EditUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
             )}
 
             {/* Informações da unidade */}
-            <div className="bg-light-bg dark:bg-dark-bg dark:bg-gray-700 rounded-lg p-4 space-y-2">
-              <h4 className="text-sm font-medium text-theme-primary dark:text-dark-text-primary">
+            <div className="space-y-2 rounded-lg bg-light-bg p-4 dark:bg-dark-bg dark:bg-gray-700">
+              <h4 className="text-theme-primary dark:text-dark-text-primary text-sm font-medium">
                 Informações da Unidade
               </h4>
-              <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted space-y-1">
+              <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted space-y-1 text-sm">
                 <div>
                   <span className="font-medium">ID:</span> {unit.id}
                 </div>
@@ -253,7 +253,7 @@ const EditUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
             </div>
 
             {/* Actions */}
-            <div className="flex items-center justify-end space-x-3 pt-4 border-t border-light-border dark:border-dark-border">
+            <div className="flex items-center justify-end space-x-3 border-t border-light-border pt-4 dark:border-dark-border">
               <Button
                 type="button"
                 variant="secondary"
@@ -270,7 +270,7 @@ const EditUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
                 loading={updating}
                 loadingText="Salvando..."
               >
-                <Check className="h-4 w-4 mr-2" />
+                <Check className="mr-2 h-4 w-4" />
                 {hasChanges ? 'Salvar Alterações' : 'Sem Alterações'}
               </Button>
             </div>

@@ -71,8 +71,8 @@ const UnitsStats = ({ units = [], loading = false }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-2 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
+        <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted ml-2">
           Carregando estatísticas...
         </span>
       </div>
@@ -81,8 +81,8 @@ const UnitsStats = ({ units = [], loading = false }) => {
   if (units.length === 0) {
     return (
       <Card className="p-8 text-center">
-        <BarChart3 className="h-16 w-16 text-light-text-muted dark:text-dark-text-muted mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-theme-primary dark:text-dark-text-primary mb-2">
+        <BarChart3 className="text-light-text-muted dark:text-dark-text-muted mx-auto mb-4 h-16 w-16" />
+        <h3 className="text-theme-primary dark:text-dark-text-primary mb-2 text-lg font-medium">
           Sem dados para exibir
         </h3>
         <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
@@ -95,10 +95,10 @@ const UnitsStats = ({ units = [], loading = false }) => {
     <div className="space-y-6">
       {/* Estatísticas Globais */}
       <div>
-        <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-4">
+        <h3 className="text-theme-primary dark:text-dark-text-primary mb-4 text-lg font-semibold">
           Visão Geral da Rede
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <KPICard
             title="Faturamento Total"
             value={formatCurrency(globalStats.totalRevenue)}
@@ -107,7 +107,7 @@ const UnitsStats = ({ units = [], loading = false }) => {
               value: 0,
               isPositive: true,
             }}
-            className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+            className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20"
           />
 
           <KPICard
@@ -118,7 +118,7 @@ const UnitsStats = ({ units = [], loading = false }) => {
               value: 0,
               isPositive: globalProfit >= 0,
             }}
-            className={`${globalProfit >= 0 ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800' : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'}`}
+            className={`${globalProfit >= 0 ? 'border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20' : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'}`}
           />
 
           <KPICard
@@ -129,7 +129,7 @@ const UnitsStats = ({ units = [], loading = false }) => {
               value: 0,
               isPositive: true,
             }}
-            className="bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800"
+            className="border-purple-200 bg-purple-50 dark:border-purple-800 dark:bg-purple-900/20"
           />
 
           <KPICard
@@ -140,27 +140,27 @@ const UnitsStats = ({ units = [], loading = false }) => {
               value: 0,
               isPositive: true,
             }}
-            className="bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800"
+            className="border-indigo-200 bg-indigo-50 dark:border-indigo-800 dark:bg-indigo-900/20"
           />
         </div>
       </div>
 
       {/* Top Performers */}
       <div>
-        <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-4">
+        <h3 className="text-theme-primary dark:text-dark-text-primary mb-4 text-lg font-semibold">
           Destaques do Mês
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {topUnitByRevenue?.stats && (
-            <Card className="p-6 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
-              <div className="flex items-center justify-between mb-4">
+            <Card className="border-green-200 bg-green-50 p-6 dark:border-green-800 dark:bg-green-900/20">
+              <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center">
-                  <Trophy className="h-8 w-8 text-green-600 mr-3" />
+                  <Trophy className="mr-3 h-8 w-8 text-green-600" />
                   <div>
                     <h4 className="text-lg font-semibold text-green-900 dark:text-green-100">
                       Maior Faturamento
                     </h4>
-                    <p className="text-green-700 dark:text-green-300 text-sm">
+                    <p className="text-sm text-green-700 dark:text-green-300">
                       {topUnitByRevenue.name}
                     </p>
                   </div>
@@ -181,15 +181,15 @@ const UnitsStats = ({ units = [], loading = false }) => {
           )}
 
           {topUnitByAttendances?.stats && (
-            <Card className="p-6 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-              <div className="flex items-center justify-between mb-4">
+            <Card className="border-blue-200 bg-blue-50 p-6 dark:border-blue-800 dark:bg-blue-900/20">
+              <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center">
-                  <BarChart3 className="h-8 w-8 text-blue-600 mr-3" />
+                  <BarChart3 className="mr-3 h-8 w-8 text-blue-600" />
                   <div>
                     <h4 className="text-lg font-semibold text-blue-900 dark:text-blue-100">
                       Mais Atendimentos
                     </h4>
-                    <p className="text-blue-700 dark:text-blue-300 text-sm">
+                    <p className="text-sm text-blue-700 dark:text-blue-300">
                       {topUnitByAttendances.name}
                     </p>
                   </div>
@@ -213,26 +213,26 @@ const UnitsStats = ({ units = [], loading = false }) => {
 
       {/* Detalhes por Unidade */}
       <div>
-        <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-4">
+        <h3 className="text-theme-primary dark:text-dark-text-primary mb-4 text-lg font-semibold">
           Desempenho por Unidade
         </h3>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {units.map(unit => (
             <Card key={unit.id} className="p-6">
-              <div className="flex items-center justify-between mb-4">
+              <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center">
-                  <Building2 className="h-6 w-6 text-blue-600 mr-3" />
+                  <Building2 className="mr-3 h-6 w-6 text-blue-600" />
                   <div>
-                    <h4 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+                    <h4 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
                       {unit.name}
                     </h4>
-                    <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                    <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                       {unit.stats?.professionals.total || 0} profissionais
                     </p>
                   </div>
                 </div>
                 <div
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${unit.status ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}`}
+                  className={`rounded-full px-3 py-1 text-xs font-medium ${unit.status ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}`}
                 >
                   {unit.status ? 'Ativa' : 'Inativa'}
                 </div>
@@ -241,7 +241,7 @@ const UnitsStats = ({ units = [], loading = false }) => {
               {unit.stats ? (
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                    <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                       Faturamento
                     </div>
                     <div className="text-lg font-semibold text-green-600">
@@ -250,7 +250,7 @@ const UnitsStats = ({ units = [], loading = false }) => {
                   </div>
 
                   <div className="space-y-2">
-                    <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                    <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                       Atendimentos
                     </div>
                     <div className="text-lg font-semibold text-blue-600">
@@ -259,7 +259,7 @@ const UnitsStats = ({ units = [], loading = false }) => {
                   </div>
 
                   <div className="space-y-2">
-                    <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                    <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                       Lucro
                     </div>
                     <div
@@ -270,7 +270,7 @@ const UnitsStats = ({ units = [], loading = false }) => {
                   </div>
 
                   <div className="space-y-2">
-                    <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                    <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                       Ticket Médio
                     </div>
                     <div className="text-lg font-semibold text-purple-600">
@@ -279,7 +279,7 @@ const UnitsStats = ({ units = [], loading = false }) => {
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-4 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted py-4 text-center">
                   Estatísticas não disponíveis
                 </div>
               )}

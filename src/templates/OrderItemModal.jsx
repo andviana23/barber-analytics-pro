@@ -135,19 +135,19 @@ const OrderItemModal = ({
 
         {/* Quantidade */}
         <div>
-          <label className="block text-sm font-medium text-theme-primary mb-2">
+          <label className="text-theme-primary mb-2 block text-sm font-medium">
             Quantidade
-            <span className="text-red-500 ml-1">*</span>
+            <span className="ml-1 text-red-500">*</span>
           </label>
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
               disabled={loading || quantity <= 1}
-              className="w-10 h-10 rounded-lg border border-light-border dark:border-dark-border card-theme dark:bg-dark-surface text-theme-primary hover:bg-light-surface dark:hover:bg-dark-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="card-theme text-theme-primary flex h-10 w-10 items-center justify-center rounded-lg border border-light-border transition-colors hover:bg-light-surface disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-border dark:bg-dark-surface dark:hover:bg-dark-hover"
             >
               <svg
-                className="w-5 h-5"
+                className="h-5 w-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -172,17 +172,17 @@ const OrderItemModal = ({
               disabled={loading}
               min={1}
               max={99}
-              className={`flex-1 px-4 py-2.5 rounded-lg border bg-white dark:bg-dark-surface text-theme-primary text-center font-semibold text-lg focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-60 disabled:cursor-not-allowed ${errors.quantity ? 'border-red-500 dark:border-red-400 focus:border-red-500' : 'border-light-border dark:border-dark-border focus:border-primary'}`}
+              className={`text-theme-primary flex-1 rounded-lg border bg-white px-4 py-2.5 text-center text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-dark-surface ${errors.quantity ? 'border-red-500 focus:border-red-500 dark:border-red-400' : 'border-light-border focus:border-primary dark:border-dark-border'}`}
             />
 
             <button
               type="button"
               onClick={() => setQuantity(Math.min(99, quantity + 1))}
               disabled={loading || quantity >= 99}
-              className="w-10 h-10 rounded-lg border border-light-border dark:border-dark-border card-theme dark:bg-dark-surface text-theme-primary hover:bg-light-surface dark:hover:bg-dark-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="card-theme text-theme-primary flex h-10 w-10 items-center justify-center rounded-lg border border-light-border transition-colors hover:bg-light-surface disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-border dark:bg-dark-surface dark:hover:bg-dark-hover"
             >
               <svg
-                className="w-5 h-5"
+                className="h-5 w-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -205,44 +205,44 @@ const OrderItemModal = ({
 
         {/* Preview do Item */}
         {selectedServiceData && selectedProfessional && (
-          <div className="bg-light-surface dark:bg-dark-hover rounded-lg p-4 border border-light-border dark:border-dark-border">
-            <h4 className="font-semibold text-theme-primary mb-4">
+          <div className="rounded-lg border border-light-border bg-light-surface p-4 dark:border-dark-border dark:bg-dark-hover">
+            <h4 className="text-theme-primary mb-4 font-semibold">
               Resumo do Item
             </h4>
             <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-theme-secondary">Serviço:</span>
-                <span className="font-medium text-theme-primary">
+              <div className="flex items-center justify-between">
+                <span className="text-theme-secondary text-sm">Serviço:</span>
+                <span className="text-theme-primary font-medium">
                   {selectedServiceData.name}
                 </span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-theme-secondary">
+              <div className="flex items-center justify-between">
+                <span className="text-theme-secondary text-sm">
                   Preço Unitário:
                 </span>
-                <span className="font-medium text-theme-primary">
+                <span className="text-theme-primary font-medium">
                   {formatCurrency(selectedServiceData.price)}
                 </span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-theme-secondary">
+              <div className="flex items-center justify-between">
+                <span className="text-theme-secondary text-sm">
                   Quantidade:
                 </span>
-                <span className="font-medium text-theme-primary">
+                <span className="text-theme-primary font-medium">
                   {quantity}x
                 </span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-theme-secondary">
+              <div className="flex items-center justify-between">
+                <span className="text-theme-secondary text-sm">
                   Comissão ({selectedServiceData.commission_percentage}%):
                 </span>
                 <span className="font-medium text-green-600 dark:text-green-400">
                   {formatCurrency(commission)}
                 </span>
               </div>
-              <div className="pt-3 border-t border-light-border dark:border-dark-border">
-                <div className="flex justify-between items-center">
-                  <span className="font-semibold text-theme-primary">
+              <div className="border-t border-light-border pt-3 dark:border-dark-border">
+                <div className="flex items-center justify-between">
+                  <span className="text-theme-primary font-semibold">
                     Total:
                   </span>
                   <span className="text-2xl font-bold text-primary">
@@ -256,10 +256,10 @@ const OrderItemModal = ({
 
         {/* Alerta quando nenhum serviço/profissional disponível */}
         {!servicesLoading && services.length === 0 && (
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+          <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
             <div className="flex items-start gap-3">
               <svg
-                className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5"
+                className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-600 dark:text-yellow-400"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -270,7 +270,7 @@ const OrderItemModal = ({
                 />
               </svg>
               <div className="flex-1">
-                <h4 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-1">
+                <h4 className="mb-1 font-semibold text-yellow-800 dark:text-yellow-200">
                   Nenhum serviço disponível
                 </h4>
                 <p className="text-sm text-yellow-700 dark:text-yellow-300">
@@ -282,10 +282,10 @@ const OrderItemModal = ({
         )}
 
         {!professionalsLoading && professionals.length === 0 && (
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+          <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
             <div className="flex items-start gap-3">
               <svg
-                className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5"
+                className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-600 dark:text-yellow-400"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -296,7 +296,7 @@ const OrderItemModal = ({
                 />
               </svg>
               <div className="flex-1">
-                <h4 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-1">
+                <h4 className="mb-1 font-semibold text-yellow-800 dark:text-yellow-200">
                   Nenhum profissional disponível
                 </h4>
                 <p className="text-sm text-yellow-700 dark:text-yellow-300">
@@ -308,29 +308,29 @@ const OrderItemModal = ({
         )}
 
         {/* Ações */}
-        <div className="flex gap-3 pt-4 border-t border-light-border dark:border-dark-border">
+        <div className="flex gap-3 border-t border-light-border pt-4 dark:border-dark-border">
           <button
             type="button"
             onClick={handleClose}
             disabled={loading}
-            className="flex-1 px-4 py-2.5 border border-light-border dark:border-dark-border rounded-lg font-medium text-theme-primary hover:bg-light-surface dark:hover:bg-dark-hover transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            className="text-theme-primary flex-1 rounded-lg border border-light-border px-4 py-2.5 font-medium transition-colors hover:bg-light-surface disabled:cursor-not-allowed disabled:opacity-60 dark:border-dark-border dark:hover:bg-dark-hover"
           >
             Cancelar
           </button>
           <button
             type="submit"
             disabled={loading || !selectedService || !selectedProfessional}
-            className="flex-1 px-4 py-2.5 bg-primary hover:bg-primary-dark text-dark-text-primary rounded-lg font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+            className="hover:bg-primary-dark text-dark-text-primary inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? (
               <>
-                <div className="w-5 h-5 border-2 border-light-surface dark:border-dark-surface border-t-transparent rounded-full animate-spin" />
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-light-surface border-t-transparent dark:border-dark-surface" />
                 Adicionando...
               </>
             ) : (
               <>
                 <svg
-                  className="w-5 h-5"
+                  className="h-5 w-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

@@ -164,12 +164,12 @@ export function EditProfessionalModal({ professional, onClose, onSuccess }) {
     }
   };
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="card-theme rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="card-theme max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-light-border dark:border-dark-border">
+        <div className="flex items-center justify-between border-b border-light-border p-6 dark:border-dark-border">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
               <Edit className="h-5 w-5 text-primary" />
             </div>
             <div>
@@ -204,7 +204,7 @@ export function EditProfessionalModal({ professional, onClose, onSuccess }) {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 py-4 px-2 text-sm font-medium border-b-2 transition-colors ${activeTab === tab.id ? 'border-primary text-primary' : 'border-transparent text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary hover:border-light-border dark:hover:border-dark-border'}`}
+                  className={`flex items-center gap-2 border-b-2 px-2 py-4 text-sm font-medium transition-colors ${activeTab === tab.id ? 'border-primary text-primary' : 'border-transparent text-text-light-secondary hover:border-light-border hover:text-text-light-primary dark:text-text-dark-secondary dark:hover:border-dark-border dark:hover:text-text-dark-primary'}`}
                 >
                   <TabIcon className="h-4 w-4" />
                   {tab.label}
@@ -220,10 +220,10 @@ export function EditProfessionalModal({ professional, onClose, onSuccess }) {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Informações Básicas */}
               <div>
-                <h3 className="text-lg font-medium text-text-light-primary dark:text-text-dark-primary mb-4">
+                <h3 className="mb-4 text-lg font-medium text-text-light-primary dark:text-text-dark-primary">
                   Informações Básicas
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="md:col-span-2">
                     <Input
                       label="Nome Completo *"
@@ -237,10 +237,10 @@ export function EditProfessionalModal({ professional, onClose, onSuccess }) {
 
                   {professional.user?.email && (
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-2">
+                      <label className="mb-2 block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary">
                         Email (não editável)
                       </label>
-                      <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-light-border dark:border-dark-border bg-light-bg/50 dark:bg-dark-bg/50">
+                      <div className="flex items-center gap-2 rounded-lg border border-light-border bg-light-bg/50 px-3 py-2 dark:border-dark-border dark:bg-dark-bg/50">
                         <Mail className="h-4 w-4 text-text-light-secondary dark:text-text-dark-secondary" />
                         <span className="text-text-light-secondary dark:text-text-dark-secondary">
                           {professional.user.email}
@@ -250,11 +250,11 @@ export function EditProfessionalModal({ professional, onClose, onSuccess }) {
                   )}
 
                   <div>
-                    <label className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2">
+                    <label className="mb-2 block text-sm font-medium text-text-light-primary dark:text-text-dark-primary">
                       Cargo *
                     </label>
                     <select
-                      className="w-full px-3 py-2 rounded-lg border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-300"
+                      className="w-full rounded-lg border border-light-border bg-light-bg px-3 py-2 text-sm text-text-light-primary transition-colors duration-300 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/50 dark:border-dark-border dark:bg-dark-bg dark:text-text-dark-primary"
                       value={formData.role}
                       onChange={e => handleInputChange('role', e.target.value)}
                     >
@@ -263,7 +263,7 @@ export function EditProfessionalModal({ professional, onClose, onSuccess }) {
                       <option value="admin">Administrador</option>
                     </select>
                     {errors.role && (
-                      <p className="text-feedback-light-error dark:text-feedback-dark-error text-xs mt-1">
+                      <p className="mt-1 text-xs text-feedback-light-error dark:text-feedback-dark-error">
                         {errors.role}
                       </p>
                     )}
@@ -271,11 +271,11 @@ export function EditProfessionalModal({ professional, onClose, onSuccess }) {
 
                   {formData.role !== 'admin' && (
                     <div>
-                      <label className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2">
+                      <label className="mb-2 block text-sm font-medium text-text-light-primary dark:text-text-dark-primary">
                         Unidade *
                       </label>
                       <select
-                        className="w-full px-3 py-2 rounded-lg border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-300"
+                        className="w-full rounded-lg border border-light-border bg-light-bg px-3 py-2 text-sm text-text-light-primary transition-colors duration-300 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/50 dark:border-dark-border dark:bg-dark-bg dark:text-text-dark-primary"
                         value={formData.unit_id || ''}
                         onChange={e =>
                           handleInputChange('unit_id', e.target.value || null)
@@ -290,7 +290,7 @@ export function EditProfessionalModal({ professional, onClose, onSuccess }) {
                         </option>
                       </select>
                       {errors.unit_id && (
-                        <p className="text-feedback-light-error dark:text-feedback-dark-error text-xs mt-1">
+                        <p className="mt-1 text-xs text-feedback-light-error dark:text-feedback-dark-error">
                           {errors.unit_id}
                         </p>
                       )}
@@ -301,10 +301,10 @@ export function EditProfessionalModal({ professional, onClose, onSuccess }) {
 
               {/* Configurações do Trabalho */}
               <div>
-                <h3 className="text-lg font-medium text-text-light-primary dark:text-text-dark-primary mb-4">
+                <h3 className="mb-4 text-lg font-medium text-text-light-primary dark:text-text-dark-primary">
                   Configurações do Trabalho
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <Input
                     label="Comissão (%)"
                     type="number"
@@ -323,7 +323,7 @@ export function EditProfessionalModal({ professional, onClose, onSuccess }) {
                     placeholder="0.00"
                   />
 
-                  <div className="flex items-center gap-2 mt-8">
+                  <div className="mt-8 flex items-center gap-2">
                     <input
                       type="checkbox"
                       id="is_active"
@@ -335,7 +335,7 @@ export function EditProfessionalModal({ professional, onClose, onSuccess }) {
                     />
                     <label
                       htmlFor="is_active"
-                      className="text-sm text-text-light-primary dark:text-text-dark-primary cursor-pointer"
+                      className="cursor-pointer text-sm text-text-light-primary dark:text-text-dark-primary"
                     >
                       Profissional ativo
                     </label>
@@ -369,16 +369,16 @@ export function EditProfessionalModal({ professional, onClose, onSuccess }) {
           {activeTab === 'commissions' && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-medium text-text-light-primary dark:text-text-dark-primary mb-4">
+                <h3 className="mb-4 text-lg font-medium text-text-light-primary dark:text-text-dark-primary">
                   Comissões por Serviço
                 </h3>
-                <p className="text-sm text-text-light-secondary dark:text-text-dark-secondary mb-6">
+                <p className="mb-6 text-sm text-text-light-secondary dark:text-text-dark-secondary">
                   Configure a porcentagem de comissão que {professional.name}{' '}
                   recebe por cada serviço realizado.
                 </p>
                 {/* Se não há unidade associada, instruir usuário a preencher na aba "Informações Básicas" */}
                 {!professional.unit_id && (
-                  <div className="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                  <div className="mb-4 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
                     <p className="text-sm text-yellow-800 dark:text-yellow-200">
                       Este profissional não possui uma unidade associada. Para
                       configurar comissões por serviço, primeiro selecione a
@@ -388,8 +388,8 @@ export function EditProfessionalModal({ professional, onClose, onSuccess }) {
                 )}
 
                 {commissionsError && (
-                  <div className="mb-4 p-4 bg-feedback-light-error/10 dark:bg-feedback-dark-error/10 border border-feedback-light-error/20 dark:border-feedback-dark-error/20 rounded-lg">
-                    <p className="text-feedback-light-error dark:text-feedback-dark-error text-sm">
+                  <div className="mb-4 rounded-lg border border-feedback-light-error/20 bg-feedback-light-error/10 p-4 dark:border-feedback-dark-error/20 dark:bg-feedback-dark-error/10">
+                    <p className="text-sm text-feedback-light-error dark:text-feedback-dark-error">
                       Erro ao carregar comissões: {commissionsError}
                     </p>
                   </div>
@@ -397,7 +397,7 @@ export function EditProfessionalModal({ professional, onClose, onSuccess }) {
 
                 {commissionsLoading ? (
                   <div className="flex items-center justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
                     <span className="ml-3 text-text-light-secondary dark:text-text-dark-secondary">
                       Carregando comissões...
                     </span>
@@ -409,8 +409,8 @@ export function EditProfessionalModal({ professional, onClose, onSuccess }) {
                     loading={commissionsLoading}
                   />
                 ) : (
-                  <div className="text-center py-8">
-                    <DollarSign className="h-12 w-12 text-text-light-secondary dark:text-text-dark-secondary mx-auto mb-4" />
+                  <div className="py-8 text-center">
+                    <DollarSign className="mx-auto mb-4 h-12 w-12 text-text-light-secondary dark:text-text-dark-secondary" />
                     <p className="text-text-light-secondary dark:text-text-dark-secondary">
                       Nenhum serviço encontrado para esta unidade.
                     </p>

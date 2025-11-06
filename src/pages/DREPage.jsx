@@ -71,12 +71,12 @@ export const DREPage = () => {
   const renderFilters = () => (
     <Card className="mb-6">
       <div className="p-6">
-        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <Calendar className="w-5 h-5" />
+        <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold">
+          <Calendar className="h-5 w-5" />
           Período
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           <button
             onClick={() => {
               updatePeriod('month');
@@ -84,7 +84,7 @@ export const DREPage = () => {
                 period: 'month',
               });
             }}
-            className={`p-4 rounded-lg border-2 transition-all ${period === 'month' ? 'border-primary bg-primary/10 dark:bg-primary/20' : 'border-light-border dark:border-dark-border hover:border-primary/50'}`}
+            className={`rounded-lg border-2 p-4 transition-all ${period === 'month' ? 'border-primary bg-primary/10 dark:bg-primary/20' : 'border-light-border hover:border-primary/50 dark:border-dark-border'}`}
           >
             <div className="font-medium text-text-light-primary dark:text-text-dark-primary">
               Mês Atual
@@ -104,7 +104,7 @@ export const DREPage = () => {
                 period: 'previous-month',
               });
             }}
-            className={`p-4 rounded-lg border-2 transition-all ${period === 'previous-month' ? 'border-primary bg-primary/10 dark:bg-primary/20' : 'border-light-border dark:border-dark-border hover:border-primary/50'}`}
+            className={`rounded-lg border-2 p-4 transition-all ${period === 'previous-month' ? 'border-primary bg-primary/10 dark:bg-primary/20' : 'border-light-border hover:border-primary/50 dark:border-dark-border'}`}
           >
             <div className="font-medium text-text-light-primary dark:text-text-dark-primary">
               Mês Anterior
@@ -126,7 +126,7 @@ export const DREPage = () => {
                 period: 'year',
               });
             }}
-            className={`p-4 rounded-lg border-2 transition-all ${period === 'year' ? 'border-primary bg-primary/10 dark:bg-primary/20' : 'border-light-border dark:border-dark-border hover:border-primary/50'}`}
+            className={`rounded-lg border-2 p-4 transition-all ${period === 'year' ? 'border-primary bg-primary/10 dark:bg-primary/20' : 'border-light-border hover:border-primary/50 dark:border-dark-border'}`}
           >
             <div className="font-medium text-text-light-primary dark:text-text-dark-primary">
               Ano Atual
@@ -141,7 +141,7 @@ export const DREPage = () => {
               updatePeriod('custom');
               setShowFilters(true);
             }}
-            className={`p-4 rounded-lg border-2 transition-all ${period === 'custom' ? 'border-primary bg-primary/10 dark:bg-primary/20' : 'border-light-border dark:border-dark-border hover:border-primary/50'}`}
+            className={`rounded-lg border-2 p-4 transition-all ${period === 'custom' ? 'border-primary bg-primary/10 dark:bg-primary/20' : 'border-light-border hover:border-primary/50 dark:border-dark-border'}`}
           >
             <div className="font-medium text-text-light-primary dark:text-text-dark-primary">
               Período Customizado
@@ -153,9 +153,9 @@ export const DREPage = () => {
         </div>
 
         {period === 'custom' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 card-theme rounded-lg border border-light-border dark:border-dark-border">
+          <div className="card-theme grid grid-cols-1 gap-4 rounded-lg border border-light-border p-4 dark:border-dark-border md:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium mb-2 text-text-light-primary dark:text-text-dark-primary">
+              <label className="mb-2 block text-sm font-medium text-text-light-primary dark:text-text-dark-primary">
                 Data Inicial
               </label>
               <input
@@ -171,7 +171,7 @@ export const DREPage = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2 text-text-light-primary dark:text-text-dark-primary">
+              <label className="mb-2 block text-sm font-medium text-text-light-primary dark:text-text-dark-primary">
                 Data Final
               </label>
               <input
@@ -227,7 +227,7 @@ export const DREPage = () => {
         : 'text-gray-900 dark:text-gray-100';
     return (
       <div
-        className={`flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-800 ${paddingClass} ${bgClass}`}
+        className={`flex items-center justify-between border-b border-gray-100 py-3 dark:border-gray-800 ${paddingClass} ${bgClass}`}
       >
         <span className={fontClass}>{label}</span>
         <span className={`${fontClass} ${valueColor}`}>
@@ -265,7 +265,7 @@ export const DREPage = () => {
       },
     ];
     return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
         {indicators.map((indicator, index) => {
           const Icon = indicator.icon;
           const colorClasses = {
@@ -277,14 +277,14 @@ export const DREPage = () => {
           return (
             <Card key={index}>
               <div className="p-6">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm font-medium">
                     {indicator.label}
                   </span>
                   <div
-                    className={`p-2 rounded-lg ${colorClasses[indicator.color]}`}
+                    className={`rounded-lg p-2 ${colorClasses[indicator.color]}`}
                   >
-                    <Icon className="w-5 h-5" />
+                    <Icon className="h-5 w-5" />
                   </div>
                 </div>
                 <div
@@ -308,7 +308,7 @@ export const DREPage = () => {
     return (
       <Card>
         <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
+          <div className="mb-6 flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold">
                 DRE - Demonstração do Resultado do Exercício
@@ -320,18 +320,18 @@ export const DREPage = () => {
                 {dre.periodo.dias && ` (${dre.periodo.dias} dias)`}
               </p>
               {dre.metadata?.calculation_timestamp && (
-                <p className="text-xs text-theme-secondary dark:text-theme-secondary mt-1">
+                <p className="text-theme-secondary dark:text-theme-secondary mt-1 text-xs">
                   Gerado em:{' '}
                   {new Date(dre.metadata.calculation_timestamp).toLocaleString(
                     'pt-BR'
                   )}
                   {dre.metadata?.regime && (
-                    <span className="ml-2 px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded text-xs font-medium">
+                    <span className="ml-2 rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
                       Regime: {dre.metadata.regime}
                     </span>
                   )}
                   {dre.metadata?.versao && (
-                    <span className="ml-1 text-light-text-muted dark:text-dark-text-muted">
+                    <span className="text-light-text-muted dark:text-dark-text-muted ml-1">
                       v{dre.metadata.versao}
                     </span>
                   )}
@@ -345,7 +345,7 @@ export const DREPage = () => {
                 className="flex items-center gap-2"
                 title="Exportar como TXT"
               >
-                <FileText className="w-4 h-4" />
+                <FileText className="h-4 w-4" />
                 TXT
               </Button>
               <Button
@@ -354,7 +354,7 @@ export const DREPage = () => {
                 className="flex items-center gap-2"
                 title="Exportar como CSV"
               >
-                <FileSpreadsheet className="w-4 h-4" />
+                <FileSpreadsheet className="h-4 w-4" />
                 CSV
               </Button>
               <Button
@@ -363,7 +363,7 @@ export const DREPage = () => {
                 className="flex items-center gap-2"
                 title="Exportar como PDF"
               >
-                <FileText className="w-4 h-4" />
+                <FileText className="h-4 w-4" />
                 PDF
               </Button>
             </div>
@@ -371,7 +371,7 @@ export const DREPage = () => {
 
           <div className="space-y-1">
             {/* RECEITA BRUTA */}
-            <div className="mt-4 mb-2">
+            <div className="mb-2 mt-4">
               <h3 className="text-lg font-bold text-blue-600 dark:text-blue-400">
                 RECEITA BRUTA
               </h3>
@@ -414,7 +414,7 @@ export const DREPage = () => {
             />
 
             {/* CUSTOS OPERACIONAIS */}
-            <div className="mt-6 mb-2">
+            <div className="mb-2 mt-6">
               <h3 className="text-lg font-bold text-orange-600 dark:text-orange-400">
                 (-) CUSTOS OPERACIONAIS
               </h3>
@@ -466,7 +466,7 @@ export const DREPage = () => {
             />
 
             {/* DESPESAS ADMINISTRATIVAS */}
-            <div className="mt-6 mb-2">
+            <div className="mb-2 mt-6">
               <h3 className="text-lg font-bold text-purple-600 dark:text-purple-400">
                 (-) DESPESAS ADMINISTRATIVAS
               </h3>
@@ -536,7 +536,7 @@ export const DREPage = () => {
             />
 
             {/* IMPOSTOS */}
-            <div className="mt-6 mb-2">
+            <div className="mb-2 mt-6">
               <h3 className="text-lg font-bold text-red-600 dark:text-red-400">
                 (-) IMPOSTO
               </h3>
@@ -569,10 +569,10 @@ export const DREPage = () => {
   };
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
-            <FileText className="w-8 h-8 text-blue-600" />
+          <h1 className="flex items-center gap-3 text-3xl font-bold">
+            <FileText className="h-8 w-8 text-blue-600" />
             DRE - Demonstração do Resultado
           </h1>
           <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
@@ -582,16 +582,16 @@ export const DREPage = () => {
       </div>
 
       {/* 📌 Badge informativa sobre Regime de Competência */}
-      <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+      <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
         <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 w-8 h-8 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center">
-            <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/40">
+            <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
           </div>
           <div className="flex-1">
-            <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">
+            <h3 className="mb-1 text-sm font-semibold text-blue-900 dark:text-blue-100">
               📊 Regime de Competência Ativo
             </h3>
-            <p className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
+            <p className="text-xs leading-relaxed text-blue-700 dark:text-blue-300">
               Este DRE utiliza o <strong>regime de competência</strong>,
               considerando a data em que a receita/despesa foi gerada (data de
               competência), independente do pagamento efetivo. Quando a data de
@@ -606,7 +606,7 @@ export const DREPage = () => {
 
       {loading && (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
           <span className="ml-3 text-lg">Calculando DRE...</span>
         </div>
       )}
@@ -614,7 +614,7 @@ export const DREPage = () => {
       {error && (
         <Card className="border-red-200 bg-red-50 dark:bg-red-900/20">
           <div className="p-6">
-            <h3 className="text-lg font-semibold text-red-600 mb-2">
+            <h3 className="mb-2 text-lg font-semibold text-red-600">
               Erro ao carregar DRE
             </h3>
             <p className="text-red-600">{error.message}</p>

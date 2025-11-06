@@ -71,8 +71,8 @@ const UnitsComparison = ({ units = [], loading = false }) => {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="card-theme dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg shadow-lg p-3">
-          <p className="font-medium text-theme-primary dark:text-dark-text-primary">
+        <div className="card-theme rounded-lg border border-light-border p-3 shadow-lg dark:border-dark-border dark:bg-dark-surface">
+          <p className="text-theme-primary dark:text-dark-text-primary font-medium">
             {label}
           </p>
           {payload.map((entry, index) => (
@@ -127,8 +127,8 @@ const UnitsComparison = ({ units = [], loading = false }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-2 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
+        <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted ml-2">
           Carregando comparativo...
         </span>
       </div>
@@ -137,8 +137,8 @@ const UnitsComparison = ({ units = [], loading = false }) => {
   if (barChartData.length === 0) {
     return (
       <Card className="p-8 text-center">
-        <ChartBarIcon className="h-16 w-16 text-light-text-muted dark:text-dark-text-muted mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-theme-primary dark:text-dark-text-primary mb-2">
+        <ChartBarIcon className="text-light-text-muted dark:text-dark-text-muted mx-auto mb-4 h-16 w-16" />
+        <h3 className="text-theme-primary dark:text-dark-text-primary mb-2 text-lg font-medium">
           Sem dados para comparar
         </h3>
         <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
@@ -152,7 +152,7 @@ const UnitsComparison = ({ units = [], loading = false }) => {
       {/* Comparativo de Faturamento e Lucro */}
       <Card className="p-6">
         <div className="mb-6">
-          <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-2">
+          <h3 className="text-theme-primary dark:text-dark-text-primary mb-2 text-lg font-semibold">
             Faturamento vs Lucro por Unidade
           </h3>
           <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
@@ -209,11 +209,11 @@ const UnitsComparison = ({ units = [], loading = false }) => {
       </Card>
 
       {/* Grid com dois gráficos lado a lado */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Distribuição de Faturamento */}
         <Card className="p-6">
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-2">
+            <h3 className="text-theme-primary dark:text-dark-text-primary mb-2 text-lg font-semibold">
               Distribuição de Faturamento
             </h3>
             <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
@@ -251,7 +251,7 @@ const UnitsComparison = ({ units = [], loading = false }) => {
               </ResponsiveContainer>
             </div>
           ) : (
-            <div className="flex items-center justify-center h-64 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+            <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted flex h-64 items-center justify-center">
               Sem dados de faturamento para exibir
             </div>
           )}
@@ -260,7 +260,7 @@ const UnitsComparison = ({ units = [], loading = false }) => {
         {/* Comparativo de Atendimentos e Profissionais */}
         <Card className="p-6">
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-2">
+            <h3 className="text-theme-primary dark:text-dark-text-primary mb-2 text-lg font-semibold">
               Atendimentos vs Profissionais
             </h3>
             <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
@@ -316,7 +316,7 @@ const UnitsComparison = ({ units = [], loading = false }) => {
       {/* Tabela Comparativa */}
       <Card className="p-6">
         <div className="mb-6">
-          <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-2">
+          <h3 className="text-theme-primary dark:text-dark-text-primary mb-2 text-lg font-semibold">
             Resumo Comparativo
           </h3>
           <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
@@ -328,27 +328,27 @@ const UnitsComparison = ({ units = [], loading = false }) => {
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-light-bg dark:bg-dark-bg dark:bg-dark-surface">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
+                <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                   Unidade
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
+                <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                   Faturamento
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
+                <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                   Lucro
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
+                <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                   Atendimentos
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
+                <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                   Profissionais
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
+                <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                   Eficiência
                 </th>
               </tr>
             </thead>
-            <tbody className="card-theme dark:bg-dark-surface divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="card-theme divide-y divide-gray-200 dark:divide-gray-700 dark:bg-dark-surface">
               {barChartData.map((unit, index) => (
                 <tr
                   key={unit.name}
@@ -356,29 +356,29 @@ const UnitsComparison = ({ units = [], loading = false }) => {
                     index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800' : ''
                   }
                 >
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="whitespace-nowrap px-6 py-4">
                     <div className="flex items-center">
-                      <Building2 className="h-5 w-5 text-light-text-muted dark:text-dark-text-muted mr-2" />
-                      <div className="text-sm font-medium text-theme-primary dark:text-dark-text-primary">
+                      <Building2 className="text-light-text-muted dark:text-dark-text-muted mr-2 h-5 w-5" />
+                      <div className="text-theme-primary dark:text-dark-text-primary text-sm font-medium">
                         {unit.name}
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-green-600">
                     {formatCurrency(unit.faturamento)}
                   </td>
                   <td
-                    className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${unit.lucro >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                    className={`whitespace-nowrap px-6 py-4 text-sm font-medium ${unit.lucro >= 0 ? 'text-green-600' : 'text-red-600'}`}
                   >
                     {formatCurrency(unit.lucro)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600 font-medium">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-blue-600">
                     {unit.atendimentos}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-600 font-medium">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-purple-600">
                     {unit.profissionais}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                  <td className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted whitespace-nowrap px-6 py-4 text-sm">
                     {unit.profissionais > 0
                       ? `${(unit.faturamento / unit.profissionais / 1000).toFixed(1)}k/prof`
                       : 'N/A'}

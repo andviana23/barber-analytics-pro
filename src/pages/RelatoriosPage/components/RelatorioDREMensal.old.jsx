@@ -292,16 +292,16 @@ const RelatorioDREMensal = ({ filters }) => {
     return (
       <div className="p-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="h-8 w-1/3 rounded bg-gray-200 dark:bg-gray-700"></div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             {[1, 2, 3].map(i => (
               <div
                 key={i}
-                className="h-32 bg-gray-200 dark:bg-gray-700 rounded"
+                className="h-32 rounded bg-gray-200 dark:bg-gray-700"
               ></div>
             ))}
           </div>
-          <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded"></div>
+          <div className="h-64 rounded bg-gray-200 dark:bg-gray-700"></div>
         </div>
       </div>
     );
@@ -317,11 +317,11 @@ const RelatorioDREMensal = ({ filters }) => {
     return `${signal}${value.toFixed(1)}%`;
   };
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6 p-6">
       {/* Header com ações */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+          <h3 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
             DRE - Demonstração do Resultado do Exercício
           </h3>
           <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
@@ -331,11 +331,11 @@ const RelatorioDREMensal = ({ filters }) => {
           </p>
         </div>
         <div className="flex space-x-2">
-          <button className="flex items-center space-x-2 px-4 py-2 border border-light-border dark:border-dark-border rounded-lg hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700 transition-colors">
+          <button className="flex items-center space-x-2 rounded-lg border border-light-border px-4 py-2 transition-colors hover:bg-light-bg dark:border-dark-border dark:bg-dark-bg dark:hover:bg-gray-700">
             <FileText size={16} />
             <span>PDF</span>
           </button>
-          <button className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-dark-text-primary rounded-lg hover:bg-green-700 transition-colors">
+          <button className="text-dark-text-primary flex items-center space-x-2 rounded-lg bg-green-600 px-4 py-2 transition-colors hover:bg-green-700">
             <Download size={16} />
             <span>Excel</span>
           </button>
@@ -343,14 +343,14 @@ const RelatorioDREMensal = ({ filters }) => {
       </div>
 
       {/* KPIs principais */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                 Receita Bruta
               </p>
-              <p className="text-xl font-bold text-theme-primary dark:text-dark-text-primary">
+              <p className="text-theme-primary dark:text-dark-text-primary text-xl font-bold">
                 {formatCurrency(dadosDRE.receitas.receitaBruta)}
               </p>
             </div>
@@ -372,10 +372,10 @@ const RelatorioDREMensal = ({ filters }) => {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                 Receita Líquida
               </p>
-              <p className="text-xl font-bold text-theme-primary dark:text-dark-text-primary">
+              <p className="text-theme-primary dark:text-dark-text-primary text-xl font-bold">
                 {formatCurrency(dadosDRE.receitas.receitaLiquida)}
               </p>
             </div>
@@ -386,10 +386,10 @@ const RelatorioDREMensal = ({ filters }) => {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                 Margem Contribuição
               </p>
-              <p className="text-xl font-bold text-theme-primary dark:text-dark-text-primary">
+              <p className="text-theme-primary dark:text-dark-text-primary text-xl font-bold">
                 {formatCurrency(dadosDRE.custos.margemContribuicao)}
               </p>
             </div>
@@ -407,10 +407,10 @@ const RelatorioDREMensal = ({ filters }) => {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                 Lucro Líquido
               </p>
-              <p className="text-xl font-bold text-theme-primary dark:text-dark-text-primary">
+              <p className="text-theme-primary dark:text-dark-text-primary text-xl font-bold">
                 {formatCurrency(dadosDRE.despesas.lucroLiquido)}
               </p>
             </div>
@@ -432,20 +432,20 @@ const RelatorioDREMensal = ({ filters }) => {
 
       {/* DRE Estrutural */}
       <Card className="p-6">
-        <h4 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-4">
+        <h4 className="text-theme-primary dark:text-dark-text-primary mb-4 text-lg font-semibold">
           Demonstração do Resultado
         </h4>
         <div className="space-y-3">
-          <div className="flex justify-between items-center py-2 border-b border-light-border dark:border-dark-border">
-            <span className="font-medium text-theme-primary dark:text-dark-text-primary">
+          <div className="flex items-center justify-between border-b border-light-border py-2 dark:border-dark-border">
+            <span className="text-theme-primary dark:text-dark-text-primary font-medium">
               (+) Receita Bruta
             </span>
-            <span className="font-medium text-theme-primary dark:text-dark-text-primary">
+            <span className="text-theme-primary dark:text-dark-text-primary font-medium">
               {formatCurrency(dadosDRE.receitas.receitaBruta)}
             </span>
           </div>
 
-          <div className="flex justify-between items-center py-2 border-b border-light-border dark:border-dark-border ml-4">
+          <div className="ml-4 flex items-center justify-between border-b border-light-border py-2 dark:border-dark-border">
             <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
               (-) Deduções
             </span>
@@ -454,7 +454,7 @@ const RelatorioDREMensal = ({ filters }) => {
             </span>
           </div>
 
-          <div className="flex justify-between items-center py-2 border-b border-light-border dark:border-dark-border bg-blue-50 dark:bg-blue-900/20 px-4 rounded">
+          <div className="flex items-center justify-between rounded border-b border-light-border bg-blue-50 px-4 py-2 dark:border-dark-border dark:bg-blue-900/20">
             <span className="font-semibold text-blue-900 dark:text-blue-100">
               (=) Receita Líquida
             </span>
@@ -463,7 +463,7 @@ const RelatorioDREMensal = ({ filters }) => {
             </span>
           </div>
 
-          <div className="flex justify-between items-center py-2 border-b border-light-border dark:border-dark-border ml-4">
+          <div className="ml-4 flex items-center justify-between border-b border-light-border py-2 dark:border-dark-border">
             <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
               (-) Custos Variáveis
             </span>
@@ -472,7 +472,7 @@ const RelatorioDREMensal = ({ filters }) => {
             </span>
           </div>
 
-          <div className="flex justify-between items-center py-2 border-b border-light-border dark:border-dark-border bg-green-50 dark:bg-green-900/20 px-4 rounded">
+          <div className="flex items-center justify-between rounded border-b border-light-border bg-green-50 px-4 py-2 dark:border-dark-border dark:bg-green-900/20">
             <span className="font-semibold text-green-900 dark:text-green-100">
               (=) Margem de Contribuição
             </span>
@@ -481,7 +481,7 @@ const RelatorioDREMensal = ({ filters }) => {
             </span>
           </div>
 
-          <div className="flex justify-between items-center py-2 border-b border-light-border dark:border-dark-border ml-4">
+          <div className="ml-4 flex items-center justify-between border-b border-light-border py-2 dark:border-dark-border">
             <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
               (-) Despesas Fixas
             </span>
@@ -490,7 +490,7 @@ const RelatorioDREMensal = ({ filters }) => {
             </span>
           </div>
 
-          <div className="flex justify-between items-center py-2 border-b border-light-border dark:border-dark-border bg-purple-50 dark:bg-purple-900/20 px-4 rounded">
+          <div className="flex items-center justify-between rounded border-b border-light-border bg-purple-50 px-4 py-2 dark:border-dark-border dark:bg-purple-900/20">
             <span className="font-semibold text-purple-900 dark:text-purple-100">
               (=) Resultado Operacional
             </span>
@@ -499,7 +499,7 @@ const RelatorioDREMensal = ({ filters }) => {
             </span>
           </div>
 
-          <div className="flex justify-between items-center py-2 border-b border-light-border dark:border-dark-border ml-4">
+          <div className="ml-4 flex items-center justify-between border-b border-light-border py-2 dark:border-dark-border">
             <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
               (-) Depreciação/Amortização
             </span>
@@ -508,7 +508,7 @@ const RelatorioDREMensal = ({ filters }) => {
             </span>
           </div>
 
-          <div className="flex justify-between items-center py-3 bg-dark-surface dark:card-theme text-dark-text-primary dark:text-theme-primary px-4 rounded font-bold text-lg">
+          <div className="dark:card-theme text-dark-text-primary dark:text-theme-primary flex items-center justify-between rounded bg-dark-surface px-4 py-3 text-lg font-bold">
             <span>(=) LUCRO LÍQUIDO</span>
             <span>{formatCurrency(dadosDRE.despesas.lucroLiquido)}</span>
           </div>
@@ -516,10 +516,10 @@ const RelatorioDREMensal = ({ filters }) => {
       </Card>
 
       {/* Gráficos */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Composição de Receitas */}
         <Card className="p-6">
-          <h4 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-4">
+          <h4 className="text-theme-primary dark:text-dark-text-primary mb-4 text-lg font-semibold">
             Composição das Receitas
           </h4>
           <ResponsiveContainer width="100%" height={300}>
@@ -545,7 +545,7 @@ const RelatorioDREMensal = ({ filters }) => {
 
         {/* Composição de Despesas */}
         <Card className="p-6">
-          <h4 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-4">
+          <h4 className="text-theme-primary dark:text-dark-text-primary mb-4 text-lg font-semibold">
             Composição das Despesas
           </h4>
           <ResponsiveContainer width="100%" height={300}>

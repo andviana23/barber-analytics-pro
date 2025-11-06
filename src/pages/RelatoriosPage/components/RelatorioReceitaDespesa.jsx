@@ -134,8 +134,8 @@ const RelatorioReceitaDespesa = ({ filters }) => {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="card-theme border border-light-border dark:border-dark-border rounded-lg p-4 shadow-lg">
-          <p className="font-semibold text-text-light-primary dark:text-text-dark-primary mb-2">
+        <div className="card-theme rounded-lg border border-light-border p-4 shadow-lg dark:border-dark-border">
+          <p className="mb-2 font-semibold text-text-light-primary dark:text-text-dark-primary">
             {label}
           </p>
           {payload.map((entry, index) => (
@@ -157,7 +157,7 @@ const RelatorioReceitaDespesa = ({ filters }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader className="w-8 h-8 text-primary animate-spin" />
+        <Loader className="h-8 w-8 animate-spin text-primary" />
         <span className="ml-3 text-text-light-secondary dark:text-text-dark-secondary">
           Carregando dados...
         </span>
@@ -167,16 +167,16 @@ const RelatorioReceitaDespesa = ({ filters }) => {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
-        <AlertCircle className="w-12 h-12 text-danger mb-4" />
-        <h3 className="text-lg font-semibold text-text-light-primary dark:text-text-dark-primary mb-2">
+        <AlertCircle className="text-danger mb-4 h-12 w-12" />
+        <h3 className="mb-2 text-lg font-semibold text-text-light-primary dark:text-text-dark-primary">
           Erro ao carregar dados
         </h3>
-        <p className="text-text-light-secondary dark:text-text-dark-secondary mb-4">
+        <p className="mb-4 text-text-light-secondary dark:text-text-dark-secondary">
           {error}
         </p>
         <button
           onClick={carregarDados}
-          className="px-4 py-2 bg-primary text-dark-text-primary rounded-lg hover:bg-primary-600 transition-colors"
+          className="text-dark-text-primary hover:bg-primary-600 rounded-lg bg-primary px-4 py-2 transition-colors"
         >
           Tentar novamente
         </button>
@@ -197,61 +197,61 @@ const RelatorioReceitaDespesa = ({ filters }) => {
   return (
     <div className="space-y-6">
       {/* KPIs do Período */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="card-theme p-6 rounded-xl border border-light-border dark:border-dark-border">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+        <div className="card-theme rounded-xl border border-light-border p-6 dark:border-dark-border">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
                 Total Receitas
               </p>
-              <h3 className="text-xl font-bold text-success mt-1">
+              <h3 className="text-success mt-1 text-xl font-bold">
                 {formatarMoeda(totalReceitas)}
               </h3>
             </div>
-            <TrendingUp className="w-8 h-8 text-success opacity-50" />
+            <TrendingUp className="text-success h-8 w-8 opacity-50" />
           </div>
         </div>
 
-        <div className="card-theme p-6 rounded-xl border border-light-border dark:border-dark-border">
+        <div className="card-theme rounded-xl border border-light-border p-6 dark:border-dark-border">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
                 Total Despesas
               </p>
-              <h3 className="text-xl font-bold text-danger mt-1">
+              <h3 className="text-danger mt-1 text-xl font-bold">
                 {formatarMoeda(totalDespesas)}
               </h3>
             </div>
-            <TrendingDown className="w-8 h-8 text-danger opacity-50" />
+            <TrendingDown className="text-danger h-8 w-8 opacity-50" />
           </div>
         </div>
 
-        <div className="card-theme p-6 rounded-xl border border-light-border dark:border-dark-border">
+        <div className="card-theme rounded-xl border border-light-border p-6 dark:border-dark-border">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
                 Lucro Total
               </p>
               <h3
-                className={`text-xl font-bold mt-1 ${totalLucro >= 0 ? 'text-success' : 'text-danger'}`}
+                className={`mt-1 text-xl font-bold ${totalLucro >= 0 ? 'text-success' : 'text-danger'}`}
               >
                 {formatarMoeda(totalLucro)}
               </h3>
             </div>
             <BarChart3
-              className={`w-8 h-8 opacity-50 ${totalLucro >= 0 ? 'text-success' : 'text-danger'}`}
+              className={`h-8 w-8 opacity-50 ${totalLucro >= 0 ? 'text-success' : 'text-danger'}`}
             />
           </div>
         </div>
 
-        <div className="card-theme p-6 rounded-xl border border-light-border dark:border-dark-border">
+        <div className="card-theme rounded-xl border border-light-border p-6 dark:border-dark-border">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
                 Margem Média
               </p>
               <h3
-                className={`text-xl font-bold mt-1 ${margemMedia >= 0 ? 'text-success' : 'text-danger'}`}
+                className={`mt-1 text-xl font-bold ${margemMedia >= 0 ? 'text-success' : 'text-danger'}`}
               >
                 {margemMedia.toFixed(1)}%
               </h3>
@@ -261,7 +261,7 @@ const RelatorioReceitaDespesa = ({ filters }) => {
       </div>
 
       {/* Controles do Gráfico */}
-      <div className="card-theme p-4 rounded-xl border border-light-border dark:border-dark-border">
+      <div className="card-theme rounded-xl border border-light-border p-4 dark:border-dark-border">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-text-light-primary dark:text-text-dark-primary">
             Evolução Temporal
@@ -269,13 +269,13 @@ const RelatorioReceitaDespesa = ({ filters }) => {
           <div className="flex gap-2">
             <button
               onClick={() => setViewMode('line')}
-              className={`px-4 py-2 rounded-lg transition-colors ${viewMode === 'line' ? 'bg-primary text-white' : 'bg-light-hover dark:bg-dark-hover text-text-light-primary dark:text-text-dark-primary'}`}
+              className={`rounded-lg px-4 py-2 transition-colors ${viewMode === 'line' ? 'bg-primary text-white' : 'bg-light-hover text-text-light-primary dark:bg-dark-hover dark:text-text-dark-primary'}`}
             >
               Linha
             </button>
             <button
               onClick={() => setViewMode('bar')}
-              className={`px-4 py-2 rounded-lg transition-colors ${viewMode === 'bar' ? 'bg-primary text-white' : 'bg-light-hover dark:bg-dark-hover text-text-light-primary dark:text-text-dark-primary'}`}
+              className={`rounded-lg px-4 py-2 transition-colors ${viewMode === 'bar' ? 'bg-primary text-white' : 'bg-light-hover text-text-light-primary dark:bg-dark-hover dark:text-text-dark-primary'}`}
             >
               Barra
             </button>
@@ -284,7 +284,7 @@ const RelatorioReceitaDespesa = ({ filters }) => {
       </div>
 
       {/* Gráfico Principal */}
-      <div className="card-theme p-6 rounded-xl border border-light-border dark:border-dark-border">
+      <div className="card-theme rounded-xl border border-light-border p-6 dark:border-dark-border">
         <ResponsiveContainer width="100%" height={400}>
           {viewMode === 'line' ? (
             <LineChart data={dadosGrafico}>
@@ -376,24 +376,24 @@ const RelatorioReceitaDespesa = ({ filters }) => {
       </div>
 
       {/* Tabela de Dados */}
-      <div className="card-theme rounded-xl border border-light-border dark:border-dark-border overflow-hidden">
+      <div className="card-theme overflow-hidden rounded-xl border border-light-border dark:border-dark-border">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-light-hover dark:bg-dark-hover">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-text-light-secondary dark:text-text-dark-secondary uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-text-light-secondary dark:text-text-dark-secondary">
                   Período
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-text-light-secondary dark:text-text-dark-secondary uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-text-light-secondary dark:text-text-dark-secondary">
                   Receitas
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-text-light-secondary dark:text-text-dark-secondary uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-text-light-secondary dark:text-text-dark-secondary">
                   Despesas
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-text-light-secondary dark:text-text-dark-secondary uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-text-light-secondary dark:text-text-dark-secondary">
                   Lucro
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-text-light-secondary dark:text-text-dark-secondary uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-text-light-secondary dark:text-text-dark-secondary">
                   Margem
                 </th>
               </tr>
@@ -402,24 +402,24 @@ const RelatorioReceitaDespesa = ({ filters }) => {
               {dadosGrafico.map((item, index) => (
                 <tr
                   key={index}
-                  className="hover:bg-light-hover dark:hover:bg-dark-hover transition-colors"
+                  className="transition-colors hover:bg-light-hover dark:hover:bg-dark-hover"
                 >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-light-primary dark:text-text-dark-primary">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-text-light-primary dark:text-text-dark-primary">
                     {item.mes}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-success font-semibold">
+                  <td className="text-success whitespace-nowrap px-6 py-4 text-right text-sm font-semibold">
                     {formatarMoeda(item.receitas)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-danger font-semibold">
+                  <td className="text-danger whitespace-nowrap px-6 py-4 text-right text-sm font-semibold">
                     {formatarMoeda(item.despesas)}
                   </td>
                   <td
-                    className={`px-6 py-4 whitespace-nowrap text-sm text-right font-semibold ${item.lucro >= 0 ? 'text-success' : 'text-danger'}`}
+                    className={`whitespace-nowrap px-6 py-4 text-right text-sm font-semibold ${item.lucro >= 0 ? 'text-success' : 'text-danger'}`}
                   >
                     {formatarMoeda(item.lucro)}
                   </td>
                   <td
-                    className={`px-6 py-4 whitespace-nowrap text-sm text-right font-semibold ${item.margem >= 0 ? 'text-success' : 'text-danger'}`}
+                    className={`whitespace-nowrap px-6 py-4 text-right text-sm font-semibold ${item.margem >= 0 ? 'text-success' : 'text-danger'}`}
                   >
                     {item.margem.toFixed(1)}%
                   </td>

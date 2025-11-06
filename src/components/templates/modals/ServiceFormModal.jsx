@@ -200,15 +200,15 @@ const ServiceFormModal = ({
   };
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="card-theme w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+      <div className="card-theme max-h-[90vh] w-full max-w-2xl overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-theme-border">
+        <div className="border-theme-border flex items-center justify-between border-b p-6">
           <div>
-            <h2 className="text-xl font-bold text-theme-primary">
+            <h2 className="text-theme-primary text-xl font-bold">
               {isEditing ? 'Editar Serviço' : 'Novo Serviço'}
             </h2>
-            <p className="text-sm text-theme-muted mt-1">
+            <p className="text-theme-muted mt-1 text-sm">
               {isEditing
                 ? 'Atualize as informações do serviço'
                 : 'Cadastre um novo serviço com preço e comissão'}
@@ -217,7 +217,7 @@ const ServiceFormModal = ({
           <button
             onClick={handleClose}
             disabled={loading}
-            className="p-2 rounded-lg hover:card-theme dark:hover:bg-dark-surface transition-colors disabled:opacity-50"
+            className="hover:card-theme rounded-lg p-2 transition-colors disabled:opacity-50 dark:hover:bg-dark-surface"
             aria-label="Fechar modal"
           >
             <X size={20} className="text-theme-muted" />
@@ -225,10 +225,10 @@ const ServiceFormModal = ({
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 p-6">
           {/* Nome do Serviço */}
           <div>
-            <label className="block text-sm font-medium text-theme-primary mb-2">
+            <label className="text-theme-primary mb-2 block text-sm font-medium">
               Nome do Serviço *
             </label>
             <Input
@@ -240,20 +240,20 @@ const ServiceFormModal = ({
               required
               maxLength={100}
             />
-            <p className="text-xs text-theme-muted mt-1">
+            <p className="text-theme-muted mt-1 text-xs">
               {formData.name.length}/100 caracteres
             </p>
           </div>
 
           {/* 📂 Categoria do Serviço */}
           <div>
-            <label className="block text-sm font-medium text-theme-primary mb-2">
+            <label className="text-theme-primary mb-2 block text-sm font-medium">
               Categoria *
             </label>
             {loadingCategories ? (
-              <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-light-border dark:border-dark-border bg-light-surface dark:bg-dark-hover">
-                <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                <span className="text-sm text-theme-secondary">
+              <div className="flex items-center gap-2 rounded-lg border border-light-border bg-light-surface px-4 py-2.5 dark:border-dark-border dark:bg-dark-hover">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                <span className="text-theme-secondary text-sm">
                   Carregando categorias...
                 </span>
               </div>
@@ -263,7 +263,7 @@ const ServiceFormModal = ({
                   value={formData.categoryId}
                   onChange={e => handleChange('categoryId', e.target.value)}
                   disabled={loading}
-                  className="w-full px-4 py-2.5 rounded-lg border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-60 disabled:cursor-not-allowed border-light-border dark:border-dark-border focus:border-primary"
+                  className="card-theme text-theme-primary w-full rounded-lg border border-light-border px-4 py-2.5 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-dark-border dark:bg-dark-surface"
                   required
                 >
                   <option value="">Selecione uma categoria</option>
@@ -279,12 +279,12 @@ const ServiceFormModal = ({
                     {errors.categoryId}
                   </p>
                 )}
-                <p className="text-xs text-theme-muted mt-1">
+                <p className="text-theme-muted mt-1 text-xs">
                   Apenas categorias de "Receita de Serviço" são exibidas
                 </p>
               </>
             ) : (
-              <div className="px-4 py-3 rounded-lg border border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20">
+              <div className="rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 dark:border-yellow-800 dark:bg-yellow-900/20">
                 <p className="text-sm text-yellow-800 dark:text-yellow-200">
                   ⚠️ Nenhuma categoria de serviço cadastrada. Cadastre
                   categorias na página de Categorias primeiro.
@@ -294,14 +294,14 @@ const ServiceFormModal = ({
           </div>
 
           {/* Grid: Duração e Preço */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {/* Duração */}
             <div>
-              <label className="block text-sm font-medium text-theme-primary mb-2">
+              <label className="text-theme-primary mb-2 block text-sm font-medium">
                 Duração (minutos) *
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                   <Clock size={18} className="text-theme-muted" />
                 </div>
                 <Input
@@ -318,18 +318,18 @@ const ServiceFormModal = ({
                   required
                 />
               </div>
-              <p className="text-xs text-theme-muted mt-1">
+              <p className="text-theme-muted mt-1 text-xs">
                 Tempo médio de execução
               </p>
             </div>
 
             {/* Preço */}
             <div>
-              <label className="block text-sm font-medium text-theme-primary mb-2">
+              <label className="text-theme-primary mb-2 block text-sm font-medium">
                 Preço (R$) *
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                   <DollarSign size={18} className="text-theme-muted" />
                 </div>
                 <Input
@@ -345,7 +345,7 @@ const ServiceFormModal = ({
                 />
               </div>
               {formData.price && (
-                <p className="text-xs text-theme-muted mt-1">
+                <p className="text-theme-muted mt-1 text-xs">
                   {formatCurrency(parseFloat(formData.price) || 0)}
                 </p>
               )}
@@ -354,11 +354,11 @@ const ServiceFormModal = ({
 
           {/* Comissão */}
           <div>
-            <label className="block text-sm font-medium text-theme-primary mb-2">
+            <label className="text-theme-primary mb-2 block text-sm font-medium">
               Percentual de Comissão (%) *
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                 <Percent size={18} className="text-theme-muted" />
               </div>
               <Input
@@ -376,15 +376,15 @@ const ServiceFormModal = ({
                 required
               />
             </div>
-            <p className="text-xs text-theme-muted mt-1">
+            <p className="text-theme-muted mt-1 text-xs">
               Percentual que o profissional recebe por serviço
             </p>
           </div>
 
           {/* Cálculo da Comissão */}
           {formData.price && formData.commissionPercentage && (
-            <div className="p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
+            <div className="rounded-lg border border-purple-200 bg-purple-50 p-4 dark:border-purple-800 dark:bg-purple-900/20">
+              <div className="mb-2 flex items-center gap-2">
                 <Calculator
                   size={20}
                   className="text-purple-600 dark:text-purple-400"
@@ -406,9 +406,9 @@ const ServiceFormModal = ({
                     {parseFloat(formData.commissionPercentage) || 0}%
                   </span>
                 </div>
-                <div className="flex justify-between pt-2 border-t border-purple-200 dark:border-purple-800">
+                <div className="flex justify-between border-t border-purple-200 pt-2 dark:border-purple-800">
                   <span className="font-bold">Comissão por serviço:</span>
-                  <span className="font-bold text-base">
+                  <span className="text-base font-bold">
                     {formatCurrency(commissionValue)}
                   </span>
                 </div>
@@ -418,25 +418,25 @@ const ServiceFormModal = ({
 
           {/* Status (apenas ao editar) */}
           {isEditing && (
-            <div className="flex items-center justify-between p-4 bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50 rounded-lg border border-theme-border">
+            <div className="border-theme-border flex items-center justify-between rounded-lg border bg-light-bg p-4 dark:bg-dark-bg dark:bg-dark-surface/50">
               <div>
-                <label className="text-sm font-medium text-theme-primary">
+                <label className="text-theme-primary text-sm font-medium">
                   Status do Serviço
                 </label>
-                <p className="text-xs text-theme-muted mt-1">
+                <p className="text-theme-muted mt-1 text-xs">
                   Serviços inativos não aparecem para seleção
                 </p>
               </div>
-              <label className="relative inline-flex items-center cursor-pointer">
+              <label className="relative inline-flex cursor-pointer items-center">
                 <input
                   type="checkbox"
                   checked={formData.active}
                   onChange={e => handleChange('active', e.target.checked)}
                   disabled={loading}
-                  className="sr-only peer"
+                  className="peer sr-only"
                 />
-                <div className="w-11 h-6 bg-gray-200 dark:bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-light-surface dark:border-dark-surface after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:card-theme after:border-light-border dark:border-dark-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600" />
-                <span className="ml-3 text-sm font-medium text-theme-primary">
+                <div className="peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 after:card-theme peer-checked:bg-primary-600 peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-light-border after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-light-surface peer-focus:outline-none peer-focus:ring-4 dark:border-dark-border dark:border-dark-surface dark:bg-gray-700" />
+                <span className="text-theme-primary ml-3 text-sm font-medium">
                   {formData.active ? 'Ativo' : 'Inativo'}
                 </span>
               </label>
@@ -445,7 +445,7 @@ const ServiceFormModal = ({
 
           {/* Erro de validação */}
           {errors.form && (
-            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <div className="rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/20">
               <p className="text-sm text-red-600 dark:text-red-400">
                 {errors.form}
               </p>
@@ -453,7 +453,7 @@ const ServiceFormModal = ({
           )}
 
           {/* Info */}
-          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
             <p className="text-sm text-blue-800 dark:text-blue-200">
               <strong>Dica:</strong> A comissão será calculada automaticamente
               ao adicionar este serviço em uma comanda.

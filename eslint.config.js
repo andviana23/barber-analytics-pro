@@ -41,10 +41,20 @@ export default [
   {
     // Exceções: arquivos de scripts/tooling não precisam seguir Design System
     files: ['scripts/**/*.js', 'eslint-plugin-barber-design-system/**/*.js'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        module: 'readonly',
+        require: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+      },
+    },
     rules: {
       'barber-design-system/no-hardcoded-colors': 'off',
       'barber-design-system/prefer-theme-classes': 'off',
       'barber-design-system/no-inline-hex-colors': 'off',
+      'no-undef': 'off',
     },
   },
 ];

@@ -196,15 +196,15 @@ const CashRegisterPage = () => {
   if (!canManageCashRegister) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="card-theme max-w-2xl mx-auto text-center py-12">
-          <Lock className="w-16 h-16 mx-auto mb-4 text-theme-muted" />
-          <h2 className="text-2xl font-bold text-theme-primary mb-2">
+        <div className="card-theme mx-auto max-w-2xl py-12 text-center">
+          <Lock className="text-theme-muted mx-auto mb-4 h-16 w-16" />
+          <h2 className="text-theme-primary mb-2 text-2xl font-bold">
             Acesso Restrito
           </h2>
           <p className="text-theme-muted">
             Você não tem permissão para acessar o gerenciamento de caixa.
           </p>
-          <p className="text-sm text-theme-muted mt-2">
+          <p className="text-theme-muted mt-2 text-sm">
             Esta funcionalidade é restrita a Recepcionistas, Gerentes e
             Administradores.
           </p>
@@ -216,8 +216,8 @@ const CashRegisterPage = () => {
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-theme-primary mb-2">
-          <DollarSign className="w-8 h-8 inline mr-2" />
+        <h1 className="text-theme-primary mb-2 text-3xl font-bold">
+          <DollarSign className="mr-2 inline h-8 w-8" />
           Gerenciamento de Caixa
         </h1>
         <p className="text-theme-muted">
@@ -227,8 +227,8 @@ const CashRegisterPage = () => {
 
       {/* Caixa Atual */}
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-theme-primary">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-theme-primary text-xl font-semibold">
             Caixa Atual
           </h2>
 
@@ -238,15 +238,15 @@ const CashRegisterPage = () => {
               onClick={() => setIsOpenModalVisible(true)}
               disabled={loading}
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="mr-2 h-4 w-4" />
               Abrir Caixa
             </Button>
           )}
         </div>
 
         {loading ? (
-          <div className="card-theme text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <div className="card-theme py-12 text-center">
+            <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-blue-500"></div>
             <p className="text-theme-muted">
               Carregando informações do caixa...
             </p>
@@ -258,9 +258,9 @@ const CashRegisterPage = () => {
             onViewReport={handleViewReport}
           />
         ) : (
-          <div className="card-theme text-center py-12">
-            <Clock className="w-16 h-16 mx-auto mb-4 text-theme-muted" />
-            <h3 className="text-lg font-semibold text-theme-primary mb-2">
+          <div className="card-theme py-12 text-center">
+            <Clock className="text-theme-muted mx-auto mb-4 h-16 w-16" />
+            <h3 className="text-theme-primary mb-2 text-lg font-semibold">
               Nenhum caixa aberto
             </h3>
             <p className="text-theme-muted mb-6">
@@ -272,7 +272,7 @@ const CashRegisterPage = () => {
                 variant="primary"
                 onClick={() => setIsOpenModalVisible(true)}
               >
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="mr-2 h-4 w-4" />
                 Abrir Caixa Agora
               </Button>
             )}
@@ -282,16 +282,16 @@ const CashRegisterPage = () => {
 
       {/* Histórico */}
       <div className="mb-8">
-        <h2 className="text-xl font-semibold text-theme-primary mb-4">
-          <FileText className="w-5 h-5 inline mr-2" />
+        <h2 className="text-theme-primary mb-4 text-xl font-semibold">
+          <FileText className="mr-2 inline h-5 w-5" />
           Histórico de Caixas
         </h2>
 
         {/* Filtros */}
         <div className="card-theme mb-4 p-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div>
-              <label className="block text-sm font-medium text-theme-primary mb-2">
+              <label className="text-theme-primary mb-2 block text-sm font-medium">
                 Data Inicial
               </label>
               <input
@@ -299,12 +299,12 @@ const CashRegisterPage = () => {
                 name="startDate"
                 value={filters.startDate}
                 onChange={handleFilterChange}
-                className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border-theme-border card-theme text-theme-primary w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-dark-surface"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-theme-primary mb-2">
+              <label className="text-theme-primary mb-2 block text-sm font-medium">
                 Data Final
               </label>
               <input
@@ -312,7 +312,7 @@ const CashRegisterPage = () => {
                 name="endDate"
                 value={filters.endDate}
                 onChange={handleFilterChange}
-                className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border-theme-border card-theme text-theme-primary w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-dark-surface"
               />
             </div>
 
@@ -334,36 +334,36 @@ const CashRegisterPage = () => {
         {/* Tabela de Histórico */}
         <div className="card-theme overflow-hidden">
           {/* Desktop Table */}
-          <div className="hidden md:block overflow-x-auto">
+          <div className="hidden overflow-x-auto md:block">
             <table className="w-full">
-              <thead className="bg-light-bg dark:bg-dark-bg dark:bg-dark-surface border-b border-theme-border">
+              <thead className="border-theme-border border-b bg-light-bg dark:bg-dark-bg dark:bg-dark-surface">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-muted uppercase tracking-wider">
+                  <th className="text-theme-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Período
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-muted uppercase tracking-wider">
+                  <th className="text-theme-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Responsável
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-theme-muted uppercase tracking-wider">
+                  <th className="text-theme-muted px-6 py-3 text-right text-xs font-medium uppercase tracking-wider">
                     Saldo Inicial
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-theme-muted uppercase tracking-wider">
+                  <th className="text-theme-muted px-6 py-3 text-right text-xs font-medium uppercase tracking-wider">
                     Saldo Final
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-theme-muted uppercase tracking-wider">
+                  <th className="text-theme-muted px-6 py-3 text-right text-xs font-medium uppercase tracking-wider">
                     Diferença
                   </th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-theme-muted uppercase tracking-wider">
+                  <th className="text-theme-muted px-6 py-3 text-center text-xs font-medium uppercase tracking-wider">
                     Status
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-theme-border">
+              <tbody className="divide-theme-border divide-y">
                 {cashRegisterHistory.length === 0 ? (
                   <tr>
                     <td
                       colSpan="6"
-                      className="px-6 py-12 text-center text-theme-muted"
+                      className="text-theme-muted px-6 py-12 text-center"
                     >
                       Nenhum registro encontrado
                     </td>
@@ -375,33 +375,33 @@ const CashRegisterPage = () => {
                     return (
                       <tr
                         key={cash.id}
-                        className="hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-dark-surface/50 transition-colors"
+                        className="transition-colors hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-dark-surface/50"
                       >
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-theme-primary font-medium">
+                        <td className="whitespace-nowrap px-6 py-4">
+                          <div className="text-theme-primary text-sm font-medium">
                             {formatDateTime(cash.openingTime)}
                           </div>
                           {cash.closingTime && (
-                            <div className="text-xs text-theme-muted">
+                            <div className="text-theme-muted text-xs">
                               até {formatDateTime(cash.closingTime)}
                             </div>
                           )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-theme-primary">
+                        <td className="text-theme-primary whitespace-nowrap px-6 py-4 text-sm">
                           {cash.openedByName || 'N/A'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-theme-primary font-medium">
+                        <td className="text-theme-primary whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                           {formatCurrency(cash.openingBalance)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-theme-primary font-medium">
+                        <td className="text-theme-primary whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                           {cash.closingBalance
                             ? formatCurrency(cash.closingBalance)
                             : '-'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
+                        <td className="whitespace-nowrap px-6 py-4 text-right text-sm">
                           {cash.status === 'closed' ? (
                             <span
-                              className={`font-medium flex items-center justify-end gap-1 ${Math.abs(difference) < 0.01 ? 'text-gray-600 dark:text-gray-400' : difference > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+                              className={`flex items-center justify-end gap-1 font-medium ${Math.abs(difference) < 0.01 ? 'text-gray-600 dark:text-gray-400' : difference > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
                             >
                               {Math.abs(difference) < 0.01 ? (
                                 <>
@@ -409,12 +409,12 @@ const CashRegisterPage = () => {
                                 </>
                               ) : difference > 0 ? (
                                 <>
-                                  <TrendingUp className="w-4 h-4" />
+                                  <TrendingUp className="h-4 w-4" />
                                   <span>+{formatCurrency(difference)}</span>
                                 </>
                               ) : (
                                 <>
-                                  <TrendingDown className="w-4 h-4" />
+                                  <TrendingDown className="h-4 w-4" />
                                   <span>{formatCurrency(difference)}</span>
                                 </>
                               )}
@@ -423,9 +423,9 @@ const CashRegisterPage = () => {
                             <span className="text-theme-muted">-</span>
                           )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                        <td className="whitespace-nowrap px-6 py-4 text-center">
                           <span
-                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${cash.status === 'open' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200' : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200'}`}
+                            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${cash.status === 'open' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'}`}
                           >
                             {cash.status === 'open' ? 'Aberto' : 'Fechado'}
                           </span>
@@ -439,9 +439,9 @@ const CashRegisterPage = () => {
           </div>
 
           {/* Mobile Cards */}
-          <div className="md:hidden divide-y divide-theme-border">
+          <div className="divide-theme-border divide-y md:hidden">
             {cashRegisterHistory.length === 0 ? (
-              <div className="p-8 text-center text-theme-muted">
+              <div className="text-theme-muted p-8 text-center">
                 Nenhum registro encontrado
               </div>
             ) : (
@@ -449,13 +449,13 @@ const CashRegisterPage = () => {
                 const difference =
                   (cash.closingBalance || 0) - (cash.expectedBalance || 0);
                 return (
-                  <div key={cash.id} className="p-4 space-y-3">
+                  <div key={cash.id} className="space-y-3 p-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-theme-primary">
+                      <span className="text-theme-primary text-sm font-medium">
                         {formatDateTime(cash.openingTime)}
                       </span>
                       <span
-                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${cash.status === 'open' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200' : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200'}`}
+                        className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${cash.status === 'open' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'}`}
                       >
                         {cash.status === 'open' ? 'Aberto' : 'Fechado'}
                       </span>
@@ -477,7 +477,7 @@ const CashRegisterPage = () => {
                     </div>
 
                     {cash.status === 'closed' && (
-                      <div className="grid grid-cols-2 gap-2 text-sm pt-2 border-t border-theme-border">
+                      <div className="border-theme-border grid grid-cols-2 gap-2 border-t pt-2 text-sm">
                         <div>
                           <span className="text-theme-muted">Saldo Final:</span>
                           <p className="text-theme-primary font-medium">

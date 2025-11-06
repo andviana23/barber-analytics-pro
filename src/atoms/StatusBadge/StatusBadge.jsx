@@ -113,7 +113,7 @@ const StatusBadge = ({
     <span className={containerClasses}>
       {/* Dot indicador */}
       <span
-        className={`${sizeClasses.dot} ${config.dotColor} rounded-full flex-shrink-0`}
+        className={`${sizeClasses.dot} ${config.dotColor} flex-shrink-0 rounded-full`}
         aria-hidden="true"
       />
 
@@ -179,7 +179,7 @@ export const StatusBadgePreview = () => {
 
       {/* Variante padrão */}
       <div>
-        <h4 className="text-md font-medium mb-2">Variante Padrão</h4>
+        <h4 className="text-md mb-2 font-medium">Variante Padrão</h4>
         <div className="flex flex-wrap gap-2">
           {allStatuses.map(status => (
             <StatusBadge key={status} status={status} />
@@ -189,7 +189,7 @@ export const StatusBadgePreview = () => {
 
       {/* Variante outline */}
       <div>
-        <h4 className="text-md font-medium mb-2">Variante Outline</h4>
+        <h4 className="text-md mb-2 font-medium">Variante Outline</h4>
         <div className="flex flex-wrap gap-2">
           {allStatuses.map(status => (
             <StatusBadge
@@ -203,7 +203,7 @@ export const StatusBadgePreview = () => {
 
       {/* Tamanhos */}
       <div>
-        <h4 className="text-md font-medium mb-2">Tamanhos</h4>
+        <h4 className="text-md mb-2 font-medium">Tamanhos</h4>
         <div className="flex items-center gap-4">
           <StatusBadge status="paid" size="sm" />
           <StatusBadge status="paid" size="md" />

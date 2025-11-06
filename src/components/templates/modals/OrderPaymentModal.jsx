@@ -144,11 +144,11 @@ const OrderPaymentModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Finalizar Venda" size="lg">
       {/* Header: Info da comanda */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg mb-4">
-        <div className="flex items-center justify-between mb-3">
+      <div className="mb-4 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 p-4">
+        <div className="mb-3 flex items-center justify-between">
           <div>
-            <p className="text-sm text-theme-secondary">Cliente</p>
-            <p className="font-bold text-lg">{order.client?.nome || 'N/A'}</p>
+            <p className="text-theme-secondary text-sm">Cliente</p>
+            <p className="text-lg font-bold">{order.client?.nome || 'N/A'}</p>
           </div>
           <OrderStatusBadge status={order.status} size="lg" />
         </div>
@@ -167,25 +167,25 @@ const OrderPaymentModal = ({
 
       {/* Resumo dos Itens */}
       <div className="mb-6">
-        <h3 className="font-semibold mb-3">Itens da Comanda</h3>
+        <h3 className="mb-3 font-semibold">Itens da Comanda</h3>
 
         {totals.itemsCount === 0 ? (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <p className="text-yellow-800 text-sm">
+          <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+            <p className="text-sm text-yellow-800">
               ⚠️ Esta comanda não possui itens. Adicione serviços antes de
               fechar.
             </p>
           </div>
         ) : (
-          <div className="space-y-2 max-h-48 overflow-y-auto">
+          <div className="max-h-48 space-y-2 overflow-y-auto">
             {order.items.map(item => (
               <div
                 key={item.id}
-                className="flex items-center justify-between card-theme border border-gray-100 rounded-lg p-3"
+                className="card-theme flex items-center justify-between rounded-lg border border-gray-100 p-3"
               >
                 <div className="flex-1">
-                  <p className="font-medium text-sm">{item.service?.name}</p>
-                  <p className="text-xs text-theme-secondary">
+                  <p className="text-sm font-medium">{item.service?.name}</p>
+                  <p className="text-theme-secondary text-xs">
                     {item.professional?.name} · Qtd: {item.quantity}
                   </p>
                 </div>
@@ -199,7 +199,7 @@ const OrderPaymentModal = ({
       </div>
 
       {/* Totalizadores */}
-      <div className="bg-light-bg dark:bg-dark-bg rounded-lg p-4 mb-6 space-y-2">
+      <div className="mb-6 space-y-2 rounded-lg bg-light-bg p-4 dark:bg-dark-bg">
         <div className="flex justify-between text-sm">
           <span className="text-theme-secondary">
             Subtotal ({totals.itemsCount} itens):
@@ -214,7 +214,7 @@ const OrderPaymentModal = ({
           </span>
         </div>
 
-        <div className="border-t border-light-border dark:border-dark-border pt-2 mt-2">
+        <div className="mt-2 border-t border-light-border pt-2 dark:border-dark-border">
           <div className="flex justify-between">
             <span className="text-lg font-bold">Total:</span>
             <span className="text-2xl font-bold text-green-600">
@@ -226,7 +226,7 @@ const OrderPaymentModal = ({
 
       {/* Forma de Pagamento */}
       <div className="mb-6">
-        <h3 className="font-semibold mb-3">Dados do Pagamento</h3>
+        <h3 className="mb-3 font-semibold">Dados do Pagamento</h3>
 
         <div className="grid grid-cols-1 gap-4">
           <Select
@@ -304,7 +304,7 @@ const OrderPaymentModal = ({
       </div>
 
       {/* Informação sobre transação atômica */}
-      <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
+      <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-3">
         <p className="text-xs text-blue-800">
           ℹ️ O fechamento será processado de forma atômica. Se houver qualquer
           erro, a transação será revertida automaticamente.

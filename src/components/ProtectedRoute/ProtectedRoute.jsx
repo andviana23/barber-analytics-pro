@@ -15,9 +15,9 @@ export function ProtectedRoute({
   // Mostrar loading enquanto verifica autenticação
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-light-bg dark:bg-dark-bg">
+      <div className="flex min-h-screen items-center justify-center bg-light-bg dark:bg-dark-bg">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
+          <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin text-primary" />
           <p className="text-text-light-secondary dark:text-text-dark-secondary">
             Verificando autenticação...
           </p>
@@ -63,9 +63,9 @@ export function PublicRoute({ children, redirectTo = '/dashboard' }) {
   // Mostrar loading enquanto verifica autenticação
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-light-bg dark:bg-dark-bg">
+      <div className="flex min-h-screen items-center justify-center bg-light-bg dark:bg-dark-bg">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
+          <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin text-primary" />
           <p className="text-text-light-secondary dark:text-text-dark-secondary">
             Carregando...
           </p>
@@ -97,9 +97,9 @@ export function RoleProtectedRoute({
   // Mostrar loading enquanto verifica autenticação
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-light-bg dark:bg-dark-bg">
+      <div className="flex min-h-screen items-center justify-center bg-light-bg dark:bg-dark-bg">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
+          <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin text-primary" />
           <p className="text-text-light-secondary dark:text-text-dark-secondary">
             Verificando permissões...
           </p>
@@ -154,9 +154,9 @@ export function ReceptionistRoute({ children }) {
   // Mostrar loading enquanto verifica autenticação
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-light-bg dark:bg-dark-bg">
+      <div className="flex min-h-screen items-center justify-center bg-light-bg dark:bg-dark-bg">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
+          <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin text-primary" />
           <p className="text-text-light-secondary dark:text-text-dark-secondary">
             Verificando permissões...
           </p>
@@ -190,21 +190,21 @@ export function ReceptionistRoute({ children }) {
 // Componente de fallback para acesso negado
 export function UnauthorizedPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-light-bg dark:bg-dark-bg px-4">
-      <div className="max-w-md w-full text-center">
-        <div className="card-theme p-8 rounded-xl border border-light-border dark:border-dark-border shadow-lg">
-          <div className="mx-auto w-16 h-16 bg-danger rounded-xl flex items-center justify-center mb-4">
-            <span className="text-dark-text-primary font-bold text-xl">!</span>
+    <div className="flex min-h-screen items-center justify-center bg-light-bg px-4 dark:bg-dark-bg">
+      <div className="w-full max-w-md text-center">
+        <div className="card-theme rounded-xl border border-light-border p-8 shadow-lg dark:border-dark-border">
+          <div className="bg-danger mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-xl">
+            <span className="text-dark-text-primary text-xl font-bold">!</span>
           </div>
-          <h2 className="text-2xl font-bold text-text-light-primary dark:text-text-dark-primary mb-4">
+          <h2 className="mb-4 text-2xl font-bold text-text-light-primary dark:text-text-dark-primary">
             Acesso Negado
           </h2>
-          <p className="text-text-light-secondary dark:text-text-dark-secondary mb-6">
+          <p className="mb-6 text-text-light-secondary dark:text-text-dark-secondary">
             Você não tem permissão para acessar esta página.
           </p>
           <button
             onClick={() => window.history.back()}
-            className="px-6 py-3 bg-primary text-dark-text-primary rounded-lg hover:bg-primary-600 transition-colors duration-300"
+            className="text-dark-text-primary hover:bg-primary-600 rounded-lg bg-primary px-6 py-3 transition-colors duration-300"
           >
             Voltar
           </button>

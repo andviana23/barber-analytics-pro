@@ -80,15 +80,11 @@ export function Tooltip({
             initial="initial"
             animate="animate"
             exit="exit"
-            className={`
-              absolute z-50 px-3 py-2 text-sm font-medium text-white bg-gray-800 dark:bg-gray-200 dark:text-gray-800 
-              rounded-lg shadow-lg whitespace-nowrap pointer-events-none
-              ${positionClasses[position]}
-            `}
+            className={`pointer-events-none absolute z-50 whitespace-nowrap rounded-lg bg-gray-800 px-3 py-2 text-sm font-medium text-white shadow-lg dark:bg-gray-200 dark:text-gray-800 ${positionClasses[position]} `}
           >
             {content}
             {/* Arrow */}
-            <div className={`absolute w-0 h-0 ${arrowClasses[position]}`} />
+            <div className={`absolute h-0 w-0 ${arrowClasses[position]}`} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -106,7 +102,7 @@ export function KeyboardShortcut({ keys, description, className = '' }) {
           <div className="flex items-center gap-1">
             {keys.map((key, index) => (
               <React.Fragment key={key}>
-                <kbd className="px-2 py-1 text-xs bg-gray-600 dark:bg-gray-300 dark:bg-gray-600 dark:text-theme-primary rounded border">
+                <kbd className="dark:text-theme-primary rounded border bg-gray-600 px-2 py-1 text-xs dark:bg-gray-300 dark:bg-gray-600">
                   {key}
                 </kbd>
                 {index < keys.length - 1 && (
@@ -132,7 +128,7 @@ export function InfoTooltip({ title, description, children, className = '' }) {
     <Tooltip
       content={
         <div className="max-w-xs">
-          {title && <div className="font-semibold mb-1">{title}</div>}
+          {title && <div className="mb-1 font-semibold">{title}</div>}
           <div className="text-xs opacity-90">{description}</div>
         </div>
       }
@@ -156,7 +152,7 @@ export function StatusTooltip({ status, details, children, className = '' }) {
       content={
         <div className="flex items-center gap-2">
           <div
-            className={`w-2 h-2 rounded-full ${statusColors[status]?.replace('text-', 'bg-')}`}
+            className={`h-2 w-2 rounded-full ${statusColors[status]?.replace('text-', 'bg-')}`}
           />
           <span>{details}</span>
         </div>

@@ -72,7 +72,7 @@ export const fluxoCaixaRepository = {
           category_id,
           payment_method:payment_methods(id, name),
           professional:professionals(id, name),
-          party:parties(id, name),
+          party:parties(id, nome),
           category:categories(id, name)
         `
         )
@@ -136,7 +136,7 @@ export const fluxoCaixaRepository = {
           category_id,
           party_id,
           category:categories(id, name),
-          party:parties(id, name)
+          party:parties(id, nome)
         `
         )
         .eq('unit_id', unitId)
@@ -178,11 +178,11 @@ export const fluxoCaixaRepository = {
       // Buscar último registro de caixa fechado antes da data inicial
       const { data, error } = await supabase
         .from('cash_registers')
-        .select('final_balance')
+        .select('closing_balance')
         .eq('unit_id', unitId)
-        .lt('closing_date', startDate)
+        .lt('closing_time', startDate)
         .eq('status', 'fechado')
-        .order('closing_date', { ascending: false })
+        .order('closing_time', { ascending: false })
         .limit(1);
 
       if (error) {
@@ -190,7 +190,7 @@ export const fluxoCaixaRepository = {
       }
 
       // Se não houver registro, retornar 0
-      const initialBalance = data?.[0]?.final_balance || 0;
+      const initialBalance = data?.[0]?.closing_balance || 0;
       return { data: initialBalance, error: null };
     } catch (error) {
       return { data: 0, error };

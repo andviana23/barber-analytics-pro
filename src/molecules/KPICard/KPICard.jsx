@@ -155,32 +155,32 @@ const KPICard = ({
   if (loading) {
     return (
       <div
-        className="card-theme dark:bg-dark-surface p-6 rounded-xl border border-light-border dark:border-dark-border animate-pulse"
+        className="card-theme animate-pulse rounded-xl border border-light-border p-6 dark:border-dark-border dark:bg-dark-surface"
         data-testid="kpi-loading-skeleton"
       >
-        <div className="flex items-center justify-between mb-4">
-          <div className="p-2 rounded-lg bg-gray-200 dark:bg-gray-700">
-            <div className="h-5 w-5 bg-gray-300 dark:bg-gray-600 rounded"></div>
+        <div className="mb-4 flex items-center justify-between">
+          <div className="rounded-lg bg-gray-200 p-2 dark:bg-gray-700">
+            <div className="h-5 w-5 rounded bg-gray-300 dark:bg-gray-600"></div>
           </div>
-          <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
+          <div className="h-4 w-16 rounded bg-gray-200 dark:bg-gray-700"></div>
         </div>
         <div>
-          <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-          <div className="h-8 w-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
+          <div className="mb-2 h-4 w-24 rounded bg-gray-200 dark:bg-gray-700"></div>
+          <div className="h-8 w-32 rounded bg-gray-200 dark:bg-gray-700"></div>
         </div>
       </div>
     );
   }
   if (error) {
     return (
-      <div className="card-theme dark:bg-dark-surface p-6 rounded-xl border border-light-border dark:border-dark-border">
-        <div className="flex items-center justify-between mb-4">
-          <div className="p-2 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600">
+      <div className="card-theme rounded-xl border border-light-border p-6 dark:border-dark-border dark:bg-dark-surface">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="rounded-lg bg-red-50 p-2 text-red-600 dark:bg-red-900/20">
             <AlertTriangle className="h-5 w-5" data-testid="error-icon" />
           </div>
         </div>
         <div>
-          <p className="text-red-600 text-sm font-medium">
+          <p className="text-sm font-medium text-red-600">
             Erro ao carregar dados
           </p>
         </div>
@@ -197,15 +197,15 @@ const KPICard = ({
       tabIndex={onClick ? 0 : undefined}
       onKeyDown={onClick ? e => e.key === 'Enter' && onClick(e) : undefined}
     >
-      <div className="flex items-center justify-between mb-4">
+      <div className="mb-4 flex items-center justify-between">
         <div
-          className={`p-2 rounded-lg bg-gray-50 dark:bg-gray-700 ${getColorClasses()}`}
+          className={`rounded-lg bg-gray-50 p-2 dark:bg-gray-700 ${getColorClasses()}`}
         >
           {renderIcon()}
         </div>
         {trendValue !== undefined && trendValue !== null && (
           <span
-            className={`text-sm font-medium flex items-center gap-1 ${getTrendColor()}`}
+            className={`flex items-center gap-1 text-sm font-medium ${getTrendColor()}`}
           >
             {renderTrendIcon()}
             {formatChange(trendValue)}
@@ -216,16 +216,16 @@ const KPICard = ({
         <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm font-medium">
           {title}
         </p>
-        <p className="text-theme-primary dark:text-dark-text-primary text-2xl font-bold mt-1">
+        <p className="text-theme-primary dark:text-dark-text-primary mt-1 text-2xl font-bold">
           {formatValue(value)}
         </p>
         {subtitle && (
-          <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-xs mt-1">
+          <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-xs">
             {subtitle}
           </p>
         )}
         {trendPeriod && (
-          <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-xs mt-1">
+          <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-xs">
             {trendPeriod}
           </p>
         )}

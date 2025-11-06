@@ -117,12 +117,12 @@ const OrderModal = ({
     >
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Informações Básicas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {/* Nome do Cliente */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-theme-primary mb-2">
+            <label className="text-theme-primary mb-2 block text-sm font-medium">
               Nome do Cliente
-              {isEditMode && <span className="text-red-500 ml-1">*</span>}
+              {isEditMode && <span className="ml-1 text-red-500">*</span>}
             </label>
             <input
               type="text"
@@ -131,7 +131,7 @@ const OrderModal = ({
               disabled={!isEditMode || loading}
               placeholder="Digite o nome do cliente"
               maxLength={100}
-              className={`w-full px-4 py-2.5 rounded-lg border bg-white dark:bg-dark-surface text-theme-primary placeholder-theme-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-60 disabled:cursor-not-allowed ${errors.clientName ? 'border-red-500 dark:border-red-400 focus:border-red-500' : 'border-light-border dark:border-dark-border focus:border-primary'}`}
+              className={`text-theme-primary placeholder-theme-secondary w-full rounded-lg border bg-white px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-dark-surface ${errors.clientName ? 'border-red-500 focus:border-red-500 dark:border-red-400' : 'border-light-border focus:border-primary dark:border-dark-border'}`}
             />
             {errors.clientName && (
               <p className="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -143,16 +143,16 @@ const OrderModal = ({
           {/* Info Cards (apenas visualização/edição) */}
           {!isCreateMode && order && (
             <>
-              <div className="p-4 bg-light-surface dark:bg-dark-hover rounded-lg border border-light-border dark:border-dark-border">
-                <p className="text-xs text-theme-secondary mb-1">Número</p>
+              <div className="rounded-lg border border-light-border bg-light-surface p-4 dark:border-dark-border dark:bg-dark-hover">
+                <p className="text-theme-secondary mb-1 text-xs">Número</p>
                 <p className="text-lg font-bold text-primary">
                   #{order.order_number}
                 </p>
               </div>
-              <div className="p-4 bg-light-surface dark:bg-dark-hover rounded-lg border border-light-border dark:border-dark-border">
-                <p className="text-xs text-theme-secondary mb-1">Status</p>
+              <div className="rounded-lg border border-light-border bg-light-surface p-4 dark:border-dark-border dark:bg-dark-hover">
+                <p className="text-theme-secondary mb-1 text-xs">Status</p>
                 <span
-                  className={`inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium ${order.status === 'open' ? 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400' : order.status === 'closed' ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-gray-50 dark:bg-gray-900/20 text-gray-700 dark:text-gray-400'}`}
+                  className={`inline-flex items-center rounded-full px-2.5 py-1 text-sm font-medium ${order.status === 'open' ? 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400' : order.status === 'closed' ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400' : 'bg-gray-50 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400'}`}
                 >
                   {order.status === 'open'
                     ? 'Aberta'
@@ -167,7 +167,7 @@ const OrderModal = ({
 
         {/* Observações */}
         <div>
-          <label className="block text-sm font-medium text-theme-primary mb-2">
+          <label className="text-theme-primary mb-2 block text-sm font-medium">
             Observações
             <span className="text-theme-secondary ml-1">(opcional)</span>
           </label>
@@ -178,9 +178,9 @@ const OrderModal = ({
             rows={3}
             maxLength={500}
             placeholder="Informações adicionais sobre a comanda"
-            className="w-full px-4 py-2.5 rounded-lg border border-light-border dark:border-dark-border card-theme dark:bg-dark-surface text-theme-primary placeholder-theme-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary disabled:opacity-60 disabled:cursor-not-allowed resize-none"
+            className="card-theme text-theme-primary placeholder-theme-secondary w-full resize-none rounded-lg border border-light-border px-4 py-2.5 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-dark-border dark:bg-dark-surface"
           />
-          <p className="mt-1 text-xs text-theme-secondary text-right">
+          <p className="text-theme-secondary mt-1 text-right text-xs">
             {observations.length}/500
           </p>
         </div>
@@ -205,13 +205,13 @@ const OrderModal = ({
 
         {/* Resumo do Total */}
         {items.length > 0 && (
-          <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-theme-secondary mb-1">
+                <p className="text-theme-secondary mb-1 text-sm">
                   Total da Comanda
                 </p>
-                <p className="text-xs text-theme-secondary">
+                <p className="text-theme-secondary text-xs">
                   {items.length} {items.length === 1 ? 'serviço' : 'serviços'}
                 </p>
               </div>
@@ -223,12 +223,12 @@ const OrderModal = ({
         )}
 
         {/* Ações */}
-        <div className="flex gap-3 pt-4 border-t border-light-border dark:border-dark-border">
+        <div className="flex gap-3 border-t border-light-border pt-4 dark:border-dark-border">
           <button
             type="button"
             onClick={handleClose}
             disabled={loading}
-            className="flex-1 px-4 py-2.5 border border-light-border dark:border-dark-border rounded-lg font-medium text-theme-primary hover:bg-light-surface dark:hover:bg-dark-hover transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            className="text-theme-primary flex-1 rounded-lg border border-light-border px-4 py-2.5 font-medium transition-colors hover:bg-light-surface disabled:cursor-not-allowed disabled:opacity-60 dark:border-dark-border dark:hover:bg-dark-hover"
           >
             {mode === 'view' ? 'Fechar' : 'Cancelar'}
           </button>
@@ -236,17 +236,17 @@ const OrderModal = ({
             <button
               type="submit"
               disabled={loading || items.length === 0}
-              className="flex-1 px-4 py-2.5 bg-primary hover:bg-primary-dark text-dark-text-primary rounded-lg font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+              className="hover:bg-primary-dark text-dark-text-primary inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-light-surface dark:border-dark-surface border-t-transparent rounded-full animate-spin" />
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-light-surface border-t-transparent dark:border-dark-surface" />
                   Salvando...
                 </>
               ) : (
                 <>
                   <svg
-                    className="w-5 h-5"
+                    className="h-5 w-5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

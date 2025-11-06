@@ -135,9 +135,9 @@ const CategoryHierarchicalDropdown = ({
     <div className="w-full">
       {/* Label */}
       {label && (
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className="ml-1 text-red-500">*</span>}
         </label>
       )}
 
@@ -167,9 +167,9 @@ const CategoryHierarchicalDropdown = ({
 
         {/* Ícone de Dropdown */}
         {showIcon && (
-          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
             <ChevronDown
-              className={`w-5 h-5 ${error ? 'text-red-400 dark:text-red-500' : 'text-gray-400 dark:text-gray-500'}`}
+              className={`h-5 w-5 ${error ? 'text-red-400 dark:text-red-500' : 'text-gray-400 dark:text-gray-500'}`}
             />
           </div>
         )}
@@ -179,7 +179,7 @@ const CategoryHierarchicalDropdown = ({
       {helperText && !error && (
         <p
           id="helper-text"
-          className="mt-1 text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted"
+          className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-sm"
         >
           {helperText}
         </p>

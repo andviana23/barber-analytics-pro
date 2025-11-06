@@ -186,10 +186,10 @@ const ServicesPage = () => {
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+        <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-theme-primary mb-2">
-              <Scissors className="w-8 h-8 inline mr-2" />
+            <h1 className="text-theme-primary mb-2 text-3xl font-bold">
+              <Scissors className="mr-2 inline h-8 w-8" />
               Serviços
             </h1>
             <p className="text-theme-muted">
@@ -205,7 +205,7 @@ const ServicesPage = () => {
               onClick={handleNewService}
               disabled={loading}
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="mr-2 h-4 w-4" />
               Novo Serviço
             </Button>
           )}
@@ -213,17 +213,17 @@ const ServicesPage = () => {
 
         {/* Barra de Busca e Filtros */}
         <div className="card-theme p-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             {/* Busca */}
-            <div className="md:col-span-2 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-theme-muted" />
+            <div className="relative md:col-span-2">
+              <Search className="text-theme-muted absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
               <input
                 type="text"
                 name="search"
                 value={filters.search}
                 onChange={handleFilterChange}
                 placeholder="Buscar serviço por nome..."
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border-theme-border card-theme text-theme-primary w-full rounded-lg border py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-dark-surface"
               />
             </div>
 
@@ -233,7 +233,7 @@ const ServicesPage = () => {
                 name="status"
                 value={filters.status}
                 onChange={handleFilterChange}
-                className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border-theme-border card-theme text-theme-primary w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-dark-surface"
               >
                 <option value="all">Todos os Status</option>
                 <option value="active">Ativos</option>
@@ -245,19 +245,19 @@ const ServicesPage = () => {
       </div>
 
       {/* Estatísticas */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="mb-6 grid grid-cols-3 gap-4">
         <div className="card-theme p-4 text-center">
-          <p className="text-sm text-theme-muted mb-1">Total</p>
-          <p className="text-2xl font-bold text-theme-primary">{stats.total}</p>
+          <p className="text-theme-muted mb-1 text-sm">Total</p>
+          <p className="text-theme-primary text-2xl font-bold">{stats.total}</p>
         </div>
         <div className="card-theme p-4 text-center">
-          <p className="text-sm text-theme-muted mb-1">Ativos</p>
+          <p className="text-theme-muted mb-1 text-sm">Ativos</p>
           <p className="text-2xl font-bold text-green-600 dark:text-green-400">
             {stats.active}
           </p>
         </div>
         <div className="card-theme p-4 text-center">
-          <p className="text-sm text-theme-muted mb-1">Inativos</p>
+          <p className="text-theme-muted mb-1 text-sm">Inativos</p>
           <p className="text-2xl font-bold text-red-600 dark:text-red-400">
             {stats.inactive}
           </p>
@@ -266,14 +266,14 @@ const ServicesPage = () => {
 
       {/* Lista/Grid de Serviços */}
       {loading ? (
-        <div className="card-theme text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+        <div className="card-theme py-12 text-center">
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-blue-500"></div>
           <p className="text-theme-muted">Carregando serviços...</p>
         </div>
       ) : filteredServices.length === 0 ? (
-        <div className="card-theme text-center py-12">
-          <Scissors className="w-16 h-16 mx-auto mb-4 text-theme-muted" />
-          <h3 className="text-lg font-semibold text-theme-primary mb-2">
+        <div className="card-theme py-12 text-center">
+          <Scissors className="text-theme-muted mx-auto mb-4 h-16 w-16" />
+          <h3 className="text-theme-primary mb-2 text-lg font-semibold">
             Nenhum serviço encontrado
           </h3>
           <p className="text-theme-muted mb-6">
@@ -284,7 +284,7 @@ const ServicesPage = () => {
 
           {canCreateService && !filters.search && filters.status === 'all' && (
             <Button variant="primary" onClick={handleNewService}>
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="mr-2 h-4 w-4" />
               Novo Serviço
             </Button>
           )}
@@ -293,46 +293,46 @@ const ServicesPage = () => {
         <div className="card-theme overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-light-bg dark:bg-dark-bg dark:bg-dark-surface border-b border-theme-border">
+              <thead className="border-theme-border border-b bg-light-bg dark:bg-dark-bg dark:bg-dark-surface">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-muted uppercase tracking-wider">
+                  <th className="text-theme-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Serviço
                   </th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-theme-muted uppercase tracking-wider">
+                  <th className="text-theme-muted px-6 py-3 text-center text-xs font-medium uppercase tracking-wider">
                     Duração
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-theme-muted uppercase tracking-wider">
+                  <th className="text-theme-muted px-6 py-3 text-right text-xs font-medium uppercase tracking-wider">
                     Preço
                   </th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-theme-muted uppercase tracking-wider">
+                  <th className="text-theme-muted px-6 py-3 text-center text-xs font-medium uppercase tracking-wider">
                     Comissão
                   </th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-theme-muted uppercase tracking-wider">
+                  <th className="text-theme-muted px-6 py-3 text-center text-xs font-medium uppercase tracking-wider">
                     Status
                   </th>
                   {canManageServices && (
-                    <th className="px-6 py-3 text-center text-xs font-medium text-theme-muted uppercase tracking-wider">
+                    <th className="text-theme-muted px-6 py-3 text-center text-xs font-medium uppercase tracking-wider">
                       Ações
                     </th>
                   )}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-theme-border">
+              <tbody className="divide-theme-border divide-y">
                 {filteredServices.map(service => {
                   const commissionValue =
                     (service.price * service.commission_percentage) / 100;
                   return (
                     <tr
                       key={service.id}
-                      className="hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-dark-surface/50 transition-colors"
+                      className="transition-colors hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-dark-surface/50"
                     >
                       {/* Nome do Serviço */}
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                            <Scissors className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                            <Scissors className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                           </div>
-                          <div className="font-medium text-theme-primary">
+                          <div className="text-theme-primary font-medium">
                             {service.name}
                           </div>
                         </div>
@@ -340,7 +340,7 @@ const ServicesPage = () => {
 
                       {/* Duração */}
                       <td className="px-6 py-4 text-center">
-                        <span className="text-sm text-theme-primary font-medium">
+                        <span className="text-theme-primary text-sm font-medium">
                           {service.duration_minutes} min
                         </span>
                       </td>
@@ -358,7 +358,7 @@ const ServicesPage = () => {
                           <span className="text-sm font-semibold text-purple-600 dark:text-purple-400">
                             {service.commission_percentage}%
                           </span>
-                          <span className="text-xs text-theme-muted">
+                          <span className="text-theme-muted text-xs">
                             {formatCurrency(commissionValue)}
                           </span>
                         </div>
@@ -367,10 +367,10 @@ const ServicesPage = () => {
                       {/* Status */}
                       <td className="px-6 py-4 text-center">
                         <span
-                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${service.active || service.is_active ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200' : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300'}`}
+                          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${service.active || service.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'}`}
                         >
                           <span
-                            className={`w-1.5 h-1.5 rounded-full ${service.active || service.is_active ? 'bg-green-600 dark:bg-green-400' : 'bg-gray-600 dark:bg-gray-400'}`}
+                            className={`h-1.5 w-1.5 rounded-full ${service.active || service.is_active ? 'bg-green-600 dark:bg-green-400' : 'bg-gray-600 dark:bg-gray-400'}`}
                           />
                           {service.active || service.is_active
                             ? 'Ativo'
@@ -384,22 +384,22 @@ const ServicesPage = () => {
                           <div className="flex items-center justify-center gap-2">
                             <button
                               onClick={() => handleEdit(service)}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
+                              className="inline-flex items-center gap-1.5 rounded-md bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-300 dark:hover:bg-blue-900/40"
                               title="Editar serviço"
                             >
-                              <Edit2 className="w-3.5 h-3.5" />
+                              <Edit2 className="h-3.5 w-3.5" />
                               Editar
                             </button>
                             <button
                               onClick={() => handleToggleActive(service)}
-                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${service.active || service.is_active ? 'text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40' : 'text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/40'}`}
+                              className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${service.active || service.is_active ? 'bg-red-50 text-red-700 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-300 dark:hover:bg-red-900/40' : 'bg-green-50 text-green-700 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-900/40'}`}
                               title={
                                 service.active || service.is_active
                                   ? 'Desativar serviço'
                                   : 'Ativar serviço'
                               }
                             >
-                              <Power className="w-3.5 h-3.5" />
+                              <Power className="h-3.5 w-3.5" />
                               {service.active || service.is_active
                                 ? 'Desativar'
                                 : 'Ativar'}
@@ -418,14 +418,14 @@ const ServicesPage = () => {
 
       {/* Aviso para profissionais */}
       {!canManageServices && services.length > 0 && (
-        <div className="card-theme bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4 mt-6">
+        <div className="card-theme mt-6 border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
           <div className="flex items-start gap-3">
-            <Lock className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+            <Lock className="mt-0.5 h-5 w-5 text-blue-600 dark:text-blue-400" />
             <div>
-              <p className="text-sm text-blue-800 dark:text-blue-200 font-medium">
+              <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
                 Modo somente leitura
               </p>
-              <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+              <p className="mt-1 text-xs text-blue-700 dark:text-blue-300">
                 Apenas Gerentes e Administradores podem criar ou editar
                 serviços.
               </p>

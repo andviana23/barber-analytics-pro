@@ -57,8 +57,8 @@ const PermissionsTest = () => {
   };
   if (!user) {
     return (
-      <div className="p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <h3 className="text-lg font-semibold text-yellow-800 mb-2">
+      <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-6">
+        <h3 className="mb-2 text-lg font-semibold text-yellow-800">
           ⚠️ Teste de Permissões
         </h3>
         <p className="text-yellow-700">
@@ -69,8 +69,8 @@ const PermissionsTest = () => {
   }
   if (loading) {
     return (
-      <div className="p-6 bg-blue-50 border border-blue-200 rounded-lg">
-        <h3 className="text-lg font-semibold text-blue-800 mb-2">
+      <div className="rounded-lg border border-blue-200 bg-blue-50 p-6">
+        <h3 className="mb-2 text-lg font-semibold text-blue-800">
           🔄 Testando Permissões...
         </h3>
         <p className="text-blue-700">
@@ -81,14 +81,14 @@ const PermissionsTest = () => {
   }
   if (error) {
     return (
-      <div className="p-6 bg-red-50 border border-red-200 rounded-lg">
-        <h3 className="text-lg font-semibold text-red-800 mb-2">
+      <div className="rounded-lg border border-red-200 bg-red-50 p-6">
+        <h3 className="mb-2 text-lg font-semibold text-red-800">
           ❌ Erro no Teste de Permissões
         </h3>
-        <p className="text-red-700 mb-4">{error}</p>
+        <p className="mb-4 text-red-700">{error}</p>
         <button
           onClick={testPermissions}
-          className="px-4 py-2 bg-red-600 text-dark-text-primary rounded hover:bg-red-700"
+          className="text-dark-text-primary rounded bg-red-600 px-4 py-2 hover:bg-red-700"
         >
           Tentar Novamente
         </button>
@@ -96,42 +96,42 @@ const PermissionsTest = () => {
     );
   }
   return (
-    <div className="p-6 bg-green-50 border border-green-200 rounded-lg">
-      <h3 className="text-lg font-semibold text-green-800 mb-4">
+    <div className="rounded-lg border border-green-200 bg-green-50 p-6">
+      <h3 className="mb-4 text-lg font-semibold text-green-800">
         ✅ Teste de Permissões - Sistema Funcionando
       </h3>
 
       <div className="space-y-3">
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <span className="font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
             ID do Usuário:
           </span>
-          <span className="text-sm font-mono card-theme px-2 py-1 rounded">
+          <span className="card-theme rounded px-2 py-1 font-mono text-sm">
             {user.id}
           </span>
         </div>
 
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <span className="font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
             Email:
           </span>
-          <span className="text-sm font-mono card-theme px-2 py-1 rounded">
+          <span className="card-theme rounded px-2 py-1 font-mono text-sm">
             {user.email}
           </span>
         </div>
 
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <span className="font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
             Perfil (Role):
           </span>
           <span
-            className={`text-sm font-semibold px-3 py-1 rounded-full ${userRole === 'admin' ? 'bg-purple-100 text-purple-800' : userRole === 'manager' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}
+            className={`rounded-full px-3 py-1 text-sm font-semibold ${userRole === 'admin' ? 'bg-purple-100 text-purple-800' : userRole === 'manager' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}
           >
             {userRole || 'barber'}
           </span>
         </div>
 
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <span className="font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
             É Admin:
           </span>
@@ -142,7 +142,7 @@ const PermissionsTest = () => {
           </span>
         </div>
 
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <span className="font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
             É Manager ou Admin:
           </span>
@@ -153,20 +153,20 @@ const PermissionsTest = () => {
           </span>
         </div>
 
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <span className="font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
             ID da Unidade:
           </span>
-          <span className="text-sm font-mono card-theme px-2 py-1 rounded">
+          <span className="card-theme rounded px-2 py-1 font-mono text-sm">
             {userUnitId || 'Não definido'}
           </span>
         </div>
       </div>
 
-      <div className="mt-4 pt-4 border-t border-green-200">
+      <div className="mt-4 border-t border-green-200 pt-4">
         <button
           onClick={testPermissions}
-          className="px-4 py-2 bg-green-600 text-dark-text-primary rounded hover:bg-green-700"
+          className="text-dark-text-primary rounded bg-green-600 px-4 py-2 hover:bg-green-700"
         >
           🔄 Testar Novamente
         </button>

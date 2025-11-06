@@ -18,9 +18,9 @@ const ImportRevenuesFromStatementButton = ({ unitId, userId, onSuccess }) => {
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-dark-text-primary rounded-lg hover:bg-purple-700 transition-colors"
+        className="text-dark-text-primary flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 transition-colors hover:bg-purple-700"
       >
-        <FileSpreadsheet className="w-5 h-5" />
+        <FileSpreadsheet className="h-5 w-5" />
         Importar Extrato
       </button>
 

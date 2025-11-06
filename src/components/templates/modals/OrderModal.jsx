@@ -267,14 +267,14 @@ const OrderModal = ({
       {/* Form Content */}
       <div className="space-y-6">
         {/* Cliente e Profissional - Grid Responsivo */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Cliente */}
           <div>
             <label
               htmlFor="clientId"
-              className="block text-sm font-medium text-theme-primary mb-2"
+              className="text-theme-primary mb-2 block text-sm font-medium"
             >
-              <User className="w-4 h-4 inline-block mr-2 -mt-0.5" />
+              <User className="-mt-0.5 mr-2 inline-block h-4 w-4" />
               Cliente *
             </label>
             <select
@@ -314,7 +314,7 @@ const OrderModal = ({
             {errors.clientId && (
               <p
                 id="clientId-error"
-                className="text-xs text-feedback-error-light dark:text-feedback-error-dark mt-1.5"
+                className="text-feedback-error-light dark:text-feedback-error-dark mt-1.5 text-xs"
                 role="alert"
               >
                 {errors.clientId}
@@ -326,9 +326,9 @@ const OrderModal = ({
           <div>
             <label
               htmlFor="professionalId"
-              className="block text-sm font-medium text-theme-primary mb-2"
+              className="text-theme-primary mb-2 block text-sm font-medium"
             >
-              <Briefcase className="w-4 h-4 inline-block mr-2 -mt-0.5" />
+              <Briefcase className="-mt-0.5 mr-2 inline-block h-4 w-4" />
               Profissional Responsável *
             </label>
             <select
@@ -354,7 +354,7 @@ const OrderModal = ({
             {errors.professionalId && (
               <p
                 id="professionalId-error"
-                className="text-xs text-feedback-error-light dark:text-feedback-error-dark mt-1.5"
+                className="text-feedback-error-light dark:text-feedback-error-dark mt-1.5 text-xs"
                 role="alert"
               >
                 {errors.professionalId}
@@ -364,9 +364,9 @@ const OrderModal = ({
         </div>
 
         {/* Seção Serviços */}
-        <div className="pt-4 border-t border-light-border dark:border-dark-border">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-theme-primary">
+        <div className="border-t border-light-border pt-4 dark:border-dark-border">
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="text-theme-primary text-lg font-semibold">
               Serviços da Comanda
             </h3>
             <Button
@@ -413,11 +413,11 @@ const OrderModal = ({
         </div>
 
         {/* Card de Totais - Design System Compliant */}
-        <div className="card-theme rounded-lg p-6 space-y-4 border border-light-border dark:border-dark-border">
+        <div className="card-theme space-y-4 rounded-lg border border-light-border p-6 dark:border-dark-border">
           {/* Total de Itens */}
           <div className="flex items-center justify-between text-sm">
             <span className="text-theme-secondary">Total de Itens:</span>
-            <span className="font-semibold text-theme-primary tabular-nums">
+            <span className="text-theme-primary font-semibold tabular-nums">
               {totals.totalItems}
             </span>
           </div>
@@ -425,32 +425,32 @@ const OrderModal = ({
           {/* Subtotal */}
           <div className="flex items-center justify-between text-sm">
             <span className="text-theme-secondary">Subtotal:</span>
-            <span className="font-semibold text-theme-primary tabular-nums">
+            <span className="text-theme-primary font-semibold tabular-nums">
               {formatCurrency(totals.subtotal)}
             </span>
           </div>
 
           {/* Divisor */}
-          <div className="border-t border-light-border dark:border-dark-border my-3" />
+          <div className="my-3 border-t border-light-border dark:border-dark-border" />
 
           {/* Total da Comanda - Destaque */}
           <div className="flex items-center justify-between">
-            <span className="text-base font-bold text-theme-primary">
+            <span className="text-theme-primary text-base font-bold">
               Total da Comanda:
             </span>
-            <span className="text-2xl font-bold text-primary tabular-nums">
+            <span className="text-2xl font-bold tabular-nums text-primary">
               {formatCurrency(totals.subtotal)}
             </span>
           </div>
         </div>
 
         {/* Detalhes de Pagamento */}
-        <div className="card-theme rounded-lg p-6 space-y-4 border border-light-border dark:border-dark-border">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <h3 className="text-lg font-semibold text-theme-primary">
+        <div className="card-theme space-y-4 rounded-lg border border-light-border p-6 dark:border-dark-border">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <h3 className="text-theme-primary text-lg font-semibold">
               Detalhes de Pagamento
             </h3>
-            <span className="text-xs text-theme-secondary">
+            <span className="text-theme-secondary text-xs">
               Obrigatório apenas ao fechar a comanda
             </span>
           </div>
@@ -462,11 +462,11 @@ const OrderModal = ({
               message="Nenhuma forma de pagamento ativa encontrada para esta unidade. Cadastre uma forma de pagamento no módulo Financeiro para habilitar o fechamento da comanda."
             />
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <label
                   htmlFor="paymentMethodId"
-                  className="block text-sm font-medium text-theme-primary mb-2"
+                  className="text-theme-primary mb-2 block text-sm font-medium"
                 >
                   Forma de Pagamento *
                 </label>
@@ -493,7 +493,7 @@ const OrderModal = ({
                 {errors.paymentMethodId && (
                   <p
                     id="paymentMethodId-error"
-                    className="text-xs text-feedback-error-light dark:text-feedback-error-dark mt-1.5"
+                    className="text-feedback-error-light dark:text-feedback-error-dark mt-1.5 text-xs"
                     role="alert"
                   >
                     {errors.paymentMethodId}
@@ -504,7 +504,7 @@ const OrderModal = ({
               <div>
                 <label
                   htmlFor="accountId"
-                  className="block text-sm font-medium text-theme-primary mb-2"
+                  className="text-theme-primary mb-2 block text-sm font-medium"
                 >
                   Conta de Destino (opcional)
                 </label>
@@ -524,7 +524,7 @@ const OrderModal = ({
                     </option>
                   ))}
                 </select>
-                <p className="text-xs text-theme-secondary mt-1.5">
+                <p className="text-theme-secondary mt-1.5 text-xs">
                   Direcione a receita para uma conta específica, se necessário.
                 </p>
               </div>
@@ -553,7 +553,7 @@ const OrderModal = ({
         )}
 
         {/* Ações - Footer Responsivo */}
-        <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-light-border dark:border-dark-border">
+        <div className="flex flex-col gap-3 border-t border-light-border pt-4 dark:border-dark-border sm:flex-row">
           {/* Cancelar */}
           <Button
             type="button"
@@ -561,7 +561,7 @@ const OrderModal = ({
             icon={XCircle}
             onClick={onClose}
             disabled={isLoading}
-            className="w-full sm:w-auto order-1 sm:order-1"
+            className="order-1 w-full sm:order-1 sm:w-auto"
             aria-label="Cancelar e fechar modal"
           >
             Cancelar
@@ -578,7 +578,7 @@ const OrderModal = ({
             onClick={() => handleSubmit('save_draft')}
             disabled={isLoading}
             loading={isLoading && pendingAction === 'save_draft'}
-            className="w-full sm:w-auto order-2 sm:order-2"
+            className="order-2 w-full sm:order-2 sm:w-auto"
             aria-label="Salvar comanda como rascunho"
           >
             {isLoading && pendingAction === 'save_draft'
@@ -596,7 +596,7 @@ const OrderModal = ({
               isLoading || items.length === 0 || paymentMethods.length === 0
             }
             loading={isLoading && pendingAction === 'close'}
-            className="w-full sm:w-auto order-3 sm:order-3"
+            className="order-3 w-full sm:order-3 sm:w-auto"
             aria-label="Fechar comanda e gerar receita"
           >
             {isLoading && pendingAction === 'close'

@@ -288,15 +288,15 @@ const FluxoSummaryPanel = ({
       };
       return (
         <div
-          className={`bg-white dark:bg-gray-800 p-6 rounded-lg border transition-all cursor-pointer ${isSelected ? 'ring-2 ring-blue-500 dark:ring-blue-400 shadow-lg border-blue-200 dark:border-blue-700' : 'border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600'} ${compactMode ? 'p-4' : ''}`}
+          className={`cursor-pointer rounded-lg border bg-white p-6 transition-all dark:bg-gray-800 ${isSelected ? 'border-blue-200 shadow-lg ring-2 ring-blue-500 dark:border-blue-700 dark:ring-blue-400' : 'border-gray-200 hover:border-gray-300 hover:shadow-md dark:border-gray-700 dark:hover:border-gray-600'} ${compactMode ? 'p-4' : ''}`}
           onClick={() => setSelectedKPI(isSelected ? null : title)}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div
-                className={`p-2 rounded-lg ${colorClasses[colorClass] || colorClasses.blue}`}
+                className={`rounded-lg p-2 ${colorClasses[colorClass] || colorClasses.blue}`}
               >
-                <Icon className="w-5 h-5" />
+                <Icon className="h-5 w-5" />
               </div>
               <div>
                 <h3
@@ -305,7 +305,7 @@ const FluxoSummaryPanel = ({
                   {title}
                 </h3>
                 {subtitle && (
-                  <p className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
+                  <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-xs">
                     {subtitle}
                   </p>
                 )}
@@ -317,11 +317,11 @@ const FluxoSummaryPanel = ({
                 className={`flex items-center text-sm font-medium ${isPositive ? 'text-green-600 dark:text-green-400' : isNegative ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400'}`}
               >
                 {isPositive ? (
-                  <ArrowUp className="w-4 h-4 mr-1" />
+                  <ArrowUp className="mr-1 h-4 w-4" />
                 ) : isNegative ? (
-                  <ArrowDown className="w-4 h-4 mr-1" />
+                  <ArrowDown className="mr-1 h-4 w-4" />
                 ) : (
-                  <Minus className="w-4 h-4 mr-1" />
+                  <Minus className="mr-1 h-4 w-4" />
                 )}
                 {formatPercentage(variation)}
               </div>
@@ -342,7 +342,7 @@ const FluxoSummaryPanel = ({
             </div>
 
             {previousValue !== null && previousValue !== undefined && (
-              <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
+              <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-sm">
                 Período anterior:{' '}
                 {format === 'currency'
                   ? formatCurrency(previousValue)
@@ -369,17 +369,17 @@ const FluxoSummaryPanel = ({
 
   // Renderizar seção de KPIs com Dark Mode
   const renderKPISection = () => (
-    <div className="card-theme dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg shadow-sm">
-      <div className="p-6 border-b border-light-border dark:border-dark-border">
+    <div className="card-theme rounded-lg border border-light-border shadow-sm dark:border-dark-border dark:bg-dark-surface">
+      <div className="border-b border-light-border p-6 dark:border-dark-border">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+          <h2 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
             Indicadores Principais
           </h2>
           <div className="flex items-center space-x-2">
             <button
               type="button"
               onClick={() => toggleSection('overview')}
-              className="p-2 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary hover:text-theme-secondary dark:hover:text-gray-300 dark:text-gray-600 hover:card-theme dark:hover:bg-gray-700 rounded-md transition-colors"
+              className="text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary hover:text-theme-secondary hover:card-theme rounded-md p-2 transition-colors dark:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
               title={
                 expandedSections.has('overview')
                   ? 'Ocultar seção'
@@ -387,9 +387,9 @@ const FluxoSummaryPanel = ({
               }
             >
               {expandedSections.has('overview') ? (
-                <EyeOff className="w-4 h-4" />
+                <EyeOff className="h-4 w-4" />
               ) : (
-                <Eye className="w-4 h-4" />
+                <Eye className="h-4 w-4" />
               )}
             </button>
           </div>
@@ -464,10 +464,10 @@ const FluxoSummaryPanel = ({
 
   // Renderizar seção de gráficos com Dark Mode
   const renderChartsSection = () => (
-    <div className="card-theme dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg shadow-sm">
-      <div className="p-6 border-b border-light-border dark:border-dark-border">
+    <div className="card-theme rounded-lg border border-light-border shadow-sm dark:border-dark-border dark:bg-dark-surface">
+      <div className="border-b border-light-border p-6 dark:border-dark-border">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+          <h2 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
             Fluxo de Caixa
           </h2>
           <div className="flex items-center space-x-2">
@@ -476,7 +476,7 @@ const FluxoSummaryPanel = ({
               onChange={e =>
                 onChartViewModeChange && onChartViewModeChange(e.target.value)
               }
-              className="px-3 py-2 text-sm border border-light-border dark:border-dark-border rounded-md card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+              className="card-theme text-theme-primary dark:text-dark-text-primary rounded-md border border-light-border px-3 py-2 text-sm transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700 dark:focus:border-blue-400 dark:focus:ring-blue-400"
             >
               <option value="combined">Combinado</option>
               <option value="bars">Barras</option>
@@ -501,16 +501,16 @@ const FluxoSummaryPanel = ({
 
   // Renderizar seção de análises com Dark Mode melhorado
   const renderAnalysisSection = () => (
-    <div className="card-theme dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg shadow-sm">
-      <div className="p-6 border-b border-light-border dark:border-dark-border">
+    <div className="card-theme rounded-lg border border-light-border shadow-sm dark:border-dark-border dark:bg-dark-surface">
+      <div className="border-b border-light-border p-6 dark:border-dark-border">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+          <h2 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
             Análises e Tendências
           </h2>
           <button
             type="button"
             onClick={() => toggleSection('trends')}
-            className="p-2 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary hover:text-theme-secondary dark:hover:text-gray-300 dark:text-gray-600 hover:card-theme dark:hover:bg-gray-700 rounded-md transition-colors"
+            className="text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary hover:text-theme-secondary hover:card-theme rounded-md p-2 transition-colors dark:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
             title={
               expandedSections.has('trends')
                 ? 'Ocultar seção'
@@ -518,29 +518,29 @@ const FluxoSummaryPanel = ({
             }
           >
             {expandedSections.has('trends') ? (
-              <EyeOff className="w-4 h-4" />
+              <EyeOff className="h-4 w-4" />
             ) : (
-              <Eye className="w-4 h-4" />
+              <Eye className="h-4 w-4" />
             )}
           </button>
         </div>
       </div>
 
       {expandedSections.has('trends') && (
-        <div className="p-6 space-y-6">
+        <div className="space-y-6 p-6">
           {/* Análise de tendências com Dark Mode */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-5 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-              <div className="flex items-center justify-between mb-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="rounded-lg border border-green-200 bg-green-50 p-5 dark:border-green-800 dark:bg-green-900/20">
+              <div className="mb-3 flex items-center justify-between">
                 <h4 className="text-sm font-medium text-green-800 dark:text-green-300">
                   Tendência Receitas
                 </h4>
-                <TrendingUp className="w-5 h-5 text-green-600 dark:text-green-400" />
+                <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
               </div>
               <div className="text-2xl font-bold text-green-900 dark:text-green-200">
                 {formatPercentage(metrics.tendenciaReceitas)}
               </div>
-              <p className="text-sm text-green-700 dark:text-green-400 mt-2">
+              <p className="mt-2 text-sm text-green-700 dark:text-green-400">
                 {metrics.tendenciaReceitas > 0
                   ? '📈 Crescimento'
                   : metrics.tendenciaReceitas < 0
@@ -549,17 +549,17 @@ const FluxoSummaryPanel = ({
               </p>
             </div>
 
-            <div className="p-5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <div className="flex items-center justify-between mb-3">
+            <div className="rounded-lg border border-red-200 bg-red-50 p-5 dark:border-red-800 dark:bg-red-900/20">
+              <div className="mb-3 flex items-center justify-between">
                 <h4 className="text-sm font-medium text-red-800 dark:text-red-300">
                   Tendência Despesas
                 </h4>
-                <TrendingDown className="w-5 h-5 text-red-600 dark:text-red-400" />
+                <TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
               </div>
               <div className="text-2xl font-bold text-red-900 dark:text-red-200">
                 {formatPercentage(metrics.tendenciaDespesas)}
               </div>
-              <p className="text-sm text-red-700 dark:text-red-400 mt-2">
+              <p className="mt-2 text-sm text-red-700 dark:text-red-400">
                 {metrics.tendenciaDespesas > 0
                   ? '📈 Aumento'
                   : metrics.tendenciaDespesas < 0
@@ -568,17 +568,17 @@ const FluxoSummaryPanel = ({
               </p>
             </div>
 
-            <div className="p-5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-              <div className="flex items-center justify-between mb-3">
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-5 dark:border-blue-800 dark:bg-blue-900/20">
+              <div className="mb-3 flex items-center justify-between">
                 <h4 className="text-sm font-medium text-blue-800 dark:text-blue-300">
                   Saldo Líquido
                 </h4>
-                <DollarSign className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <DollarSign className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
               <div className="text-2xl font-bold text-blue-900 dark:text-blue-200">
                 {formatPercentage(metrics.tendenciaSaldo)}
               </div>
-              <p className="text-sm text-blue-700 dark:text-blue-400 mt-2">
+              <p className="mt-2 text-sm text-blue-700 dark:text-blue-400">
                 {metrics.tendenciaSaldo > 0
                   ? '✅ Melhoria'
                   : metrics.tendenciaSaldo < 0
@@ -589,39 +589,39 @@ const FluxoSummaryPanel = ({
           </div>
 
           {/* Estatísticas adicionais com Dark Mode */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-light-bg dark:bg-dark-bg dark:bg-gray-700/50 border border-light-border dark:border-dark-border rounded-lg hover:shadow-md transition-shadow">
-              <div className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            <div className="rounded-lg border border-light-border bg-light-bg p-4 text-center transition-shadow hover:shadow-md dark:border-dark-border dark:bg-dark-bg dark:bg-gray-700/50">
+              <div className="text-theme-primary dark:text-dark-text-primary text-2xl font-bold">
                 {metrics.diasPositivos}
               </div>
-              <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
+              <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-sm">
                 Dias Positivos
               </div>
             </div>
 
-            <div className="text-center p-4 bg-light-bg dark:bg-dark-bg dark:bg-gray-700/50 border border-light-border dark:border-dark-border rounded-lg hover:shadow-md transition-shadow">
-              <div className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary">
+            <div className="rounded-lg border border-light-border bg-light-bg p-4 text-center transition-shadow hover:shadow-md dark:border-dark-border dark:bg-dark-bg dark:bg-gray-700/50">
+              <div className="text-theme-primary dark:text-dark-text-primary text-2xl font-bold">
                 {metrics.diasNegativos}
               </div>
-              <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
+              <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-sm">
                 Dias Negativos
               </div>
             </div>
 
-            <div className="text-center p-4 bg-light-bg dark:bg-dark-bg dark:bg-gray-700/50 border border-light-border dark:border-dark-border rounded-lg hover:shadow-md transition-shadow">
-              <div className="text-xl font-bold text-theme-primary dark:text-dark-text-primary">
+            <div className="rounded-lg border border-light-border bg-light-bg p-4 text-center transition-shadow hover:shadow-md dark:border-dark-border dark:bg-dark-bg dark:bg-gray-700/50">
+              <div className="text-theme-primary dark:text-dark-text-primary text-xl font-bold">
                 {formatCurrency(metrics.maiorReceita)}
               </div>
-              <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
+              <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-sm">
                 Maior Receita
               </div>
             </div>
 
-            <div className="text-center p-4 bg-light-bg dark:bg-dark-bg dark:bg-gray-700/50 border border-light-border dark:border-dark-border rounded-lg hover:shadow-md transition-shadow">
-              <div className="text-xl font-bold text-theme-primary dark:text-dark-text-primary">
+            <div className="rounded-lg border border-light-border bg-light-bg p-4 text-center transition-shadow hover:shadow-md dark:border-dark-border dark:bg-dark-bg dark:bg-gray-700/50">
+              <div className="text-theme-primary dark:text-dark-text-primary text-xl font-bold">
                 {formatCurrency(metrics.maiorDespesa)}
               </div>
-              <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
+              <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-sm">
                 Maior Despesa
               </div>
             </div>
@@ -629,14 +629,14 @@ const FluxoSummaryPanel = ({
 
           {/* Alertas e recomendações com Dark Mode */}
           {metrics.runwayDays < 30 && metrics.runwayDays > 0 && (
-            <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+            <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
               <div className="flex items-start space-x-3">
-                <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+                <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-600 dark:text-yellow-400" />
                 <div>
                   <h4 className="text-sm font-medium text-yellow-800 dark:text-yellow-300">
                     ⚠️ Atenção: Runway Baixo
                   </h4>
-                  <p className="text-sm text-yellow-700 dark:text-yellow-400 mt-1">
+                  <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-400">
                     Com o burn rate atual, você tem apenas{' '}
                     <strong>{metrics.runwayDays} dias</strong> de runway.
                     Considere reduzir despesas ou aumentar receitas.
@@ -652,13 +652,13 @@ const FluxoSummaryPanel = ({
 
   // Renderizar cabeçalho do painel com Dark Mode
   const renderPanelHeader = () => (
-    <div className="card-theme dark:bg-dark-surface border-b border-light-border dark:border-dark-border p-6">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div className="card-theme border-b border-light-border p-6 dark:border-dark-border dark:bg-dark-surface">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary">
+          <h1 className="text-theme-primary dark:text-dark-text-primary text-2xl font-bold">
             Resumo Financeiro
           </h1>
-          <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
+          <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-sm">
             Análise completa do fluxo de caixa e indicadores financeiros
           </p>
         </div>
@@ -674,19 +674,19 @@ const FluxoSummaryPanel = ({
             type="button"
             onClick={() => onRefreshData && onRefreshData()}
             disabled={loading}
-            className="p-2 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary hover:card-theme dark:hover:bg-gray-700 rounded-md transition-colors disabled:opacity-50"
+            className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary hover:card-theme rounded-md p-2 transition-colors disabled:opacity-50 dark:hover:bg-gray-700"
             title="Atualizar dados"
           >
-            <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-5 w-5 ${loading ? 'animate-spin' : ''}`} />
           </button>
 
           {onExportData && (
             <button
               type="button"
               onClick={() => onExportData('full')}
-              className="flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-500 text-dark-text-primary rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors shadow-sm"
+              className="text-dark-text-primary flex items-center rounded-md bg-blue-600 px-4 py-2 shadow-sm transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
             >
-              <Download className="w-4 h-4 mr-2" />
+              <Download className="mr-2 h-4 w-4" />
               Exportar
             </button>
           )}
@@ -695,10 +695,10 @@ const FluxoSummaryPanel = ({
             <button
               type="button"
               onClick={() => onOpenSettings()}
-              className="p-2 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary hover:card-theme dark:hover:bg-gray-700 rounded-md transition-colors"
+              className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary hover:card-theme rounded-md p-2 transition-colors dark:hover:bg-gray-700"
               title="Configurações"
             >
-              <Settings className="w-5 h-5" />
+              <Settings className="h-5 w-5" />
             </button>
           )}
         </div>
@@ -709,16 +709,16 @@ const FluxoSummaryPanel = ({
   if (loading && (!cashflowData || cashflowData.length === 0)) {
     return (
       <div className={containerClasses}>
-        <div className="flex items-center justify-center h-96">
+        <div className="flex h-96 items-center justify-center">
           <div className="text-center">
             <div className="relative">
-              <RefreshCw className="w-12 h-12 animate-spin mx-auto mb-4 text-blue-500 dark:text-blue-400" />
-              <div className="absolute inset-0 w-12 h-12 mx-auto bg-blue-500/10 dark:bg-blue-400/10 rounded-full animate-ping"></div>
+              <RefreshCw className="mx-auto mb-4 h-12 w-12 animate-spin text-blue-500 dark:text-blue-400" />
+              <div className="absolute inset-0 mx-auto h-12 w-12 animate-ping rounded-full bg-blue-500/10 dark:bg-blue-400/10"></div>
             </div>
             <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted font-medium">
               Carregando dados financeiros...
             </p>
-            <p className="text-sm text-theme-secondary dark:text-theme-secondary mt-2">
+            <p className="text-theme-secondary dark:text-theme-secondary mt-2 text-sm">
               Isso pode levar alguns segundos
             </p>
           </div>
@@ -731,12 +731,12 @@ const FluxoSummaryPanel = ({
   if (error && typeof error === 'string' && error.length > 0) {
     return (
       <div className={containerClasses}>
-        <div className="flex items-center justify-center h-96">
-          <div className="text-center max-w-md mx-auto p-6">
-            <div className="bg-red-50 dark:bg-red-900/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <AlertTriangle className="w-8 h-8 text-red-500 dark:text-red-400" />
+        <div className="flex h-96 items-center justify-center">
+          <div className="mx-auto max-w-md p-6 text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50 dark:bg-red-900/20">
+              <AlertTriangle className="h-8 w-8 text-red-500 dark:text-red-400" />
             </div>
-            <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-2">
+            <h3 className="text-theme-primary dark:text-dark-text-primary mb-2 text-lg font-semibold">
               Erro ao carregar dados
             </h3>
             <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-6">
@@ -746,9 +746,9 @@ const FluxoSummaryPanel = ({
             <button
               type="button"
               onClick={() => onRefreshData && onRefreshData()}
-              className="px-6 py-3 bg-blue-600 dark:bg-blue-500 text-dark-text-primary rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors shadow-sm inline-flex items-center"
+              className="text-dark-text-primary inline-flex items-center rounded-md bg-blue-600 px-6 py-3 shadow-sm transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
             >
-              <RefreshCw className="w-4 h-4 mr-2" />
+              <RefreshCw className="mr-2 h-4 w-4" />
               Tentar Novamente
             </button>
           </div>
@@ -762,7 +762,7 @@ const FluxoSummaryPanel = ({
       {renderPanelHeader()}
 
       {/* Conteúdo principal */}
-      <div className="p-6 space-y-6">
+      <div className="space-y-6 p-6">
         {/* KPIs */}
         {renderKPISection()}
 
@@ -908,7 +908,7 @@ export const FluxoSummaryPanelPreview = () => {
     console.log(`Ação: ${action}`, data);
   };
   return (
-    <div className="space-y-6 p-4 max-w-7xl">
+    <div className="max-w-7xl space-y-6 p-4">
       <h3 className="text-lg font-semibold">FluxoSummaryPanel Preview</h3>
 
       {/* Painel completo */}
@@ -932,7 +932,7 @@ export const FluxoSummaryPanelPreview = () => {
 
       {/* Versão compacta */}
       <div className="h-96">
-        <h4 className="text-md font-medium mb-2">Modo compacto</h4>
+        <h4 className="text-md mb-2 font-medium">Modo compacto</h4>
         <FluxoSummaryPanel
           cashflowData={mockData.slice(0, 30)}
           compactMode={true}

@@ -96,33 +96,23 @@ const Modal = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? 'modal-title' : undefined}
     >
       <div
-        className={`
-          card-theme
-          rounded-lg shadow-2xl
-          ${maxWidthClasses[maxWidth] || maxWidthClasses.md}
-          w-full
-          ${fullHeight ? 'h-full' : 'max-h-[90vh]'}
-          overflow-hidden
-          flex flex-col
-          border border-light-border dark:border-dark-border
-          ${className}
-        `}
+        className={`card-theme rounded-lg shadow-2xl ${maxWidthClasses[maxWidth] || maxWidthClasses.md} w-full ${fullHeight ? 'h-full' : 'max-h-[90vh]'} flex flex-col overflow-hidden border border-light-border dark:border-dark-border ${className} `}
         onClick={e => e.stopPropagation()}
       >
         {/* 📋 Header */}
         {(title || showCloseButton) && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-light-border dark:border-dark-border bg-light-surface/50 dark:bg-dark-hover/50">
+          <div className="flex items-center justify-between border-b border-light-border bg-light-surface/50 px-6 py-4 dark:border-dark-border dark:bg-dark-hover/50">
             {title && (
               <h2
                 id="modal-title"
-                className="text-xl font-bold text-theme-primary"
+                className="text-theme-primary text-xl font-bold"
               >
                 {title}
               </h2>
@@ -131,11 +121,11 @@ const Modal = ({
             {showCloseButton && onClose && (
               <button
                 onClick={onClose}
-                className="p-2 rounded-lg text-theme-secondary hover:text-theme-primary hover:bg-light-surface dark:hover:bg-dark-hover transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-bg"
+                className="text-theme-secondary hover:text-theme-primary rounded-lg p-2 transition-colors hover:bg-light-surface focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:hover:bg-dark-hover dark:focus:ring-offset-dark-bg"
                 aria-label="Fechar modal"
                 type="button"
               >
-                <X className="w-5 h-5" />
+                <X className="h-5 w-5" />
               </button>
             )}
           </div>

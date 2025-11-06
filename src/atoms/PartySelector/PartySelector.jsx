@@ -216,9 +216,9 @@ const PartySelector = ({
   // Ícone baseado no tipo
   const getPartyIcon = partyTipo => {
     return partyTipo === 'cliente' ? (
-      <User className="w-4 h-4 text-blue-500" />
+      <User className="h-4 w-4 text-blue-500" />
     ) : (
-      <Building className="w-4 h-4 text-green-500" />
+      <Building className="h-4 w-4 text-green-500" />
     );
   };
   const containerClasses = `relative ${className}`;
@@ -246,14 +246,14 @@ const PartySelector = ({
         aria-expanded={isOpen}
         aria-disabled={disabled}
       >
-        <div className="flex items-center min-w-0 flex-1">
+        <div className="flex min-w-0 flex-1 items-center">
           {selectedParty && getPartyIcon(selectedParty.tipo)}
-          <span className="truncate ml-2">
+          <span className="ml-2 truncate">
             {selectedParty ? formatPartyDisplay(selectedParty) : placeholder}
           </span>
         </div>
 
-        <div className="flex items-center ml-2 flex-shrink-0">
+        <div className="ml-2 flex flex-shrink-0 items-center">
           {clearable && selectedParty && (
             <button
               type="button"
@@ -261,33 +261,33 @@ const PartySelector = ({
                 e.stopPropagation();
                 handleClear(e);
               }}
-              className="p-0.5 hover:card-theme dark:hover:bg-gray-700 rounded transition-colors"
+              className="hover:card-theme rounded p-0.5 transition-colors dark:hover:bg-gray-700"
               title="Limpar"
               aria-label="Limpar seleção"
             >
-              <X className="w-3 h-3 text-light-text-muted dark:text-dark-text-muted" />
+              <X className="text-light-text-muted dark:text-dark-text-muted h-3 w-3" />
             </button>
           )}
           <ChevronDown
-            className={`w-4 h-4 ml-1 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+            className={`ml-1 h-4 w-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           />
         </div>
       </div>
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 card-theme dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-md shadow-lg overflow-hidden flex flex-col max-h-80">
+        <div className="card-theme absolute z-50 mt-1 flex max-h-80 w-full flex-col overflow-hidden rounded-md border border-light-border shadow-lg dark:border-dark-border dark:bg-dark-surface">
           {/* Search */}
-          <div className="p-3 border-b border-light-border dark:border-dark-border flex-shrink-0">
+          <div className="flex-shrink-0 border-b border-light-border p-3 dark:border-dark-border">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-light-text-muted dark:text-dark-text-muted" />
+              <Search className="text-light-text-muted dark:text-dark-text-muted absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform" />
               <input
                 ref={searchRef}
                 type="text"
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
                 placeholder="Buscar por nome, CPF/CNPJ ou email..."
-                className="w-full pl-9 pr-3 py-2 text-sm border border-light-border dark:border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary"
+                className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-md border border-light-border py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
               />
             </div>
           </div>
@@ -300,7 +300,7 @@ const PartySelector = ({
             }}
           >
             {loading ? (
-              <div className="p-3 text-center text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted p-3 text-center text-sm">
                 Carregando...
               </div>
             ) : filteredParties.length > 0 ? (
@@ -310,21 +310,18 @@ const PartySelector = ({
                     key={party.id}
                     type="button"
                     onClick={() => handleSelectParty(party)}
-                    className={`
-                      w-full px-3 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center transition-colors
-                      ${selectedParty?.id === party.id ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'text-gray-900 dark:text-gray-100'}
-                    `}
+                    className={`flex w-full items-center px-3 py-2 text-left text-sm transition-colors hover:bg-gray-50 dark:hover:bg-gray-700 ${selectedParty?.id === party.id ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-900 dark:text-gray-100'} `}
                   >
                     {getPartyIcon(party.tipo)}
-                    <div className="ml-2 flex-1 min-w-0">
-                      <div className="font-medium truncate">{party.nome}</div>
+                    <div className="ml-2 min-w-0 flex-1">
+                      <div className="truncate font-medium">{party.nome}</div>
                       {party.cpf_cnpj && (
-                        <div className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted truncate">
+                        <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted truncate text-xs">
                           {party.cpf_cnpj} • {party.tipo}
                         </div>
                       )}
                       {party.email && (
-                        <div className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted truncate">
+                        <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted truncate text-xs">
                           {party.email}
                         </div>
                       )}
@@ -334,7 +331,7 @@ const PartySelector = ({
               </>
             ) : (
               <div className="p-3">
-                <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-center">
+                <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-center text-sm">
                   {searchTerm
                     ? 'Nenhum resultado encontrado'
                     : 'Nenhum cliente/fornecedor cadastrado'}
@@ -345,9 +342,9 @@ const PartySelector = ({
                   <button
                     type="button"
                     onClick={handleCreateNew}
-                    className="w-full mt-2 px-3 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md flex items-center justify-center transition-colors"
+                    className="mt-2 flex w-full items-center justify-center rounded-md px-3 py-2 text-sm text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
                   >
-                    <Plus className="w-4 h-4 mr-2" />
+                    <Plus className="mr-2 h-4 w-4" />
                     Criar "{searchTerm}"
                   </button>
                 )}
@@ -357,13 +354,13 @@ const PartySelector = ({
 
           {/* Footer com ação de criar */}
           {allowCreate && (
-            <div className="border-t border-light-border dark:border-dark-border p-2 flex-shrink-0 card-theme dark:bg-dark-surface">
+            <div className="card-theme flex-shrink-0 border-t border-light-border p-2 dark:border-dark-border dark:bg-dark-surface">
               <button
                 type="button"
                 onClick={handleCreateNew}
-                className="w-full px-3 py-2.5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md flex items-center justify-center transition-colors gap-2"
+                className="flex w-full items-center justify-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="h-4 w-4" />
                 Cadastrar novo fornecedor
               </button>
             </div>
@@ -373,19 +370,19 @@ const PartySelector = ({
 
       {/* Modal Inline de Criação Rápida */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[999] p-4">
-          <div className="card-theme dark:bg-dark-surface rounded-lg shadow-2xl max-w-md w-full p-6 space-y-4 animate-fadeIn">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="card-theme w-full max-w-md animate-fadeIn space-y-4 rounded-lg p-6 shadow-2xl dark:bg-dark-surface">
             {/* Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-light-border dark:border-dark-border">
+            <div className="flex items-center justify-between border-b border-light-border pb-4 dark:border-dark-border">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                  <Building className="w-5 h-5 text-dark-text-primary" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-600">
+                  <Building className="text-dark-text-primary h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+                  <h3 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
                     Novo Fornecedor
                   </h3>
-                  <p className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                  <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-xs">
                     Criação rápida - apenas o nome
                   </p>
                 </div>
@@ -393,9 +390,9 @@ const PartySelector = ({
               <button
                 type="button"
                 onClick={handleCancelCreate}
-                className="p-1 hover:card-theme dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="hover:card-theme rounded-lg p-1 transition-colors dark:hover:bg-gray-700"
               >
-                <X className="w-5 h-5 text-theme-secondary" />
+                <X className="text-theme-secondary h-5 w-5" />
               </button>
             </div>
 
@@ -412,9 +409,9 @@ const PartySelector = ({
                 onKeyDown={handleCreateKeyDown}
                 placeholder="Ex: João da Silva, Empresa LTDA..."
                 disabled={isCreating}
-                className="w-full px-4 py-3 text-sm border-2 border-light-border dark:border-dark-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary placeholder-gray-400 dark:placeholder-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border-2 border-light-border px-4 py-3 text-sm placeholder-gray-400 transition-all duration-200 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-border dark:bg-gray-700 dark:placeholder-gray-500"
               />
-              <p className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-xs">
                 Você poderá adicionar CPF/CNPJ e outros dados depois.
               </p>
             </div>
@@ -425,7 +422,7 @@ const PartySelector = ({
                 type="button"
                 onClick={handleCancelCreate}
                 disabled={isCreating}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 card-theme dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="card-theme flex-1 rounded-lg px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-700 dark:text-gray-300 dark:text-gray-600 dark:hover:bg-gray-600"
               >
                 Cancelar
               </button>
@@ -433,16 +430,16 @@ const PartySelector = ({
                 type="button"
                 onClick={handleConfirmCreate}
                 disabled={isCreating || !newPartyName.trim()}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-dark-text-primary bg-gradient-primary hover:from-blue-600 hover:to-blue-700 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                className="text-dark-text-primary flex flex-1 items-center justify-center gap-2 rounded-lg bg-gradient-primary px-4 py-2.5 text-sm font-medium shadow-md transition-all hover:from-blue-600 hover:to-blue-700 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isCreating ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-light-surface dark:border-dark-surface border-t-transparent rounded-full animate-spin" />
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-light-surface border-t-transparent dark:border-dark-surface" />
                     Criando...
                   </>
                 ) : (
                   <>
-                    <Plus className="w-4 h-4" />
+                    <Plus className="h-4 w-4" />
                     Criar Fornecedor
                   </>
                 )}
@@ -509,11 +506,11 @@ export const PartySelectorPreview = () => {
     alert(`Criar novo com termo: "${searchTerm}"`);
   };
   return (
-    <div className="space-y-6 p-4 max-w-md">
+    <div className="max-w-md space-y-6 p-4">
       <h3 className="text-lg font-semibold">PartySelector Preview</h3>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
           Apenas Clientes:
         </label>
         <PartySelector
@@ -528,7 +525,7 @@ export const PartySelectorPreview = () => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
           Apenas Fornecedores:
         </label>
         <PartySelector
@@ -541,7 +538,7 @@ export const PartySelectorPreview = () => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
           Clientes e Fornecedores:
         </label>
         <PartySelector
@@ -555,7 +552,7 @@ export const PartySelectorPreview = () => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
           Desabilitado:
         </label>
         <PartySelector
@@ -568,11 +565,11 @@ export const PartySelectorPreview = () => {
       </div>
 
       {/* Display dos valores selecionados */}
-      <div className="mt-6 p-3 bg-light-bg dark:bg-dark-bg rounded-md">
-        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+      <div className="mt-6 rounded-md bg-light-bg p-3 dark:bg-dark-bg">
+        <h4 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
           Valores selecionados:
         </h4>
-        <div className="text-xs space-y-1">
+        <div className="space-y-1 text-xs">
           <div>Cliente: {selectedClient || 'nenhum'}</div>
           <div>Fornecedor: {selectedSupplier || 'nenhum'}</div>
           <div>Qualquer: {selectedAny || 'nenhum'}</div>

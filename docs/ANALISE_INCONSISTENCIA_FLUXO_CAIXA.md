@@ -13,6 +13,7 @@ Na página **Módulo Financeiro Avançado → Fluxo de Caixa**, existem **MÚLTI
 ### 📸 Visual Atual (Conforme Print)
 
 O print mostra um cabeçalho com:
+
 - ✅ Título "Fluxo de Caixa" correto
 - ✅ Filtros de período (Dia/Semana/Mês) estilizados
 - ⚠️ **PROBLEMA:** Fundo branco sólido onde deveria ter gradiente
@@ -29,21 +30,23 @@ O print mostra um cabeçalho com:
 
 ```jsx
 // ❌ ERRADO - Gradiente inline hardcoded
-<div className="p-3 from-blue-500 to-indigo-600 bg-blue-500 rounded-xl">
-  <BarChart3 className="w-6 h-6 text-dark-text-primary" />
+<div className="rounded-xl bg-blue-500 from-blue-500 to-indigo-600 p-3">
+  <BarChart3 className="text-dark-text-primary h-6 w-6" />
 </div>
 ```
 
 **Problema:**
+
 - Usa `from-blue-500 to-indigo-600` mas **NÃO tem `bg-gradient-to-br`**
 - Resulta em **fundo azul sólido** em vez de gradiente
 - Cor hardcoded não respeita tema
 
 **Correção:**
+
 ```jsx
 // ✅ CORRETO - Usar token de gradiente do Design System
-<div className="p-3 bg-gradient-primary rounded-xl shadow-lg">
-  <BarChart3 className="w-6 h-6 text-dark-text-primary" />
+<div className="rounded-xl bg-gradient-primary p-3 shadow-lg">
+  <BarChart3 className="text-dark-text-primary h-6 w-6" />
 </div>
 ```
 
@@ -55,32 +58,38 @@ O print mostra um cabeçalho com:
 
 ```jsx
 // ❌ ERRADO - Cores hardcoded verdes
-{isCurrentPeriod && (
-  <div className="flex items-center gap-2 px-3 py-1.5 bg-green-100 dark:bg-green-900/30 border-2 border-green-300 dark:border-green-700 rounded-full">
-    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-    <span className="text-xs font-bold text-green-700 dark:text-green-300">
-      PERÍODO ATUAL
-    </span>
-  </div>
-)}
+{
+  isCurrentPeriod && (
+    <div className="flex items-center gap-2 rounded-full border-2 border-green-300 bg-green-100 px-3 py-1.5 dark:border-green-700 dark:bg-green-900/30">
+      <div className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
+      <span className="text-xs font-bold text-green-700 dark:text-green-300">
+        PERÍODO ATUAL
+      </span>
+    </div>
+  );
+}
 ```
 
 **Problema:**
+
 - Cores verdes hardcoded (`bg-green-100`, `border-green-300`, etc.)
 - Não usa tokens do Design System
 - Inconsistente com o resto do padrão visual
 
 **Correção:**
+
 ```jsx
 // ✅ CORRETO - Usar tokens semânticos
-{isCurrentPeriod && (
-  <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 rounded-full">
-    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-    <span className="text-xs font-bold text-green-600 dark:text-green-400">
-      PERÍODO ATUAL
-    </span>
-  </div>
-)}
+{
+  isCurrentPeriod && (
+    <div className="flex items-center gap-2 rounded-full border-2 border-green-200 bg-green-50 px-3 py-1.5 dark:border-green-800 dark:bg-green-900/20">
+      <div className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
+      <span className="text-xs font-bold text-green-600 dark:text-green-400">
+        PERÍODO ATUAL
+      </span>
+    </div>
+  );
+}
 ```
 
 ---
@@ -107,11 +116,13 @@ O print mostra um cabeçalho com:
 ```
 
 **Problema:**
+
 - `text-blue-600 dark:text-blue-400` hardcoded
 - `hover:bg-blue-100 dark:hover:bg-blue-900/30` hardcoded
 - Não usa padrão de botões do Design System
 
 **Correção:**
+
 ```jsx
 // ✅ CORRETO - Usar tokens do Design System
 <button
@@ -141,12 +152,14 @@ O print mostra um cabeçalho com:
 ```
 
 **Problema:**
+
 - `from-blue-50 to-indigo-50` SEM `bg-gradient-to-r`
 - Resulta em **fundo sólido** `bg-blue-50`
 - Cores hardcoded não seguem Design System
 - Border azul hardcoded
 
 **Correção:**
+
 ```jsx
 // ✅ CORRETO - Usar classes utilitárias do Design System
 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-primary/5 dark:bg-primary/10 rounded-xl border-2 border-light-border dark:border-dark-border">
@@ -162,22 +175,24 @@ O print mostra um cabeçalho com:
 // ❌ ERRADO - Cores azuis hardcoded
 <button
   onClick={resetToToday}
-  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-dark-text-primary font-semibold rounded-lg transition-all shadow-md hover:shadow-lg"
+  className="text-dark-text-primary rounded-lg bg-blue-600 px-4 py-2 font-semibold shadow-md transition-all hover:bg-blue-700 hover:shadow-lg"
 >
   Voltar para Hoje
 </button>
 ```
 
 **Problema:**
+
 - `bg-blue-600 hover:bg-blue-700` hardcoded
 - Não usa `btn-theme-primary` do Design System
 
 **Correção:**
+
 ```jsx
 // ✅ CORRETO - Usar classe utilitária de botão
 <button
   onClick={resetToToday}
-  className="btn-theme-primary px-4 py-2 rounded-lg shadow-md hover:shadow-lg"
+  className="btn-theme-primary rounded-lg px-4 py-2 shadow-md hover:shadow-lg"
 >
   Voltar para Hoje
 </button>
@@ -191,28 +206,31 @@ O print mostra um cabeçalho com:
 
 ```jsx
 // ❌ ERRADO - Gradiente inline sem bg-gradient
-<div className="p-2.5 from-purple-500 to-violet-600 bg-purple-500 rounded-xl shadow-lg">
-  <TrendingUp className="w-5 h-5 text-dark-text-primary" />
+<div className="rounded-xl bg-purple-500 from-purple-500 to-violet-600 p-2.5 shadow-lg">
+  <TrendingUp className="text-dark-text-primary h-5 w-5" />
 </div>
 ```
 
 **Problema:**
+
 - Mesma issue do header principal
 - `from-purple-500 to-violet-600` sem `bg-gradient-to-br`
 - Resulta em roxo sólido
 
 **Correção:**
+
 ```jsx
 // ✅ CORRETO - Usar token de gradiente
-<div className="p-2.5 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl shadow-lg">
-  <TrendingUp className="w-5 h-5 text-dark-text-primary" />
+<div className="rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 p-2.5 shadow-lg">
+  <TrendingUp className="text-dark-text-primary h-5 w-5" />
 </div>
 ```
 
 **OU usar token existente:**
+
 ```jsx
-<div className="p-2.5 bg-purple-500 rounded-xl shadow-lg">
-  <TrendingUp className="w-5 h-5 text-dark-text-primary" />
+<div className="rounded-xl bg-purple-500 p-2.5 shadow-lg">
+  <TrendingUp className="text-dark-text-primary h-5 w-5" />
 </div>
 ```
 
@@ -228,17 +246,20 @@ O print mostra um cabeçalho com:
 ```
 
 **Problema:**
+
 - `bg-gradient-light` no light mode → OK (classe existe?)
 - `dark:from-gray-800 dark:to-gray-700` SEM `dark:bg-gradient-to-r`
 - Inconsistência entre light/dark mode
 
 **Correção:**
+
 ```jsx
 // ✅ CORRETO - Usar bg-gradient consistente
 <div className="bg-gradient-to-r from-light-surface to-light-bg dark:from-dark-surface dark:to-dark-bg px-6 py-4 border-b-2 border-light-border dark:border-dark-border">
 ```
 
 **OU simplificar:**
+
 ```jsx
 <div className="bg-light-surface dark:bg-dark-surface px-6 py-4 border-b-2 border-light-border dark:border-dark-border">
 ```
@@ -265,27 +286,29 @@ O print mostra um cabeçalho com:
 ```jsx
 // ❌ ERRADO - Gradiente complexo inline
 className={`group transition-all duration-200 ${
-  isSaldoInicial 
-    ? 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-900/30 dark:hover:to-indigo-900/30' 
-    : isWeekend 
-      ? 'bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-indigo-50/30 dark:hover:from-blue-900/10 dark:hover:to-indigo-900/10' 
+  isSaldoInicial
+    ? 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-900/30 dark:hover:to-indigo-900/30'
+    : isWeekend
+      ? 'bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-indigo-50/30 dark:hover:from-blue-900/10 dark:hover:to-indigo-900/10'
       : 'hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/50 dark:hover:from-blue-900/10 dark:hover:to-indigo-900/10'
 }`}
 ```
 
 **Problema:**
+
 - **13 classes de gradiente inline** em uma única linha!
 - Cores hardcoded para todos os estados (normal, hover, dark, weekend)
 - Código extremamente verboso e difícil de manter
 
 **Correção:**
+
 ```jsx
 // ✅ CORRETO - Simplificar com classes semânticas
 className={`group transition-all duration-200 ${
-  isSaldoInicial 
-    ? 'bg-primary/5 dark:bg-primary/10 hover:bg-primary/10 dark:hover:bg-primary/15' 
-    : isWeekend 
-      ? 'bg-light-surface/50 dark:bg-dark-surface/50 hover:bg-light-hover dark:hover:bg-dark-hover' 
+  isSaldoInicial
+    ? 'bg-primary/5 dark:bg-primary/10 hover:bg-primary/10 dark:hover:bg-primary/15'
+    : isWeekend
+      ? 'bg-light-surface/50 dark:bg-dark-surface/50 hover:bg-light-hover dark:hover:bg-dark-hover'
       : 'hover:bg-light-hover dark:hover:bg-dark-hover'
 }`}
 ```
@@ -294,17 +317,17 @@ className={`group transition-all duration-200 ${
 
 ## 📊 Resumo das Violações
 
-| # | Componente | Violação | Severidade | Linha |
-|---|------------|----------|------------|-------|
-| 1 | Header Icon | Gradiente inline sem `bg-gradient-to-br` | 🟠 ALTA | ~790 |
-| 2 | Badge Período Atual | Cores verdes hardcoded | 🟡 MÉDIA | ~918 |
-| 3 | Botões Navegação (2x) | Cores azuis hardcoded | 🟡 MÉDIA | ~890, ~900 |
-| 4 | Container Navegação | Gradiente inline + border hardcoded | 🟠 ALTA | ~882 |
-| 5 | Botão "Voltar Hoje" | Cores azuis hardcoded | 🟡 MÉDIA | ~910 |
-| 6 | Timeline Icon | Gradiente inline sem `bg-gradient-to-br` | 🟡 MÉDIA | ~934 |
-| 7 | Table Header | Gradiente inconsistente light/dark | 🟠 ALTA | ~956 |
-| 8 | Table Thead | Gradiente inconsistente light/dark | 🟠 ALTA | ~974 |
-| 9 | Table Row Saldo Inicial | **13 classes** de gradiente inline | 🔴 CRÍTICA | ~984 |
+| #   | Componente              | Violação                                 | Severidade | Linha      |
+| --- | ----------------------- | ---------------------------------------- | ---------- | ---------- |
+| 1   | Header Icon             | Gradiente inline sem `bg-gradient-to-br` | 🟠 ALTA    | ~790       |
+| 2   | Badge Período Atual     | Cores verdes hardcoded                   | 🟡 MÉDIA   | ~918       |
+| 3   | Botões Navegação (2x)   | Cores azuis hardcoded                    | 🟡 MÉDIA   | ~890, ~900 |
+| 4   | Container Navegação     | Gradiente inline + border hardcoded      | 🟠 ALTA    | ~882       |
+| 5   | Botão "Voltar Hoje"     | Cores azuis hardcoded                    | 🟡 MÉDIA   | ~910       |
+| 6   | Timeline Icon           | Gradiente inline sem `bg-gradient-to-br` | 🟡 MÉDIA   | ~934       |
+| 7   | Table Header            | Gradiente inconsistente light/dark       | 🟠 ALTA    | ~956       |
+| 8   | Table Thead             | Gradiente inconsistente light/dark       | 🟠 ALTA    | ~974       |
+| 9   | Table Row Saldo Inicial | **13 classes** de gradiente inline       | 🔴 CRÍTICA | ~984       |
 
 **Total de Violações:** **9 pontos críticos**  
 **Violações Críticas:** 1 (Row com 13 classes inline)  
@@ -365,19 +388,19 @@ className={`group transition-all duration-200 ${
 ```jsx
 // ❌ ANTES: 13 classes inline
 className={`group transition-all duration-200 ${
-  isSaldoInicial 
-    ? 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-900/30 dark:hover:to-indigo-900/30' 
-    : isWeekend 
-      ? 'bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-indigo-50/30 dark:hover:from-blue-900/10 dark:hover:to-indigo-900/10' 
+  isSaldoInicial
+    ? 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-900/30 dark:hover:to-indigo-900/30'
+    : isWeekend
+      ? 'bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-indigo-50/30 dark:hover:from-blue-900/10 dark:hover:to-indigo-900/10'
       : 'hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/50 dark:hover:from-blue-900/10 dark:hover:to-indigo-900/10'
 }`}
 
 // ✅ DEPOIS: 4 classes semânticas
 className={`group transition-all duration-200 ${
-  isSaldoInicial 
-    ? 'bg-primary/5 dark:bg-primary/10 hover:bg-primary/10 dark:hover:bg-primary/15' 
-    : isWeekend 
-      ? 'bg-light-surface/50 dark:bg-dark-surface/50 hover:bg-light-hover dark:hover:bg-dark-hover' 
+  isSaldoInicial
+    ? 'bg-primary/5 dark:bg-primary/10 hover:bg-primary/10 dark:hover:bg-primary/15'
+    : isWeekend
+      ? 'bg-light-surface/50 dark:bg-dark-surface/50 hover:bg-light-hover dark:hover:bg-dark-hover'
       : 'hover:bg-light-hover dark:hover:bg-dark-hover'
 }`}
 ```
@@ -389,6 +412,7 @@ className={`group transition-all duration-200 ${
 ## 🎯 Resultado Esperado
 
 ### ✅ Antes das Correções
+
 - ❌ 9 violações do Design System
 - ❌ Inconsistência visual light/dark mode
 - ❌ Gradientes não aparecem corretamente
@@ -396,6 +420,7 @@ className={`group transition-all duration-200 ${
 - ❌ Cores hardcoded sem padrão
 
 ### ✅ Depois das Correções
+
 - ✅ 100% conforme ao Design System
 - ✅ Visual consistente em light/dark mode
 - ✅ Gradientes funcionando corretamente
@@ -426,6 +451,7 @@ Após correções, validar:
 **URGENTE:** Corrigir este arquivo **ANTES** de continuar com novas features.
 
 **Razão:**
+
 1. Componente **muito usado** (página financeira principal)
 2. Afeta **experiência do usuário** diretamente
 3. Inconsistência visual **notória** (conforme print)

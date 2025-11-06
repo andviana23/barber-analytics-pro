@@ -71,12 +71,12 @@ const OrderItemModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="card-theme w-full max-w-md p-6 rounded-xl shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+      <div className="card-theme w-full max-w-md rounded-xl p-6 shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-light-border dark:border-dark-border">
-          <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
-            <Plus className="w-5 h-5 text-primary" />
+        <div className="mb-6 flex items-center justify-between border-b border-light-border pb-4 dark:border-dark-border">
+          <h2 className="text-theme-primary flex items-center gap-2 text-lg font-semibold">
+            <Plus className="h-5 w-5 text-primary" />
             Adicionar Serviço à Comanda
           </h2>
           <button
@@ -85,7 +85,7 @@ const OrderItemModal = ({
             disabled={isLoading}
             aria-label="Fechar modal"
           >
-            <X className="w-5 h-5" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
@@ -95,9 +95,9 @@ const OrderItemModal = ({
           <div>
             <label
               htmlFor="serviceId"
-              className="block text-sm font-medium text-theme-primary mb-2 flex items-center gap-2"
+              className="text-theme-primary mb-2 block flex items-center gap-2 text-sm font-medium"
             >
-              <Package className="w-4 h-4 text-primary" />
+              <Package className="h-4 w-4 text-primary" />
               Serviço
             </label>
             <select
@@ -123,7 +123,7 @@ const OrderItemModal = ({
               type="button"
               onClick={onClose}
               disabled={isLoading}
-              className="btn-theme-secondary flex-1 py-2.5 rounded-lg font-medium transition-colors"
+              className="btn-theme-secondary flex-1 rounded-lg py-2.5 font-medium transition-colors"
             >
               Cancelar
             </button>
@@ -131,9 +131,9 @@ const OrderItemModal = ({
             <button
               type="submit"
               disabled={isLoading || !selectedServiceId}
-              className="btn-theme-primary flex-1 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="btn-theme-primary flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="h-4 w-4" />
               {isLoading ? 'Adicionando...' : 'Adicionar Serviço'}
             </button>
           </div>

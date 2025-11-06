@@ -53,28 +53,23 @@ const BankAccountCard = ({
 
   return (
     <div
-      className={`
-      bg-light-surface dark:bg-dark-surface rounded-xl shadow-sm border border-light-border dark:border-dark-border
-      hover:shadow-lg hover:border-primary 
-      transition-all duration-300 ease-in-out
-      ${!account.is_active ? 'opacity-60' : ''}
-    `}
+      className={`rounded-xl border border-light-border bg-light-surface shadow-sm transition-all duration-300 ease-in-out hover:border-primary hover:shadow-lg dark:border-dark-border dark:bg-dark-surface ${!account.is_active ? 'opacity-60' : ''} `}
     >
       {/* Header com ações */}
-      <div className="p-5 border-b border-light-border dark:border-dark-border">
+      <div className="border-b border-light-border p-5 dark:border-dark-border">
         <div className="flex items-start justify-between gap-4">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="flex-shrink-0 p-2 bg-primary/10 dark:bg-primary/20 rounded-lg">
+          <div className="min-w-0 flex-1">
+            <div className="mb-2 flex items-center gap-3">
+              <div className="flex-shrink-0 rounded-lg bg-primary/10 p-2 dark:bg-primary/20">
                 <CreditCard className="h-5 w-5 text-primary" />
               </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-lg text-theme-primary truncate">
+              <div className="min-w-0 flex-1">
+                <h3 className="text-theme-primary truncate text-lg font-semibold">
                   {account.name}
                 </h3>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <Building className="h-4 w-4 text-text-light-secondary dark:text-text-dark-secondary flex-shrink-0" />
-                  <span className="text-sm text-theme-secondary truncate">
+                <div className="mt-0.5 flex items-center gap-2">
+                  <Building className="h-4 w-4 flex-shrink-0 text-text-light-secondary dark:text-text-dark-secondary" />
+                  <span className="text-theme-secondary truncate text-sm">
                     {account.bank}
                   </span>
                 </div>
@@ -82,7 +77,7 @@ const BankAccountCard = ({
             </div>
 
             {!account.is_active && (
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-feedback-light-error/10 text-feedback-light-error dark:bg-feedback-dark-error/30 dark:text-feedback-dark-error">
+              <span className="inline-flex items-center rounded-full bg-feedback-light-error/10 px-2.5 py-1 text-xs font-medium text-feedback-light-error dark:bg-feedback-dark-error/30 dark:text-feedback-dark-error">
                 Inativa
               </span>
             )}
@@ -90,11 +85,11 @@ const BankAccountCard = ({
 
           {/* Botões de ação */}
           {(canEdit || canDelete) && (
-            <div className="flex items-center gap-1.5 flex-shrink-0">
+            <div className="flex flex-shrink-0 items-center gap-1.5">
               {canEdit && (
                 <button
                   onClick={() => onEdit(account)}
-                  className="p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:text-primary hover:bg-light-bg dark:hover:bg-dark-hover transition-colors"
+                  className="rounded-lg p-2 text-text-light-secondary transition-colors hover:bg-light-bg hover:text-primary dark:text-text-dark-secondary dark:hover:bg-dark-hover"
                   title="Editar conta"
                 >
                   <Pencil className="h-4 w-4" />
@@ -103,7 +98,7 @@ const BankAccountCard = ({
               {canDelete && (
                 <button
                   onClick={() => onDelete(account)}
-                  className="p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:text-feedback-light-error dark:hover:text-feedback-dark-error hover:bg-light-bg dark:hover:bg-dark-hover transition-colors"
+                  className="rounded-lg p-2 text-text-light-secondary transition-colors hover:bg-light-bg hover:text-feedback-light-error dark:text-text-dark-secondary dark:hover:bg-dark-hover dark:hover:text-feedback-dark-error"
                   title="Excluir conta"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -119,38 +114,38 @@ const BankAccountCard = ({
         <div className="space-y-4">
           {/* Informações da conta */}
           <div className="space-y-3">
-            <div className="flex items-center gap-3 p-3 bg-light-bg dark:bg-dark-bg rounded-lg">
-              <MapPin className="h-4 w-4 text-text-light-secondary dark:text-text-dark-secondary flex-shrink-0" />
-              <div className="flex-1 min-w-0">
-                <span className="text-xs text-theme-secondary block mb-0.5">
+            <div className="flex items-center gap-3 rounded-lg bg-light-bg p-3 dark:bg-dark-bg">
+              <MapPin className="h-4 w-4 flex-shrink-0 text-text-light-secondary dark:text-text-dark-secondary" />
+              <div className="min-w-0 flex-1">
+                <span className="text-theme-secondary mb-0.5 block text-xs">
                   Agência
                 </span>
-                <span className="font-semibold text-sm text-theme-primary">
+                <span className="text-theme-primary text-sm font-semibold">
                   {account.agency}
                 </span>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 p-3 bg-light-bg dark:bg-dark-bg rounded-lg">
-              <Hash className="h-4 w-4 text-text-light-secondary dark:text-text-dark-secondary flex-shrink-0" />
-              <div className="flex-1 min-w-0">
-                <span className="text-xs text-theme-secondary block mb-0.5">
+            <div className="flex items-center gap-3 rounded-lg bg-light-bg p-3 dark:bg-dark-bg">
+              <Hash className="h-4 w-4 flex-shrink-0 text-text-light-secondary dark:text-text-dark-secondary" />
+              <div className="min-w-0 flex-1">
+                <span className="text-theme-secondary mb-0.5 block text-xs">
                   Número da Conta
                 </span>
-                <span className="font-semibold text-sm text-theme-primary">
+                <span className="text-theme-primary text-sm font-semibold">
                   {account.account_number}
                 </span>
               </div>
             </div>
 
             {showUnit && account.units && (
-              <div className="flex items-center gap-3 p-3 bg-light-bg dark:bg-dark-bg rounded-lg">
-                <Building className="h-4 w-4 text-text-light-secondary dark:text-text-dark-secondary flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <span className="text-xs text-theme-secondary block mb-0.5">
+              <div className="flex items-center gap-3 rounded-lg bg-light-bg p-3 dark:bg-dark-bg">
+                <Building className="h-4 w-4 flex-shrink-0 text-text-light-secondary dark:text-text-dark-secondary" />
+                <div className="min-w-0 flex-1">
+                  <span className="text-theme-secondary mb-0.5 block text-xs">
                     Unidade
                   </span>
-                  <span className="font-semibold text-sm text-theme-primary truncate block">
+                  <span className="text-theme-primary block truncate text-sm font-semibold">
                     {account.units.name}
                   </span>
                 </div>
@@ -159,47 +154,47 @@ const BankAccountCard = ({
           </div>
 
           {/* Informações financeiras */}
-          <div className="pt-4 border-t border-light-border dark:border-dark-border">
+          <div className="border-t border-light-border pt-4 dark:border-dark-border">
             {/* Saldo Inicial */}
-            <div className="flex items-center gap-3 p-3 bg-primary/5 dark:bg-primary/10 rounded-lg mb-3">
-              <div className="flex-shrink-0 p-2 bg-primary/10 dark:bg-primary/20 rounded-lg">
+            <div className="mb-3 flex items-center gap-3 rounded-lg bg-primary/5 p-3 dark:bg-primary/10">
+              <div className="flex-shrink-0 rounded-lg bg-primary/10 p-2 dark:bg-primary/20">
                 <DollarSign className="h-4 w-4 text-primary" />
               </div>
-              <div className="flex-1 min-w-0">
-                <span className="text-xs text-theme-secondary block mb-1">
+              <div className="min-w-0 flex-1">
+                <span className="text-theme-secondary mb-1 block text-xs">
                   Saldo Inicial
                 </span>
-                <span className="font-bold text-base text-primary">
+                <span className="text-base font-bold text-primary">
                   {formatCurrency(account.initial_balance)}
                 </span>
               </div>
             </div>
 
             {/* Saldo Atual */}
-            <div className="flex items-center gap-3 p-3 bg-feedback-light-success/5 dark:bg-feedback-dark-success/10 rounded-lg mb-3">
-              <div className="flex-shrink-0 p-2 bg-feedback-light-success/10 dark:bg-feedback-dark-success/20 rounded-lg">
+            <div className="mb-3 flex items-center gap-3 rounded-lg bg-feedback-light-success/5 p-3 dark:bg-feedback-dark-success/10">
+              <div className="flex-shrink-0 rounded-lg bg-feedback-light-success/10 p-2 dark:bg-feedback-dark-success/20">
                 <DollarSign className="h-4 w-4 text-feedback-light-success dark:text-feedback-dark-success" />
               </div>
-              <div className="flex-1 min-w-0">
-                <span className="text-xs text-theme-secondary block mb-1">
+              <div className="min-w-0 flex-1">
+                <span className="text-theme-secondary mb-1 block text-xs">
                   Saldo Atual
                 </span>
-                <span className="font-bold text-lg text-feedback-light-success dark:text-feedback-dark-success">
+                <span className="text-lg font-bold text-feedback-light-success dark:text-feedback-dark-success">
                   {formatCurrency(account.current_balance || 0)}
                 </span>
               </div>
             </div>
 
             {/* Saldo Disponível */}
-            <div className="flex items-center gap-3 p-3 bg-primary/5 dark:bg-primary/10 rounded-lg">
-              <div className="flex-shrink-0 p-2 bg-primary/10 dark:bg-primary/20 rounded-lg">
+            <div className="flex items-center gap-3 rounded-lg bg-primary/5 p-3 dark:bg-primary/10">
+              <div className="flex-shrink-0 rounded-lg bg-primary/10 p-2 dark:bg-primary/20">
                 <DollarSign className="h-4 w-4 text-primary" />
               </div>
-              <div className="flex-1 min-w-0">
-                <span className="text-xs text-theme-secondary block mb-1">
+              <div className="min-w-0 flex-1">
+                <span className="text-theme-secondary mb-1 block text-xs">
                   Saldo Disponível
                 </span>
-                <span className="font-bold text-lg text-primary">
+                <span className="text-lg font-bold text-primary">
                   {formatCurrency(account.available_balance || 0)}
                 </span>
               </div>
@@ -208,14 +203,11 @@ const BankAccountCard = ({
         </div>
 
         {/* Footer com status */}
-        <div className="mt-5 pt-4 border-t border-light-border dark:border-dark-border">
+        <div className="mt-5 border-t border-light-border pt-4 dark:border-dark-border">
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-2">
               <div
-                className={`
-                h-2 w-2 rounded-full animate-pulse
-                ${account.is_active ? 'bg-feedback-light-success' : 'bg-feedback-light-error'}
-              `}
+                className={`h-2 w-2 animate-pulse rounded-full ${account.is_active ? 'bg-feedback-light-success' : 'bg-feedback-light-error'} `}
               />
               <span
                 className={`font-medium ${

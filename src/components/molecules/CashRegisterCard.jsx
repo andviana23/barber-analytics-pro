@@ -38,9 +38,9 @@ const CashRegisterCard = ({
   if (!cashRegister) {
     return (
       <Card className={`p-6 ${className}`}>
-        <div className="text-center text-theme-muted">
+        <div className="text-theme-muted text-center">
           <p className="text-lg font-medium">Nenhum caixa aberto</p>
-          <p className="text-sm mt-2">
+          <p className="mt-2 text-sm">
             Abra um caixa para começar a registrar comandas
           </p>
         </div>
@@ -66,12 +66,12 @@ const CashRegisterCard = ({
   return (
     <Card className={`p-6 ${className}`}>
       {/* Header */}
-      <div className="flex items-start justify-between mb-4">
+      <div className="mb-4 flex items-start justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-theme-primary">
+          <h3 className="text-theme-primary text-lg font-semibold">
             Caixa Atual
           </h3>
-          <p className="text-sm text-theme-muted mt-1">
+          <p className="text-theme-muted mt-1 text-sm">
             {cashRegister.unit?.name || 'Unidade'}
           </p>
         </div>
@@ -79,18 +79,18 @@ const CashRegisterCard = ({
       </div>
 
       {/* Informações principais */}
-      <div className="space-y-3 mb-6">
+      <div className="mb-6 space-y-3">
         {/* Saldo de Abertura */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
             <DollarSign
               size={20}
               className="text-blue-600 dark:text-blue-400"
             />
           </div>
           <div className="flex-1">
-            <p className="text-sm text-theme-muted">Saldo de Abertura</p>
-            <p className="text-lg font-semibold text-theme-primary">
+            <p className="text-theme-muted text-sm">Saldo de Abertura</p>
+            <p className="text-theme-primary text-lg font-semibold">
               {formatCurrency(cashRegister.opening_balance || 0)}
             </p>
           </div>
@@ -98,15 +98,15 @@ const CashRegisterCard = ({
 
         {/* Data/Hora de Abertura */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/30">
             <Calendar
               size={20}
               className="text-purple-600 dark:text-purple-400"
             />
           </div>
           <div className="flex-1">
-            <p className="text-sm text-theme-muted">Aberto em</p>
-            <p className="text-base font-medium text-theme-primary">
+            <p className="text-theme-muted text-sm">Aberto em</p>
+            <p className="text-theme-primary text-base font-medium">
               {formatDateTime(openingDate)}
             </p>
           </div>
@@ -115,12 +115,12 @@ const CashRegisterCard = ({
         {/* Tempo de Abertura (se aberto) */}
         {isOpen && openTime && (
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/30">
               <Clock size={20} className="text-green-600 dark:text-green-400" />
             </div>
             <div className="flex-1">
-              <p className="text-sm text-theme-muted">Tempo Aberto</p>
-              <p className="text-base font-medium text-theme-primary">
+              <p className="text-theme-muted text-sm">Tempo Aberto</p>
+              <p className="text-theme-primary text-base font-medium">
                 {openTime}
               </p>
             </div>
@@ -130,15 +130,15 @@ const CashRegisterCard = ({
         {/* Saldo de Fechamento (se fechado) */}
         {!isOpen && cashRegister.closing_balance !== null && (
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/30">
               <CheckCircle
                 size={20}
                 className="text-green-600 dark:text-green-400"
               />
             </div>
             <div className="flex-1">
-              <p className="text-sm text-theme-muted">Saldo de Fechamento</p>
-              <p className="text-lg font-semibold text-theme-primary">
+              <p className="text-theme-muted text-sm">Saldo de Fechamento</p>
+              <p className="text-theme-primary text-lg font-semibold">
                 {formatCurrency(cashRegister.closing_balance)}
               </p>
             </div>
@@ -148,15 +148,15 @@ const CashRegisterCard = ({
         {/* Data de Fechamento (se fechado) */}
         {!isOpen && closingDate && (
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg card-theme dark:bg-dark-surface/30 flex items-center justify-center">
+            <div className="card-theme flex h-10 w-10 items-center justify-center rounded-lg dark:bg-dark-surface/30">
               <Calendar
                 size={20}
                 className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted"
               />
             </div>
             <div className="flex-1">
-              <p className="text-sm text-theme-muted">Fechado em</p>
-              <p className="text-base font-medium text-theme-primary">
+              <p className="text-theme-muted text-sm">Fechado em</p>
+              <p className="text-theme-primary text-base font-medium">
                 {formatDateTime(closingDate)}
               </p>
             </div>
@@ -166,11 +166,11 @@ const CashRegisterCard = ({
 
       {/* Observações */}
       {cashRegister.observations && (
-        <div className="mb-6 p-3 bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50 rounded-lg border border-light-border dark:border-dark-border">
-          <p className="text-xs font-medium text-theme-muted mb-1">
+        <div className="mb-6 rounded-lg border border-light-border bg-light-bg p-3 dark:border-dark-border dark:bg-dark-bg dark:bg-dark-surface/50">
+          <p className="text-theme-muted mb-1 text-xs font-medium">
             Observações:
           </p>
-          <p className="text-sm text-theme-primary">
+          <p className="text-theme-primary text-sm">
             {cashRegister.observations}
           </p>
         </div>

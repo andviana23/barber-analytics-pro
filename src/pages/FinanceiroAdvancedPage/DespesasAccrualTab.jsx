@@ -440,12 +440,12 @@ const DespesasAccrualTab = ({ globalFilters }) => {
     }
   };
   return (
-    <div className="w-full h-full flex flex-col overflow-hidden">
+    <div className="flex h-full w-full flex-col overflow-hidden">
       {/* Filtros Ultra Compactos */}
-      <div className="card-theme dark:bg-dark-surface rounded-lg shadow-sm border border-light-border dark:border-dark-border p-2 mb-2">
+      <div className="card-theme mb-2 rounded-lg border border-light-border p-2 shadow-sm dark:border-dark-border dark:bg-dark-surface">
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 flex-1 min-w-[300px]">
-            <Calendar className="w-4 h-4 text-light-text-muted dark:text-dark-text-muted" />
+          <div className="flex min-w-[300px] flex-1 items-center gap-2">
+            <Calendar className="text-light-text-muted dark:text-dark-text-muted h-4 w-4" />
             <input
               type="date"
               value={filters.dueDateFrom}
@@ -455,9 +455,9 @@ const DespesasAccrualTab = ({ globalFilters }) => {
                   dueDateFrom: e.target.value,
                 }))
               }
-              className="flex-1 px-2 py-1 text-xs border border-light-border dark:border-dark-border rounded card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary"
+              className="card-theme text-theme-primary dark:text-dark-text-primary flex-1 rounded border border-light-border px-2 py-1 text-xs dark:border-dark-border dark:bg-gray-700"
             />
-            <span className="text-xs text-light-text-muted dark:text-dark-text-muted">
+            <span className="text-light-text-muted dark:text-dark-text-muted text-xs">
               até
             </span>
             <input
@@ -469,32 +469,32 @@ const DespesasAccrualTab = ({ globalFilters }) => {
                   dueDateTo: e.target.value,
                 }))
               }
-              className="flex-1 px-2 py-1 text-xs border border-light-border dark:border-dark-border rounded card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary"
+              className="card-theme text-theme-primary dark:text-dark-text-primary flex-1 rounded border border-light-border px-2 py-1 text-xs dark:border-dark-border dark:bg-gray-700"
             />
           </div>
           <button
             onClick={fetchExpenses}
-            className="flex items-center px-2 py-1 text-xs bg-green-600 dark:bg-green-700 text-dark-text-primary rounded hover:bg-green-700 dark:hover:bg-green-800 transition-colors"
+            className="text-dark-text-primary flex items-center rounded bg-green-600 px-2 py-1 text-xs transition-colors hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
           >
-            <Search className="w-3 h-3 mr-1" />
+            <Search className="mr-1 h-3 w-3" />
             Buscar
           </button>
           <button
             onClick={clearFilters}
-            className="btn-theme-secondary flex items-center px-2 py-1 text-xs rounded transition-colors"
+            className="btn-theme-secondary flex items-center rounded px-2 py-1 text-xs transition-colors"
           >
-            <X className="w-3 h-3 mr-1" />
+            <X className="mr-1 h-3 w-3" />
             Limpar
           </button>
         </div>
       </div>
 
       {/* Tabela com Container Controlado */}
-      <div className="card-theme dark:bg-dark-surface rounded-lg shadow-sm border border-light-border dark:border-dark-border flex-1 flex flex-col min-h-0">
+      <div className="card-theme flex min-h-0 flex-1 flex-col rounded-lg border border-light-border shadow-sm dark:border-dark-border dark:bg-dark-surface">
         {/* Controles da Tabela */}
-        <div className="p-2 border-b border-light-border dark:border-dark-border flex flex-wrap justify-between items-center gap-2 flex-shrink-0">
+        <div className="flex flex-shrink-0 flex-wrap items-center justify-between gap-2 border-b border-light-border p-2 dark:border-dark-border">
           <div className="flex items-center gap-2">
-            <select className="px-2 py-1 text-xs border border-light-border dark:border-dark-border rounded card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary">
+            <select className="card-theme text-theme-primary dark:text-dark-text-primary rounded border border-light-border px-2 py-1 text-xs dark:border-dark-border dark:bg-gray-700">
               <option>10 por página</option>
               <option>25 por página</option>
               <option>50 por página</option>
@@ -511,13 +511,13 @@ const DespesasAccrualTab = ({ globalFilters }) => {
             />
           </div>
           <div className="flex items-center gap-1">
-            <Search className="w-3 h-3 text-light-text-muted dark:text-dark-text-muted" />
+            <Search className="text-light-text-muted dark:text-dark-text-muted h-3 w-3" />
             <input
               type="text"
               placeholder="Pesquisar"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="px-2 py-1 text-xs w-48 border border-light-border dark:border-dark-border rounded card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary"
+              className="card-theme text-theme-primary dark:text-dark-text-primary w-48 rounded border border-light-border px-2 py-1 text-xs dark:border-dark-border dark:bg-gray-700"
             />
           </div>
         </div>
@@ -525,50 +525,50 @@ const DespesasAccrualTab = ({ globalFilters }) => {
         {/* Tabela com Scroll Horizontal e Vertical */}
         <div className="flex-1 overflow-auto">
           <table className="w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-light-bg dark:bg-dark-bg dark:bg-dark-surface sticky top-0 z-10">
+            <thead className="sticky top-0 z-10 bg-light-bg dark:bg-dark-bg dark:bg-dark-surface">
               <tr>
                 <th className="w-8 px-2 py-1 text-left">
-                  <input type="checkbox" className="rounded w-3 h-3" />
+                  <input type="checkbox" className="h-3 w-3 rounded" />
                 </th>
-                <th className="min-w-[250px] px-2 py-1 text-left text-[10px] font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase">
+                <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted min-w-[250px] px-2 py-1 text-left text-[10px] font-medium uppercase">
                   Documento
                 </th>
-                <th className="w-24 px-2 py-1 text-left text-[10px] font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase">
+                <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted w-24 px-2 py-1 text-left text-[10px] font-medium uppercase">
                   Emissão
                 </th>
-                <th className="w-32 px-2 py-1 text-left text-[10px] font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase">
+                <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted w-32 px-2 py-1 text-left text-[10px] font-medium uppercase">
                   Plano
                 </th>
-                <th className="w-32 px-2 py-1 text-left text-[10px] font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase">
+                <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted w-32 px-2 py-1 text-left text-[10px] font-medium uppercase">
                   Pessoa
                 </th>
-                <th className="w-24 px-2 py-1 text-left text-[10px] font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase">
+                <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted w-24 px-2 py-1 text-left text-[10px] font-medium uppercase">
                   Venc.
                 </th>
-                <th className="w-28 px-2 py-1 text-right text-[10px] font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase">
+                <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted w-28 px-2 py-1 text-right text-[10px] font-medium uppercase">
                   Valor
                 </th>
-                <th className="w-28 px-2 py-1 text-right text-[10px] font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase">
+                <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted w-28 px-2 py-1 text-right text-[10px] font-medium uppercase">
                   Pago
                 </th>
-                <th className="w-24 px-2 py-1 text-left text-[10px] font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase">
+                <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted w-24 px-2 py-1 text-left text-[10px] font-medium uppercase">
                   Pgto
                 </th>
-                <th className="w-20 px-2 py-1 text-center text-[10px] font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase">
+                <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted w-20 px-2 py-1 text-center text-[10px] font-medium uppercase">
                   Status
                 </th>
-                <th className="w-16 px-2 py-1 text-center text-[10px] font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase">
+                <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted w-16 px-2 py-1 text-center text-[10px] font-medium uppercase">
                   Ações
                 </th>
               </tr>
             </thead>
-            <tbody className="card-theme dark:bg-dark-surface divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="card-theme divide-y divide-gray-200 dark:divide-gray-700 dark:bg-dark-surface">
               {loading ? (
                 <tr>
                   <td colSpan="11" className="px-4 py-8 text-center">
                     <div className="flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                      <span className="ml-2 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                      <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
+                      <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted ml-2">
                         Carregando...
                       </span>
                     </div>
@@ -578,7 +578,7 @@ const DespesasAccrualTab = ({ globalFilters }) => {
                 <tr>
                   <td
                     colSpan="11"
-                    className="px-4 py-8 text-center text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted"
+                    className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-4 py-8 text-center"
                   >
                     Nenhuma despesa encontrada
                   </td>
@@ -587,34 +587,34 @@ const DespesasAccrualTab = ({ globalFilters }) => {
                 filteredExpenses.map(expense => (
                   <tr
                     key={expense.id}
-                    className="hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700 transition-colors"
+                    className="transition-colors hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700"
                   >
                     <td className="px-2 py-1">
-                      <input type="checkbox" className="rounded w-3 h-3" />
+                      <input type="checkbox" className="h-3 w-3 rounded" />
                     </td>
-                    <td className="px-2 py-1 text-[11px] font-medium text-theme-primary dark:text-dark-text-primary">
+                    <td className="text-theme-primary dark:text-dark-text-primary px-2 py-1 text-[11px] font-medium">
                       <div className="line-clamp-1">
                         {expense.description || '-'}
                       </div>
                     </td>
-                    <td className="px-2 py-1 text-[11px] text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted whitespace-nowrap">
+                    <td className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted whitespace-nowrap px-2 py-1 text-[11px]">
                       {expense.date
                         ? format(parseISO(expense.date), 'dd/MM/yy', {
                             locale: ptBR,
                           })
                         : '-'}
                     </td>
-                    <td className="px-2 py-1 text-[11px] text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                    <td className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-2 py-1 text-[11px]">
                       <div className="truncate">
                         {expense.category?.name || '-'}
                       </div>
                     </td>
-                    <td className="px-2 py-1 text-[11px] text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                    <td className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-2 py-1 text-[11px]">
                       <div className="truncate">
                         {expense.party?.nome || '-'}
                       </div>
                     </td>
-                    <td className="px-2 py-1 text-[11px] text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted whitespace-nowrap">
+                    <td className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted whitespace-nowrap px-2 py-1 text-[11px]">
                       {expense.expected_payment_date
                         ? format(
                             parseISO(expense.expected_payment_date),
@@ -625,13 +625,13 @@ const DespesasAccrualTab = ({ globalFilters }) => {
                           )
                         : '-'}
                     </td>
-                    <td className="px-2 py-1 text-[11px] font-semibold text-theme-primary dark:text-dark-text-primary text-right whitespace-nowrap">
+                    <td className="text-theme-primary dark:text-dark-text-primary whitespace-nowrap px-2 py-1 text-right text-[11px] font-semibold">
                       {expense.value?.toLocaleString('pt-BR', {
                         style: 'currency',
                         currency: 'BRL',
                       }) || '-'}
                     </td>
-                    <td className="px-2 py-1 text-[11px] text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-right whitespace-nowrap">
+                    <td className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted whitespace-nowrap px-2 py-1 text-right text-[11px]">
                       {expense.status === 'Paid'
                         ? expense.value?.toLocaleString('pt-BR', {
                             style: 'currency',
@@ -639,7 +639,7 @@ const DespesasAccrualTab = ({ globalFilters }) => {
                           })
                         : 'R$ 0,00'}
                     </td>
-                    <td className="px-2 py-1 text-[11px] text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted whitespace-nowrap">
+                    <td className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted whitespace-nowrap px-2 py-1 text-[11px]">
                       {expense.actual_payment_date
                         ? format(
                             parseISO(expense.actual_payment_date),
@@ -652,13 +652,13 @@ const DespesasAccrualTab = ({ globalFilters }) => {
                     </td>
                     <td className="px-2 py-1 text-center">
                       <span
-                        className={`inline-flex px-1.5 py-0.5 text-[10px] font-semibold rounded-full whitespace-nowrap ${getStatusColor(expense.status)}`}
+                        className={`inline-flex whitespace-nowrap rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${getStatusColor(expense.status)}`}
                       >
                         {getStatusText(expense.status)}
                       </span>
                     </td>
                     <td className="px-2 py-1 text-center">
-                      <div className="relative dropdown-container">
+                      <div className="dropdown-container relative">
                         <button
                           onClick={() =>
                             setExpenseActionsOpen(
@@ -667,22 +667,22 @@ const DespesasAccrualTab = ({ globalFilters }) => {
                                 : expense.id
                             )
                           }
-                          className="flex items-center justify-center w-8 h-8 text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary hover:card-theme dark:hover:bg-gray-700 rounded-full transition-colors"
+                          className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary hover:card-theme flex h-8 w-8 items-center justify-center rounded-full transition-colors dark:hover:bg-gray-700"
                         >
-                          <ChevronDown className="w-4 h-4" />
+                          <ChevronDown className="h-4 w-4" />
                         </button>
 
                         {expenseActionsOpen === expense.id && (
-                          <div className="absolute right-0 bottom-full mb-1 w-48 card-theme dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg shadow-2xl z-[9999] overflow-hidden">
+                          <div className="card-theme absolute bottom-full right-0 z-[9999] mb-1 w-48 overflow-hidden rounded-lg border border-light-border shadow-2xl dark:border-dark-border dark:bg-dark-surface">
                             <div className="py-1">
                               <button
                                 onClick={() => {
                                   openDetailsModal(expense);
                                   setExpenseActionsOpen(null);
                                 }}
-                                className="flex items-center w-full px-4 py-2.5 text-sm text-theme-secondary hover:card-theme dark:hover:bg-gray-700 transition-colors"
+                                className="text-theme-secondary hover:card-theme flex w-full items-center px-4 py-2.5 text-sm transition-colors dark:hover:bg-gray-700"
                               >
-                                <Eye className="w-4 h-4 mr-3" />
+                                <Eye className="mr-3 h-4 w-4" />
                                 Ver Detalhes
                               </button>
 
@@ -693,9 +693,9 @@ const DespesasAccrualTab = ({ globalFilters }) => {
                                     darBaixaRapida(expense);
                                     setExpenseActionsOpen(null);
                                   }}
-                                  className="flex items-center w-full px-4 py-2.5 text-sm text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors font-medium"
+                                  className="flex w-full items-center px-4 py-2.5 text-sm font-medium text-green-600 transition-colors hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20"
                                 >
-                                  <CheckCircle className="w-4 h-4 mr-3" />
+                                  <CheckCircle className="mr-3 h-4 w-4" />
                                   Dar Baixa
                                 </button>
                               )}
@@ -705,9 +705,9 @@ const DespesasAccrualTab = ({ globalFilters }) => {
                                   openEditModal(expense);
                                   setExpenseActionsOpen(null);
                                 }}
-                                className="flex items-center w-full px-4 py-2.5 text-sm text-theme-secondary hover:card-theme dark:hover:bg-gray-700 transition-colors"
+                                className="text-theme-secondary hover:card-theme flex w-full items-center px-4 py-2.5 text-sm transition-colors dark:hover:bg-gray-700"
                               >
-                                <Edit className="w-4 h-4 mr-3" />
+                                <Edit className="mr-3 h-4 w-4" />
                                 Editar
                               </button>
                               <button
@@ -715,20 +715,20 @@ const DespesasAccrualTab = ({ globalFilters }) => {
                                   openPaymentModal(expense);
                                   setExpenseActionsOpen(null);
                                 }}
-                                className="flex items-center w-full px-4 py-2.5 text-sm text-theme-secondary hover:card-theme dark:hover:bg-gray-700 transition-colors"
+                                className="text-theme-secondary hover:card-theme flex w-full items-center px-4 py-2.5 text-sm transition-colors dark:hover:bg-gray-700"
                               >
-                                <ArrowDown className="w-4 h-4 mr-3" />
+                                <ArrowDown className="mr-3 h-4 w-4" />
                                 Baixar Pagamento
                               </button>
-                              <div className="border-t border-light-border dark:border-dark-border my-1"></div>
+                              <div className="my-1 border-t border-light-border dark:border-dark-border"></div>
                               <button
                                 onClick={() => {
                                   openDeleteModal(expense);
                                   setExpenseActionsOpen(null);
                                 }}
-                                className="flex items-center w-full px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                className="flex w-full items-center px-4 py-2.5 text-sm text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
                               >
-                                <Trash2 className="w-4 h-4 mr-3" />
+                                <Trash2 className="mr-3 h-4 w-4" />
                                 Deletar
                               </button>
                             </div>
@@ -744,25 +744,25 @@ const DespesasAccrualTab = ({ globalFilters }) => {
         </div>
 
         {/* Paginação */}
-        <div className="px-4 py-3 border-t border-light-border dark:border-dark-border flex items-center justify-between flex-shrink-0">
-          <div className="text-sm text-theme-secondary">
+        <div className="flex flex-shrink-0 items-center justify-between border-t border-light-border px-4 py-3 dark:border-dark-border">
+          <div className="text-theme-secondary text-sm">
             Mostrando de 1 até {filteredExpenses.length} de{' '}
             {filteredExpenses.length} registros
           </div>
           <div className="flex items-center space-x-2">
-            <button className="px-3 py-1 text-sm text-theme-secondary hover:text-theme-primary transition-colors">
+            <button className="text-theme-secondary hover:text-theme-primary px-3 py-1 text-sm transition-colors">
               Anterior
             </button>
-            <button className="px-3 py-1 text-sm bg-green-600 dark:bg-green-700 text-dark-text-primary rounded">
+            <button className="text-dark-text-primary rounded bg-green-600 px-3 py-1 text-sm dark:bg-green-700">
               1
             </button>
-            <button className="px-3 py-1 text-sm text-theme-secondary hover:text-theme-primary transition-colors">
+            <button className="text-theme-secondary hover:text-theme-primary px-3 py-1 text-sm transition-colors">
               2
             </button>
-            <button className="px-3 py-1 text-sm text-theme-secondary hover:text-theme-secondary dark:hover:text-gray-300">
+            <button className="text-theme-secondary hover:text-theme-secondary px-3 py-1 text-sm dark:hover:text-gray-300">
               3
             </button>
-            <button className="px-3 py-1 text-sm text-theme-secondary hover:text-theme-secondary dark:hover:text-gray-300">
+            <button className="text-theme-secondary hover:text-theme-secondary px-3 py-1 text-sm dark:hover:text-gray-300">
               Próximo
             </button>
           </div>
@@ -770,13 +770,13 @@ const DespesasAccrualTab = ({ globalFilters }) => {
       </div>
 
       {/* Cards de Resumo */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 flex-shrink-0">
-        <div className="card-theme dark:bg-dark-surface rounded-lg shadow-sm border border-light-border dark:border-dark-border p-6">
+      <div className="mt-4 grid flex-shrink-0 grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="card-theme rounded-lg border border-light-border p-6 shadow-sm dark:border-dark-border dark:bg-dark-surface">
           <div className="text-center">
-            <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-2">
+            <h3 className="text-theme-primary dark:text-dark-text-primary mb-2 text-lg font-semibold">
               Total de Títulos
             </h3>
-            <p className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary">
+            <p className="text-theme-primary dark:text-dark-text-primary text-2xl font-bold">
               {totals.totalTitles.toLocaleString('pt-BR', {
                 style: 'currency',
                 currency: 'BRL',
@@ -785,12 +785,12 @@ const DespesasAccrualTab = ({ globalFilters }) => {
           </div>
         </div>
 
-        <div className="card-theme dark:bg-dark-surface rounded-lg shadow-sm border border-light-border dark:border-dark-border p-6">
+        <div className="card-theme rounded-lg border border-light-border p-6 shadow-sm dark:border-dark-border dark:bg-dark-surface">
           <div className="text-center">
-            <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-2">
+            <h3 className="text-theme-primary dark:text-dark-text-primary mb-2 text-lg font-semibold">
               Total Pago
             </h3>
-            <p className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary">
+            <p className="text-theme-primary dark:text-dark-text-primary text-2xl font-bold">
               {totals.totalPaid.toLocaleString('pt-BR', {
                 style: 'currency',
                 currency: 'BRL',
@@ -799,12 +799,12 @@ const DespesasAccrualTab = ({ globalFilters }) => {
           </div>
         </div>
 
-        <div className="bg-red-600 rounded-lg shadow-sm p-6">
+        <div className="rounded-lg bg-red-600 p-6 shadow-sm">
           <div className="text-center">
-            <h3 className="text-lg font-semibold text-dark-text-primary mb-2">
+            <h3 className="text-dark-text-primary mb-2 text-lg font-semibold">
               Total em Aberto
             </h3>
-            <p className="text-2xl font-bold text-dark-text-primary">
+            <p className="text-dark-text-primary text-2xl font-bold">
               {totals.totalOpen.toLocaleString('pt-BR', {
                 style: 'currency',
                 currency: 'BRL',
@@ -837,15 +837,15 @@ const DespesasAccrualTab = ({ globalFilters }) => {
 
       {/* Modal de Dados da Baixa - Versão Melhorada */}
       {isPaymentModalOpen && selectedExpenseForPayment && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="card-theme dark:bg-dark-surface rounded-xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="card-theme mx-4 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl shadow-2xl dark:bg-dark-surface">
             {/* Header */}
-            <div className="flex justify-between items-center p-6 border-b border-light-border dark:border-dark-border">
+            <div className="flex items-center justify-between border-b border-light-border p-6 dark:border-dark-border">
               <div>
-                <h3 className="text-xl font-semibold text-theme-primary dark:text-dark-text-primary">
+                <h3 className="text-theme-primary dark:text-dark-text-primary text-xl font-semibold">
                   💳 Dados da Baixa
                 </h3>
-                <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
+                <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-sm">
                   Processar pagamento da despesa
                 </p>
               </div>
@@ -853,13 +853,13 @@ const DespesasAccrualTab = ({ globalFilters }) => {
                 onClick={() => setIsPaymentModalOpen(false)}
                 className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary transition-colors"
               >
-                <X className="w-6 h-6" />
+                <X className="h-6 w-6" />
               </button>
             </div>
 
             {/* Informações da Despesa */}
-            <div className="p-6 bg-light-bg dark:bg-gray-700/50 border-b border-light-border dark:border-dark-border">
-              <h4 className="text-sm font-medium text-theme-secondary mb-3">
+            <div className="border-b border-light-border bg-light-bg p-6 dark:border-dark-border dark:bg-gray-700/50">
+              <h4 className="text-theme-secondary mb-3 text-sm font-medium">
                 📋 Despesa Selecionada
               </h4>
               <div className="grid grid-cols-2 gap-4 text-sm">
@@ -867,7 +867,7 @@ const DespesasAccrualTab = ({ globalFilters }) => {
                   <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                     Descrição:
                   </span>
-                  <p className="font-medium text-theme-primary dark:text-dark-text-primary">
+                  <p className="text-theme-primary dark:text-dark-text-primary font-medium">
                     {selectedExpenseForPayment.description || '-'}
                   </p>
                 </div>
@@ -886,10 +886,10 @@ const DespesasAccrualTab = ({ globalFilters }) => {
             </div>
 
             {/* Formulário */}
-            <div className="p-6 space-y-6">
+            <div className="space-y-6 p-6">
               {/* Data de Baixa */}
               <div>
-                <label className="block text-sm font-medium text-theme-secondary mb-2">
+                <label className="text-theme-secondary mb-2 block text-sm font-medium">
                   📅 Data de Baixa *
                 </label>
                 <input
@@ -901,17 +901,17 @@ const DespesasAccrualTab = ({ globalFilters }) => {
                       paymentDate: e.target.value,
                     }))
                   }
-                  className="w-full px-4 py-3 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
                 />
               </div>
 
               {/* Banco */}
               <div>
-                <label className="block text-sm font-medium text-theme-secondary mb-2">
+                <label className="text-theme-secondary mb-2 block text-sm font-medium">
                   🏦 Banco *
                 </label>
                 {selectedExpenseForPayment?.account_id ? (
-                  <div className="w-full px-4 py-3 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-dark-hover text-theme-secondary">
+                  <div className="card-theme text-theme-secondary w-full rounded-lg border border-light-border px-4 py-3 dark:border-dark-border dark:bg-dark-hover">
                     <div className="flex items-center justify-between">
                       <span>
                         {selectedExpenseForPayment.account?.name} -{' '}
@@ -919,7 +919,7 @@ const DespesasAccrualTab = ({ globalFilters }) => {
                         {selectedExpenseForPayment.account?.account_number &&
                           ` (${selectedExpenseForPayment.account.account_number})`}
                       </span>
-                      <span className="text-xs text-theme-secondary bg-light-hover dark:bg-dark-surface px-2 py-1 rounded">
+                      <span className="text-theme-secondary rounded bg-light-hover px-2 py-1 text-xs dark:bg-dark-surface">
                         Banco Original
                       </span>
                     </div>
@@ -933,7 +933,7 @@ const DespesasAccrualTab = ({ globalFilters }) => {
                         bankId: e.target.value,
                       }))
                     }
-                    className="w-full px-4 py-3 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
                   >
                     <option value="">Selecione o banco</option>
                     {bankAccounts.map(bank => (
@@ -946,20 +946,20 @@ const DespesasAccrualTab = ({ globalFilters }) => {
                 )}
                 {bankAccounts.length === 0 &&
                   !selectedExpenseForPayment?.account_id && (
-                    <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                    <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
                       ⚠️ Nenhum banco cadastrado nesta unidade
                     </p>
                   )}
               </div>
 
               {/* Valores Financeiros */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <div>
-                  <label className="block text-sm font-medium text-theme-secondary mb-2">
+                  <label className="text-theme-secondary mb-2 block text-sm font-medium">
                     💰 Valor Pago *
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
+                    <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted absolute left-3 top-1/2 -translate-y-1/2 transform text-sm">
                       R$
                     </span>
                     <input
@@ -969,16 +969,16 @@ const DespesasAccrualTab = ({ globalFilters }) => {
                         handleCurrencyChange('paidValue', e.target.value)
                       }
                       placeholder="0,00"
-                      className="w-full pl-8 pr-4 py-3 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border py-3 pl-8 pr-4 transition-colors focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-theme-secondary mb-2">
+                  <label className="text-theme-secondary mb-2 block text-sm font-medium">
                     📈 Juros
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
+                    <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted absolute left-3 top-1/2 -translate-y-1/2 transform text-sm">
                       R$
                     </span>
                     <input
@@ -988,16 +988,16 @@ const DespesasAccrualTab = ({ globalFilters }) => {
                         handleCurrencyChange('interestValue', e.target.value)
                       }
                       placeholder="0,00"
-                      className="w-full pl-8 pr-4 py-3 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border py-3 pl-8 pr-4 transition-colors focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-theme-secondary mb-2">
+                  <label className="text-theme-secondary mb-2 block text-sm font-medium">
                     📉 Desconto
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
+                    <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted absolute left-3 top-1/2 -translate-y-1/2 transform text-sm">
                       R$
                     </span>
                     <input
@@ -1007,7 +1007,7 @@ const DespesasAccrualTab = ({ globalFilters }) => {
                         handleCurrencyChange('discountValue', e.target.value)
                       }
                       placeholder="0,00"
-                      className="w-full pl-8 pr-4 py-3 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border py-3 pl-8 pr-4 transition-colors focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
                     />
                   </div>
                 </div>
@@ -1015,7 +1015,7 @@ const DespesasAccrualTab = ({ globalFilters }) => {
 
               {/* Observação */}
               <div>
-                <label className="block text-sm font-medium text-theme-secondary mb-2">
+                <label className="text-theme-secondary mb-2 block text-sm font-medium">
                   📝 Observação da Baixa
                 </label>
                 <textarea
@@ -1028,17 +1028,17 @@ const DespesasAccrualTab = ({ globalFilters }) => {
                   }
                   rows={3}
                   placeholder="Informações adicionais sobre o pagamento..."
-                  className="w-full px-4 py-3 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
+                  className="card-theme text-theme-primary dark:text-dark-text-primary w-full resize-none rounded-lg border border-light-border px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
                 />
               </div>
             </div>
 
             {/* Footer */}
-            <div className="p-6 border-t border-light-border dark:border-dark-border bg-light-bg dark:bg-gray-700/50 rounded-b-xl">
+            <div className="rounded-b-xl border-t border-light-border bg-light-bg p-6 dark:border-dark-border dark:bg-gray-700/50">
               <div className="flex space-x-3">
                 <button
                   onClick={() => setIsPaymentModalOpen(false)}
-                  className="btn-theme-secondary flex-1 px-4 py-3 rounded-lg transition-colors font-medium"
+                  className="btn-theme-secondary flex-1 rounded-lg px-4 py-3 font-medium transition-colors"
                 >
                   Cancelar
                 </button>
@@ -1050,11 +1050,11 @@ const DespesasAccrualTab = ({ globalFilters }) => {
                       !selectedExpenseForPayment?.account_id) ||
                     !paymentData.paidValue
                   }
-                  className="flex-1 px-4 py-3 bg-green-600 dark:bg-green-700 text-dark-text-primary rounded-lg hover:bg-green-700 dark:hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center justify-center"
+                  className="text-dark-text-primary flex flex-1 items-center justify-center rounded-lg bg-green-600 px-4 py-3 font-medium transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-green-700 dark:hover:bg-green-800"
                 >
                   {paymentLoading ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-light-surface dark:border-dark-surface mr-2"></div>
+                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-light-surface dark:border-dark-surface"></div>
                       Processando...
                     </>
                   ) : (

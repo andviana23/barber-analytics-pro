@@ -361,62 +361,62 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
   return (
     <div className="space-y-6">
       {/* 📊 Cards de Métricas - DESIGN SYSTEM */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {/* Total - Faturamento do Mês Vigente */}
-        <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-blue-300 dark:hover:border-blue-600 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <div className="p-3 bg-gradient-primary rounded-xl">
-              <DollarSign className="w-6 h-6 text-dark-text-primary" />
+        <div className="card-theme rounded-xl border-2 border-transparent p-5 transition-all hover:border-blue-300 dark:hover:border-blue-600">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="rounded-xl bg-gradient-primary p-3">
+              <DollarSign className="text-dark-text-primary h-6 w-6" />
             </div>
-            <TrendingUp className="w-8 h-8 text-blue-400 dark:text-blue-500 opacity-20" />
+            <TrendingUp className="h-8 w-8 text-blue-400 opacity-20 dark:text-blue-500" />
           </div>
-          <p className="text-xs font-semibold text-theme-secondary uppercase tracking-wide mb-1">
+          <p className="text-theme-secondary mb-1 text-xs font-semibold uppercase tracking-wide">
             Faturamento do Mês
           </p>
-          <p className="text-3xl font-bold text-theme-primary mb-2">
+          <p className="text-theme-primary mb-2 text-3xl font-bold">
             {formatCurrency(metrics.total)}
           </p>
-          <p className="text-xs text-theme-secondary">
+          <p className="text-theme-secondary text-xs">
             {metrics.count} receita{metrics.count !== 1 ? 's' : ''} • Data Pgto
             no mês
           </p>
         </div>
 
         {/* Recebido - Prev. Receb. até hoje */}
-        <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-green-300 dark:hover:border-green-600 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <div className="p-3 bg-gradient-success rounded-xl">
-              <CheckCircle2 className="w-6 h-6 text-dark-text-primary" />
+        <div className="card-theme rounded-xl border-2 border-transparent p-5 transition-all hover:border-green-300 dark:hover:border-green-600">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="rounded-xl bg-gradient-success p-3">
+              <CheckCircle2 className="text-dark-text-primary h-6 w-6" />
             </div>
-            <CheckCircle2 className="w-8 h-8 text-green-400 dark:text-green-500 opacity-20" />
+            <CheckCircle2 className="h-8 w-8 text-green-400 opacity-20 dark:text-green-500" />
           </div>
-          <p className="text-xs font-semibold text-theme-secondary uppercase tracking-wide mb-1">
+          <p className="text-theme-secondary mb-1 text-xs font-semibold uppercase tracking-wide">
             Recebido
           </p>
-          <p className="text-3xl font-bold text-theme-primary mb-2">
+          <p className="text-theme-primary mb-2 text-3xl font-bold">
             {formatCurrency(metrics.recebido)}
           </p>
-          <p className="text-xs text-theme-secondary">
+          <p className="text-theme-secondary text-xs">
             {metrics.recebidoCount} receita
             {metrics.recebidoCount !== 1 ? 's' : ''} • Confirmadas
           </p>
         </div>
 
         {/* Pendente - Prev. Receb. a partir de amanhã */}
-        <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-yellow-300 dark:hover:border-yellow-600 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <div className="p-3 bg-gradient-warning rounded-xl">
-              <Clock className="w-6 h-6 text-dark-text-primary" />
+        <div className="card-theme rounded-xl border-2 border-transparent p-5 transition-all hover:border-yellow-300 dark:hover:border-yellow-600">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="rounded-xl bg-gradient-warning p-3">
+              <Clock className="text-dark-text-primary h-6 w-6" />
             </div>
-            <Clock className="w-8 h-8 text-yellow-400 dark:text-yellow-500 opacity-20" />
+            <Clock className="h-8 w-8 text-yellow-400 opacity-20 dark:text-yellow-500" />
           </div>
-          <p className="text-xs font-semibold text-theme-secondary uppercase tracking-wide mb-1">
+          <p className="text-theme-secondary mb-1 text-xs font-semibold uppercase tracking-wide">
             Pendente
           </p>
-          <p className="text-3xl font-bold text-theme-primary mb-2">
+          <p className="text-theme-primary mb-2 text-3xl font-bold">
             {formatCurrency(metrics.pendente)}
           </p>
-          <p className="text-xs text-theme-secondary">
+          <p className="text-theme-secondary text-xs">
             {metrics.pendenteCount} receita
             {metrics.pendenteCount !== 1 ? 's' : ''} • Aguardando
           </p>
@@ -424,25 +424,25 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
       </div>
 
       {/* 📅 Seletor de Mês - DESIGN SYSTEM */}
-      <div className="card-theme p-4 rounded-xl flex items-center gap-4">
-        <div className="p-2.5 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
-          <Calendar className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+      <div className="card-theme flex items-center gap-4 rounded-xl p-4">
+        <div className="rounded-xl bg-purple-100 p-2.5 dark:bg-purple-900/30">
+          <Calendar className="h-5 w-5 text-purple-600 dark:text-purple-400" />
         </div>
-        <label className="text-sm font-semibold text-theme-primary">
+        <label className="text-theme-primary text-sm font-semibold">
           Período:
         </label>
         <input
           type="month"
           value={selectedMonth}
           onChange={e => setSelectedMonth(e.target.value)}
-          className="px-4 py-2 text-sm font-medium border-2 border-light-border dark:border-dark-border rounded-xl card-theme dark:bg-gray-700 text-theme-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+          className="card-theme text-theme-primary rounded-xl border-2 border-light-border px-4 py-2 text-sm font-medium transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary dark:border-dark-border dark:bg-gray-700"
         />
         <button
           onClick={() => {
             const now = new Date();
             setSelectedMonth(format(now, 'yyyy-MM'));
           }}
-          className="px-4 py-2 text-sm font-semibold text-primary hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-xl transition-all"
+          className="rounded-xl px-4 py-2 text-sm font-semibold text-primary transition-all hover:bg-blue-100 dark:hover:bg-blue-900/30"
         >
           Mês Atual
         </button>
@@ -450,46 +450,46 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
 
       {/* 🎛️ Barra de Controles - DESIGN SYSTEM */}
       <div className="card-theme rounded-xl p-5">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           {/* Esquerda: Busca + Filtros */}
-          <div className="flex flex-col sm:flex-row gap-3 flex-1">
+          <div className="flex flex-1 flex-col gap-3 sm:flex-row">
             {/* Busca */}
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-light-text-muted dark:text-dark-text-muted" />
+            <div className="relative max-w-md flex-1">
+              <Search className="text-light-text-muted dark:text-dark-text-muted absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Buscar receitas..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-11 pr-10 py-2.5 border-2 border-light-border dark:border-dark-border rounded-xl card-theme dark:bg-gray-700 text-theme-primary placeholder-gray-400 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                className="card-theme text-theme-primary w-full rounded-xl border-2 border-light-border py-2.5 pl-11 pr-10 placeholder-gray-400 transition-all focus:border-primary focus:ring-2 focus:ring-primary/50 dark:border-dark-border dark:bg-gray-700"
               />
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary transition-colors"
+                  className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="h-5 w-5" />
                 </button>
               )}
             </div>
 
             {/* Filtro de Status */}
-            <div className="flex gap-2 p-1.5 card-theme dark:bg-gray-700/50 rounded-xl">
+            <div className="card-theme flex gap-2 rounded-xl p-1.5 dark:bg-gray-700/50">
               <button
                 onClick={() => setStatusFilter('all')}
-                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${statusFilter === 'all' ? 'bg-white dark:bg-gray-600 text-theme-primary shadow-md' : 'text-theme-secondary hover:text-theme-primary'}`}
+                className={`rounded-lg px-4 py-2 text-sm font-semibold transition-all ${statusFilter === 'all' ? 'text-theme-primary bg-white shadow-md dark:bg-gray-600' : 'text-theme-secondary hover:text-theme-primary'}`}
               >
                 Todas
               </button>
               <button
                 onClick={() => setStatusFilter('Received')}
-                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${statusFilter === 'Received' ? 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 shadow-md' : 'text-theme-secondary hover:text-green-600'}`}
+                className={`rounded-lg px-4 py-2 text-sm font-semibold transition-all ${statusFilter === 'Received' ? 'bg-green-100 text-green-700 shadow-md dark:bg-green-900/50 dark:text-green-300' : 'text-theme-secondary hover:text-green-600'}`}
               >
                 Recebido
               </button>
               <button
                 onClick={() => setStatusFilter('Pending')}
-                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${statusFilter === 'Pending' ? 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300 shadow-md' : 'text-theme-secondary hover:text-yellow-600'}`}
+                className={`rounded-lg px-4 py-2 text-sm font-semibold transition-all ${statusFilter === 'Pending' ? 'bg-yellow-100 text-yellow-700 shadow-md dark:bg-yellow-900/50 dark:text-yellow-300' : 'text-theme-secondary hover:text-yellow-600'}`}
               >
                 Pendente
               </button>
@@ -498,11 +498,11 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
             {/* Filtro de Unidade */}
             {units.length > 1 && (
               <div className="relative">
-                <Filter className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-light-text-muted dark:text-dark-text-muted pointer-events-none" />
+                <Filter className="text-light-text-muted dark:text-dark-text-muted pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2" />
                 <select
                   value={selectedUnitFilter}
                   onChange={e => setSelectedUnitFilter(e.target.value)}
-                  className="pl-10 pr-10 py-2.5 text-sm font-medium border-2 border-light-border dark:border-dark-border rounded-xl card-theme dark:bg-gray-700 text-theme-primary focus:outline-none focus:ring-2 focus:ring-primary appearance-none cursor-pointer transition-all"
+                  className="card-theme text-theme-primary cursor-pointer appearance-none rounded-xl border-2 border-light-border py-2.5 pl-10 pr-10 text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-primary dark:border-dark-border dark:bg-gray-700"
                 >
                   <option value="">Todas unidades</option>
                   {units.map(unit => (
@@ -520,16 +520,16 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
             <button
               onClick={fetchReceitas}
               disabled={loading}
-              className="p-2.5 text-theme-secondary hover:text-theme-primary hover:card-theme dark:hover:bg-gray-700 rounded-xl transition-all disabled:opacity-50"
+              className="text-theme-secondary hover:text-theme-primary hover:card-theme rounded-xl p-2.5 transition-all disabled:opacity-50 dark:hover:bg-gray-700"
               title="Atualizar"
             >
               <RefreshCw
-                className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`}
+                className={`h-5 w-5 ${loading ? 'animate-spin' : ''}`}
               />
             </button>
 
-            <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-theme-secondary border-2 border-light-border dark:border-dark-border rounded-xl hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700 hover:text-theme-primary transition-all">
-              <Download className="w-4 h-4" />
+            <button className="text-theme-secondary hover:text-theme-primary flex items-center gap-2 rounded-xl border-2 border-light-border px-4 py-2.5 text-sm font-medium transition-all hover:bg-light-bg dark:border-dark-border dark:bg-dark-bg dark:hover:bg-gray-700">
+              <Download className="h-4 w-4" />
               <span className="hidden sm:inline">Exportar</span>
             </button>
 
@@ -541,9 +541,9 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
 
             <button
               onClick={() => setIsModalOpen(true)}
-              className="btn-theme-primary px-5 py-2.5 rounded-xl flex items-center gap-2 shadow-lg hover:shadow-xl transition-all"
+              className="btn-theme-primary flex items-center gap-2 rounded-xl px-5 py-2.5 shadow-lg transition-all hover:shadow-xl"
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="h-5 w-5" />
               Nova Receita
             </button>
           </div>
@@ -551,10 +551,10 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
       </div>
 
       {/* 📋 Tabela de Receitas - DESIGN SYSTEM */}
-      <div className="card-theme rounded-xl overflow-hidden">
+      <div className="card-theme overflow-hidden rounded-xl">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-24">
-            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+            <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
             <p className="text-theme-secondary font-medium">
               Carregando receitas...
             </p>
@@ -586,27 +586,27 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-light-bg dark:bg-dark-surface border-b-2 border-light-border dark:border-dark-border">
+              <thead className="border-b-2 border-light-border bg-light-bg dark:border-dark-border dark:bg-dark-surface">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                  <th className="text-theme-secondary px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                  <th className="text-theme-secondary px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                     Descrição
                   </th>
-                  <th className="px-6 py-4 text-right text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                  <th className="text-theme-secondary px-6 py-4 text-right text-xs font-bold uppercase tracking-wider">
                     Valor
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                  <th className="text-theme-secondary px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                     Data Pgto
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                  <th className="text-theme-secondary px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                     Prev. Receb.
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                  <th className="text-theme-secondary px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                     Conta
                   </th>
-                  <th className="px-6 py-4 text-center text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                  <th className="text-theme-secondary px-6 py-4 text-center text-xs font-bold uppercase tracking-wider">
                     Ações
                   </th>
                 </tr>
@@ -615,18 +615,18 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
                 {filteredReceitas.map(receita => (
                   <tr
                     key={receita.id}
-                    className="group hover:bg-light-hover dark:hover:bg-dark-hover transition-all duration-200"
+                    className="group transition-all duration-200 hover:bg-light-hover dark:hover:bg-dark-hover"
                   >
                     {/* Status */}
                     <td className="px-6 py-4">
                       {receita.status === 'Received' ? (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full text-xs font-semibold">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1.5 text-xs font-semibold text-green-700 dark:bg-green-900/30 dark:text-green-300">
+                          <CheckCircle2 className="h-3.5 w-3.5" />
                           Recebido
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 rounded-full text-xs font-semibold">
-                          <Clock className="w-3.5 h-3.5" />
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-yellow-100 px-3 py-1.5 text-xs font-semibold text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300">
+                          <Clock className="h-3.5 w-3.5" />
                           Pendente
                         </span>
                       )}
@@ -635,11 +635,11 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
                     {/* Descrição */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg group-hover:scale-110 transition-transform">
-                          <FileText className="w-4 h-4 text-green-600 dark:text-green-400" />
+                        <div className="rounded-lg bg-green-50 p-2 transition-transform group-hover:scale-110 dark:bg-green-900/20">
+                          <FileText className="h-4 w-4 text-green-600 dark:text-green-400" />
                         </div>
                         <p
-                          className="font-semibold text-theme-primary truncate max-w-xs"
+                          className="text-theme-primary max-w-xs truncate font-semibold"
                           title={receita.source || 'Sem título'}
                         >
                           {receita.source || 'Sem título'}
@@ -656,14 +656,14 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
 
                     {/* Data Pagamento */}
                     <td className="px-6 py-4">
-                      <p className="text-sm font-medium text-theme-primary">
+                      <p className="text-theme-primary text-sm font-medium">
                         {formatDate(receita.date)}
                       </p>
                     </td>
 
                     {/* Previsão Recebimento */}
                     <td className="px-6 py-4">
-                      <p className="text-sm font-medium text-theme-primary">
+                      <p className="text-theme-primary text-sm font-medium">
                         {formatDate(receita.expected_receipt_date)}
                       </p>
                     </td>
@@ -671,9 +671,9 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
                     {/* Conta */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <Building2 className="w-4 h-4 text-theme-secondary" />
+                        <Building2 className="text-theme-secondary h-4 w-4" />
                         <p
-                          className="text-sm text-theme-secondary truncate max-w-[150px]"
+                          className="text-theme-secondary max-w-[150px] truncate text-sm"
                           title={receita.bank_account?.name || '-'}
                         >
                           {receita.bank_account?.name || '-'}
@@ -686,30 +686,30 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
                       <div className="flex items-center justify-center gap-2">
                         <button
                           onClick={() => handleViewDetails(receita)}
-                          className="p-2 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-all"
+                          className="rounded-lg p-2 text-blue-600 transition-all hover:bg-blue-100 dark:hover:bg-blue-900/30"
                           title="Ver Detalhes"
                         >
-                          <Eye className="w-4 h-4" />
+                          <Eye className="h-4 w-4" />
                         </button>
                         {isAdmin && (
                           <>
                             <button
                               onClick={() => handleEdit(receita)}
-                              className="p-2 text-green-600 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-all"
+                              className="rounded-lg p-2 text-green-600 transition-all hover:bg-green-100 dark:hover:bg-green-900/30"
                               title="Editar"
                             >
-                              <Edit2 className="w-4 h-4" />
+                              <Edit2 className="h-4 w-4" />
                             </button>
                             <button
                               onClick={() => handleDeleteClick(receita)}
                               disabled={deletingId === receita.id}
-                              className="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-all disabled:opacity-50"
+                              className="rounded-lg p-2 text-red-600 transition-all hover:bg-red-100 disabled:opacity-50 dark:hover:bg-red-900/30"
                               title="Deletar"
                             >
                               {deletingId === receita.id ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <Loader2 className="h-4 w-4 animate-spin" />
                               ) : (
-                                <Trash2 className="w-4 h-4" />
+                                <Trash2 className="h-4 w-4" />
                               )}
                             </button>
                           </>
@@ -733,57 +733,57 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
 
       {/* 👁️ Modal de Detalhes da Receita */}
       {isDetailsModalOpen && selectedReceita && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="card-theme rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="card-theme max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl shadow-2xl">
             {/* Header */}
-            <div className="sticky top-0 bg-gradient-primary p-6 rounded-t-2xl">
+            <div className="sticky top-0 rounded-t-2xl bg-gradient-primary p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-3 card-theme/20 rounded-xl">
-                    <Eye className="w-6 h-6 text-dark-text-primary" />
+                  <div className="card-theme/20 rounded-xl p-3">
+                    <Eye className="text-dark-text-primary h-6 w-6" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-dark-text-primary">
+                    <h2 className="text-dark-text-primary text-2xl font-bold">
                       Detalhes da Receita
                     </h2>
-                    <p className="text-blue-100 text-sm mt-1">
+                    <p className="mt-1 text-sm text-blue-100">
                       Informações completas do registro
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setIsDetailsModalOpen(false)}
-                  className="p-2 hover:card-theme/20 rounded-lg transition-colors"
+                  className="hover:card-theme/20 rounded-lg p-2 transition-colors"
                 >
-                  <X className="w-6 h-6 text-dark-text-primary" />
+                  <X className="text-dark-text-primary h-6 w-6" />
                 </button>
               </div>
             </div>
 
             {/* Content */}
-            <div className="p-6 space-y-6">
+            <div className="space-y-6 p-6">
               {/* Status e Valor */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="card-theme p-4 rounded-xl border-2 border-green-200 dark:border-green-800">
-                  <p className="text-xs font-semibold text-theme-secondary uppercase mb-2">
+                <div className="card-theme rounded-xl border-2 border-green-200 p-4 dark:border-green-800">
+                  <p className="text-theme-secondary mb-2 text-xs font-semibold uppercase">
                     Valor
                   </p>
                   <p className="text-3xl font-bold text-green-600 dark:text-green-400">
                     {formatCurrency(selectedReceita.value)}
                   </p>
                 </div>
-                <div className="card-theme p-4 rounded-xl">
-                  <p className="text-xs font-semibold text-theme-secondary uppercase mb-2">
+                <div className="card-theme rounded-xl p-4">
+                  <p className="text-theme-secondary mb-2 text-xs font-semibold uppercase">
                     Status
                   </p>
                   {selectedReceita.status === 'Received' ? (
-                    <span className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full font-semibold">
-                      <CheckCircle2 className="w-5 h-5" />
+                    <span className="inline-flex items-center gap-2 rounded-full bg-green-100 px-4 py-2 font-semibold text-green-700 dark:bg-green-900/30 dark:text-green-300">
+                      <CheckCircle2 className="h-5 w-5" />
                       Recebido
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 rounded-full font-semibold">
-                      <Clock className="w-5 h-5" />
+                    <span className="inline-flex items-center gap-2 rounded-full bg-yellow-100 px-4 py-2 font-semibold text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300">
+                      <Clock className="h-5 w-5" />
                       Pendente
                     </span>
                   )}
@@ -791,10 +791,10 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
               </div>
 
               {/* Descrição */}
-              <div className="card-theme p-4 rounded-xl">
-                <div className="flex items-center gap-2 mb-3">
-                  <FileText className="w-5 h-5 text-theme-secondary" />
-                  <p className="text-xs font-semibold text-theme-secondary uppercase">
+              <div className="card-theme rounded-xl p-4">
+                <div className="mb-3 flex items-center gap-2">
+                  <FileText className="text-theme-secondary h-5 w-5" />
+                  <p className="text-theme-secondary text-xs font-semibold uppercase">
                     Descrição
                   </p>
                 </div>
@@ -805,10 +805,10 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
 
               {/* Datas */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="card-theme p-4 rounded-xl">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Calendar className="w-4 h-4 text-theme-secondary" />
-                    <p className="text-xs font-semibold text-theme-secondary uppercase">
+                <div className="card-theme rounded-xl p-4">
+                  <div className="mb-2 flex items-center gap-2">
+                    <Calendar className="text-theme-secondary h-4 w-4" />
+                    <p className="text-theme-secondary text-xs font-semibold uppercase">
                       Data Pagamento
                     </p>
                   </div>
@@ -816,10 +816,10 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
                     {formatDate(selectedReceita.date)}
                   </p>
                 </div>
-                <div className="card-theme p-4 rounded-xl">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Calendar className="w-4 h-4 text-theme-secondary" />
-                    <p className="text-xs font-semibold text-theme-secondary uppercase">
+                <div className="card-theme rounded-xl p-4">
+                  <div className="mb-2 flex items-center gap-2">
+                    <Calendar className="text-theme-secondary h-4 w-4" />
+                    <p className="text-theme-secondary text-xs font-semibold uppercase">
                       Previsão Recebimento
                     </p>
                   </div>
@@ -831,10 +831,10 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
 
               {/* Conta Bancária */}
               {selectedReceita.bank_account && (
-                <div className="card-theme p-4 rounded-xl">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Building2 className="w-5 h-5 text-theme-secondary" />
-                    <p className="text-xs font-semibold text-theme-secondary uppercase">
+                <div className="card-theme rounded-xl p-4">
+                  <div className="mb-2 flex items-center gap-2">
+                    <Building2 className="text-theme-secondary h-5 w-5" />
+                    <p className="text-theme-secondary text-xs font-semibold uppercase">
                       Conta Bancária
                     </p>
                   </div>
@@ -846,10 +846,10 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
 
               {/* Profissional */}
               {selectedReceita.professional && (
-                <div className="card-theme p-4 rounded-xl">
-                  <div className="flex items-center gap-2 mb-2">
-                    <User className="w-5 h-5 text-theme-secondary" />
-                    <p className="text-xs font-semibold text-theme-secondary uppercase">
+                <div className="card-theme rounded-xl p-4">
+                  <div className="mb-2 flex items-center gap-2">
+                    <User className="text-theme-secondary h-5 w-5" />
+                    <p className="text-theme-secondary text-xs font-semibold uppercase">
                       Profissional
                     </p>
                   </div>
@@ -861,10 +861,10 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
 
               {/* Forma de Pagamento */}
               {selectedReceita.payment_method && (
-                <div className="card-theme p-4 rounded-xl">
-                  <div className="flex items-center gap-2 mb-2">
-                    <CreditCard className="w-5 h-5 text-theme-secondary" />
-                    <p className="text-xs font-semibold text-theme-secondary uppercase">
+                <div className="card-theme rounded-xl p-4">
+                  <div className="mb-2 flex items-center gap-2">
+                    <CreditCard className="text-theme-secondary h-5 w-5" />
+                    <p className="text-theme-secondary text-xs font-semibold uppercase">
                       Forma de Pagamento
                     </p>
                   </div>
@@ -876,7 +876,7 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
             </div>
 
             {/* Footer */}
-            <div className="sticky bottom-0 bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50 p-6 rounded-b-2xl border-t border-light-border dark:border-dark-border">
+            <div className="sticky bottom-0 rounded-b-2xl border-t border-light-border bg-light-bg p-6 dark:border-dark-border dark:bg-dark-bg dark:bg-dark-surface/50">
               <div className="flex items-center justify-end gap-3">
                 {isAdmin && (
                   <>
@@ -885,9 +885,9 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
                         setIsDetailsModalOpen(false);
                         handleEdit(selectedReceita);
                       }}
-                      className="px-5 py-2.5 bg-green-600 text-dark-text-primary font-semibold rounded-xl hover:bg-green-700 transition-all flex items-center gap-2"
+                      className="text-dark-text-primary flex items-center gap-2 rounded-xl bg-green-600 px-5 py-2.5 font-semibold transition-all hover:bg-green-700"
                     >
-                      <Edit2 className="w-4 h-4" />
+                      <Edit2 className="h-4 w-4" />
                       Editar
                     </button>
                     <button
@@ -895,16 +895,16 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
                         setIsDetailsModalOpen(false);
                         handleDeleteClick(selectedReceita);
                       }}
-                      className="px-5 py-2.5 bg-red-600 text-dark-text-primary font-semibold rounded-xl hover:bg-red-700 transition-all flex items-center gap-2"
+                      className="text-dark-text-primary flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 font-semibold transition-all hover:bg-red-700"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="h-4 w-4" />
                       Deletar
                     </button>
                   </>
                 )}
                 <button
                   onClick={() => setIsDetailsModalOpen(false)}
-                  className="px-5 py-2.5 bg-gray-200 dark:bg-gray-700 text-theme-primary font-semibold rounded-xl hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-600 transition-all"
+                  className="text-theme-primary rounded-xl bg-gray-200 px-5 py-2.5 font-semibold transition-all hover:bg-gray-300 dark:bg-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600"
                 >
                   Fechar
                 </button>
@@ -933,19 +933,19 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
 
       {/* 🗑️ Modal de Confirmação de Exclusão */}
       {isDeleteModalOpen && selectedReceita && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="card-theme rounded-2xl max-w-md w-full shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="card-theme w-full max-w-md rounded-2xl shadow-2xl">
             {/* Header */}
-            <div className="bg-gradient-error p-6 rounded-t-2xl">
+            <div className="rounded-t-2xl bg-gradient-error p-6">
               <div className="flex items-center gap-3">
-                <div className="p-3 card-theme/20 rounded-xl">
-                  <Trash2 className="w-6 h-6 text-dark-text-primary" />
+                <div className="card-theme/20 rounded-xl p-3">
+                  <Trash2 className="text-dark-text-primary h-6 w-6" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-dark-text-primary">
+                  <h2 className="text-dark-text-primary text-2xl font-bold">
                     Confirmar Exclusão
                   </h2>
-                  <p className="text-red-100 text-sm mt-1">
+                  <p className="mt-1 text-sm text-red-100">
                     Esta ação não pode ser desfeita
                   </p>
                 </div>
@@ -953,32 +953,32 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
             </div>
 
             {/* Content */}
-            <div className="p-6 space-y-4">
-              <div className="bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-200 dark:border-yellow-800 rounded-xl p-4">
-                <p className="text-sm text-yellow-800 dark:text-yellow-200 font-medium">
+            <div className="space-y-4 p-6">
+              <div className="rounded-xl border-2 border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
+                <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
                   ⚠️ Você está prestes a deletar esta receita:
                 </p>
               </div>
 
-              <div className="card-theme p-4 rounded-xl">
-                <p className="text-sm text-theme-secondary mb-2">Descrição:</p>
-                <p className="font-semibold text-theme-primary mb-3">
+              <div className="card-theme rounded-xl p-4">
+                <p className="text-theme-secondary mb-2 text-sm">Descrição:</p>
+                <p className="text-theme-primary mb-3 font-semibold">
                   {selectedReceita.source || 'Sem descrição'}
                 </p>
 
-                <p className="text-sm text-theme-secondary mb-2">Valor:</p>
+                <p className="text-theme-secondary mb-2 text-sm">Valor:</p>
                 <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                   {formatCurrency(selectedReceita.value)}
                 </p>
               </div>
 
-              <p className="text-sm text-theme-secondary text-center">
+              <p className="text-theme-secondary text-center text-sm">
                 Tem certeza que deseja continuar?
               </p>
             </div>
 
             {/* Footer */}
-            <div className="bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50 p-6 rounded-b-2xl border-t border-light-border dark:border-dark-border">
+            <div className="rounded-b-2xl border-t border-light-border bg-light-bg p-6 dark:border-dark-border dark:bg-dark-bg dark:bg-dark-surface/50">
               <div className="flex items-center justify-end gap-3">
                 <button
                   onClick={() => {
@@ -986,23 +986,23 @@ const ReceitasAccrualTab = ({ globalFilters }) => {
                     setSelectedReceita(null);
                   }}
                   disabled={deletingId === selectedReceita.id}
-                  className="px-5 py-2.5 bg-gray-200 dark:bg-gray-700 text-theme-primary font-semibold rounded-xl hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-600 transition-all disabled:opacity-50"
+                  className="text-theme-primary rounded-xl bg-gray-200 px-5 py-2.5 font-semibold transition-all hover:bg-gray-300 disabled:opacity-50 dark:bg-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={confirmDelete}
                   disabled={deletingId === selectedReceita.id}
-                  className="px-5 py-2.5 bg-red-600 text-dark-text-primary font-semibold rounded-xl hover:bg-red-700 transition-all flex items-center gap-2 disabled:opacity-50"
+                  className="text-dark-text-primary flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 font-semibold transition-all hover:bg-red-700 disabled:opacity-50"
                 >
                   {deletingId === selectedReceita.id ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <Loader2 className="h-4 w-4 animate-spin" />
                       Deletando...
                     </>
                   ) : (
                     <>
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="h-4 w-4" />
                       Confirmar Exclusão
                     </>
                   )}

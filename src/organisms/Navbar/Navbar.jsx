@@ -61,15 +61,15 @@ export function Navbar({ onMenuToggle }) {
     return roles[role] || 'Usuário';
   };
   return (
-    <nav className="sticky top-0 z-50 bg-light-surface/95 dark:bg-dark-surface/95 backdrop-blur-md border-b border-light-border dark:border-dark-border transition-all duration-200 shadow-sm">
+    <nav className="sticky top-0 z-50 border-b border-light-border bg-light-surface/95 shadow-sm backdrop-blur-md transition-all duration-200 dark:border-dark-border dark:bg-dark-surface/95">
       <div className="px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex h-16 items-center justify-between">
           {/* Left section - Menu & Logo */}
           <div className="flex items-center gap-4">
             {/* Mobile menu button - Design System */}
             <button
               onClick={onMenuToggle}
-              className="lg:hidden p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:card-theme/5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-surface"
+              className="dark:hover:card-theme/5 rounded-lg p-2 text-text-light-secondary transition-all duration-200 hover:bg-light-bg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:text-text-dark-secondary dark:focus:ring-offset-dark-surface lg:hidden"
               aria-label="Abrir menu de navegação"
             >
               <Menu className="h-5 w-5" />
@@ -77,16 +77,16 @@ export function Navbar({ onMenuToggle }) {
 
             {/* Logo - Design System */}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center shadow-md">
-                <span className="text-dark-text-primary font-bold text-base">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-primary shadow-md">
+                <span className="text-dark-text-primary text-base font-bold">
                   TB
                 </span>
               </div>
               <div className="hidden sm:block">
-                <h1 className="text-text-light-primary dark:text-text-dark-primary font-semibold text-base leading-tight">
+                <h1 className="text-base font-semibold leading-tight text-text-light-primary dark:text-text-dark-primary">
                   Gestão Trato de Barbados
                 </h1>
-                <p className="text-text-light-secondary dark:text-text-dark-secondary text-xs leading-tight">
+                <p className="text-xs leading-tight text-text-light-secondary dark:text-text-dark-secondary">
                   Sistema de Gestão
                 </p>
               </div>
@@ -94,13 +94,13 @@ export function Navbar({ onMenuToggle }) {
           </div>
 
           {/* Center section - Search Bar - Design System */}
-          <div className="hidden md:flex flex-1 max-w-md mx-8">
-            <div className="relative w-full group">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-text-light-secondary dark:text-text-dark-secondary group-focus-within:text-primary transition-colors duration-200" />
+          <div className="mx-8 hidden max-w-md flex-1 md:flex">
+            <div className="group relative w-full">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-text-light-secondary transition-colors duration-200 group-focus-within:text-primary dark:text-text-dark-secondary" />
               <input
                 type="text"
                 placeholder="Buscar..."
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
+                className="w-full rounded-lg border border-light-border bg-light-bg py-2 pl-10 pr-4 text-text-light-primary transition-all duration-200 placeholder:text-text-light-secondary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/50 dark:border-dark-border dark:bg-dark-bg dark:text-text-dark-primary dark:placeholder:text-text-dark-secondary"
                 aria-label="Campo de busca"
               />
             </div>
@@ -110,7 +110,7 @@ export function Navbar({ onMenuToggle }) {
           <div className="flex items-center gap-2">
             {/* Search button (mobile) - Design System */}
             <button
-              className="md:hidden p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:card-theme/5 hover:text-text-light-primary dark:hover:text-text-dark-primary transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-surface"
+              className="dark:hover:card-theme/5 rounded-lg p-2 text-text-light-secondary transition-all duration-200 hover:bg-light-bg hover:text-text-light-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:text-text-dark-secondary dark:hover:text-text-dark-primary dark:focus:ring-offset-dark-surface md:hidden"
               aria-label="Buscar"
             >
               <Search className="h-5 w-5" />
@@ -118,11 +118,11 @@ export function Navbar({ onMenuToggle }) {
 
             {/* Notifications - Design System */}
             <button
-              className="relative p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:card-theme/5 hover:text-text-light-primary dark:hover:text-text-dark-primary transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-surface"
+              className="dark:hover:card-theme/5 relative rounded-lg p-2 text-text-light-secondary transition-all duration-200 hover:bg-light-bg hover:text-text-light-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:text-text-dark-secondary dark:hover:text-text-dark-primary dark:focus:ring-offset-dark-surface"
               aria-label="Notificações"
             >
               <Bell className="h-5 w-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 dark:bg-red-400 rounded-full ring-2 ring-light-surface dark:ring-dark-surface"></span>
+              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-light-surface dark:bg-red-400 dark:ring-dark-surface"></span>
             </button>
 
             {/* Theme toggle */}
@@ -132,46 +132,46 @@ export function Navbar({ onMenuToggle }) {
             <div className="relative" ref={userMenuRef}>
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="flex items-center gap-2 p-2 rounded-lg text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:card-theme/5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-dark-surface"
+                className="dark:hover:card-theme/5 flex items-center gap-2 rounded-lg p-2 text-text-light-secondary transition-all duration-200 hover:bg-light-bg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:text-text-dark-secondary dark:focus:ring-offset-dark-surface"
                 aria-label="Menu do usuário"
                 aria-expanded={isUserMenuOpen}
               >
-                <div className="w-9 h-9 bg-gradient-primary rounded-full flex items-center justify-center shadow-md ring-2 ring-light-surface dark:ring-dark-surface">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-primary shadow-md ring-2 ring-light-surface dark:ring-dark-surface">
                   {user?.user_metadata?.avatar_url ? (
                     <img
                       src={user.user_metadata.avatar_url}
                       alt="Avatar do usuário"
-                      className="w-full h-full rounded-full object-cover"
+                      className="h-full w-full rounded-full object-cover"
                     />
                   ) : (
-                    <User className="h-5 w-5 text-dark-text-primary" />
+                    <User className="text-dark-text-primary h-5 w-5" />
                   )}
                 </div>
-                <div className="hidden sm:block text-left">
-                  <p className="text-text-light-primary dark:text-text-dark-primary text-sm font-semibold leading-tight">
+                <div className="hidden text-left sm:block">
+                  <p className="text-sm font-semibold leading-tight text-text-light-primary dark:text-text-dark-primary">
                     {getUserDisplayName()}
                   </p>
-                  <p className="text-text-light-secondary dark:text-text-dark-secondary text-xs leading-tight">
+                  <p className="text-xs leading-tight text-text-light-secondary dark:text-text-dark-secondary">
                     {getUserRole()}
                   </p>
                 </div>
                 <ChevronDown
-                  className={`hidden sm:block h-4 w-4 transition-transform duration-200 ${isUserMenuOpen ? 'rotate-180' : ''}`}
+                  className={`hidden h-4 w-4 transition-transform duration-200 sm:block ${isUserMenuOpen ? 'rotate-180' : ''}`}
                 />
               </button>
 
               {/* Dropdown menu - Design System */}
               {isUserMenuOpen && (
-                <div className="absolute right-0 mt-2 w-64 card-theme border border-light-border dark:border-dark-border rounded-lg shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="card-theme animate-in fade-in slide-in-from-top-2 absolute right-0 z-50 mt-2 w-64 overflow-hidden rounded-lg border border-light-border shadow-xl duration-200 dark:border-dark-border">
                   {/* User Info Header */}
-                  <div className="p-4 bg-primary/5 dark:bg-primary/10 border-b border-light-border dark:border-dark-border">
-                    <p className="font-semibold text-text-light-primary dark:text-text-dark-primary truncate">
+                  <div className="border-b border-light-border bg-primary/5 p-4 dark:border-dark-border dark:bg-primary/10">
+                    <p className="truncate font-semibold text-text-light-primary dark:text-text-dark-primary">
                       {getUserDisplayName()}
                     </p>
-                    <p className="text-sm text-text-light-secondary dark:text-text-dark-secondary truncate mt-0.5">
+                    <p className="mt-0.5 truncate text-sm text-text-light-secondary dark:text-text-dark-secondary">
                       {user?.email}
                     </p>
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 mt-2 rounded-full text-xs font-semibold bg-primary/15 text-primary">
+                    <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-2.5 py-1 text-xs font-semibold text-primary">
                       {getUserRole()}
                     </span>
                   </div>
@@ -180,7 +180,7 @@ export function Navbar({ onMenuToggle }) {
                   <div className="py-1.5">
                     <button
                       onClick={handleProfileClick}
-                      className="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:card-theme/5 hover:text-text-light-primary dark:hover:text-text-dark-primary transition-all duration-200 focus:outline-none focus:bg-light-bg dark:focus:card-theme/5"
+                      className="dark:hover:card-theme/5 dark:focus:card-theme/5 flex w-full items-center gap-3 px-4 py-2.5 text-sm font-medium text-text-light-secondary transition-all duration-200 hover:bg-light-bg hover:text-text-light-primary focus:bg-light-bg focus:outline-none dark:text-text-dark-secondary dark:hover:text-text-dark-primary"
                     >
                       <UserCircle className="h-4 w-4 flex-shrink-0" />
                       <span>Meu Perfil</span>
@@ -191,7 +191,7 @@ export function Navbar({ onMenuToggle }) {
                         navigate('/settings');
                         setIsUserMenuOpen(false);
                       }}
-                      className="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary hover:bg-light-bg dark:hover:card-theme/5 hover:text-text-light-primary dark:hover:text-text-dark-primary transition-all duration-200 focus:outline-none focus:bg-light-bg dark:focus:card-theme/5"
+                      className="dark:hover:card-theme/5 dark:focus:card-theme/5 flex w-full items-center gap-3 px-4 py-2.5 text-sm font-medium text-text-light-secondary transition-all duration-200 hover:bg-light-bg hover:text-text-light-primary focus:bg-light-bg focus:outline-none dark:text-text-dark-secondary dark:hover:text-text-dark-primary"
                     >
                       <Settings className="h-4 w-4 flex-shrink-0" />
                       <span>Configurações</span>
@@ -199,10 +199,10 @@ export function Navbar({ onMenuToggle }) {
                   </div>
 
                   {/* Logout - Design System */}
-                  <div className="border-t border-light-border dark:border-dark-border py-1.5">
+                  <div className="border-t border-light-border py-1.5 dark:border-dark-border">
                     <button
                       onClick={handleSignOut}
-                      className="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-red-500 dark:text-red-400 hover:bg-red-500/10 dark:hover:bg-red-400/10 transition-all duration-200 focus:outline-none focus:bg-red-500/10 dark:focus:bg-red-400/10"
+                      className="flex w-full items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-500 transition-all duration-200 hover:bg-red-500/10 focus:bg-red-500/10 focus:outline-none dark:text-red-400 dark:hover:bg-red-400/10 dark:focus:bg-red-400/10"
                     >
                       <LogOut className="h-4 w-4 flex-shrink-0" />
                       <span>Sair</span>

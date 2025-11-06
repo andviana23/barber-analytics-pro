@@ -94,9 +94,9 @@ const ServiceSelector = ({
     <div ref={containerRef} className={`relative ${className}`}>
       {/* Label */}
       {label && (
-        <label className="block text-sm font-medium text-theme-primary mb-2">
+        <label className="text-theme-primary mb-2 block text-sm font-medium">
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className="ml-1 text-red-500">*</span>}
         </label>
       )}
 
@@ -105,23 +105,18 @@ const ServiceSelector = ({
         type="button"
         onClick={handleToggle}
         disabled={disabled || loading}
-        className={`
-          w-full px-4 py-3 rounded-lg border text-left transition-all
-          flex items-center justify-between gap-2
-          ${disabled || loading ? 'bg-light-surface/50 dark:bg-dark-surface/50 cursor-not-allowed opacity-60' : 'bg-white dark:bg-dark-surface hover:border-primary cursor-pointer'}
-          ${error ? 'border-red-500 dark:border-red-400' : isOpen ? 'border-primary ring-2 ring-primary/20' : 'border-light-border dark:border-dark-border'}
-        `}
+        className={`flex w-full items-center justify-between gap-2 rounded-lg border px-4 py-3 text-left transition-all ${disabled || loading ? 'cursor-not-allowed bg-light-surface/50 opacity-60 dark:bg-dark-surface/50' : 'cursor-pointer bg-white hover:border-primary dark:bg-dark-surface'} ${error ? 'border-red-500 dark:border-red-400' : isOpen ? 'border-primary ring-2 ring-primary/20' : 'border-light-border dark:border-dark-border'} `}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-label={label}
       >
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           {selectedService ? (
             <div>
-              <p className="font-medium text-theme-primary truncate">
+              <p className="text-theme-primary truncate font-medium">
                 {selectedService.name}
               </p>
-              <p className="text-sm text-theme-secondary">
+              <p className="text-theme-secondary text-sm">
                 {selectedService.duration_minutes >= 60
                   ? `${Math.floor(selectedService.duration_minutes / 60)}h ${selectedService.duration_minutes % 60}min`
                   : `${selectedService.duration_minutes} min`}{' '}
@@ -135,7 +130,7 @@ const ServiceSelector = ({
 
         {/* Icon */}
         <svg
-          className={`w-5 h-5 text-theme-secondary transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`text-theme-secondary h-5 w-5 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -156,9 +151,9 @@ const ServiceSelector = ({
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute z-50 w-full mt-2 card-theme dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg shadow-lg max-h-80 flex flex-col">
+        <div className="card-theme absolute z-50 mt-2 flex max-h-80 w-full flex-col rounded-lg border border-light-border shadow-lg dark:border-dark-border dark:bg-dark-surface">
           {/* Search Input */}
-          <div className="p-3 border-b border-light-border dark:border-dark-border">
+          <div className="border-b border-light-border p-3 dark:border-dark-border">
             <div className="relative">
               <input
                 ref={searchInputRef}
@@ -167,10 +162,10 @@ const ServiceSelector = ({
                 onChange={e => setSearchTerm(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Buscar serviço..."
-                className="w-full pl-10 pr-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-surface dark:bg-dark-hover text-theme-primary placeholder-theme-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                className="text-theme-primary placeholder-theme-secondary w-full rounded-md border border-light-border bg-light-surface py-2 pl-10 pr-4 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-dark-border dark:bg-dark-hover"
               />
               <svg
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-theme-secondary"
+                className="text-theme-secondary absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -186,18 +181,18 @@ const ServiceSelector = ({
           </div>
 
           {/* Services List */}
-          <div className="overflow-y-auto flex-1">
+          <div className="flex-1 overflow-y-auto">
             {loading ? (
               <div className="p-4 text-center">
-                <div className="inline-block w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                <p className="mt-2 text-sm text-theme-secondary">
+                <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                <p className="text-theme-secondary mt-2 text-sm">
                   Carregando serviços...
                 </p>
               </div>
             ) : filteredServices.length === 0 ? (
               <div className="p-8 text-center">
                 <svg
-                  className="w-12 h-12 mx-auto text-theme-secondary/50 mb-2"
+                  className="text-theme-secondary/50 mx-auto mb-2 h-12 w-12"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -209,7 +204,7 @@ const ServiceSelector = ({
                     d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <p className="text-sm text-theme-secondary">
+                <p className="text-theme-secondary text-sm">
                   {searchTerm
                     ? 'Nenhum serviço encontrado'
                     : 'Nenhum serviço disponível'}
@@ -222,31 +217,26 @@ const ServiceSelector = ({
                     key={service.id}
                     type="button"
                     onClick={() => handleSelect(service)}
-                    className={`
-                      w-full px-4 py-3 text-left transition-colors border-b border-light-border/50 dark:border-dark-border/50 last:border-b-0
-                      hover:bg-light-surface dark:hover:bg-dark-hover
-                      ${value === service.id ? 'bg-primary/5' : ''}
-                      ${service.is_active === false ? 'opacity-60' : ''}
-                    `}
+                    className={`w-full border-b border-light-border/50 px-4 py-3 text-left transition-colors last:border-b-0 hover:bg-light-surface dark:border-dark-border/50 dark:hover:bg-dark-hover ${value === service.id ? 'bg-primary/5' : ''} ${service.is_active === false ? 'opacity-60' : ''} `}
                     role="option"
                     aria-selected={value === service.id}
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <p className="font-medium text-theme-primary truncate">
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-1 flex items-center gap-2">
+                          <p className="text-theme-primary truncate font-medium">
                             {service.name}
                           </p>
                           {service.is_active === false && (
-                            <span className="px-2 py-0.5 text-xs font-medium rounded-full card-theme dark:bg-dark-surface text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                            <span className="card-theme text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted rounded-full px-2 py-0.5 text-xs font-medium dark:bg-dark-surface">
                               Inativo
                             </span>
                           )}
                         </div>
-                        <div className="flex items-center gap-3 text-sm text-theme-secondary">
+                        <div className="text-theme-secondary flex items-center gap-3 text-sm">
                           <span className="flex items-center gap-1">
                             <svg
-                              className="w-3.5 h-3.5"
+                              className="h-3.5 w-3.5"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -267,8 +257,8 @@ const ServiceSelector = ({
                           </span>
                         </div>
                       </div>
-                      <div className="text-right flex-shrink-0">
-                        <p className="font-semibold text-theme-primary">
+                      <div className="flex-shrink-0 text-right">
+                        <p className="text-theme-primary font-semibold">
                           {formatCurrency(service.price)}
                         </p>
                       </div>

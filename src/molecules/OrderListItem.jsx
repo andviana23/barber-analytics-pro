@@ -43,16 +43,11 @@ const OrderListItem = ({
 
   return (
     <div
-      className={`
-        group relative p-4 rounded-lg border transition-all duration-200
-        ${onClick ? 'cursor-pointer hover:shadow-md hover:border-primary/50' : ''}
-        ${
-          selected
-            ? 'bg-primary/5 border-primary shadow-md'
-            : 'bg-white dark:bg-dark-surface border-light-border dark:border-dark-border hover:bg-light-surface/50 dark:hover:bg-dark-hover'
-        }
-        ${className}
-      `}
+      className={`group relative rounded-lg border p-4 transition-all duration-200 ${onClick ? 'cursor-pointer hover:border-primary/50 hover:shadow-md' : ''} ${
+        selected
+          ? 'border-primary bg-primary/5 shadow-md'
+          : 'border-light-border bg-white hover:bg-light-surface/50 dark:border-dark-border dark:bg-dark-surface dark:hover:bg-dark-hover'
+      } ${className} `}
       onClick={handleClick}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
@@ -65,19 +60,19 @@ const OrderListItem = ({
       aria-label={`Comanda ${order.order_number} - ${order.client_name || 'Cliente não informado'}`}
     >
       {/* Header */}
-      <div className="flex items-start justify-between mb-3">
+      <div className="mb-3 flex items-start justify-between">
         <div className="flex items-center gap-3">
           {/* Número da comanda */}
-          <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 text-primary font-bold text-lg flex-shrink-0">
+          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-lg font-bold text-primary">
             #{order.order_number}
           </div>
 
           {/* Informações principais */}
           <div className="min-w-0">
-            <h3 className="text-base font-semibold text-theme-primary truncate">
+            <h3 className="text-theme-primary truncate text-base font-semibold">
               {order.client_name || 'Cliente não informado'}
             </h3>
-            <p className="text-sm text-theme-secondary">
+            <p className="text-theme-secondary text-sm">
               {formatDateTime(order.created_at, 'short')}
             </p>
           </div>
@@ -92,12 +87,12 @@ const OrderListItem = ({
       </div>
 
       {/* Detalhes */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-3">
+      <div className="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {/* Profissional */}
         {showProfessional && order.professional_name && (
           <div className="flex items-center gap-2 text-sm">
             <svg
-              className="w-4 h-4 text-theme-secondary flex-shrink-0"
+              className="text-theme-secondary h-4 w-4 flex-shrink-0"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -121,7 +116,7 @@ const OrderListItem = ({
         {/* Quantidade de serviços */}
         <div className="flex items-center gap-2 text-sm">
           <svg
-            className="w-4 h-4 text-theme-secondary flex-shrink-0"
+            className="text-theme-secondary h-4 w-4 flex-shrink-0"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -142,7 +137,7 @@ const OrderListItem = ({
         {/* Total */}
         <div className="flex items-center gap-2 text-sm">
           <svg
-            className="w-4 h-4 text-theme-secondary flex-shrink-0"
+            className="text-theme-secondary h-4 w-4 flex-shrink-0"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -154,7 +149,7 @@ const OrderListItem = ({
               d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <span className="font-semibold text-theme-primary">
+          <span className="text-theme-primary font-semibold">
             {formatCurrency(order.total_amount || 0)}
           </span>
         </div>
@@ -162,9 +157,9 @@ const OrderListItem = ({
 
       {/* Observações (se houver) */}
       {order.observations && (
-        <div className="pt-3 border-t border-light-border dark:border-dark-border">
+        <div className="border-t border-light-border pt-3 dark:border-dark-border">
           <p
-            className="text-sm text-theme-secondary italic line-clamp-2"
+            className="text-theme-secondary line-clamp-2 text-sm italic"
             title={order.observations}
           >
             {order.observations}
@@ -174,14 +169,14 @@ const OrderListItem = ({
 
       {/* Indicador visual de seleção */}
       {selected && (
-        <div className="absolute top-2 right-2 w-3 h-3 rounded-full bg-primary animate-pulse" />
+        <div className="absolute right-2 top-2 h-3 w-3 animate-pulse rounded-full bg-primary" />
       )}
 
       {/* Seta de navegação (hover) */}
       {onClick && (
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100">
           <svg
-            className="w-5 h-5 text-primary"
+            className="h-5 w-5 text-primary"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

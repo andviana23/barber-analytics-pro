@@ -54,38 +54,38 @@ const OrderItemsTable = ({
   return (
     <div className={`card-theme overflow-hidden ${className}`}>
       {/* Tabela Desktop */}
-      <div className="hidden md:block overflow-x-auto">
+      <div className="hidden overflow-x-auto md:block">
         <table className="w-full">
-          <thead className="bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50 border-b border-theme-border">
+          <thead className="border-theme-border border-b bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-theme-muted uppercase tracking-wider">
+              <th className="text-theme-muted px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">
                 Serviço
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-theme-muted uppercase tracking-wider">
+              <th className="text-theme-muted px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">
                 Profissional
               </th>
-              <th className="px-4 py-3 text-center text-xs font-semibold text-theme-muted uppercase tracking-wider">
+              <th className="text-theme-muted px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider">
                 Qtd
               </th>
-              <th className="px-4 py-3 text-right text-xs font-semibold text-theme-muted uppercase tracking-wider">
+              <th className="text-theme-muted px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider">
                 Preço Unit.
               </th>
               {showCommission && (
-                <th className="px-4 py-3 text-right text-xs font-semibold text-theme-muted uppercase tracking-wider">
+                <th className="text-theme-muted px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider">
                   Comissão
                 </th>
               )}
-              <th className="px-4 py-3 text-right text-xs font-semibold text-theme-muted uppercase tracking-wider">
+              <th className="text-theme-muted px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider">
                 Total
               </th>
               {canEdit && onRemoveItem && (
-                <th className="px-4 py-3 text-center text-xs font-semibold text-theme-muted uppercase tracking-wider">
+                <th className="text-theme-muted px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider">
                   Ações
                 </th>
               )}
             </tr>
           </thead>
-          <tbody className="divide-y divide-theme-border">
+          <tbody className="divide-theme-border divide-y">
             {items.map(item => {
               // ✅ Aceita ambos os formatos
               const unitPrice = item.unit_price || item.unitPrice || 0;
@@ -97,14 +97,14 @@ const OrderItemsTable = ({
               return (
                 <tr
                   key={item.id}
-                  className="hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-dark-surface/30 transition-colors"
+                  className="transition-colors hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-dark-surface/30"
                 >
                   <td className="px-4 py-3">
-                    <p className="text-sm font-medium text-theme-primary">
+                    <p className="text-theme-primary text-sm font-medium">
                       {item.service?.name || item.serviceName || 'Serviço'}
                     </p>
                     {item.service?.duration_minutes && (
-                      <p className="text-xs text-theme-muted">
+                      <p className="text-theme-muted text-xs">
                         {item.service.duration_minutes} min
                       </p>
                     )}
@@ -112,7 +112,7 @@ const OrderItemsTable = ({
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <User size={14} className="text-theme-muted" />
-                      <span className="text-sm text-theme-primary">
+                      <span className="text-theme-primary text-sm">
                         {item.professional?.name ||
                           item.professionalName ||
                           'Sem profissional'}
@@ -120,12 +120,12 @@ const OrderItemsTable = ({
                     </div>
                   </td>
                   <td className="px-4 py-3 text-center">
-                    <span className="text-sm font-semibold text-theme-primary">
+                    <span className="text-theme-primary text-sm font-semibold">
                       {quantity}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <span className="text-sm text-theme-primary">
+                    <span className="text-theme-primary text-sm">
                       {formatCurrency(unitPrice)}
                     </span>
                   </td>
@@ -135,14 +135,14 @@ const OrderItemsTable = ({
                         <p className="text-sm font-medium text-purple-600 dark:text-purple-400">
                           {formatCurrency(itemCommission)}
                         </p>
-                        <p className="text-xs text-theme-muted">
+                        <p className="text-theme-muted text-xs">
                           {commissionPercentage}%
                         </p>
                       </div>
                     </td>
                   )}
                   <td className="px-4 py-3 text-right">
-                    <span className="text-sm font-bold text-theme-primary">
+                    <span className="text-theme-primary text-sm font-bold">
                       {formatCurrency(itemTotal)}
                     </span>
                   </td>
@@ -152,7 +152,7 @@ const OrderItemsTable = ({
                         variant="ghost"
                         size="sm"
                         onClick={() => onRemoveItem(item)}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                        className="text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20"
                         aria-label="Remover item"
                       >
                         <Trash2 size={16} />
@@ -167,7 +167,7 @@ const OrderItemsTable = ({
       </div>
 
       {/* Cards Mobile */}
-      <div className="md:hidden divide-y divide-theme-border">
+      <div className="divide-theme-border divide-y md:hidden">
         {items.map(item => {
           // ✅ Aceita ambos os formatos
           const unitPrice = item.unit_price || item.unitPrice || 0;
@@ -178,12 +178,12 @@ const OrderItemsTable = ({
           const itemCommission = (itemTotal * commissionPercentage) / 100;
           return (
             <div key={item.id} className="p-4">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-sm font-semibold text-theme-primary truncate">
+              <div className="mb-3 flex items-start justify-between">
+                <div className="min-w-0 flex-1">
+                  <h4 className="text-theme-primary truncate text-sm font-semibold">
                     {item.service?.name || item.serviceName || 'Serviço'}
                   </h4>
-                  <p className="text-xs text-theme-muted mt-1">
+                  <p className="text-theme-muted mt-1 text-xs">
                     {item.professional?.name ||
                       item.professionalName ||
                       'Sem profissional'}
@@ -194,7 +194,7 @@ const OrderItemsTable = ({
                     variant="ghost"
                     size="sm"
                     onClick={() => onRemoveItem(item)}
-                    className="text-red-600 hover:text-red-700 flex-shrink-0 ml-2"
+                    className="ml-2 flex-shrink-0 text-red-600 hover:text-red-700"
                   >
                     <Trash2 size={16} />
                   </Button>
@@ -204,13 +204,13 @@ const OrderItemsTable = ({
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div>
                   <span className="text-theme-muted">Quantidade:</span>
-                  <span className="ml-1 font-semibold text-theme-primary">
+                  <span className="text-theme-primary ml-1 font-semibold">
                     {quantity}
                   </span>
                 </div>
                 <div className="text-right">
                   <span className="text-theme-muted">Preço Unit.:</span>
-                  <span className="ml-1 font-semibold text-theme-primary">
+                  <span className="text-theme-primary ml-1 font-semibold">
                     {formatCurrency(unitPrice)}
                   </span>
                 </div>
@@ -231,11 +231,11 @@ const OrderItemsTable = ({
                 )}
               </div>
 
-              <div className="mt-3 pt-3 border-t border-theme-border flex items-center justify-between">
-                <span className="text-xs font-medium text-theme-muted">
+              <div className="border-theme-border mt-3 flex items-center justify-between border-t pt-3">
+                <span className="text-theme-muted text-xs font-medium">
                   Total:
                 </span>
-                <span className="text-base font-bold text-theme-primary">
+                <span className="text-theme-primary text-base font-bold">
                   {formatCurrency(itemTotal)}
                 </span>
               </div>
@@ -245,20 +245,20 @@ const OrderItemsTable = ({
       </div>
 
       {/* Footer com Totais */}
-      <div className="bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50 border-t border-theme-border p-4">
+      <div className="border-theme-border border-t bg-light-bg p-4 dark:bg-dark-bg dark:bg-dark-surface/50">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-theme-muted">
+            <span className="text-theme-muted text-sm font-medium">
               Total de Serviços:
             </span>
-            <span className="text-sm font-semibold text-theme-primary">
+            <span className="text-theme-primary text-sm font-semibold">
               {totals.quantity} {totals.quantity === 1 ? 'item' : 'itens'}
             </span>
           </div>
 
           {showCommission && (
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-theme-muted">
+              <span className="text-theme-muted text-sm font-medium">
                 Total em Comissões:
               </span>
               <span className="text-sm font-bold text-purple-600 dark:text-purple-400">
@@ -267,8 +267,8 @@ const OrderItemsTable = ({
             </div>
           )}
 
-          <div className="flex items-center justify-between pt-2 border-t border-theme-border">
-            <span className="text-base font-bold text-theme-primary">
+          <div className="border-theme-border flex items-center justify-between border-t pt-2">
+            <span className="text-theme-primary text-base font-bold">
               Total Geral:
             </span>
             <span className="text-xl font-bold text-green-600 dark:text-green-400">

@@ -125,15 +125,15 @@ const ChartComponent = ({
   if (loading) {
     return (
       <div
-        className="card-theme dark:bg-dark-surface p-6 rounded-xl border border-light-border dark:border-dark-border animate-pulse"
+        className="card-theme animate-pulse rounded-xl border border-light-border p-6 dark:border-dark-border dark:bg-dark-surface"
         style={{
           height: height + 100,
         }}
       >
         {title && (
-          <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
+          <div className="mb-4 h-6 w-48 rounded bg-gray-200 dark:bg-gray-700"></div>
         )}
-        <div className="h-full card-theme dark:bg-gray-700 rounded"></div>
+        <div className="card-theme h-full rounded dark:bg-gray-700"></div>
       </div>
     );
   }
@@ -145,10 +145,10 @@ const ChartComponent = ({
             <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
             <XAxis
               dataKey={chartConfig.xDataKey}
-              className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted"
+              className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm"
             />
             <YAxis
-              className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted"
+              className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm"
               tickFormatter={formatCurrency}
             />
             <Tooltip
@@ -184,10 +184,10 @@ const ChartComponent = ({
             <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
             <XAxis
               dataKey={chartConfig.xDataKey}
-              className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted"
+              className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm"
             />
             <YAxis
-              className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted"
+              className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm"
               tickFormatter={formatCurrency}
             />
             <Tooltip
@@ -219,10 +219,10 @@ const ChartComponent = ({
             <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
             <XAxis
               dataKey={chartConfig.xDataKey}
-              className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted"
+              className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm"
             />
             <YAxis
-              className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted"
+              className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm"
               tickFormatter={formatCurrency}
             />
             <Tooltip
@@ -275,9 +275,9 @@ const ChartComponent = ({
     }
   };
   return (
-    <div className="card-theme dark:bg-dark-surface p-6 rounded-xl border border-light-border dark:border-dark-border">
+    <div className="card-theme rounded-xl border border-light-border p-6 dark:border-dark-border dark:bg-dark-surface">
       {title && (
-        <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-4">
+        <h3 className="text-theme-primary dark:text-dark-text-primary mb-4 text-lg font-semibold">
           {title}
         </h3>
       )}

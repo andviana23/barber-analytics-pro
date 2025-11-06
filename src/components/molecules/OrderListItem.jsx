@@ -46,15 +46,7 @@ const OrderListItem = ({
   };
   return (
     <div
-      className={`
-        group
-        card-theme
-        p-4
-        transition-all
-        duration-200
-        ${onClick ? 'cursor-pointer hover:shadow-lg hover:scale-[1.01]' : ''}
-        ${className}
-      `}
+      className={`card-theme group p-4 transition-all duration-200 ${onClick ? 'cursor-pointer hover:scale-[1.01] hover:shadow-lg' : ''} ${className} `}
       onClick={handleClick}
       role={onClick ? 'button' : 'article'}
       tabIndex={onClick ? 0 : undefined}
@@ -66,15 +58,15 @@ const OrderListItem = ({
       }}
     >
       {/* Header */}
-      <div className="flex items-start justify-between mb-3">
+      <div className="mb-3 flex items-start justify-between">
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <h4 className="text-base font-semibold text-theme-primary">
+          <div className="mb-1 flex items-center gap-2">
+            <h4 className="text-theme-primary text-base font-semibold">
               Comanda #{order.id?.slice(0, 8) || 'N/A'}
             </h4>
             <StatusBadge status={order.status} size="sm" />
           </div>
-          <p className="text-xs text-theme-muted">
+          <p className="text-theme-muted text-xs">
             {formatDateTime(new Date(order.created_at))}
           </p>
         </div>
@@ -83,7 +75,7 @@ const OrderListItem = ({
         {(canClose || canCancel) && isOpen && (
           <div className="relative">
             <button
-              className="p-2 rounded-lg hover:card-theme dark:hover:bg-dark-surface transition-colors"
+              className="hover:card-theme rounded-lg p-2 transition-colors dark:hover:bg-dark-surface"
               onClick={e => e.stopPropagation()}
               aria-label="Ações"
             >
@@ -94,15 +86,15 @@ const OrderListItem = ({
       </div>
 
       {/* Informações */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+      <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {/* Cliente */}
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
             <User size={16} className="text-blue-600 dark:text-blue-400" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-xs text-theme-muted">Cliente</p>
-            <p className="text-sm font-medium text-theme-primary truncate">
+            <p className="text-theme-muted text-xs">Cliente</p>
+            <p className="text-theme-primary truncate text-sm font-medium">
               {order.client?.name || 'N/A'}
             </p>
           </div>
@@ -110,15 +102,15 @@ const OrderListItem = ({
 
         {/* Profissional */}
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0">
+          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/30">
             <Scissors
               size={16}
               className="text-purple-600 dark:text-purple-400"
             />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-xs text-theme-muted">Profissional</p>
-            <p className="text-sm font-medium text-theme-primary truncate">
+            <p className="text-theme-muted text-xs">Profissional</p>
+            <p className="text-theme-primary truncate text-sm font-medium">
               {order.professional?.name || 'N/A'}
             </p>
           </div>
@@ -126,14 +118,14 @@ const OrderListItem = ({
       </div>
 
       {/* Total e Itens */}
-      <div className="flex items-center justify-between pt-3 border-t border-theme-border">
+      <div className="border-theme-border flex items-center justify-between border-t pt-3">
         <div className="flex items-center gap-2">
           <DollarSign
             size={18}
             className="text-green-600 dark:text-green-400"
           />
           <div>
-            <p className="text-xs text-theme-muted">Total</p>
+            <p className="text-theme-muted text-xs">Total</p>
             <p className="text-lg font-bold text-green-600 dark:text-green-400">
               {formatCurrency(order.total_amount || 0)}
             </p>
@@ -141,8 +133,8 @@ const OrderListItem = ({
         </div>
 
         <div className="text-right">
-          <p className="text-xs text-theme-muted">Serviços</p>
-          <p className="text-sm font-semibold text-theme-primary">
+          <p className="text-theme-muted text-xs">Serviços</p>
+          <p className="text-theme-primary text-sm font-semibold">
             {order.items?.length || 0}{' '}
             {order.items?.length === 1 ? 'item' : 'itens'}
           </p>
@@ -151,8 +143,8 @@ const OrderListItem = ({
 
       {/* Data de Fechamento */}
       {isClosed && order.closed_at && (
-        <div className="mt-3 pt-3 border-t border-theme-border">
-          <div className="flex items-center gap-2 text-xs text-theme-muted">
+        <div className="border-theme-border mt-3 border-t pt-3">
+          <div className="text-theme-muted flex items-center gap-2 text-xs">
             <Calendar size={14} />
             <span>Fechado em {formatDateTime(new Date(order.closed_at))}</span>
           </div>
@@ -161,11 +153,11 @@ const OrderListItem = ({
 
       {/* Motivo de Cancelamento */}
       {isCanceled && order.cancel_reason && (
-        <div className="mt-3 pt-3 border-t border-theme-border">
-          <p className="text-xs font-medium text-red-600 dark:text-red-400 mb-1">
+        <div className="border-theme-border mt-3 border-t pt-3">
+          <p className="mb-1 text-xs font-medium text-red-600 dark:text-red-400">
             Motivo do cancelamento:
           </p>
-          <p className="text-sm text-theme-muted italic">
+          <p className="text-theme-muted text-sm italic">
             {order.cancel_reason}
           </p>
         </div>
@@ -177,7 +169,7 @@ const OrderListItem = ({
           {canClose && onClose && (
             <button
               onClick={e => handleActionClick(e, () => onClose(order))}
-              className="btn-theme-primary flex-1 text-sm py-2"
+              className="btn-theme-primary flex-1 py-2 text-sm"
             >
               Fechar Comanda
             </button>
@@ -185,7 +177,7 @@ const OrderListItem = ({
           {canCancel && onCancel && (
             <button
               onClick={e => handleActionClick(e, () => onCancel(order))}
-              className="btn-theme-danger text-sm py-2 px-4"
+              className="btn-theme-danger px-4 py-2 text-sm"
             >
               Cancelar
             </button>

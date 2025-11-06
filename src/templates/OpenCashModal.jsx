@@ -88,35 +88,35 @@ const OpenCashModal = ({
     >
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Grid Responsivo - 2 colunas em desktop, 1 em mobile */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
           {/* Coluna Esquerda - Inputs */}
           <div className="space-y-6">
             {/* Alerta informativo - Compacto e claro */}
-            <div className="relative overflow-hidden rounded-xl border border-primary/30 from-primary/5 to-transparent dark:from-primary/10 bg-primary/5 dark:bg-primary/10 p-5">
-              <div className="absolute top-0 left-0 w-1 h-full bg-primary"></div>
-              <div className="flex items-start gap-4 ml-1">
-                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
-                  <Info className="w-5 h-5 text-primary" />
+            <div className="relative overflow-hidden rounded-xl border border-primary/30 bg-primary/5 from-primary/5 to-transparent p-5 dark:bg-primary/10 dark:from-primary/10">
+              <div className="absolute left-0 top-0 h-full w-1 bg-primary"></div>
+              <div className="ml-1 flex items-start gap-4">
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 dark:bg-primary/20">
+                  <Info className="h-5 w-5 text-primary" />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-theme-primary mb-3 text-sm">
+                <div className="min-w-0 flex-1">
+                  <h4 className="text-theme-primary mb-3 text-sm font-semibold">
                     Informações Importantes
                   </h4>
                   <ul className="space-y-2">
-                    <li className="flex items-start gap-2 text-xs text-theme-secondary leading-relaxed">
-                      <span className="flex-shrink-0 w-1 h-1 rounded-full bg-primary mt-1.5"></span>
+                    <li className="text-theme-secondary flex items-start gap-2 text-xs leading-relaxed">
+                      <span className="mt-1.5 h-1 w-1 flex-shrink-0 rounded-full bg-primary"></span>
                       <span className="flex-1">
                         Confira o saldo inicial antes de abrir o caixa
                       </span>
                     </li>
-                    <li className="flex items-start gap-2 text-xs text-theme-secondary leading-relaxed">
-                      <span className="flex-shrink-0 w-1 h-1 rounded-full bg-primary mt-1.5"></span>
+                    <li className="text-theme-secondary flex items-start gap-2 text-xs leading-relaxed">
+                      <span className="mt-1.5 h-1 w-1 flex-shrink-0 rounded-full bg-primary"></span>
                       <span className="flex-1">
                         O caixa ficará aberto até o fechamento manual
                       </span>
                     </li>
-                    <li className="flex items-start gap-2 text-xs text-theme-secondary leading-relaxed">
-                      <span className="flex-shrink-0 w-1 h-1 rounded-full bg-primary mt-1.5"></span>
+                    <li className="text-theme-secondary flex items-start gap-2 text-xs leading-relaxed">
+                      <span className="mt-1.5 h-1 w-1 flex-shrink-0 rounded-full bg-primary"></span>
                       <span className="flex-1">
                         Apenas um caixa pode estar aberto por vez
                       </span>
@@ -143,9 +143,9 @@ const OpenCashModal = ({
 
             {/* Observações - Compacto */}
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-theme-primary">
+              <label className="text-theme-primary block text-sm font-semibold">
                 Observações
-                <span className="text-theme-secondary font-normal text-xs ml-2">
+                <span className="text-theme-secondary ml-2 text-xs font-normal">
                   (opcional)
                 </span>
               </label>
@@ -158,11 +158,11 @@ const OpenCashModal = ({
                 placeholder="Ex: Troco preparado, notas disponíveis, etc."
                 className="input-theme w-full resize-none text-sm leading-relaxed"
               />
-              <div className="flex justify-between items-center text-xs">
+              <div className="flex items-center justify-between text-xs">
                 <p className="text-theme-secondary italic">
                   Informações adicionais sobre o caixa
                 </p>
-                <p className="font-semibold text-theme-secondary tabular-nums">
+                <p className="text-theme-secondary font-semibold tabular-nums">
                   {observations.length}/500
                 </p>
               </div>
@@ -172,17 +172,17 @@ const OpenCashModal = ({
           {/* Coluna Direita - Resumo */}
           <div className="space-y-6">
             {/* Card de Resumo - Compacto e visual */}
-            <div className="card-theme rounded-xl p-6 border-2 border-primary/20 from-primary/5 to-transparent dark:from-primary/10 bg-primary/5 dark:bg-primary/10 shadow-lg">
+            <div className="card-theme rounded-xl border-2 border-primary/20 bg-primary/5 from-primary/5 to-transparent p-6 shadow-lg dark:bg-primary/10 dark:from-primary/10">
               {/* Header */}
-              <div className="flex items-center gap-3 mb-6 pb-5 border-b border-primary/20">
-                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-                  <CheckCircle className="w-6 h-6 text-dark-text-primary" />
+              <div className="mb-6 flex items-center gap-3 border-b border-primary/20 pb-5">
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary">
+                  <CheckCircle className="text-dark-text-primary h-6 w-6" />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-bold text-theme-primary text-base">
+                <div className="min-w-0 flex-1">
+                  <h4 className="text-theme-primary text-base font-bold">
                     Resumo da Abertura
                   </h4>
-                  <p className="text-xs text-theme-secondary mt-0.5">
+                  <p className="text-theme-secondary mt-0.5 text-xs">
                     Confira os dados antes de confirmar
                   </p>
                 </div>
@@ -190,31 +190,31 @@ const OpenCashModal = ({
 
               <div className="space-y-4">
                 {/* Saldo Inicial - Grande destaque */}
-                <div className="card-theme rounded-lg p-5 border border-light-border dark:border-dark-border">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-bold text-theme-secondary uppercase tracking-wide">
+                <div className="card-theme rounded-lg border border-light-border p-5 dark:border-dark-border">
+                  <div className="mb-3 flex items-center justify-between">
+                    <span className="text-theme-secondary text-xs font-bold uppercase tracking-wide">
                       Saldo Inicial
                     </span>
-                    <div className="w-8 h-8 rounded-md bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
-                      <DollarSign className="w-4 h-4 text-primary" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 dark:bg-primary/20">
+                      <DollarSign className="h-4 w-4 text-primary" />
                     </div>
                   </div>
-                  <p className="text-3xl font-black text-primary tracking-tight">
+                  <p className="text-3xl font-black tracking-tight text-primary">
                     R$ {openingBalance.toFixed(2).replace('.', ',')}
                   </p>
                 </div>
 
                 {/* Data e Hora */}
-                <div className="card-theme rounded-lg p-4 border border-light-border dark:border-dark-border">
+                <div className="card-theme rounded-lg border border-light-border p-4 dark:border-dark-border">
                   <div className="flex items-center gap-3">
-                    <div className="flex-shrink-0 w-9 h-9 rounded-md bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
-                      <Calendar className="w-4 h-4 text-primary" />
+                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md bg-primary/10 dark:bg-primary/20">
+                      <Calendar className="h-4 w-4 text-primary" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-theme-secondary uppercase tracking-wide mb-1">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-theme-secondary mb-1 text-xs font-semibold uppercase tracking-wide">
                         Data/Hora de Abertura
                       </p>
-                      <p className="text-sm font-bold text-theme-primary truncate">
+                      <p className="text-theme-primary truncate text-sm font-bold">
                         {new Date().toLocaleString('pt-BR', {
                           dateStyle: 'short',
                           timeStyle: 'medium',
@@ -225,13 +225,13 @@ const OpenCashModal = ({
                 </div>
 
                 {/* Status */}
-                <div className="from-feedback-light-success/10 to-feedback-light-success/5 dark:from-feedback-dark-success/10 dark:to-feedback-dark-success/5 bg-feedback-light-success/10 dark:bg-feedback-dark-success/10 rounded-lg p-4 border border-feedback-light-success/30 dark:border-feedback-dark-success/30">
+                <div className="rounded-lg border border-feedback-light-success/30 bg-feedback-light-success/10 from-feedback-light-success/10 to-feedback-light-success/5 p-4 dark:border-feedback-dark-success/30 dark:bg-feedback-dark-success/10 dark:from-feedback-dark-success/10 dark:to-feedback-dark-success/5">
                   <div className="flex items-center gap-3">
-                    <div className="flex-shrink-0 w-9 h-9 rounded-md bg-feedback-light-success/20 dark:bg-feedback-dark-success/20 flex items-center justify-center">
-                      <Clock className="w-4 h-4 text-feedback-light-success dark:text-feedback-dark-success" />
+                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md bg-feedback-light-success/20 dark:bg-feedback-dark-success/20">
+                      <Clock className="h-4 w-4 text-feedback-light-success dark:text-feedback-dark-success" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-theme-secondary uppercase tracking-wide mb-1">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-theme-secondary mb-1 text-xs font-semibold uppercase tracking-wide">
                         Status Após Abertura
                       </p>
                       <p className="text-sm font-bold text-feedback-light-success dark:text-feedback-dark-success">
@@ -244,9 +244,9 @@ const OpenCashModal = ({
             </div>
 
             {/* Informação adicional */}
-            <div className="flex items-start gap-3 p-4 rounded-lg bg-light-bg dark:bg-dark-hover border border-light-border dark:border-dark-border">
-              <Info className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-theme-secondary leading-relaxed">
+            <div className="flex items-start gap-3 rounded-lg border border-light-border bg-light-bg p-4 dark:border-dark-border dark:bg-dark-hover">
+              <Info className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
+              <p className="text-theme-secondary text-xs leading-relaxed">
                 Após abrir o caixa, você poderá registrar todas as movimentações
                 financeiras. O fechamento pode ser feito ao final do expediente.
               </p>
@@ -255,28 +255,28 @@ const OpenCashModal = ({
         </div>
 
         {/* Ações - Footer responsivo */}
-        <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t-2 border-light-border dark:border-dark-border">
+        <div className="flex flex-col gap-3 border-t-2 border-light-border pt-6 dark:border-dark-border sm:flex-row">
           <button
             type="button"
             onClick={handleClose}
             disabled={loading}
-            className="btn-theme-secondary w-full sm:flex-1 px-6 py-3.5 rounded-lg font-semibold text-base transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.01] active:scale-[0.99]"
+            className="btn-theme-secondary w-full rounded-lg px-6 py-3.5 text-base font-semibold transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50 sm:flex-1"
           >
             Cancelar
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="btn-theme-primary w-full sm:flex-1 px-6 py-3.5 rounded-lg font-semibold text-base transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] shadow-lg hover:shadow-xl"
+            className="btn-theme-primary inline-flex w-full items-center justify-center gap-2 rounded-lg px-6 py-3.5 text-base font-semibold shadow-lg transition-all duration-200 hover:scale-[1.01] hover:shadow-xl active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50 sm:flex-1"
           >
             {loading ? (
               <>
-                <div className="w-5 h-5 border-2 border-light-surface dark:border-dark-surface border-t-transparent rounded-full animate-spin" />
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-light-surface border-t-transparent dark:border-dark-surface" />
                 <span>Abrindo Caixa...</span>
               </>
             ) : (
               <>
-                <CheckCircle className="w-5 h-5" />
+                <CheckCircle className="h-5 w-5" />
                 <span>Abrir Caixa</span>
               </>
             )}

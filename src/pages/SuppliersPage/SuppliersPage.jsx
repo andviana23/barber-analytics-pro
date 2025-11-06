@@ -178,9 +178,9 @@ const SuppliersPage = () => {
   if (!selectedUnit) {
     return (
       <Layout>
-        <div className="flex items-center justify-center h-64">
+        <div className="flex h-64 items-center justify-center">
           <div className="text-center">
-            <Package className="w-16 h-16 mx-auto text-light-text-muted dark:text-dark-text-muted mb-4" />
+            <Package className="text-light-text-muted dark:text-dark-text-muted mx-auto mb-4 h-16 w-16" />
             <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
               Selecione uma unidade para visualizar os fornecedores
             </p>
@@ -193,10 +193,10 @@ const SuppliersPage = () => {
     <Layout>
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-theme-primary dark:text-dark-text-primary flex items-center gap-3">
-              <Package className="w-8 h-8 text-primary-600" />
+            <h1 className="text-theme-primary dark:text-dark-text-primary flex items-center gap-3 text-3xl font-bold">
+              <Package className="text-primary-600 h-8 w-8" />
               Fornecedores
             </h1>
             <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
@@ -209,64 +209,64 @@ const SuppliersPage = () => {
               onClick={handleCreate}
               className="btn-primary flex items-center gap-2"
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="h-5 w-5" />
               Fornecedor
             </button>
           )}
         </div>
 
         {/* KPIs */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="card-theme dark:bg-dark-surface rounded-lg p-4 border border-light-border dark:border-dark-border">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="card-theme rounded-lg border border-light-border p-4 dark:border-dark-border dark:bg-dark-surface">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                   Total
                 </p>
-                <p className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary">
+                <p className="text-theme-primary dark:text-dark-text-primary text-2xl font-bold">
                   {stats.total}
                 </p>
               </div>
-              <Package className="w-8 h-8 text-blue-500" />
+              <Package className="h-8 w-8 text-blue-500" />
             </div>
           </div>
 
-          <div className="card-theme dark:bg-dark-surface rounded-lg p-4 border border-light-border dark:border-dark-border">
+          <div className="card-theme rounded-lg border border-light-border p-4 dark:border-dark-border dark:bg-dark-surface">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                   Ativos
                 </p>
                 <p className="text-2xl font-bold text-green-600">
                   {stats.active}
                 </p>
               </div>
-              <CheckCircle className="w-8 h-8 text-green-500" />
+              <CheckCircle className="h-8 w-8 text-green-500" />
             </div>
           </div>
 
-          <div className="card-theme dark:bg-dark-surface rounded-lg p-4 border border-light-border dark:border-dark-border">
+          <div className="card-theme rounded-lg border border-light-border p-4 dark:border-dark-border dark:bg-dark-surface">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                   Inativos
                 </p>
                 <p className="text-2xl font-bold text-red-600">
                   {stats.inactive}
                 </p>
               </div>
-              <XCircle className="w-8 h-8 text-red-500" />
+              <XCircle className="h-8 w-8 text-red-500" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Filtros e Busca */}
-      <div className="card-theme dark:bg-dark-surface rounded-lg shadow-sm border border-light-border dark:border-dark-border p-4 mb-6">
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+      <div className="card-theme mb-6 rounded-lg border border-light-border p-4 shadow-sm dark:border-dark-border dark:bg-dark-surface">
+        <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
           {/* Busca */}
-          <div className="relative flex-1 w-full md:w-auto">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-text-muted dark:text-dark-text-muted w-5 h-5" />
+          <div className="relative w-full flex-1 md:w-auto">
+            <Search className="text-light-text-muted dark:text-dark-text-muted absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
             <input
               type="text"
               placeholder="Pesquisar por nome, CNPJ ou email..."
@@ -275,7 +275,7 @@ const SuppliersPage = () => {
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full pl-10 pr-4 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="card-theme text-theme-primary dark:text-dark-text-primary focus:ring-primary-500 w-full rounded-lg border border-light-border py-2 pl-10 pr-4 focus:border-transparent focus:ring-2 dark:border-dark-border dark:bg-gray-700"
             />
           </div>
 
@@ -288,19 +288,19 @@ const SuppliersPage = () => {
                 setItemsPerPage(Number(e.target.value));
                 setCurrentPage(1);
               }}
-              className="border border-light-border dark:border-dark-border rounded-lg px-3 py-2 card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary"
+              className="card-theme text-theme-primary dark:text-dark-text-primary rounded-lg border border-light-border px-3 py-2 dark:border-dark-border dark:bg-gray-700"
             >
               <option value={10}>10</option>
               <option value={25}>25</option>
               <option value={50}>50</option>
               <option value={100}>100</option>
             </select>
-            <span className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+            <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
               resultados por página
             </span>
 
             {/* Mostrar inativos */}
-            <label className="flex items-center gap-2 cursor-pointer">
+            <label className="flex cursor-pointer items-center gap-2">
               <input
                 type="checkbox"
                 checked={showInactive}
@@ -308,7 +308,7 @@ const SuppliersPage = () => {
                   setShowInactive(e.target.checked);
                   setCurrentPage(1);
                 }}
-                className="w-4 h-4 text-primary-600 border-light-border dark:border-dark-border rounded focus:ring-primary-500"
+                className="text-primary-600 focus:ring-primary-500 h-4 w-4 rounded border-light-border dark:border-dark-border"
               />
               <span className="text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600">
                 Mostrar inativos
@@ -319,10 +319,10 @@ const SuppliersPage = () => {
       </div>
 
       {/* Tabela */}
-      <div className="card-theme dark:bg-dark-surface rounded-lg shadow-sm border border-light-border dark:border-dark-border overflow-hidden">
+      <div className="card-theme overflow-hidden rounded-lg border border-light-border shadow-sm dark:border-dark-border dark:bg-dark-surface">
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader className="w-8 h-8 animate-spin text-primary-600" />
+            <Loader className="text-primary-600 h-8 w-8 animate-spin" />
           </div>
         ) : error ? (
           <div className="flex items-center justify-center py-12">
@@ -332,7 +332,7 @@ const SuppliersPage = () => {
           </div>
         ) : filteredSuppliers.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12">
-            <Package className="w-16 h-16 text-light-text-muted dark:text-dark-text-muted mb-4" />
+            <Package className="text-light-text-muted dark:text-dark-text-muted mb-4 h-16 w-16" />
             <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
               {searchTerm
                 ? 'Nenhum fornecedor encontrado'
@@ -345,16 +345,16 @@ const SuppliersPage = () => {
               <table className="w-full">
                 <thead className="bg-light-bg dark:bg-dark-bg dark:bg-gray-700">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
+                    <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                       Fornecedor
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
+                    <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                       CNPJ
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
+                    <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                       Observação
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
+                    <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-3 text-right text-xs font-medium uppercase tracking-wider">
                       Ações
                     </th>
                   </tr>
@@ -363,51 +363,51 @@ const SuppliersPage = () => {
                   {paginatedSuppliers.map(supplier => (
                     <tr
                       key={supplier.id}
-                      className={`hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${!supplier.is_active ? 'opacity-60' : ''}`}
+                      className={`transition-colors hover:bg-gray-50 dark:hover:bg-gray-700 ${!supplier.is_active ? 'opacity-60' : ''}`}
                     >
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="whitespace-nowrap px-6 py-4">
                         <div className="flex items-center">
                           <div>
-                            <div className="text-sm font-medium text-theme-primary dark:text-dark-text-primary">
+                            <div className="text-theme-primary dark:text-dark-text-primary text-sm font-medium">
                               {supplier.nome}
                             </div>
                             {supplier.razao_social && (
-                              <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                              <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                                 {supplier.razao_social}
                               </div>
                             )}
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-theme-primary dark:text-dark-text-primary">
+                      <td className="whitespace-nowrap px-6 py-4">
+                        <div className="text-theme-primary dark:text-dark-text-primary text-sm">
                           {formatCNPJ(supplier.cpf_cnpj)}
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted truncate max-w-xs">
+                        <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted max-w-xs truncate text-sm">
                           {supplier.observacoes || '-'}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                         <div className="flex items-center justify-end gap-2">
                           {/* Info */}
                           <button
                             onClick={() => handleInfo(supplier)}
-                            className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                            className="rounded p-1 text-blue-600 hover:bg-blue-50 hover:text-blue-900 dark:text-blue-400 dark:hover:bg-blue-900/20 dark:hover:text-blue-300"
                             title="Informações"
                           >
-                            <Info className="w-4 h-4" />
+                            <Info className="h-4 w-4" />
                           </button>
 
                           {/* Editar */}
                           {canManage && supplier.is_active && (
                             <button
                               onClick={() => handleEdit(supplier)}
-                              className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 p-1 rounded hover:bg-green-50 dark:hover:bg-green-900/20"
+                              className="rounded p-1 text-green-600 hover:bg-green-50 hover:text-green-900 dark:text-green-400 dark:hover:bg-green-900/20 dark:hover:text-green-300"
                               title="Editar"
                             >
-                              <Edit2 className="w-4 h-4" />
+                              <Edit2 className="h-4 w-4" />
                             </button>
                           )}
 
@@ -417,22 +417,22 @@ const SuppliersPage = () => {
                               <button
                                 onClick={() => handleDelete(supplier)}
                                 disabled={deletingId === supplier.id}
-                                className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-50"
+                                className="rounded p-1 text-red-600 hover:bg-red-50 hover:text-red-900 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300"
                                 title="Excluir"
                               >
                                 {deletingId === supplier.id ? (
-                                  <Loader className="w-4 h-4 animate-spin" />
+                                  <Loader className="h-4 w-4 animate-spin" />
                                 ) : (
-                                  <Trash2 className="w-4 h-4" />
+                                  <Trash2 className="h-4 w-4" />
                                 )}
                               </button>
                             ) : (
                               <button
                                 onClick={() => handleActivate(supplier)}
-                                className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 p-1 rounded hover:bg-green-50 dark:hover:bg-green-900/20"
+                                className="rounded p-1 text-green-600 hover:bg-green-50 hover:text-green-900 dark:text-green-400 dark:hover:bg-green-900/20 dark:hover:text-green-300"
                                 title="Ativar"
                               >
-                                <CheckCircle className="w-4 h-4" />
+                                <CheckCircle className="h-4 w-4" />
                               </button>
                             ))}
                         </div>
@@ -445,9 +445,9 @@ const SuppliersPage = () => {
 
             {/* Paginação */}
             {totalPages > 1 && (
-              <div className="px-6 py-4 border-t border-light-border dark:border-dark-border">
+              <div className="border-t border-light-border px-6 py-4 dark:border-dark-border">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                  <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                     Mostrando {(currentPage - 1) * itemsPerPage + 1} a{' '}
                     {Math.min(
                       currentPage * itemsPerPage,
@@ -459,7 +459,7 @@ const SuppliersPage = () => {
                     <button
                       onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
-                      className="px-3 py-1 border border-light-border dark:border-dark-border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700"
+                      className="rounded border border-light-border px-3 py-1 hover:bg-light-bg disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-border dark:bg-dark-bg dark:hover:bg-gray-700"
                     >
                       Anterior
                     </button>
@@ -471,7 +471,7 @@ const SuppliersPage = () => {
                         setCurrentPage(p => Math.min(totalPages, p + 1))
                       }
                       disabled={currentPage === totalPages}
-                      className="px-3 py-1 border border-light-border dark:border-dark-border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700"
+                      className="rounded border border-light-border px-3 py-1 hover:bg-light-bg disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-border dark:bg-dark-bg dark:hover:bg-gray-700"
                     >
                       Próxima
                     </button>

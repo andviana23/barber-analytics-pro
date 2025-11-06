@@ -159,14 +159,14 @@ const ListaDaVezPage = () => {
     },
   };
   return (
-    <div className="min-h-screen bg-light-bg dark:bg-dark-bg dark:bg-dark-surface p-6 space-y-6">
+    <div className="min-h-screen space-y-6 bg-light-bg p-6 dark:bg-dark-bg dark:bg-dark-surface">
       {/* Cabeçalho */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-theme-primary dark:text-dark-text-primary">
+          <h1 className="text-theme-primary dark:text-dark-text-primary text-3xl font-bold">
             Lista da Vez
           </h1>
-          <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
+          <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-sm">
             Gerencie a ordem de atendimento dos barbeiros
           </p>
         </div>
@@ -207,7 +207,7 @@ const ListaDaVezPage = () => {
       {/* Seletor de Unidade */}
       <Card className="p-4">
         <div className="flex items-center gap-4">
-          <label className="text-sm font-medium text-theme-secondary whitespace-nowrap">
+          <label className="text-theme-secondary whitespace-nowrap text-sm font-medium">
             Unidade:
           </label>
           <UnitSelector />
@@ -215,17 +215,17 @@ const ListaDaVezPage = () => {
       </Card>
 
       {/* Indicadores Superiores */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
-              <FiUsers className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+            <div className="rounded-lg bg-blue-100 p-3 dark:bg-blue-900/20">
+              <FiUsers className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                 Total de Barbeiros
               </p>
-              <p className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary">
+              <p className="text-theme-primary dark:text-dark-text-primary text-2xl font-bold">
                 {totalBarbers}
               </p>
             </div>
@@ -234,14 +234,14 @@ const ListaDaVezPage = () => {
 
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-green-100 dark:bg-green-900/20 rounded-lg">
-              <FiTrendingUp className="w-6 h-6 text-green-600 dark:text-green-400" />
+            <div className="rounded-lg bg-green-100 p-3 dark:bg-green-900/20">
+              <FiTrendingUp className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
             <div>
-              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                 Total de Atendimentos
               </p>
-              <p className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary">
+              <p className="text-theme-primary dark:text-dark-text-primary text-2xl font-bold">
                 {totalPoints}
               </p>
             </div>
@@ -250,14 +250,14 @@ const ListaDaVezPage = () => {
 
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
-              <FiAward className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+            <div className="rounded-lg bg-purple-100 p-3 dark:bg-purple-900/20">
+              <FiAward className="h-6 w-6 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
-              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                 Média de Atendimentos
               </p>
-              <p className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary">
+              <p className="text-theme-primary dark:text-dark-text-primary text-2xl font-bold">
                 {averagePoints}
               </p>
             </div>
@@ -266,14 +266,14 @@ const ListaDaVezPage = () => {
 
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-orange-100 dark:bg-orange-900/20 rounded-lg">
-              <FiClock className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+            <div className="rounded-lg bg-orange-100 p-3 dark:bg-orange-900/20">
+              <FiClock className="h-6 w-6 text-orange-600 dark:text-orange-400" />
             </div>
             <div>
-              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                 Última Atualização
               </p>
-              <p className="text-sm font-medium text-theme-primary dark:text-dark-text-primary">
+              <p className="text-theme-primary dark:text-dark-text-primary text-sm font-medium">
                 {new Date().toLocaleTimeString('pt-BR', {
                   hour: '2-digit',
                   minute: '2-digit',
@@ -287,8 +287,8 @@ const ListaDaVezPage = () => {
       {/* Conteúdo Principal */}
       {!selectedUnit?.id ? (
         <Card className="p-12 text-center">
-          <FiUsers className="w-16 h-16 mx-auto text-light-text-muted dark:text-dark-text-muted mb-4" />
-          <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-2">
+          <FiUsers className="text-light-text-muted dark:text-dark-text-muted mx-auto mb-4 h-16 w-16" />
+          <h3 className="text-theme-primary dark:text-dark-text-primary mb-2 text-lg font-semibold">
             Selecione uma Unidade
           </h3>
           <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
@@ -297,8 +297,8 @@ const ListaDaVezPage = () => {
         </Card>
       ) : turnList.length === 0 ? (
         <Card className="p-12 text-center">
-          <FiUsers className="w-16 h-16 mx-auto text-light-text-muted dark:text-dark-text-muted mb-4" />
-          <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-2">
+          <FiUsers className="text-light-text-muted dark:text-dark-text-muted mx-auto mb-4 h-16 w-16" />
+          <h3 className="text-theme-primary dark:text-dark-text-primary mb-2 text-lg font-semibold">
             Nenhuma lista encontrada
           </h3>
           <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-6">
@@ -309,11 +309,11 @@ const ListaDaVezPage = () => {
           </Button>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Lista de Barbeiros (2/3) */}
           <div className="lg:col-span-2">
             <Card className="p-6">
-              <h2 className="text-xl font-bold text-theme-primary dark:text-dark-text-primary mb-4">
+              <h2 className="text-theme-primary dark:text-dark-text-primary mb-4 text-xl font-bold">
                 Ordem de Atendimento
               </h2>
 
@@ -330,17 +330,13 @@ const ListaDaVezPage = () => {
                   return (
                     <div
                       key={barber.id}
-                      className={`
-                        flex items-center gap-3 p-3 rounded-lg border-l-4 transition-all
-                        ${isFirst ? 'bg-green-600 dark:bg-green-700 text-white border-green-800' : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700'}
-                        ${isProcessing ? 'opacity-50' : ''}
-                      `}
+                      className={`flex items-center gap-3 rounded-lg border-l-4 p-3 transition-all ${isFirst ? 'border-green-800 bg-green-600 text-white dark:bg-green-700' : 'border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-800'} ${isProcessing ? 'opacity-50' : ''} `}
                       style={{
                         borderLeftColor: isFirst ? '#065F46' : color,
                       }}
                     >
                       {/* Posição */}
-                      <div className="flex-shrink-0 w-10 text-center">
+                      <div className="w-10 flex-shrink-0 text-center">
                         <span
                           className={`text-xl font-bold ${isFirst ? 'text-white' : 'text-gray-900 dark:text-white'}`}
                         >
@@ -349,9 +345,9 @@ const ListaDaVezPage = () => {
                       </div>
 
                       {/* Nome */}
-                      <div className="flex-1 min-w-0">
+                      <div className="min-w-0 flex-1">
                         <h3
-                          className={`text-base font-semibold truncate ${isFirst ? 'text-white' : 'text-gray-900 dark:text-white'}`}
+                          className={`truncate text-base font-semibold ${isFirst ? 'text-white' : 'text-gray-900 dark:text-white'}`}
                         >
                           {barber.professionalName}
                         </h3>
@@ -363,7 +359,7 @@ const ListaDaVezPage = () => {
                       </div>
 
                       {/* Pontos */}
-                      <div className="text-center px-3">
+                      <div className="px-3 text-center">
                         <p
                           className={`text-xl font-bold ${isFirst ? 'text-white' : 'text-gray-900 dark:text-white'}`}
                         >
@@ -377,7 +373,7 @@ const ListaDaVezPage = () => {
                       </div>
 
                       {/* Percentual */}
-                      <div className="text-center px-3">
+                      <div className="px-3 text-center">
                         <p
                           className={`text-base font-semibold ${isFirst ? 'text-white' : 'text-gray-900 dark:text-white'}`}
                         >
@@ -395,10 +391,7 @@ const ListaDaVezPage = () => {
                         onClick={() => handleAddPoint(barber.professionalId)}
                         disabled={loading || isProcessing}
                         size="sm"
-                        className={`
-                          flex-shrink-0
-                          ${isFirst ? 'bg-green-800 text-white hover:bg-green-900 border-green-900 font-bold shadow-lg' : 'bg-blue-600 text-white hover:bg-blue-700 border-blue-600 font-semibold'}
-                        `}
+                        className={`flex-shrink-0 ${isFirst ? 'border-green-900 bg-green-800 font-bold text-white shadow-lg hover:bg-green-900' : 'border-blue-600 bg-blue-600 font-semibold text-white hover:bg-blue-700'} `}
                       >
                         {isProcessing ? '...' : '+1'}
                       </Button>
@@ -411,8 +404,8 @@ const ListaDaVezPage = () => {
 
           {/* Gráfico de Distribuição (1/3) */}
           <div className="lg:col-span-1">
-            <Card className="p-6 h-full">
-              <h2 className="text-xl font-bold text-theme-primary dark:text-dark-text-primary mb-4">
+            <Card className="h-full p-6">
+              <h2 className="text-theme-primary dark:text-dark-text-primary mb-4 text-xl font-bold">
                 Distribuição de Atendimentos
               </h2>
 
@@ -440,16 +433,16 @@ const ListaDaVezPage = () => {
                     >
                       <div className="flex items-center gap-2">
                         <div
-                          className="w-3 h-3 rounded-full"
+                          className="h-3 w-3 rounded-full"
                           style={{
                             backgroundColor: color,
                           }}
                         />
-                        <span className="text-sm text-theme-secondary truncate">
+                        <span className="text-theme-secondary truncate text-sm">
                           {barber.professionalName}
                         </span>
                       </div>
-                      <span className="text-sm font-semibold text-theme-primary dark:text-dark-text-primary">
+                      <span className="text-theme-primary dark:text-dark-text-primary text-sm font-semibold">
                         {percentage}%
                       </span>
                     </div>
@@ -463,7 +456,7 @@ const ListaDaVezPage = () => {
 
       {/* Mensagem de Erro */}
       {error && (
-        <Card className="p-4 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800">
+        <Card className="border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
           <p className="text-red-800 dark:text-red-200">⚠️ {error}</p>
         </Card>
       )}

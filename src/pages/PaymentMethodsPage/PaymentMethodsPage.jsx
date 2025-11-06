@@ -190,9 +190,9 @@ const PaymentMethodsPage = () => {
   if (loading) {
     return (
       <Layout activeMenuItem="cadastros">
-        <div className="p-6 flex items-center justify-center min-h-[400px]">
+        <div className="flex min-h-[400px] items-center justify-center p-6">
           <div className="text-center">
-            <Loader className="w-12 h-12 animate-spin text-primary-light-500 dark:text-primary-dark-500 mx-auto mb-4" />
+            <Loader className="text-primary-light-500 dark:text-primary-dark-500 mx-auto mb-4 h-12 w-12 animate-spin" />
             <p className="text-text-light-secondary dark:text-text-dark-secondary">
               Carregando formas de pagamento...
             </p>
@@ -206,18 +206,18 @@ const PaymentMethodsPage = () => {
   if (error) {
     return (
       <Layout activeMenuItem="cadastros">
-        <div className="p-6 flex items-center justify-center min-h-[400px]">
+        <div className="flex min-h-[400px] items-center justify-center p-6">
           <div className="text-center">
-            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-text-light-primary dark:text-text-dark-primary mb-2">
+            <AlertCircle className="mx-auto mb-4 h-12 w-12 text-red-500" />
+            <h3 className="mb-2 text-lg font-semibold text-text-light-primary dark:text-text-dark-primary">
               Erro ao carregar formas de pagamento
             </h3>
-            <p className="text-text-light-secondary dark:text-text-dark-secondary mb-4">
+            <p className="mb-4 text-text-light-secondary dark:text-text-dark-secondary">
               {error.message || 'Ocorreu um erro inesperado'}
             </p>
             <button
               onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-primary-light-500 dark:bg-primary-dark-500 text-dark-text-primary rounded-lg hover:bg-primary-light-600 dark:hover:bg-primary-dark-600"
+              className="bg-primary-light-500 dark:bg-primary-dark-500 text-dark-text-primary hover:bg-primary-light-600 dark:hover:bg-primary-dark-600 rounded-lg px-4 py-2"
             >
               Tentar Novamente
             </button>
@@ -228,16 +228,16 @@ const PaymentMethodsPage = () => {
   }
   return (
     <Layout activeMenuItem="cadastros">
-      <div className="p-6 space-y-6">
+      <div className="space-y-6 p-6">
         {/* Aviso para não-admin */}
         {!isAdmin && (
-          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+          <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20">
+            <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-400" />
             <div>
               <h3 className="font-semibold text-amber-800 dark:text-amber-300">
                 Acesso Restrito
               </h3>
-              <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
+              <p className="mt-1 text-sm text-amber-700 dark:text-amber-400">
                 Apenas administradores podem criar, editar ou excluir formas de
                 pagamento. Você pode visualizar as formas de pagamento
                 cadastradas, mas não pode modificá-las.
@@ -252,7 +252,7 @@ const PaymentMethodsPage = () => {
             <h1 className="text-2xl font-bold text-text-light-primary dark:text-text-dark-primary">
               Formas de Pagamento
             </h1>
-            <p className="text-text-light-secondary dark:text-text-dark-secondary mt-1">
+            <p className="mt-1 text-text-light-secondary dark:text-text-dark-secondary">
               Gerencie as formas de pagamento aceitas pela sua barbearia
             </p>
           </div>
@@ -261,14 +261,14 @@ const PaymentMethodsPage = () => {
           {isAdmin ? (
             <button
               onClick={handleCreate}
-              className="flex items-center gap-2 px-4 py-2 bg-primary text-dark-text-primary rounded-lg hover:bg-primary-600 transition-colors duration-300"
+              className="text-dark-text-primary hover:bg-primary-600 flex items-center gap-2 rounded-lg bg-primary px-4 py-2 transition-colors duration-300"
             >
               <Plus className="h-5 w-5" />
               Nova Forma de Pagamento
             </button>
           ) : (
             <div
-              className="flex items-center gap-2 px-4 py-2 card-theme dark:bg-gray-700 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary rounded-lg cursor-not-allowed"
+              className="card-theme text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary flex cursor-not-allowed items-center gap-2 rounded-lg px-4 py-2 dark:bg-gray-700"
               title="Apenas administradores podem criar formas de pagamento"
             >
               <Plus className="h-5 w-5" />
@@ -278,14 +278,14 @@ const PaymentMethodsPage = () => {
         </div>
 
         {/* KPIs */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="card-theme dark:bg-dark-surface p-6 rounded-lg border border-light-border dark:border-dark-border">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="card-theme rounded-lg border border-light-border p-6 dark:border-dark-border dark:bg-dark-surface">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                   Total
                 </p>
-                <p className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary mt-1">
+                <p className="text-theme-primary dark:text-dark-text-primary mt-1 text-2xl font-bold">
                   {stats?.total || 0}
                 </p>
               </div>
@@ -293,13 +293,13 @@ const PaymentMethodsPage = () => {
             </div>
           </div>
 
-          <div className="card-theme dark:bg-dark-surface p-6 rounded-lg border border-light-border dark:border-dark-border">
+          <div className="card-theme rounded-lg border border-light-border p-6 dark:border-dark-border dark:bg-dark-surface">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                   Ativas
                 </p>
-                <p className="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">
+                <p className="mt-1 text-2xl font-bold text-green-600 dark:text-green-400">
                   {stats?.active || 0}
                 </p>
               </div>
@@ -307,13 +307,13 @@ const PaymentMethodsPage = () => {
             </div>
           </div>
 
-          <div className="card-theme dark:bg-dark-surface p-6 rounded-lg border border-light-border dark:border-dark-border">
+          <div className="card-theme rounded-lg border border-light-border p-6 dark:border-dark-border dark:bg-dark-surface">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                   Taxa Média
                 </p>
-                <p className="text-2xl font-bold text-orange-600 dark:text-orange-400 mt-1">
+                <p className="mt-1 text-2xl font-bold text-orange-600 dark:text-orange-400">
                   {(stats?.averageFee || 0).toFixed(2)}%
                 </p>
               </div>
@@ -323,30 +323,30 @@ const PaymentMethodsPage = () => {
         </div>
 
         {/* Filtros */}
-        <div className="card-theme dark:bg-dark-surface p-4 rounded-lg border border-light-border dark:border-dark-border">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="card-theme rounded-lg border border-light-border p-4 dark:border-dark-border dark:bg-dark-surface">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             {/* Busca */}
             <div className="md:col-span-2">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-light-text-muted dark:text-dark-text-muted" />
+                <Search className="text-light-text-muted dark:text-dark-text-muted absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
                 <input
                   type="text"
                   placeholder="Buscar por nome..."
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border py-2 pl-10 pr-4 focus:border-transparent focus:ring-2 focus:ring-primary dark:border-dark-border dark:bg-gray-700"
                 />
               </div>
             </div>
 
             {/* Filtro por Unidade (apenas para visualização) */}
             <div className="flex items-center gap-2">
-              <label className="flex items-center gap-2 cursor-pointer">
+              <label className="flex cursor-pointer items-center gap-2">
                 <input
                   type="checkbox"
                   checked={showInactive}
                   onChange={e => setShowInactive(e.target.checked)}
-                  className="w-4 h-4 text-primary border-light-border dark:border-dark-border rounded focus:ring-primary"
+                  className="h-4 w-4 rounded border-light-border text-primary focus:ring-primary dark:border-dark-border"
                 />
                 <span className="text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Mostrar inativas
@@ -357,20 +357,20 @@ const PaymentMethodsPage = () => {
 
           {/* Informação da unidade filtrada */}
           {selectedUnit && (
-            <div className="mt-3 pt-3 border-t border-light-border dark:border-dark-border">
-              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+            <div className="mt-3 border-t border-light-border pt-3 dark:border-dark-border">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                 Exibindo formas de pagamento da unidade:{' '}
-                <span className="font-semibold text-theme-primary dark:text-dark-text-primary">
+                <span className="text-theme-primary dark:text-dark-text-primary font-semibold">
                   {selectedUnit.name}
                 </span>
               </p>
             </div>
           )}
           {!selectedUnit && (
-            <div className="mt-3 pt-3 border-t border-light-border dark:border-dark-border">
-              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+            <div className="mt-3 border-t border-light-border pt-3 dark:border-dark-border">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                 Exibindo formas de pagamento de{' '}
-                <span className="font-semibold text-theme-primary dark:text-dark-text-primary">
+                <span className="text-theme-primary dark:text-dark-text-primary font-semibold">
                   todas as unidades
                 </span>
               </p>
@@ -379,39 +379,39 @@ const PaymentMethodsPage = () => {
         </div>
 
         {/* Lista de Formas de Pagamento */}
-        <div className="card-theme dark:bg-dark-surface rounded-lg border border-light-border dark:border-dark-border overflow-hidden">
+        <div className="card-theme overflow-hidden rounded-lg border border-light-border dark:border-dark-border dark:bg-dark-surface">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-light-bg dark:bg-dark-bg dark:bg-gray-700">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
+                  <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Nome
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
+                  <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Unidade
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
+                  <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Taxa (%)
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
+                  <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Prazo (dias)
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
+                  <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Status
                   </th>
                   {isAdmin && (
-                    <th className="px-6 py-3 text-right text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
+                    <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-3 text-right text-xs font-medium uppercase tracking-wider">
                       Ações
                     </th>
                   )}
                 </tr>
               </thead>
-              <tbody className="card-theme dark:bg-dark-surface divide-y divide-gray-200 dark:divide-gray-700">
+              <tbody className="card-theme divide-y divide-gray-200 dark:divide-gray-700 dark:bg-dark-surface">
                 {filteredMethods.length === 0 ? (
                   <tr>
                     <td
                       colSpan={isAdmin ? 6 : 5}
-                      className="px-6 py-8 text-center text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted"
+                      className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-8 text-center"
                     >
                       Nenhuma forma de pagamento encontrada
                     </td>
@@ -422,56 +422,56 @@ const PaymentMethodsPage = () => {
                       key={method.id}
                       className="hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700"
                     >
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="whitespace-nowrap px-6 py-4">
                         <div className="flex items-center">
-                          <CreditCard className="h-5 w-5 text-light-text-muted dark:text-dark-text-muted mr-3" />
-                          <span className="text-sm font-medium text-theme-primary dark:text-dark-text-primary">
+                          <CreditCard className="text-light-text-muted dark:text-dark-text-muted mr-3 h-5 w-5" />
+                          <span className="text-theme-primary dark:text-dark-text-primary text-sm font-medium">
                             {method.name}
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="whitespace-nowrap px-6 py-4">
                         <span className="text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600">
                           {method.units?.name || 'N/A'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="whitespace-nowrap px-6 py-4">
                         <div className="flex items-center">
-                          <Percent className="h-4 w-4 text-orange-500 mr-2" />
-                          <span className="text-sm text-theme-primary dark:text-dark-text-primary">
+                          <Percent className="mr-2 h-4 w-4 text-orange-500" />
+                          <span className="text-theme-primary dark:text-dark-text-primary text-sm">
                             {method.fee_percentage.toFixed(2)}%
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="whitespace-nowrap px-6 py-4">
                         <div className="flex items-center">
-                          <Calendar className="h-4 w-4 text-blue-500 mr-2" />
-                          <span className="text-sm text-theme-primary dark:text-dark-text-primary">
+                          <Calendar className="mr-2 h-4 w-4 text-blue-500" />
+                          <span className="text-theme-primary dark:text-dark-text-primary text-sm">
                             {method.receipt_days === 0
                               ? 'Imediato'
                               : `${method.receipt_days} dias`}
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="whitespace-nowrap px-6 py-4">
                         {method.is_active ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200">
                             <CheckCircle className="h-3 w-3" />
                             Ativa
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-200">
                             <XCircle className="h-3 w-3" />
                             Inativa
                           </span>
                         )}
                       </td>
                       {isAdmin && (
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                           <div className="flex items-center justify-end gap-2">
                             <button
                               onClick={() => handleEdit(method)}
-                              className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 disabled:opacity-50"
+                              className="text-blue-600 hover:text-blue-900 disabled:opacity-50 dark:text-blue-400 dark:hover:text-blue-300"
                               title="Editar"
                               disabled={deletingId === method.id}
                             >
@@ -480,7 +480,7 @@ const PaymentMethodsPage = () => {
                             {method.is_active ? (
                               <button
                                 onClick={() => handleDelete(method)}
-                                className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50"
+                                className="text-red-600 hover:text-red-900 disabled:opacity-50 dark:text-red-400 dark:hover:text-red-300"
                                 title="Desativar"
                                 disabled={deletingId === method.id}
                               >

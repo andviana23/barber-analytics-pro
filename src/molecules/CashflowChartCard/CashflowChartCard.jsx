@@ -102,8 +102,8 @@ const CustomTooltip = ({ active, payload, period }) => {
   const data = payload[0]?.payload;
   if (!data) return null;
   return (
-    <div className="card-theme dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg shadow-lg p-3 min-w-48">
-      <div className="font-medium text-theme-primary dark:text-dark-text-primary mb-2">
+    <div className="card-theme min-w-48 rounded-lg border border-light-border p-3 shadow-lg dark:border-dark-border dark:bg-dark-surface">
+      <div className="text-theme-primary dark:text-dark-text-primary mb-2 font-medium">
         {formatFullDate(data.date, period)}
       </div>
 
@@ -115,7 +115,7 @@ const CustomTooltip = ({ active, payload, period }) => {
           >
             <div className="flex items-center">
               <div
-                className="w-3 h-3 rounded mr-2"
+                className="mr-2 h-3 w-3 rounded"
                 style={{
                   backgroundColor: entry.color,
                 }}
@@ -124,14 +124,14 @@ const CustomTooltip = ({ active, payload, period }) => {
                 {entry.name}:
               </span>
             </div>
-            <span className="font-medium text-theme-primary dark:text-dark-text-primary">
+            <span className="text-theme-primary dark:text-dark-text-primary font-medium">
               {formatCurrency(entry.value)}
             </span>
           </div>
         ))}
 
         {data.saldoDiario !== undefined && (
-          <div className="border-t border-light-border dark:border-dark-border pt-1 mt-1">
+          <div className="mt-1 border-t border-light-border pt-1 dark:border-dark-border">
             <div className="flex items-center justify-between text-sm">
               <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
                 Saldo do dia:
@@ -146,7 +146,7 @@ const CustomTooltip = ({ active, payload, period }) => {
         )}
 
         {data.transactions_count > 0 && (
-          <div className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
+          <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-xs">
             {data.transactions_count} transações
           </div>
         )}
@@ -243,8 +243,8 @@ const CashflowChartCard = ({
     return (
       <div className={cardClasses}>
         <div className="p-6 text-center">
-          <AlertCircle className="w-12 h-12 text-red-500 dark:text-red-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-theme-primary dark:text-dark-text-primary mb-2">
+          <AlertCircle className="mx-auto mb-4 h-12 w-12 text-red-500 dark:text-red-400" />
+          <h3 className="text-theme-primary dark:text-dark-text-primary mb-2 text-lg font-medium">
             Erro ao carregar dados
           </h3>
           <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-4">
@@ -254,9 +254,9 @@ const CashflowChartCard = ({
             <button
               type="button"
               onClick={onRefresh}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-dark-text-primary rounded-md hover:bg-blue-700"
+              className="text-dark-text-primary inline-flex items-center rounded-md bg-blue-600 px-4 py-2 hover:bg-blue-700"
             >
-              <RefreshCw className="w-4 h-4 mr-2" />
+              <RefreshCw className="mr-2 h-4 w-4" />
               Tentar novamente
             </button>
           )}
@@ -267,43 +267,43 @@ const CashflowChartCard = ({
   return (
     <div className={cardClasses}>
       {/* Header com Dark Mode */}
-      <div className="p-4 border-b border-light-border dark:border-dark-border">
+      <div className="border-b border-light-border p-4 dark:border-dark-border">
         <div className="flex items-start justify-between">
           <div className="min-w-0 flex-1">
             <div className="flex items-center">
-              <BarChart3 className="w-5 h-5 text-blue-500 dark:text-blue-400 mr-2" />
-              <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+              <BarChart3 className="mr-2 h-5 w-5 text-blue-500 dark:text-blue-400" />
+              <h3 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
                 {title}
               </h3>
             </div>
             {subtitle && (
-              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-sm">
                 {subtitle}
               </p>
             )}
           </div>
 
-          <div className="flex items-center space-x-2 ml-4">
+          <div className="ml-4 flex items-center space-x-2">
             {/* View toggles com Dark Mode */}
-            <div className="flex card-theme dark:bg-dark-surface/50 rounded-lg p-1">
+            <div className="card-theme flex rounded-lg p-1 dark:bg-dark-surface/50">
               <button
                 type="button"
                 onClick={() => setActiveView('combined')}
-                className={`px-2 py-1 text-xs rounded transition-colors ${activeView === 'combined' ? 'bg-light-surface dark:bg-dark-hover text-theme-primary dark:text-dark-text-primary shadow-sm' : 'text-theme-secondary dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary'}`}
+                className={`rounded px-2 py-1 text-xs transition-colors ${activeView === 'combined' ? 'text-theme-primary dark:text-dark-text-primary bg-light-surface shadow-sm dark:bg-dark-hover' : 'text-theme-secondary dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary'}`}
               >
                 Completo
               </button>
               <button
                 type="button"
                 onClick={() => setActiveView('bars')}
-                className={`px-2 py-1 text-xs rounded transition-colors ${activeView === 'bars' ? 'bg-light-surface dark:bg-dark-hover text-theme-primary dark:text-dark-text-primary shadow-sm' : 'text-theme-secondary dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary'}`}
+                className={`rounded px-2 py-1 text-xs transition-colors ${activeView === 'bars' ? 'text-theme-primary dark:text-dark-text-primary bg-light-surface shadow-sm dark:bg-dark-hover' : 'text-theme-secondary dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary'}`}
               >
                 Barras
               </button>
               <button
                 type="button"
                 onClick={() => setActiveView('line')}
-                className={`px-2 py-1 text-xs rounded transition-colors ${activeView === 'line' ? 'bg-light-surface dark:bg-dark-hover text-theme-primary dark:text-dark-text-primary shadow-sm' : 'text-theme-secondary dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary'}`}
+                className={`rounded px-2 py-1 text-xs transition-colors ${activeView === 'line' ? 'text-theme-primary dark:text-dark-text-primary bg-light-surface shadow-sm dark:bg-dark-hover' : 'text-theme-secondary dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary'}`}
               >
                 Linha
               </button>
@@ -314,10 +314,10 @@ const CashflowChartCard = ({
               <button
                 type="button"
                 onClick={onExport}
-                className="p-2 text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary rounded-md hover:card-theme"
+                className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary hover:card-theme rounded-md p-2"
                 title="Exportar dados"
               >
-                <Download className="w-4 h-4" />
+                <Download className="h-4 w-4" />
               </button>
             )}
 
@@ -325,10 +325,10 @@ const CashflowChartCard = ({
               <button
                 type="button"
                 onClick={onFullscreen}
-                className="p-2 text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary rounded-md hover:card-theme"
+                className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary hover:card-theme rounded-md p-2"
                 title="Tela cheia"
               >
-                <Maximize2 className="w-4 h-4" />
+                <Maximize2 className="h-4 w-4" />
               </button>
             )}
 
@@ -336,10 +336,10 @@ const CashflowChartCard = ({
               <button
                 type="button"
                 onClick={onRefresh}
-                className={`p-2 text-theme-secondary dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary rounded-md hover:bg-light-surface/50 dark:hover:bg-dark-surface/50 transition-colors ${loading ? 'animate-spin' : ''}`}
+                className={`text-theme-secondary dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary rounded-md p-2 transition-colors hover:bg-light-surface/50 dark:hover:bg-dark-surface/50 ${loading ? 'animate-spin' : ''}`}
                 title="Atualizar"
               >
-                <RefreshCw className="w-4 h-4" />
+                <RefreshCw className="h-4 w-4" />
               </button>
             )}
           </div>
@@ -347,9 +347,9 @@ const CashflowChartCard = ({
 
         {/* Métricas resumo com Dark Mode */}
         {metrics && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+          <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
             <div className="text-center">
-              <div className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-xs">
                 Entradas
               </div>
               <div className="text-lg font-semibold text-green-600 dark:text-green-400">
@@ -357,7 +357,7 @@ const CashflowChartCard = ({
               </div>
             </div>
             <div className="text-center">
-              <div className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-xs">
                 Saídas
               </div>
               <div className="text-lg font-semibold text-red-600 dark:text-red-400">
@@ -365,7 +365,7 @@ const CashflowChartCard = ({
               </div>
             </div>
             <div className="text-center">
-              <div className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-xs">
                 Saldo Final
               </div>
               <div
@@ -375,16 +375,16 @@ const CashflowChartCard = ({
               </div>
             </div>
             <div className="text-center">
-              <div className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-xs">
                 Variação
               </div>
               <div
-                className={`text-lg font-semibold flex items-center justify-center ${metrics.variacao >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+                className={`flex items-center justify-center text-lg font-semibold ${metrics.variacao >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
               >
                 {metrics.variacao >= 0 ? (
-                  <TrendingUp className="w-4 h-4 mr-1" />
+                  <TrendingUp className="mr-1 h-4 w-4" />
                 ) : (
-                  <TrendingDown className="w-4 h-4 mr-1" />
+                  <TrendingDown className="mr-1 h-4 w-4" />
                 )}
                 {Math.abs(metrics.variacaoPercentual).toFixed(1)}%
               </div>
@@ -396,15 +396,15 @@ const CashflowChartCard = ({
       {/* Chart */}
       <div className="p-4">
         {loading ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 dark:border-blue-400"></div>
-            <span className="ml-2 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+          <div className="flex h-64 items-center justify-center">
+            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-500 dark:border-blue-400"></div>
+            <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted ml-2">
               Carregando dados...
             </span>
           </div>
         ) : processedData.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
-            <Calendar className="w-12 h-12 mb-4" />
+          <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted flex h-64 flex-col items-center justify-center">
+            <Calendar className="mb-4 h-12 w-12" />
             <p>Nenhum dado disponível para o período selecionado</p>
           </div>
         ) : (
@@ -520,16 +520,16 @@ const CashflowChartCard = ({
       {/* Footer com insights */}
       {metrics && !loading && (
         <div className="px-4 pb-4">
-          <div className="bg-light-bg dark:bg-dark-bg rounded-lg p-3">
+          <div className="rounded-lg bg-light-bg p-3 dark:bg-dark-bg">
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center space-x-4">
                 <div className="flex items-center text-green-600">
-                  <CheckCircle className="w-4 h-4 mr-1" />
+                  <CheckCircle className="mr-1 h-4 w-4" />
                   <span>{metrics.diasPositivos} dias positivos</span>
                 </div>
                 {metrics.diasNegativos > 0 && (
                   <div className="flex items-center text-red-600">
-                    <AlertCircle className="w-4 h-4 mr-1" />
+                    <AlertCircle className="mr-1 h-4 w-4" />
                     <span>{metrics.diasNegativos} dias negativos</span>
                   </div>
                 )}
@@ -651,7 +651,7 @@ export const CashflowChartCardPreview = () => {
     alert(`Ação: ${action}`);
   };
   return (
-    <div className="space-y-6 p-4 max-w-6xl">
+    <div className="max-w-6xl space-y-6 p-4">
       <h3 className="text-lg font-semibold">CashflowChartCard Preview</h3>
 
       <CashflowChartCard
@@ -664,7 +664,7 @@ export const CashflowChartCardPreview = () => {
         onFullscreen={() => handleAction('Fullscreen')}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <CashflowChartCard
           data={mockData.slice(-14)}
           title="Últimas 2 semanas"

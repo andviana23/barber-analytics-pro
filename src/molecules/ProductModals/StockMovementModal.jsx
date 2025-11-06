@@ -186,19 +186,19 @@ const StockMovementModal = ({
   };
   if (!isOpen || !product) return null;
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="card-theme dark:bg-dark-surface rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+      <div className="card-theme max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg shadow-xl dark:bg-dark-surface">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-light-border dark:border-dark-border">
+        <div className="flex items-center justify-between border-b border-light-border p-6 dark:border-dark-border">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg">
-              <Package className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900">
+              <Package className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-theme-primary dark:text-dark-text-primary">
+              <h2 className="text-theme-primary dark:text-dark-text-primary text-xl font-semibold">
                 Movimentação de Estoque
               </h2>
-              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                 {product.name}
               </p>
             </div>
@@ -206,26 +206,26 @@ const StockMovementModal = ({
 
           <button
             onClick={handleClose}
-            className="flex items-center justify-center w-8 h-8 text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary dark:hover:text-gray-300 dark:text-gray-600 rounded-lg hover:card-theme dark:hover:bg-gray-700 transition-colors"
+            className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary hover:card-theme flex h-8 w-8 items-center justify-center rounded-lg transition-colors dark:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
           >
-            <X className="w-5 h-5" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 p-6">
           {/* Informações do Produto */}
-          <div className="bg-light-bg dark:bg-dark-bg dark:bg-gray-700 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+          <div className="rounded-lg bg-light-bg p-4 dark:bg-dark-bg dark:bg-gray-700">
+            <h3 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
               Produto Selecionado
             </h3>
             <div className="flex items-center gap-3">
-              <Package className="w-5 h-5 text-light-text-muted dark:text-dark-text-muted" />
+              <Package className="text-light-text-muted dark:text-dark-text-muted h-5 w-5" />
               <div>
-                <p className="font-medium text-theme-primary dark:text-dark-text-primary">
+                <p className="text-theme-primary dark:text-dark-text-primary font-medium">
                   {product.name}
                 </p>
-                <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                   Estoque atual: {product.current_stock}{' '}
                   {product.unit_of_measure}
                 </p>
@@ -235,7 +235,7 @@ const StockMovementModal = ({
 
           {/* Tipo de Movimentação */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-3">
+            <label className="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
               Tipo de Movimentação <span className="text-red-500">*</span>
             </label>
             <div className="grid grid-cols-3 gap-3">
@@ -263,9 +263,9 @@ const StockMovementModal = ({
                         movementType: type.value,
                       }))
                     }
-                    className={`p-3 border rounded-lg transition-colors flex flex-col items-center gap-2 ${colorClasses[type.color]}`}
+                    className={`flex flex-col items-center gap-2 rounded-lg border p-3 transition-colors ${colorClasses[type.color]}`}
                   >
-                    <IconComponent className="w-5 h-5" />
+                    <IconComponent className="h-5 w-5" />
                     <span className="text-sm font-medium">{type.label}</span>
                   </button>
                 );
@@ -274,10 +274,10 @@ const StockMovementModal = ({
           </div>
 
           {/* Quantidade e Custos */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             {/* Quantidade */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                 Quantidade <span className="text-red-500">*</span>
               </label>
               <input
@@ -287,23 +287,23 @@ const StockMovementModal = ({
                 onChange={handleChange}
                 placeholder="0"
                 min="1"
-                className={`w-full px-3 py-2 border ${errors.quantity ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                className={`w-full border px-3 py-2 ${errors.quantity ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white`}
               />
               {errors.quantity && (
                 <p className="mt-1 text-sm text-red-500">{errors.quantity}</p>
               )}
-              <p className="mt-1 text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-xs">
                 {product.unit_of_measure}
               </p>
             </div>
 
             {/* Custo Unitário */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                 Custo Unitário
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-theme-secondary">
+                <span className="text-theme-secondary absolute left-3 top-1/2 -translate-y-1/2 transform">
                   R$
                 </span>
                 <input
@@ -314,7 +314,7 @@ const StockMovementModal = ({
                   placeholder="0,00"
                   step="0.01"
                   min="0"
-                  className={`w-full pl-8 pr-3 py-2 border ${errors.unitCost ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                  className={`w-full border py-2 pl-8 pr-3 ${errors.unitCost ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white`}
                 />
               </div>
               {errors.unitCost && (
@@ -324,11 +324,11 @@ const StockMovementModal = ({
 
             {/* Custo Total */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                 Custo Total
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-theme-secondary">
+                <span className="text-theme-secondary absolute left-3 top-1/2 -translate-y-1/2 transform">
                   R$
                 </span>
                 <input
@@ -339,7 +339,7 @@ const StockMovementModal = ({
                   placeholder="0,00"
                   step="0.01"
                   min="0"
-                  className={`w-full pl-8 pr-3 py-2 border ${errors.totalCost ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                  className={`w-full border py-2 pl-8 pr-3 ${errors.totalCost ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white`}
                 />
               </div>
               {errors.totalCost && (
@@ -349,17 +349,17 @@ const StockMovementModal = ({
           </div>
 
           {/* Motivo e Documento */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {/* Motivo */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                 Motivo <span className="text-red-500">*</span>
               </label>
               <select
                 name="reason"
                 value={formData.reason}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 border ${errors.reason ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                className={`w-full border px-3 py-2 ${errors.reason ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white`}
               >
                 <option value="">Selecione o motivo</option>
                 {reasonOptions.map(option => (
@@ -375,45 +375,45 @@ const StockMovementModal = ({
 
             {/* Documento de Referência */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                 Documento de Referência
               </label>
               <div className="relative">
-                <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-light-text-muted dark:text-dark-text-muted" />
+                <FileText className="text-light-text-muted dark:text-dark-text-muted absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
                 <input
                   type="text"
                   name="referenceDocument"
                   value={formData.referenceDocument}
                   onChange={handleChange}
                   placeholder="Ex: NF 123456, Pedido 789"
-                  className="w-full pl-10 pr-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary"
+                  className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border py-2 pl-10 pr-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
                 />
               </div>
             </div>
           </div>
 
           {/* Data e Observações */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {/* Data da Movimentação */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                 Data da Movimentação
               </label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-light-text-muted dark:text-dark-text-muted" />
+                <Calendar className="text-light-text-muted dark:text-dark-text-muted absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
                 <input
                   type="date"
                   name="movementDate"
                   value={formData.movementDate}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary"
+                  className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border py-2 pl-10 pr-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
                 />
               </div>
             </div>
 
             {/* Observações */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                 Observações
               </label>
               <textarea
@@ -422,15 +422,15 @@ const StockMovementModal = ({
                 onChange={handleChange}
                 placeholder="Observações adicionais"
                 rows={2}
-                className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary"
+                className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
               />
             </div>
           </div>
 
           {/* Preview do Estoque */}
           {formData.quantity && (
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-blue-700 dark:text-blue-300 mb-2">
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+              <h4 className="mb-2 text-sm font-medium text-blue-700 dark:text-blue-300">
                 Previsão de Estoque
               </h4>
               <div className="flex items-center gap-4 text-sm">
@@ -458,11 +458,11 @@ const StockMovementModal = ({
           )}
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-light-border dark:border-dark-border">
+          <div className="flex items-center justify-end gap-3 border-t border-light-border pt-4 dark:border-dark-border">
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2 text-gray-700 dark:text-gray-300 dark:text-gray-600 border border-light-border dark:border-dark-border rounded-lg hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700 transition-colors"
+              className="rounded-lg border border-light-border px-4 py-2 text-gray-700 transition-colors hover:bg-light-bg dark:border-dark-border dark:bg-dark-bg dark:text-gray-300 dark:text-gray-600 dark:hover:bg-gray-700"
               disabled={loading}
             >
               Cancelar
@@ -471,11 +471,11 @@ const StockMovementModal = ({
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 bg-blue-600 text-dark-text-primary rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+              className="text-dark-text-primary flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2 transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? (
                 <>
-                  <Loader className="w-4 h-4 animate-spin" />
+                  <Loader className="h-4 w-4 animate-spin" />
                   Registrando...
                 </>
               ) : (

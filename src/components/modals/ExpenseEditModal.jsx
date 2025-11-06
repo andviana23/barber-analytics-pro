@@ -331,27 +331,27 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
   if (!isOpen) return null;
   return (
     <div
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="expense-edit-title"
     >
       <div
-        className="card-theme w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl"
+        className="card-theme flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden shadow-2xl"
         onClick={e => e.stopPropagation()}
       >
         {/* 🎯 Header com visual destacado */}
-        <div className="bg-primary/10 dark:bg-primary/20 px-6 py-5 border-b border-light-border dark:border-dark-border">
+        <div className="border-b border-light-border bg-primary/10 px-6 py-5 dark:border-dark-border dark:bg-primary/20">
           <div className="flex items-start justify-between gap-4">
-            <div className="flex-1 min-w-0">
+            <div className="min-w-0 flex-1">
               <h2
                 id="expense-edit-title"
-                className="text-xl font-semibold text-theme-primary mb-1"
+                className="text-theme-primary mb-1 text-xl font-semibold"
               >
                 {isCreateMode ? 'Nova Despesa' : 'Editar Despesa'}
               </h2>
-              <p className="text-sm text-theme-secondary">
+              <p className="text-theme-secondary text-sm">
                 {isCreateMode
                   ? 'Cadastre uma nova despesa no sistema'
                   : 'Atualize as informações da despesa'}
@@ -359,10 +359,10 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
             </div>
             <button
               onClick={onClose}
-              className="flex-shrink-0 p-2 rounded-lg hover:bg-light-surface dark:hover:bg-dark-surface transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50"
+              className="flex-shrink-0 rounded-lg p-2 transition-colors hover:bg-light-surface focus:outline-none focus:ring-2 focus:ring-primary/50 dark:hover:bg-dark-surface"
               aria-label="Fechar modal"
             >
-              <X className="w-5 h-5 text-theme-secondary" />
+              <X className="text-theme-secondary h-5 w-5" />
             </button>
           </div>
         </div>
@@ -374,11 +374,11 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
         >
           {/* 📝 Seção: Informações Básicas */}
           <div className="mb-8">
-            <h3 className="text-sm font-semibold text-theme-primary uppercase tracking-wide mb-4 flex items-center gap-2">
-              <FileText className="w-4 h-4" />
+            <h3 className="text-theme-primary mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide">
+              <FileText className="h-4 w-4" />
               Informações Básicas
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
                 label="Descrição"
                 required
@@ -402,7 +402,7 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
 
               <FormField label="Valor" required icon={DollarSign}>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary">
+                  <span className="text-theme-secondary absolute left-3 top-1/2 -translate-y-1/2">
                     R$
                   </span>
                   <input
@@ -455,9 +455,9 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
 
           {/* ✅ Seção: Status de Pagamento */}
           <div className="mb-8">
-            <div className="p-4 bg-primary/5 dark:bg-primary/10 rounded-xl border border-primary/20 dark:border-primary/30">
-              <label className="flex items-start gap-3 cursor-pointer group">
-                <div className="flex items-center h-6">
+            <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 dark:border-primary/30 dark:bg-primary/10">
+              <label className="group flex cursor-pointer items-start gap-3">
+                <div className="flex h-6 items-center">
                   <input
                     type="checkbox"
                     checked={formData.status?.toLowerCase() === 'paid'}
@@ -471,17 +471,17 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
                           : null,
                       }));
                     }}
-                    className="w-5 h-5 text-primary card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 dark:focus:ring-offset-dark-bg cursor-pointer transition-all"
+                    className="card-theme h-5 w-5 cursor-pointer rounded border-2 border-light-border text-primary transition-all focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 dark:border-dark-border dark:bg-dark-surface dark:focus:ring-offset-dark-bg"
                   />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-primary" />
-                    <span className="text-sm font-semibold text-theme-primary">
+                    <CheckCircle2 className="h-5 w-5 text-primary" />
+                    <span className="text-theme-primary text-sm font-semibold">
                       Marcar como Paga
                     </span>
                   </div>
-                  <p className="text-xs text-theme-secondary mt-1">
+                  <p className="text-theme-secondary mt-1 text-xs">
                     {formData.status?.toLowerCase() === 'paid'
                       ? '✓ Despesa marcada como paga - data de pagamento registrada'
                       : 'Marque para alterar o status para pago e registrar a data de pagamento'}
@@ -493,11 +493,11 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
 
           {/* 🏷️ Seção: Categorização */}
           <div className="mb-8">
-            <h3 className="text-sm font-semibold text-theme-primary uppercase tracking-wide mb-4 flex items-center gap-2">
-              <Tag className="w-4 h-4" />
+            <h3 className="text-theme-primary mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide">
+              <Tag className="h-4 w-4" />
               Categorização
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField label="Categoria Pai" icon={Tag}>
                 <select
                   value={selectedParentId}
@@ -518,7 +518,7 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
                   value={formData.category_id}
                   onChange={e => handleChildCategoryChange(e.target.value)}
                   disabled={!selectedParentId || childCategories.length === 0}
-                  className="input-theme disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="input-theme disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <option value="">Selecione a subcategoria</option>
                   {childCategories.map(category => (
@@ -527,7 +527,7 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
                     </option>
                   ))}
                 </select>
-                <p className="text-xs text-theme-secondary mt-1.5">
+                <p className="text-theme-secondary mt-1.5 text-xs">
                   Opcional. Se não selecionar, será usada a categoria pai.
                 </p>
               </FormField>
@@ -571,7 +571,7 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
                       ))}
                 </select>
                 {isComissaoCategory && (
-                  <p className="text-xs text-primary mt-1.5 flex items-center gap-1">
+                  <p className="mt-1.5 flex items-center gap-1 text-xs text-primary">
                     <span>💈</span>
                     Mostrando apenas profissionais barbeiros
                   </p>
@@ -602,11 +602,11 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
 
           {/* 📋 Seção: Informações Adicionais */}
           <div className="mb-8">
-            <h3 className="text-sm font-semibold text-theme-primary uppercase tracking-wide mb-4 flex items-center gap-2">
-              <CreditCard className="w-4 h-4" />
+            <h3 className="text-theme-primary mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide">
+              <CreditCard className="h-4 w-4" />
               Informações Adicionais
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField label="Forma de Pagamento" icon={CreditCard}>
                 <select
                   value={formData.forma_pagamento}
@@ -664,13 +664,13 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
         </form>
 
         {/* 🎯 Footer com ações */}
-        <div className="px-6 py-4 border-t border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg">
+        <div className="border-t border-light-border bg-light-bg px-6 py-4 dark:border-dark-border dark:bg-dark-bg">
           <div className="flex justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-5 py-2.5 rounded-lg font-medium transition-all duration-200 card-theme text-theme-primary hover:bg-light-border dark:hover:bg-dark-border focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-dark-bg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="card-theme text-theme-primary rounded-lg px-5 py-2.5 font-medium transition-all duration-200 hover:bg-light-border focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-dark-border dark:focus:ring-offset-dark-bg"
             >
               Cancelar
             </button>
@@ -678,16 +678,16 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
               type="submit"
               disabled={loading}
               onClick={handleSubmit}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium transition-all duration-200 bg-gradient-success hover:opacity-90 text-dark-text-primary shadow-lg shadow-green-500/30 hover:shadow-green-500/50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-dark-bg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+              className="text-dark-text-primary flex items-center gap-2 rounded-lg bg-gradient-success px-6 py-2.5 font-medium shadow-lg shadow-green-500/30 transition-all duration-200 hover:opacity-90 hover:shadow-green-500/50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none dark:focus:ring-offset-dark-bg"
             >
               {loading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-light-surface dark:border-dark-surface/30 border-t-white rounded-full animate-spin" />
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-light-surface border-t-white dark:border-dark-surface/30" />
                   {isCreateMode ? 'Criando...' : 'Salvando...'}
                 </>
               ) : (
                 <>
-                  <Save className="w-4 h-4" />
+                  <Save className="h-4 w-4" />
                   {isCreateMode ? 'Criar Despesa' : 'Salvar Alterações'}
                 </>
               )}
@@ -712,9 +712,9 @@ const FormField = ({
 }) => {
   return (
     <div className={className}>
-      <label className="block mb-2">
-        <div className="flex items-center gap-2 text-xs font-semibold text-theme-primary uppercase tracking-wide mb-2">
-          {Icon && <Icon className="w-3.5 h-3.5" />}
+      <label className="mb-2 block">
+        <div className="text-theme-primary mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide">
+          {Icon && <Icon className="h-3.5 w-3.5" />}
           {label}
           {required && <span className="text-red-500">*</span>}
         </div>

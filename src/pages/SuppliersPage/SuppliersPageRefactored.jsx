@@ -184,9 +184,9 @@ const SuppliersPageRefactored = () => {
   if (!selectedUnit) {
     return (
       <Layout>
-        <div className="flex items-center justify-center h-screen">
-          <div className="text-center space-y-4">
-            <Building2 className="w-16 h-16 mx-auto text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary" />
+        <div className="flex h-screen items-center justify-center">
+          <div className="space-y-4 text-center">
+            <Building2 className="text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary mx-auto h-16 w-16" />
             <p className="text-theme-secondary font-medium">
               Selecione uma unidade para visualizar os fornecedores
             </p>
@@ -201,11 +201,11 @@ const SuppliersPageRefactored = () => {
         {/* 🎯 Header Premium - DESIGN SYSTEM */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-primary rounded-xl shadow-lg">
-              <Package className="w-8 h-8 text-dark-text-primary" />
+            <div className="rounded-xl bg-gradient-primary p-3 shadow-lg">
+              <Package className="text-dark-text-primary h-8 w-8" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-theme-primary">
+              <h1 className="text-theme-primary text-3xl font-bold">
                 Fornecedores
               </h1>
               <p className="text-theme-secondary mt-1">
@@ -218,80 +218,80 @@ const SuppliersPageRefactored = () => {
           {canManage && (
             <button
               onClick={handleCreate}
-              className="flex items-center gap-2 px-5 py-3 bg-gradient-primary hover:opacity-90 text-dark-text-primary font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+              className="text-dark-text-primary flex transform items-center gap-2 rounded-xl bg-gradient-primary px-5 py-3 font-semibold shadow-lg transition-all duration-200 hover:scale-105 hover:opacity-90 hover:shadow-xl"
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="h-5 w-5" />
               Fornecedor
             </button>
           )}
         </div>
 
         {/* 💳 KPI Cards Premium - DESIGN SYSTEM */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {/* Card: Total */}
-          <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-300">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-3 bg-gradient-primary rounded-xl shadow-lg">
-                <Package className="w-6 h-6 text-dark-text-primary" />
+          <div className="card-theme rounded-xl border-2 border-transparent p-5 transition-all duration-300 hover:border-blue-300 dark:hover:border-blue-700">
+            <div className="mb-3 flex items-center justify-between">
+              <div className="rounded-xl bg-gradient-primary p-3 shadow-lg">
+                <Package className="text-dark-text-primary h-6 w-6" />
               </div>
-              <TrendingUp className="w-5 h-5 text-blue-500 dark:text-blue-400 opacity-60" />
+              <TrendingUp className="h-5 w-5 text-blue-500 opacity-60 dark:text-blue-400" />
             </div>
-            <p className="text-xs font-bold text-theme-secondary uppercase tracking-wider mb-2">
+            <p className="text-theme-secondary mb-2 text-xs font-bold uppercase tracking-wider">
               Total de Fornecedores
             </p>
-            <p className="text-3xl font-bold text-theme-primary mb-1">
+            <p className="text-theme-primary mb-1 text-3xl font-bold">
               {stats.total}
             </p>
-            <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+            <p className="text-xs font-medium text-blue-600 dark:text-blue-400">
               Cadastrados no sistema
             </p>
           </div>
 
           {/* Card: Ativos */}
-          <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-green-300 dark:hover:border-green-700 transition-all duration-300">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-3 bg-gradient-success rounded-xl shadow-lg">
-                <CheckCircle className="w-6 h-6 text-dark-text-primary" />
+          <div className="card-theme rounded-xl border-2 border-transparent p-5 transition-all duration-300 hover:border-green-300 dark:hover:border-green-700">
+            <div className="mb-3 flex items-center justify-between">
+              <div className="rounded-xl bg-gradient-success p-3 shadow-lg">
+                <CheckCircle className="text-dark-text-primary h-6 w-6" />
               </div>
-              <TrendingUp className="w-5 h-5 text-green-500 dark:text-green-400 opacity-60" />
+              <TrendingUp className="h-5 w-5 text-green-500 opacity-60 dark:text-green-400" />
             </div>
-            <p className="text-xs font-bold text-theme-secondary uppercase tracking-wider mb-2">
+            <p className="text-theme-secondary mb-2 text-xs font-bold uppercase tracking-wider">
               Fornecedores Ativos
             </p>
-            <p className="text-3xl font-bold text-theme-primary mb-1">
+            <p className="text-theme-primary mb-1 text-3xl font-bold">
               {stats.active}
             </p>
-            <p className="text-xs text-green-600 dark:text-green-400 font-medium">
+            <p className="text-xs font-medium text-green-600 dark:text-green-400">
               Disponíveis para uso
             </p>
           </div>
 
           {/* Card: Inativos */}
-          <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-red-300 dark:hover:border-red-700 transition-all duration-300">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-3 bg-gradient-danger rounded-xl shadow-lg">
-                <XCircle className="w-6 h-6 text-dark-text-primary" />
+          <div className="card-theme rounded-xl border-2 border-transparent p-5 transition-all duration-300 hover:border-red-300 dark:hover:border-red-700">
+            <div className="mb-3 flex items-center justify-between">
+              <div className="bg-gradient-danger rounded-xl p-3 shadow-lg">
+                <XCircle className="text-dark-text-primary h-6 w-6" />
               </div>
-              <XCircle className="w-5 h-5 text-red-500 dark:text-red-400 opacity-60" />
+              <XCircle className="h-5 w-5 text-red-500 opacity-60 dark:text-red-400" />
             </div>
-            <p className="text-xs font-bold text-theme-secondary uppercase tracking-wider mb-2">
+            <p className="text-theme-secondary mb-2 text-xs font-bold uppercase tracking-wider">
               Fornecedores Inativos
             </p>
-            <p className="text-3xl font-bold text-theme-primary mb-1">
+            <p className="text-theme-primary mb-1 text-3xl font-bold">
               {stats.inactive}
             </p>
-            <p className="text-xs text-red-600 dark:text-red-400 font-medium">
+            <p className="text-xs font-medium text-red-600 dark:text-red-400">
               Desativados temporariamente
             </p>
           </div>
         </div>
 
         {/* 🎛️ Filtros Premium - DESIGN SYSTEM */}
-        <div className="card-theme rounded-xl p-5 border-2 border-transparent hover:border-light-border dark:border-dark-border dark:hover:border-dark-border transition-all duration-300">
-          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+        <div className="card-theme rounded-xl border-2 border-transparent p-5 transition-all duration-300 hover:border-light-border dark:border-dark-border dark:hover:border-dark-border">
+          <div className="flex flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
             {/* Busca Premium */}
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary w-5 h-5" />
+            <div className="relative max-w-md flex-1">
+              <Search className="text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
               <input
                 type="text"
                 placeholder="Pesquisar por nome, CNPJ ou email..."
@@ -300,12 +300,12 @@ const SuppliersPageRefactored = () => {
                   setSearchTerm(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full pl-11 pr-4 py-3 card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-xl text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md"
+                className="card-theme text-theme-primary w-full rounded-xl border-2 border-light-border py-3 pl-11 pr-4 placeholder-gray-400 shadow-sm transition-all duration-200 hover:shadow-md focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-dark-surface dark:placeholder-gray-500"
               />
             </div>
 
             {/* Controles */}
-            <div className="flex flex-wrap gap-4 items-center">
+            <div className="flex flex-wrap items-center gap-4">
               {/* Items por página */}
               <div className="flex items-center gap-2">
                 <select
@@ -314,20 +314,20 @@ const SuppliersPageRefactored = () => {
                     setItemsPerPage(Number(e.target.value));
                     setCurrentPage(1);
                   }}
-                  className="px-4 py-3 card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-xl text-sm font-semibold text-theme-primary focus:ring-2 focus:ring-blue-500 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
+                  className="card-theme text-theme-primary cursor-pointer rounded-xl border-2 border-light-border px-4 py-3 text-sm font-semibold shadow-sm transition-all duration-200 hover:shadow-md focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-dark-surface"
                 >
                   <option value={10}>10</option>
                   <option value={25}>25</option>
                   <option value={50}>50</option>
                   <option value={100}>100</option>
                 </select>
-                <span className="text-sm font-medium text-theme-secondary whitespace-nowrap">
+                <span className="text-theme-secondary whitespace-nowrap text-sm font-medium">
                   por página
                 </span>
               </div>
 
               {/* Mostrar inativos */}
-              <label className="flex items-center gap-2 px-4 py-3 card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer">
+              <label className="card-theme flex cursor-pointer items-center gap-2 rounded-xl border-2 border-light-border px-4 py-3 shadow-sm transition-all duration-200 hover:shadow-md dark:border-dark-border dark:bg-dark-surface">
                 <input
                   type="checkbox"
                   checked={showInactive}
@@ -335,9 +335,9 @@ const SuppliersPageRefactored = () => {
                     setShowInactive(e.target.checked);
                     setCurrentPage(1);
                   }}
-                  className="w-4 h-4 text-blue-600 card-theme dark:bg-gray-700 border-light-border dark:border-dark-border rounded focus:ring-2 focus:ring-blue-500 cursor-pointer transition-all"
+                  className="card-theme h-4 w-4 cursor-pointer rounded border-light-border text-blue-600 transition-all focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
                 />
-                <span className="text-sm font-semibold text-theme-primary whitespace-nowrap">
+                <span className="text-theme-primary whitespace-nowrap text-sm font-semibold">
                   Mostrar inativos
                 </span>
               </label>
@@ -346,11 +346,11 @@ const SuppliersPageRefactored = () => {
         </div>
 
         {/* 📊 Tabela Premium - DESIGN SYSTEM */}
-        <div className="card-theme rounded-xl overflow-hidden border-2 border-transparent hover:border-light-border dark:border-dark-border dark:hover:border-dark-border transition-all duration-300">
+        <div className="card-theme overflow-hidden rounded-xl border-2 border-transparent transition-all duration-300 hover:border-light-border dark:border-dark-border dark:hover:border-dark-border">
           {loading ? (
             <div className="flex items-center justify-center py-20">
               <div className="flex flex-col items-center gap-4">
-                <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
                 <span className="text-theme-secondary font-medium">
                   Carregando fornecedores...
                 </span>
@@ -358,23 +358,23 @@ const SuppliersPageRefactored = () => {
             </div>
           ) : error ? (
             <div className="flex items-center justify-center py-20">
-              <div className="text-center space-y-3">
-                <XCircle className="w-12 h-12 text-red-500 mx-auto" />
-                <p className="text-red-600 dark:text-red-400 font-medium">
+              <div className="space-y-3 text-center">
+                <XCircle className="mx-auto h-12 w-12 text-red-500" />
+                <p className="font-medium text-red-600 dark:text-red-400">
                   Erro ao carregar fornecedores
                 </p>
-                <p className="text-sm text-theme-secondary">{error}</p>
+                <p className="text-theme-secondary text-sm">{error}</p>
               </div>
             </div>
           ) : filteredSuppliers.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20">
-              <Package className="w-16 h-16 text-gray-300 dark:text-gray-600 dark:text-theme-secondary mb-4" />
-              <p className="text-theme-primary font-medium mb-2">
+              <Package className="dark:text-theme-secondary mb-4 h-16 w-16 text-gray-300 dark:text-gray-600" />
+              <p className="text-theme-primary mb-2 font-medium">
                 {searchTerm
                   ? 'Nenhum fornecedor encontrado'
                   : 'Nenhum fornecedor cadastrado'}
               </p>
-              <p className="text-sm text-theme-secondary">
+              <p className="text-theme-secondary text-sm">
                 {searchTerm
                   ? 'Tente ajustar os filtros ou o termo de busca'
                   : 'Clique em "Fornecedor" para cadastrar o primeiro'}
@@ -384,18 +384,18 @@ const SuppliersPageRefactored = () => {
             <>
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-light-bg dark:bg-dark-surface border-b-2 border-light-border dark:border-dark-border">
+                  <thead className="border-b-2 border-light-border bg-light-bg dark:border-dark-border dark:bg-dark-surface">
                     <tr>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                      <th className="text-theme-secondary px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                         Fornecedor
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                      <th className="text-theme-secondary px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                         CNPJ
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                      <th className="text-theme-secondary px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                         Observação
                       </th>
-                      <th className="px-6 py-4 text-center text-xs font-bold text-theme-secondary uppercase tracking-wider">
+                      <th className="text-theme-secondary px-6 py-4 text-center text-xs font-bold uppercase tracking-wider">
                         Ações
                       </th>
                     </tr>
@@ -408,15 +408,15 @@ const SuppliersPageRefactored = () => {
                       >
                         <td className="px-6 py-4">
                           <div className="flex items-start gap-3">
-                            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                              <Package className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                            <div className="rounded-lg bg-blue-100 p-2 dark:bg-blue-900/30">
+                              <Package className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                             </div>
                             <div>
-                              <p className="text-sm font-semibold text-theme-primary">
+                              <p className="text-theme-primary text-sm font-semibold">
                                 {supplier.nome}
                               </p>
                               {supplier.razao_social && (
-                                <p className="text-xs text-theme-secondary mt-0.5">
+                                <p className="text-theme-secondary mt-0.5 text-xs">
                                   {supplier.razao_social}
                                 </p>
                               )}
@@ -424,12 +424,12 @@ const SuppliersPageRefactored = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <p className="text-sm font-medium text-theme-primary font-mono">
+                          <p className="text-theme-primary font-mono text-sm font-medium">
                             {formatCNPJ(supplier.cpf_cnpj)}
                           </p>
                         </td>
                         <td className="px-6 py-4">
-                          <p className="text-sm text-theme-secondary truncate max-w-xs">
+                          <p className="text-theme-secondary max-w-xs truncate text-sm">
                             {supplier.observacoes || '-'}
                           </p>
                         </td>
@@ -438,20 +438,20 @@ const SuppliersPageRefactored = () => {
                             {/* Ver Detalhes */}
                             <button
                               onClick={() => handleInfo(supplier)}
-                              className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-all duration-200"
+                              className="rounded-lg p-2 text-blue-600 transition-all duration-200 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-blue-900/30"
                               title="Ver detalhes"
                             >
-                              <Eye className="w-4 h-4" />
+                              <Eye className="h-4 w-4" />
                             </button>
 
                             {/* Editar */}
                             {canManage && supplier.is_active && (
                               <button
                                 onClick={() => handleEdit(supplier)}
-                                className="p-2 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-all duration-200"
+                                className="rounded-lg p-2 text-green-600 transition-all duration-200 hover:bg-green-100 dark:text-green-400 dark:hover:bg-green-900/30"
                                 title="Editar"
                               >
-                                <Edit className="w-4 h-4" />
+                                <Edit className="h-4 w-4" />
                               </button>
                             )}
 
@@ -461,22 +461,22 @@ const SuppliersPageRefactored = () => {
                                 <button
                                   onClick={() => handleDelete(supplier)}
                                   disabled={deletingId === supplier.id}
-                                  className="p-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-all duration-200 disabled:opacity-50"
+                                  className="rounded-lg p-2 text-red-600 transition-all duration-200 hover:bg-red-100 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-900/30"
                                   title="Excluir"
                                 >
                                   {deletingId === supplier.id ? (
-                                    <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-red-600 border-t-transparent" />
                                   ) : (
-                                    <Trash2 className="w-4 h-4" />
+                                    <Trash2 className="h-4 w-4" />
                                   )}
                                 </button>
                               ) : (
                                 <button
                                   onClick={() => handleActivate(supplier)}
-                                  className="p-2 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-all duration-200"
+                                  className="rounded-lg p-2 text-green-600 transition-all duration-200 hover:bg-green-100 dark:text-green-400 dark:hover:bg-green-900/30"
                                   title="Ativar"
                                 >
-                                  <CheckCircle className="w-4 h-4" />
+                                  <CheckCircle className="h-4 w-4" />
                                 </button>
                               ))}
                           </div>
@@ -489,22 +489,22 @@ const SuppliersPageRefactored = () => {
 
               {/* Paginação Premium */}
               {totalPages > 1 && (
-                <div className="px-6 py-4 border-t-2 border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-surface">
+                <div className="border-t-2 border-light-border bg-light-bg px-6 py-4 dark:border-dark-border dark:bg-dark-surface">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-theme-secondary">
+                    <p className="text-theme-secondary text-sm font-medium">
                       Mostrando{' '}
-                      <span className="font-bold text-theme-primary">
+                      <span className="text-theme-primary font-bold">
                         {(currentPage - 1) * itemsPerPage + 1}
                       </span>{' '}
                       a{' '}
-                      <span className="font-bold text-theme-primary">
+                      <span className="text-theme-primary font-bold">
                         {Math.min(
                           currentPage * itemsPerPage,
                           filteredSuppliers.length
                         )}
                       </span>{' '}
                       de{' '}
-                      <span className="font-bold text-theme-primary">
+                      <span className="text-theme-primary font-bold">
                         {filteredSuppliers.length}
                       </span>{' '}
                       resultados
@@ -513,11 +513,11 @@ const SuppliersPageRefactored = () => {
                       <button
                         onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                         disabled={currentPage === 1}
-                        className="px-4 py-2 text-sm font-semibold text-theme-primary card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md"
+                        className="text-theme-primary card-theme rounded-lg border-2 border-light-border px-4 py-2 text-sm font-semibold shadow-sm transition-all duration-200 hover:border-blue-500 hover:bg-light-bg hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-border dark:bg-dark-bg dark:bg-dark-surface dark:hover:border-blue-500 dark:hover:bg-gray-700"
                       >
                         Anterior
                       </button>
-                      <span className="px-4 py-2 text-sm font-bold text-theme-primary bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-300 dark:border-blue-700 rounded-lg">
+                      <span className="text-theme-primary rounded-lg border-2 border-blue-300 bg-blue-50 px-4 py-2 text-sm font-bold dark:border-blue-700 dark:bg-blue-900/20">
                         Página {currentPage} de {totalPages}
                       </span>
                       <button
@@ -525,7 +525,7 @@ const SuppliersPageRefactored = () => {
                           setCurrentPage(p => Math.min(totalPages, p + 1))
                         }
                         disabled={currentPage === totalPages}
-                        className="px-4 py-2 text-sm font-semibold text-theme-primary card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md"
+                        className="text-theme-primary card-theme rounded-lg border-2 border-light-border px-4 py-2 text-sm font-semibold shadow-sm transition-all duration-200 hover:border-blue-500 hover:bg-light-bg hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-border dark:bg-dark-bg dark:bg-dark-surface dark:hover:border-blue-500 dark:hover:bg-gray-700"
                       >
                         Próxima
                       </button>

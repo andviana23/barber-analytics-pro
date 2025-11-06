@@ -69,7 +69,7 @@ const ServicesTable = ({
   return (
     <div className={`space-y-4 ${className}`}>
       {/* Header com busca e filtros */}
-      <div className="flex flex-col lg:flex-row gap-4">
+      <div className="flex flex-col gap-4 lg:flex-row">
         {/* Busca */}
         <div className="flex-1">
           <div className="relative">
@@ -78,10 +78,10 @@ const ServicesTable = ({
               value={searchTerm}
               onChange={e => onSearchChange && onSearchChange(e.target.value)}
               placeholder="Buscar serviço por nome..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-light-border dark:border-dark-border card-theme dark:bg-dark-surface text-theme-primary placeholder-theme-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              className="card-theme text-theme-primary placeholder-theme-secondary w-full rounded-lg border border-light-border py-2.5 pl-10 pr-4 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-dark-border dark:bg-dark-surface"
             />
             <svg
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-theme-secondary"
+              className="text-theme-secondary absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -99,7 +99,7 @@ const ServicesTable = ({
         {/* Filtros e ações */}
         <div className="flex flex-wrap gap-3">
           {/* Mostrar inativos */}
-          <label className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-light-border dark:border-dark-border card-theme dark:bg-dark-surface cursor-pointer hover:bg-light-surface dark:hover:bg-dark-hover transition-colors">
+          <label className="card-theme flex cursor-pointer items-center gap-2 rounded-lg border border-light-border px-4 py-2.5 transition-colors hover:bg-light-surface dark:border-dark-border dark:bg-dark-surface dark:hover:bg-dark-hover">
             <input
               type="checkbox"
               checked={filters.showInactive !== false}
@@ -110,9 +110,9 @@ const ServicesTable = ({
                   showInactive: e.target.checked,
                 })
               }
-              className="w-4 h-4 rounded border-light-border dark:border-dark-border text-primary focus:ring-primary/20"
+              className="h-4 w-4 rounded border-light-border text-primary focus:ring-primary/20 dark:border-dark-border"
             />
-            <span className="text-sm text-theme-primary">
+            <span className="text-theme-primary text-sm">
               Mostrar inativos ({inactiveCount})
             </span>
           </label>
@@ -127,7 +127,7 @@ const ServicesTable = ({
                 sortBy: e.target.value,
               })
             }
-            className="px-4 py-2.5 rounded-lg border border-light-border dark:border-dark-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+            className="card-theme text-theme-primary rounded-lg border border-light-border px-4 py-2.5 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-dark-border dark:bg-dark-surface"
           >
             <option value="name">Nome</option>
             <option value="price">Preço</option>
@@ -136,14 +136,14 @@ const ServicesTable = ({
           </select>
 
           {/* Toggle de visualização */}
-          <div className="flex rounded-lg border border-light-border dark:border-dark-border overflow-hidden">
+          <div className="flex overflow-hidden rounded-lg border border-light-border dark:border-dark-border">
             <button
               onClick={() => setViewMode('grid')}
-              className={`px-3 py-2 transition-colors ${viewMode === 'grid' ? 'bg-primary text-white' : 'bg-white dark:bg-dark-surface text-theme-secondary hover:bg-light-surface dark:hover:bg-dark-hover'}`}
+              className={`px-3 py-2 transition-colors ${viewMode === 'grid' ? 'bg-primary text-white' : 'text-theme-secondary bg-white hover:bg-light-surface dark:bg-dark-surface dark:hover:bg-dark-hover'}`}
               title="Visualização em grade"
             >
               <svg
-                className="w-5 h-5"
+                className="h-5 w-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -158,11 +158,11 @@ const ServicesTable = ({
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`px-3 py-2 transition-colors ${viewMode === 'list' ? 'bg-primary text-white' : 'bg-white dark:bg-dark-surface text-theme-secondary hover:bg-light-surface dark:hover:bg-dark-hover'}`}
+              className={`px-3 py-2 transition-colors ${viewMode === 'list' ? 'bg-primary text-white' : 'text-theme-secondary bg-white hover:bg-light-surface dark:bg-dark-surface dark:hover:bg-dark-hover'}`}
               title="Visualização em lista"
             >
               <svg
-                className="w-5 h-5"
+                className="h-5 w-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -185,7 +185,7 @@ const ServicesTable = ({
               requiredRoles={['gerente', 'admin']}
               icon={
                 <svg
-                  className="w-5 h-5"
+                  className="h-5 w-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -208,9 +208,9 @@ const ServicesTable = ({
 
       {/* Stats */}
       <div className="flex flex-wrap gap-4">
-        <div className="px-4 py-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+        <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 dark:border-green-800 dark:bg-green-900/20">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-green-600 dark:bg-green-400" />
+            <div className="h-2 w-2 rounded-full bg-green-600 dark:bg-green-400" />
             <span className="text-sm font-medium text-green-800 dark:text-green-200">
               {activeCount}{' '}
               {activeCount === 1 ? 'serviço ativo' : 'serviços ativos'}
@@ -218,10 +218,10 @@ const ServicesTable = ({
           </div>
         </div>
         {inactiveCount > 0 && filters.showInactive !== false && (
-          <div className="px-4 py-3 bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/20 border border-light-border dark:border-dark-border dark:border-gray-800 rounded-lg">
+          <div className="rounded-lg border border-light-border bg-light-bg px-4 py-3 dark:border-dark-border dark:border-gray-800 dark:bg-dark-bg dark:bg-dark-surface/20">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-gray-600 dark:bg-gray-400" />
-              <span className="text-sm font-medium text-theme-primary dark:text-gray-200">
+              <div className="h-2 w-2 rounded-full bg-gray-600 dark:bg-gray-400" />
+              <span className="text-theme-primary text-sm font-medium dark:text-gray-200">
                 {inactiveCount}{' '}
                 {inactiveCount === 1 ? 'serviço inativo' : 'serviços inativos'}
               </span>
@@ -233,13 +233,13 @@ const ServicesTable = ({
       {/* Lista de serviços */}
       {loading ? (
         <div className="py-12 text-center">
-          <div className="inline-block w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin mb-3" />
+          <div className="border-3 mb-3 inline-block h-8 w-8 animate-spin rounded-full border-primary border-t-transparent" />
           <p className="text-theme-secondary">Carregando serviços...</p>
         </div>
       ) : filteredServices.length === 0 ? (
         <div className="py-12 text-center">
           <svg
-            className="w-16 h-16 mx-auto text-theme-secondary/50 mb-4"
+            className="text-theme-secondary/50 mx-auto mb-4 h-16 w-16"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -251,7 +251,7 @@ const ServicesTable = ({
               d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z"
             />
           </svg>
-          <h3 className="text-lg font-semibold text-theme-primary mb-2">
+          <h3 className="text-theme-primary mb-2 text-lg font-semibold">
             {searchTerm
               ? 'Nenhum serviço encontrado'
               : 'Nenhum serviço cadastrado'}
@@ -269,7 +269,7 @@ const ServicesTable = ({
               requiredRoles={['gerente', 'admin']}
               icon={
                 <svg
-                  className="w-5 h-5"
+                  className="h-5 w-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -292,7 +292,7 @@ const ServicesTable = ({
         <div
           className={
             viewMode === 'grid'
-              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'
+              ? 'grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
               : 'space-y-3'
           }
         >

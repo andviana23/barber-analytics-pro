@@ -109,12 +109,12 @@ export function ContrastTester() {
       className="space-y-4"
     >
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+        <h3 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
           Validação de Contraste - Tema {theme === 'dark' ? 'Escuro' : 'Claro'}
         </h3>
-        <div className="text-sm text-theme-secondary dark:text-gray-300 dark:text-gray-600">
+        <div className="text-theme-secondary text-sm dark:text-gray-300 dark:text-gray-600">
           <span className="text-green-600">AAA ≥ 7:1</span> •
-          <span className="text-yellow-600 ml-2">AA ≥ 4.5:1</span>
+          <span className="ml-2 text-yellow-600">AA ≥ 4.5:1</span>
         </div>
       </div>
 
@@ -134,9 +134,9 @@ export function ContrastTester() {
               delay: index * 0.1,
             }}
           >
-            <Card className="p-4 space-y-3">
+            <Card className="space-y-3 p-4">
               <div className="flex items-start justify-between">
-                <h4 className="font-medium text-theme-primary dark:text-dark-text-primary">
+                <h4 className="text-theme-primary dark:text-dark-text-primary font-medium">
                   {result.name}
                 </h4>
                 <span className={`text-lg ${getStatusColor(result.level)}`}>
@@ -144,13 +144,13 @@ export function ContrastTester() {
                 </span>
               </div>
 
-              <div className="text-sm text-theme-secondary dark:text-gray-300 dark:text-gray-600">
+              <div className="text-theme-secondary text-sm dark:text-gray-300 dark:text-gray-600">
                 {result.context}
               </div>
 
               {/* Exemplo visual */}
               <div
-                className="p-3 rounded border"
+                className="rounded border p-3"
                 style={{
                   backgroundColor: result.background,
                   color: result.foreground,
@@ -160,7 +160,7 @@ export function ContrastTester() {
                 Exemplo de texto
               </div>
 
-              <div className="flex justify-between items-center text-sm">
+              <div className="flex items-center justify-between text-sm">
                 <div>
                   <span className="text-theme-secondary dark:text-gray-300 dark:text-gray-600">
                     Contraste:
@@ -172,7 +172,7 @@ export function ContrastTester() {
                   </span>
                 </div>
                 <div
-                  className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(result.level)} bg-opacity-10`}
+                  className={`rounded px-2 py-1 text-xs font-medium ${getStatusColor(result.level)} bg-opacity-10`}
                 >
                   {result.level}
                 </div>
@@ -181,7 +181,7 @@ export function ContrastTester() {
               <div className="flex items-center space-x-2 text-xs">
                 <div className="flex items-center space-x-1">
                   <div
-                    className="w-3 h-3 rounded border"
+                    className="h-3 w-3 rounded border"
                     style={{
                       backgroundColor: result.foreground,
                     }}
@@ -195,7 +195,7 @@ export function ContrastTester() {
                 </span>
                 <div className="flex items-center space-x-1">
                   <div
-                    className="w-3 h-3 rounded border"
+                    className="h-3 w-3 rounded border"
                     style={{
                       backgroundColor: result.background,
                     }}
@@ -211,13 +211,13 @@ export function ContrastTester() {
       </div>
 
       {/* Resumo geral */}
-      <Card className="p-4 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+      <Card className="border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
         <div className="flex items-center justify-between">
           <div>
             <h4 className="font-medium text-blue-900 dark:text-blue-100">
               Resumo da Validação
             </h4>
-            <p className="text-sm text-blue-700 dark:text-blue-200 mt-1">
+            <p className="mt-1 text-sm text-blue-700 dark:text-blue-200">
               {testResults.filter(r => r.level === 'AAA').length} excelentes •
               {testResults.filter(r => r.level === 'AA').length} adequados •
               {testResults.filter(r => r.level === 'Falha').length} precisam
@@ -259,7 +259,7 @@ export function ThemeValidator() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary">
+        <h2 className="text-theme-primary dark:text-dark-text-primary text-2xl font-bold">
           Validação de Tema e Acessibilidade
         </h2>
         <Button
@@ -273,15 +273,12 @@ export function ThemeValidator() {
       </div>
 
       {/* Tabs */}
-      <div className="flex space-x-1 card-theme dark:bg-dark-surface p-1 rounded-lg">
+      <div className="card-theme flex space-x-1 rounded-lg p-1 dark:bg-dark-surface">
         {tabs.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`
-              flex items-center space-x-2 px-4 py-2 rounded-md font-medium text-sm transition-all
-              ${activeTab === tab.id ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'}
-            `}
+            className={`flex items-center space-x-2 rounded-md px-4 py-2 text-sm font-medium transition-all ${activeTab === tab.id ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-700 dark:text-white' : 'text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white'} `}
           >
             <span>{tab.icon}</span>
             <span>{tab.label}</span>
@@ -309,7 +306,7 @@ export function ThemeValidator() {
         {activeTab === 'accessibility' && (
           <div className="space-y-4">
             <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">
+              <h3 className="mb-4 text-lg font-semibold">
                 Checklist de Acessibilidade
               </h3>
               <div className="space-y-3">
@@ -337,10 +334,10 @@ export function ThemeValidator() {
         {activeTab === 'responsiveness' && (
           <div className="space-y-4">
             <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">
+              <h3 className="mb-4 text-lg font-semibold">
                 Breakpoints Suportados
               </h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                 {[
                   {
                     size: 'xs',
@@ -380,15 +377,15 @@ export function ThemeValidator() {
                 ].map(bp => (
                   <div
                     key={bp.size}
-                    className="text-center p-3 bg-light-bg dark:bg-dark-bg dark:bg-dark-surface rounded"
+                    className="rounded bg-light-bg p-3 text-center dark:bg-dark-bg dark:bg-dark-surface"
                   >
                     <div className="font-mono text-sm font-medium">
                       {bp.size}
                     </div>
-                    <div className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                    <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-xs">
                       {bp.width}
                     </div>
-                    <div className="text-xs text-theme-secondary mt-1">
+                    <div className="text-theme-secondary mt-1 text-xs">
                       {bp.label}
                     </div>
                   </div>

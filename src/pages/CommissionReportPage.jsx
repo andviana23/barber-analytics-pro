@@ -277,13 +277,13 @@ const CommissionReportPage = () => {
     fetchCommissions();
   }, []);
   return (
-    <div className="min-h-screen bg-gradient-light dark:from-gray-900 dark:to-gray-800 p-6">
+    <div className="min-h-screen bg-gradient-light p-6 dark:from-gray-900 dark:to-gray-800">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-theme-primary dark:text-dark-text-primary flex items-center gap-3">
-              <TrendingUp className="w-8 h-8 text-purple-600" />
+            <h1 className="text-theme-primary dark:text-dark-text-primary flex items-center gap-3 text-3xl font-bold">
+              <TrendingUp className="h-8 w-8 text-purple-600" />
               Relatório de Comissões
             </h1>
             <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-2">
@@ -299,7 +299,7 @@ const CommissionReportPage = () => {
               disabled={exportLoading || commissions.length === 0}
               className="flex items-center gap-2"
             >
-              <Download className="w-4 h-4" />
+              <Download className="h-4 w-4" />
               Exportar CSV
             </Button>
             <Button
@@ -308,7 +308,7 @@ const CommissionReportPage = () => {
               disabled={exportLoading || commissions.length === 0}
               className="flex items-center gap-2"
             >
-              <FileText className="w-4 h-4" />
+              <FileText className="h-4 w-4" />
               Exportar PDF
             </Button>
           </div>
@@ -331,19 +331,19 @@ const CommissionReportPage = () => {
       </div>
 
       {/* Filtros Avançados */}
-      <div className="card-theme dark:bg-dark-surface rounded-xl shadow-md p-6 mb-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Filter className="w-5 h-5 text-purple-600" />
-          <h2 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+      <div className="card-theme mb-6 rounded-xl p-6 shadow-md dark:bg-dark-surface">
+        <div className="mb-4 flex items-center gap-2">
+          <Filter className="h-5 w-5 text-purple-600" />
+          <h2 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
             Filtros Avançados
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5">
           {/* Profissional */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
-              <User className="w-4 h-4 inline mr-1" />
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+              <User className="mr-1 inline h-4 w-4" />
               Profissional
             </label>
             <select
@@ -351,7 +351,7 @@ const CommissionReportPage = () => {
               onChange={e =>
                 handleFilterChange('professionalId', e.target.value)
               }
-              className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-purple-500"
+              className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:ring-2 focus:ring-purple-500 dark:border-dark-border dark:bg-gray-700"
             >
               <option value="">Todos</option>
               {professionals.map(prof => (
@@ -364,41 +364,41 @@ const CommissionReportPage = () => {
 
           {/* Data Início */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
-              <Calendar className="w-4 h-4 inline mr-1" />
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+              <Calendar className="mr-1 inline h-4 w-4" />
               Data Início
             </label>
             <input
               type="date"
               value={filters.startDate}
               onChange={e => handleFilterChange('startDate', e.target.value)}
-              className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-purple-500"
+              className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:ring-2 focus:ring-purple-500 dark:border-dark-border dark:bg-gray-700"
             />
           </div>
 
           {/* Data Fim */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
-              <Calendar className="w-4 h-4 inline mr-1" />
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+              <Calendar className="mr-1 inline h-4 w-4" />
               Data Fim
             </label>
             <input
               type="date"
               value={filters.endDate}
               onChange={e => handleFilterChange('endDate', e.target.value)}
-              className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-purple-500"
+              className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:ring-2 focus:ring-purple-500 dark:border-dark-border dark:bg-gray-700"
             />
           </div>
 
           {/* Status */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
               Status
             </label>
             <select
               value={filters.status}
               onChange={e => handleFilterChange('status', e.target.value)}
-              className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-purple-500"
+              className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:ring-2 focus:ring-purple-500 dark:border-dark-border dark:bg-gray-700"
             >
               <option value="all">Todas</option>
               <option value="paid">Pagas</option>
@@ -408,7 +408,7 @@ const CommissionReportPage = () => {
 
           {/* Comanda */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
               Nº Comanda
             </label>
             <input
@@ -416,25 +416,25 @@ const CommissionReportPage = () => {
               value={filters.orderId}
               onChange={e => handleFilterChange('orderId', e.target.value)}
               placeholder="Ex: 001"
-              className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary focus:ring-2 focus:ring-purple-500"
+              className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:ring-2 focus:ring-purple-500 dark:border-dark-border dark:bg-gray-700"
             />
           </div>
         </div>
 
         {/* Botões de Ação */}
-        <div className="flex gap-3 mt-4">
+        <div className="mt-4 flex gap-3">
           <Button variant="primary" onClick={handleApplyFilters}>
             Aplicar Filtros
           </Button>
           <Button variant="outline" onClick={handleClearFilters}>
             Limpar
           </Button>
-          <label className="flex items-center gap-2 ml-auto">
+          <label className="ml-auto flex items-center gap-2">
             <input
               type="checkbox"
               checked={groupByProfessional}
               onChange={e => setGroupByProfessional(e.target.checked)}
-              className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+              className="h-4 w-4 rounded text-purple-600 focus:ring-purple-500"
             />
             <span className="text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600">
               Agrupar por profissional
@@ -444,14 +444,14 @@ const CommissionReportPage = () => {
       </div>
 
       {/* Tabela de Comissões */}
-      <div className="card-theme dark:bg-dark-surface rounded-xl shadow-md overflow-hidden">
+      <div className="card-theme overflow-hidden rounded-xl shadow-md dark:bg-dark-surface">
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+            <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-purple-600"></div>
           </div>
         ) : commissions.length === 0 ? (
-          <div className="text-center py-12">
-            <FileText className="w-16 h-16 text-light-text-muted dark:text-dark-text-muted mx-auto mb-4" />
+          <div className="py-12 text-center">
+            <FileText className="text-light-text-muted dark:text-dark-text-muted mx-auto mb-4 h-16 w-16" />
             <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
               Nenhuma comissão encontrada com os filtros aplicados
             </p>
@@ -460,8 +460,8 @@ const CommissionReportPage = () => {
           <div className="divide-y divide-gray-200 dark:divide-gray-700">
             {groupedCommissions().map((group, index) => (
               <div key={index} className="p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+                <div className="mb-4 flex items-center justify-between">
+                  <h3 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
                     {group.professional}
                   </h3>
                   <div className="flex gap-4 text-sm">
@@ -483,28 +483,28 @@ const CommissionReportPage = () => {
                   <table className="min-w-full">
                     <thead className="bg-light-bg dark:bg-dark-bg dark:bg-gray-700">
                       <tr>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-theme-secondary dark:text-gray-300 dark:text-gray-600">
+                        <th className="text-theme-secondary px-4 py-2 text-left text-xs font-medium dark:text-gray-300 dark:text-gray-600">
                           Data
                         </th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-theme-secondary dark:text-gray-300 dark:text-gray-600">
+                        <th className="text-theme-secondary px-4 py-2 text-left text-xs font-medium dark:text-gray-300 dark:text-gray-600">
                           Comanda
                         </th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-theme-secondary dark:text-gray-300 dark:text-gray-600">
+                        <th className="text-theme-secondary px-4 py-2 text-left text-xs font-medium dark:text-gray-300 dark:text-gray-600">
                           Cliente
                         </th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-theme-secondary dark:text-gray-300 dark:text-gray-600">
+                        <th className="text-theme-secondary px-4 py-2 text-left text-xs font-medium dark:text-gray-300 dark:text-gray-600">
                           Serviço
                         </th>
-                        <th className="px-4 py-2 text-right text-xs font-medium text-theme-secondary dark:text-gray-300 dark:text-gray-600">
+                        <th className="text-theme-secondary px-4 py-2 text-right text-xs font-medium dark:text-gray-300 dark:text-gray-600">
                           Valor
                         </th>
-                        <th className="px-4 py-2 text-right text-xs font-medium text-theme-secondary dark:text-gray-300 dark:text-gray-600">
+                        <th className="text-theme-secondary px-4 py-2 text-right text-xs font-medium dark:text-gray-300 dark:text-gray-600">
                           %
                         </th>
-                        <th className="px-4 py-2 text-right text-xs font-medium text-theme-secondary dark:text-gray-300 dark:text-gray-600">
+                        <th className="text-theme-secondary px-4 py-2 text-right text-xs font-medium dark:text-gray-300 dark:text-gray-600">
                           Comissão
                         </th>
-                        <th className="px-4 py-2 text-center text-xs font-medium text-theme-secondary dark:text-gray-300 dark:text-gray-600">
+                        <th className="text-theme-secondary px-4 py-2 text-center text-xs font-medium dark:text-gray-300 dark:text-gray-600">
                           Status
                         </th>
                       </tr>
@@ -515,30 +515,30 @@ const CommissionReportPage = () => {
                           key={item.id}
                           className="hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700"
                         >
-                          <td className="px-4 py-3 text-sm text-theme-primary dark:text-dark-text-primary">
+                          <td className="text-theme-primary dark:text-dark-text-primary px-4 py-3 text-sm">
                             {formatDate(item.date)}
                           </td>
-                          <td className="px-4 py-3 text-sm text-theme-primary dark:text-dark-text-primary">
+                          <td className="text-theme-primary dark:text-dark-text-primary px-4 py-3 text-sm">
                             #{item.orderNumber}
                           </td>
-                          <td className="px-4 py-3 text-sm text-theme-primary dark:text-dark-text-primary">
+                          <td className="text-theme-primary dark:text-dark-text-primary px-4 py-3 text-sm">
                             {item.clientName}
                           </td>
-                          <td className="px-4 py-3 text-sm text-theme-primary dark:text-dark-text-primary">
+                          <td className="text-theme-primary dark:text-dark-text-primary px-4 py-3 text-sm">
                             {item.serviceName}
                           </td>
-                          <td className="px-4 py-3 text-sm text-right text-theme-primary dark:text-dark-text-primary">
+                          <td className="text-theme-primary dark:text-dark-text-primary px-4 py-3 text-right text-sm">
                             {formatCurrency(item.unitPrice)}
                           </td>
-                          <td className="px-4 py-3 text-sm text-right text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                          <td className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-4 py-3 text-right text-sm">
                             {item.commissionPercentage}%
                           </td>
-                          <td className="px-4 py-3 text-sm text-right font-semibold text-purple-600">
+                          <td className="px-4 py-3 text-right text-sm font-semibold text-purple-600">
                             {formatCurrency(item.commissionValue)}
                           </td>
                           <td className="px-4 py-3 text-center">
                             <span
-                              className={`px-2 py-1 text-xs font-medium rounded-full ${item.status === 'paid' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'}`}
+                              className={`rounded-full px-2 py-1 text-xs font-medium ${item.status === 'paid' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'}`}
                             >
                               {item.status === 'paid' ? 'Paga' : 'Pendente'}
                             </span>
@@ -556,31 +556,31 @@ const CommissionReportPage = () => {
             <table className="min-w-full">
               <thead className="bg-light-bg dark:bg-dark-bg dark:bg-gray-700">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-gray-300 dark:text-gray-600 uppercase">
+                  <th className="text-theme-secondary px-6 py-3 text-left text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600">
                     Data
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-gray-300 dark:text-gray-600 uppercase">
+                  <th className="text-theme-secondary px-6 py-3 text-left text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600">
                     Comanda
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-gray-300 dark:text-gray-600 uppercase">
+                  <th className="text-theme-secondary px-6 py-3 text-left text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600">
                     Profissional
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-gray-300 dark:text-gray-600 uppercase">
+                  <th className="text-theme-secondary px-6 py-3 text-left text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600">
                     Cliente
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-gray-300 dark:text-gray-600 uppercase">
+                  <th className="text-theme-secondary px-6 py-3 text-left text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600">
                     Serviço
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-theme-secondary dark:text-gray-300 dark:text-gray-600 uppercase">
+                  <th className="text-theme-secondary px-6 py-3 text-right text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600">
                     Valor
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-theme-secondary dark:text-gray-300 dark:text-gray-600 uppercase">
+                  <th className="text-theme-secondary px-6 py-3 text-right text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600">
                     %
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-theme-secondary dark:text-gray-300 dark:text-gray-600 uppercase">
+                  <th className="text-theme-secondary px-6 py-3 text-right text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600">
                     Comissão
                   </th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-theme-secondary dark:text-gray-300 dark:text-gray-600 uppercase">
+                  <th className="text-theme-secondary px-6 py-3 text-center text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600">
                     Status
                   </th>
                 </tr>
@@ -591,33 +591,33 @@ const CommissionReportPage = () => {
                     key={item.id}
                     className="hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700"
                   >
-                    <td className="px-6 py-4 text-sm text-theme-primary dark:text-dark-text-primary">
+                    <td className="text-theme-primary dark:text-dark-text-primary px-6 py-4 text-sm">
                       {formatDate(item.date)}
                     </td>
-                    <td className="px-6 py-4 text-sm text-theme-primary dark:text-dark-text-primary">
+                    <td className="text-theme-primary dark:text-dark-text-primary px-6 py-4 text-sm">
                       #{item.orderNumber}
                     </td>
-                    <td className="px-6 py-4 text-sm text-theme-primary dark:text-dark-text-primary">
+                    <td className="text-theme-primary dark:text-dark-text-primary px-6 py-4 text-sm">
                       {item.professionalName}
                     </td>
-                    <td className="px-6 py-4 text-sm text-theme-primary dark:text-dark-text-primary">
+                    <td className="text-theme-primary dark:text-dark-text-primary px-6 py-4 text-sm">
                       {item.clientName}
                     </td>
-                    <td className="px-6 py-4 text-sm text-theme-primary dark:text-dark-text-primary">
+                    <td className="text-theme-primary dark:text-dark-text-primary px-6 py-4 text-sm">
                       {item.serviceName}
                     </td>
-                    <td className="px-6 py-4 text-sm text-right text-theme-primary dark:text-dark-text-primary">
+                    <td className="text-theme-primary dark:text-dark-text-primary px-6 py-4 text-right text-sm">
                       {formatCurrency(item.unitPrice)}
                     </td>
-                    <td className="px-6 py-4 text-sm text-right text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                    <td className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-4 text-right text-sm">
                       {item.commissionPercentage}%
                     </td>
-                    <td className="px-6 py-4 text-sm text-right font-semibold text-purple-600">
+                    <td className="px-6 py-4 text-right text-sm font-semibold text-purple-600">
                       {formatCurrency(item.commissionValue)}
                     </td>
                     <td className="px-6 py-4 text-center">
                       <span
-                        className={`px-3 py-1 text-xs font-medium rounded-full ${item.status === 'paid' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'}`}
+                        className={`rounded-full px-3 py-1 text-xs font-medium ${item.status === 'paid' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'}`}
                       >
                         {item.status === 'paid' ? 'Paga' : 'Pendente'}
                       </span>
@@ -631,9 +631,9 @@ const CommissionReportPage = () => {
 
         {/* Footer com Totais */}
         {commissions.length > 0 && (
-          <div className="bg-light-bg dark:bg-dark-bg dark:bg-gray-700 px-6 py-4 border-t border-light-border dark:border-dark-border">
-            <div className="flex justify-between items-center">
-              <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+          <div className="border-t border-light-border bg-light-bg px-6 py-4 dark:border-dark-border dark:bg-dark-bg dark:bg-gray-700">
+            <div className="flex items-center justify-between">
+              <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                 Total de {totals.count} {totals.count === 1 ? 'item' : 'itens'}
               </div>
               <div className="flex gap-6 text-sm font-semibold">

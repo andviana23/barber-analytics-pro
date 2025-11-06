@@ -38,11 +38,11 @@ const MatchTable = ({ matches = [], onConfirm, onReject, loading = false }) => {
   if (matches.length === 0) {
     return (
       <div
-        className="text-center py-12 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted"
+        className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted py-12 text-center"
         data-testid="match-table-empty"
       >
         <p className="text-lg font-medium">Nenhum match encontrado</p>
-        <p className="text-sm mt-2">
+        <p className="mt-2 text-sm">
           Ajuste a tolerância ou revise os lançamentos manualmente
         </p>
       </div>
@@ -52,7 +52,7 @@ const MatchTable = ({ matches = [], onConfirm, onReject, loading = false }) => {
     <div className="overflow-x-auto" data-testid="match-table">
       <table className="w-full border-collapse">
         <thead>
-          <tr className="card-theme dark:bg-dark-surface border-b-2 border-light-border dark:border-dark-border">
+          <tr className="card-theme border-b-2 border-light-border dark:border-dark-border dark:bg-dark-surface">
             <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600">
               Extrato Bancário
             </th>
@@ -78,16 +78,16 @@ const MatchTable = ({ matches = [], onConfirm, onReject, loading = false }) => {
             return (
               <tr
                 key={`match-${index}`}
-                className="border-b border-light-border dark:border-dark-border hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-dark-surface/50 transition-colors"
+                className="border-b border-light-border transition-colors hover:bg-light-bg dark:border-dark-border dark:bg-dark-bg dark:hover:bg-dark-surface/50"
                 data-testid={`match-row-${index}`}
               >
                 {/* Coluna Extrato */}
                 <td className="px-4 py-4">
                   <div className="space-y-1">
-                    <div className="text-sm font-medium text-theme-primary dark:text-dark-text-primary">
+                    <div className="text-theme-primary dark:text-dark-text-primary text-sm font-medium">
                       {match.statement?.description || 'Sem descrição'}
                     </div>
-                    <div className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                    <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-xs">
                       {formatDate(match.statement?.date)} •{' '}
                       {formatCurrency(match.statement?.amount || 0)}
                     </div>
@@ -97,12 +97,12 @@ const MatchTable = ({ matches = [], onConfirm, onReject, loading = false }) => {
                 {/* Coluna Receita */}
                 <td className="px-4 py-4">
                   <div className="space-y-1">
-                    <div className="text-sm font-medium text-theme-primary dark:text-dark-text-primary">
+                    <div className="text-theme-primary dark:text-dark-text-primary text-sm font-medium">
                       {match.revenue?.description ||
                         match.revenue?.category ||
                         'Sem descrição'}
                     </div>
-                    <div className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                    <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-xs">
                       {formatDate(match.revenue?.date)} •{' '}
                       {formatCurrency(
                         match.revenue?.amount || match.revenue?.value || 0
@@ -146,7 +146,7 @@ const MatchTable = ({ matches = [], onConfirm, onReject, loading = false }) => {
                       </span>
                     </div>
                   ) : (
-                    <span className="text-sm text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary">
+                    <span className="text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary text-sm">
                       —
                     </span>
                   )}
@@ -158,7 +158,7 @@ const MatchTable = ({ matches = [], onConfirm, onReject, loading = false }) => {
                     <button
                       onClick={() => handleConfirm(match, index)}
                       disabled={loading || isProcessing}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-dark-text-primary bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-md transition-colors"
+                      className="text-dark-text-primary inline-flex items-center gap-1.5 rounded-md bg-green-600 px-3 py-1.5 text-sm font-medium transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-400"
                       data-testid={`btn-confirm-match-${index}`}
                       aria-label="Confirmar match"
                     >
@@ -172,7 +172,7 @@ const MatchTable = ({ matches = [], onConfirm, onReject, loading = false }) => {
                     <button
                       onClick={() => handleReject(match, index)}
                       disabled={loading || isProcessing}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-dark-text-primary bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-md transition-colors"
+                      className="text-dark-text-primary inline-flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-gray-400"
                       data-testid={`btn-reject-match-${index}`}
                       aria-label="Rejeitar match"
                     >
@@ -192,7 +192,7 @@ const MatchTable = ({ matches = [], onConfirm, onReject, loading = false }) => {
       </table>
 
       {/* Rodapé com resumo */}
-      <div className="mt-4 px-4 py-3 bg-light-bg dark:bg-dark-bg dark:bg-dark-surface rounded-md">
+      <div className="mt-4 rounded-md bg-light-bg px-4 py-3 dark:bg-dark-bg dark:bg-dark-surface">
         <div className="flex items-center justify-between text-sm">
           <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
             Total de matches encontrados: <strong>{matches.length}</strong>

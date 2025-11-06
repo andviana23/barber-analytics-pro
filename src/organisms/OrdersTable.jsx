@@ -88,7 +88,7 @@ const OrdersTable = ({
   return (
     <div className={`space-y-4 ${className}`}>
       {/* Header com busca e filtros */}
-      <div className="flex flex-col lg:flex-row gap-4">
+      <div className="flex flex-col gap-4 lg:flex-row">
         {/* Busca */}
         <div className="flex-1">
           <div className="relative">
@@ -97,10 +97,10 @@ const OrdersTable = ({
               value={searchTerm}
               onChange={e => onSearchChange && onSearchChange(e.target.value)}
               placeholder="Buscar por número, cliente ou profissional..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-light-border dark:border-dark-border card-theme dark:bg-dark-surface text-theme-primary placeholder-theme-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              className="card-theme text-theme-primary placeholder-theme-secondary w-full rounded-lg border border-light-border py-2.5 pl-10 pr-4 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-dark-border dark:bg-dark-surface"
             />
             <svg
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-theme-secondary"
+              className="text-theme-secondary absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -127,7 +127,7 @@ const OrdersTable = ({
                 status: e.target.value,
               })
             }
-            className="px-4 py-2.5 rounded-lg border border-light-border dark:border-dark-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+            className="card-theme text-theme-primary rounded-lg border border-light-border px-4 py-2.5 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-dark-border dark:bg-dark-surface"
           >
             {statusOptions.map(option => (
               <option key={option.value} value={option.value}>
@@ -137,14 +137,14 @@ const OrdersTable = ({
           </select>
 
           {/* Toggle de visualização */}
-          <div className="flex rounded-lg border border-light-border dark:border-dark-border overflow-hidden">
+          <div className="flex overflow-hidden rounded-lg border border-light-border dark:border-dark-border">
             <button
               onClick={() => setViewMode('grid')}
-              className={`px-3 py-2 transition-colors ${viewMode === 'grid' ? 'bg-primary text-white' : 'bg-white dark:bg-dark-surface text-theme-secondary hover:bg-light-surface dark:hover:bg-dark-hover'}`}
+              className={`px-3 py-2 transition-colors ${viewMode === 'grid' ? 'bg-primary text-white' : 'text-theme-secondary bg-white hover:bg-light-surface dark:bg-dark-surface dark:hover:bg-dark-hover'}`}
               title="Visualização em grade"
             >
               <svg
-                className="w-5 h-5"
+                className="h-5 w-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -159,11 +159,11 @@ const OrdersTable = ({
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`px-3 py-2 transition-colors ${viewMode === 'list' ? 'bg-primary text-white' : 'bg-white dark:bg-dark-surface text-theme-secondary hover:bg-light-surface dark:hover:bg-dark-hover'}`}
+              className={`px-3 py-2 transition-colors ${viewMode === 'list' ? 'bg-primary text-white' : 'text-theme-secondary bg-white hover:bg-light-surface dark:bg-dark-surface dark:hover:bg-dark-hover'}`}
               title="Visualização em lista"
             >
               <svg
-                className="w-5 h-5"
+                className="h-5 w-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -182,10 +182,10 @@ const OrdersTable = ({
           {onCreateOrder && (
             <button
               onClick={onCreateOrder}
-              className="px-4 py-2.5 bg-primary hover:bg-primary-dark text-dark-text-primary font-medium rounded-lg transition-colors inline-flex items-center gap-2"
+              className="hover:bg-primary-dark text-dark-text-primary inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 font-medium transition-colors"
             >
               <svg
-                className="w-5 h-5"
+                className="h-5 w-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -206,13 +206,13 @@ const OrdersTable = ({
       {/* Lista de comandas */}
       {loading ? (
         <div className="py-12 text-center">
-          <div className="inline-block w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin mb-3" />
+          <div className="border-3 mb-3 inline-block h-8 w-8 animate-spin rounded-full border-primary border-t-transparent" />
           <p className="text-theme-secondary">Carregando comandas...</p>
         </div>
       ) : filteredOrders.length === 0 ? (
         <div className="py-12 text-center">
           <svg
-            className="w-16 h-16 mx-auto text-theme-secondary/50 mb-4"
+            className="text-theme-secondary/50 mx-auto mb-4 h-16 w-16"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -224,7 +224,7 @@ const OrdersTable = ({
               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
             />
           </svg>
-          <h3 className="text-lg font-semibold text-theme-primary mb-2">
+          <h3 className="text-theme-primary mb-2 text-lg font-semibold">
             {searchTerm || filters.status !== 'all'
               ? 'Nenhuma comanda encontrada'
               : 'Nenhuma comanda ainda'}
@@ -237,10 +237,10 @@ const OrdersTable = ({
           {onCreateOrder && !searchTerm && filters.status === 'all' && (
             <button
               onClick={onCreateOrder}
-              className="px-6 py-3 bg-primary hover:bg-primary-dark text-dark-text-primary font-medium rounded-lg transition-colors inline-flex items-center gap-2"
+              className="hover:bg-primary-dark text-dark-text-primary inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium transition-colors"
             >
               <svg
-                className="w-5 h-5"
+                className="h-5 w-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -262,7 +262,7 @@ const OrdersTable = ({
           <div
             className={
               viewMode === 'grid'
-                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'
+                ? 'grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'
                 : 'space-y-3'
             }
           >
@@ -279,7 +279,7 @@ const OrdersTable = ({
           {/* Paginação */}
           {pagination && pagination.totalPages > 1 && (
             <div className="flex items-center justify-between pt-4">
-              <p className="text-sm text-theme-secondary">
+              <p className="text-theme-secondary text-sm">
                 Mostrando {pagination.from || 1} a{' '}
                 {pagination.to || filteredOrders.length} de{' '}
                 {pagination.total || filteredOrders.length} comandas
@@ -290,11 +290,11 @@ const OrdersTable = ({
                     onPageChange && onPageChange(pagination.currentPage - 1)
                   }
                   disabled={pagination.currentPage === 1}
-                  className="px-3 py-1.5 rounded-md border border-light-border dark:border-dark-border text-sm font-medium text-theme-primary hover:bg-light-surface dark:hover:bg-dark-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="text-theme-primary rounded-md border border-light-border px-3 py-1.5 text-sm font-medium transition-colors hover:bg-light-surface disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-border dark:hover:bg-dark-hover"
                 >
                   Anterior
                 </button>
-                <span className="px-3 py-1.5 text-sm text-theme-secondary">
+                <span className="text-theme-secondary px-3 py-1.5 text-sm">
                   Página {pagination.currentPage} de {pagination.totalPages}
                 </span>
                 <button
@@ -302,7 +302,7 @@ const OrdersTable = ({
                     onPageChange && onPageChange(pagination.currentPage + 1)
                   }
                   disabled={pagination.currentPage === pagination.totalPages}
-                  className="px-3 py-1.5 rounded-md border border-light-border dark:border-dark-border text-sm font-medium text-theme-primary hover:bg-light-surface dark:hover:bg-dark-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="text-theme-primary rounded-md border border-light-border px-3 py-1.5 text-sm font-medium transition-colors hover:bg-light-surface disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-border dark:hover:bg-dark-hover"
                 >
                   Próxima
                 </button>

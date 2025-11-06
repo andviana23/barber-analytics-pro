@@ -100,22 +100,22 @@ const CloseCashModal = ({
         ? 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
         : 'text-theme-secondary dark:text-dark-text-muted bg-light-surface/30 dark:bg-dark-surface/30 border-light-border dark:border-dark-border';
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="card-theme w-full max-w-md max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+      <div className="card-theme max-h-[90vh] w-full max-w-md overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-theme-border">
+        <div className="border-theme-border flex items-center justify-between border-b p-6">
           <div>
-            <h2 className="text-xl font-bold text-theme-primary">
+            <h2 className="text-theme-primary text-xl font-bold">
               Fechar Caixa
             </h2>
-            <p className="text-sm text-theme-muted mt-1">
+            <p className="text-theme-muted mt-1 text-sm">
               Informe o saldo final para fechamento
             </p>
           </div>
           <button
             onClick={handleClose}
             disabled={loading}
-            className="p-2 rounded-lg hover:card-theme dark:hover:bg-dark-surface transition-colors disabled:opacity-50"
+            className="hover:card-theme rounded-lg p-2 transition-colors disabled:opacity-50 dark:hover:bg-dark-surface"
             aria-label="Fechar modal"
           >
             <X size={20} className="text-theme-muted" />
@@ -123,21 +123,21 @@ const CloseCashModal = ({
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 p-6">
           {/* Saldo Inicial */}
-          <div className="p-4 bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50 rounded-lg border border-theme-border">
+          <div className="border-theme-border rounded-lg border bg-light-bg p-4 dark:bg-dark-bg dark:bg-dark-surface/50">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-theme-muted">
+              <span className="text-theme-muted text-sm font-medium">
                 Saldo Inicial:
               </span>
-              <span className="text-base font-semibold text-theme-primary">
+              <span className="text-theme-primary text-base font-semibold">
                 {formatCurrency(cashRegister.opening_balance || 0)}
               </span>
             </div>
           </div>
 
           {/* Saldo Esperado */}
-          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+          <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
                 Saldo Esperado:
@@ -146,18 +146,18 @@ const CloseCashModal = ({
                 {formatCurrency(expectedBalance || 0)}
               </span>
             </div>
-            <p className="text-xs text-blue-600 dark:text-blue-300 mt-2">
+            <p className="mt-2 text-xs text-blue-600 dark:text-blue-300">
               Calculado com base nas movimentações registradas
             </p>
           </div>
 
           {/* Saldo Informado */}
           <div>
-            <label className="block text-sm font-medium text-theme-primary mb-2">
+            <label className="text-theme-primary mb-2 block text-sm font-medium">
               Saldo em Caixa (Contado) *
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                 <DollarSign size={18} className="text-theme-muted" />
               </div>
               <Input
@@ -173,7 +173,7 @@ const CloseCashModal = ({
               />
             </div>
             {closingBalanceNumber > 0 && (
-              <p className="text-xs text-theme-muted mt-1">
+              <p className="text-theme-muted mt-1 text-xs">
                 {formatCurrency(closingBalanceNumber)}
               </p>
             )}
@@ -181,8 +181,8 @@ const CloseCashModal = ({
 
           {/* Diferença */}
           {hasDifference && formData.closingBalance && (
-            <div className={`p-4 rounded-lg border ${differenceColor}`}>
-              <div className="flex items-center gap-2 mb-1">
+            <div className={`rounded-lg border p-4 ${differenceColor}`}>
+              <div className="mb-1 flex items-center gap-2">
                 <DifferenceIcon size={20} />
                 <span className="text-sm font-medium">
                   {difference > 0 ? 'Sobra em caixa' : 'Falta em caixa'}
@@ -191,7 +191,7 @@ const CloseCashModal = ({
               <p className="text-2xl font-bold">
                 {formatCurrency(Math.abs(difference))}
               </p>
-              <p className="text-xs mt-1 opacity-80">
+              <p className="mt-1 text-xs opacity-80">
                 {difference > 0
                   ? 'O caixa tem mais dinheiro do que o esperado'
                   : 'O caixa tem menos dinheiro do que o esperado'}
@@ -201,7 +201,7 @@ const CloseCashModal = ({
 
           {/* Observações */}
           <div>
-            <label className="block text-sm font-medium text-theme-primary mb-2">
+            <label className="text-theme-primary mb-2 block text-sm font-medium">
               Observações {hasDifference && '*'}
             </label>
             <textarea
@@ -215,16 +215,16 @@ const CloseCashModal = ({
               rows={4}
               disabled={loading}
               required={hasDifference}
-              className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary placeholder-theme-muted focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed resize-none"
+              className="border-theme-border card-theme text-theme-primary placeholder-theme-muted focus:ring-primary-500 w-full resize-none rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-dark-surface"
             />
-            <p className="text-xs text-theme-muted mt-1">
+            <p className="text-theme-muted mt-1 text-xs">
               {formData.observations.length}/500 caracteres
             </p>
           </div>
 
           {/* Erro de validação */}
           {errors.form && (
-            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <div className="rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/20">
               <p className="text-sm text-red-600 dark:text-red-400">
                 {errors.form}
               </p>
@@ -232,7 +232,7 @@ const CloseCashModal = ({
           )}
 
           {/* Alerta */}
-          <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+          <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
             <p className="text-sm text-yellow-800 dark:text-yellow-200">
               <strong>Atenção:</strong> Após o fechamento, não será possível
               criar novas comandas neste caixa.

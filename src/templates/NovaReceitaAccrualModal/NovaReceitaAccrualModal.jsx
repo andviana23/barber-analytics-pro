@@ -313,19 +313,19 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
   };
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="card-theme dark:bg-dark-surface rounded-2xl shadow-2xl w-full max-w-3xl my-8 mx-auto flex flex-col max-h-[calc(100vh-4rem)] border-2 border-light-border dark:border-dark-border">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-4 dark:bg-black/70">
+      <div className="card-theme mx-auto my-8 flex max-h-[calc(100vh-4rem)] w-full max-w-3xl flex-col rounded-2xl border-2 border-light-border shadow-2xl dark:border-dark-border dark:bg-dark-surface">
         {/* 🎨 Header com gradiente azul→índigo */}
-        <div className="relative px-6 py-5 border-b-2 border-light-border dark:border-dark-border flex items-center justify-between flex-shrink-0 bg-gradient-primary rounded-t-2xl">
+        <div className="relative flex flex-shrink-0 items-center justify-between rounded-t-2xl border-b-2 border-light-border bg-gradient-primary px-6 py-5 dark:border-dark-border">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 card-theme/20 backdrop-blur-sm rounded-xl">
-              <DollarSign className="w-6 h-6 text-dark-text-primary" />
+            <div className="card-theme/20 rounded-xl p-2.5 backdrop-blur-sm">
+              <DollarSign className="text-dark-text-primary h-6 w-6" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-dark-text-primary tracking-wide">
+              <h2 className="text-dark-text-primary text-xl font-bold tracking-wide">
                 Nova Receita
               </h2>
-              <p className="text-xs text-blue-100 mt-0.5">
+              <p className="mt-0.5 text-xs text-blue-100">
                 Regime de Competência
               </p>
             </div>
@@ -334,31 +334,31 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-dark-text-primary/80 hover:text-dark-text-primary hover:card-theme/20 rounded-lg transition-all"
+            className="text-dark-text-primary/80 hover:text-dark-text-primary hover:card-theme/20 rounded-lg p-2 transition-all"
             disabled={loading}
           >
-            <X className="w-5 h-5" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* 📋 Form */}
-        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           {/* ⚠️ Loading overlay */}
           {loadingData && (
-            <div className="absolute inset-0 card-theme/80 dark:bg-dark-surface/80 backdrop-blur-sm flex items-center justify-center z-10 rounded-2xl">
+            <div className="card-theme/80 absolute inset-0 z-10 flex items-center justify-center rounded-2xl backdrop-blur-sm dark:bg-dark-surface/80">
               <div className="text-center">
-                <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-2" />
-                <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                <Loader2 className="mx-auto mb-2 h-8 w-8 animate-spin text-blue-600" />
+                <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                   Carregando dados...
                 </p>
               </div>
             </div>
           )}
 
-          <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5 min-h-0">
+          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
             {/* 📝 Campo: Título */}
             <div>
-              <label className="flex items-center gap-2 text-sm font-semibold text-theme-secondary mb-2">
+              <label className="text-theme-secondary mb-2 flex items-center gap-2 text-sm font-semibold">
                 <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                 Título *
               </label>
@@ -369,14 +369,14 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
                 onChange={e => handleInputChange('titulo', e.target.value)}
                 className={
                   errors.titulo
-                    ? 'border-red-400 dark:border-red-500 focus:ring-red-500'
+                    ? 'border-red-400 focus:ring-red-500 dark:border-red-500'
                     : ''
                 }
               />
               {errors.titulo && (
-                <div className="flex items-center gap-1.5 mt-1.5">
-                  <AlertCircle className="w-3.5 h-3.5 text-red-500" />
-                  <p className="text-xs text-red-600 dark:text-red-400 font-medium">
+                <div className="mt-1.5 flex items-center gap-1.5">
+                  <AlertCircle className="h-3.5 w-3.5 text-red-500" />
+                  <p className="text-xs font-medium text-red-600 dark:text-red-400">
                     {errors.titulo}
                   </p>
                 </div>
@@ -385,12 +385,12 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
 
             {/* 💰 Campo: Valor */}
             <div>
-              <label className="flex items-center gap-2 text-sm font-semibold text-theme-secondary mb-2">
+              <label className="text-theme-secondary mb-2 flex items-center gap-2 text-sm font-semibold">
                 <DollarSign className="h-4 w-4 text-green-600 dark:text-green-400" />
                 Valor *
               </label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted font-bold text-sm">
+                <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold">
                   R$
                 </span>
                 <Input
@@ -399,13 +399,13 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
                   placeholder="0,00"
                   value={formData.valor}
                   onChange={handleValorChange}
-                  className={`pl-12 text-lg font-semibold ${errors.valor ? 'border-red-400 dark:border-red-500 focus:ring-red-500' : ''}`}
+                  className={`pl-12 text-lg font-semibold ${errors.valor ? 'border-red-400 focus:ring-red-500 dark:border-red-500' : ''}`}
                 />
               </div>
               {errors.valor && (
-                <div className="flex items-center gap-1.5 mt-1.5">
-                  <AlertCircle className="w-3.5 h-3.5 text-red-500" />
-                  <p className="text-xs text-red-600 dark:text-red-400 font-medium">
+                <div className="mt-1.5 flex items-center gap-1.5">
+                  <AlertCircle className="h-3.5 w-3.5 text-red-500" />
+                  <p className="text-xs font-medium text-red-600 dark:text-red-400">
                     {errors.valor}
                   </p>
                 </div>
@@ -413,10 +413,10 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
             </div>
 
             {/* 📅 Data de Pagamento + Unidade (2 colunas) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {/* Data de Pagamento */}
               <div>
-                <label className="flex items-center gap-2 text-sm font-semibold text-theme-secondary mb-2">
+                <label className="text-theme-secondary mb-2 flex items-center gap-2 text-sm font-semibold">
                   <Calendar className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                   Data de Pagamento *
                 </label>
@@ -428,18 +428,18 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
                   }
                   className={
                     errors.data_pagamento
-                      ? 'border-red-400 dark:border-red-500 focus:ring-red-500'
+                      ? 'border-red-400 focus:ring-red-500 dark:border-red-500'
                       : ''
                   }
                 />
-                <p className="mt-1.5 text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted flex items-center gap-1">
-                  <Info className="w-3 h-3" />
+                <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1.5 flex items-center gap-1 text-xs">
+                  <Info className="h-3 w-3" />
                   Data de competência no sistema
                 </p>
                 {errors.data_pagamento && (
-                  <div className="flex items-center gap-1.5 mt-1.5">
-                    <AlertCircle className="w-3.5 h-3.5 text-red-500" />
-                    <p className="text-xs text-red-600 dark:text-red-400 font-medium">
+                  <div className="mt-1.5 flex items-center gap-1.5">
+                    <AlertCircle className="h-3.5 w-3.5 text-red-500" />
+                    <p className="text-xs font-medium text-red-600 dark:text-red-400">
                       {errors.data_pagamento}
                     </p>
                   </div>
@@ -448,14 +448,14 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
 
               {/* Unidade */}
               <div>
-                <label className="flex items-center gap-2 text-sm font-semibold text-theme-secondary mb-2">
+                <label className="text-theme-secondary mb-2 flex items-center gap-2 text-sm font-semibold">
                   <Building2 className="h-4 w-4 text-orange-600 dark:text-orange-400" />
                   Unidade *
                 </label>
                 <select
                   value={formData.unit_id}
                   onChange={e => handleInputChange('unit_id', e.target.value)}
-                  className={`w-full px-4 py-2.5 border-2 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all ${errors.unit_id ? 'border-red-400 dark:border-red-500' : 'border-gray-200 dark:border-gray-600'}`}
+                  className={`w-full rounded-xl border-2 bg-white px-4 py-2.5 text-gray-900 transition-all focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/20 dark:bg-gray-700 dark:text-white ${errors.unit_id ? 'border-red-400 dark:border-red-500' : 'border-gray-200 dark:border-gray-600'}`}
                 >
                   <option value="">Selecione uma unidade</option>
                   {units.map(unit => (
@@ -465,9 +465,9 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
                   ))}
                 </select>
                 {errors.unit_id && (
-                  <div className="flex items-center gap-1.5 mt-1.5">
-                    <AlertCircle className="w-3.5 h-3.5 text-red-500" />
-                    <p className="text-xs text-red-600 dark:text-red-400 font-medium">
+                  <div className="mt-1.5 flex items-center gap-1.5">
+                    <AlertCircle className="h-3.5 w-3.5 text-red-500" />
+                    <p className="text-xs font-medium text-red-600 dark:text-red-400">
                       {errors.unit_id}
                     </p>
                   </div>
@@ -477,22 +477,22 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
 
             {/* 🏷️ Categoria */}
             <div>
-              <label className="flex items-center gap-2 text-sm font-semibold text-theme-secondary mb-2">
+              <label className="text-theme-secondary mb-2 flex items-center gap-2 text-sm font-semibold">
                 <Tag className="h-4 w-4 text-pink-600 dark:text-pink-400" />
                 Categoria *
               </label>
               <select
                 value={formData.category_id}
                 onChange={e => handleInputChange('category_id', e.target.value)}
-                className={`w-full px-4 py-2.5 border-2 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all ${errors.category_id ? 'border-red-400 dark:border-red-500' : 'border-gray-200 dark:border-gray-600'}`}
+                className={`w-full rounded-xl border-2 bg-white px-4 py-2.5 text-gray-900 transition-all focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/20 dark:bg-gray-700 dark:text-white ${errors.category_id ? 'border-red-400 dark:border-red-500' : 'border-gray-200 dark:border-gray-600'}`}
               >
                 <option value="">Selecione uma categoria</option>
                 {renderCategoryOptions()}
               </select>
               {errors.category_id && (
-                <div className="flex items-center gap-1.5 mt-1.5">
-                  <AlertCircle className="w-3.5 h-3.5 text-red-500" />
-                  <p className="text-xs text-red-600 dark:text-red-400 font-medium">
+                <div className="mt-1.5 flex items-center gap-1.5">
+                  <AlertCircle className="h-3.5 w-3.5 text-red-500" />
+                  <p className="text-xs font-medium text-red-600 dark:text-red-400">
                     {errors.category_id}
                   </p>
                 </div>
@@ -500,10 +500,10 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
             </div>
 
             {/* 💳 Forma de Pagamento + Conta Bancária (2 colunas) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {/* Forma de Pagamento */}
               <div>
-                <label className="flex items-center gap-2 text-sm font-semibold text-theme-secondary mb-2">
+                <label className="text-theme-secondary mb-2 flex items-center gap-2 text-sm font-semibold">
                   <CreditCard className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
                   Forma de Pagamento *
                 </label>
@@ -513,7 +513,7 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
                     handleInputChange('payment_method_id', e.target.value)
                   }
                   disabled={!formData.unit_id}
-                  className={`w-full px-4 py-2.5 border-2 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${errors.payment_method_id ? 'border-red-400 dark:border-red-500' : 'border-gray-200 dark:border-gray-600'}`}
+                  className={`w-full rounded-xl border-2 bg-white px-4 py-2.5 text-gray-900 transition-all focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-700 dark:text-white ${errors.payment_method_id ? 'border-red-400 dark:border-red-500' : 'border-gray-200 dark:border-gray-600'}`}
                 >
                   <option value="">
                     {formData.unit_id
@@ -530,16 +530,16 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
                   ))}
                 </select>
                 {errors.payment_method_id && (
-                  <div className="flex items-center gap-1.5 mt-1.5">
-                    <AlertCircle className="w-3.5 h-3.5 text-red-500" />
-                    <p className="text-xs text-red-600 dark:text-red-400 font-medium">
+                  <div className="mt-1.5 flex items-center gap-1.5">
+                    <AlertCircle className="h-3.5 w-3.5 text-red-500" />
+                    <p className="text-xs font-medium text-red-600 dark:text-red-400">
                       {errors.payment_method_id}
                     </p>
                   </div>
                 )}
                 {paymentMethods.length === 0 && formData.unit_id && (
-                  <p className="mt-1.5 text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" />
+                  <p className="mt-1.5 flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
+                    <AlertCircle className="h-3 w-3" />
                     Nenhuma forma cadastrada
                   </p>
                 )}
@@ -547,7 +547,7 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
 
               {/* Conta Bancária */}
               <div>
-                <label className="flex items-center gap-2 text-sm font-semibold text-theme-secondary mb-2">
+                <label className="text-theme-secondary mb-2 flex items-center gap-2 text-sm font-semibold">
                   <Landmark className="h-4 w-4 text-teal-600 dark:text-teal-400" />
                   Conta Bancária (Opcional)
                 </label>
@@ -557,7 +557,7 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
                     handleInputChange('account_id', e.target.value)
                   }
                   disabled={!formData.unit_id}
-                  className={`w-full px-4 py-2.5 border-2 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed border-gray-200 dark:border-gray-600`}
+                  className={`w-full rounded-xl border-2 border-gray-200 bg-white px-4 py-2.5 text-gray-900 transition-all focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white`}
                 >
                   <option value="">
                     {formData.unit_id
@@ -575,8 +575,8 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
 
             {/* 📝 Observações */}
             <div>
-              <label className="flex items-center gap-2 text-sm font-semibold text-theme-secondary mb-2">
-                <FileText className="h-4 w-4 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted" />
+              <label className="text-theme-secondary mb-2 flex items-center gap-2 text-sm font-semibold">
+                <FileText className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted h-4 w-4" />
                 Observações (Opcional)
               </label>
               <textarea
@@ -584,22 +584,22 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
                 onChange={e => handleInputChange('observacoes', e.target.value)}
                 placeholder="Informações adicionais sobre esta receita..."
                 rows={3}
-                className="w-full px-4 py-3 border-2 border-light-border dark:border-dark-border rounded-xl card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
+                className="card-theme text-theme-primary dark:text-dark-text-primary w-full resize-none rounded-xl border-2 border-light-border px-4 py-3 placeholder-gray-400 transition-all focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/20 dark:border-dark-border dark:bg-gray-700 dark:placeholder-gray-500"
               />
             </div>
 
             {/* ✅ Info: Data de Recebimento Calculada */}
             {selectedPaymentMethod && formData.prev_recebimento && (
-              <div className="bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 rounded-xl p-4">
+              <div className="rounded-xl border-2 border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
                 <div className="flex items-start gap-3">
-                  <div className="p-2 bg-green-500/10 rounded-lg">
+                  <div className="rounded-lg bg-green-500/10 p-2">
                     <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-bold text-green-900 dark:text-green-100">
                       Data de Recebimento Calculada
                     </p>
-                    <p className="text-base font-semibold text-green-700 dark:text-green-300 mt-1">
+                    <p className="mt-1 text-base font-semibold text-green-700 dark:text-green-300">
                       {new Date(
                         formData.prev_recebimento + 'T00:00:00'
                       ).toLocaleDateString('pt-BR', {
@@ -609,12 +609,12 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
                         weekday: 'long',
                       })}
                     </p>
-                    <p className="text-xs text-green-600 dark:text-green-400 mt-2">
+                    <p className="mt-2 text-xs text-green-600 dark:text-green-400">
                       {selectedPaymentMethod.receipt_days === 0
                         ? '✓ Recebimento imediato no mesmo dia'
                         : `✓ ${selectedPaymentMethod.receipt_days} ${selectedPaymentMethod.receipt_days === 1 ? 'dia corrido' : 'dias corridos'} após pagamento`}
                       {selectedPaymentMethod.receipt_days > 0 && (
-                        <span className="block mt-1">
+                        <span className="mt-1 block">
                           ✓ Ajustado automaticamente para dia útil
                         </span>
                       )}
@@ -626,28 +626,28 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
           </div>
 
           {/* 🎯 Footer */}
-          <div className="px-6 py-4 border-t-2 border-light-border dark:border-dark-border flex items-center justify-end gap-3 flex-shrink-0 bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50 rounded-b-2xl">
+          <div className="flex flex-shrink-0 items-center justify-end gap-3 rounded-b-2xl border-t-2 border-light-border bg-light-bg px-6 py-4 dark:border-dark-border dark:bg-dark-bg dark:bg-dark-surface/50">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-5 py-2.5 text-theme-secondary border-2 border-light-border dark:border-dark-border rounded-xl hover:card-theme dark:hover:bg-gray-700 transition-all font-medium disabled:opacity-50"
+              className="text-theme-secondary hover:card-theme rounded-xl border-2 border-light-border px-5 py-2.5 font-medium transition-all disabled:opacity-50 dark:border-dark-border dark:hover:bg-gray-700"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading || loadingData}
-              className="px-6 py-2.5 bg-gradient-success text-dark-text-primary rounded-xl hover:opacity-90 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-lg shadow-green-500/30"
+              className="text-dark-text-primary flex items-center rounded-xl bg-gradient-success px-6 py-2.5 font-semibold shadow-lg shadow-green-500/30 transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Salvando...
                 </>
               ) : (
                 <>
-                  <Save className="w-4 h-4 mr-2" />
+                  <Save className="mr-2 h-4 w-4" />
                   Salvar Receita
                 </>
               )}

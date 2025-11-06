@@ -644,10 +644,10 @@ const OrdersPage = () => {
     !bankAccountsLoading && !financialError && bankAccounts.length === 0;
   if (!unitId) {
     return (
-      <div className="container mx-auto px-4 py-8 space-y-6">
+      <div className="container mx-auto space-y-6 px-4 py-8">
         <div className="flex items-center gap-3">
-          <FileText className="w-8 h-8 text-theme-primary" />
-          <h1 className="text-3xl font-bold text-theme-primary">Comandas</h1>
+          <FileText className="text-theme-primary h-8 w-8" />
+          <h1 className="text-theme-primary text-3xl font-bold">Comandas</h1>
         </div>
         <Alert
           type="info"
@@ -661,10 +661,10 @@ const OrdersPage = () => {
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+        <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-theme-primary mb-2">
-              <FileText className="w-8 h-8 inline mr-2" />
+            <h1 className="text-theme-primary mb-2 text-3xl font-bold">
+              <FileText className="mr-2 inline h-8 w-8" />
               Comandas
             </h1>
             <p className="text-theme-muted">
@@ -678,7 +678,7 @@ const OrdersPage = () => {
               onClick={handleNewOrder}
               disabled={ordersLoading}
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="mr-2 h-4 w-4" />
               Nova Comanda
             </Button>
           )}
@@ -703,18 +703,18 @@ const OrdersPage = () => {
         </div>
 
         {/* Barra de Busca e Filtros */}
-        <div className="card-theme p-4 space-y-4">
+        <div className="card-theme space-y-4 p-4">
           {/* Busca */}
           <div className="flex gap-2">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-theme-muted" />
+            <div className="relative flex-1">
+              <Search className="text-theme-muted absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
               <input
                 type="text"
                 name="search"
                 value={filters.search}
                 onChange={handleFilterChange}
                 placeholder="Buscar por cliente ou profissional..."
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border-theme-border card-theme text-theme-primary w-full rounded-lg border py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-dark-surface"
               />
             </div>
 
@@ -722,24 +722,24 @@ const OrdersPage = () => {
               variant="secondary"
               onClick={() => setShowFilters(!showFilters)}
             >
-              <Filter className="w-4 h-4 mr-2" />
+              <Filter className="mr-2 h-4 w-4" />
               Filtros
             </Button>
           </div>
 
           {/* Filtros Expandidos */}
           {showFilters && (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-theme-border">
+            <div className="border-theme-border grid grid-cols-1 gap-4 border-t pt-4 md:grid-cols-4">
               {/* Status */}
               <div>
-                <label className="block text-sm font-medium text-theme-primary mb-2">
+                <label className="text-theme-primary mb-2 block text-sm font-medium">
                   Status
                 </label>
                 <select
                   name="status"
                   value={filters.status}
                   onChange={handleFilterChange}
-                  className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="border-theme-border card-theme text-theme-primary w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-dark-surface"
                 >
                   <option value="all">Todos</option>
                   <option value="open">Abertas</option>
@@ -750,7 +750,7 @@ const OrdersPage = () => {
 
               {/* Data Inicial */}
               <div>
-                <label className="block text-sm font-medium text-theme-primary mb-2">
+                <label className="text-theme-primary mb-2 block text-sm font-medium">
                   Data Inicial
                 </label>
                 <input
@@ -758,13 +758,13 @@ const OrdersPage = () => {
                   name="startDate"
                   value={filters.startDate}
                   onChange={handleFilterChange}
-                  className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="border-theme-border card-theme text-theme-primary w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-dark-surface"
                 />
               </div>
 
               {/* Data Final */}
               <div>
-                <label className="block text-sm font-medium text-theme-primary mb-2">
+                <label className="text-theme-primary mb-2 block text-sm font-medium">
                   Data Final
                 </label>
                 <input
@@ -772,7 +772,7 @@ const OrdersPage = () => {
                   name="endDate"
                   value={filters.endDate}
                   onChange={handleFilterChange}
-                  className="w-full px-4 py-2 rounded-lg border border-theme-border card-theme dark:bg-dark-surface text-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="border-theme-border card-theme text-theme-primary w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-dark-surface"
                 />
               </div>
 
@@ -783,7 +783,7 @@ const OrdersPage = () => {
                   onClick={handleClearFilters}
                   className="w-full"
                 >
-                  <X className="w-4 h-4 mr-2" />
+                  <X className="mr-2 h-4 w-4" />
                   Limpar Filtros
                 </Button>
               </div>
@@ -795,14 +795,14 @@ const OrdersPage = () => {
       {/* Lista de Comandas */}
       <div className="space-y-3">
         {ordersLoading ? (
-          <div className="card-theme text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <div className="card-theme py-12 text-center">
+            <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-blue-500"></div>
             <p className="text-theme-muted">Carregando comandas...</p>
           </div>
         ) : filteredOrders.length === 0 ? (
-          <div className="card-theme text-center py-12">
-            <Package className="w-16 h-16 mx-auto mb-4 text-theme-muted" />
-            <h3 className="text-lg font-semibold text-theme-primary mb-2">
+          <div className="card-theme py-12 text-center">
+            <Package className="text-theme-muted mx-auto mb-4 h-16 w-16" />
+            <h3 className="text-theme-primary mb-2 text-lg font-semibold">
               Nenhuma comanda encontrada
             </h3>
             <p className="text-theme-muted mb-6">
@@ -816,7 +816,7 @@ const OrdersPage = () => {
 
             {canCreateOrder && !filters.search && filters.status === 'all' && (
               <Button variant="primary" onClick={handleNewOrder}>
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="mr-2 h-4 w-4" />
                 Nova Comanda
               </Button>
             )}
@@ -853,27 +853,27 @@ const OrdersPage = () => {
       {/* Resumo */}
       {filteredOrders.length > 0 && (
         <div className="card-theme mt-6 p-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+          <div className="grid grid-cols-2 gap-4 text-center md:grid-cols-4">
             <div>
-              <p className="text-sm text-theme-muted mb-1">Total</p>
-              <p className="text-2xl font-bold text-theme-primary">
+              <p className="text-theme-muted mb-1 text-sm">Total</p>
+              <p className="text-theme-primary text-2xl font-bold">
                 {filteredOrders.length}
               </p>
             </div>
             <div>
-              <p className="text-sm text-theme-muted mb-1">Abertas</p>
+              <p className="text-theme-muted mb-1 text-sm">Abertas</p>
               <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                 {filteredOrders.filter(o => o.status === 'open').length}
               </p>
             </div>
             <div>
-              <p className="text-sm text-theme-muted mb-1">Fechadas</p>
+              <p className="text-theme-muted mb-1 text-sm">Fechadas</p>
               <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                 {filteredOrders.filter(o => o.status === 'closed').length}
               </p>
             </div>
             <div>
-              <p className="text-sm text-theme-muted mb-1">Canceladas</p>
+              <p className="text-theme-muted mb-1 text-sm">Canceladas</p>
               <p className="text-2xl font-bold text-red-600 dark:text-red-400">
                 {filteredOrders.filter(o => o.status === 'canceled').length}
               </p>
@@ -882,17 +882,17 @@ const OrdersPage = () => {
         </div>
       )}
 
-      <div className="mt-12 grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <div className="mt-12 grid grid-cols-1 gap-6 xl:grid-cols-2">
         {/* Clientes */}
-        <section className="card-theme p-6 space-y-6">
+        <section className="card-theme space-y-6 p-6">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
-              <Users className="w-5 h-5 text-theme-primary" />
-              <h2 className="text-xl font-semibold text-theme-primary">
+              <Users className="text-theme-primary h-5 w-5" />
+              <h2 className="text-theme-primary text-xl font-semibold">
                 Clientes da unidade
               </h2>
             </div>
-            <p className="text-sm text-theme-secondary">
+            <p className="text-theme-secondary text-sm">
               {filteredClients.length}{' '}
               {filteredClients.length === 1
                 ? 'cliente encontrado'
@@ -901,19 +901,19 @@ const OrdersPage = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-4">
             <div className="relative lg:col-span-2">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-theme-muted" />
+              <Search className="text-theme-muted absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
               <input
                 type="text"
                 value={clientsSearch}
                 onChange={event => setClientsSearch(event.target.value)}
                 placeholder="Buscar por nome, documento ou contato"
-                className="w-full input-theme pl-10"
+                className="input-theme w-full pl-10"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-theme-primary mb-1">
+              <label className="text-theme-primary mb-1 block text-sm font-medium">
                 Status
               </label>
               <select
@@ -927,7 +927,7 @@ const OrdersPage = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-theme-primary mb-1">
+              <label className="text-theme-primary mb-1 block text-sm font-medium">
                 Histórico de compras
               </label>
               <select
@@ -946,11 +946,11 @@ const OrdersPage = () => {
 
           {clientsLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="h-10 w-10 rounded-full border-2 border-blue-500 border-t-transparent animate-spin" />
+              <div className="h-10 w-10 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
             </div>
           ) : filteredClients.length === 0 ? (
-            <div className="text-center py-12 space-y-3">
-              <Users className="w-12 h-12 mx-auto text-theme-muted" />
+            <div className="space-y-3 py-12 text-center">
+              <Users className="text-theme-muted mx-auto h-12 w-12" />
               <p className="text-theme-secondary">
                 Nenhum cliente encontrado com os filtros selecionados.
               </p>
@@ -977,64 +977,64 @@ const OrdersPage = () => {
                 return (
                   <div
                     key={client.id}
-                    className="card-theme border border-light-border dark:border-dark-border rounded-xl p-4 space-y-4"
+                    className="card-theme space-y-4 rounded-xl border border-light-border p-4 dark:border-dark-border"
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div className="flex items-start gap-3">
-                        <div className="w-12 h-12 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary font-semibold">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary dark:bg-primary/20">
                           {clientName.charAt(0).toUpperCase()}
                         </div>
                         <div className="space-y-1">
-                          <h3 className="text-base font-semibold text-theme-primary">
+                          <h3 className="text-theme-primary text-base font-semibold">
                             {clientName}
                           </h3>
                           {clientEmail && (
-                            <div className="flex items-center gap-2 text-sm text-theme-secondary">
-                              <Mail className="w-4 h-4" />
-                              <span className="truncate max-w-[220px]">
+                            <div className="text-theme-secondary flex items-center gap-2 text-sm">
+                              <Mail className="h-4 w-4" />
+                              <span className="max-w-[220px] truncate">
                                 {clientEmail}
                               </span>
                             </div>
                           )}
                           {clientPhone && (
-                            <div className="flex items-center gap-2 text-sm text-theme-secondary">
-                              <Phone className="w-4 h-4" />
+                            <div className="text-theme-secondary flex items-center gap-2 text-sm">
+                              <Phone className="h-4 w-4" />
                               <span>{formatPhone(clientPhone)}</span>
                             </div>
                           )}
                         </div>
                       </div>
                       <span
-                        className={`inline-flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-full ${client.is_active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'}`}
+                        className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${client.is_active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'}`}
                       >
                         {client.is_active ? (
                           <>
-                            <CheckCircle className="w-3 h-3" />
+                            <CheckCircle className="h-3 w-3" />
                             Ativo
                           </>
                         ) : (
                           <>
-                            <XCircle className="w-3 h-3" />
+                            <XCircle className="h-3 w-3" />
                             Inativo
                           </>
                         )}
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                      <div className="rounded-lg bg-light-hover dark:bg-dark-hover p-3">
-                        <p className="text-xs text-theme-secondary uppercase tracking-wide">
+                    <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+                      <div className="rounded-lg bg-light-hover p-3 dark:bg-dark-hover">
+                        <p className="text-theme-secondary text-xs uppercase tracking-wide">
                           Total de comandas
                         </p>
-                        <p className="text-lg font-semibold text-theme-primary">
+                        <p className="text-theme-primary text-lg font-semibold">
                           {metrics.totalOrders || 0}
                         </p>
                       </div>
-                      <div className="rounded-lg bg-light-hover dark:bg-dark-hover p-3">
-                        <p className="text-xs text-theme-secondary uppercase tracking-wide">
+                      <div className="rounded-lg bg-light-hover p-3 dark:bg-dark-hover">
+                        <p className="text-theme-secondary text-xs uppercase tracking-wide">
                           Última visita
                         </p>
-                        <p className="text-lg font-semibold text-theme-primary">
+                        <p className="text-theme-primary text-lg font-semibold">
                           {metrics.lastOrderDate
                             ? formatDateShort(metrics.lastOrderDate)
                             : '—'}
@@ -1067,7 +1067,7 @@ const OrdersPage = () => {
           )}
 
           {filteredClients.length > clientsPerPage && (
-            <div className="pt-4 border-t border-light-border dark:border-dark-border flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between border-t border-light-border pt-4 text-sm dark:border-dark-border">
               <span className="text-theme-secondary">
                 Página {clientsPage} de {totalClientPages}
               </span>
@@ -1098,15 +1098,15 @@ const OrdersPage = () => {
         </section>
 
         {/* Profissionais */}
-        <section className="card-theme p-6 space-y-6">
+        <section className="card-theme space-y-6 p-6">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
-              <Briefcase className="w-5 h-5 text-theme-primary" />
-              <h2 className="text-xl font-semibold text-theme-primary">
+              <Briefcase className="text-theme-primary h-5 w-5" />
+              <h2 className="text-theme-primary text-xl font-semibold">
                 Profissionais em destaque
               </h2>
             </div>
-            <p className="text-sm text-theme-secondary">
+            <p className="text-theme-secondary text-sm">
               {filteredProfessionals.length}{' '}
               {filteredProfessionals.length === 1
                 ? 'profissional disponível'
@@ -1115,19 +1115,19 @@ const OrdersPage = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-4">
             <div className="relative lg:col-span-2">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-theme-muted" />
+              <Search className="text-theme-muted absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
               <input
                 type="text"
                 value={professionalSearch}
                 onChange={event => setProfessionalSearch(event.target.value)}
                 placeholder="Buscar por nome ou especialidade"
-                className="w-full input-theme pl-10"
+                className="input-theme w-full pl-10"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-theme-primary mb-1">
+              <label className="text-theme-primary mb-1 block text-sm font-medium">
                 Status
               </label>
               <select
@@ -1143,7 +1143,7 @@ const OrdersPage = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-theme-primary mb-1">
+              <label className="text-theme-primary mb-1 block text-sm font-medium">
                 Especialidade
               </label>
               <select
@@ -1160,7 +1160,7 @@ const OrdersPage = () => {
               </select>
             </div>
             <div className="flex flex-col">
-              <label className="block text-sm font-medium text-theme-primary mb-1">
+              <label className="text-theme-primary mb-1 block text-sm font-medium">
                 Ordenação
               </label>
               <Button
@@ -1180,11 +1180,11 @@ const OrdersPage = () => {
 
           {professionalsLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="h-10 w-10 rounded-full border-2 border-purple-500 border-t-transparent animate-spin" />
+              <div className="h-10 w-10 animate-spin rounded-full border-2 border-purple-500 border-t-transparent" />
             </div>
           ) : filteredProfessionals.length === 0 ? (
-            <div className="text-center py-12 space-y-3">
-              <Briefcase className="w-12 h-12 mx-auto text-theme-muted" />
+            <div className="space-y-3 py-12 text-center">
+              <Briefcase className="text-theme-muted mx-auto h-12 w-12" />
               <p className="text-theme-secondary">
                 Nenhum profissional encontrado com os filtros selecionados.
               </p>
@@ -1208,52 +1208,52 @@ const OrdersPage = () => {
                 return (
                   <div
                     key={professional.id}
-                    className="card-theme border border-light-border dark:border-dark-border rounded-xl p-4 space-y-4"
+                    className="card-theme space-y-4 rounded-xl border border-light-border p-4 dark:border-dark-border"
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div className="flex items-start gap-3">
-                        <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-700 dark:text-purple-200 font-semibold">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-100 font-semibold text-purple-700 dark:bg-purple-900/30 dark:text-purple-200">
                           {professional.name?.charAt(0).toUpperCase()}
                         </div>
                         <div className="space-y-1">
-                          <h3 className="text-base font-semibold text-theme-primary">
+                          <h3 className="text-theme-primary text-base font-semibold">
                             {professional.name}
                           </h3>
-                          <p className="flex items-center gap-2 text-sm text-theme-secondary">
-                            <Briefcase className="w-4 h-4" />
+                          <p className="text-theme-secondary flex items-center gap-2 text-sm">
+                            <Briefcase className="h-4 w-4" />
                             {specialty}
                           </p>
                         </div>
                       </div>
                       <span
-                        className={`inline-flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-full ${professional.is_active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'}`}
+                        className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${professional.is_active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'}`}
                       >
                         {professional.is_active ? 'Disponível' : 'Inativo'}
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
-                      <div className="rounded-lg bg-light-hover dark:bg-dark-hover p-3">
-                        <p className="text-xs text-theme-secondary uppercase tracking-wide">
+                    <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-3">
+                      <div className="rounded-lg bg-light-hover p-3 dark:bg-dark-hover">
+                        <p className="text-theme-secondary text-xs uppercase tracking-wide">
                           Comandas em andamento
                         </p>
-                        <p className="text-lg font-semibold text-theme-primary">
+                        <p className="text-theme-primary text-lg font-semibold">
                           {metrics.openOrders || 0}
                         </p>
                       </div>
-                      <div className="rounded-lg bg-light-hover dark:bg-dark-hover p-3">
-                        <p className="text-xs text-theme-secondary uppercase tracking-wide">
+                      <div className="rounded-lg bg-light-hover p-3 dark:bg-dark-hover">
+                        <p className="text-theme-secondary text-xs uppercase tracking-wide">
                           Comandas concluídas
                         </p>
-                        <p className="text-lg font-semibold text-theme-primary">
+                        <p className="text-theme-primary text-lg font-semibold">
                           {metrics.closedOrders || 0}
                         </p>
                       </div>
-                      <div className="rounded-lg bg-light-hover dark:bg-dark-hover p-3">
-                        <p className="text-xs text-theme-secondary uppercase tracking-wide">
+                      <div className="rounded-lg bg-light-hover p-3 dark:bg-dark-hover">
+                        <p className="text-theme-secondary text-xs uppercase tracking-wide">
                           Comissão padrão
                         </p>
-                        <p className="text-lg font-semibold text-theme-primary">
+                        <p className="text-theme-primary text-lg font-semibold">
                           {professional.commission_rate || 0}%
                         </p>
                       </div>

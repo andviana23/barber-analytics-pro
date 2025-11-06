@@ -83,21 +83,21 @@ export function SignUpPage() {
   };
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-light-bg dark:bg-dark-bg px-4">
-        <div className="max-w-md w-full text-center">
-          <div className="card-theme p-8 rounded-xl border border-light-border dark:border-dark-border shadow-lg">
-            <div className="mx-auto w-16 h-16 bg-success rounded-xl flex items-center justify-center mb-4">
+      <div className="flex min-h-screen items-center justify-center bg-light-bg px-4 dark:bg-dark-bg">
+        <div className="w-full max-w-md text-center">
+          <div className="card-theme rounded-xl border border-light-border p-8 shadow-lg dark:border-dark-border">
+            <div className="bg-success mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-xl">
               <UserPlus className="text-dark-text-primary h-8 w-8" />
             </div>
-            <h2 className="text-2xl font-bold text-text-light-primary dark:text-text-dark-primary mb-4">
+            <h2 className="mb-4 text-2xl font-bold text-text-light-primary dark:text-text-dark-primary">
               Conta criada com sucesso!
             </h2>
-            <p className="text-text-light-secondary dark:text-text-dark-secondary mb-6">
+            <p className="mb-6 text-text-light-secondary dark:text-text-dark-secondary">
               Verifique seu email para confirmar sua conta antes de fazer login.
             </p>
             <Link
               to="/login"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-dark-text-primary rounded-lg hover:bg-primary-600 transition-colors duration-300"
+              className="text-dark-text-primary hover:bg-primary-600 inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 transition-colors duration-300"
             >
               Ir para Login
             </Link>
@@ -107,12 +107,12 @@ export function SignUpPage() {
     );
   }
   return (
-    <div className="min-h-screen flex items-center justify-center bg-light-bg dark:bg-dark-bg px-4 py-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="flex min-h-screen items-center justify-center bg-light-bg px-4 py-8 dark:bg-dark-bg">
+      <div className="w-full max-w-md space-y-8">
         {/* Header */}
         <div className="text-center">
-          <div className="mx-auto w-16 h-16 bg-primary rounded-xl flex items-center justify-center mb-4">
-            <span className="text-dark-text-primary font-bold text-xl">BA</span>
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-xl bg-primary">
+            <span className="text-dark-text-primary text-xl font-bold">BA</span>
           </div>
           <h2 className="text-3xl font-bold text-text-light-primary dark:text-text-dark-primary">
             Criar sua conta
@@ -123,18 +123,18 @@ export function SignUpPage() {
         </div>
 
         {/* SignUp Form */}
-        <div className="card-theme p-8 rounded-xl border border-light-border dark:border-dark-border shadow-lg">
+        <div className="card-theme rounded-xl border border-light-border p-8 shadow-lg dark:border-dark-border">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Full Name Field */}
             <div>
               <label
                 htmlFor="fullName"
-                className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2"
+                className="mb-2 block text-sm font-medium text-text-light-primary dark:text-text-dark-primary"
               >
                 Nome Completo
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                   <User className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary" />
                 </div>
                 <input
@@ -145,7 +145,7 @@ export function SignUpPage() {
                   required
                   value={formData.fullName}
                   onChange={handleInputChange}
-                  className="block w-full pl-10 pr-3 py-3 border border-light-border dark:border-dark-border rounded-lg bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary placeholder-text-light-secondary dark:placeholder-text-dark-secondary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-300"
+                  className="block w-full rounded-lg border border-light-border bg-light-bg py-3 pl-10 pr-3 text-text-light-primary placeholder-text-light-secondary transition-colors duration-300 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/50 dark:border-dark-border dark:bg-dark-bg dark:text-text-dark-primary dark:placeholder-text-dark-secondary"
                   placeholder="Seu nome completo"
                 />
               </div>
@@ -155,12 +155,12 @@ export function SignUpPage() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2"
+                className="mb-2 block text-sm font-medium text-text-light-primary dark:text-text-dark-primary"
               >
                 Email
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                   <Mail className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary" />
                 </div>
                 <input
@@ -171,7 +171,7 @@ export function SignUpPage() {
                   required
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="block w-full pl-10 pr-3 py-3 border border-light-border dark:border-dark-border rounded-lg bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary placeholder-text-light-secondary dark:placeholder-text-dark-secondary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-300"
+                  className="block w-full rounded-lg border border-light-border bg-light-bg py-3 pl-10 pr-3 text-text-light-primary placeholder-text-light-secondary transition-colors duration-300 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/50 dark:border-dark-border dark:bg-dark-bg dark:text-text-dark-primary dark:placeholder-text-dark-secondary"
                   placeholder="seu@email.com"
                 />
               </div>
@@ -181,12 +181,12 @@ export function SignUpPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2"
+                className="mb-2 block text-sm font-medium text-text-light-primary dark:text-text-dark-primary"
               >
                 Senha
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                   <Lock className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary" />
                 </div>
                 <input
@@ -197,18 +197,18 @@ export function SignUpPage() {
                   required
                   value={formData.password}
                   onChange={handleInputChange}
-                  className="block w-full pl-10 pr-12 py-3 border border-light-border dark:border-dark-border rounded-lg bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary placeholder-text-light-secondary dark:placeholder-text-dark-secondary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-300"
+                  className="block w-full rounded-lg border border-light-border bg-light-bg py-3 pl-10 pr-12 text-text-light-primary placeholder-text-light-secondary transition-colors duration-300 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/50 dark:border-dark-border dark:bg-dark-bg dark:text-text-dark-primary dark:placeholder-text-dark-secondary"
                   placeholder="Mínimo 6 caracteres"
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute inset-y-0 right-0 flex items-center pr-3"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary transition-colors duration-300" />
+                    <EyeOff className="h-5 w-5 text-text-light-secondary transition-colors duration-300 hover:text-text-light-primary dark:text-text-dark-secondary dark:hover:text-text-dark-primary" />
                   ) : (
-                    <Eye className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary transition-colors duration-300" />
+                    <Eye className="h-5 w-5 text-text-light-secondary transition-colors duration-300 hover:text-text-light-primary dark:text-text-dark-secondary dark:hover:text-text-dark-primary" />
                   )}
                 </button>
               </div>
@@ -218,12 +218,12 @@ export function SignUpPage() {
             <div>
               <label
                 htmlFor="confirmPassword"
-                className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2"
+                className="mb-2 block text-sm font-medium text-text-light-primary dark:text-text-dark-primary"
               >
                 Confirmar Senha
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                   <Lock className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary" />
                 </div>
                 <input
@@ -234,18 +234,18 @@ export function SignUpPage() {
                   required
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
-                  className="block w-full pl-10 pr-12 py-3 border border-light-border dark:border-dark-border rounded-lg bg-light-bg dark:bg-dark-bg text-text-light-primary dark:text-text-dark-primary placeholder-text-light-secondary dark:placeholder-text-dark-secondary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-300"
+                  className="block w-full rounded-lg border border-light-border bg-light-bg py-3 pl-10 pr-12 text-text-light-primary placeholder-text-light-secondary transition-colors duration-300 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/50 dark:border-dark-border dark:bg-dark-bg dark:text-text-dark-primary dark:placeholder-text-dark-secondary"
                   placeholder="Confirme sua senha"
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute inset-y-0 right-0 flex items-center pr-3"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? (
-                    <EyeOff className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary transition-colors duration-300" />
+                    <EyeOff className="h-5 w-5 text-text-light-secondary transition-colors duration-300 hover:text-text-light-primary dark:text-text-dark-secondary dark:hover:text-text-dark-primary" />
                   ) : (
-                    <Eye className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary transition-colors duration-300" />
+                    <Eye className="h-5 w-5 text-text-light-secondary transition-colors duration-300 hover:text-text-light-primary dark:text-text-dark-secondary dark:hover:text-text-dark-primary" />
                   )}
                 </button>
               </div>
@@ -253,7 +253,7 @@ export function SignUpPage() {
 
             {/* Error Message */}
             {error && (
-              <div className="bg-danger/10 border border-danger/20 rounded-lg p-3">
+              <div className="bg-danger/10 border-danger/20 rounded-lg border p-3">
                 <p className="text-danger text-sm">{error}</p>
               </div>
             )}
@@ -262,7 +262,7 @@ export function SignUpPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-dark-text-primary bg-primary hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
+              className="text-dark-text-primary hover:bg-primary-600 flex w-full items-center justify-center gap-2 rounded-lg border border-transparent bg-primary px-4 py-3 text-sm font-medium shadow-sm transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isLoading ? (
                 <>
@@ -284,7 +284,7 @@ export function SignUpPage() {
               Já tem uma conta?{' '}
               <Link
                 to="/login"
-                className="text-primary hover:text-primary-600 font-medium transition-colors duration-300"
+                className="hover:text-primary-600 font-medium text-primary transition-colors duration-300"
               >
                 Fazer login
               </Link>
@@ -298,14 +298,14 @@ export function SignUpPage() {
             Ao criar uma conta, você concorda com nossos{' '}
             <Link
               to="/terms"
-              className="text-primary hover:text-primary-600 transition-colors duration-300"
+              className="hover:text-primary-600 text-primary transition-colors duration-300"
             >
               Termos de Uso
             </Link>{' '}
             e{' '}
             <Link
               to="/privacy"
-              className="text-primary hover:text-primary-600 transition-colors duration-300"
+              className="hover:text-primary-600 text-primary transition-colors duration-300"
             >
               Política de Privacidade
             </Link>

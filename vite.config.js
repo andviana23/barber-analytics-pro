@@ -9,19 +9,60 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 5173, // Porta padrão do Vite
+    port: 5173,
     open: true,
+    host: true, // Permite acesso via rede local
   },
   build: {
     outDir: 'dist',
     sourcemap: true,
+    minify: 'esbuild',
+    target: 'es2020',
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          charts: ['chart.js', 'react-chartjs-2', 'recharts'],
+          supabase: ['@supabase/supabase-js'],
+          utils: ['date-fns', 'lodash', 'uuid'],
+        },
+      },
+    },
+  },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+      '@atoms': path.resolve(__dirname, './src/atoms'),
+      '@molecules': path.resolve(__dirname, './src/molecules'),
+      '@organisms': path.resolve(__dirname, './src/organisms'),
+      '@templates': path.resolve(__dirname, './src/templates'),
+      '@pages': path.resolve(__dirname, './src/pages'),
+      '@services': path.resolve(__dirname, './src/services'),
+      '@repositories': path.resolve(__dirname, './src/repositories'),
+      '@hooks': path.resolve(__dirname, './src/hooks'),
+      '@dtos': path.resolve(__dirname, './src/dtos'),
+      '@utils': path.resolve(__dirname, './src/utils'),
+      '@contexts': path.resolve(__dirname, './src/contexts'),
+      '@config': path.resolve(__dirname, './src/config'),
+      '@tests': path.resolve(__dirname, './tests'),
+    },
+  },
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      '@supabase/supabase-js',
+      'date-fns',
+      'lodash',
+    ],
   },
   test: {
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: true,
-    // Excluir testes E2E (Playwright) do Vitest
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
@@ -51,12 +92,6 @@ export default defineConfig({
           statements: 85,
         },
       },
-    },
-  },
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@tests': path.resolve(__dirname, './tests'),
     },
   },
 });

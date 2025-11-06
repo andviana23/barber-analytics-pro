@@ -28,11 +28,11 @@ const AtomsDemo = () => {
     setTimeout(() => setLoading(false), 2000);
   };
   return (
-    <div className="min-h-screen bg-light-bg dark:bg-dark-bg p-6">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen bg-light-bg p-6 dark:bg-dark-bg">
+      <div className="mx-auto max-w-6xl space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-theme-primary mb-2">
+          <h1 className="text-theme-primary mb-2 text-3xl font-bold">
             Atoms Demo - FASE 1
           </h1>
           <p className="text-theme-secondary">
@@ -43,11 +43,11 @@ const AtomsDemo = () => {
 
         {/* CurrencyInput Examples */}
         <Card className="p-6">
-          <h2 className="text-2xl font-semibold text-theme-primary mb-4">
+          <h2 className="text-theme-primary mb-4 text-2xl font-semibold">
             💰 CurrencyInput
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {/* Normal */}
             <div>
               <CurrencyInput
@@ -58,7 +58,7 @@ const AtomsDemo = () => {
                 min={0}
                 max={100000}
               />
-              <p className="mt-2 text-sm text-theme-secondary">
+              <p className="text-theme-secondary mt-2 text-sm">
                 Valor atual: R$ {saldoInicial.toFixed(2)}
               </p>
             </div>
@@ -101,7 +101,7 @@ const AtomsDemo = () => {
             <summary className="cursor-pointer text-sm font-medium text-primary hover:text-primary-hover">
               Ver código de exemplo
             </summary>
-            <pre className="mt-2 p-4 card-theme rounded-md overflow-x-auto text-xs">
+            <pre className="card-theme mt-2 overflow-x-auto rounded-md p-4 text-xs">
               <code>{`<CurrencyInput
   label="Saldo Inicial"
   value={saldoInicial}
@@ -117,11 +117,11 @@ const AtomsDemo = () => {
 
         {/* TimeInput Examples */}
         <Card className="p-6">
-          <h2 className="text-2xl font-semibold text-theme-primary mb-4">
+          <h2 className="text-theme-primary mb-4 text-2xl font-semibold">
             ⏱️ TimeInput
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {/* Normal */}
             <div>
               <TimeInput
@@ -133,7 +133,7 @@ const AtomsDemo = () => {
                 max={480}
                 step={15}
               />
-              <p className="mt-2 text-sm text-theme-secondary">
+              <p className="text-theme-secondary mt-2 text-sm">
                 Valor atual: {duracao} minutos ({Math.floor(duracao / 60)}h{' '}
                 {duracao % 60}min)
               </p>
@@ -176,7 +176,7 @@ const AtomsDemo = () => {
             <summary className="cursor-pointer text-sm font-medium text-primary hover:text-primary-hover">
               Ver código de exemplo
             </summary>
-            <pre className="mt-2 p-4 card-theme rounded-md overflow-x-auto text-xs">
+            <pre className="card-theme mt-2 overflow-x-auto rounded-md p-4 text-xs">
               <code>{`<TimeInput
   label="Duração do Serviço"
   value={duracao}
@@ -192,14 +192,14 @@ const AtomsDemo = () => {
 
         {/* ProtectedButton Examples */}
         <Card className="p-6">
-          <h2 className="text-2xl font-semibold text-theme-primary mb-4">
+          <h2 className="text-theme-primary mb-4 text-2xl font-semibold">
             🔐 ProtectedButton
           </h2>
 
           <div className="space-y-6">
             {/* Variantes */}
             <div>
-              <h3 className="text-lg font-medium text-theme-primary mb-3">
+              <h3 className="text-theme-primary mb-3 text-lg font-medium">
                 Variantes
               </h3>
               <div className="flex flex-wrap gap-3">
@@ -244,7 +244,7 @@ const AtomsDemo = () => {
 
             {/* Tamanhos */}
             <div>
-              <h3 className="text-lg font-medium text-theme-primary mb-3">
+              <h3 className="text-theme-primary mb-3 text-lg font-medium">
                 Tamanhos
               </h3>
               <div className="flex flex-wrap items-center gap-3">
@@ -258,7 +258,7 @@ const AtomsDemo = () => {
 
             {/* Estados */}
             <div>
-              <h3 className="text-lg font-medium text-theme-primary mb-3">
+              <h3 className="text-theme-primary mb-3 text-lg font-medium">
                 Estados
               </h3>
               <div className="flex flex-wrap gap-3">
@@ -274,7 +274,7 @@ const AtomsDemo = () => {
 
             {/* Com Permissões */}
             <div>
-              <h3 className="text-lg font-medium text-theme-primary mb-3">
+              <h3 className="text-theme-primary mb-3 text-lg font-medium">
                 Controle de Acesso (Role-based)
               </h3>
               <div className="flex flex-wrap gap-3">
@@ -301,14 +301,14 @@ const AtomsDemo = () => {
                   Apenas Profissional (esconde se não tiver permissão)
                 </ProtectedButton>
               </div>
-              <p className="mt-3 text-sm text-theme-secondary">
+              <p className="text-theme-secondary mt-3 text-sm">
                 💡 Passe o mouse sobre os botões bloqueados para ver o tooltip
               </p>
             </div>
 
             {/* Full Width */}
             <div>
-              <h3 className="text-lg font-medium text-theme-primary mb-3">
+              <h3 className="text-theme-primary mb-3 text-lg font-medium">
                 Full Width
               </h3>
               <ProtectedButton fullWidth variant="primary">
@@ -322,7 +322,7 @@ const AtomsDemo = () => {
             <summary className="cursor-pointer text-sm font-medium text-primary hover:text-primary-hover">
               Ver código de exemplo
             </summary>
-            <pre className="mt-2 p-4 card-theme rounded-md overflow-x-auto text-xs">
+            <pre className="card-theme mt-2 overflow-x-auto rounded-md p-4 text-xs">
               <code>{`<ProtectedButton
   requiredRoles={['gerente', 'admin']}
   onClick={handleCadastrarServico}
@@ -338,15 +338,15 @@ const AtomsDemo = () => {
         </Card>
 
         {/* Resumo */}
-        <Card className="p-6 bg-primary/5 border-2 border-primary/20">
-          <h3 className="text-lg font-semibold text-primary mb-2">
+        <Card className="border-2 border-primary/20 bg-primary/5 p-6">
+          <h3 className="mb-2 text-lg font-semibold text-primary">
             ✅ FASE 1 Completa
           </h3>
           <p className="text-theme-secondary">
             Todos os 3 atoms essenciais foram implementados seguindo o Design
             System:
           </p>
-          <ul className="mt-3 space-y-1 text-theme-secondary">
+          <ul className="text-theme-secondary mt-3 space-y-1">
             <li>
               ✅ <strong>CurrencyInput</strong> - Formatação automática de moeda
               brasileira

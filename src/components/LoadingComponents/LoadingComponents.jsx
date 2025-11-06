@@ -26,10 +26,7 @@ export function LoadingSpinner({
     <div className="flex flex-col items-center justify-center space-y-3">
       {/* Spinner animado */}
       <motion.div
-        className={`
-          border-2 border-gray-200 dark:border-gray-700 border-t-transparent 
-          ${sizeClasses[size]} ${colorClasses[color]} rounded-full
-        `}
+        className={`border-2 border-gray-200 border-t-transparent dark:border-gray-700 ${sizeClasses[size]} ${colorClasses[color]} rounded-full`}
         animate={{
           rotate: 360,
         }}
@@ -43,7 +40,7 @@ export function LoadingSpinner({
 
       {/* Texto com suporte a screen reader */}
       <div
-        className="text-sm text-theme-secondary dark:text-gray-300 dark:text-gray-600 font-medium"
+        className="text-theme-secondary text-sm font-medium dark:text-gray-300 dark:text-gray-600"
         role="status"
         aria-live="polite"
       >
@@ -66,10 +63,7 @@ export function LoadingSpinner({
         exit={{
           opacity: 0,
         }}
-        className={`
-          fixed inset-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm
-          flex items-center justify-center ${className}
-        `}
+        className={`fixed inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm dark:bg-gray-900/80 ${className} `}
         role="dialog"
         aria-modal="true"
         aria-labelledby="loading-title"
@@ -99,10 +93,10 @@ export function SkeletonLoader({
     <div className={`animate-pulse space-y-4 ${className}`} aria-hidden="true">
       {showAvatar && (
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full" />
-          <div className="space-y-2 flex-1">
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4" />
-            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/6" />
+          <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700" />
+          <div className="flex-1 space-y-2">
+            <div className="h-4 w-1/4 rounded bg-gray-200 dark:bg-gray-700" />
+            <div className="h-3 w-1/6 rounded bg-gray-200 dark:bg-gray-700" />
           </div>
         </div>
       )}
@@ -113,16 +107,13 @@ export function SkeletonLoader({
         }).map((_, index) => (
           <div
             key={index}
-            className={`
-              h-4 bg-gray-200 dark:bg-gray-700 rounded
-              ${index === lines - 1 ? 'w-3/4' : 'w-full'}
-            `}
+            className={`h-4 rounded bg-gray-200 dark:bg-gray-700 ${index === lines - 1 ? 'w-3/4' : 'w-full'} `}
           />
         ))}
       </div>
 
       {showButton && (
-        <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-32" />
+        <div className="h-10 w-32 rounded bg-gray-200 dark:bg-gray-700" />
       )}
 
       <span className="sr-only">Conteúdo sendo carregado</span>
@@ -134,7 +125,7 @@ export function SkeletonLoader({
 export function CardSkeleton({ className = '' }) {
   return (
     <div
-      className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 ${className}`}
+      className={`rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800 ${className}`}
     >
       <SkeletonLoader lines={3} showButton={true} />
     </div>
@@ -145,10 +136,10 @@ export function CardSkeleton({ className = '' }) {
 export function TableSkeleton({ rows = 5, columns = 4, className = '' }) {
   return (
     <div
-      className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden ${className}`}
+      className={`overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 ${className}`}
     >
       {/* Header */}
-      <div className="border-b border-light-border dark:border-dark-border p-4">
+      <div className="border-b border-light-border p-4 dark:border-dark-border">
         <div
           className="grid gap-4"
           style={{
@@ -160,7 +151,7 @@ export function TableSkeleton({ rows = 5, columns = 4, className = '' }) {
           }).map((_, index) => (
             <div
               key={index}
-              className="h-4 bg-gray-200 dark:bg-gray-700 rounded"
+              className="h-4 rounded bg-gray-200 dark:bg-gray-700"
             />
           ))}
         </div>
@@ -183,10 +174,7 @@ export function TableSkeleton({ rows = 5, columns = 4, className = '' }) {
               }).map((_, colIndex) => (
                 <div
                   key={colIndex}
-                  className={`
-                    h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse
-                    ${colIndex === 0 ? 'w-3/4' : 'w-full'}
-                  `}
+                  className={`h-4 animate-pulse rounded bg-gray-200 dark:bg-gray-700 ${colIndex === 0 ? 'w-3/4' : 'w-full'} `}
                   style={{
                     animationDelay: `${(rowIndex * columns + colIndex) * 0.1}s`,
                   }}
@@ -213,19 +201,19 @@ export function ProgressBar({
   const percentage = Math.min(100, Math.max(0, (progress / max) * 100));
   return (
     <div className={`w-full ${className}`}>
-      <div className="flex justify-between items-center mb-2">
+      <div className="mb-2 flex items-center justify-between">
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
           {label}
         </span>
         {showPercentage && (
-          <span className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+          <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
             {Math.round(percentage)}%
           </span>
         )}
       </div>
 
       <div
-        className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5"
+        className="h-2.5 w-full rounded-full bg-gray-200 dark:bg-gray-700"
         role="progressbar"
         aria-valuenow={progress}
         aria-valuemin={0}
@@ -233,7 +221,7 @@ export function ProgressBar({
         aria-label={`${label}: ${Math.round(percentage)}% concluído`}
       >
         <motion.div
-          className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+          className="h-2.5 rounded-full bg-blue-600 transition-all duration-300"
           initial={{
             width: 0,
           }}
@@ -264,13 +252,13 @@ export function FormLoadingOverlay({ isVisible, message = 'Processando...' }) {
       exit={{
         opacity: 0,
       }}
-      className="absolute inset-0 card-theme/80 dark:bg-dark-surface/80 backdrop-blur-sm z-10 flex items-center justify-center"
+      className="card-theme/80 absolute inset-0 z-10 flex items-center justify-center backdrop-blur-sm dark:bg-dark-surface/80"
       role="status"
       aria-live="polite"
     >
       <div className="flex flex-col items-center space-y-3">
         <LoadingSpinner />
-        <span className="text-sm font-medium text-theme-secondary dark:text-gray-300 dark:text-gray-600">
+        <span className="text-theme-secondary text-sm font-medium dark:text-gray-300 dark:text-gray-600">
           {message}
         </span>
       </div>

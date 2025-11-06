@@ -9,6 +9,7 @@
 ## 🔍 Análise do Problema
 
 ### Sintomas
+
 - Admin faz login com sucesso
 - Abre página "Módulo Financeiro Avançado"
 - Seletor de unidades aparece **vazio** ou **desabilitado**
@@ -27,7 +28,7 @@ Após análise profunda do banco de dados e código, identifiquei que:
 
 ```sql
 -- Usuário admin tem 2 registros em professionals (1 por unidade)
-SELECT 
+SELECT
     u.email,
     p.role,
     p.unit_id,
@@ -61,6 +62,7 @@ true  -- Permite SELECT para todos
 ### Teste 1: unitsRepository.findAll()
 
 O repository faz:
+
 ```javascript
 let query = supabase.from('units').select(defaultSelect);
 if (!includeInactive) {
@@ -79,6 +81,7 @@ const { data, error } = await unitsService.getUnits({
 ```
 
 **Log esperado:**
+
 ```
 📍 UnitContext - Unidades carregadas: 2
 ```
@@ -86,6 +89,7 @@ const { data, error } = await unitsService.getUnits({
 ### Teste 3: Console do Browser
 
 Verificar no console do navegador se `units` array está vazio:
+
 ```javascript
 console.log('🏢 FinanceiroAdvancedPage - Units carregadas:', units);
 ```
@@ -99,6 +103,7 @@ console.log('🏢 FinanceiroAdvancedPage - Units carregadas:', units);
 **Possível causa:** O Supabase JS está retornando erro mas não está sendo logado.
 
 **Teste:**
+
 ```javascript
 // Em unitsRepository.js - linha ~20
 const { data, error } = await formatOrder(query);
@@ -112,6 +117,7 @@ return { data, error };
 **Possível causa:** Supabase Client está usando um `user_id` diferente do esperado.
 
 **Teste:**
+
 ```javascript
 // Adicionar em unitsRepository.js
 const { data: userData } = await supabase.auth.getUser();
@@ -123,6 +129,7 @@ console.log('👤 Current user:', userData.user?.email, userData.user?.id);
 **Possível causa:** localStorage ou cache de sessão está interferindo.
 
 **Teste:**
+
 1. Abrir DevTools
 2. Application → Local Storage → Limpar tudo
 3. Application → Session Storage → Limpar tudo
@@ -137,10 +144,11 @@ console.log('👤 Current user:', userData.user?.email, userData.user?.id);
 Adicionar logs em 3 pontos críticos:
 
 #### 1. unitsRepository.js
+
 ```javascript
 async findAll({ includeInactive = false } = {}) {
   console.log('🔍 [unitsRepository] findAll - includeInactive:', includeInactive);
-  
+
   let query = supabase.from(table).select(defaultSelect);
 
   if (!includeInactive) {
@@ -148,20 +156,21 @@ async findAll({ includeInactive = false } = {}) {
   }
 
   const { data, error } = await formatOrder(query);
-  
+
   console.log('🔍 [unitsRepository] findAll - data:', data);
   console.log('🔍 [unitsRepository] findAll - error:', error);
   console.log('🔍 [unitsRepository] findAll - count:', data?.length);
-  
+
   return { data, error };
 }
 ```
 
 #### 2. unitsService.js
+
 ```javascript
 async getUnits(params = {}) {
   console.log('🔍 [unitsService] getUnits - params:', params);
-  
+
   const includeInactive = this.resolveIncludeInactiveFlag(params);
   const filtersDTO = new UnitFiltersDTO({ includeInactive });
 
@@ -187,7 +196,7 @@ async getUnits(params = {}) {
     }
 
     const units = (data || []).map(toUnitResponse);
-    
+
     console.log('✅ [unitsService] getUnits - units mapeadas:', units.length, units);
 
     return { data: units, error: null };
@@ -202,6 +211,7 @@ async getUnits(params = {}) {
 ```
 
 #### 3. UnitContext.jsx
+
 ```javascript
 const loadUnits = useCallback(async () => {
   console.log('🔄 [UnitContext] Iniciando loadUnits...');
@@ -222,7 +232,11 @@ const loadUnits = useCallback(async () => {
       throw error;
     }
 
-    console.log('📍 [UnitContext] Unidades carregadas:', data?.length || 0, data);
+    console.log(
+      '📍 [UnitContext] Unidades carregadas:',
+      data?.length || 0,
+      data
+    );
     setAllUnits(data || []);
 
     // ... resto do código
@@ -254,12 +268,12 @@ const checkAuth = async () => {
 // Modificar findAll para verificar auth
 async findAll({ includeInactive = false } = {}) {
   const user = await checkAuth();
-  
+
   if (!user) {
     console.error('❌ Usuário não autenticado no Supabase Client!');
     return { data: [], error: { message: 'Usuário não autenticado' } };
   }
-  
+
   // ... resto do código
 }
 ```
@@ -288,6 +302,7 @@ CREATE POLICY admin_select_all_units ON units
 ## 📋 Plano de Ação
 
 ### Fase 1: Diagnóstico (AGORA)
+
 1. ✅ Adicionar logs detalhados em repository, service e context
 2. ✅ Fazer commit e push
 3. ✅ Deploy no Vercel
@@ -295,12 +310,14 @@ CREATE POLICY admin_select_all_units ON units
 5. ✅ Coletar logs completos
 
 ### Fase 2: Correção (APÓS DIAGNÓSTICO)
+
 - Dependendo dos logs, aplicar correção apropriada
 - Se for problema de auth: verificar Supabase client initialization
 - Se for problema de RLS: ajustar policies
 - Se for problema de cache: limpar localStorage/sessionStorage
 
 ### Fase 3: Validação
+
 1. Testar login como admin
 2. Verificar que unidades aparecem no seletor
 3. Selecionar cada unidade e verificar que dados são filtrados corretamente
@@ -328,22 +345,27 @@ Após correção:
 **Data da Resolução:** 1 de novembro de 2025
 
 ### O que foi feito:
+
 1. ✅ Adicionados logs detalhados em 3 camadas (Repository, Service, Context)
 2. ✅ Deploy realizado no Vercel
 3. ✅ Teste confirmado: Admin agora consegue ver e selecionar ambas as unidades
 
 ### Possíveis Causas (identificadas):
+
 - **Race Condition:** O UnitContext pode ter tentado carregar unidades antes do auth estar completamente inicializado
 - **Cache/Build Issue:** Possível problema no bundle do Vercel que foi corrigido com novo deploy
 - **localStorage Corrompido:** Dados antigos podem ter causado conflito
 
 ### Logs Mantidos:
+
 Os logs de diagnóstico foram **mantidos permanentemente** para:
+
 - Debugging futuro caso o problema retorne
 - Monitoramento do fluxo de dados em produção
 - Facilitar onboarding de novos desenvolvedores
 
 ### Arquivos Modificados:
+
 - `src/repositories/unitsRepository.js` - Logs de auth state e query results
 - `src/services/unitsService.js` - Logs de transformação de dados
 - `src/context/UnitContext.jsx` - Logs de carregamento e localStorage

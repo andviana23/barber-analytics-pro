@@ -500,7 +500,7 @@ function MyComponent() {
   }
 
   // Fallback para versão legacy
-  return <LegacyCard className="bg-white border-gray-300" />;
+  return <LegacyCard className="border-gray-300 bg-white" />;
 }
 ```
 

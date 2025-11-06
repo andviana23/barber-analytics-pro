@@ -97,21 +97,21 @@ const CloseCashModal = ({
     >
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Resumo de Movimentações */}
-        <div className="bg-light-surface dark:bg-dark-hover rounded-lg p-4 border border-light-border dark:border-dark-border">
-          <h4 className="font-semibold text-theme-primary mb-4">
+        <div className="rounded-lg border border-light-border bg-light-surface p-4 dark:border-dark-border dark:bg-dark-hover">
+          <h4 className="text-theme-primary mb-4 font-semibold">
             Resumo do Caixa
           </h4>
           <div className="space-y-2.5">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-theme-secondary">
+            <div className="flex items-center justify-between">
+              <span className="text-theme-secondary text-sm">
                 Saldo Inicial:
               </span>
-              <span className="font-medium text-theme-primary">
+              <span className="text-theme-primary font-medium">
                 {formatCurrency(cashRegister?.opening_balance || 0)}
               </span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-theme-secondary">
+            <div className="flex items-center justify-between">
+              <span className="text-theme-secondary text-sm">
                 (+) Entradas
                 <span className="ml-1 text-xs">
                   ({transactions.filter(t => t.type === 'inflow').length})
@@ -121,8 +121,8 @@ const CloseCashModal = ({
                 +{formatCurrency(totalInflow)}
               </span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-theme-secondary">
+            <div className="flex items-center justify-between">
+              <span className="text-theme-secondary text-sm">
                 (-) Saídas
                 <span className="ml-1 text-xs">
                   ({transactions.filter(t => t.type === 'outflow').length})
@@ -132,9 +132,9 @@ const CloseCashModal = ({
                 -{formatCurrency(totalOutflow)}
               </span>
             </div>
-            <div className="pt-2 border-t border-light-border dark:border-dark-border">
-              <div className="flex justify-between items-center">
-                <span className="font-semibold text-theme-primary">
+            <div className="border-t border-light-border pt-2 dark:border-dark-border">
+              <div className="flex items-center justify-between">
+                <span className="text-theme-primary font-semibold">
                   Saldo Esperado:
                 </span>
                 <span className="text-xl font-bold text-primary">
@@ -162,11 +162,11 @@ const CloseCashModal = ({
         {/* Diferença */}
         {hasDifference && (
           <div
-            className={`rounded-lg p-4 border ${difference > 0 ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'}`}
+            className={`rounded-lg border p-4 ${difference > 0 ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20' : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'}`}
           >
             <div className="flex items-start gap-3">
               <svg
-                className={`w-5 h-5 flex-shrink-0 mt-0.5 ${difference > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+                className={`mt-0.5 h-5 w-5 flex-shrink-0 ${difference > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -178,7 +178,7 @@ const CloseCashModal = ({
               </svg>
               <div className="flex-1">
                 <h4
-                  className={`font-semibold mb-1 ${difference > 0 ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'}`}
+                  className={`mb-1 font-semibold ${difference > 0 ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'}`}
                 >
                   Diferença Detectada: {difference > 0 ? '+' : ''}
                   {formatCurrency(difference)}
@@ -197,9 +197,9 @@ const CloseCashModal = ({
 
         {/* Observações */}
         <div>
-          <label className="block text-sm font-medium text-theme-primary mb-2">
+          <label className="text-theme-primary mb-2 block text-sm font-medium">
             Observações
-            {hasDifference && <span className="text-red-500 ml-1">*</span>}
+            {hasDifference && <span className="ml-1 text-red-500">*</span>}
           </label>
           <textarea
             value={observations}
@@ -212,15 +212,15 @@ const CloseCashModal = ({
                 ? 'Explique o motivo da diferença encontrada...'
                 : 'Informações adicionais sobre o fechamento (opcional)'
             }
-            className="w-full px-4 py-2.5 rounded-lg border border-light-border dark:border-dark-border card-theme dark:bg-dark-surface text-theme-primary placeholder-theme-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary disabled:opacity-60 disabled:cursor-not-allowed resize-none"
+            className="card-theme text-theme-primary placeholder-theme-secondary w-full resize-none rounded-lg border border-light-border px-4 py-2.5 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-dark-border dark:bg-dark-surface"
           />
-          <div className="flex justify-between items-center mt-1">
-            <p className="text-xs text-theme-secondary">
+          <div className="mt-1 flex items-center justify-between">
+            <p className="text-theme-secondary text-xs">
               {hasDifference
                 ? 'Obrigatório explicar a diferença'
                 : 'Informações adicionais'}
             </p>
-            <p className="text-xs text-theme-secondary">
+            <p className="text-theme-secondary text-xs">
               {observations.length}/500
             </p>
           </div>
@@ -228,10 +228,10 @@ const CloseCashModal = ({
 
         {/* Confirmação de diferença */}
         {hasDifference && showDifferenceWarning && (
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+          <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
             <div className="flex items-start gap-3">
               <svg
-                className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5"
+                className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-600 dark:text-yellow-400"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -242,7 +242,7 @@ const CloseCashModal = ({
                 />
               </svg>
               <div className="flex-1">
-                <h4 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-1">
+                <h4 className="mb-1 font-semibold text-yellow-800 dark:text-yellow-200">
                   Confirme o Fechamento
                 </h4>
                 <p className="text-sm text-yellow-700 dark:text-yellow-300">
@@ -259,29 +259,29 @@ const CloseCashModal = ({
         )}
 
         {/* Ações */}
-        <div className="flex gap-3 pt-4 border-t border-light-border dark:border-dark-border">
+        <div className="flex gap-3 border-t border-light-border pt-4 dark:border-dark-border">
           <button
             type="button"
             onClick={handleClose}
             disabled={loading}
-            className="flex-1 px-4 py-2.5 border border-light-border dark:border-dark-border rounded-lg font-medium text-theme-primary hover:bg-light-surface dark:hover:bg-dark-hover transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            className="text-theme-primary flex-1 rounded-lg border border-light-border px-4 py-2.5 font-medium transition-colors hover:bg-light-surface disabled:cursor-not-allowed disabled:opacity-60 dark:border-dark-border dark:hover:bg-dark-hover"
           >
             Cancelar
           </button>
           <button
             type="submit"
             disabled={loading || (hasDifference && !observations.trim())}
-            className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-dark-text-primary rounded-lg font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+            className="text-dark-text-primary inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 font-medium transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? (
               <>
-                <div className="w-5 h-5 border-2 border-light-surface dark:border-dark-surface border-t-transparent rounded-full animate-spin" />
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-light-surface border-t-transparent dark:border-dark-surface" />
                 Fechando...
               </>
             ) : (
               <>
                 <svg
-                  className="w-5 h-5"
+                  className="h-5 w-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

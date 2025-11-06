@@ -618,19 +618,19 @@ const ImportStatementModal = ({
   }, [resetModal, onClose]);
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="card-theme rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+      <div className="card-theme max-h-[90vh] w-full max-w-6xl overflow-hidden rounded-lg shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-light-border dark:border-dark-border">
+        <div className="flex items-center justify-between border-b border-light-border p-6 dark:border-dark-border">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-lg">
-              <Upload className="w-5 h-5 text-blue-600" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100">
+              <Upload className="h-5 w-5 text-blue-600" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-theme-primary">
+              <h2 className="text-theme-primary text-xl font-semibold">
                 Importar Extrato Bancário
               </h2>
-              <p className="text-sm text-theme-secondary">
+              <p className="text-theme-secondary text-sm">
                 Passo {currentStep} de {enableAutoMatch ? '4' : '3'} -{' '}
                 {currentStep === 1
                   ? 'Upload do Arquivo'
@@ -645,14 +645,14 @@ const ImportStatementModal = ({
 
           <button
             onClick={handleClose}
-            className="flex items-center justify-center w-8 h-8 text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary rounded-lg hover:card-theme transition-colors"
+            className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary hover:card-theme flex h-8 w-8 items-center justify-center rounded-lg transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Progress Bar */}
-        <div className="px-6 py-3 bg-light-bg dark:bg-dark-bg border-b border-light-border dark:border-dark-border">
+        <div className="border-b border-light-border bg-light-bg px-6 py-3 dark:border-dark-border dark:bg-dark-bg">
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center space-x-6">
               {[
@@ -686,17 +686,17 @@ const ImportStatementModal = ({
                   className={`flex items-center gap-2 ${currentStep >= step ? 'text-blue-600' : 'text-gray-400'}`}
                 >
                   <div
-                    className={`flex items-center justify-center w-6 h-6 rounded-full border-2 ${currentStep >= step ? 'border-blue-600 bg-blue-600 text-white' : 'border-gray-300'}`}
+                    className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${currentStep >= step ? 'border-blue-600 bg-blue-600 text-white' : 'border-gray-300'}`}
                   >
                     {currentStep > step ? (
-                      <CheckCircle className="w-4 h-4" />
+                      <CheckCircle className="h-4 w-4" />
                     ) : (
                       <span className="text-xs font-medium">
                         {step === 2.5 ? '★' : step}
                       </span>
                     )}
                   </div>
-                  <span className="font-medium text-xs">{title}</span>
+                  <span className="text-xs font-medium">{title}</span>
                 </div>
               ))}
             </div>
@@ -704,18 +704,18 @@ const ImportStatementModal = ({
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto max-h-[60vh]">
+        <div className="max-h-[60vh] flex-1 overflow-y-auto">
           {currentStep === 1 && (
-            <div className="p-6 space-y-6">
+            <div className="space-y-6 p-6">
               {/* Seleção de Conta */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Conta Bancária *
                 </label>
                 <select
                   value={selectedAccount}
                   onChange={e => setSelectedAccount(e.target.value)}
-                  className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full rounded-lg border border-light-border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border"
                 >
                   <option value="">Selecionar conta...</option>
                   {availableAccounts.map(account => (
@@ -727,9 +727,9 @@ const ImportStatementModal = ({
               </div>
 
               {/* Configurações de Import */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                     Delimitador
                   </label>
                   <select
@@ -740,7 +740,7 @@ const ImportStatementModal = ({
                         delimiter: e.target.value,
                       }))
                     }
-                    className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full rounded-lg border border-light-border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border"
                   >
                     {delimiterOptions.map(option => (
                       <option key={option.value} value={option.value}>
@@ -751,7 +751,7 @@ const ImportStatementModal = ({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                     Formato de Data
                   </label>
                   <select
@@ -762,7 +762,7 @@ const ImportStatementModal = ({
                         dateFormat: e.target.value,
                       }))
                     }
-                    className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full rounded-lg border border-light-border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border"
                   >
                     {dateFormatOptions.map(option => (
                       <option key={option.value} value={option.value}>
@@ -773,7 +773,7 @@ const ImportStatementModal = ({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                     Encoding
                   </label>
                   <select
@@ -784,7 +784,7 @@ const ImportStatementModal = ({
                         encoding: e.target.value,
                       }))
                     }
-                    className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full rounded-lg border border-light-border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border"
                   >
                     {encodingOptions.map(option => (
                       <option key={option.value} value={option.value}>
@@ -805,7 +805,7 @@ const ImportStatementModal = ({
                         skipFirstRow: e.target.checked,
                       }))
                     }
-                    className="w-4 h-4 text-blue-600 border-light-border dark:border-dark-border rounded focus:ring-blue-500"
+                    className="h-4 w-4 rounded border-light-border text-blue-600 focus:ring-blue-500 dark:border-dark-border"
                   />
                   <label
                     htmlFor="skipFirstRow"
@@ -816,7 +816,7 @@ const ImportStatementModal = ({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                     Tratamento de Duplicatas
                   </label>
                   <select
@@ -827,7 +827,7 @@ const ImportStatementModal = ({
                         duplicateHandling: e.target.value,
                       }))
                     }
-                    className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full rounded-lg border border-light-border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border"
                   >
                     {duplicateHandlingOptions.map(option => (
                       <option key={option.value} value={option.value}>
@@ -840,23 +840,23 @@ const ImportStatementModal = ({
 
               {/* Upload Area */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Arquivo do Extrato *
                 </label>
 
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-light-border dark:border-dark-border rounded-lg p-8 text-center hover:border-gray-400 cursor-pointer transition-colors"
+                  className="cursor-pointer rounded-lg border-2 border-dashed border-light-border p-8 text-center transition-colors hover:border-gray-400 dark:border-dark-border"
                 >
-                  <Upload className="w-12 h-12 text-light-text-muted dark:text-dark-text-muted mx-auto mb-4" />
+                  <Upload className="text-light-text-muted dark:text-dark-text-muted mx-auto mb-4 h-12 w-12" />
                   <div className="space-y-2">
-                    <p className="text-lg font-medium text-theme-primary">
+                    <p className="text-theme-primary text-lg font-medium">
                       {file ? file.name : 'Clique para selecionar arquivo'}
                     </p>
-                    <p className="text-sm text-theme-secondary">
+                    <p className="text-theme-secondary text-sm">
                       Formatos suportados: CSV, TXT, OFX, QIF
                     </p>
-                    <p className="text-xs text-light-text-muted dark:text-dark-text-muted">
+                    <p className="text-light-text-muted dark:text-dark-text-muted text-xs">
                       Tamanho máximo: 10MB
                     </p>
                   </div>
@@ -877,11 +877,11 @@ const ImportStatementModal = ({
               </div>
 
               {/* Formatos Suportados */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h4 className="text-sm font-medium text-blue-900 mb-3">
+              <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+                <h4 className="mb-3 text-sm font-medium text-blue-900">
                   Formatos Suportados
                 </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                   {supportedFormats.map(format => {
                     const Icon = format.icon;
                     return (
@@ -889,7 +889,7 @@ const ImportStatementModal = ({
                         key={format.value}
                         className="flex items-center gap-2 text-sm text-blue-700"
                       >
-                        <Icon className="w-4 h-4" />
+                        <Icon className="h-4 w-4" />
                         <span>{format.label}</span>
                         <span className="text-blue-500">({format.ext})</span>
                       </div>
@@ -901,10 +901,10 @@ const ImportStatementModal = ({
           )}
 
           {currentStep === 2 && parseResult && (
-            <div className="p-6 space-y-6">
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <div className="flex items-center gap-2 text-green-700 mb-2">
-                  <CheckCircle className="w-5 h-5" />
+            <div className="space-y-6 p-6">
+              <div className="rounded-lg border border-green-200 bg-green-50 p-4">
+                <div className="mb-2 flex items-center gap-2 text-green-700">
+                  <CheckCircle className="h-5 w-5" />
                   <span className="font-medium">
                     Arquivo processado com sucesso!
                   </span>
@@ -917,20 +917,20 @@ const ImportStatementModal = ({
 
               {/* Column Mapping */}
               <div>
-                <h3 className="text-lg font-medium text-theme-primary mb-4">
+                <h3 className="text-theme-primary mb-4 text-lg font-medium">
                   Mapeamento de Colunas
                 </h3>
 
                 <div className="space-y-4">
                   {/* Required Columns */}
                   <div>
-                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-3">
+                    <h4 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                       Campos Obrigatórios
                     </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                       {requiredColumns.map(column => (
                         <div key={column.key}>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-1">
+                          <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                             {column.label} *
                           </label>
                           <select
@@ -941,7 +941,7 @@ const ImportStatementModal = ({
                                 [column.key]: e.target.value,
                               }))
                             }
-                            className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full rounded-lg border border-light-border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border"
                           >
                             <option value="">Selecionar coluna...</option>
                             {parseResult.headers.map(header => (
@@ -957,13 +957,13 @@ const ImportStatementModal = ({
 
                   {/* Optional Columns */}
                   <div>
-                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-3">
+                    <h4 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                       Campos Opcionais
                     </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                       {optionalColumns.map(column => (
                         <div key={column.key}>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-1">
+                          <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                             {column.label}
                           </label>
                           <select
@@ -974,7 +974,7 @@ const ImportStatementModal = ({
                                 [column.key]: e.target.value,
                               }))
                             }
-                            className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full rounded-lg border border-light-border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border"
                           >
                             <option value="">Não mapear</option>
                             {parseResult.headers.map(header => (
@@ -993,17 +993,17 @@ const ImportStatementModal = ({
               {/* Sample Data Preview */}
               {parseResult.sample.length > 0 && (
                 <div>
-                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-3">
+                  <h4 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                     Amostra dos Dados (Primeiras 5 linhas)
                   </h4>
                   <div className="overflow-x-auto">
-                    <table className="min-w-full border border-light-border dark:border-dark-border rounded-lg">
+                    <table className="min-w-full rounded-lg border border-light-border dark:border-dark-border">
                       <thead className="bg-light-bg dark:bg-dark-bg">
                         <tr>
                           {parseResult.headers.map(header => (
                             <th
                               key={header}
-                              className="px-3 py-2 text-left text-xs font-medium text-theme-secondary uppercase tracking-wider border-b border-light-border dark:border-dark-border"
+                              className="text-theme-secondary border-b border-light-border px-3 py-2 text-left text-xs font-medium uppercase tracking-wider dark:border-dark-border"
                             >
                               {header}
                             </th>
@@ -1021,7 +1021,7 @@ const ImportStatementModal = ({
                             {parseResult.headers.map(header => (
                               <td
                                 key={header}
-                                className="px-3 py-2 text-sm text-theme-primary border-b border-light-border dark:border-dark-border"
+                                className="text-theme-primary border-b border-light-border px-3 py-2 text-sm dark:border-dark-border"
                               >
                                 {row[header] || '-'}
                               </td>
@@ -1060,15 +1060,15 @@ const ImportStatementModal = ({
           )}
 
           {currentStep === 3 && previewData.length > 0 && (
-            <div className="p-6 space-y-6">
+            <div className="space-y-6 p-6">
               {/* Summary */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h3 className="text-lg font-medium text-blue-900 mb-2">
+              <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+                <h3 className="mb-2 text-lg font-medium text-blue-900">
                   Resumo da Importação
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-3">
                   <div>
-                    <span className="text-blue-700 font-medium">
+                    <span className="font-medium text-blue-700">
                       Total de transações:
                     </span>
                     <span className="ml-2 text-blue-900">
@@ -1076,13 +1076,13 @@ const ImportStatementModal = ({
                     </span>
                   </div>
                   <div>
-                    <span className="text-green-700 font-medium">Válidas:</span>
+                    <span className="font-medium text-green-700">Válidas:</span>
                     <span className="ml-2 text-green-900">
                       {previewData.filter(row => !row.hasErrors).length}
                     </span>
                   </div>
                   <div>
-                    <span className="text-red-700 font-medium">Com erros:</span>
+                    <span className="font-medium text-red-700">Com erros:</span>
                     <span className="ml-2 text-red-900">
                       {previewData.filter(row => row.hasErrors).length}
                     </span>
@@ -1092,29 +1092,29 @@ const ImportStatementModal = ({
 
               {/* Preview Table */}
               <div>
-                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-3">
+                <h4 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Preview dos Dados Processados
                 </h4>
                 <div className="overflow-x-auto">
-                  <table className="min-w-full border border-light-border dark:border-dark-border rounded-lg">
+                  <table className="min-w-full rounded-lg border border-light-border dark:border-dark-border">
                     <thead className="bg-light-bg dark:bg-dark-bg">
                       <tr>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-theme-secondary uppercase tracking-wider">
+                        <th className="text-theme-secondary px-3 py-2 text-left text-xs font-medium uppercase tracking-wider">
                           Status
                         </th>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-theme-secondary uppercase tracking-wider">
+                        <th className="text-theme-secondary px-3 py-2 text-left text-xs font-medium uppercase tracking-wider">
                           Data
                         </th>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-theme-secondary uppercase tracking-wider">
+                        <th className="text-theme-secondary px-3 py-2 text-left text-xs font-medium uppercase tracking-wider">
                           Descrição
                         </th>
-                        <th className="px-3 py-2 text-right text-xs font-medium text-theme-secondary uppercase tracking-wider">
+                        <th className="text-theme-secondary px-3 py-2 text-right text-xs font-medium uppercase tracking-wider">
                           Valor
                         </th>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-theme-secondary uppercase tracking-wider">
+                        <th className="text-theme-secondary px-3 py-2 text-left text-xs font-medium uppercase tracking-wider">
                           Tipo
                         </th>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-theme-secondary uppercase tracking-wider">
+                        <th className="text-theme-secondary px-3 py-2 text-left text-xs font-medium uppercase tracking-wider">
                           Observações
                         </th>
                       </tr>
@@ -1125,20 +1125,20 @@ const ImportStatementModal = ({
                           key={index}
                           className={row.hasErrors ? 'bg-red-50' : 'bg-white'}
                         >
-                          <td className="px-3 py-2 whitespace-nowrap">
+                          <td className="whitespace-nowrap px-3 py-2">
                             {row.hasErrors ? (
                               <StatusBadge status="error" size="sm" />
                             ) : (
                               <StatusBadge status="success" size="sm" />
                             )}
                           </td>
-                          <td className="px-3 py-2 text-sm text-theme-primary">
+                          <td className="text-theme-primary px-3 py-2 text-sm">
                             {row.data}
                           </td>
-                          <td className="px-3 py-2 text-sm text-theme-primary">
+                          <td className="text-theme-primary px-3 py-2 text-sm">
                             {row.descricao}
                           </td>
-                          <td className="px-3 py-2 text-sm text-right">
+                          <td className="px-3 py-2 text-right text-sm">
                             <span
                               className={
                                 row.valor >= 0
@@ -1153,14 +1153,14 @@ const ImportStatementModal = ({
                               })}
                             </span>
                           </td>
-                          <td className="px-3 py-2 text-sm text-theme-primary">
+                          <td className="text-theme-primary px-3 py-2 text-sm">
                             <span
-                              className={`px-2 py-1 text-xs rounded-full ${row.tipo === 'C' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
+                              className={`rounded-full px-2 py-1 text-xs ${row.tipo === 'C' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
                             >
                               {row.tipo === 'C' ? 'Crédito' : 'Débito'}
                             </span>
                           </td>
-                          <td className="px-3 py-2 text-sm text-theme-secondary">
+                          <td className="text-theme-secondary px-3 py-2 text-sm">
                             {row.hasErrors ? (
                               <div className="text-red-600">
                                 {row.errors.join(', ')}
@@ -1181,14 +1181,14 @@ const ImportStatementModal = ({
 
         {/* Validation Errors */}
         {validationErrors.length > 0 && (
-          <div className="px-6 py-3 bg-red-50 border-t border-red-200">
+          <div className="border-t border-red-200 bg-red-50 px-6 py-3">
             <div className="flex items-start gap-2">
-              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-500" />
               <div>
                 <h4 className="text-sm font-medium text-red-800">
                   Problemas encontrados:
                 </h4>
-                <ul className="mt-1 text-sm text-red-700 list-disc list-inside space-y-1">
+                <ul className="mt-1 list-inside list-disc space-y-1 text-sm text-red-700">
                   {validationErrors.map((error, index) => (
                     <li key={index}>{error}</li>
                   ))}
@@ -1199,8 +1199,8 @@ const ImportStatementModal = ({
         )}
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-6 border-t border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg">
-          <div className="flex items-center text-sm text-theme-secondary">
+        <div className="flex items-center justify-between border-t border-light-border bg-light-bg p-6 dark:border-dark-border dark:bg-dark-bg">
+          <div className="text-theme-secondary flex items-center text-sm">
             {file && (
               <span>
                 Arquivo: {file.name} ({(file.size / 1024).toFixed(1)} KB)
@@ -1228,7 +1228,7 @@ const ImportStatementModal = ({
                     setCurrentStep(currentStep === 3 ? 2 : currentStep - 1);
                   }
                 }}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 dark:text-gray-600 border border-light-border dark:border-dark-border rounded-lg hover:bg-light-bg dark:bg-dark-bg transition-colors"
+                className="rounded-lg border border-light-border px-4 py-2 text-gray-700 transition-colors hover:bg-light-bg dark:border-dark-border dark:bg-dark-bg dark:text-gray-300 dark:text-gray-600"
                 data-testid="btn-back"
               >
                 Voltar
@@ -1238,7 +1238,7 @@ const ImportStatementModal = ({
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2 text-gray-700 dark:text-gray-300 dark:text-gray-600 border border-light-border dark:border-dark-border rounded-lg hover:bg-light-bg dark:bg-dark-bg transition-colors"
+              className="rounded-lg border border-light-border px-4 py-2 text-gray-700 transition-colors hover:bg-light-bg dark:border-dark-border dark:bg-dark-bg dark:text-gray-300 dark:text-gray-600"
             >
               Cancelar
             </button>
@@ -1247,22 +1247,22 @@ const ImportStatementModal = ({
               <button
                 type="button"
                 onClick={() => setCurrentStep(2)}
-                className="px-6 py-2 bg-blue-600 text-dark-text-primary rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                className="text-dark-text-primary flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2 transition-colors hover:bg-blue-700"
               >
                 Continuar
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="h-4 w-4" />
               </button>
             )}
 
             {currentStep === 2 && (
               <>
                 {/* Checkbox para habilitar/desabilitar auto-match */}
-                <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600 mr-2">
+                <label className="mr-2 flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   <input
                     type="checkbox"
                     checked={enableAutoMatch}
                     onChange={e => setEnableAutoMatch(e.target.checked)}
-                    className="rounded border-light-border dark:border-dark-border text-blue-600 focus:ring-blue-500"
+                    className="rounded border-light-border text-blue-600 focus:ring-blue-500 dark:border-dark-border"
                   />
                   <span>Executar auto-match de reconciliação</span>
                 </label>
@@ -1270,11 +1270,11 @@ const ImportStatementModal = ({
                 <button
                   type="button"
                   onClick={handleProceedToPreview}
-                  className="px-6 py-2 bg-blue-600 text-dark-text-primary rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                  className="text-dark-text-primary flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2 transition-colors hover:bg-blue-700"
                   data-testid="btn-proceed-from-mapping"
                 >
                   {enableAutoMatch ? 'Executar Auto-Match' : 'Gerar Preview'}
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="h-4 w-4" />
                 </button>
               </>
             )}
@@ -1287,16 +1287,16 @@ const ImportStatementModal = ({
                   isProcessing ||
                   previewData.filter(row => !row.hasErrors).length === 0
                 }
-                className="px-6 py-2 bg-green-600 text-dark-text-primary rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                className="text-dark-text-primary flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2 transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isProcessing ? (
                   <>
-                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <RefreshCw className="h-4 w-4 animate-spin" />
                     Importando...
                   </>
                 ) : (
                   <>
-                    <CheckCircle className="w-4 h-4" />
+                    <CheckCircle className="h-4 w-4" />
                     Importar {
                       previewData.filter(row => !row.hasErrors).length
                     }{' '}

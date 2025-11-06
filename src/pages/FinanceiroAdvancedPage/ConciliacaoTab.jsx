@@ -103,13 +103,13 @@ const ConciliacaoTab = ({ globalFilters }) => {
   return (
     <div className="space-y-6">
       {/* Controles principais - Dark Mode */}
-      <div className="card-theme dark:bg-dark-surface rounded-lg shadow-sm border border-light-border dark:border-dark-border p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+      <div className="card-theme rounded-lg border border-light-border p-6 shadow-sm dark:border-dark-border dark:bg-dark-surface">
+        <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
           <div>
-            <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+            <h3 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
               Conciliação Bancária
             </h3>
-            <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
+            <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-sm">
               Gerencie a conciliação entre extratos bancários e lançamentos
               financeiros
             </p>
@@ -118,26 +118,26 @@ const ConciliacaoTab = ({ globalFilters }) => {
           <div className="flex items-center space-x-3">
             <button
               onClick={() => setIsImportModalOpen(true)}
-              className="px-4 py-2 text-sm font-medium text-dark-text-primary bg-blue-600 dark:bg-blue-500 rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="text-dark-text-primary rounded-md bg-blue-600 px-4 py-2 text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600"
             >
               Importar Extrato
             </button>
             <button
               onClick={() => setIsImportExpensesOFXModalOpen(true)}
-              className="px-4 py-2 text-sm font-medium text-dark-text-primary bg-purple-600 dark:bg-purple-500 rounded-md hover:bg-purple-700 dark:hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="text-dark-text-primary rounded-md bg-purple-600 px-4 py-2 text-sm font-medium hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-purple-500 dark:hover:bg-purple-600"
             >
               Importar Despesas (OFX)
             </button>
             <button
               onClick={() => setIsManualModalOpen(true)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 card-theme dark:bg-gray-700 border border-light-border dark:border-dark-border rounded-md hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="card-theme rounded-md border border-light-border px-4 py-2 text-sm font-medium text-gray-700 hover:bg-light-bg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-dark-bg dark:bg-gray-700 dark:text-gray-300 dark:text-gray-600 dark:hover:bg-gray-600"
             >
               Vincular Manual
             </button>
             <button
               onClick={handleRunAutoMatch}
               disabled={matchesLoading || !globalFilters.accountId}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 card-theme dark:bg-gray-700 border border-light-border dark:border-dark-border rounded-md hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              className="card-theme rounded-md border border-light-border px-4 py-2 text-sm font-medium text-gray-700 hover:bg-light-bg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 dark:border-dark-border dark:bg-dark-bg dark:bg-gray-700 dark:text-gray-300 dark:text-gray-600 dark:hover:bg-gray-600"
             >
               Executar Auto-Match
             </button>
@@ -146,7 +146,7 @@ const ConciliacaoTab = ({ globalFilters }) => {
 
         {/* Info da conta selecionada - Dark Mode */}
         {!globalFilters.accountId && (
-          <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
+          <div className="mt-4 rounded-md border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
             <p className="text-sm text-yellow-800 dark:text-yellow-300">
               Selecione uma conta bancária nos filtros globais para utilizar a
               conciliação.
@@ -185,15 +185,15 @@ const ConciliacaoTab = ({ globalFilters }) => {
           onCreateManualMatch={() => setIsManualModalOpen(true)}
         />
       ) : (
-        <div className="card-theme dark:bg-dark-surface rounded-lg shadow-sm border border-light-border dark:border-dark-border p-12">
+        <div className="card-theme rounded-lg border border-light-border p-12 shadow-sm dark:border-dark-border dark:bg-dark-surface">
           <div className="text-center">
-            <div className="text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary text-6xl mb-4">
+            <div className="text-light-text-muted dark:text-dark-text-muted dark:text-theme-secondary mb-4 text-6xl">
               🏦
             </div>
-            <h3 className="text-lg font-medium text-theme-primary dark:text-dark-text-primary mb-2">
+            <h3 className="text-theme-primary dark:text-dark-text-primary mb-2 text-lg font-medium">
               Nenhuma conta selecionada
             </h3>
-            <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted max-w-md mx-auto">
+            <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mx-auto max-w-md">
               Para utilizar a conciliação bancária, você precisa primeiro
               selecionar uma conta bancária nos filtros globais da página.
             </p>
@@ -233,10 +233,10 @@ const ConciliacaoTab = ({ globalFilters }) => {
 
       {/* Status de loading overlay - Dark Mode */}
       {(matchesLoading || statementsLoading) && (
-        <div className="fixed inset-0 bg-black bg-opacity-25 dark:bg-black dark:bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="card-theme dark:bg-dark-surface rounded-lg p-6 shadow-xl border border-light-border dark:border-dark-border">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-25 backdrop-blur-sm dark:bg-black dark:bg-opacity-50">
+          <div className="card-theme rounded-lg border border-light-border p-6 shadow-xl dark:border-dark-border dark:bg-dark-surface">
             <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 dark:border-blue-400"></div>
+              <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-blue-600 dark:border-blue-400"></div>
               <span className="text-theme-primary dark:text-dark-text-primary">
                 Carregando dados de conciliação...
               </span>

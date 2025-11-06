@@ -230,11 +230,11 @@ const DateRangePicker = ({
         aria-expanded={isOpen}
       >
         <div className="flex items-center">
-          <Calendar className="w-4 h-4 mr-2 text-light-text-muted dark:text-dark-text-muted" />
+          <Calendar className="text-light-text-muted dark:text-dark-text-muted mr-2 h-4 w-4" />
           <span className="truncate">{formatDisplayValue()}</span>
         </div>
 
-        <div className="flex items-center ml-2">
+        <div className="ml-2 flex items-center">
           {clearable && value && (
             <button
               type="button"
@@ -242,26 +242,26 @@ const DateRangePicker = ({
                 e.stopPropagation();
                 handleClear(e);
               }}
-              className="p-0.5 hover:card-theme rounded"
+              className="hover:card-theme rounded p-0.5"
               title="Limpar"
             >
-              <X className="w-3 h-3 text-light-text-muted dark:text-dark-text-muted" />
+              <X className="text-light-text-muted dark:text-dark-text-muted h-3 w-3" />
             </button>
           )}
           <ChevronDown
-            className={`w-4 h-4 ml-1 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+            className={`ml-1 h-4 w-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           />
         </div>
       </div>
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute z-50 w-80 mt-1 card-theme border border-light-border dark:border-dark-border rounded-md shadow-lg">
+        <div className="card-theme absolute z-50 mt-1 w-80 rounded-md border border-light-border shadow-lg dark:border-dark-border">
           <div className="p-4">
             {/* Presets */}
             {presets && (
               <div className="mb-4">
-                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                <h4 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Períodos Rápidos
                 </h4>
                 <div className="grid grid-cols-2 gap-2">
@@ -270,10 +270,7 @@ const DateRangePicker = ({
                       key={preset.id}
                       type="button"
                       onClick={() => handlePresetSelect(preset.id)}
-                      className={`
-                        px-3 py-2 text-xs rounded-md text-left transition-colors
-                        ${selectedPreset === preset.id ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-transparent'}
-                      `}
+                      className={`rounded-md px-3 py-2 text-left text-xs transition-colors ${selectedPreset === preset.id ? 'border border-blue-200 bg-blue-100 text-blue-700' : 'border border-transparent bg-gray-50 text-gray-700 hover:bg-gray-100'} `}
                     >
                       {preset.label}
                     </button>
@@ -284,37 +281,37 @@ const DateRangePicker = ({
 
             {/* Divisor */}
             {presets && (
-              <div className="border-t border-light-border dark:border-dark-border mb-4 -mx-4"></div>
+              <div className="-mx-4 mb-4 border-t border-light-border dark:border-dark-border"></div>
             )}
 
             {/* Datas customizadas */}
-            <div className="px-4 -mx-4">
-              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-3">
+            <div className="-mx-4 px-4">
+              <h4 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                 Período Personalizado
               </h4>
 
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-medium text-theme-secondary mb-1">
+                  <label className="text-theme-secondary mb-1 block text-xs font-medium">
                     Data Inicial
                   </label>
                   <input
                     type="date"
                     value={customStartDate}
                     onChange={e => setCustomStartDate(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-light-border dark:border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-md border border-light-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-dark-border"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-theme-secondary mb-1">
+                  <label className="text-theme-secondary mb-1 block text-xs font-medium">
                     Data Final
                   </label>
                   <input
                     type="date"
                     value={customEndDate}
                     onChange={e => setCustomEndDate(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-light-border dark:border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-md border border-light-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-dark-border"
                   />
                 </div>
 
@@ -322,7 +319,7 @@ const DateRangePicker = ({
                   <button
                     type="button"
                     onClick={() => setIsOpen(false)}
-                    className="px-3 py-1.5 text-sm text-theme-secondary hover:text-theme-primary"
+                    className="text-theme-secondary hover:text-theme-primary px-3 py-1.5 text-sm"
                   >
                     Cancelar
                   </button>
@@ -331,7 +328,7 @@ const DateRangePicker = ({
                     type="button"
                     onClick={handleCustomDateApply}
                     disabled={!customStartDate || !customEndDate}
-                    className="px-4 py-1.5 text-sm bg-blue-600 text-dark-text-primary rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="text-dark-text-primary rounded-md bg-blue-600 px-4 py-1.5 text-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     Aplicar
                   </button>
@@ -393,11 +390,11 @@ DateRangePicker.propTypes = {
 export const DateRangePickerPreview = () => {
   const [selectedRange, setSelectedRange] = useState(null);
   return (
-    <div className="space-y-4 p-4 max-w-md">
+    <div className="max-w-md space-y-4 p-4">
       <h3 className="text-lg font-semibold">DateRangePicker Preview</h3>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
           Selecione um período:
         </label>
         <DateRangePicker
@@ -408,11 +405,11 @@ export const DateRangePickerPreview = () => {
       </div>
 
       {selectedRange && (
-        <div className="mt-4 p-3 bg-light-bg dark:bg-dark-bg rounded-md">
-          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+        <div className="mt-4 rounded-md bg-light-bg p-3 dark:bg-dark-bg">
+          <h4 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
             Valor selecionado:
           </h4>
-          <pre className="text-xs text-theme-secondary">
+          <pre className="text-theme-secondary text-xs">
             {JSON.stringify(
               {
                 startDate: format(
@@ -430,7 +427,7 @@ export const DateRangePickerPreview = () => {
 
       {/* Versão sem presets */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
           Sem presets:
         </label>
         <DateRangePicker
@@ -443,7 +440,7 @@ export const DateRangePickerPreview = () => {
 
       {/* Versão desabilitada */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
           Desabilitado:
         </label>
         <DateRangePicker

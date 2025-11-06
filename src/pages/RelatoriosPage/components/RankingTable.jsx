@@ -50,9 +50,9 @@ const PerformanceBadge = ({ badge }) => {
   const Icon = badgeInfo.icon;
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badgeInfo.color}`}
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeInfo.color}`}
     >
-      <Icon className="w-3 h-3 mr-1" />
+      <Icon className="mr-1 h-3 w-3" />
       {badgeInfo.label}
     </span>
   );
@@ -63,12 +63,12 @@ const PerformanceBadge = ({ badge }) => {
  */
 const TrendIcon = ({ trend }) => {
   if (!trend || trend === 'stable') {
-    return <Minus className="w-4 h-4 text-theme-secondary" />;
+    return <Minus className="text-theme-secondary h-4 w-4" />;
   }
   if (trend === 'up') {
-    return <TrendingUp className="w-4 h-4 text-green-500" />;
+    return <TrendingUp className="h-4 w-4 text-green-500" />;
   }
-  return <TrendingDown className="w-4 h-4 text-red-500" />;
+  return <TrendingDown className="h-4 w-4 text-red-500" />;
 };
 
 /**
@@ -83,11 +83,11 @@ const RankingRow = ({ professional, index }) => {
   };
   return (
     <tr
-      className="hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700/50 transition-colors"
+      className="transition-colors hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700/50"
       data-testid={`ranking-row-${index + 1}`}
     >
       {/* Posição */}
-      <td className="px-6 py-4 whitespace-nowrap">
+      <td className="whitespace-nowrap px-6 py-4">
         <div className="flex items-center space-x-2">
           <span
             className={`text-lg font-bold ${getRankColor(professional.rank_by_revenue)}`}
@@ -99,16 +99,16 @@ const RankingRow = ({ professional, index }) => {
       </td>
 
       {/* Profissional */}
-      <td className="px-6 py-4 whitespace-nowrap">
+      <td className="whitespace-nowrap px-6 py-4">
         <div className="flex items-center">
-          <div className="flex-shrink-0 h-10 w-10 bg-primary rounded-full flex items-center justify-center text-dark-text-primary font-semibold">
+          <div className="text-dark-text-primary flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary font-semibold">
             {professional.professional_name?.charAt(0).toUpperCase() || '?'}
           </div>
           <div className="ml-4">
-            <div className="text-sm font-medium text-theme-primary dark:text-dark-text-primary">
+            <div className="text-theme-primary dark:text-dark-text-primary text-sm font-medium">
               {professional.professional_name || 'N/A'}
             </div>
-            <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+            <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
               {professional.unit_name || 'N/A'}
             </div>
           </div>
@@ -116,41 +116,41 @@ const RankingRow = ({ professional, index }) => {
       </td>
 
       {/* Badge */}
-      <td className="px-6 py-4 whitespace-nowrap">
+      <td className="whitespace-nowrap px-6 py-4">
         <PerformanceBadge badge={professional.performance_badge} />
       </td>
 
       {/* Total de Serviços */}
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-theme-primary dark:text-dark-text-primary">
+      <td className="text-theme-primary dark:text-dark-text-primary whitespace-nowrap px-6 py-4 text-sm">
         <div className="flex items-center space-x-1">
-          <Users className="w-4 h-4 text-theme-secondary" />
+          <Users className="text-theme-secondary h-4 w-4" />
           <span>{professional.total_services || 0}</span>
         </div>
       </td>
 
       {/* Receita Total */}
-      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-theme-primary dark:text-dark-text-primary">
+      <td className="text-theme-primary dark:text-dark-text-primary whitespace-nowrap px-6 py-4 text-sm font-semibold">
         <div className="flex items-center space-x-1">
-          <DollarSign className="w-4 h-4 text-green-500" />
+          <DollarSign className="h-4 w-4 text-green-500" />
           <span>{formatCurrency(professional.total_revenue || 0)}</span>
         </div>
       </td>
 
       {/* Ticket Médio */}
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-theme-primary dark:text-dark-text-primary">
+      <td className="text-theme-primary dark:text-dark-text-primary whitespace-nowrap px-6 py-4 text-sm">
         {formatCurrency(professional.avg_ticket || 0)}
       </td>
 
       {/* Taxa de Conversão */}
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-theme-primary dark:text-dark-text-primary">
+      <td className="text-theme-primary dark:text-dark-text-primary whitespace-nowrap px-6 py-4 text-sm">
         <div className="flex items-center space-x-1">
-          <Activity className="w-4 h-4 text-blue-500" />
+          <Activity className="h-4 w-4 text-blue-500" />
           <span>{(professional.conversion_rate || 0).toFixed(1)}%</span>
         </div>
       </td>
 
       {/* Comissão */}
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-theme-primary dark:text-dark-text-primary">
+      <td className="text-theme-primary dark:text-dark-text-primary whitespace-nowrap px-6 py-4 text-sm">
         {formatCurrency(professional.commission_amount || 0)}
       </td>
     </tr>
@@ -163,13 +163,13 @@ const RankingRow = ({ professional, index }) => {
 const RankingTable = ({ ranking = [], loading = false }) => {
   if (loading) {
     return (
-      <div className="card-theme dark:bg-dark-surface rounded-lg border border-light-border dark:border-dark-border overflow-hidden">
+      <div className="card-theme overflow-hidden rounded-lg border border-light-border dark:border-dark-border dark:bg-dark-surface">
         <div className="animate-pulse p-6">
-          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-4"></div>
+          <div className="mb-4 h-6 w-1/4 rounded bg-gray-200 dark:bg-gray-700"></div>
           {[...Array(5)].map((_, i) => (
             <div
               key={i}
-              className="h-16 bg-gray-200 dark:bg-gray-700 rounded mb-2"
+              className="mb-2 h-16 rounded bg-gray-200 dark:bg-gray-700"
             ></div>
           ))}
         </div>
@@ -178,9 +178,9 @@ const RankingTable = ({ ranking = [], loading = false }) => {
   }
   if (!ranking || ranking.length === 0) {
     return (
-      <div className="card-theme dark:bg-dark-surface rounded-lg border border-light-border dark:border-dark-border p-8 text-center">
-        <Users className="w-12 h-12 text-light-text-muted dark:text-dark-text-muted mx-auto mb-3" />
-        <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary mb-2">
+      <div className="card-theme rounded-lg border border-light-border p-8 text-center dark:border-dark-border dark:bg-dark-surface">
+        <Users className="text-light-text-muted dark:text-dark-text-muted mx-auto mb-3 h-12 w-12" />
+        <h3 className="text-theme-primary dark:text-dark-text-primary mb-2 text-lg font-semibold">
           Nenhum dado de ranking disponível
         </h3>
         <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
@@ -190,14 +190,14 @@ const RankingTable = ({ ranking = [], loading = false }) => {
     );
   }
   return (
-    <div className="card-theme dark:bg-dark-surface rounded-lg border border-light-border dark:border-dark-border overflow-hidden">
+    <div className="card-theme overflow-hidden rounded-lg border border-light-border dark:border-dark-border dark:bg-dark-surface">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-light-border dark:border-dark-border">
-        <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary flex items-center">
-          <Trophy className="w-5 h-5 text-yellow-500 mr-2" />
+      <div className="border-b border-light-border px-6 py-4 dark:border-dark-border">
+        <h3 className="text-theme-primary dark:text-dark-text-primary flex items-center text-lg font-semibold">
+          <Trophy className="mr-2 h-5 w-5 text-yellow-500" />
           Ranking de Profissionais
         </h3>
-        <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
+        <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-sm">
           {ranking.length} profissionais encontrados
         </p>
       </div>
@@ -207,33 +207,33 @@ const RankingTable = ({ ranking = [], loading = false }) => {
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
+              <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Posição
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
+              <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Profissional
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
+              <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Desempenho
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
+              <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Serviços
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
+              <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Receita
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
+              <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Ticket Médio
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
+              <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Conversão
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider">
+              <th className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Comissão
               </th>
             </tr>
           </thead>
-          <tbody className="card-theme dark:bg-dark-surface divide-y divide-gray-200 dark:divide-gray-700">
+          <tbody className="card-theme divide-y divide-gray-200 dark:divide-gray-700 dark:bg-dark-surface">
             {ranking.map((professional, index) => (
               <RankingRow
                 key={professional.professional_id || index}

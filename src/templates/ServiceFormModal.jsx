@@ -187,10 +187,10 @@ const ServiceFormModal = ({
       <form onSubmit={handleSubmit} className="space-y-6 p-6">
         {/* Aviso se não houver unitId */}
         {!unitId && (
-          <div className="bg-feedback-light-error/10 dark:bg-feedback-dark-error/10 border border-feedback-light-error/30 dark:border-feedback-dark-error/30 rounded-lg p-4">
+          <div className="rounded-lg border border-feedback-light-error/30 bg-feedback-light-error/10 p-4 dark:border-feedback-dark-error/30 dark:bg-feedback-dark-error/10">
             <div className="flex items-start gap-3">
               <svg
-                className="w-5 h-5 text-feedback-light-error dark:text-feedback-dark-error flex-shrink-0 mt-0.5"
+                className="mt-0.5 h-5 w-5 flex-shrink-0 text-feedback-light-error dark:text-feedback-dark-error"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -201,7 +201,7 @@ const ServiceFormModal = ({
                 />
               </svg>
               <div>
-                <h4 className="font-semibold text-feedback-light-error dark:text-feedback-dark-error mb-1">
+                <h4 className="mb-1 font-semibold text-feedback-light-error dark:text-feedback-dark-error">
                   Unidade não selecionada
                 </h4>
                 <p className="text-sm text-feedback-light-error dark:text-feedback-dark-error">
@@ -215,10 +215,10 @@ const ServiceFormModal = ({
 
         {/* Aviso de erro ao carregar categorias */}
         {categoriesError && (
-          <div className="bg-feedback-light-warning/10 dark:bg-feedback-dark-warning/10 border border-feedback-light-warning/30 dark:border-feedback-dark-warning/30 rounded-lg p-4">
+          <div className="rounded-lg border border-feedback-light-warning/30 bg-feedback-light-warning/10 p-4 dark:border-feedback-dark-warning/30 dark:bg-feedback-dark-warning/10">
             <div className="flex items-start gap-3">
               <svg
-                className="w-5 h-5 text-feedback-light-warning dark:text-feedback-dark-warning flex-shrink-0 mt-0.5"
+                className="mt-0.5 h-5 w-5 flex-shrink-0 text-feedback-light-warning dark:text-feedback-dark-warning"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -229,7 +229,7 @@ const ServiceFormModal = ({
                 />
               </svg>
               <div>
-                <h4 className="font-semibold text-feedback-light-warning dark:text-feedback-dark-warning mb-1">
+                <h4 className="mb-1 font-semibold text-feedback-light-warning dark:text-feedback-dark-warning">
                   Problema ao carregar categorias
                 </h4>
                 <p className="text-sm text-feedback-light-warning dark:text-feedback-dark-warning">
@@ -238,7 +238,7 @@ const ServiceFormModal = ({
                 <button
                   type="button"
                   onClick={loadCategories}
-                  className="mt-2 text-sm font-medium text-feedback-light-warning dark:text-feedback-dark-warning hover:underline"
+                  className="mt-2 text-sm font-medium text-feedback-light-warning hover:underline dark:text-feedback-dark-warning"
                 >
                   Tentar novamente
                 </button>
@@ -249,9 +249,9 @@ const ServiceFormModal = ({
 
         {/* Nome do Serviço */}
         <div>
-          <label className="block text-sm font-medium text-theme-primary mb-2">
+          <label className="text-theme-primary mb-2 block text-sm font-medium">
             Nome do Serviço
-            <span className="text-feedback-light-error dark:text-feedback-dark-error ml-1">
+            <span className="ml-1 text-feedback-light-error dark:text-feedback-dark-error">
               *
             </span>
           </label>
@@ -262,7 +262,7 @@ const ServiceFormModal = ({
             disabled={loading}
             placeholder="Ex: Corte + Barba"
             maxLength={100}
-            className={`input-theme ${errors.name ? 'border-feedback-light-error dark:border-feedback-dark-error focus:border-feedback-light-error' : ''}`}
+            className={`input-theme ${errors.name ? 'border-feedback-light-error focus:border-feedback-light-error dark:border-feedback-dark-error' : ''}`}
           />
           {errors.name && (
             <p className="mt-1 text-sm text-feedback-light-error dark:text-feedback-dark-error">
@@ -273,9 +273,9 @@ const ServiceFormModal = ({
 
         {/* 📂 Categoria do Serviço */}
         <div>
-          <label className="block text-sm font-medium text-theme-primary mb-2">
+          <label className="text-theme-primary mb-2 block text-sm font-medium">
             Categoria
-            <span className="text-feedback-light-error dark:text-feedback-dark-error ml-1">
+            <span className="ml-1 text-feedback-light-error dark:text-feedback-dark-error">
               *
             </span>
           </label>
@@ -288,9 +288,9 @@ const ServiceFormModal = ({
             });
             if (loadingCategories) {
               return (
-                <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-light-border dark:border-dark-border bg-light-surface dark:bg-dark-hover">
-                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                  <span className="text-sm text-theme-secondary">
+                <div className="flex items-center gap-2 rounded-lg border border-light-border bg-light-surface px-4 py-2.5 dark:border-dark-border dark:bg-dark-hover">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                  <span className="text-theme-secondary text-sm">
                     Carregando categorias...
                   </span>
                 </div>
@@ -303,7 +303,7 @@ const ServiceFormModal = ({
                     value={categoryId}
                     onChange={e => setCategoryId(e.target.value)}
                     disabled={loading}
-                    className={`input-theme ${errors.categoryId ? 'border-feedback-light-error dark:border-feedback-dark-error focus:border-feedback-light-error' : ''}`}
+                    className={`input-theme ${errors.categoryId ? 'border-feedback-light-error focus:border-feedback-light-error dark:border-feedback-dark-error' : ''}`}
                   >
                     <option value="">Selecione uma categoria</option>
                     {categories.map(cat => (
@@ -318,14 +318,14 @@ const ServiceFormModal = ({
                       {errors.categoryId}
                     </p>
                   )}
-                  <p className="mt-1 text-xs text-theme-secondary">
+                  <p className="text-theme-secondary mt-1 text-xs">
                     Apenas categorias de "Receita de Serviço" são exibidas
                   </p>
                 </>
               );
             }
             return (
-              <div className="px-4 py-3 rounded-lg border border-feedback-light-warning/30 dark:border-feedback-dark-warning/30 bg-feedback-light-warning/10 dark:bg-feedback-dark-warning/10">
+              <div className="rounded-lg border border-feedback-light-warning/30 bg-feedback-light-warning/10 px-4 py-3 dark:border-feedback-dark-warning/30 dark:bg-feedback-dark-warning/10">
                 <p className="text-sm text-feedback-light-warning dark:text-feedback-dark-warning">
                   ⚠️ Nenhuma categoria de serviço cadastrada. Cadastre
                   categorias na página de Categorias primeiro.
@@ -336,7 +336,7 @@ const ServiceFormModal = ({
         </div>
 
         {/* Preço e Duração */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {/* Preço */}
           <div>
             <CurrencyInput
@@ -371,9 +371,9 @@ const ServiceFormModal = ({
 
         {/* Comissão */}
         <div>
-          <label className="block text-sm font-medium text-theme-primary mb-2">
+          <label className="text-theme-primary mb-2 block text-sm font-medium">
             Comissão do Profissional (%)
-            <span className="text-feedback-light-error dark:text-feedback-dark-error ml-1">
+            <span className="ml-1 text-feedback-light-error dark:text-feedback-dark-error">
               *
             </span>
           </label>
@@ -388,14 +388,14 @@ const ServiceFormModal = ({
               min={0}
               max={100}
               step={5}
-              className="flex-1 h-2 bg-light-surface dark:bg-dark-hover rounded-lg appearance-none cursor-pointer accent-primary"
+              className="h-2 flex-1 cursor-pointer appearance-none rounded-lg bg-light-surface accent-primary dark:bg-dark-hover"
             />
-            <div className="w-20 px-3 py-2 rounded-lg border border-light-border dark:border-dark-border bg-light-surface dark:bg-dark-hover text-theme-primary font-semibold text-center">
+            <div className="text-theme-primary w-20 rounded-lg border border-light-border bg-light-surface px-3 py-2 text-center font-semibold dark:border-dark-border dark:bg-dark-hover">
               {commissionPercentage}%
             </div>
           </div>
-          <div className="flex justify-between items-center mt-2">
-            <p className="text-xs text-theme-secondary">
+          <div className="mt-2 flex items-center justify-between">
+            <p className="text-theme-secondary text-xs">
               Arraste para ajustar a porcentagem
             </p>
             <p className="text-sm font-medium text-feedback-light-success dark:text-feedback-dark-success">
@@ -414,13 +414,13 @@ const ServiceFormModal = ({
         </div>
 
         {/* Preview/Resumo */}
-        <div className="bg-light-surface dark:bg-dark-hover rounded-lg p-4 border border-light-border dark:border-dark-border">
-          <h4 className="font-semibold text-theme-primary mb-4">
+        <div className="rounded-lg border border-light-border bg-light-surface p-4 dark:border-dark-border dark:bg-dark-hover">
+          <h4 className="text-theme-primary mb-4 font-semibold">
             Resumo do Serviço
           </h4>
           <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-theme-secondary">
+            <div className="flex items-center justify-between">
+              <span className="text-theme-secondary text-sm">
                 Preço para o cliente:
               </span>
               <span className="text-lg font-bold text-primary">
@@ -430,8 +430,8 @@ const ServiceFormModal = ({
                 })}
               </span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-theme-secondary">
+            <div className="flex items-center justify-between">
+              <span className="text-theme-secondary text-sm">
                 Comissão ({commissionPercentage}%):
               </span>
               <span className="text-lg font-semibold text-feedback-light-success dark:text-feedback-dark-success">
@@ -441,11 +441,11 @@ const ServiceFormModal = ({
                 })}
               </span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-theme-secondary">
+            <div className="flex items-center justify-between">
+              <span className="text-theme-secondary text-sm">
                 Duração estimada:
               </span>
-              <span className="font-medium text-theme-primary">
+              <span className="text-theme-primary font-medium">
                 {durationMinutes >= 60
                   ? `${Math.floor(durationMinutes / 60)}h ${durationMinutes % 60}min`
                   : `${durationMinutes} min`}
@@ -455,10 +455,10 @@ const ServiceFormModal = ({
         </div>
 
         {/* Dicas */}
-        <div className="bg-primary/10 dark:bg-primary/20 border border-primary/30 dark:border-primary/40 rounded-lg p-4">
+        <div className="rounded-lg border border-primary/30 bg-primary/10 p-4 dark:border-primary/40 dark:bg-primary/20">
           <div className="flex items-start gap-3">
             <svg
-              className="w-5 h-5 text-primary flex-shrink-0 mt-0.5"
+              className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -469,10 +469,10 @@ const ServiceFormModal = ({
               />
             </svg>
             <div className="flex-1">
-              <h4 className="font-semibold text-theme-primary mb-1">
+              <h4 className="text-theme-primary mb-1 font-semibold">
                 Dicas para Precificação
               </h4>
-              <ul className="text-sm text-theme-secondary space-y-1">
+              <ul className="text-theme-secondary space-y-1 text-sm">
                 <li>• Considere custos de materiais e tempo de execução</li>
                 <li>• A comissão típica varia entre 40% e 60%</li>
                 <li>• Revise preços periodicamente conforme o mercado</li>
@@ -482,7 +482,7 @@ const ServiceFormModal = ({
         </div>
 
         {/* Ações */}
-        <div className="flex gap-3 pt-4 border-t border-light-border dark:border-dark-border">
+        <div className="flex gap-3 border-t border-light-border pt-4 dark:border-dark-border">
           <button
             type="button"
             onClick={handleClose}
@@ -494,17 +494,17 @@ const ServiceFormModal = ({
           <button
             type="submit"
             disabled={loading}
-            className="btn-theme-primary flex-1 inline-flex items-center justify-center gap-2"
+            className="btn-theme-primary inline-flex flex-1 items-center justify-center gap-2"
           >
             {loading ? (
               <>
-                <div className="w-5 h-5 border-2 border-light-surface dark:border-dark-surface border-t-transparent rounded-full animate-spin" />
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-light-surface border-t-transparent dark:border-dark-surface" />
                 Salvando...
               </>
             ) : (
               <>
                 <svg
-                  className="w-5 h-5"
+                  className="h-5 w-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

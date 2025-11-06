@@ -138,7 +138,7 @@ const AutoMatchStep = ({
   if (loading) {
     return (
       <div
-        className="flex flex-col items-center justify-center py-16 space-y-4"
+        className="flex flex-col items-center justify-center space-y-4 py-16"
         data-testid="auto-match-loading"
       >
         <Loader2
@@ -148,7 +148,7 @@ const AutoMatchStep = ({
         <p className="text-lg font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
           Executando auto-match...
         </p>
-        <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+        <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
           Comparando lançamentos bancários com receitas registradas
         </p>
       </div>
@@ -159,19 +159,19 @@ const AutoMatchStep = ({
   if (error) {
     return (
       <div
-        className="flex flex-col items-center justify-center py-16 space-y-4"
+        className="flex flex-col items-center justify-center space-y-4 py-16"
         data-testid="auto-match-error"
       >
         <AlertCircle size={48} className="text-red-600 dark:text-red-400" />
         <p className="text-lg font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
           Erro ao executar auto-match
         </p>
-        <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted max-w-md text-center">
+        <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted max-w-md text-center text-sm">
           {error}
         </p>
         <button
           onClick={onSkip}
-          className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-dark-text-primary rounded-md transition-colors"
+          className="text-dark-text-primary mt-4 rounded-md bg-blue-600 px-6 py-2 transition-colors hover:bg-blue-700"
           data-testid="btn-skip-after-error"
         >
           Pular e continuar manualmente
@@ -184,7 +184,7 @@ const AutoMatchStep = ({
   if (matches.length === 0) {
     return (
       <div className="space-y-6" data-testid="auto-match-complete">
-        <div className="flex flex-col items-center justify-center py-12 space-y-4">
+        <div className="flex flex-col items-center justify-center space-y-4 py-12">
           <CheckCircle2
             size={64}
             className="text-green-600 dark:text-green-400"
@@ -192,15 +192,15 @@ const AutoMatchStep = ({
           <p className="text-xl font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600">
             Revisão concluída!
           </p>
-          <div className="text-center space-y-1">
-            <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+          <div className="space-y-1 text-center">
+            <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
               <strong className="text-green-600 dark:text-green-400">
                 {confirmedCount}
               </strong>{' '}
               match(es) confirmado(s)
             </p>
             {rejectedCount > 0 && (
-              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                 <strong className="text-red-600 dark:text-red-400">
                   {rejectedCount}
                 </strong>{' '}
@@ -210,17 +210,17 @@ const AutoMatchStep = ({
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-light-border dark:border-dark-border">
+        <div className="flex items-center justify-end gap-3 border-t border-light-border pt-4 dark:border-dark-border">
           <button
             onClick={onSkip}
-            className="px-4 py-2 text-gray-700 dark:text-gray-300 dark:text-gray-600 hover:card-theme dark:hover:bg-dark-surface rounded-md transition-colors"
+            className="hover:card-theme rounded-md px-4 py-2 text-gray-700 transition-colors dark:text-gray-300 dark:text-gray-600 dark:hover:bg-dark-surface"
             data-testid="btn-back-to-preview"
           >
             Revisar lançamentos
           </button>
           <button
             onClick={handleFinishReview}
-            className="inline-flex items-center gap-2 px-6 py-2 bg-green-600 hover:bg-green-700 text-dark-text-primary rounded-md transition-colors"
+            className="text-dark-text-primary inline-flex items-center gap-2 rounded-md bg-green-600 px-6 py-2 transition-colors hover:bg-green-700"
             data-testid="btn-finish-review"
           >
             Continuar
@@ -235,12 +235,12 @@ const AutoMatchStep = ({
   return (
     <div className="space-y-6" data-testid="auto-match-step">
       {/* Header com resumo */}
-      <div className="flex items-center justify-between pb-4 border-b border-light-border dark:border-dark-border">
+      <div className="flex items-center justify-between border-b border-light-border pb-4 dark:border-dark-border">
         <div>
-          <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+          <h3 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
             Revisão de Matches Automáticos
           </h3>
-          <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
+          <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-sm">
             Revise cada match e confirme ou rejeite individualmente
           </p>
         </div>
@@ -285,10 +285,10 @@ const AutoMatchStep = ({
       />
 
       {/* Footer com ações */}
-      <div className="flex items-center justify-end gap-3 pt-4 border-t border-light-border dark:border-dark-border">
+      <div className="flex items-center justify-end gap-3 border-t border-light-border pt-4 dark:border-dark-border">
         <button
           onClick={onSkip}
-          className="px-4 py-2 text-gray-700 dark:text-gray-300 dark:text-gray-600 hover:card-theme dark:hover:bg-dark-surface rounded-md transition-colors"
+          className="hover:card-theme rounded-md px-4 py-2 text-gray-700 transition-colors dark:text-gray-300 dark:text-gray-600 dark:hover:bg-dark-surface"
           data-testid="btn-skip-automatch"
         >
           Pular auto-match

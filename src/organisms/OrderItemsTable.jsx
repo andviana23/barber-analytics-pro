@@ -49,10 +49,10 @@ const OrderItemsTable = ({
   if (loading) {
     return (
       <div
-        className={`bg-white dark:bg-dark-surface rounded-lg border border-light-border dark:border-dark-border ${className}`}
+        className={`rounded-lg border border-light-border bg-white dark:border-dark-border dark:bg-dark-surface ${className}`}
       >
         <div className="p-8 text-center">
-          <div className="inline-block w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin mb-3" />
+          <div className="border-3 mb-3 inline-block h-8 w-8 animate-spin rounded-full border-primary border-t-transparent" />
           <p className="text-theme-secondary">Carregando itens...</p>
         </div>
       </div>
@@ -60,26 +60,26 @@ const OrderItemsTable = ({
   }
   return (
     <div
-      className={`bg-white dark:bg-dark-surface rounded-lg border border-light-border dark:border-dark-border overflow-hidden ${className}`}
+      className={`overflow-hidden rounded-lg border border-light-border bg-white dark:border-dark-border dark:bg-dark-surface ${className}`}
     >
       {/* Header */}
-      <div className="px-6 py-4 border-b border-light-border dark:border-dark-border bg-light-surface/50 dark:bg-dark-hover/50">
+      <div className="border-b border-light-border bg-light-surface/50 px-6 py-4 dark:border-dark-border dark:bg-dark-hover/50">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-theme-primary">
+            <h3 className="text-theme-primary text-lg font-semibold">
               Serviços da Comanda
             </h3>
-            <p className="text-sm text-theme-secondary mt-1">
+            <p className="text-theme-secondary mt-1 text-sm">
               {items.length} {items.length === 1 ? 'serviço' : 'serviços'}
             </p>
           </div>
           {onAddItem && editable && (
             <button
               onClick={onAddItem}
-              className="px-4 py-2 bg-primary hover:bg-primary-dark text-dark-text-primary font-medium rounded-lg transition-colors inline-flex items-center gap-2"
+              className="hover:bg-primary-dark text-dark-text-primary inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium transition-colors"
             >
               <svg
-                className="w-5 h-5"
+                className="h-5 w-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -101,7 +101,7 @@ const OrderItemsTable = ({
       {items.length === 0 ? (
         <div className="p-12 text-center">
           <svg
-            className="w-16 h-16 mx-auto text-theme-secondary/50 mb-4"
+            className="text-theme-secondary/50 mx-auto mb-4 h-16 w-16"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -113,7 +113,7 @@ const OrderItemsTable = ({
               d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
             />
           </svg>
-          <h3 className="text-lg font-semibold text-theme-primary mb-2">
+          <h3 className="text-theme-primary mb-2 text-lg font-semibold">
             {emptyMessage}
           </h3>
           {onAddItem && editable && (
@@ -124,10 +124,10 @@ const OrderItemsTable = ({
           {onAddItem && editable && (
             <button
               onClick={onAddItem}
-              className="px-6 py-3 bg-primary hover:bg-primary-dark text-dark-text-primary font-medium rounded-lg transition-colors inline-flex items-center gap-2"
+              className="hover:bg-primary-dark text-dark-text-primary inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium transition-colors"
             >
               <svg
-                className="w-5 h-5"
+                className="h-5 w-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -147,34 +147,34 @@ const OrderItemsTable = ({
         <>
           {/* Table Header */}
           <div
-            className="grid items-center gap-3 px-4 py-3 bg-light-surface/30 dark:bg-dark-hover/30 border-b border-light-border dark:border-dark-border"
+            className="grid items-center gap-3 border-b border-light-border bg-light-surface/30 px-4 py-3 dark:border-dark-border dark:bg-dark-hover/30"
             style={{
               gridTemplateColumns: showCommission
                 ? 'minmax(150px, 2fr) minmax(120px, 1.5fr) 80px 100px 100px 100px 40px'
                 : 'minmax(150px, 2fr) minmax(120px, 1.5fr) 80px 100px 40px',
             }}
           >
-            <div className="text-xs font-semibold text-theme-secondary uppercase tracking-wider">
+            <div className="text-theme-secondary text-xs font-semibold uppercase tracking-wider">
               Serviço
             </div>
-            <div className="text-xs font-semibold text-theme-secondary uppercase tracking-wider">
+            <div className="text-theme-secondary text-xs font-semibold uppercase tracking-wider">
               Profissional
             </div>
-            <div className="text-xs font-semibold text-theme-secondary uppercase tracking-wider text-center">
+            <div className="text-theme-secondary text-center text-xs font-semibold uppercase tracking-wider">
               Qtd
             </div>
-            <div className="text-xs font-semibold text-theme-secondary uppercase tracking-wider text-right">
+            <div className="text-theme-secondary text-right text-xs font-semibold uppercase tracking-wider">
               Preço Unit.
             </div>
             {showCommission && (
-              <div className="text-xs font-semibold text-theme-secondary uppercase tracking-wider text-right">
+              <div className="text-theme-secondary text-right text-xs font-semibold uppercase tracking-wider">
                 Comissão
               </div>
             )}
-            <div className="text-xs font-semibold text-theme-secondary uppercase tracking-wider text-right">
+            <div className="text-theme-secondary text-right text-xs font-semibold uppercase tracking-wider">
               Total
             </div>
-            <div className="text-xs font-semibold text-theme-secondary uppercase tracking-wider text-right">
+            <div className="text-theme-secondary text-right text-xs font-semibold uppercase tracking-wider">
               {editable ? 'Ações' : ''}
             </div>
           </div>
@@ -193,19 +193,19 @@ const OrderItemsTable = ({
           </div>
 
           {/* Totals Footer */}
-          <div className="px-4 py-4 border-t-2 border-light-border dark:border-dark-border bg-light-surface/50 dark:bg-dark-hover/50">
-            <div className="flex flex-col gap-2 max-w-md ml-auto">
+          <div className="border-t-2 border-light-border bg-light-surface/50 px-4 py-4 dark:border-dark-border dark:bg-dark-hover/50">
+            <div className="ml-auto flex max-w-md flex-col gap-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-theme-secondary">
+                <span className="text-theme-secondary text-sm font-medium">
                   Subtotal:
                 </span>
-                <span className="text-base font-semibold text-theme-primary">
+                <span className="text-theme-primary text-base font-semibold">
                   {formatCurrency(totals.subtotal)}
                 </span>
               </div>
               {showCommission && (
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-theme-secondary">
+                  <span className="text-theme-secondary text-sm font-medium">
                     Total Comissões:
                   </span>
                   <span className="text-base font-semibold text-green-600 dark:text-green-400">
@@ -213,8 +213,8 @@ const OrderItemsTable = ({
                   </span>
                 </div>
               )}
-              <div className="flex items-center justify-between pt-2 border-t border-light-border dark:border-dark-border">
-                <span className="text-lg font-semibold text-theme-primary">
+              <div className="flex items-center justify-between border-t border-light-border pt-2 dark:border-dark-border">
+                <span className="text-theme-primary text-lg font-semibold">
                   Total:
                 </span>
                 <span className="text-xl font-bold text-primary">

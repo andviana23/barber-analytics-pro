@@ -63,8 +63,8 @@ const CustomTooltip = ({ active, payload, label }) => {
   const data = payload[0]?.payload;
   if (!data) return null;
   return (
-    <div className="card-theme dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg shadow-lg p-4 min-w-64">
-      <div className="font-semibold text-theme-primary dark:text-dark-text-primary mb-3">
+    <div className="card-theme min-w-64 rounded-lg border border-light-border p-4 shadow-lg dark:border-dark-border dark:bg-dark-surface">
+      <div className="text-theme-primary dark:text-dark-text-primary mb-3 font-semibold">
         {format(new Date(data.date), "MMMM 'de' yyyy", {
           locale: ptBR,
         })}
@@ -73,8 +73,8 @@ const CustomTooltip = ({ active, payload, label }) => {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+            <div className="h-3 w-3 rounded-full bg-green-500"></div>
+            <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
               Entradas:
             </span>
           </div>
@@ -85,8 +85,8 @@ const CustomTooltip = ({ active, payload, label }) => {
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-            <span className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+            <div className="h-3 w-3 rounded-full bg-red-500"></div>
+            <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
               Saídas:
             </span>
           </div>
@@ -95,9 +95,9 @@ const CustomTooltip = ({ active, payload, label }) => {
           </span>
         </div>
 
-        <div className="border-t border-light-border dark:border-dark-border pt-2 mt-2">
+        <div className="mt-2 border-t border-light-border pt-2 dark:border-dark-border">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-theme-primary dark:text-dark-text-primary">
+            <span className="text-theme-primary dark:text-dark-text-primary text-sm font-medium">
               Resultado:
             </span>
             <span
@@ -107,8 +107,8 @@ const CustomTooltip = ({ active, payload, label }) => {
             </span>
           </div>
 
-          <div className="flex items-center justify-between mt-1">
-            <span className="text-sm font-medium text-theme-primary dark:text-dark-text-primary">
+          <div className="mt-1 flex items-center justify-between">
+            <span className="text-theme-primary dark:text-dark-text-primary text-sm font-medium">
               Margem:
             </span>
             <span
@@ -216,11 +216,11 @@ const CashflowTimelineChart = ({
   if (loading) {
     return (
       <div
-        className={`card-theme rounded-lg border border-light-border dark:border-dark-border p-6 ${className}`}
+        className={`card-theme rounded-lg border border-light-border p-6 dark:border-dark-border ${className}`}
       >
-        <div className="flex items-center justify-center h-64">
+        <div className="flex h-64 items-center justify-center">
           <div className="text-center">
-            <RefreshCw className="w-8 h-8 animate-spin text-blue-500 mx-auto mb-4" />
+            <RefreshCw className="mx-auto mb-4 h-8 w-8 animate-spin text-blue-500" />
             <p className="text-theme-secondary dark:text-dark-text-muted">
               Carregando dados do fluxo de caixa...
             </p>
@@ -232,21 +232,21 @@ const CashflowTimelineChart = ({
   if (error) {
     return (
       <div
-        className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 ${className}`}
+        className={`rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800 ${className}`}
       >
-        <div className="flex items-center justify-center h-64">
+        <div className="flex h-64 items-center justify-center">
           <div className="text-center">
-            <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-4" />
-            <p className="text-red-600 dark:text-red-400 mb-2">
+            <AlertCircle className="mx-auto mb-4 h-8 w-8 text-red-500" />
+            <p className="mb-2 text-red-600 dark:text-red-400">
               Erro ao carregar dados
             </p>
-            <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-4">
+            <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-4 text-sm">
               {error}
             </p>
             {onRefresh && (
               <button
                 onClick={onRefresh}
-                className="px-4 py-2 bg-blue-600 text-dark-text-primary rounded-lg hover:bg-blue-700 transition-colors"
+                className="text-dark-text-primary rounded-lg bg-blue-600 px-4 py-2 transition-colors hover:bg-blue-700"
               >
                 Tentar Novamente
               </button>
@@ -258,20 +258,20 @@ const CashflowTimelineChart = ({
   }
   return (
     <div
-      className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 ${className}`}
+      className={`rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 ${className}`}
     >
       {/* Header */}
-      <div className="p-6 border-b border-light-border dark:border-dark-border">
-        <div className="flex items-center justify-between mb-4">
+      <div className="border-b border-light-border p-6 dark:border-dark-border">
+        <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-              <Activity className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
+              <Activity className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+              <h3 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
                 {title}
               </h3>
-              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                 Evolução temporal dos últimos {timeRange} meses
               </p>
             </div>
@@ -279,12 +279,12 @@ const CashflowTimelineChart = ({
 
           <div className="flex items-center gap-2">
             {/* Controles de período */}
-            <div className="flex items-center gap-1 card-theme dark:bg-gray-700 rounded-lg p-1">
+            <div className="card-theme flex items-center gap-1 rounded-lg p-1 dark:bg-gray-700">
               {['6', '12', '24'].map(period => (
                 <button
                   key={period}
                   onClick={() => setTimeRange(period)}
-                  className={`px-3 py-1 text-sm rounded-md transition-colors ${timeRange === period ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}
+                  className={`rounded-md px-3 py-1 text-sm transition-colors ${timeRange === period ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-600 dark:text-white' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'}`}
                 >
                   {period}m
                 </button>
@@ -292,20 +292,20 @@ const CashflowTimelineChart = ({
             </div>
 
             {/* Controles de tipo de gráfico */}
-            <div className="flex items-center gap-1 card-theme dark:bg-gray-700 rounded-lg p-1">
+            <div className="card-theme flex items-center gap-1 rounded-lg p-1 dark:bg-gray-700">
               <button
                 onClick={() => setChartType('area')}
-                className={`p-2 rounded-md transition-colors ${chartType === 'area' ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}
+                className={`rounded-md p-2 transition-colors ${chartType === 'area' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-600 dark:text-white' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'}`}
                 title="Gráfico de Área"
               >
-                <BarChart3 className="w-4 h-4" />
+                <BarChart3 className="h-4 w-4" />
               </button>
               <button
                 onClick={() => setChartType('line')}
-                className={`p-2 rounded-md transition-colors ${chartType === 'line' ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}
+                className={`rounded-md p-2 transition-colors ${chartType === 'line' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-600 dark:text-white' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'}`}
                 title="Gráfico de Linha"
               >
-                <TrendingUp className="w-4 h-4" />
+                <TrendingUp className="h-4 w-4" />
               </button>
             </div>
 
@@ -313,30 +313,30 @@ const CashflowTimelineChart = ({
             {onRefresh && (
               <button
                 onClick={onRefresh}
-                className="p-2 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary hover:card-theme dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary hover:card-theme rounded-lg p-2 transition-colors dark:hover:bg-gray-700"
                 title="Atualizar dados"
               >
-                <RefreshCw className="w-4 h-4" />
+                <RefreshCw className="h-4 w-4" />
               </button>
             )}
 
             {onExport && (
               <button
                 onClick={onExport}
-                className="p-2 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary hover:card-theme dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary hover:card-theme rounded-lg p-2 transition-colors dark:hover:bg-gray-700"
                 title="Exportar gráfico"
               >
-                <Download className="w-4 h-4" />
+                <Download className="h-4 w-4" />
               </button>
             )}
           </div>
         </div>
 
         {/* Estatísticas Resumidas */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
-            <div className="flex items-center gap-2 mb-1">
-              <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+          <div className="rounded-lg bg-green-50 p-3 dark:bg-green-900/20">
+            <div className="mb-1 flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />
               <span className="text-sm font-medium text-green-700 dark:text-green-300">
                 Total Entradas
               </span>
@@ -346,9 +346,9 @@ const CashflowTimelineChart = ({
             </p>
           </div>
 
-          <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3">
-            <div className="flex items-center gap-2 mb-1">
-              <TrendingDown className="w-4 h-4 text-red-600 dark:text-red-400" />
+          <div className="rounded-lg bg-red-50 p-3 dark:bg-red-900/20">
+            <div className="mb-1 flex items-center gap-2">
+              <TrendingDown className="h-4 w-4 text-red-600 dark:text-red-400" />
               <span className="text-sm font-medium text-red-700 dark:text-red-300">
                 Total Saídas
               </span>
@@ -361,9 +361,9 @@ const CashflowTimelineChart = ({
           <div
             className={`rounded-lg p-3 ${stats.netResult >= 0 ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20'}`}
           >
-            <div className="flex items-center gap-2 mb-1">
+            <div className="mb-1 flex items-center gap-2">
               <DollarSign
-                className={`w-4 h-4 ${stats.netResult >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+                className={`h-4 w-4 ${stats.netResult >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
               />
               <span
                 className={`text-sm font-medium ${stats.netResult >= 0 ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}`}
@@ -381,9 +381,9 @@ const CashflowTimelineChart = ({
           <div
             className={`rounded-lg p-3 ${stats.avgMargin >= 0 ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-orange-50 dark:bg-orange-900/20'}`}
           >
-            <div className="flex items-center gap-2 mb-1">
+            <div className="mb-1 flex items-center gap-2">
               <Activity
-                className={`w-4 h-4 ${stats.avgMargin >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-orange-600 dark:text-orange-400'}`}
+                className={`h-4 w-4 ${stats.avgMargin >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-orange-600 dark:text-orange-400'}`}
               />
               <span
                 className={`text-sm font-medium ${stats.avgMargin >= 0 ? 'text-blue-700 dark:text-blue-300' : 'text-orange-700 dark:text-orange-300'}`}

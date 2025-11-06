@@ -80,18 +80,18 @@ const DeleteUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
         />
 
         {/* Modal */}
-        <div className="relative transform overflow-hidden rounded-lg card-theme dark:bg-dark-surface px-6 pb-6 pt-5 text-left shadow-xl transition-all w-full max-w-lg">
+        <div className="card-theme relative w-full max-w-lg transform overflow-hidden rounded-lg px-6 pb-6 pt-5 text-left shadow-xl transition-all dark:bg-dark-surface">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
+          <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center">
-              <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg mr-3">
+              <div className="mr-3 rounded-lg bg-red-100 p-2 dark:bg-red-900/30">
                 <Trash2 className="h-6 w-6 text-red-600 dark:text-red-400" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+                <h3 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
                   Excluir Unidade
                 </h3>
-                <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                   Esta ação não pode ser desfeita
                 </p>
               </div>
@@ -99,7 +99,7 @@ const DeleteUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
             <button
               onClick={handleClose}
               disabled={deleting}
-              className="p-2 text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary dark:hover:text-gray-200 rounded-lg hover:card-theme dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary hover:card-theme rounded-lg p-2 transition-colors disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700 dark:hover:text-gray-200"
             >
               <X className="h-5 w-5" />
             </button>
@@ -108,14 +108,14 @@ const DeleteUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
           {/* Conteúdo */}
           <div className="space-y-6">
             {/* Alerta principal */}
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+            <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
               <div className="flex">
-                <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 mr-3" />
+                <AlertTriangle className="mr-3 mt-0.5 h-5 w-5 text-red-600 dark:text-red-400" />
                 <div className="text-sm">
-                  <p className="text-red-800 dark:text-red-300 font-medium mb-2">
+                  <p className="mb-2 font-medium text-red-800 dark:text-red-300">
                     Atenção! Você está prestes a excluir a unidade:
                   </p>
-                  <p className="text-red-700 dark:text-red-400 font-semibold text-lg">
+                  <p className="text-lg font-semibold text-red-700 dark:text-red-400">
                     {unit.name}
                   </p>
                 </div>
@@ -125,27 +125,27 @@ const DeleteUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
             {/* Verificação de dependências */}
             {loadingDependencies ? (
               <div className="flex items-center justify-center py-4">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                <span className="ml-2 text-sm text-theme-secondary">
+                <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-blue-600"></div>
+                <span className="text-theme-secondary ml-2 text-sm">
                   Verificando dependências...
                 </span>
               </div>
             ) : dependencies ? (
               <div>
                 {dependencies.hasDependencies ? (
-                  <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                  <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20">
                     <div className="flex">
-                      <Shield className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5 mr-3" />
+                      <Shield className="mr-3 mt-0.5 h-5 w-5 text-amber-600 dark:text-amber-400" />
                       <div className="text-sm">
-                        <p className="text-amber-800 dark:text-amber-300 font-medium mb-2">
+                        <p className="mb-2 font-medium text-amber-800 dark:text-amber-300">
                           Esta unidade possui dados vinculados:
                         </p>
-                        <ul className="text-amber-700 dark:text-amber-400 space-y-1">
+                        <ul className="space-y-1 text-amber-700 dark:text-amber-400">
                           {dependencies.dependencies.map((dep, index) => (
                             <li key={index}>• {dep}</li>
                           ))}
                         </ul>
-                        <p className="text-amber-800 dark:text-amber-300 font-medium mt-3">
+                        <p className="mt-3 font-medium text-amber-800 dark:text-amber-300">
                           A unidade será marcada como inativa, preservando o
                           histórico.
                         </p>
@@ -153,9 +153,9 @@ const DeleteUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                  <div className="rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
                     <div className="flex">
-                      <AlertTriangle className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5 mr-3" />
+                      <AlertTriangle className="mr-3 mt-0.5 h-5 w-5 text-green-600 dark:text-green-400" />
                       <div className="text-sm">
                         <p className="text-green-800 dark:text-green-300">
                           Esta unidade não possui dados vinculados e pode ser
@@ -169,11 +169,11 @@ const DeleteUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
             ) : null}
 
             {/* Informações da unidade */}
-            <div className="bg-light-bg dark:bg-dark-bg dark:bg-gray-700 rounded-lg p-4 space-y-2">
-              <h4 className="text-sm font-medium text-theme-primary dark:text-dark-text-primary">
+            <div className="space-y-2 rounded-lg bg-light-bg p-4 dark:bg-dark-bg dark:bg-gray-700">
+              <h4 className="text-theme-primary dark:text-dark-text-primary text-sm font-medium">
                 Informações da Unidade
               </h4>
-              <div className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted space-y-1">
+              <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted space-y-1 text-sm">
                 <div>
                   <span className="font-medium">Nome:</span> {unit.name}
                 </div>
@@ -194,7 +194,7 @@ const DeleteUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
 
             {/* Confirmação */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                 Para confirmar, digite o nome da unidade:{' '}
                 <span className="font-bold">{unit.name}</span>
               </label>
@@ -204,7 +204,7 @@ const DeleteUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
                 onChange={handleConfirmChange}
                 disabled={deleting}
                 placeholder={`Digite "${unit.name}" para confirmar`}
-                className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary placeholder-gray-500 dark:placeholder-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 placeholder-gray-500 focus:border-transparent focus:ring-2 focus:ring-red-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-border dark:bg-gray-700 dark:placeholder-gray-400"
               />
               {confirmText && !canDelete && (
                 <p className="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -214,11 +214,11 @@ const DeleteUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
             </div>
 
             {/* Consequências */}
-            <div className="bg-light-bg dark:bg-dark-bg dark:bg-gray-700 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-theme-primary dark:text-dark-text-primary mb-2">
+            <div className="rounded-lg bg-light-bg p-4 dark:bg-dark-bg dark:bg-gray-700">
+              <h4 className="text-theme-primary dark:text-dark-text-primary mb-2 text-sm font-medium">
                 Consequências da exclusão:
               </h4>
-              <ul className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted space-y-1">
+              <ul className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted space-y-1 text-sm">
                 <li>• A unidade será removida permanentemente do sistema</li>
                 <li>• Profissionais vinculados precisarão ser reatribuídos</li>
                 <li>• Dados históricos serão preservados para relatórios</li>
@@ -228,7 +228,7 @@ const DeleteUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-end space-x-3 pt-6 border-t border-light-border dark:border-dark-border mt-6">
+          <div className="mt-6 flex items-center justify-end space-x-3 border-t border-light-border pt-6 dark:border-dark-border">
             <Button
               type="button"
               variant="secondary"
@@ -246,7 +246,7 @@ const DeleteUnitModal = ({ isOpen, onClose, onSuccess, unit }) => {
               loading={deleting}
               loadingText="Excluindo..."
             >
-              <Trash2 className="h-4 w-4 mr-2" />
+              <Trash2 className="mr-2 h-4 w-4" />
               Excluir Unidade
             </Button>
           </div>

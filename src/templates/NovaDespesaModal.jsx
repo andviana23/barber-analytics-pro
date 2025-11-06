@@ -531,7 +531,7 @@ const NovaDespesaModal = ({
       // Se for recorrente, criar configuração de recorrência E GERAR DESPESAS MENSAIS
       if (isRecurring && expense) {
         console.log('🔁 Criando despesas recorrentes...');
-        
+
         const totalParcelas = getTotalParcels();
         const recurringData = {
           expense_id: expense.id,
@@ -542,30 +542,36 @@ const NovaDespesaModal = ({
           data_inicio: formData.data_competencia,
           total_parcelas: totalParcelas,
         };
-        
+
         const { error: recurringError } = await supabase
           .from('recurring_expenses')
           .insert(recurringData);
-        
+
         if (recurringError) {
-          console.error('❌ Erro ao criar configuração recorrente:', recurringError);
+          console.error(
+            '❌ Erro ao criar configuração recorrente:',
+            recurringError
+          );
           throw recurringError;
         }
-        
+
         // 🎯 CORREÇÃO DO BUG: Gerar as despesas mensais subsequentes
         console.log(`📅 Gerando ${totalParcelas - 1} despesas mensais...`);
-        
+
         const monthlyExpenses = [];
         for (let i = 1; i < totalParcelas; i++) {
-          const nextMonthDate = addMonths(new Date(formData.data_competencia), i);
-          
+          const nextMonthDate = addMonths(
+            new Date(formData.data_competencia),
+            i
+          );
+
           // Ajustar dia do vencimento se configurado
           let dueDate = nextMonthDate;
           if (recurringConfig.cobrar_sempre_no) {
             dueDate = new Date(nextMonthDate);
             dueDate.setDate(parseInt(recurringConfig.cobrar_sempre_no));
           }
-          
+
           monthlyExpenses.push({
             type: expenseData.type,
             unit_id: unidadeId,
@@ -586,18 +592,20 @@ const NovaDespesaModal = ({
             recurring_series_id: expense.id, // Vincular à despesa principal
           });
         }
-        
+
         if (monthlyExpenses.length > 0) {
           const { error: monthlyError } = await supabase
             .from('expenses')
             .insert(monthlyExpenses);
-          
+
           if (monthlyError) {
             console.error('❌ Erro ao criar despesas mensais:', monthlyError);
             throw monthlyError;
           }
-          
-          console.log(`✅ ${monthlyExpenses.length} despesas mensais criadas com sucesso!`);
+
+          console.log(
+            `✅ ${monthlyExpenses.length} despesas mensais criadas com sucesso!`
+          );
         }
       }
       addToast({
@@ -682,17 +690,17 @@ const NovaDespesaModal = ({
   if (!isOpen) return null;
   if (loadingData) {
     return (
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-        <div className="card-theme dark:bg-dark-surface rounded-2xl shadow-2xl p-8 max-w-md w-full">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+        <div className="card-theme w-full max-w-md rounded-2xl p-8 shadow-2xl dark:bg-dark-surface">
           <div className="flex flex-col items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-primary rounded-xl shadow-lg flex items-center justify-center">
-              <Clock className="w-6 h-6 text-dark-text-primary animate-spin" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary shadow-lg">
+              <Clock className="text-dark-text-primary h-6 w-6 animate-spin" />
             </div>
             <div className="text-center">
-              <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+              <h3 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
                 Carregando dados...
               </h3>
-              <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-sm">
                 Buscando categorias, contas e fornecedores
               </p>
             </div>
@@ -702,21 +710,21 @@ const NovaDespesaModal = ({
     );
   }
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-300 overflow-y-auto">
-      <div className="card-theme dark:bg-dark-surface rounded-2xl shadow-2xl w-full max-w-5xl min-h-[80vh] max-h-[95vh] border border-light-border dark:border-dark-border animate-in zoom-in-95 duration-300 my-8 flex flex-col">
+    <div className="animate-in fade-in fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-sm duration-300">
+      <div className="card-theme animate-in zoom-in-95 my-8 flex max-h-[95vh] min-h-[80vh] w-full max-w-5xl flex-col rounded-2xl border border-light-border shadow-2xl duration-300 dark:border-dark-border dark:bg-dark-surface">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-light-border dark:border-dark-border bg-red-50 dark:bg-red-900/20">
+        <div className="flex items-center justify-between border-b border-light-border bg-red-50 p-4 dark:border-dark-border dark:bg-red-900/20">
           <div className="flex items-center gap-4">
-            <div className="flex items-center justify-center w-12 h-12 bg-gradient-error rounded-xl shadow-lg">
-              <Calculator className="w-6 h-6 text-dark-text-primary" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-error shadow-lg">
+              <Calculator className="text-dark-text-primary h-6 w-6" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-theme-primary dark:text-dark-text-primary">
+              <h2 className="text-theme-primary dark:text-dark-text-primary text-lg font-bold">
                 {isEditing ? 'Editar Despesa' : 'Nova Despesa'}
               </h2>
-              <p className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted flex items-center gap-2">
+              <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted flex items-center gap-2 text-xs">
                 <span
-                  className={`w-2 h-2 rounded-full ${isRecurring ? 'bg-orange-500' : 'bg-green-500'}`}
+                  className={`h-2 w-2 rounded-full ${isRecurring ? 'bg-orange-500' : 'bg-green-500'}`}
                 ></span>
                 {isRecurring ? 'Despesa com recorrência' : 'Despesa única'}
               </p>
@@ -724,35 +732,35 @@ const NovaDespesaModal = ({
           </div>
           <button
             onClick={handleClose}
-            className="flex items-center justify-center w-10 h-10 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted hover:text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:hover:text-gray-200 rounded-xl hover:card-theme dark:hover:bg-dark-surface transition-all duration-200 group"
+            className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted hover:card-theme group flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 hover:text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:hover:bg-dark-surface dark:hover:text-gray-200"
           >
-            <X className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <X className="h-5 w-5 transition-transform group-hover:scale-110" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50 scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-200 dark:scrollbar-track-gray-800 max-h-[calc(95vh-200px)]">
-          <div className="p-6 space-y-6">
+        <div className="scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-200 dark:scrollbar-track-gray-800 max-h-[calc(95vh-200px)] flex-1 overflow-y-auto bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50">
+          <div className="space-y-6 p-6">
             {/* 📋 1. Informações do Lançamento */}
             <div className="space-y-6">
-              <div className="flex items-center gap-4 pb-6 border-b border-light-border dark:border-dark-border">
-                <div className="flex items-center justify-center w-10 h-10 bg-gradient-primary rounded-xl shadow-lg">
-                  <FileText className="w-5 h-5 text-dark-text-primary" />
+              <div className="flex items-center gap-4 border-b border-light-border pb-6 dark:border-dark-border">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary shadow-lg">
+                  <FileText className="text-dark-text-primary h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold text-theme-primary dark:text-dark-text-primary">
+                  <h3 className="text-theme-primary dark:text-dark-text-primary text-base font-semibold">
                     Informações do lançamento
                   </h3>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
                 {/* Fornecedor */}
                 <div className="lg:col-span-1">
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                  <label className="mb-2 block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                     Fornecedor
                   </label>
-                  <div className="card-theme dark:bg-dark-surface rounded-xl border-2 border-light-border dark:border-dark-border focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/20 transition-all duration-200">
+                  <div className="card-theme rounded-xl border-2 border-light-border transition-all duration-200 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/20 dark:border-dark-border dark:bg-dark-surface">
                     <PartySelector
                       value={formData.fornecedor_id}
                       onChange={value =>
@@ -766,8 +774,8 @@ const NovaDespesaModal = ({
                     />
                   </div>
                   {errors.fornecedor_id && (
-                    <div className="mt-2 flex items-center gap-2 text-red-600 dark:text-red-400 text-xs">
-                      <AlertCircle className="w-4 h-4" />
+                    <div className="mt-2 flex items-center gap-2 text-xs text-red-600 dark:text-red-400">
+                      <AlertCircle className="h-4 w-4" />
                       {errors.fornecedor_id}
                     </div>
                   )}
@@ -775,7 +783,7 @@ const NovaDespesaModal = ({
 
                 {/* Data de Competência */}
                 <div className="lg:col-span-1">
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                  <label className="mb-2 block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                     Data de competência *
                   </label>
                   <input
@@ -791,11 +799,11 @@ const NovaDespesaModal = ({
                         e.target.value ? new Date(e.target.value) : null
                       )
                     }
-                    className={`w-full px-3 py-2 text-sm border-2 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${errors.data_competencia ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+                    className={`w-full rounded-lg border-2 bg-white px-3 py-2 text-sm text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-800 dark:text-white ${errors.data_competencia ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                   />
                   {errors.data_competencia && (
-                    <div className="mt-2 flex items-center gap-2 text-red-600 dark:text-red-400 text-xs">
-                      <AlertCircle className="w-4 h-4" />
+                    <div className="mt-2 flex items-center gap-2 text-xs text-red-600 dark:text-red-400">
+                      <AlertCircle className="h-4 w-4" />
                       {errors.data_competencia}
                     </div>
                   )}
@@ -803,7 +811,7 @@ const NovaDespesaModal = ({
 
                 {/* Descrição */}
                 <div className="lg:col-span-1">
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                  <label className="mb-2 block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                     Descrição *
                   </label>
                   <input
@@ -813,11 +821,11 @@ const NovaDespesaModal = ({
                       handleInputChange('descricao', e.target.value)
                     }
                     placeholder="Ex: Aluguel, Material..."
-                    className={`w-full px-3 py-2 text-sm border-2 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${errors.descricao ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+                    className={`w-full rounded-lg border-2 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 ${errors.descricao ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                   />
                   {errors.descricao && (
-                    <div className="mt-2 flex items-center gap-2 text-red-600 dark:text-red-400 text-xs">
-                      <AlertCircle className="w-4 h-4" />
+                    <div className="mt-2 flex items-center gap-2 text-xs text-red-600 dark:text-red-400">
+                      <AlertCircle className="h-4 w-4" />
                       {errors.descricao}
                     </div>
                   )}
@@ -825,11 +833,11 @@ const NovaDespesaModal = ({
 
                 {/* Valor */}
                 <div className="lg:col-span-1">
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                  <label className="mb-2 block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                     Valor *
                   </label>
                   <div className="relative">
-                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted font-medium text-sm">
+                    <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted absolute left-3 top-1/2 -translate-y-1/2 transform text-sm font-medium">
                       R$
                     </div>
                     <input
@@ -839,12 +847,12 @@ const NovaDespesaModal = ({
                       value={formData.valor}
                       onChange={e => handleInputChange('valor', e.target.value)}
                       placeholder="0,00"
-                      className={`w-full pl-10 pr-4 py-2 text-sm border-2 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${errors.valor ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+                      className={`w-full rounded-lg border-2 bg-white py-2 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-500 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 ${errors.valor ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                     />
                   </div>
                   {errors.valor && (
-                    <div className="mt-2 flex items-center gap-2 text-red-600 dark:text-red-400 text-xs">
-                      <AlertCircle className="w-4 h-4" />
+                    <div className="mt-2 flex items-center gap-2 text-xs text-red-600 dark:text-red-400">
+                      <AlertCircle className="h-4 w-4" />
                       {errors.valor}
                     </div>
                   )}
@@ -852,7 +860,7 @@ const NovaDespesaModal = ({
 
                 {/* Categoria */}
                 <div className="lg:col-span-4">
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                  <label className="mb-2 block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                     Categoria *
                   </label>
                   <div className="relative">
@@ -861,7 +869,7 @@ const NovaDespesaModal = ({
                       onChange={e =>
                         handleInputChange('categoria_id', e.target.value)
                       }
-                      className={`w-full px-3 py-2 text-sm border-2 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${errors.categoria_id ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+                      className={`w-full rounded-lg border-2 bg-white px-3 py-2 text-sm text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-800 dark:text-white ${errors.categoria_id ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                     >
                       <option value="">Selecionar categoria...</option>
                       {(() => {
@@ -917,8 +925,8 @@ const NovaDespesaModal = ({
                       })()}
                     </select>
                     {errors.categoria_id && (
-                      <div className="mt-2 flex items-center gap-2 text-red-600 dark:text-red-400 text-xs">
-                        <AlertCircle className="w-4 h-4" />
+                      <div className="mt-2 flex items-center gap-2 text-xs text-red-600 dark:text-red-400">
+                        <AlertCircle className="h-4 w-4" />
                         {errors.categoria_id}
                       </div>
                     )}
@@ -928,16 +936,16 @@ const NovaDespesaModal = ({
             </div>
 
             {/* Toggle de Recorrência */}
-            <div className="flex items-center justify-between p-4 bg-purple-50 dark:bg-purple-900/10 border-2 border-purple-200 dark:border-purple-700/50 rounded-2xl">
+            <div className="flex items-center justify-between rounded-2xl border-2 border-purple-200 bg-purple-50 p-4 dark:border-purple-700/50 dark:bg-purple-900/10">
               <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center w-10 h-10 bg-gradient-purple rounded-xl shadow-lg">
-                  <Repeat className="w-5 h-5 text-dark-text-primary" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-purple shadow-lg">
+                  <Repeat className="text-dark-text-primary h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-theme-primary dark:text-dark-text-primary">
+                  <h3 className="text-theme-primary dark:text-dark-text-primary text-sm font-semibold">
                     Despesa Recorrente
                   </h3>
-                  <p className="text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                  <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-xs">
                     Ativar para repetir este lançamento mensalmente
                   </p>
                 </div>
@@ -948,7 +956,7 @@ const NovaDespesaModal = ({
                 className={`relative inline-flex h-8 w-14 items-center rounded-full transition-all duration-300 ${isRecurring ? 'bg-gradient-secondary' : 'bg-gray-300 dark:bg-gray-600'}`}
               >
                 <span
-                  className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform duration-300 shadow-lg ${isRecurring ? 'translate-x-7' : 'translate-x-1'}`}
+                  className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform duration-300 ${isRecurring ? 'translate-x-7' : 'translate-x-1'}`}
                 />
               </button>
             </div>
@@ -956,23 +964,23 @@ const NovaDespesaModal = ({
             {/* 🔁 2. Configuração de Repetição - Aparece apenas quando ativada */}
             {isRecurring && (
               <div className="space-y-6">
-                <div className="flex items-center justify-between pb-6 border-b border-light-border dark:border-dark-border">
+                <div className="flex items-center justify-between border-b border-light-border pb-6 dark:border-dark-border">
                   <div className="flex items-center gap-4">
-                    <div className="flex items-center justify-center w-10 h-10 bg-gradient-purple rounded-xl shadow-lg">
-                      <Repeat className="w-5 h-5 text-dark-text-primary" />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-purple shadow-lg">
+                      <Repeat className="text-dark-text-primary h-5 w-5" />
                     </div>
                     <div>
-                      <h3 className="text-base font-semibold text-theme-primary dark:text-dark-text-primary">
+                      <h3 className="text-theme-primary dark:text-dark-text-primary text-base font-semibold">
                         Configurações de repetição
                       </h3>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-purple-50 dark:bg-purple-900/20 border-2 border-purple-200 dark:border-purple-700 rounded-2xl p-6 space-y-6">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="space-y-6 rounded-2xl border-2 border-purple-200 bg-purple-50 p-6 dark:border-purple-700 dark:bg-purple-900/20">
+                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                      <label className="mb-2 block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                         Configurações de Repetição
                       </label>
                       <select
@@ -983,7 +991,7 @@ const NovaDespesaModal = ({
                             configuracao: e.target.value,
                           }))
                         }
-                        className="w-full px-4 py-3 border-2 border-purple-300 dark:border-purple-600 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-200 card-theme dark:bg-dark-surface text-theme-primary dark:text-dark-text-primary"
+                        className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-xl border-2 border-purple-300 px-4 py-3 transition-all duration-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 dark:border-purple-600 dark:bg-dark-surface"
                       >
                         <option value="mensal-12x">
                           Mensal - A cada 1 mês(es), 12 vez(es)
@@ -999,7 +1007,7 @@ const NovaDespesaModal = ({
                     </div>
 
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                      <label className="mb-2 block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                         Cobrar sempre no
                       </label>
                       <select
@@ -1010,7 +1018,7 @@ const NovaDespesaModal = ({
                             cobrar_sempre_no: parseInt(e.target.value),
                           }))
                         }
-                        className="w-full px-4 py-3 border-2 border-purple-300 dark:border-purple-600 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-200 card-theme dark:bg-dark-surface text-theme-primary dark:text-dark-text-primary"
+                        className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-xl border-2 border-purple-300 px-4 py-3 transition-all duration-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 dark:border-purple-600 dark:bg-dark-surface"
                       >
                         {dayOptions.map(option => (
                           <option key={option.value} value={option.value}>
@@ -1023,7 +1031,7 @@ const NovaDespesaModal = ({
 
                   {recurringConfig.configuracao === 'personalizar' && (
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                      <label className="mb-2 block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                         Duração (meses)
                       </label>
                       <input
@@ -1037,7 +1045,7 @@ const NovaDespesaModal = ({
                           }))
                         }
                         placeholder="Ex: 12"
-                        className="w-full px-4 py-3 border-2 border-purple-300 dark:border-purple-600 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-200 card-theme dark:bg-dark-surface text-theme-primary dark:text-dark-text-primary placeholder-gray-500 dark:placeholder-gray-400"
+                        className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-xl border-2 border-purple-300 px-4 py-3 placeholder-gray-500 transition-all duration-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 dark:border-purple-600 dark:bg-dark-surface dark:placeholder-gray-400"
                       />
                     </div>
                   )}
@@ -1047,21 +1055,21 @@ const NovaDespesaModal = ({
 
             {/* 💳 3. Condição de Pagamento */}
             <div className="space-y-6">
-              <div className="flex items-center gap-4 pb-6 border-b border-light-border dark:border-dark-border">
-                <div className="flex items-center justify-center w-10 h-10 bg-gradient-warning rounded-xl shadow-lg">
-                  <CreditCard className="w-5 h-5 text-dark-text-primary" />
+              <div className="flex items-center gap-4 border-b border-light-border pb-6 dark:border-dark-border">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-warning shadow-lg">
+                  <CreditCard className="text-dark-text-primary h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold text-theme-primary dark:text-dark-text-primary">
+                  <h3 className="text-theme-primary dark:text-dark-text-primary text-base font-semibold">
                     Condição de pagamento
                   </h3>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                 {/* 1º vencimento */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                  <label className="mb-2 block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                     Data de vencimento *
                   </label>
                   <input
@@ -1077,11 +1085,11 @@ const NovaDespesaModal = ({
                         e.target.value ? new Date(e.target.value) : null
                       )
                     }
-                    className={`w-full px-3 py-2 text-sm border-2 rounded-lg focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${errors.data_vencimento ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+                    className={`w-full rounded-lg border-2 bg-white px-3 py-2 text-sm text-gray-900 transition-all duration-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 dark:bg-gray-800 dark:text-white ${errors.data_vencimento ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                   />
                   {errors.data_vencimento && (
-                    <div className="mt-2 flex items-center gap-2 text-red-600 dark:text-red-400 text-xs">
-                      <AlertCircle className="w-4 h-4" />
+                    <div className="mt-2 flex items-center gap-2 text-xs text-red-600 dark:text-red-400">
+                      <AlertCircle className="h-4 w-4" />
                       {errors.data_vencimento}
                     </div>
                   )}
@@ -1089,7 +1097,7 @@ const NovaDespesaModal = ({
 
                 {/* Forma de pagamento */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                  <label className="mb-2 block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                     Forma de pagamento
                   </label>
                   <select
@@ -1097,7 +1105,7 @@ const NovaDespesaModal = ({
                     onChange={e =>
                       handleInputChange('forma_pagamento', e.target.value)
                     }
-                    className="w-full px-4 py-3 border-2 border-light-border dark:border-dark-border rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 card-theme dark:bg-dark-surface text-theme-primary dark:text-dark-text-primary"
+                    className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-xl border-2 border-light-border px-4 py-3 transition-all duration-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/20 dark:border-dark-border dark:bg-dark-surface"
                   >
                     {paymentMethods.map(method => (
                       <option key={method.value} value={method.value}>
@@ -1109,7 +1117,7 @@ const NovaDespesaModal = ({
 
                 {/* Conta de pagamento */}
                 <div className="lg:col-span-2">
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                  <label className="mb-2 block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                     Conta de pagamento
                   </label>
                   <select
@@ -1117,7 +1125,7 @@ const NovaDespesaModal = ({
                     onChange={e =>
                       handleInputChange('conta_id', e.target.value)
                     }
-                    className="w-full px-4 py-3 border-2 border-light-border dark:border-dark-border rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 card-theme dark:bg-dark-surface text-theme-primary dark:text-dark-text-primary"
+                    className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-xl border-2 border-light-border px-4 py-3 transition-all duration-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/20 dark:border-dark-border dark:bg-dark-surface"
                   >
                     <option value="">Selecionar conta...</option>
                     {accounts.map(account => (
@@ -1132,22 +1140,22 @@ const NovaDespesaModal = ({
 
             {/* 📎 4. Observações */}
             <div className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 {/* Observações Tab */}
                 <div className="lg:col-span-2">
-                  <div className="border-b border-light-border dark:border-dark-border mb-4">
+                  <div className="mb-4 border-b border-light-border dark:border-dark-border">
                     <div className="flex gap-4">
-                      <button className="px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400">
+                      <button className="border-b-2 border-blue-600 px-4 py-2 text-sm font-medium text-blue-600 dark:border-blue-400 dark:text-blue-400">
                         Observações
                       </button>
-                      <button className="px-4 py-2 text-sm font-medium text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary">
+                      <button className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary px-4 py-2 text-sm font-medium">
                         Anexo
                       </button>
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+                    <label className="mb-2 block text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                       Observações
                     </label>
                     <textarea
@@ -1157,7 +1165,7 @@ const NovaDespesaModal = ({
                       }
                       placeholder="Descreva observações relevantes sobre esse lançamento financeiro"
                       rows={4}
-                      className="w-full px-4 py-3 border-2 border-light-border dark:border-dark-border rounded-xl focus:ring-4 focus:ring-gray-500/20 focus:border-gray-500 dark:border-gray-400 transition-all duration-200 card-theme dark:bg-dark-surface text-theme-primary dark:text-dark-text-primary placeholder-gray-500 dark:placeholder-gray-400 resize-none"
+                      className="card-theme text-theme-primary dark:text-dark-text-primary w-full resize-none rounded-xl border-2 border-light-border px-4 py-3 placeholder-gray-500 transition-all duration-200 focus:border-gray-500 focus:ring-4 focus:ring-gray-500/20 dark:border-dark-border dark:border-gray-400 dark:bg-dark-surface dark:placeholder-gray-400"
                     />
                   </div>
                 </div>
@@ -1167,11 +1175,11 @@ const NovaDespesaModal = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-4 border-t border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50 mt-auto">
-          <div className="flex items-center gap-3 text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+        <div className="mt-auto flex items-center justify-between border-t border-light-border bg-light-bg p-4 dark:border-dark-border dark:bg-dark-bg dark:bg-dark-surface/50">
+          <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted flex items-center gap-3 text-sm">
             {formData.status && (
               <>
-                <Shield className="w-4 h-4" />
+                <Shield className="h-4 w-4" />
                 <span>Status:</span>
                 <StatusBadge
                   status={formData.status}
@@ -1182,7 +1190,7 @@ const NovaDespesaModal = ({
             )}
             {isDirty && (
               <>
-                <Clock className="w-4 h-4" />
+                <Clock className="h-4 w-4" />
                 <span className="text-orange-600 dark:text-orange-400">
                   Alterações não salvas
                 </span>
@@ -1194,7 +1202,7 @@ const NovaDespesaModal = ({
             <button
               type="button"
               onClick={handleClose}
-              className="px-6 py-3 text-gray-700 dark:text-gray-300 dark:text-gray-600 border-2 border-light-border dark:border-dark-border rounded-xl hover:card-theme dark:hover:bg-gray-700 transition-all duration-200 font-medium"
+              className="hover:card-theme rounded-xl border-2 border-light-border px-6 py-3 font-medium text-gray-700 transition-all duration-200 dark:border-dark-border dark:text-gray-300 dark:text-gray-600 dark:hover:bg-gray-700"
             >
               Cancelar
             </button>
@@ -1202,16 +1210,16 @@ const NovaDespesaModal = ({
               type="button"
               onClick={handleSave}
               disabled={loading}
-              className="px-8 py-3 bg-gradient-error text-dark-text-primary rounded-xl hover:from-red-600 hover:to-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-3 font-semibold shadow-lg hover:shadow-xl"
+              className="text-dark-text-primary flex items-center gap-3 rounded-xl bg-gradient-error px-8 py-3 font-semibold shadow-lg transition-all duration-200 hover:from-red-600 hover:to-red-700 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-light-surface dark:border-dark-surface border-t-transparent rounded-full animate-spin" />
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-light-surface border-t-transparent dark:border-dark-surface" />
                   Salvando...
                 </>
               ) : (
                 <>
-                  <Calculator className="w-5 h-5" />
+                  <Calculator className="h-5 w-5" />
                   {isEditing ? 'Salvar Alterações' : 'Criar Despesa'}
                 </>
               )}
@@ -1275,10 +1283,10 @@ export const NovaDespesaModalPreview = () => {
     alert('Despesa salva com sucesso!');
   };
   return (
-    <div className="p-6 card-theme dark:bg-dark-surface min-h-screen">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div className="card-theme dark:bg-dark-surface p-6 rounded-xl shadow-lg">
-          <h2 className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary mb-4">
+    <div className="card-theme min-h-screen p-6 dark:bg-dark-surface">
+      <div className="mx-auto max-w-4xl space-y-6">
+        <div className="card-theme rounded-xl p-6 shadow-lg dark:bg-dark-surface">
+          <h2 className="text-theme-primary dark:text-dark-text-primary mb-4 text-2xl font-bold">
             Nova Despesa Modal - Preview
           </h2>
           <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-6">
@@ -1293,7 +1301,7 @@ export const NovaDespesaModalPreview = () => {
                 setIsEditing(false);
                 setIsOpen(true);
               }}
-              className="px-4 py-2 bg-red-600 text-dark-text-primary rounded-lg hover:bg-red-700 transition-colors"
+              className="text-dark-text-primary rounded-lg bg-red-600 px-4 py-2 transition-colors hover:bg-red-700"
             >
               Nova Despesa
             </button>
@@ -1302,7 +1310,7 @@ export const NovaDespesaModalPreview = () => {
                 setIsEditing(true);
                 setIsOpen(true);
               }}
-              className="px-4 py-2 bg-blue-600 text-dark-text-primary rounded-lg hover:bg-blue-700 transition-colors"
+              className="text-dark-text-primary rounded-lg bg-blue-600 px-4 py-2 transition-colors hover:bg-blue-700"
             >
               Editar Despesa
             </button>

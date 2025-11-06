@@ -181,18 +181,14 @@ export function LazyImage({
           alt={alt}
           onLoad={handleLoad}
           onError={handleError}
-          className={`
-            transition-opacity duration-300
-            ${isLoaded ? 'opacity-100' : 'opacity-0'}
-            ${className}
-          `}
+          className={`transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'} ${className} `}
           loading="lazy"
           {...props}
         />
       )}
       {!isIntersecting && (
         <div
-          className={`bg-light-hover dark:bg-dark-hover animate-pulse ${className}`}
+          className={`animate-pulse bg-light-hover dark:bg-dark-hover ${className}`}
         />
       )}
     </div>

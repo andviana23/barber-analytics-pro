@@ -123,26 +123,26 @@ const NovaFormaPagamentoModal = ({
   };
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="card-theme dark:bg-dark-surface rounded-lg max-w-md w-full shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="card-theme w-full max-w-md rounded-lg shadow-xl dark:bg-dark-surface">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-light-border dark:border-dark-border">
-          <h2 className="text-xl font-bold text-theme-primary dark:text-dark-text-primary">
+        <div className="flex items-center justify-between border-b border-light-border p-6 dark:border-dark-border">
+          <h2 className="text-theme-primary dark:text-dark-text-primary text-xl font-bold">
             {paymentMethod ? 'Editar' : 'Nova'} Forma de Pagamento
           </h2>
           <button
             onClick={onClose}
-            className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary dark:hover:text-gray-300 dark:text-gray-600 transition-colors"
+            className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary transition-colors dark:text-gray-600 dark:hover:text-gray-300"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 p-6">
           {/* Unidade */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
               <div className="flex items-center gap-2">
                 <Building2 className="h-4 w-4" />
                 Unidade *
@@ -151,14 +151,7 @@ const NovaFormaPagamentoModal = ({
             <select
               value={formData.unit_id}
               onChange={e => handleChange('unit_id', e.target.value)}
-              className={`
-                w-full px-4 py-2 border rounded-lg
-                bg-white dark:bg-gray-700
-                text-gray-900 dark:text-white
-                focus:ring-2 focus:ring-primary focus:border-transparent
-                transition-colors
-                ${errors.unit_id ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}
-              `}
+              className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 transition-colors focus:border-transparent focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white ${errors.unit_id ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} `}
             >
               <option value="">Selecione uma unidade</option>
               {allUnits.map(unit => (
@@ -168,7 +161,7 @@ const NovaFormaPagamentoModal = ({
               ))}
             </select>
             {errors.unit_id && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+              <p className="mt-1 flex items-center gap-1 text-sm text-red-600 dark:text-red-400">
                 <AlertCircle className="h-4 w-4" />
                 {errors.unit_id}
               </p>
@@ -177,7 +170,7 @@ const NovaFormaPagamentoModal = ({
 
           {/* Nome */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
               <div className="flex items-center gap-2">
                 <CreditCard className="h-4 w-4" />
                 Nome *
@@ -188,18 +181,10 @@ const NovaFormaPagamentoModal = ({
               placeholder="Ex: Cartão de Crédito, PIX, Dinheiro"
               value={formData.name}
               onChange={e => handleChange('name', e.target.value)}
-              className={`
-                w-full px-4 py-2 border rounded-lg
-                bg-white dark:bg-gray-700
-                text-gray-900 dark:text-white
-                placeholder-gray-400 dark:placeholder-gray-500
-                focus:ring-2 focus:ring-primary focus:border-transparent
-                transition-colors
-                ${errors.name ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}
-              `}
+              className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 placeholder-gray-400 transition-colors focus:border-transparent focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 ${errors.name ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} `}
             />
             {errors.name && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+              <p className="mt-1 flex items-center gap-1 text-sm text-red-600 dark:text-red-400">
                 <AlertCircle className="h-4 w-4" />
                 {errors.name}
               </p>
@@ -208,7 +193,7 @@ const NovaFormaPagamentoModal = ({
 
           {/* Taxa */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
               <div className="flex items-center gap-2">
                 <Percent className="h-4 w-4" />
                 Taxa (%) *
@@ -223,25 +208,17 @@ const NovaFormaPagamentoModal = ({
                 placeholder="Ex: 2.5"
                 value={formData.fee_percentage}
                 onChange={e => handleChange('fee_percentage', e.target.value)}
-                className={`
-                  w-full px-4 py-2 pr-10 border rounded-lg
-                  bg-white dark:bg-gray-700
-                  text-gray-900 dark:text-white
-                  placeholder-gray-400 dark:placeholder-gray-500
-                  focus:ring-2 focus:ring-primary focus:border-transparent
-                  transition-colors
-                  ${errors.fee_percentage ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}
-                `}
+                className={`w-full rounded-lg border bg-white px-4 py-2 pr-10 text-gray-900 placeholder-gray-400 transition-colors focus:border-transparent focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 ${errors.fee_percentage ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} `}
               />
-              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-light-text-muted dark:text-dark-text-muted">
+              <span className="text-light-text-muted dark:text-dark-text-muted absolute right-3 top-1/2 -translate-y-1/2 transform">
                 %
               </span>
             </div>
-            <p className="mt-1 text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+            <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-xs">
               Percentual que será descontado do valor total (0 a 100%)
             </p>
             {errors.fee_percentage && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+              <p className="mt-1 flex items-center gap-1 text-sm text-red-600 dark:text-red-400">
                 <AlertCircle className="h-4 w-4" />
                 {errors.fee_percentage}
               </p>
@@ -250,7 +227,7 @@ const NovaFormaPagamentoModal = ({
 
           {/* Prazo de Recebimento */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
                 Prazo de Recebimento (dias) *
@@ -263,17 +240,9 @@ const NovaFormaPagamentoModal = ({
               placeholder="Ex: 30"
               value={formData.receipt_days}
               onChange={e => handleChange('receipt_days', e.target.value)}
-              className={`
-                w-full px-4 py-2 border rounded-lg
-                bg-white dark:bg-gray-700
-                text-gray-900 dark:text-white
-                placeholder-gray-400 dark:placeholder-gray-500
-                focus:ring-2 focus:ring-primary focus:border-transparent
-                transition-colors
-                ${errors.receipt_days ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}
-              `}
+              className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 placeholder-gray-400 transition-colors focus:border-transparent focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 ${errors.receipt_days ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} `}
             />
-            <p className="mt-1 text-xs text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+            <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-xs">
               Dias{' '}
               <strong className="text-gray-700 dark:text-gray-300 dark:text-gray-600">
                 úteis
@@ -282,7 +251,7 @@ const NovaFormaPagamentoModal = ({
               imediato)
             </p>
             {errors.receipt_days && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+              <p className="mt-1 flex items-center gap-1 text-sm text-red-600 dark:text-red-400">
                 <AlertCircle className="h-4 w-4" />
                 {errors.receipt_days}
               </p>
@@ -291,8 +260,8 @@ const NovaFormaPagamentoModal = ({
 
           {/* Erro geral */}
           {errors.submit && (
-            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
+            <div className="rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/20">
+              <p className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
                 <AlertCircle className="h-4 w-4" />
                 {errors.submit}
               </p>
@@ -304,18 +273,18 @@ const NovaFormaPagamentoModal = ({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-light-border dark:border-dark-border text-gray-700 dark:text-gray-300 dark:text-gray-600 rounded-lg hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700 transition-colors"
+              className="flex-1 rounded-lg border border-light-border px-4 py-2 text-gray-700 transition-colors hover:bg-light-bg dark:border-dark-border dark:bg-dark-bg dark:text-gray-300 dark:text-gray-600 dark:hover:bg-gray-700"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={isSaving}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-primary text-dark-text-primary rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="text-dark-text-primary hover:bg-primary-600 flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSaving ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-light-surface dark:border-dark-surface border-t-transparent rounded-full animate-spin" />
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-light-surface border-t-transparent dark:border-dark-surface" />
                   Salvando...
                 </>
               ) : (

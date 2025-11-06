@@ -117,7 +117,7 @@ const ProtectedButton = ({
   // Loading spinner
   const LoadingSpinner = () => (
     <svg
-      className="animate-spin h-4 w-4"
+      className="h-4 w-4 animate-spin"
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
@@ -144,12 +144,7 @@ const ProtectedButton = ({
       type={type}
       onClick={onClick}
       disabled={disabled || loading || !hasAccess}
-      className={`
-        ${baseClasses}
-        ${sizeClasses[size]}
-        ${variantClasses[variant]}
-        ${className}
-      `}
+      className={` ${baseClasses} ${sizeClasses[size]} ${variantClasses[variant]} ${className} `}
       aria-label={typeof children === 'string' ? children : undefined}
       aria-busy={loading}
       {...props}
@@ -157,13 +152,13 @@ const ProtectedButton = ({
       {loading && <LoadingSpinner />}
 
       {!loading && Icon && iconPosition === 'left' && (
-        <Icon className="w-4 h-4" aria-hidden="true" />
+        <Icon className="h-4 w-4" aria-hidden="true" />
       )}
 
       {children}
 
       {!loading && Icon && iconPosition === 'right' && (
-        <Icon className="w-4 h-4" aria-hidden="true" />
+        <Icon className="h-4 w-4" aria-hidden="true" />
       )}
     </button>
   );

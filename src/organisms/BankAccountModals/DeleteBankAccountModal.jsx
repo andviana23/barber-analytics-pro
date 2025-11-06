@@ -58,18 +58,18 @@ const DeleteBankAccountModal = ({
 
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative w-full max-w-md transform rounded-lg card-theme dark:bg-dark-surface shadow-xl transition-all">
+        <div className="card-theme relative w-full max-w-md transform rounded-lg shadow-xl transition-all dark:bg-dark-surface">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-light-border dark:border-dark-border">
+          <div className="flex items-center justify-between border-b border-light-border p-6 dark:border-dark-border">
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 bg-red-100 dark:bg-red-900 rounded-lg">
-                <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900">
+                <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-theme-primary dark:text-dark-text-primary">
+                <h3 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
                   Excluir Conta Bancária
                 </h3>
-                <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                   Esta ação não pode ser desfeita
                 </p>
               </div>
@@ -82,24 +82,24 @@ const DeleteBankAccountModal = ({
               disabled={loading}
               className="h-8 w-8 p-0"
             >
-              <X className="w-4 h-4" />
+              <X className="h-4 w-4" />
             </Button>
           </div>
 
           {/* Content */}
-          <div className="p-6 space-y-4">
+          <div className="space-y-4 p-6">
             {/* Account info */}
-            <div className="flex items-start gap-3 p-4 bg-light-bg dark:bg-dark-bg dark:bg-gray-700 rounded-lg">
-              <CreditCard className="w-5 h-5 text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-0.5" />
-              <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-theme-primary dark:text-dark-text-primary truncate">
+            <div className="flex items-start gap-3 rounded-lg bg-light-bg p-4 dark:bg-dark-bg dark:bg-gray-700">
+              <CreditCard className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-0.5 h-5 w-5" />
+              <div className="min-w-0 flex-1">
+                <h4 className="text-theme-primary dark:text-dark-text-primary truncate font-medium">
                   {account.name}
                 </h4>
-                <p className="text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+                <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                   {account.bank} • {account.agency}-{account.account_number}
                 </p>
                 {account.units && (
-                  <p className="text-xs text-theme-secondary dark:text-theme-secondary mt-1">
+                  <p className="text-theme-secondary dark:text-theme-secondary mt-1 text-xs">
                     Unidade: {account.units.name}
                   </p>
                 )}
@@ -107,13 +107,13 @@ const DeleteBankAccountModal = ({
             </div>
 
             {/* Warning */}
-            <div className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-              <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5" />
+            <div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
+              <AlertTriangle className="mt-0.5 h-5 w-5 text-red-600 dark:text-red-400" />
               <div className="flex-1">
                 <h4 className="font-medium text-red-800 dark:text-red-200">
                   Atenção!
                 </h4>
-                <p className="text-sm text-red-700 dark:text-red-300 mt-1">
+                <p className="mt-1 text-sm text-red-700 dark:text-red-300">
                   A conta será desativada permanentemente. Ela não aparecerá
                   mais nas listagens, mas os dados históricos serão preservados
                   no sistema.
@@ -123,7 +123,7 @@ const DeleteBankAccountModal = ({
 
             {/* Confirmation */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                 Para confirmar, digite o nome da conta:{' '}
                 <strong>{account.name}</strong>
               </label>
@@ -133,13 +133,7 @@ const DeleteBankAccountModal = ({
                 onChange={e => setConfirmText(e.target.value)}
                 placeholder={account.name}
                 disabled={loading}
-                className={`
-                  w-full px-3 py-2 border rounded-md shadow-sm
-                  focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
-                  disabled:bg-gray-50 disabled:text-gray-500
-                  ${isConfirmValid ? 'border-green-300 bg-green-50 dark:bg-green-900/20 dark:border-green-700' : 'border-gray-300 dark:border-gray-600'}
-                  bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                `}
+                className={`w-full rounded-md border px-3 py-2 shadow-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-red-500 disabled:bg-gray-50 disabled:text-gray-500 ${isConfirmValid ? 'border-green-300 bg-green-50 dark:border-green-700 dark:bg-green-900/20' : 'border-gray-300 dark:border-gray-600'} bg-white text-gray-900 dark:bg-gray-700 dark:text-white`}
               />
               {confirmText && !isConfirmValid && (
                 <p className="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -169,12 +163,12 @@ const DeleteBankAccountModal = ({
               >
                 {loading ? (
                   <div className="flex items-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-light-surface dark:border-dark-surface"></div>
+                    <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-light-surface dark:border-dark-surface"></div>
                     Excluindo...
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="h-4 w-4" />
                     Excluir Conta
                   </div>
                 )}

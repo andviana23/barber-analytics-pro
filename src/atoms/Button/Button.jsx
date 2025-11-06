@@ -53,13 +53,30 @@ const Button = ({
   // Filtrar apenas atributos válidos para button
   const validButtonProps = {};
   const validButtonAttributes = [
-    'type', 'id', 'name', 'value', 'disabled', 'onClick', 'onFocus',
-    'onBlur', 'onKeyDown', 'onKeyUp', 'title', 'aria-label',
-    'aria-describedby', 'aria-expanded', 'aria-haspopup', 'autoFocus',
-    'tabIndex', 'form', 'formAction', 'formMethod', 'formNoValidate',
-    'formTarget'
+    'type',
+    'id',
+    'name',
+    'value',
+    'disabled',
+    'onClick',
+    'onFocus',
+    'onBlur',
+    'onKeyDown',
+    'onKeyUp',
+    'title',
+    'aria-label',
+    'aria-describedby',
+    'aria-expanded',
+    'aria-haspopup',
+    'autoFocus',
+    'tabIndex',
+    'form',
+    'formAction',
+    'formMethod',
+    'formNoValidate',
+    'formTarget',
   ];
-  
+
   Object.keys(props).forEach(key => {
     if (validButtonAttributes.includes(key)) {
       validButtonProps[key] = props[key];

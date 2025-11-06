@@ -46,10 +46,10 @@ export function DebugAuthPage() {
   };
   return (
     <Layout activeMenuItem="settings">
-      <div className="p-6 space-y-6">
+      <div className="space-y-6 p-6">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <div className="p-3 bg-primary/10 rounded-xl">
+          <div className="rounded-xl bg-primary/10 p-3">
             <Shield className="h-8 w-8 text-primary" />
           </div>
           <div>
@@ -63,10 +63,10 @@ export function DebugAuthPage() {
         </div>
 
         {/* Auth Status */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {/* User Info Card */}
-          <div className="card-theme border border-light-border dark:border-dark-border rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-4">
+          <div className="card-theme rounded-xl border border-light-border p-6 dark:border-dark-border">
+            <div className="mb-4 flex items-center gap-3">
               <User className="h-5 w-5 text-primary" />
               <h2 className="text-lg font-semibold text-text-light-primary dark:text-text-dark-primary">
                 Informações do Usuário
@@ -76,12 +76,12 @@ export function DebugAuthPage() {
               {Object.entries(debugInfo).map(([key, value]) => (
                 <div
                   key={key}
-                  className="flex items-center justify-between py-2 border-b border-light-border dark:border-dark-border last:border-0"
+                  className="flex items-center justify-between border-b border-light-border py-2 last:border-0 dark:border-dark-border"
                 >
                   <span className="text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary">
                     {key}:
                   </span>
-                  <span className="text-sm font-mono text-text-light-primary dark:text-text-dark-primary flex items-center gap-2">
+                  <span className="flex items-center gap-2 font-mono text-sm text-text-light-primary dark:text-text-dark-primary">
                     {typeof value === 'boolean' ? (
                       value ? (
                         <CheckCircle className="h-4 w-4 text-green-500" />
@@ -97,8 +97,8 @@ export function DebugAuthPage() {
           </div>
 
           {/* Permissions Card */}
-          <div className="card-theme border border-light-border dark:border-dark-border rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-4">
+          <div className="card-theme rounded-xl border border-light-border p-6 dark:border-dark-border">
+            <div className="mb-4 flex items-center gap-3">
               <Database className="h-5 w-5 text-primary" />
               <h2 className="text-lg font-semibold text-text-light-primary dark:text-text-dark-primary">
                 Permissões
@@ -108,7 +108,7 @@ export function DebugAuthPage() {
               {Object.entries(permissions).map(([key, value]) => (
                 <div
                   key={key}
-                  className="flex items-center justify-between py-2 border-b border-light-border dark:border-dark-border last:border-0"
+                  className="flex items-center justify-between border-b border-light-border py-2 last:border-0 dark:border-dark-border"
                 >
                   <span className="text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary">
                     {key}:
@@ -119,7 +119,7 @@ export function DebugAuthPage() {
                     ) : (
                       <XCircle className="h-4 w-4 text-red-500" />
                     )}
-                    <span className="text-sm font-mono text-text-light-primary dark:text-text-dark-primary">
+                    <span className="font-mono text-sm text-text-light-primary dark:text-text-dark-primary">
                       {String(value)}
                     </span>
                   </span>
@@ -130,43 +130,43 @@ export function DebugAuthPage() {
         </div>
 
         {/* Raw User Object */}
-        <div className="card-theme border border-light-border dark:border-dark-border rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-text-light-primary dark:text-text-dark-primary mb-4">
+        <div className="card-theme rounded-xl border border-light-border p-6 dark:border-dark-border">
+          <h2 className="mb-4 text-lg font-semibold text-text-light-primary dark:text-text-dark-primary">
             Objeto User Completo (JSON)
           </h2>
-          <pre className="bg-light-bg dark:bg-dark-bg p-4 rounded-lg overflow-auto text-xs text-text-light-primary dark:text-text-dark-primary">
+          <pre className="overflow-auto rounded-lg bg-light-bg p-4 text-xs text-text-light-primary dark:bg-dark-bg dark:text-text-dark-primary">
             {JSON.stringify(user, null, 2)}
           </pre>
         </div>
 
         {/* Access Test */}
-        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-amber-800 dark:text-amber-300 mb-2">
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-6 dark:border-amber-800 dark:bg-amber-900/20">
+          <h2 className="mb-2 text-lg font-semibold text-amber-800 dark:text-amber-300">
             ⚠️ Teste de Acesso ao Caixa
           </h2>
           <div className="space-y-2 text-sm text-amber-700 dark:text-amber-400">
             <p>
               <strong>Rota /caixa</strong> requer:{' '}
-              <code className="bg-amber-100 dark:bg-amber-900 px-2 py-0.5 rounded">
+              <code className="rounded bg-amber-100 px-2 py-0.5 dark:bg-amber-900">
                 roles={`['admin', 'gerente', 'recepcionista']`}
               </code>
             </p>
             <p>
               <strong>Seu metadata role:</strong>{' '}
-              <code className="bg-amber-100 dark:bg-amber-900 px-2 py-0.5 rounded">
+              <code className="rounded bg-amber-100 px-2 py-0.5 dark:bg-amber-900">
                 '{debugInfo.metadata_role}'
               </code>
             </p>
             <p>
               <strong>AdminStatus:</strong>{' '}
-              <code className="bg-amber-100 dark:bg-amber-900 px-2 py-0.5 rounded">
+              <code className="rounded bg-amber-100 px-2 py-0.5 dark:bg-amber-900">
                 {String(debugInfo.adminStatus)}
               </code>
             </p>
-            <div className="mt-4 p-4 bg-amber-100 dark:bg-amber-900/40 rounded-lg">
-              <p className="font-semibold mb-2">Resultado Esperado:</p>
+            <div className="mt-4 rounded-lg bg-amber-100 p-4 dark:bg-amber-900/40">
+              <p className="mb-2 font-semibold">Resultado Esperado:</p>
               {debugInfo.adminStatus ? (
-                <p className="text-green-700 dark:text-green-400 flex items-center gap-2">
+                <p className="flex items-center gap-2 text-green-700 dark:text-green-400">
                   <CheckCircle className="h-4 w-4" />
                   ACESSO PERMITIDO (adminStatus = true)
                 </p>
@@ -174,12 +174,12 @@ export function DebugAuthPage() {
                 ['admin', 'gerente', 'recepcionista'].includes(
                   debugInfo.userRole
                 ) ? (
-                <p className="text-green-700 dark:text-green-400 flex items-center gap-2">
+                <p className="flex items-center gap-2 text-green-700 dark:text-green-400">
                   <CheckCircle className="h-4 w-4" />
                   ACESSO PERMITIDO (role incluído na lista)
                 </p>
               ) : (
-                <p className="text-red-700 dark:text-red-400 flex items-center gap-2">
+                <p className="flex items-center gap-2 text-red-700 dark:text-red-400">
                   <XCircle className="h-4 w-4" />
                   ACESSO NEGADO
                 </p>
@@ -189,11 +189,11 @@ export function DebugAuthPage() {
         </div>
 
         {/* Instructions */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-blue-800 dark:text-blue-300 mb-2">
+        <div className="rounded-xl border border-blue-200 bg-blue-50 p-6 dark:border-blue-800 dark:bg-blue-900/20">
+          <h2 className="mb-2 text-lg font-semibold text-blue-800 dark:text-blue-300">
             📋 Como usar esta página
           </h2>
-          <ol className="list-decimal list-inside space-y-2 text-sm text-blue-700 dark:text-blue-400">
+          <ol className="list-inside list-decimal space-y-2 text-sm text-blue-700 dark:text-blue-400">
             <li>
               Verifique se <code>isAuthenticated</code> é <code>true</code>
             </li>

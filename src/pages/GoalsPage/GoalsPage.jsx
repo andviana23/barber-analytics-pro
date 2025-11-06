@@ -314,13 +314,13 @@ const GoalModal = ({
   // Alerta se não houver unidade selecionada
   if (!selectedUnitId) {
     return (
-      <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-        <div className="card-theme dark:bg-dark-surface rounded-2xl border-2 border-light-border dark:border-dark-border w-full max-w-md shadow-2xl">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm dark:bg-black/70">
+        <div className="card-theme w-full max-w-md rounded-2xl border-2 border-light-border shadow-2xl dark:border-dark-border dark:bg-dark-surface">
           <div className="p-8 text-center">
-            <div className="p-4 bg-gradient-danger rounded-2xl w-20 h-20 mx-auto mb-6 flex items-center justify-center shadow-lg shadow-red-500/30">
-              <AlertCircle className="w-10 h-10 text-dark-text-primary" />
+            <div className="bg-gradient-danger mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl p-4 shadow-lg shadow-red-500/30">
+              <AlertCircle className="text-dark-text-primary h-10 w-10" />
             </div>
-            <h3 className="text-2xl font-bold text-theme-primary dark:text-dark-text-primary mb-3">
+            <h3 className="text-theme-primary dark:text-dark-text-primary mb-3 text-2xl font-bold">
               Unidade Necessária
             </h3>
             <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-8 leading-relaxed">
@@ -328,7 +328,7 @@ const GoalModal = ({
             </p>
             <button
               onClick={onClose}
-              className="w-full px-6 py-3 bg-gradient-secondary text-dark-text-primary rounded-xl transition-all font-semibold shadow-lg"
+              className="bg-gradient-secondary text-dark-text-primary w-full rounded-xl px-6 py-3 font-semibold shadow-lg transition-all"
             >
               Entendi
             </button>
@@ -339,28 +339,28 @@ const GoalModal = ({
   }
   const selectedGoalType = goalTypes.find(t => t.value === formData.goal_type);
   return (
-    <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4 overflow-y-auto backdrop-blur-sm">
-      <div className="card-theme dark:bg-dark-surface rounded-2xl border-2 border-light-border dark:border-dark-border w-full max-w-3xl my-8 mx-auto flex flex-col max-h-[calc(100vh-4rem)] shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-4 backdrop-blur-sm dark:bg-black/70">
+      <div className="card-theme mx-auto my-8 flex max-h-[calc(100vh-4rem)] w-full max-w-3xl flex-col rounded-2xl border-2 border-light-border shadow-2xl dark:border-dark-border dark:bg-dark-surface">
         {/* 🎨 Header com gradiente dinâmico */}
         <div
-          className={`relative px-6 py-6 border-b-2 border-light-border dark:border-gray-700 flex items-center justify-between flex-shrink-0 bg-gradient-to-r ${selectedGoalType?.gradient || 'bg-gradient-primary'} rounded-t-2xl`}
+          className={`relative flex flex-shrink-0 items-center justify-between border-b-2 border-light-border bg-gradient-to-r px-6 py-6 dark:border-gray-700 ${selectedGoalType?.gradient || 'bg-gradient-primary'} rounded-t-2xl`}
         >
           <div className="flex items-center gap-4">
-            <div className="p-3 card-theme/20 backdrop-blur-sm rounded-xl shadow-lg">
-              <Target className="w-7 h-7 text-dark-text-primary" />
+            <div className="card-theme/20 rounded-xl p-3 shadow-lg backdrop-blur-sm">
+              <Target className="text-dark-text-primary h-7 w-7" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-dark-text-primary tracking-wide">
+              <h2 className="text-dark-text-primary text-2xl font-bold tracking-wide">
                 {goal ? '✏️ Editar Meta' : '✨ Nova Meta'}
               </h2>
-              <p className="text-sm text-dark-text-primary/80 mt-1">
+              <p className="text-dark-text-primary/80 mt-1 text-sm">
                 {goal
                   ? 'Atualize os parâmetros da meta'
                   : 'Configure uma nova meta financeira'}
               </p>
               <div className="mt-2 flex items-center gap-2">
-                <div className="px-3 py-1 card-theme/20 backdrop-blur-sm rounded-lg">
-                  <span className="text-xs font-bold text-dark-text-primary">
+                <div className="card-theme/20 rounded-lg px-3 py-1 backdrop-blur-sm">
+                  <span className="text-dark-text-primary text-xs font-bold">
                     📍 {selectedUnitName || 'Unidade não selecionada'}
                   </span>
                 </div>
@@ -370,18 +370,18 @@ const GoalModal = ({
           <button
             onClick={onClose}
             disabled={loading}
-            className="p-2 text-dark-text-primary/80 hover:text-dark-text-primary hover:card-theme/20 rounded-xl transition-all"
+            className="text-dark-text-primary/80 hover:text-dark-text-primary hover:card-theme/20 rounded-xl p-2 transition-all"
           >
-            <X className="w-6 h-6" />
+            <X className="h-6 w-6" />
           </button>
         </div>
 
         {/* 📋 Corpo do Modal - Formulário Premium */}
-        <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6 min-h-0">
+        <div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-6 py-6">
           {/* 🏢 Seletor de Unidade */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-gray-200 mb-3">
-              <Award className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+            <label className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 dark:text-gray-300 dark:text-gray-600">
+              <Award className="h-4 w-4 text-purple-600 dark:text-purple-400" />
               Unidade *
             </label>
             <select
@@ -400,7 +400,7 @@ const GoalModal = ({
                   }));
                 }
               }}
-              className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-medium ${errors.unit ? 'border-red-400 dark:border-red-500' : 'border-gray-200 dark:border-gray-600'}`}
+              className={`w-full rounded-xl border-2 bg-white px-4 py-3 font-medium text-gray-900 transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 dark:bg-gray-700 dark:text-white ${errors.unit ? 'border-red-400 dark:border-red-500' : 'border-gray-200 dark:border-gray-600'}`}
               disabled={unitsLoading}
             >
               <option value="">
@@ -415,9 +415,9 @@ const GoalModal = ({
               ))}
             </select>
             {errors.unit && (
-              <div className="flex items-center gap-1.5 mt-2">
-                <AlertCircle className="w-3.5 h-3.5 text-red-500" />
-                <p className="text-xs text-red-600 dark:text-red-400 font-medium">
+              <div className="mt-2 flex items-center gap-1.5">
+                <AlertCircle className="h-3.5 w-3.5 text-red-500" />
+                <p className="text-xs font-medium text-red-600 dark:text-red-400">
                   {errors.unit}
                 </p>
               </div>
@@ -426,11 +426,11 @@ const GoalModal = ({
 
           {/* 🎯 Tipo de Meta - Cards Premium */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-gray-200 mb-3">
-              <Target className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            <label className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 dark:text-gray-300 dark:text-gray-600">
+              <Target className="h-4 w-4 text-blue-600 dark:text-blue-400" />
               Tipo de Meta *
             </label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               {goalTypes.map(type => {
                 const Icon = type.icon;
                 const isSelected = formData.goal_type === type.value;
@@ -439,14 +439,14 @@ const GoalModal = ({
                     key={type.value}
                     type="button"
                     onClick={() => handleInputChange('goal_type', type.value)}
-                    className={`group p-4 rounded-xl border-2 transition-all duration-300 ${isSelected ? `${type.border} ${type.bg} shadow-lg` : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 hover:shadow-md'}`}
+                    className={`group rounded-xl border-2 p-4 transition-all duration-300 ${isSelected ? `${type.border} ${type.bg} shadow-lg` : 'border-gray-200 hover:border-gray-300 hover:shadow-md dark:border-gray-600 dark:hover:border-gray-500'}`}
                   >
                     <div className="flex items-center gap-3">
                       <div
-                        className={`p-2 rounded-lg transition-all ${isSelected ? `bg-gradient-to-r ${type.gradient} shadow-md` : 'bg-gray-100 dark:bg-gray-700 group-hover:scale-110'}`}
+                        className={`rounded-lg p-2 transition-all ${isSelected ? `bg-gradient-to-r ${type.gradient} shadow-md` : 'bg-gray-100 group-hover:scale-110 dark:bg-gray-700'}`}
                       >
                         <Icon
-                          className={`w-5 h-5 ${isSelected ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`}
+                          className={`h-5 w-5 ${isSelected ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`}
                         />
                       </div>
                       <span
@@ -463,8 +463,8 @@ const GoalModal = ({
 
           {/* 📅 Período - Pills Interativos */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-gray-200 mb-3">
-              <Calendar className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <label className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 dark:text-gray-300 dark:text-gray-600">
+              <Calendar className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
               Período *
             </label>
             <div className="grid grid-cols-3 gap-3">
@@ -476,11 +476,11 @@ const GoalModal = ({
                     key={period.value}
                     type="button"
                     onClick={() => handleInputChange('period', period.value)}
-                    className={`group p-3 rounded-xl border-2 transition-all duration-300 ${isSelected ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 shadow-lg' : 'border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-500 hover:shadow-md'}`}
+                    className={`group rounded-xl border-2 p-3 transition-all duration-300 ${isSelected ? 'border-indigo-500 bg-indigo-50 shadow-lg dark:bg-indigo-900/30' : 'border-gray-200 hover:border-indigo-300 hover:shadow-md dark:border-gray-600 dark:hover:border-indigo-500'}`}
                   >
                     <div className="flex flex-col items-center gap-2">
                       <PeriodIcon
-                        className={`w-5 h-5 transition-all ${isSelected ? 'text-indigo-600 dark:text-indigo-400 scale-110' : 'text-gray-500 dark:text-gray-400 group-hover:scale-110'}`}
+                        className={`h-5 w-5 transition-all ${isSelected ? 'scale-110 text-indigo-600 dark:text-indigo-400' : 'text-gray-500 group-hover:scale-110 dark:text-gray-400'}`}
                       />
                       <span
                         className={`text-sm font-semibold ${isSelected ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-900 dark:text-white'}`}
@@ -495,11 +495,11 @@ const GoalModal = ({
           </div>
 
           {/* 📆 Ano + Mês/Trimestre (Grid 2 colunas) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {/* Ano */}
             <div>
-              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-gray-200 mb-2">
-                <Calendar className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+              <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 dark:text-gray-300 dark:text-gray-600">
+                <Calendar className="h-4 w-4 text-teal-600 dark:text-teal-400" />
                 Ano *
               </label>
               <input
@@ -511,12 +511,12 @@ const GoalModal = ({
                 min="2020"
                 max="2030"
                 placeholder="2025"
-                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-semibold text-lg ${errors.goal_year ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+                className={`w-full rounded-xl border-2 bg-white px-4 py-3 text-lg font-semibold text-gray-900 transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 dark:bg-gray-700 dark:text-white ${errors.goal_year ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
               />
               {errors.goal_year && (
-                <div className="flex items-center gap-1.5 mt-2">
-                  <AlertCircle className="w-3.5 h-3.5 text-red-500" />
-                  <p className="text-xs text-red-600 dark:text-red-400 font-medium">
+                <div className="mt-2 flex items-center gap-1.5">
+                  <AlertCircle className="h-3.5 w-3.5 text-red-500" />
+                  <p className="text-xs font-medium text-red-600 dark:text-red-400">
                     {errors.goal_year}
                   </p>
                 </div>
@@ -526,8 +526,8 @@ const GoalModal = ({
             {/* Mês (se mensal) */}
             {formData.period === 'monthly' && (
               <div>
-                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-gray-200 mb-2">
-                  <Calendar className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+                <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 dark:text-gray-300 dark:text-gray-600">
+                  <Calendar className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
                   Mês *
                 </label>
                 <select
@@ -535,7 +535,7 @@ const GoalModal = ({
                   onChange={e =>
                     handleInputChange('goal_month', parseInt(e.target.value))
                   }
-                  className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-medium ${errors.goal_month ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+                  className={`w-full rounded-xl border-2 bg-white px-4 py-3 font-medium text-gray-900 transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 dark:bg-gray-700 dark:text-white ${errors.goal_month ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                 >
                   <option value="">📅 Selecionar mês...</option>
                   {months.map(month => (
@@ -545,9 +545,9 @@ const GoalModal = ({
                   ))}
                 </select>
                 {errors.goal_month && (
-                  <div className="flex items-center gap-1.5 mt-2">
-                    <AlertCircle className="w-3.5 h-3.5 text-red-500" />
-                    <p className="text-xs text-red-600 dark:text-red-400 font-medium">
+                  <div className="mt-2 flex items-center gap-1.5">
+                    <AlertCircle className="h-3.5 w-3.5 text-red-500" />
+                    <p className="text-xs font-medium text-red-600 dark:text-red-400">
                       {errors.goal_month}
                     </p>
                   </div>
@@ -558,8 +558,8 @@ const GoalModal = ({
             {/* Trimestre (se trimestral) */}
             {formData.period === 'quarterly' && (
               <div>
-                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-gray-200 mb-2">
-                  <BarChart3 className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 dark:text-gray-300 dark:text-gray-600">
+                  <BarChart3 className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                   Trimestre *
                 </label>
                 <select
@@ -567,7 +567,7 @@ const GoalModal = ({
                   onChange={e =>
                     handleInputChange('goal_quarter', parseInt(e.target.value))
                   }
-                  className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-medium ${errors.goal_quarter ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+                  className={`w-full rounded-xl border-2 bg-white px-4 py-3 font-medium text-gray-900 transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 dark:bg-gray-700 dark:text-white ${errors.goal_quarter ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                 >
                   <option value="">📊 Selecionar trimestre...</option>
                   {quarters.map(quarter => (
@@ -577,9 +577,9 @@ const GoalModal = ({
                   ))}
                 </select>
                 {errors.goal_quarter && (
-                  <div className="flex items-center gap-1.5 mt-2">
-                    <AlertCircle className="w-3.5 h-3.5 text-red-500" />
-                    <p className="text-xs text-red-600 dark:text-red-400 font-medium">
+                  <div className="mt-2 flex items-center gap-1.5">
+                    <AlertCircle className="h-3.5 w-3.5 text-red-500" />
+                    <p className="text-xs font-medium text-red-600 dark:text-red-400">
                       {errors.goal_quarter}
                     </p>
                   </div>
@@ -590,12 +590,12 @@ const GoalModal = ({
 
           {/* 💰 Valor da Meta */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-gray-200 mb-2">
-              <DollarSign className="w-4 h-4 text-green-600 dark:text-green-400" />
+            <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 dark:text-gray-300 dark:text-gray-600">
+              <DollarSign className="h-4 w-4 text-green-600 dark:text-green-400" />
               Valor da Meta *
             </label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-green-600 dark:text-green-400 font-bold text-lg">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-bold text-green-600 dark:text-green-400">
                 R$
               </span>
               <input
@@ -625,19 +625,19 @@ const GoalModal = ({
                   }
                 }}
                 placeholder="0,00"
-                className={`w-full pl-14 pr-4 py-4 border-2 rounded-xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-xl font-bold ${errors.target_value ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+                className={`w-full rounded-xl border-2 bg-white py-4 pl-14 pr-4 text-xl font-bold text-gray-900 transition-all focus:border-green-500 focus:ring-4 focus:ring-green-500/20 dark:bg-gray-700 dark:text-white ${errors.target_value ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
               />
             </div>
             {errors.target_value && (
-              <div className="flex items-center gap-1.5 mt-2">
-                <AlertCircle className="w-3.5 h-3.5 text-red-500" />
-                <p className="text-xs text-red-600 dark:text-red-400 font-medium">
+              <div className="mt-2 flex items-center gap-1.5">
+                <AlertCircle className="h-3.5 w-3.5 text-red-500" />
+                <p className="text-xs font-medium text-red-600 dark:text-red-400">
                   {errors.target_value}
                 </p>
               </div>
             )}
             {formData.target_value && (
-              <div className="mt-2 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+              <div className="mt-2 rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-900/20">
                 <p className="text-sm font-bold text-green-700 dark:text-green-300">
                   💰 Meta Total:{' '}
                   {new Intl.NumberFormat('pt-BR', {
@@ -654,31 +654,31 @@ const GoalModal = ({
           </div>
 
           {/* ✅ Status Ativo/Inativo */}
-          <div className="flex items-center gap-3 p-4 bg-light-bg dark:bg-dark-bg dark:bg-gray-700/50 rounded-xl border border-light-border dark:border-dark-border">
+          <div className="flex items-center gap-3 rounded-xl border border-light-border bg-light-bg p-4 dark:border-dark-border dark:bg-dark-bg dark:bg-gray-700/50">
             <input
               type="checkbox"
               id="is_active"
               checked={formData.is_active}
               onChange={e => handleInputChange('is_active', e.target.checked)}
-              className="w-5 h-5 text-green-600 card-theme border-light-border dark:border-dark-border rounded-lg focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 cursor-pointer transition-all"
+              className="card-theme h-5 w-5 cursor-pointer rounded-lg border-light-border text-green-600 transition-all focus:ring-2 focus:ring-green-500 dark:border-dark-border dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-green-600"
             />
             <label
               htmlFor="is_active"
-              className="text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 cursor-pointer flex items-center gap-2"
+              className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600"
             >
-              <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
+              <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
               Meta ativa (visível nos relatórios)
             </label>
           </div>
         </div>
 
         {/* 🎯 Footer com Botões Gradientes */}
-        <div className="px-6 py-4 border-t-2 border-light-border dark:border-dark-border flex justify-end gap-3 flex-shrink-0 bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/50 rounded-b-2xl">
+        <div className="flex flex-shrink-0 justify-end gap-3 rounded-b-2xl border-t-2 border-light-border bg-light-bg px-6 py-4 dark:border-dark-border dark:bg-dark-bg dark:bg-dark-surface/50">
           <button
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="px-5 py-2.5 text-gray-700 dark:text-gray-300 dark:text-gray-600 border-2 border-light-border dark:border-dark-border rounded-xl hover:card-theme dark:hover:bg-gray-700 transition-all font-medium disabled:opacity-50"
+            className="hover:card-theme rounded-xl border-2 border-light-border px-5 py-2.5 font-medium text-gray-700 transition-all disabled:opacity-50 dark:border-dark-border dark:text-gray-300 dark:text-gray-600 dark:hover:bg-gray-700"
           >
             Cancelar
           </button>
@@ -686,19 +686,19 @@ const GoalModal = ({
             type="button"
             onClick={handleSave}
             disabled={loading}
-            className={`px-6 py-2.5 bg-gradient-to-r ${selectedGoalType?.gradient || 'bg-gradient-primary'} text-white rounded-xl hover:opacity-90 disabled:opacity-50 transition-all font-semibold flex items-center gap-2 shadow-lg`}
+            className={`bg-gradient-to-r px-6 py-2.5 ${selectedGoalType?.gradient || 'bg-gradient-primary'} flex items-center gap-2 rounded-xl font-semibold text-white shadow-lg transition-all hover:opacity-90 disabled:opacity-50`}
           >
             {loading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" />
                 Salvando...
               </>
             ) : (
               <>
                 {goal ? (
-                  <Edit className="w-4 h-4" />
+                  <Edit className="h-4 w-4" />
                 ) : (
-                  <Sparkles className="w-4 h-4" />
+                  <Sparkles className="h-4 w-4" />
                 )}
                 {goal ? 'Atualizar Meta' : 'Criar Meta'}
               </>
@@ -820,19 +820,19 @@ const GoalCard = ({ goal, onEdit, onDelete, onToggleStatus }) => {
   );
   const isAchieved = percentage >= 100;
   return (
-    <div className="group card-theme dark:bg-dark-surface rounded-2xl border border-light-border dark:border-dark-border overflow-hidden hover:shadow-2xl hover:shadow-gray-300/50 dark:hover:shadow-gray-900/50 transition-all duration-300">
+    <div className="card-theme group overflow-hidden rounded-2xl border border-light-border transition-all duration-300 hover:shadow-2xl hover:shadow-gray-300/50 dark:border-dark-border dark:bg-dark-surface dark:hover:shadow-gray-900/50">
       {/* 🎨 Header com gradiente dinâmico */}
       <div className={`bg-gradient-to-r ${typeInfo.gradient} p-5`}>
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 card-theme/20 backdrop-blur-sm rounded-xl shadow-lg group-hover:scale-110 transition-transform">
-              <Icon className="w-6 h-6 text-dark-text-primary" />
+            <div className="card-theme/20 rounded-xl p-2.5 shadow-lg backdrop-blur-sm transition-transform group-hover:scale-110">
+              <Icon className="text-dark-text-primary h-6 w-6" />
             </div>
             <div>
-              <h3 className="font-bold text-dark-text-primary text-lg tracking-wide">
+              <h3 className="text-dark-text-primary text-lg font-bold tracking-wide">
                 {typeInfo.label}
               </h3>
-              <p className="text-sm text-dark-text-primary/80 font-medium">
+              <p className="text-dark-text-primary/80 text-sm font-medium">
                 📅{' '}
                 {getPeriodLabel(
                   goal.period,
@@ -846,7 +846,7 @@ const GoalCard = ({ goal, onEdit, onDelete, onToggleStatus }) => {
           {/* Badge de status premium */}
           <div className="flex items-center gap-2">
             <span
-              className={`px-3 py-1.5 rounded-full text-xs font-bold shadow-lg backdrop-blur-sm ${goal.is_active ? 'bg-white/30 text-white border border-white/50' : 'bg-black/20 text-white/70 border border-white/30'}`}
+              className={`rounded-full px-3 py-1.5 text-xs font-bold shadow-lg backdrop-blur-sm ${goal.is_active ? 'border border-white/50 bg-white/30 text-white' : 'border border-white/30 bg-black/20 text-white/70'}`}
             >
               {goal.is_active ? '✓ Ativa' : '○ Inativa'}
             </span>
@@ -855,14 +855,14 @@ const GoalCard = ({ goal, onEdit, onDelete, onToggleStatus }) => {
       </div>
 
       {/* 💰 Body com valores e progresso */}
-      <div className="p-6 space-y-4">
+      <div className="space-y-4 p-6">
         {/* Valor da meta */}
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted uppercase tracking-wider mb-1">
+            <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-1 text-xs font-semibold uppercase tracking-wider">
               🎯 Meta
             </p>
-            <div className="text-3xl font-black text-theme-primary dark:text-dark-text-primary">
+            <div className="text-theme-primary dark:text-dark-text-primary text-3xl font-black">
               {new Intl.NumberFormat('pt-BR', {
                 style: 'currency',
                 currency: 'BRL',
@@ -874,9 +874,9 @@ const GoalCard = ({ goal, onEdit, onDelete, onToggleStatus }) => {
 
           {/* Badge de atingimento */}
           {isAchieved && (
-            <div className="px-3 py-2 bg-gradient-to-r bg-gradient-success text-dark-text-primary rounded-xl shadow-lg animate-pulse">
+            <div className="text-dark-text-primary animate-pulse rounded-xl bg-gradient-success bg-gradient-to-r px-3 py-2 shadow-lg">
               <div className="flex items-center gap-1.5">
-                <Award className="w-5 h-5" />
+                <Award className="h-5 w-5" />
                 <span className="text-sm font-bold">META ATINGIDA!</span>
               </div>
             </div>
@@ -884,11 +884,11 @@ const GoalCard = ({ goal, onEdit, onDelete, onToggleStatus }) => {
         </div>
 
         {/* Valor atingido */}
-        <div className="flex items-center justify-between p-3 bg-light-bg dark:bg-dark-bg dark:bg-dark-surface/30 rounded-xl">
-          <span className="text-sm font-semibold text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+        <div className="flex items-center justify-between rounded-xl bg-light-bg p-3 dark:bg-dark-bg dark:bg-dark-surface/30">
+          <span className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm font-semibold">
             💎 Atingido:
           </span>
-          <span className="text-lg font-black text-theme-primary dark:text-dark-text-primary">
+          <span className="text-theme-primary dark:text-dark-text-primary text-lg font-black">
             {new Intl.NumberFormat('pt-BR', {
               style: 'currency',
               currency: 'BRL',
@@ -905,53 +905,53 @@ const GoalCard = ({ goal, onEdit, onDelete, onToggleStatus }) => {
               Progresso
             </span>
             <span
-              className={`font-black text-lg ${percentage >= 100 ? 'text-green-600 dark:text-green-400' : percentage >= 75 ? 'text-blue-600 dark:text-blue-400' : percentage >= 50 ? 'text-orange-600 dark:text-orange-400' : 'text-gray-600 dark:text-gray-400'}`}
+              className={`text-lg font-black ${percentage >= 100 ? 'text-green-600 dark:text-green-400' : percentage >= 75 ? 'text-blue-600 dark:text-blue-400' : percentage >= 50 ? 'text-orange-600 dark:text-orange-400' : 'text-gray-600 dark:text-gray-400'}`}
             >
               {percentage.toFixed(1)}%
             </span>
           </div>
 
-          <div className="relative w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden shadow-inner">
+          <div className="relative h-3 w-full overflow-hidden rounded-full bg-gray-200 shadow-inner dark:bg-gray-700">
             <div
-              className={`h-3 rounded-full bg-gradient-to-r ${typeInfo.progress} transition-all duration-700 ease-out shadow-lg relative`}
+              className={`h-3 rounded-full bg-gradient-to-r ${typeInfo.progress} relative shadow-lg transition-all duration-700 ease-out`}
               style={{
                 width: `${percentage}%`,
               }}
             >
               {/* Brilho animado */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+              <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
             </div>
           </div>
         </div>
 
         {/* Botões de ação */}
-        <div className="flex items-center justify-end gap-2 pt-3 border-t border-light-border dark:border-dark-border">
+        <div className="flex items-center justify-end gap-2 border-t border-light-border pt-3 dark:border-dark-border">
           <button
             onClick={() => onToggleStatus(goal)}
-            className={`group/btn p-2.5 rounded-xl transition-all duration-300 ${goal.is_active ? 'text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 hover:shadow-lg hover:shadow-orange-500/30' : 'text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 hover:shadow-lg hover:shadow-green-500/30'}`}
+            className={`group/btn rounded-xl p-2.5 transition-all duration-300 ${goal.is_active ? 'text-orange-600 hover:bg-orange-50 hover:shadow-lg hover:shadow-orange-500/30 dark:hover:bg-orange-900/20' : 'text-green-600 hover:bg-green-50 hover:shadow-lg hover:shadow-green-500/30 dark:hover:bg-green-900/20'}`}
             title={goal.is_active ? 'Desativar meta' : 'Ativar meta'}
           >
             {goal.is_active ? (
-              <AlertCircle className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
+              <AlertCircle className="h-5 w-5 transition-transform group-hover/btn:scale-110" />
             ) : (
-              <CheckCircle className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
+              <CheckCircle className="h-5 w-5 transition-transform group-hover/btn:scale-110" />
             )}
           </button>
 
           <button
             onClick={() => onEdit(goal)}
-            className="group/btn p-2.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/30"
+            className="group/btn rounded-xl p-2.5 text-blue-600 transition-all duration-300 hover:bg-blue-50 hover:shadow-lg hover:shadow-blue-500/30 dark:hover:bg-blue-900/20"
             title="Editar meta"
           >
-            <Edit className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
+            <Edit className="h-5 w-5 transition-transform group-hover/btn:scale-110" />
           </button>
 
           <button
             onClick={() => onDelete(goal)}
-            className="group/btn p-2.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-red-500/30"
+            className="group/btn rounded-xl p-2.5 text-red-600 transition-all duration-300 hover:bg-red-50 hover:shadow-lg hover:shadow-red-500/30 dark:hover:bg-red-900/20"
             title="Excluir meta"
           >
-            <Trash2 className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
+            <Trash2 className="h-5 w-5 transition-transform group-hover/btn:scale-110" />
           </button>
         </div>
       </div>
@@ -1092,20 +1092,20 @@ export default function GoalsPage() {
     }
   };
   return (
-    <div className="min-h-screen from-gray-50 via-blue-50/30 to-purple-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900 p-6 bg-light-bg dark:bg-dark-bg">
+    <div className="min-h-screen bg-light-bg from-gray-50 via-blue-50/30 to-purple-50/30 p-6 dark:bg-dark-bg dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
       {/* 🎨 Header Premium com gradiente */}
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-8">
+        <div className="mb-8 flex items-center justify-between">
           <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-gradient-primary rounded-xl shadow-lg">
-                <Target className="w-8 h-8 text-dark-text-primary" />
+              <div className="rounded-xl bg-gradient-primary p-3 shadow-lg">
+                <Target className="text-dark-text-primary h-8 w-8" />
               </div>
               <div>
-                <h1 className="text-4xl font-black text-theme-primary dark:text-dark-text-primary tracking-tight">
+                <h1 className="text-theme-primary dark:text-dark-text-primary text-4xl font-black tracking-tight">
                   🎯 Cadastro de Metas
                 </h1>
-                <p className="text-base text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted font-medium">
+                <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-base font-medium">
                   Gerencie as metas financeiras por unidade e período
                 </p>
               </div>
@@ -1113,20 +1113,20 @@ export default function GoalsPage() {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="card-theme dark:bg-dark-surface rounded-xl shadow-lg border border-light-border dark:border-dark-border p-1">
+            <div className="card-theme rounded-xl border border-light-border p-1 shadow-lg dark:border-dark-border dark:bg-dark-surface">
               <UnitSelector userId="current-user" />
             </div>
             {hasSelectedUnit ? (
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="group flex items-center gap-2 px-6 py-3 bg-gradient-primary text-dark-text-primary rounded-xl hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 font-bold hover:scale-105"
+                className="text-dark-text-primary group flex items-center gap-2 rounded-xl bg-gradient-primary px-6 py-3 font-bold transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/50"
               >
-                <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+                <Plus className="h-5 w-5 transition-transform group-hover:rotate-90" />
                 Nova Meta
               </button>
             ) : (
-              <div className="flex items-center gap-2 text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted px-5 py-3 card-theme dark:bg-dark-surface border-2 border-dashed border-light-border dark:border-dark-border rounded-xl">
-                <Info className="w-4 h-4" />
+              <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted card-theme flex items-center gap-2 rounded-xl border-2 border-dashed border-light-border px-5 py-3 text-sm dark:border-dark-border dark:bg-dark-surface">
+                <Info className="h-4 w-4" />
                 Selecione uma unidade para criar metas
               </div>
             )}
@@ -1134,22 +1134,22 @@ export default function GoalsPage() {
         </div>
 
         {/* 🔍 Filtros Premium */}
-        <div className="flex items-center gap-4 card-theme dark:bg-dark-surface rounded-2xl shadow-lg border border-light-border dark:border-dark-border p-5">
+        <div className="card-theme flex items-center gap-4 rounded-2xl border border-light-border p-5 shadow-lg dark:border-dark-border dark:bg-dark-surface">
           <div className="flex items-center gap-2 text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-600">
-            <Calendar className="w-5 h-5 text-indigo-600" />
+            <Calendar className="h-5 w-5 text-indigo-600" />
             Filtrar por:
           </div>
 
-          <div className="flex-1 grid grid-cols-2 gap-4">
+          <div className="grid flex-1 grid-cols-2 gap-4">
             <div>
-              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
-                <Calendar className="w-4 h-4 text-teal-600" />
+              <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600">
+                <Calendar className="h-4 w-4 text-teal-600" />
                 Ano
               </label>
               <select
                 value={selectedYear}
                 onChange={e => setSelectedYear(parseInt(e.target.value))}
-                className="w-full px-4 py-2.5 border-2 border-light-border dark:border-dark-border rounded-xl card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary font-semibold hover:border-indigo-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-xl border-2 border-light-border px-4 py-2.5 font-semibold transition-all hover:border-indigo-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-dark-border dark:bg-gray-700"
               >
                 {Array.from(
                   {
@@ -1168,14 +1168,14 @@ export default function GoalsPage() {
             </div>
 
             <div>
-              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
-                <Calendar className="w-4 h-4 text-cyan-600" />
+              <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600">
+                <Calendar className="h-4 w-4 text-cyan-600" />
                 Mês
               </label>
               <select
                 value={selectedMonth}
                 onChange={e => setSelectedMonth(parseInt(e.target.value))}
-                className="w-full px-4 py-2.5 border-2 border-light-border dark:border-dark-border rounded-xl card-theme dark:bg-gray-700 text-theme-primary dark:text-dark-text-primary font-semibold hover:border-indigo-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-xl border-2 border-light-border px-4 py-2.5 font-semibold transition-all hover:border-indigo-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-dark-border dark:bg-gray-700"
               >
                 {Array.from(
                   {
@@ -1201,93 +1201,93 @@ export default function GoalsPage() {
 
       {/* 📊 Lista de Metas com Estados Premium */}
       {!hasSelectedUnit ? (
-        <div className="text-center py-16 card-theme dark:bg-dark-surface rounded-2xl shadow-xl border-2 border-dashed border-light-border dark:border-dark-border">
-          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-2xl inline-block mb-6">
-            <Target className="w-20 h-20 text-blue-500 dark:text-blue-400" />
+        <div className="card-theme rounded-2xl border-2 border-dashed border-light-border py-16 text-center shadow-xl dark:border-dark-border dark:bg-dark-surface">
+          <div className="mb-6 inline-block rounded-2xl bg-blue-50 p-4 dark:bg-blue-900/20">
+            <Target className="h-20 w-20 text-blue-500 dark:text-blue-400" />
           </div>
-          <h3 className="text-2xl font-black text-theme-primary dark:text-dark-text-primary mb-3">
+          <h3 className="text-theme-primary dark:text-dark-text-primary mb-3 text-2xl font-black">
             🏢 Selecione uma unidade
           </h3>
-          <p className="text-base text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-6 max-w-md mx-auto">
+          <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mx-auto mb-6 max-w-md text-base">
             Escolha uma unidade no seletor acima para visualizar e gerenciar
             suas metas financeiras.
           </p>
-          <div className="flex items-center justify-center gap-2 text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
-            <Info className="w-4 h-4" />
+          <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted flex items-center justify-center gap-2 text-sm">
+            <Info className="h-4 w-4" />
             <span>Você pode criar metas personalizadas para cada unidade</span>
           </div>
         </div>
       ) : goalsLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, index) => (
             <div
               key={index}
-              className="card-theme dark:bg-dark-surface rounded-2xl border border-light-border dark:border-dark-border overflow-hidden shadow-lg"
+              className="card-theme overflow-hidden rounded-2xl border border-light-border shadow-lg dark:border-dark-border dark:bg-dark-surface"
             >
               {/* Header skeleton com cor sólida */}
-              <div className="h-28 bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
+              <div className="h-28 animate-pulse bg-gray-200 dark:bg-gray-700"></div>
 
               {/* Body skeleton */}
-              <div className="p-6 space-y-4">
-                <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
-                <div className="h-10 w-40 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
-                <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
+              <div className="space-y-4 p-6">
+                <div className="h-6 w-32 animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+                <div className="h-10 w-40 animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+                <div className="h-4 w-full animate-pulse rounded-full bg-gray-200 dark:bg-gray-700"></div>
                 <div className="flex gap-2 pt-3">
-                  <div className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse"></div>
-                  <div className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse"></div>
-                  <div className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse"></div>
+                  <div className="h-10 w-10 animate-pulse rounded-xl bg-gray-200 dark:bg-gray-700"></div>
+                  <div className="h-10 w-10 animate-pulse rounded-xl bg-gray-200 dark:bg-gray-700"></div>
+                  <div className="h-10 w-10 animate-pulse rounded-xl bg-gray-200 dark:bg-gray-700"></div>
                 </div>
               </div>
             </div>
           ))}
         </div>
       ) : goals.length === 0 ? (
-        <div className="text-center py-16 card-theme dark:bg-dark-surface rounded-2xl shadow-xl border-2 border-dashed border-indigo-300 dark:border-indigo-600">
-          <div className="relative inline-block mb-6">
-            <div className="p-4 from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl">
-              <Target className="w-20 h-20 text-indigo-500 dark:text-indigo-400" />
+        <div className="card-theme rounded-2xl border-2 border-dashed border-indigo-300 py-16 text-center shadow-xl dark:border-indigo-600 dark:bg-dark-surface">
+          <div className="relative mb-6 inline-block">
+            <div className="rounded-2xl bg-indigo-50 from-indigo-50 to-purple-50 p-4 dark:bg-indigo-900/20 dark:from-indigo-900/20 dark:to-purple-900/20">
+              <Target className="h-20 w-20 text-indigo-500 dark:text-indigo-400" />
             </div>
-            <div className="absolute -top-2 -right-2 p-2 from-yellow-400 to-orange-400 bg-yellow-400 rounded-full shadow-lg animate-bounce">
-              <Sparkles className="w-6 h-6 text-dark-text-primary" />
+            <div className="absolute -right-2 -top-2 animate-bounce rounded-full bg-yellow-400 from-yellow-400 to-orange-400 p-2 shadow-lg">
+              <Sparkles className="text-dark-text-primary h-6 w-6" />
             </div>
           </div>
 
-          <h3 className="text-2xl font-black text-theme-primary dark:text-dark-text-primary mb-3">
+          <h3 className="text-theme-primary dark:text-dark-text-primary mb-3 text-2xl font-black">
             📈 Nenhuma meta cadastrada
           </h3>
-          <p className="text-base text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-2 font-medium">
+          <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-2 text-base font-medium">
             {selectedUnit?.name}
           </p>
-          <p className="text-base text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mb-8 max-w-md mx-auto">
+          <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mx-auto mb-8 max-w-md text-base">
             Comece criando sua primeira meta financeira para esta unidade e
             acompanhe o progresso em tempo real.
           </p>
 
           <button
             onClick={() => setIsModalOpen(true)}
-            className="group inline-flex items-center gap-2 px-6 py-3 bg-gradient-primary text-dark-text-primary rounded-xl hover:shadow-2xl hover:shadow-indigo-500/50 transition-all duration-300 font-bold hover:scale-105"
+            className="text-dark-text-primary group inline-flex items-center gap-2 rounded-xl bg-gradient-primary px-6 py-3 font-bold transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-indigo-500/50"
           >
-            <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+            <Plus className="h-5 w-5 transition-transform group-hover:rotate-90" />
             Criar primeira meta
           </button>
 
-          <div className="mt-8 flex items-center justify-center gap-6 text-sm text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
+          <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-8 flex items-center justify-center gap-6 text-sm">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <div className="h-2 w-2 rounded-full bg-green-500"></div>
               <span>Faturamento</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <div className="h-2 w-2 rounded-full bg-blue-500"></div>
               <span>Assinaturas</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+              <div className="h-2 w-2 rounded-full bg-purple-500"></div>
               <span>Produtos</span>
             </div>
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {goals.map(goal => (
             <GoalCard
               key={goal.id}

@@ -37,11 +37,11 @@ const CashRegisterHeader = ({
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Status e Ações */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         {/* Info do Caixa */}
         <div>
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-2xl font-bold text-theme-primary">
+          <div className="mb-2 flex items-center gap-3">
+            <h1 className="text-theme-primary text-2xl font-bold">
               Controle de Caixa
             </h1>
             <StatusBadge
@@ -50,10 +50,10 @@ const CashRegisterHeader = ({
             />
           </div>
           {isCashOpen && cashRegister && (
-            <div className="flex flex-wrap items-center gap-4 text-sm text-theme-secondary">
+            <div className="text-theme-secondary flex flex-wrap items-center gap-4 text-sm">
               <span className="flex items-center gap-1.5">
                 <svg
-                  className="w-4 h-4"
+                  className="h-4 w-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -69,7 +69,7 @@ const CashRegisterHeader = ({
               </span>
               <span className="flex items-center gap-1.5">
                 <svg
-                  className="w-4 h-4"
+                  className="h-4 w-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -85,7 +85,7 @@ const CashRegisterHeader = ({
               </span>
               <span className="flex items-center gap-1.5">
                 <svg
-                  className="w-4 h-4"
+                  className="h-4 w-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -115,7 +115,7 @@ const CashRegisterHeader = ({
               requiredRoles={['recepcionista', 'gerente', 'admin']}
               icon={
                 <svg
-                  className="w-5 h-5"
+                  className="h-5 w-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -142,7 +142,7 @@ const CashRegisterHeader = ({
                 requiredRoles={['recepcionista', 'gerente', 'admin']}
                 icon={
                   <svg
-                    className="w-5 h-5"
+                    className="h-5 w-5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -167,7 +167,7 @@ const CashRegisterHeader = ({
                   disabled={loading}
                   icon={
                     <svg
-                      className="w-5 h-5"
+                      className="h-5 w-5"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -191,7 +191,7 @@ const CashRegisterHeader = ({
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <KPICard
           title="Entradas"
           value={formatCurrency(summary.total_inflow || 0)}
@@ -232,10 +232,10 @@ const CashRegisterHeader = ({
 
       {/* Alerta se caixa fechado */}
       {!isCashOpen && (
-        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
           <div className="flex items-start gap-3">
             <svg
-              className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5"
+              className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-600 dark:text-yellow-400"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -246,7 +246,7 @@ const CashRegisterHeader = ({
               />
             </svg>
             <div className="flex-1">
-              <h3 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-1">
+              <h3 className="mb-1 font-semibold text-yellow-800 dark:text-yellow-200">
                 Caixa Fechado
               </h3>
               <p className="text-sm text-yellow-700 dark:text-yellow-300">

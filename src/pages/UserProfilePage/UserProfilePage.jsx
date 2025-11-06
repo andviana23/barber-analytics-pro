@@ -148,7 +148,7 @@ export function UserProfilePage() {
     const IconComponent = config.icon;
     return (
       <span
-        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium border ${config.color}`}
+        className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-medium ${config.color}`}
       >
         <IconComponent size={14} />
         {config.label}
@@ -166,36 +166,36 @@ export function UserProfilePage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="border-b border-light-border dark:border-dark-border pb-6">
+      <div className="border-b border-light-border pb-6 dark:border-dark-border">
         <h1 className="text-2xl font-bold text-text-light-primary dark:text-text-dark-primary">
           Meu Perfil
         </h1>
-        <p className="text-text-light-secondary dark:text-text-dark-secondary mt-1">
+        <p className="mt-1 text-text-light-secondary dark:text-text-dark-secondary">
           Gerencie suas informações pessoais e configurações de conta
         </p>
       </div>
 
       {/* Messages */}
       {success && (
-        <div className="flex items-center gap-3 p-4 bg-success/10 border border-success/20 rounded-lg">
-          <CheckCircle className="h-5 w-5 text-success flex-shrink-0" />
+        <div className="bg-success/10 border-success/20 flex items-center gap-3 rounded-lg border p-4">
+          <CheckCircle className="text-success h-5 w-5 flex-shrink-0" />
           <p className="text-success font-medium">{success}</p>
         </div>
       )}
 
       {errors.general && (
-        <div className="flex items-center gap-3 p-4 bg-danger/10 border border-danger/20 rounded-lg">
-          <AlertCircle className="h-5 w-5 text-danger flex-shrink-0" />
+        <div className="bg-danger/10 border-danger/20 flex items-center gap-3 rounded-lg border p-4">
+          <AlertCircle className="text-danger h-5 w-5 flex-shrink-0" />
           <p className="text-danger font-medium">{errors.general}</p>
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Profile Picture & Info */}
-        <div className="lg:col-span-1 space-y-6">
+        <div className="space-y-6 lg:col-span-1">
           {/* Avatar Card */}
-          <div className="card-theme rounded-xl border border-light-border dark:border-dark-border p-6">
-            <h3 className="text-lg font-semibold text-text-light-primary dark:text-text-dark-primary mb-4">
+          <div className="card-theme rounded-xl border border-light-border p-6 dark:border-dark-border">
+            <h3 className="mb-4 text-lg font-semibold text-text-light-primary dark:text-text-dark-primary">
               Foto do Perfil
             </h3>
             <div className="flex flex-col items-center">
@@ -204,28 +204,28 @@ export function UserProfilePage() {
                   <img
                     src={profileData.avatar_url}
                     alt="Profile"
-                    className="w-24 h-24 rounded-full object-cover border-2 border-light-border dark:border-dark-border"
+                    className="h-24 w-24 rounded-full border-2 border-light-border object-cover dark:border-dark-border"
                   />
                 ) : (
-                  <div className="w-24 h-24 rounded-full bg-primary flex items-center justify-center border-2 border-light-border dark:border-dark-border">
-                    <span className="text-dark-text-primary font-bold text-xl">
+                  <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-light-border bg-primary dark:border-dark-border">
+                    <span className="text-dark-text-primary text-xl font-bold">
                       {getInitials(profileData.name || 'User')}
                     </span>
                   </div>
                 )}
-                <button className="absolute bottom-0 right-0 p-2 bg-primary hover:bg-primary-600 text-dark-text-primary rounded-full shadow-lg transition-colors duration-300">
+                <button className="hover:bg-primary-600 text-dark-text-primary absolute bottom-0 right-0 rounded-full bg-primary p-2 shadow-lg transition-colors duration-300">
                   <Camera size={16} />
                 </button>
               </div>
-              <p className="text-sm text-text-light-secondary dark:text-text-dark-secondary text-center">
+              <p className="text-center text-sm text-text-light-secondary dark:text-text-dark-secondary">
                 Clique no ícone da câmera para alterar sua foto
               </p>
             </div>
           </div>
 
           {/* Professional Info Card */}
-          <div className="card-theme rounded-xl border border-light-border dark:border-dark-border p-6">
-            <h3 className="text-lg font-semibold text-text-light-primary dark:text-text-dark-primary mb-4">
+          <div className="card-theme rounded-xl border border-light-border p-6 dark:border-dark-border">
+            <h3 className="mb-4 text-lg font-semibold text-text-light-primary dark:text-text-dark-primary">
               Informações Profissionais
             </h3>
             <div className="space-y-4">
@@ -242,7 +242,7 @@ export function UserProfilePage() {
                 <label className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
                   Unidade
                 </label>
-                <div className="flex items-center gap-2 mt-1">
+                <div className="mt-1 flex items-center gap-2">
                   <Building2 className="h-4 w-4 text-text-light-secondary dark:text-text-dark-secondary" />
                   <span className="text-sm font-medium text-text-light-primary dark:text-text-dark-primary">
                     {professionalData.unit}
@@ -254,7 +254,7 @@ export function UserProfilePage() {
                 <label className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
                   Data de Entrada
                 </label>
-                <div className="flex items-center gap-2 mt-1">
+                <div className="mt-1 flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-text-light-secondary dark:text-text-dark-secondary" />
                   <span className="text-sm font-medium text-text-light-primary dark:text-text-dark-primary">
                     {professionalData.joinDate}
@@ -266,9 +266,9 @@ export function UserProfilePage() {
                 <label className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
                   Faturamento do Mês
                 </label>
-                <div className="flex items-center gap-2 mt-1">
-                  <DollarSign className="h-4 w-4 text-success" />
-                  <span className="text-sm font-medium text-success">
+                <div className="mt-1 flex items-center gap-2">
+                  <DollarSign className="text-success h-4 w-4" />
+                  <span className="text-success text-sm font-medium">
                     {professionalData.monthlyRevenue}
                   </span>
                 </div>
@@ -278,20 +278,20 @@ export function UserProfilePage() {
         </div>
 
         {/* Profile Form */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6 lg:col-span-2">
           {/* Personal Information */}
-          <div className="card-theme rounded-xl border border-light-border dark:border-dark-border p-6">
-            <h3 className="text-lg font-semibold text-text-light-primary dark:text-text-dark-primary mb-6">
+          <div className="card-theme rounded-xl border border-light-border p-6 dark:border-dark-border">
+            <h3 className="mb-6 text-lg font-semibold text-text-light-primary dark:text-text-dark-primary">
               Informações Pessoais
             </h3>
 
             <form onSubmit={handleProfileUpdate} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2">
+                <label className="mb-2 block text-sm font-medium text-text-light-primary dark:text-text-dark-primary">
                   Nome Completo
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                     <User className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary" />
                   </div>
                   <input
@@ -304,34 +304,34 @@ export function UserProfilePage() {
                       })
                     }
                     placeholder="Seu nome completo"
-                    className="w-full pl-10 pr-4 py-3 bg-light-bg dark:bg-dark-bg border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-300 text-text-light-primary dark:text-text-dark-primary placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary"
+                    className="w-full rounded-lg border border-light-border bg-light-bg py-3 pl-10 pr-4 text-text-light-primary transition-colors duration-300 placeholder:text-text-light-secondary focus:border-transparent focus:ring-2 focus:ring-primary dark:border-dark-border dark:bg-dark-bg dark:text-text-dark-primary dark:placeholder:text-text-dark-secondary"
                     required
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2">
+                <label className="mb-2 block text-sm font-medium text-text-light-primary dark:text-text-dark-primary">
                   E-mail
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                     <Mail className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary" />
                   </div>
                   <input
                     type="email"
                     value={profileData.email}
                     disabled
-                    className="w-full pl-10 pr-4 py-3 bg-light-border/20 dark:bg-dark-border/20 border border-light-border dark:border-dark-border rounded-lg text-text-light-secondary dark:text-text-dark-secondary cursor-not-allowed"
+                    className="w-full cursor-not-allowed rounded-lg border border-light-border bg-light-border/20 py-3 pl-10 pr-4 text-text-light-secondary dark:border-dark-border dark:bg-dark-border/20 dark:text-text-dark-secondary"
                   />
                 </div>
-                <p className="text-xs text-text-light-secondary dark:text-text-dark-secondary mt-1">
+                <p className="mt-1 text-xs text-text-light-secondary dark:text-text-dark-secondary">
                   O email não pode ser alterado por motivos de segurança
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2">
+                <label className="mb-2 block text-sm font-medium text-text-light-primary dark:text-text-dark-primary">
                   Telefone
                 </label>
                 <input
@@ -344,7 +344,7 @@ export function UserProfilePage() {
                     })
                   }
                   placeholder="(31) 99999-9999"
-                  className="w-full px-4 py-3 bg-light-bg dark:bg-dark-bg border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-300 text-text-light-primary dark:text-text-dark-primary placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary"
+                  className="w-full rounded-lg border border-light-border bg-light-bg px-4 py-3 text-text-light-primary transition-colors duration-300 placeholder:text-text-light-secondary focus:border-transparent focus:ring-2 focus:ring-primary dark:border-dark-border dark:bg-dark-bg dark:text-text-dark-primary dark:placeholder:text-text-dark-secondary"
                 />
               </div>
 
@@ -352,10 +352,10 @@ export function UserProfilePage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-600 text-dark-text-primary rounded-lg font-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="hover:bg-primary-600 text-dark-text-primary flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {loading ? (
-                    <div className="w-4 h-4 border-2 border-light-surface dark:border-dark-surface border-t-transparent rounded-full animate-spin" />
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-light-surface border-t-transparent dark:border-dark-surface" />
                   ) : (
                     <Save size={16} />
                   )}
@@ -366,15 +366,15 @@ export function UserProfilePage() {
           </div>
 
           {/* Password Change */}
-          <div className="card-theme rounded-xl border border-light-border dark:border-dark-border p-6">
-            <div className="flex items-center justify-between mb-6">
+          <div className="card-theme rounded-xl border border-light-border p-6 dark:border-dark-border">
+            <div className="mb-6 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-text-light-primary dark:text-text-dark-primary">
                 Alterar Senha
               </h3>
               {!showPasswordForm && (
                 <button
                   onClick={() => setShowPasswordForm(true)}
-                  className="flex items-center gap-2 px-4 py-2 border border-light-border dark:border-dark-border text-text-light-primary dark:text-text-dark-primary rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition-colors duration-300"
+                  className="flex items-center gap-2 rounded-lg border border-light-border px-4 py-2 text-text-light-primary transition-colors duration-300 hover:bg-light-bg dark:border-dark-border dark:text-text-dark-primary dark:hover:bg-dark-bg"
                 >
                   <Lock size={16} />
                   Alterar Senha
@@ -385,11 +385,11 @@ export function UserProfilePage() {
             {showPasswordForm && (
               <form onSubmit={handlePasswordChange} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2">
+                  <label className="mb-2 block text-sm font-medium text-text-light-primary dark:text-text-dark-primary">
                     Senha Atual
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                       <Lock className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary" />
                     </div>
                     <input
@@ -402,7 +402,7 @@ export function UserProfilePage() {
                         })
                       }
                       placeholder="Digite sua senha atual"
-                      className="w-full pl-10 pr-12 py-3 bg-light-bg dark:bg-dark-bg border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-300 text-text-light-primary dark:text-text-dark-primary placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary"
+                      className="w-full rounded-lg border border-light-border bg-light-bg py-3 pl-10 pr-12 text-text-light-primary transition-colors duration-300 placeholder:text-text-light-secondary focus:border-transparent focus:ring-2 focus:ring-primary dark:border-dark-border dark:bg-dark-bg dark:text-text-dark-primary dark:placeholder:text-text-dark-secondary"
                       required
                     />
                     <button
@@ -410,7 +410,7 @@ export function UserProfilePage() {
                       onClick={() =>
                         setShowCurrentPassword(!showCurrentPassword)
                       }
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                      className="absolute inset-y-0 right-0 flex items-center pr-3"
                     >
                       {showCurrentPassword ? (
                         <EyeOff className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary" />
@@ -422,11 +422,11 @@ export function UserProfilePage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2">
+                  <label className="mb-2 block text-sm font-medium text-text-light-primary dark:text-text-dark-primary">
                     Nova Senha
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                       <Lock className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary" />
                     </div>
                     <input
@@ -439,13 +439,13 @@ export function UserProfilePage() {
                         })
                       }
                       placeholder="Digite a nova senha"
-                      className={`w-full pl-10 pr-12 py-3 bg-light-bg dark:bg-dark-bg border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-300 text-text-light-primary dark:text-text-dark-primary placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary ${errors.newPassword ? 'border-danger' : 'border-light-border dark:border-dark-border'}`}
+                      className={`w-full rounded-lg border bg-light-bg py-3 pl-10 pr-12 text-text-light-primary transition-colors duration-300 placeholder:text-text-light-secondary focus:border-transparent focus:ring-2 focus:ring-primary dark:bg-dark-bg dark:text-text-dark-primary dark:placeholder:text-text-dark-secondary ${errors.newPassword ? 'border-danger' : 'border-light-border dark:border-dark-border'}`}
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                      className="absolute inset-y-0 right-0 flex items-center pr-3"
                     >
                       {showNewPassword ? (
                         <EyeOff className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary" />
@@ -455,18 +455,18 @@ export function UserProfilePage() {
                     </button>
                   </div>
                   {errors.newPassword && (
-                    <p className="text-sm text-danger mt-1">
+                    <p className="text-danger mt-1 text-sm">
                       {errors.newPassword}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2">
+                  <label className="mb-2 block text-sm font-medium text-text-light-primary dark:text-text-dark-primary">
                     Confirmar Nova Senha
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                       <Lock className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary" />
                     </div>
                     <input
@@ -479,7 +479,7 @@ export function UserProfilePage() {
                         })
                       }
                       placeholder="Confirme a nova senha"
-                      className={`w-full pl-10 pr-12 py-3 bg-light-bg dark:bg-dark-bg border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-300 text-text-light-primary dark:text-text-dark-primary placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary ${errors.confirmPassword ? 'border-danger' : 'border-light-border dark:border-dark-border'}`}
+                      className={`w-full rounded-lg border bg-light-bg py-3 pl-10 pr-12 text-text-light-primary transition-colors duration-300 placeholder:text-text-light-secondary focus:border-transparent focus:ring-2 focus:ring-primary dark:bg-dark-bg dark:text-text-dark-primary dark:placeholder:text-text-dark-secondary ${errors.confirmPassword ? 'border-danger' : 'border-light-border dark:border-dark-border'}`}
                       required
                     />
                     <button
@@ -487,7 +487,7 @@ export function UserProfilePage() {
                       onClick={() =>
                         setShowConfirmPassword(!showConfirmPassword)
                       }
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                      className="absolute inset-y-0 right-0 flex items-center pr-3"
                     >
                       {showConfirmPassword ? (
                         <EyeOff className="h-5 w-5 text-text-light-secondary dark:text-text-dark-secondary" />
@@ -497,7 +497,7 @@ export function UserProfilePage() {
                     </button>
                   </div>
                   {errors.confirmPassword && (
-                    <p className="text-sm text-danger mt-1">
+                    <p className="text-danger mt-1 text-sm">
                       {errors.confirmPassword}
                     </p>
                   )}
@@ -515,17 +515,17 @@ export function UserProfilePage() {
                       });
                       setErrors({});
                     }}
-                    className="px-4 py-2 border border-light-border dark:border-dark-border text-text-light-primary dark:text-text-dark-primary rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition-colors duration-300"
+                    className="rounded-lg border border-light-border px-4 py-2 text-text-light-primary transition-colors duration-300 hover:bg-light-bg dark:border-dark-border dark:text-text-dark-primary dark:hover:bg-dark-bg"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-600 text-dark-text-primary rounded-lg font-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="hover:bg-primary-600 text-dark-text-primary flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {loading ? (
-                      <div className="w-4 h-4 border-2 border-light-surface dark:border-dark-surface border-t-transparent rounded-full animate-spin" />
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-light-surface border-t-transparent dark:border-dark-surface" />
                     ) : (
                       <Save size={16} />
                     )}

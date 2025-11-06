@@ -255,40 +255,40 @@ export const EditarReceitaModal = ({
   };
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="card-theme rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+      <div className="card-theme max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl shadow-2xl">
         {/* 📝 Header com Gradiente */}
-        <div className="sticky top-0 bg-gradient-success p-6 rounded-t-2xl">
+        <div className="sticky top-0 rounded-t-2xl bg-gradient-success p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-3 card-theme/20 rounded-xl">
-                <Edit2 className="w-6 h-6 text-dark-text-primary" />
+              <div className="card-theme/20 rounded-xl p-3">
+                <Edit2 className="text-dark-text-primary h-6 w-6" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-dark-text-primary">
+                <h2 className="text-dark-text-primary text-2xl font-bold">
                   Editar Receita
                 </h2>
-                <p className="text-green-50 text-sm mt-1">
+                <p className="mt-1 text-sm text-green-50">
                   Atualize as informações da receita
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:card-theme/20 rounded-lg transition-colors"
+              className="hover:card-theme/20 rounded-lg p-2 transition-colors"
               disabled={loading}
             >
-              <X className="w-6 h-6 text-dark-text-primary" />
+              <X className="text-dark-text-primary h-6 w-6" />
             </button>
           </div>
         </div>
 
         {/* 📋 Formulário */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 p-6">
           {/* Título */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-bold text-theme-secondary uppercase tracking-wider mb-2">
-              <FileText className="w-4 h-4" />
+            <label className="text-theme-secondary mb-2 flex items-center gap-2 text-sm font-bold uppercase tracking-wider">
+              <FileText className="h-4 w-4" />
               Título *
             </label>
             <Input
@@ -300,8 +300,8 @@ export const EditarReceitaModal = ({
               disabled={loading}
             />
             {errors.titulo && (
-              <p className="text-xs text-red-600 dark:text-red-400 mt-1 flex items-center gap-1">
-                <AlertCircle className="w-3 h-3" />
+              <p className="mt-1 flex items-center gap-1 text-xs text-red-600 dark:text-red-400">
+                <AlertCircle className="h-3 w-3" />
                 {errors.titulo}
               </p>
             )}
@@ -309,12 +309,12 @@ export const EditarReceitaModal = ({
 
           {/* Valor */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-bold text-theme-secondary uppercase tracking-wider mb-2">
-              <DollarSign className="w-4 h-4" />
+            <label className="text-theme-secondary mb-2 flex items-center gap-2 text-sm font-bold uppercase tracking-wider">
+              <DollarSign className="h-4 w-4" />
               Valor *
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary font-semibold">
+              <span className="text-theme-secondary absolute left-3 top-1/2 -translate-y-1/2 font-semibold">
                 R$
               </span>
               <Input
@@ -329,8 +329,8 @@ export const EditarReceitaModal = ({
               />
             </div>
             {errors.valor && (
-              <p className="text-xs text-red-600 dark:text-red-400 mt-1 flex items-center gap-1">
-                <AlertCircle className="w-3 h-3" />
+              <p className="mt-1 flex items-center gap-1 text-xs text-red-600 dark:text-red-400">
+                <AlertCircle className="h-3 w-3" />
                 {errors.valor}
               </p>
             )}
@@ -338,8 +338,8 @@ export const EditarReceitaModal = ({
 
           {/* Data de Pagamento */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-bold text-theme-secondary uppercase tracking-wider mb-2">
-              <Calendar className="w-4 h-4" />
+            <label className="text-theme-secondary mb-2 flex items-center gap-2 text-sm font-bold uppercase tracking-wider">
+              <Calendar className="h-4 w-4" />
               Data de Pagamento *
             </label>
             <Input
@@ -352,26 +352,26 @@ export const EditarReceitaModal = ({
               disabled={loading}
             />
             {errors.data_pagamento && (
-              <p className="text-xs text-red-600 dark:text-red-400 mt-1 flex items-center gap-1">
-                <AlertCircle className="w-3 h-3" />
+              <p className="mt-1 flex items-center gap-1 text-xs text-red-600 dark:text-red-400">
+                <AlertCircle className="h-3 w-3" />
                 {errors.data_pagamento}
               </p>
             )}
-            <p className="text-xs text-theme-secondary mt-1">
+            <p className="text-theme-secondary mt-1 text-xs">
               Esta data será usada como data de competência no sistema
             </p>
           </div>
 
           {/* Unidade */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-bold text-theme-secondary uppercase tracking-wider mb-2">
-              <Building2 className="w-4 h-4" />
+            <label className="text-theme-secondary mb-2 flex items-center gap-2 text-sm font-bold uppercase tracking-wider">
+              <Building2 className="h-4 w-4" />
               Unidade *
             </label>
             <select
               value={formData.unit_id}
               onChange={e => handleInputChange('unit_id', e.target.value)}
-              className={`w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 ${errors.unit_id ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-xl text-theme-primary font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 cursor-pointer`}
+              className={`w-full border-2 bg-white px-4 py-3 dark:bg-gray-800 ${errors.unit_id ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} text-theme-primary cursor-pointer rounded-xl font-medium transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500`}
               disabled={loading}
             >
               <option value="">Selecione uma unidade</option>
@@ -382,8 +382,8 @@ export const EditarReceitaModal = ({
               ))}
             </select>
             {errors.unit_id && (
-              <p className="text-xs text-red-600 dark:text-red-400 mt-1 flex items-center gap-1">
-                <AlertCircle className="w-3 h-3" />
+              <p className="mt-1 flex items-center gap-1 text-xs text-red-600 dark:text-red-400">
+                <AlertCircle className="h-3 w-3" />
                 {errors.unit_id}
               </p>
             )}
@@ -391,8 +391,8 @@ export const EditarReceitaModal = ({
 
           {/* Forma de Pagamento */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-bold text-theme-secondary uppercase tracking-wider mb-2">
-              <CreditCard className="w-4 h-4" />
+            <label className="text-theme-secondary mb-2 flex items-center gap-2 text-sm font-bold uppercase tracking-wider">
+              <CreditCard className="h-4 w-4" />
               Forma de Pagamento *
             </label>
             <select
@@ -400,7 +400,7 @@ export const EditarReceitaModal = ({
               onChange={e =>
                 handleInputChange('payment_method_id', e.target.value)
               }
-              className={`w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 ${errors.payment_method_id ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-xl text-theme-primary font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 cursor-pointer`}
+              className={`w-full border-2 bg-white px-4 py-3 dark:bg-gray-800 ${errors.payment_method_id ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} text-theme-primary cursor-pointer rounded-xl font-medium transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500`}
               disabled={!formData.unit_id || loading}
             >
               <option value="">
@@ -415,13 +415,13 @@ export const EditarReceitaModal = ({
               ))}
             </select>
             {errors.payment_method_id && (
-              <p className="text-xs text-red-600 dark:text-red-400 mt-1 flex items-center gap-1">
-                <AlertCircle className="w-3 h-3" />
+              <p className="mt-1 flex items-center gap-1 text-xs text-red-600 dark:text-red-400">
+                <AlertCircle className="h-3 w-3" />
                 {errors.payment_method_id}
               </p>
             )}
             {selectedPaymentMethod && (
-              <p className="text-xs text-blue-600 dark:text-blue-400 mt-1 font-medium">
+              <p className="mt-1 text-xs font-medium text-blue-600 dark:text-blue-400">
                 ⏱️ Prazo de recebimento: {selectedPaymentMethod.receipt_days}{' '}
                 dias corridos
               </p>
@@ -430,9 +430,9 @@ export const EditarReceitaModal = ({
 
           {/* Previsão de Recebimento (calculado automaticamente) */}
           {formData.prev_recebimento && (
-            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-xl">
-              <div className="flex items-center gap-2 mb-2">
-                <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            <div className="rounded-xl border-2 border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+              <div className="mb-2 flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                 <span className="text-sm font-bold text-blue-700 dark:text-blue-300">
                   Previsão de Recebimento
                 </span>
@@ -446,7 +446,7 @@ export const EditarReceitaModal = ({
                   year: 'numeric',
                 })}
               </p>
-              <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+              <p className="mt-1 text-xs text-blue-600 dark:text-blue-400">
                 Calculado automaticamente com base na forma de pagamento
               </p>
             </div>
@@ -454,14 +454,14 @@ export const EditarReceitaModal = ({
 
           {/* Conta Bancária (Opcional) */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-bold text-theme-secondary uppercase tracking-wider mb-2">
-              <Landmark className="w-4 h-4" />
+            <label className="text-theme-secondary mb-2 flex items-center gap-2 text-sm font-bold uppercase tracking-wider">
+              <Landmark className="h-4 w-4" />
               Conta Bancária (Opcional)
             </label>
             <select
               value={formData.account_id || ''}
               onChange={e => handleInputChange('account_id', e.target.value)}
-              className="w-full px-4 py-3 card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-xl text-theme-primary font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 cursor-pointer"
+              className="card-theme text-theme-primary w-full cursor-pointer rounded-xl border-2 border-light-border px-4 py-3 font-medium transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-dark-surface"
               disabled={!formData.unit_id || loading}
             >
               <option value="">Sem conta bancária</option>
@@ -475,8 +475,8 @@ export const EditarReceitaModal = ({
 
           {/* Observações */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-bold text-theme-secondary uppercase tracking-wider mb-2">
-              <FileText className="w-4 h-4" />
+            <label className="text-theme-secondary mb-2 flex items-center gap-2 text-sm font-bold uppercase tracking-wider">
+              <FileText className="h-4 w-4" />
               Observações (Opcional)
             </label>
             <textarea
@@ -484,34 +484,34 @@ export const EditarReceitaModal = ({
               onChange={e => handleInputChange('observacoes', e.target.value)}
               placeholder="Adicione observações sobre esta receita..."
               rows={3}
-              className="w-full px-4 py-3 card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-xl text-theme-primary font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none"
+              className="card-theme text-theme-primary w-full resize-none rounded-xl border-2 border-light-border px-4 py-3 font-medium transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-dark-surface"
               disabled={loading}
             />
           </div>
 
           {/* 🎯 Botões de Ação */}
-          <div className="flex gap-3 pt-4 border-t-2 border-light-border dark:border-dark-border">
+          <div className="flex gap-3 border-t-2 border-light-border pt-4 dark:border-dark-border">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 card-theme dark:bg-gray-700 text-theme-primary font-semibold rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200 border-2 border-transparent hover:border-light-border dark:border-dark-border dark:hover:border-gray-500 dark:border-gray-400"
+              className="card-theme text-theme-primary flex-1 rounded-xl border-2 border-transparent px-6 py-3 font-semibold transition-all duration-200 hover:border-light-border hover:bg-gray-200 dark:border-dark-border dark:border-gray-400 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
               disabled={loading}
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="flex-1 px-6 py-3 bg-gradient-to-r bg-gradient-success text-dark-text-primary font-semibold rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-dark-text-primary flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-success bg-gradient-to-r px-6 py-3 font-semibold shadow-lg transition-all duration-200 hover:from-green-700 hover:to-emerald-700 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50"
               disabled={loading}
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <Loader2 className="h-5 w-5 animate-spin" />
                   Salvando...
                 </>
               ) : (
                 <>
-                  <Save className="w-5 h-5" />
+                  <Save className="h-5 w-5" />
                   Salvar Alterações
                 </>
               )}

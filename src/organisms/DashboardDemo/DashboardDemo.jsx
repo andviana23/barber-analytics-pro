@@ -20,8 +20,8 @@ import { useTheme } from '../../context/ThemeContext';
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="card-theme border border-light-border dark:border-dark-border rounded-lg p-3 shadow-lg">
-        <p className="text-text-light-primary dark:text-text-dark-primary font-medium">{`${label}`}</p>
+      <div className="card-theme rounded-lg border border-light-border p-3 shadow-lg dark:border-dark-border">
+        <p className="font-medium text-text-light-primary dark:text-text-dark-primary">{`${label}`}</p>
         {payload.map((entry, index) => (
           <p
             key={index}
@@ -130,10 +130,10 @@ export function DashboardDemo() {
     grid: actualTheme === 'light' ? '#E2E8F0' : '#334155',
   };
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-6">
+    <div className="mx-auto max-w-7xl space-y-6 p-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-text-light-primary dark:text-text-dark-primary text-3xl font-bold mb-2">
+        <h1 className="mb-2 text-3xl font-bold text-text-light-primary dark:text-text-dark-primary">
           📊 Dashboard Analytics Demo
         </h1>
         <p className="text-text-light-secondary dark:text-text-dark-secondary">
@@ -145,14 +145,14 @@ export function DashboardDemo() {
       </div>
 
       {/* KPIs Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card variant="elevated" className="text-center">
           <CardContent className="p-6">
-            <div className="text-3xl font-bold text-primary mb-2">R$ 24.5K</div>
-            <div className="text-text-light-secondary dark:text-text-dark-secondary text-sm">
+            <div className="mb-2 text-3xl font-bold text-primary">R$ 24.5K</div>
+            <div className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
               Faturamento Mensal
             </div>
-            <div className="text-feedback-light-success dark:text-feedback-dark-success text-sm mt-1">
+            <div className="mt-1 text-sm text-feedback-light-success dark:text-feedback-dark-success">
               +12.5%
             </div>
           </CardContent>
@@ -160,11 +160,11 @@ export function DashboardDemo() {
 
         <Card variant="elevated" className="text-center">
           <CardContent className="p-6">
-            <div className="text-3xl font-bold text-primary mb-2">156</div>
-            <div className="text-text-light-secondary dark:text-text-dark-secondary text-sm">
+            <div className="mb-2 text-3xl font-bold text-primary">156</div>
+            <div className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
               Atendimentos
             </div>
-            <div className="text-feedback-light-success dark:text-feedback-dark-success text-sm mt-1">
+            <div className="mt-1 text-sm text-feedback-light-success dark:text-feedback-dark-success">
               +8.2%
             </div>
           </CardContent>
@@ -172,11 +172,11 @@ export function DashboardDemo() {
 
         <Card variant="elevated" className="text-center">
           <CardContent className="p-6">
-            <div className="text-3xl font-bold text-primary mb-2">R$ 157</div>
-            <div className="text-text-light-secondary dark:text-text-dark-secondary text-sm">
+            <div className="mb-2 text-3xl font-bold text-primary">R$ 157</div>
+            <div className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
               Ticket Médio
             </div>
-            <div className="text-feedback-light-error dark:text-feedback-dark-error text-sm mt-1">
+            <div className="mt-1 text-sm text-feedback-light-error dark:text-feedback-dark-error">
               -2.1%
             </div>
           </CardContent>
@@ -184,11 +184,11 @@ export function DashboardDemo() {
 
         <Card variant="elevated" className="text-center">
           <CardContent className="p-6">
-            <div className="text-3xl font-bold text-primary mb-2">73%</div>
-            <div className="text-text-light-secondary dark:text-text-dark-secondary text-sm">
+            <div className="mb-2 text-3xl font-bold text-primary">73%</div>
+            <div className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
               Margem de Lucro
             </div>
-            <div className="text-feedback-light-success dark:text-feedback-dark-success text-sm mt-1">
+            <div className="mt-1 text-sm text-feedback-light-success dark:text-feedback-dark-success">
               +5.3%
             </div>
           </CardContent>
@@ -196,7 +196,7 @@ export function DashboardDemo() {
       </div>
 
       {/* Gráficos */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Gráfico de Barras */}
         <Card variant="elevated">
           <CardHeader>
@@ -344,22 +344,22 @@ export function DashboardDemo() {
               ].map((profissional, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 bg-light-bg dark:bg-dark-bg rounded-lg"
+                  className="flex items-center justify-between rounded-lg bg-light-bg p-3 dark:bg-dark-bg"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-primary text-dark-text-primary rounded-full flex items-center justify-center text-sm font-bold">
+                    <div className="text-dark-text-primary flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-bold">
                       {index + 1}
                     </div>
                     <div>
-                      <div className="text-text-light-primary dark:text-text-dark-primary font-medium">
+                      <div className="font-medium text-text-light-primary dark:text-text-dark-primary">
                         {profissional.name}
                       </div>
-                      <div className="text-text-light-secondary dark:text-text-dark-secondary text-sm">
+                      <div className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
                         {profissional.atendimentos} atendimentos
                       </div>
                     </div>
                   </div>
-                  <div className="text-primary font-semibold">
+                  <div className="font-semibold text-primary">
                     {profissional.receita}
                   </div>
                 </div>
@@ -370,8 +370,8 @@ export function DashboardDemo() {
       </div>
 
       {/* Footer */}
-      <div className="mt-12 pt-8 border-t border-light-border dark:border-dark-border">
-        <p className="text-text-light-secondary dark:text-text-dark-secondary text-center text-sm">
+      <div className="mt-12 border-t border-light-border pt-8 dark:border-dark-border">
+        <p className="text-center text-sm text-text-light-secondary dark:text-text-dark-secondary">
           📊 Dashboard Demo - Barber Analytics Pro © 2025
           <br />
           Gráficos criados com Recharts e sistema de temas personalizado

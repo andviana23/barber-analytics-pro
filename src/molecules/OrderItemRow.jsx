@@ -38,12 +38,7 @@ const OrderItemRow = ({
   const commission = calculateCommission();
   return (
     <div
-      className={`
-        grid items-center gap-3 py-3 px-4 border-b border-light-border dark:border-dark-border
-        transition-colors hover:bg-light-surface/30 dark:hover:bg-dark-hover/30
-        ${compact ? 'text-sm' : ''}
-        ${className}
-      `}
+      className={`grid items-center gap-3 border-b border-light-border px-4 py-3 transition-colors hover:bg-light-surface/30 dark:border-dark-border dark:hover:bg-dark-hover/30 ${compact ? 'text-sm' : ''} ${className} `}
       style={{
         gridTemplateColumns: showCommission
           ? 'minmax(150px, 2fr) minmax(120px, 1.5fr) 80px 100px 100px 100px 40px'
@@ -51,10 +46,10 @@ const OrderItemRow = ({
       }}
     >
       {/* Serviço */}
-      <div className="flex items-center gap-2 min-w-0">
-        <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0">
+      <div className="flex min-w-0 items-center gap-2">
+        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md bg-primary/10">
           <svg
-            className="w-4 h-4 text-primary"
+            className="h-4 w-4 text-primary"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -69,13 +64,13 @@ const OrderItemRow = ({
         </div>
         <div className="min-w-0 flex-1">
           <p
-            className="font-medium text-theme-primary truncate"
+            className="text-theme-primary truncate font-medium"
             title={item.service_name}
           >
             {item.service_name}
           </p>
           {item.duration_minutes && (
-            <p className="text-xs text-theme-secondary">
+            <p className="text-theme-secondary text-xs">
               {item.duration_minutes >= 60
                 ? `${Math.floor(item.duration_minutes / 60)}h ${item.duration_minutes % 60}min`
                 : `${item.duration_minutes} min`}
@@ -85,9 +80,9 @@ const OrderItemRow = ({
       </div>
 
       {/* Profissional */}
-      <div className="flex items-center gap-2 min-w-0">
+      <div className="flex min-w-0 items-center gap-2">
         <svg
-          className="w-4 h-4 text-theme-secondary flex-shrink-0"
+          className="text-theme-secondary h-4 w-4 flex-shrink-0"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -109,20 +104,20 @@ const OrderItemRow = ({
 
       {/* Quantidade */}
       <div className="text-center">
-        <span className="inline-flex items-center justify-center w-10 h-10 rounded-md card-theme font-medium text-theme-primary">
+        <span className="card-theme text-theme-primary inline-flex h-10 w-10 items-center justify-center rounded-md font-medium">
           {item.quantity || 1}
         </span>
       </div>
 
       {/* Preço unitário */}
-      <div className="text-right font-medium text-theme-primary">
+      <div className="text-theme-primary text-right font-medium">
         {formatCurrency(item.price)}
       </div>
 
       {/* Comissão (opcional) */}
       {showCommission && (
         <div className="text-right">
-          <div className="text-xs text-theme-secondary mb-0.5">
+          <div className="text-theme-secondary mb-0.5 text-xs">
             {item.commission_percentage}%
           </div>
           <div className="font-medium text-green-600 dark:text-green-400">
@@ -132,7 +127,7 @@ const OrderItemRow = ({
       )}
 
       {/* Total */}
-      <div className="text-right font-semibold text-theme-primary">
+      <div className="text-theme-primary text-right font-semibold">
         {formatCurrency((item.price || 0) * (item.quantity || 1))}
       </div>
 
@@ -141,12 +136,12 @@ const OrderItemRow = ({
         {editable && onRemove ? (
           <button
             onClick={handleRemove}
-            className="w-8 h-8 rounded-md text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-center"
+            className="flex h-8 w-8 items-center justify-center rounded-md text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
             aria-label="Remover item"
             title="Remover item"
           >
             <svg
-              className="w-4 h-4"
+              className="h-4 w-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

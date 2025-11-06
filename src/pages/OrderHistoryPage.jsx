@@ -240,11 +240,11 @@ const OrderHistoryPage = () => {
     currentPage * itemsPerPage
   );
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6 p-6">
       {/* Cabeçalho */}
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-theme-primary">
+          <h1 className="text-theme-primary text-2xl font-bold">
             Histórico de Comandas
           </h1>
           <p className="text-theme-secondary">
@@ -258,7 +258,7 @@ const OrderHistoryPage = () => {
           onClick={exportToCSV}
           loading={exporting}
           disabled={filteredOrders.length === 0}
-          icon={<Download className="w-4 h-4" />}
+          icon={<Download className="h-4 w-4" />}
         >
           Exportar CSV
         </Button>
@@ -266,22 +266,22 @@ const OrderHistoryPage = () => {
 
       {/* Filtros */}
       <Card className="p-4">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-medium text-theme-primary flex items-center gap-2">
-            <Filter className="w-4 h-4" />
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-theme-primary flex items-center gap-2 font-medium">
+            <Filter className="h-4 w-4" />
             Filtros Avançados
           </h3>
           <Button
             variant="secondary"
             size="sm"
             onClick={clearFilters}
-            icon={<X className="w-4 h-4" />}
+            icon={<X className="h-4 w-4" />}
           >
             Limpar Filtros
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {/* Data Inicial */}
           <Input
             label="Data Inicial"
@@ -324,7 +324,7 @@ const OrderHistoryPage = () => {
 
           {/* Profissional */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
               Profissional
             </label>
             <select
@@ -335,7 +335,7 @@ const OrderHistoryPage = () => {
                   professionalId: e.target.value,
                 })
               }
-              className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full rounded-lg border border-light-border px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-dark-border"
             >
               <option value="">Todos</option>
               {professionals.map(prof => (
@@ -348,7 +348,7 @@ const OrderHistoryPage = () => {
 
           {/* Status */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
               Status
             </label>
             <select
@@ -359,7 +359,7 @@ const OrderHistoryPage = () => {
                   status: e.target.value,
                 })
               }
-              className="w-full px-3 py-2 border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full rounded-lg border border-light-border px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-dark-border"
             >
               <option value="">Todos</option>
               {Object.entries(ORDER_STATUS_LABELS).map(([key, label]) => (
@@ -406,9 +406,9 @@ const OrderHistoryPage = () => {
 
       {/* Lista de Comandas */}
       {loading ? (
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <p className="mt-2 text-theme-secondary">Carregando histórico...</p>
+        <div className="py-12 text-center">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
+          <p className="text-theme-secondary mt-2">Carregando histórico...</p>
         </div>
       ) : filteredOrders.length === 0 ? (
         <Card className="p-12 text-center">
@@ -422,28 +422,28 @@ const OrderHistoryPage = () => {
             {paginatedOrders.map(order => (
               <Card
                 key={order.id}
-                className="p-4 hover:shadow-md transition-shadow"
+                className="p-4 transition-shadow hover:shadow-md"
               >
-                <div className="flex justify-between items-start">
+                <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="font-mono text-sm text-theme-secondary">
+                    <div className="mb-2 flex items-center gap-3">
+                      <span className="text-theme-secondary font-mono text-sm">
                         #{order.id.slice(0, 8)}
                       </span>
                       <OrderStatusBadge status={order.status} />
                       {order.discount_value > 0 && (
-                        <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">
+                        <span className="rounded bg-green-100 px-2 py-1 text-xs text-green-700">
                           Desconto
                         </span>
                       )}
                       {order.fee_value > 0 && (
-                        <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded">
+                        <span className="rounded bg-orange-100 px-2 py-1 text-xs text-orange-700">
                           Taxa
                         </span>
                       )}
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div className="grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
                       <div>
                         <span className="text-theme-secondary">Cliente:</span>
                         <p className="font-medium">
@@ -471,15 +471,15 @@ const OrderHistoryPage = () => {
                     </div>
 
                     {order.items && order.items.length > 0 && (
-                      <div className="mt-3 pt-3 border-t border-light-border dark:border-dark-border">
-                        <p className="text-xs text-theme-secondary mb-2">
+                      <div className="mt-3 border-t border-light-border pt-3 dark:border-dark-border">
+                        <p className="text-theme-secondary mb-2 text-xs">
                           Itens:
                         </p>
                         <div className="flex flex-wrap gap-2">
                           {order.items.map(item => (
                             <span
                               key={item.id}
-                              className="text-xs card-theme px-2 py-1 rounded"
+                              className="card-theme rounded px-2 py-1 text-xs"
                             >
                               {item.service?.name || item.product?.name}
                               {item.quantity > 1 && ` (${item.quantity}x)`}
@@ -496,7 +496,7 @@ const OrderHistoryPage = () => {
 
           {/* Paginação */}
           {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 mt-6">
+            <div className="mt-6 flex items-center justify-center gap-2">
               <Button
                 variant="secondary"
                 size="sm"
@@ -505,7 +505,7 @@ const OrderHistoryPage = () => {
               >
                 Anterior
               </Button>
-              <span className="text-sm text-theme-secondary">
+              <span className="text-theme-secondary text-sm">
                 Página {currentPage} de {totalPages}
               </span>
               <Button

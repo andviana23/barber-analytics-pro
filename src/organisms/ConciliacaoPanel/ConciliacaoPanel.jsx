@@ -328,13 +328,13 @@ const ConciliacaoPanel = ({
 
   // Renderizar cabeçalho do painel
   const renderPanelHeader = () => (
-    <div className="card-theme border-b border-light-border dark:border-dark-border p-6">
-      <div className="flex items-center justify-between mb-4">
+    <div className="card-theme border-b border-light-border p-6 dark:border-dark-border">
+      <div className="mb-4 flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-theme-primary">
+          <h2 className="text-theme-primary text-xl font-semibold">
             Reconciliação Bancária
           </h2>
-          <p className="text-sm text-theme-secondary mt-1">
+          <p className="text-theme-secondary mt-1 text-sm">
             {selectedAccount
               ? `Conta: ${selectedAccount.nome}`
               : 'Selecione uma conta bancária'}
@@ -346,18 +346,18 @@ const ConciliacaoPanel = ({
             type="button"
             onClick={() => onRefreshData && onRefreshData()}
             disabled={loading}
-            className="p-2 text-theme-secondary hover:text-theme-primary hover:card-theme rounded-md transition-colors disabled:opacity-50"
+            className="text-theme-secondary hover:text-theme-primary hover:card-theme rounded-md p-2 transition-colors disabled:opacity-50"
             title="Atualizar dados"
           >
-            <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-5 w-5 ${loading ? 'animate-spin' : ''}`} />
           </button>
 
           <button
             type="button"
             onClick={() => onImportStatement && onImportStatement()}
-            className="flex items-center px-4 py-2 bg-blue-600 text-dark-text-primary rounded-md hover:bg-blue-700 transition-colors"
+            className="text-dark-text-primary flex items-center rounded-md bg-blue-600 px-4 py-2 transition-colors hover:bg-blue-700"
           >
-            <Upload className="w-4 h-4 mr-2" />
+            <Upload className="mr-2 h-4 w-4" />
             Importar Extrato
           </button>
 
@@ -365,10 +365,10 @@ const ConciliacaoPanel = ({
             type="button"
             onClick={() => onRunAutoMatch && onRunAutoMatch()}
             disabled={autoMatchRunning}
-            className="flex items-center px-4 py-2 bg-green-600 text-dark-text-primary rounded-md hover:bg-green-700 transition-colors disabled:opacity-50"
+            className="text-dark-text-primary flex items-center rounded-md bg-green-600 px-4 py-2 transition-colors hover:bg-green-700 disabled:opacity-50"
           >
             <Zap
-              className={`w-4 h-4 mr-2 ${autoMatchRunning ? 'animate-pulse' : ''}`}
+              className={`mr-2 h-4 w-4 ${autoMatchRunning ? 'animate-pulse' : ''}`}
             />
             {autoMatchRunning ? 'Processando...' : 'Auto Match'}
           </button>
@@ -376,40 +376,40 @@ const ConciliacaoPanel = ({
       </div>
 
       {/* Estatísticas resumidas */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        <div className="bg-light-bg dark:bg-dark-bg p-3 rounded-lg">
-          <div className="text-xs text-theme-secondary mb-1">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
+        <div className="rounded-lg bg-light-bg p-3 dark:bg-dark-bg">
+          <div className="text-theme-secondary mb-1 text-xs">
             Transações Bancárias
           </div>
-          <div className="text-lg font-semibold text-theme-primary">
+          <div className="text-theme-primary text-lg font-semibold">
             {reconciliationStats.totalBankTransactions}
           </div>
         </div>
 
-        <div className="bg-green-50 p-3 rounded-lg">
-          <div className="text-xs text-green-600 mb-1">Reconciliadas</div>
+        <div className="rounded-lg bg-green-50 p-3">
+          <div className="mb-1 text-xs text-green-600">Reconciliadas</div>
           <div className="text-lg font-semibold text-green-700">
             {reconciliationStats.approvedMatches}
           </div>
         </div>
 
-        <div className="bg-yellow-50 p-3 rounded-lg">
-          <div className="text-xs text-yellow-600 mb-1">Pendentes</div>
+        <div className="rounded-lg bg-yellow-50 p-3">
+          <div className="mb-1 text-xs text-yellow-600">Pendentes</div>
           <div className="text-lg font-semibold text-yellow-700">
             {reconciliationStats.pendingMatches}
           </div>
         </div>
 
-        <div className="bg-red-50 p-3 rounded-lg">
-          <div className="text-xs text-red-600 mb-1">Não Reconciliadas</div>
+        <div className="rounded-lg bg-red-50 p-3">
+          <div className="mb-1 text-xs text-red-600">Não Reconciliadas</div>
           <div className="text-lg font-semibold text-red-700">
             {reconciliationStats.totalBankTransactions -
               reconciliationStats.approvedMatches}
           </div>
         </div>
 
-        <div className="bg-blue-50 p-3 rounded-lg">
-          <div className="text-xs text-blue-600 mb-1">
+        <div className="rounded-lg bg-blue-50 p-3">
+          <div className="mb-1 text-xs text-blue-600">
             Taxa de Reconciliação
           </div>
           <div className="text-lg font-semibold text-blue-700">
@@ -417,8 +417,8 @@ const ConciliacaoPanel = ({
           </div>
         </div>
 
-        <div className="bg-purple-50 p-3 rounded-lg">
-          <div className="text-xs text-purple-600 mb-1">Valor Reconciliado</div>
+        <div className="rounded-lg bg-purple-50 p-3">
+          <div className="mb-1 text-xs text-purple-600">Valor Reconciliado</div>
           <div className="text-sm font-semibold text-purple-700">
             {formatCurrency(reconciliationStats.matchedBankAmount)}
           </div>
@@ -431,8 +431,8 @@ const ConciliacaoPanel = ({
   const renderFiltersBar = () => {
     if (!showFilters) return null;
     return (
-      <div className="bg-light-bg dark:bg-dark-bg border-b border-light-border dark:border-dark-border p-4">
-        <div className="flex items-center justify-between mb-4">
+      <div className="border-b border-light-border bg-light-bg p-4 dark:border-dark-border dark:bg-dark-bg">
+        <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             {/* Filtro de período */}
             <DateRangePicker
@@ -443,13 +443,13 @@ const ConciliacaoPanel = ({
 
             {/* Busca */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-text-muted dark:text-dark-text-muted w-4 h-4" />
+              <Search className="text-light-text-muted dark:text-dark-text-muted absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform" />
               <input
                 type="text"
                 placeholder="Buscar por descrição, referência..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-light-border dark:border-dark-border rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-64"
+                className="w-64 rounded-md border border-light-border py-2 pl-10 pr-4 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border"
               />
             </div>
 
@@ -460,7 +460,7 @@ const ConciliacaoPanel = ({
                 onMatchStatusFilterChange &&
                 onMatchStatusFilterChange(e.target.value)
               }
-              className="px-3 py-2 border border-light-border dark:border-dark-border rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="rounded-md border border-light-border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border"
             >
               <option value="all">Todos os Status</option>
               <option value="approved">Aprovados</option>
@@ -474,7 +474,7 @@ const ConciliacaoPanel = ({
           <div className="flex items-center space-x-4">
             {/* Filtro de confiança */}
             <div className="flex items-center space-x-2">
-              <label className="text-sm text-theme-secondary">
+              <label className="text-theme-secondary text-sm">
                 Confiança min:
               </label>
               <input
@@ -488,7 +488,7 @@ const ConciliacaoPanel = ({
                 }
                 className="w-24"
               />
-              <span className="text-sm text-theme-secondary w-10">
+              <span className="text-theme-secondary w-10 text-sm">
                 {confidenceFilter}%
               </span>
             </div>
@@ -501,7 +501,7 @@ const ConciliacaoPanel = ({
                 setSortBy(field);
                 setSortOrder(order);
               }}
-              className="px-3 py-2 border border-light-border dark:border-dark-border rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="rounded-md border border-light-border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border"
             >
               <option value="confidence_desc">Maior Confiança</option>
               <option value="confidence_asc">Menor Confiança</option>
@@ -515,7 +515,7 @@ const ConciliacaoPanel = ({
 
         {/* Ações em lote */}
         {selectedMatches.length > 0 && (
-          <div className="flex items-center justify-between bg-blue-50 p-3 rounded-md">
+          <div className="flex items-center justify-between rounded-md bg-blue-50 p-3">
             <span className="text-sm text-blue-700">
               {selectedMatches.length} match
               {selectedMatches.length !== 1 ? 'es' : ''} selecionado
@@ -526,25 +526,25 @@ const ConciliacaoPanel = ({
               <button
                 type="button"
                 onClick={() => handleBulkAction('approve')}
-                className="px-3 py-1 bg-green-600 text-dark-text-primary rounded text-sm hover:bg-green-700"
+                className="text-dark-text-primary rounded bg-green-600 px-3 py-1 text-sm hover:bg-green-700"
               >
-                <Check className="w-4 h-4 mr-1 inline" />
+                <Check className="mr-1 inline h-4 w-4" />
                 Aprovar
               </button>
 
               <button
                 type="button"
                 onClick={() => handleBulkAction('reject')}
-                className="px-3 py-1 bg-red-600 text-dark-text-primary rounded text-sm hover:bg-red-700"
+                className="text-dark-text-primary rounded bg-red-600 px-3 py-1 text-sm hover:bg-red-700"
               >
-                <X className="w-4 h-4 mr-1 inline" />
+                <X className="mr-1 inline h-4 w-4" />
                 Rejeitar
               </button>
 
               <button
                 type="button"
                 onClick={() => setSelectedMatches([])}
-                className="px-3 py-1 bg-gray-600 text-dark-text-primary rounded text-sm hover:bg-gray-700"
+                className="text-dark-text-primary rounded bg-gray-600 px-3 py-1 text-sm hover:bg-gray-700"
               >
                 Limpar
               </button>
@@ -559,17 +559,17 @@ const ConciliacaoPanel = ({
   const renderMatchesList = () => (
     <div className="flex-1 overflow-auto">
       {filteredMatches.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-64 text-theme-secondary">
-          <Target className="w-12 h-12 mb-4" />
-          <h3 className="text-lg font-medium mb-2">Nenhum match encontrado</h3>
-          <p className="text-sm text-center">
+        <div className="text-theme-secondary flex h-64 flex-col items-center justify-center">
+          <Target className="mb-4 h-12 w-12" />
+          <h3 className="mb-2 text-lg font-medium">Nenhum match encontrado</h3>
+          <p className="text-center text-sm">
             {reconciliationMatches.length === 0
               ? 'Execute o auto-match ou importe um extrato para começar'
               : 'Ajuste os filtros para ver outros matches'}
           </p>
         </div>
       ) : (
-        <div className="p-4 space-y-3">
+        <div className="space-y-3 p-4">
           {filteredMatches.map(match => (
             <div key={match.id} className="relative">
               <ReconciliationMatchCard
@@ -593,12 +593,12 @@ const ConciliacaoPanel = ({
 
   // Renderizar tabs de visualização
   const renderViewTabs = () => (
-    <div className="border-b border-light-border dark:border-dark-border card-theme">
+    <div className="card-theme border-b border-light-border dark:border-dark-border">
       <div className="flex px-6">
         <button
           type="button"
           onClick={() => onViewModeChange && onViewModeChange('matches')}
-          className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${viewMode === 'matches' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+          className={`border-b-2 px-4 py-3 text-sm font-medium transition-colors ${viewMode === 'matches' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}`}
         >
           Matches ({filteredMatches.length})
         </button>
@@ -606,7 +606,7 @@ const ConciliacaoPanel = ({
         <button
           type="button"
           onClick={() => onViewModeChange && onViewModeChange('bank')}
-          className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${viewMode === 'bank' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+          className={`border-b-2 px-4 py-3 text-sm font-medium transition-colors ${viewMode === 'bank' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}`}
         >
           Extrato Bancário ({bankTransactions.length})
         </button>
@@ -614,7 +614,7 @@ const ConciliacaoPanel = ({
         <button
           type="button"
           onClick={() => onViewModeChange && onViewModeChange('internal')}
-          className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${viewMode === 'internal' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+          className={`border-b-2 px-4 py-3 text-sm font-medium transition-colors ${viewMode === 'internal' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}`}
         >
           Transações Internas ({internalTransactions.length})
         </button>
@@ -625,9 +625,9 @@ const ConciliacaoPanel = ({
   if (loading && reconciliationMatches.length === 0) {
     return (
       <div className={containerClasses}>
-        <div className="flex items-center justify-center h-96">
+        <div className="flex h-96 items-center justify-center">
           <div className="text-center">
-            <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-500" />
+            <RefreshCw className="mx-auto mb-4 h-8 w-8 animate-spin text-blue-500" />
             <p className="text-theme-secondary">
               Carregando dados de reconciliação...
             </p>
@@ -653,7 +653,7 @@ const ConciliacaoPanel = ({
 
         {viewMode === 'bank' && (
           <div className="p-4">
-            <h3 className="text-lg font-medium mb-4">Transações Bancárias</h3>
+            <h3 className="mb-4 text-lg font-medium">Transações Bancárias</h3>
             {/* Lista de transações bancárias seria implementada aqui */}
             <div className="text-theme-secondary">
               Lista de transações bancárias em desenvolvimento...
@@ -663,7 +663,7 @@ const ConciliacaoPanel = ({
 
         {viewMode === 'internal' && (
           <div className="p-4">
-            <h3 className="text-lg font-medium mb-4">Transações Internas</h3>
+            <h3 className="mb-4 text-lg font-medium">Transações Internas</h3>
             {/* Lista de transações internas seria implementada aqui */}
             <div className="text-theme-secondary">
               Lista de transações internas em desenvolvimento...
@@ -907,7 +907,7 @@ export const ConciliacaoPanelPreview = () => {
     console.log(`Ação: ${action}`, data);
   };
   return (
-    <div className="space-y-6 p-4 max-w-7xl">
+    <div className="max-w-7xl space-y-6 p-4">
       <h3 className="text-lg font-semibold">ConciliacaoPanel Preview</h3>
 
       {/* Painel completo */}
@@ -940,7 +940,7 @@ export const ConciliacaoPanelPreview = () => {
 
       {/* Versão em loading */}
       <div className="h-64">
-        <h4 className="text-md font-medium mb-2">Estado de carregamento</h4>
+        <h4 className="text-md mb-2 font-medium">Estado de carregamento</h4>
         <ConciliacaoPanel loading={true} selectedAccount={mockAccount} />
       </div>
     </div>

@@ -159,19 +159,19 @@ const CategoriesPage = () => {
       <div key={category.id}>
         {/* Categoria Principal/Subcategoria */}
         <div
-          className={`flex items-center justify-between px-4 py-3 hover:bg-light-hover dark:hover:bg-dark-hover transition-colors border-b border-light-border dark:border-dark-border ${isSubcategory ? 'pl-12 bg-light-bg dark:bg-dark-bg' : ''}`}
+          className={`flex items-center justify-between border-b border-light-border px-4 py-3 transition-colors hover:bg-light-hover dark:border-dark-border dark:hover:bg-dark-hover ${isSubcategory ? 'bg-light-bg pl-12 dark:bg-dark-bg' : ''}`}
         >
-          <div className="flex items-center gap-3 flex-1">
+          <div className="flex flex-1 items-center gap-3">
             {/* Botão de expandir (apenas para categorias com filhas) */}
             {!isSubcategory && hasSubcategories ? (
               <button
                 onClick={() => toggleExpanded(category.id)}
-                className="p-1 hover:bg-light-hover dark:hover:bg-dark-hover rounded transition-colors"
+                className="rounded p-1 transition-colors hover:bg-light-hover dark:hover:bg-dark-hover"
               >
                 {isExpanded ? (
-                  <ChevronDown className="w-4 h-4 text-text-light-secondary dark:text-text-dark-secondary" />
+                  <ChevronDown className="h-4 w-4 text-text-light-secondary dark:text-text-dark-secondary" />
                 ) : (
-                  <ChevronRight className="w-4 h-4 text-text-light-secondary dark:text-text-dark-secondary" />
+                  <ChevronRight className="h-4 w-4 text-text-light-secondary dark:text-text-dark-secondary" />
                 )}
               </button>
             ) : (
@@ -184,7 +184,7 @@ const CategoriesPage = () => {
                 {category.name}
               </div>
               {category.description && (
-                <div className="text-sm text-text-light-secondary dark:text-text-dark-secondary mt-0.5">
+                <div className="mt-0.5 text-sm text-text-light-secondary dark:text-text-dark-secondary">
                   {category.description}
                 </div>
               )}
@@ -196,23 +196,23 @@ const CategoriesPage = () => {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => handleEditCategory(category)}
-                className="p-2 text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-lg transition-colors"
+                className="rounded-lg p-2 text-primary transition-colors hover:bg-primary/10 dark:hover:bg-primary/20"
                 title="Editar"
                 disabled={isDeleting}
               >
-                <Edit2 className="w-4 h-4" />
+                <Edit2 className="h-4 w-4" />
               </button>
 
               <button
                 onClick={() => handleDeleteCategory(category)}
-                className="p-2 text-danger hover:bg-danger/10 dark:hover:bg-danger/20 rounded-lg transition-colors"
+                className="text-danger hover:bg-danger/10 dark:hover:bg-danger/20 rounded-lg p-2 transition-colors"
                 title="Excluir"
                 disabled={isDeleting}
               >
                 {isDeleting ? (
-                  <Loader className="w-4 h-4 animate-spin" />
+                  <Loader className="h-4 w-4 animate-spin" />
                 ) : (
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="h-4 w-4" />
                 )}
               </button>
             </div>
@@ -232,18 +232,18 @@ const CategoriesPage = () => {
   // Renderizar seção de categorias
   const renderSection = (title, hierarchy, loading, type) => {
     return (
-      <div className="card-theme rounded-lg border border-light-border dark:border-dark-border overflow-hidden">
+      <div className="card-theme overflow-hidden rounded-lg border border-light-border dark:border-dark-border">
         {/* Header da seção */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-light-border dark:border-dark-border bg-light-hover dark:bg-dark-hover">
+        <div className="flex items-center justify-between border-b border-light-border bg-light-hover px-6 py-4 dark:border-dark-border dark:bg-dark-hover">
           <h2 className="text-lg font-semibold text-text-light-primary dark:text-text-dark-primary">
             {title}
           </h2>
           {canManage && (
             <button
               onClick={() => handleCreateCategory(type)}
-              className="flex items-center gap-2 px-4 py-2 bg-success hover:bg-success/90 text-dark-text-primary rounded-lg transition-colors text-sm font-medium"
+              className="bg-success hover:bg-success/90 text-dark-text-primary flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="h-4 w-4" />
               Nova categoria de {type === 'Revenue' ? 'receita' : 'despesa'}
             </button>
           )}
@@ -253,15 +253,15 @@ const CategoriesPage = () => {
         <div>
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader className="w-8 h-8 text-primary animate-spin" />
+              <Loader className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : hierarchy.length === 0 ? (
-            <div className="text-center py-12 text-text-light-secondary dark:text-text-dark-secondary">
+            <div className="py-12 text-center text-text-light-secondary dark:text-text-dark-secondary">
               <p>Nenhuma categoria cadastrada</p>
               {canManage && (
                 <button
                   onClick={() => handleCreateCategory(type)}
-                  className="mt-4 text-primary hover:text-primary-600 dark:text-primary-400 font-medium"
+                  className="hover:text-primary-600 dark:text-primary-400 mt-4 font-medium text-primary"
                 >
                   Criar primeira categoria
                 </button>
@@ -282,7 +282,7 @@ const CategoriesPage = () => {
           <h1 className="text-2xl font-bold text-text-light-primary dark:text-text-dark-primary">
             Categorias Financeiras
           </h1>
-          <p className="text-text-light-secondary dark:text-text-dark-secondary mt-1">
+          <p className="mt-1 text-text-light-secondary dark:text-text-dark-secondary">
             Gerencie as categorias de receitas e despesas da sua unidade
           </p>
         </div>

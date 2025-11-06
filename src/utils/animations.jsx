@@ -261,7 +261,7 @@ export function AnimatedModal({ children, isOpen, onClose, className = '' }) {
       initial="hidden"
       animate="visible"
       exit="exit"
-      className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
       onClick={onClose}
     >
       <motion.div

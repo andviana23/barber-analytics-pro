@@ -50,12 +50,7 @@ const CommissionBadge = ({
   const tooltipText = `Comissão: ${percentage}% de ${formatCurrency(baseValue || 0)} = ${formatCurrency(calculatedValue)}`;
   const BadgeContent = () => (
     <div
-      className={`
-        inline-flex items-center gap-1.5 rounded-md border font-medium
-        ${sizeClasses[size]}
-        ${variantClasses[variant]}
-        ${className}
-      `}
+      className={`inline-flex items-center gap-1.5 rounded-md border font-medium ${sizeClasses[size]} ${variantClasses[variant]} ${className} `}
       title={showTooltip ? tooltipText : undefined}
       aria-label={tooltipText}
     >
@@ -100,13 +95,13 @@ const CommissionBadge = ({
   );
   if (showTooltip) {
     return (
-      <div className="relative group inline-block">
+      <div className="group relative inline-block">
         <BadgeContent />
         {/* Tooltip */}
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-dark-surface dark:bg-gray-700 text-dark-text-primary text-xs rounded-lg whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10 pointer-events-none">
+        <div className="text-dark-text-primary pointer-events-none invisible absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-dark-surface px-3 py-2 text-xs opacity-0 transition-all group-hover:visible group-hover:opacity-100 dark:bg-gray-700">
           {tooltipText}
           {/* Arrow */}
-          <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px">
+          <div className="absolute left-1/2 top-full -mt-px -translate-x-1/2">
             <div className="border-4 border-transparent border-t-gray-900 dark:border-t-gray-700" />
           </div>
         </div>
