@@ -32,7 +32,6 @@ import { DashboardPage } from './pages/DashboardPage/DashboardPage';
 import { DebugAuthPage } from './pages/DebugAuthPage'; // 🐛 Debug Auth page
 import { DREPage } from './pages/DREPage';
 import FinanceiroAdvancedPage from './pages/FinanceiroAdvancedPage/FinanceiroAdvancedPage';
-import FluxoCaixaPage from './pages/FluxoCaixaPage'; // ✨ NOVA PÁGINA REFATORADA
 import GoalsPage from './pages/GoalsPage';
 import { ListaDaVezPage } from './pages/ListaDaVezPage';
 import PaymentMethodsPage from './pages/PaymentMethodsPage/PaymentMethodsPage';
@@ -144,21 +143,9 @@ function App() {
                     }
                   />
 
-                  {/* Rotas futuras - já preparadas */}
+                  {/* 💰 Módulo Financeiro Avançado (Receitas, Despesas, Fluxo, Contas) */}
                   <Route
                     path="/financial"
-                    element={
-                      <ReceptionistRoute>
-                        <ProtectedRoute roles={['admin', 'gerente']}>
-                          <FluxoCaixaPage />
-                        </ProtectedRoute>
-                      </ReceptionistRoute>
-                    }
-                  />
-
-                  {/* 🔧 ROTA ANTIGA (temporária - manter para testes) */}
-                  <Route
-                    path="/financial-old"
                     element={
                       <ReceptionistRoute>
                         <ProtectedRoute roles={['admin', 'gerente']}>
@@ -168,7 +155,7 @@ function App() {
                     }
                   />
 
-                  {/* Alias para compatibilidade com testes E2E */}
+                  {/* Alias /financeiro → redireciona para /financial */}
                   <Route
                     path="/financeiro"
                     element={<Navigate to="/financial" replace />}
