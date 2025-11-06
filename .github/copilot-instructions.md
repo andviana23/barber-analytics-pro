@@ -290,7 +290,29 @@ Ao criar uma nova feature, siga SEMPRE esta ordem:
 
 ### ✅ Quando gerar SQL:
 
-1. **Seguir snake_case**
+**🚨 REGRA CRÍTICA: MIGRAÇÕES EXCLUSIVAMENTE VIA @pgsql**
+
+**SEMPRE use as ferramentas `@pgsql` para:**
+
+- Criar/alterar tabelas, índices, constraints
+- Executar migrações e scripts DDL/DML
+- Funções, triggers, policies RLS
+- Qualquer modificação no banco de dados
+
+**❌ NUNCA MAIS use:**
+
+- `run_in_terminal` com psql, createdb, dropdb
+- Scripts SQL manuais via terminal
+- Conexões diretas ao banco fora do @pgsql
+
+**✅ Fluxo padrão:**
+
+1. Conectar: `@pgsql_connect`
+2. Executar: `@pgsql_modify` ou `@pgsql_query`
+3. Verificar: `@pgsql_db_context`
+4. Desconectar: `@pgsql_disconnect`
+
+5. **Seguir snake_case**
 
    ```sql
    CREATE TABLE barbers_turn_list (
@@ -303,25 +325,25 @@ Ao criar uma nova feature, siga SEMPRE esta ordem:
    );
    ```
 
-2. **Incluir constraints:**
+6. **Incluir constraints:**
    - `CHECK` para validações
    - `DEFAULT` para valores padrão
    - `REFERENCES` para foreign keys
 
-3. **Sempre adicionar timestamps:**
+7. **Sempre adicionar timestamps:**
 
    ```sql
    created_at timestamptz DEFAULT now(),
    updated_at timestamptz DEFAULT now()
    ```
 
-4. **Usar `is_active` para soft delete:**
+8. **Usar `is_active` para soft delete:**
 
    ```sql
    is_active boolean DEFAULT true
    ```
 
-5. **Criar RLS policies:**
+9. **Criar RLS policies:**
 
    ```sql
    ALTER TABLE table_name ENABLE ROW LEVEL SECURITY;
@@ -643,6 +665,8 @@ O Copilot deve:
 ✅ **SEMPRE usar classes utilitárias do Design System**
 ✅ **NUNCA usar classes CSS hardcoded**
 ✅ **SEMPRE usar pnpm em vez de npm**
+✅ **SEMPRE usar @pgsql para migrações e mudanças no banco**
+✅ **NUNCA usar terminal direto para comandos SQL**
 ✅ Respeitar as RLS policies e permissões
 ✅ Validar dados com DTOs
 ✅ Retornar `{ data, error }`
@@ -657,4 +681,4 @@ O Copilot deve:
 **Estilo:** Enterprise, Clean Code, Atomic, Multi-tenant, Supabase-first
 **Meta:** Sistema de gestão de barbearia completo, modular e escalável.
 
-**Última atualização:** 4 de novembro de 2025
+**Última atualização:** 5 de novembro de 2025

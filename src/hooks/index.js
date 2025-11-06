@@ -11,24 +11,29 @@ export { default as useProfissionais } from './useProfissionais';
 export { useUnits } from './useUnits';
 
 // FASE 4 - Custom Hooks para Módulo Financeiro Avançado
+export { useBankStatements } from './useBankStatements';
 export { useCashflowData } from './useCashflowData';
 export { default as useCashflowTimeline } from './useCashflowTimeline';
-export { useReconciliationMatches } from './useReconciliationMatches';
-export { useParties } from './useParties';
-export { useBankStatements } from './useBankStatements';
+export { useDRE } from './useDRE';
 export { useGoals } from './useGoals';
 export { useGoalsSummary } from './useGoalsSummary';
-export { useDRE } from './useDRE';
 export { useListaDaVez } from './useListaDaVez';
+export { useParties } from './useParties';
+export { useReconciliationMatches } from './useReconciliationMatches';
+
+// ✨ REFATORAÇÃO COMPLETA - Hooks de Fluxo de Caixa (Clean Architecture)
+export { useCashflowTable } from './useCashflowTable';
+export { useFluxoCaixa, useFluxoCaixaSimple } from './useFluxoCaixa';
+export { useInvalidateFluxoCaixa } from './useInvalidateFluxoCaixa';
 
 // Hooks para Relatórios com SQL Views
-export {
-  useRelatoriosKPIs,
-  useCurrentPeriodSummary,
-  useRevenueTrend,
-} from './useRelatoriosKPIs';
 export { useComparativos } from './useComparativos';
 export {
   useRankingProfissionais,
   useTopPerformers,
 } from './useRankingProfissionais';
+export {
+  useCurrentPeriodSummary,
+  useRelatoriosKPIs,
+  useRevenueTrend,
+} from './useRelatoriosKPIs';

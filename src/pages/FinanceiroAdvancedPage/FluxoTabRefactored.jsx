@@ -1,48 +1,50 @@
-import React, { useState, useEffect, useMemo } from 'react';
 import {
-  format,
-  subMonths,
-  addMonths,
-  startOfMonth,
-  endOfMonth,
-  subDays,
-  startOfDay,
-  parseISO,
+  addDays,
   differenceInDays,
+  endOfMonth,
+  format,
+  parseISO,
+  startOfDay,
+  startOfMonth,
+  subMonths,
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import {
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  Calendar,
   BarChart3,
-  PieChart,
-  RefreshCw,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
   Download,
-  Filter,
   FileSpreadsheet,
   FileText,
   Loader2,
-  ChevronLeft,
-  ChevronRight,
+  RefreshCw,
+  TrendingDown,
+  TrendingUp,
 } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 
 // Services
+import { balanceAdjustmentService } from '../../services';
 import fluxoExportService from '../../services/fluxoExportService';
 
 // Custom Hooks
+import { useToast } from '../../context/ToastContext';
 import { useCashflowData } from '../../hooks/useCashflowData';
+import { useCashflowTable } from '../../hooks/useCashflowTable';
 import useCashflowTimeline from '../../hooks/useCashflowTimeline';
 import usePeriodFilter from '../../hooks/usePeriodFilter';
-import { useToast } from '../../context/ToastContext';
 import { supabase } from '../../services/supabase';
 
 // Components
-import DateRangePicker from '../../atoms/DateRangePicker/DateRangePicker';
 import PeriodFilter from '../../atoms/PeriodFilter/PeriodFilter';
+import {
+  CashflowTable,
+  createCashflowColumns,
+} from '../../molecules/CashflowTable';
 import { CashflowTimelineChart } from '../../molecules/CashflowTimelineChart';
 import { PieChartCard } from '../../molecules/PieChartCard';
+import EditInitialBalanceModal from '../../organisms/EditInitialBalanceModal/EditInitialBalanceModal';
 
 /**
  * 📊 Tab do Fluxo de Caixa - 100% REFATORADO COM DESIGN SYSTEM
@@ -62,6 +64,10 @@ import { PieChartCard } from '../../molecules/PieChartCard';
 const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
   const { showToast } = useToast();
   const [exporting, setExporting] = useState(false);
+
+  // 💰 Estados do Modal de Saldo Inicial
+  const [isEditBalanceModalOpen, setIsEditBalanceModalOpen] = useState(false);
+  const [currentPeriod, setCurrentPeriod] = useState('');
 
   // �️ Hook para gerenciar filtros de período (Dia/Semana/Mês)
   // ✅ PADRÃO: Semana vigente
@@ -131,10 +137,37 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
       // ✅ CORRIGIDO: Usar selectedDate do filtro ao invés de new Date()
       const referenceDate =
         selectedDate instanceof Date ? selectedDate : new Date(selectedDate);
+      const currentPeriod = format(referenceDate, 'yyyy-MM');
+
+      console.log(
+        '💰 Buscando saldo inicial ajustado para período:',
+        currentPeriod
+      );
+
+      // 🎯 PRIORIDADE 1: Verificar se há ajuste manual do saldo inicial
+      const { data: balanceData, error: balanceError } =
+        await balanceAdjustmentService.getAdjustedInitialBalance(
+          globalFilters.unitId,
+          currentPeriod
+        );
+
+      if (balanceError) {
+        console.warn('⚠️ Erro ao buscar ajuste de saldo:', balanceError);
+        // Se houver erro de autenticação ou acesso, continuar com cálculo normal
+      } else if (balanceData?.adjustedBalance !== undefined) {
+        console.log(
+          '✅ Saldo inicial ajustado encontrado:',
+          balanceData.adjustedBalance
+        );
+        return balanceData.adjustedBalance;
+      }
+
+      // 🎯 PRIORIDADE 2: Calcular saldo com base no mês anterior
       const previousMonth = subMonths(referenceDate, 1);
       const startOfPreviousMonth = startOfMonth(previousMonth);
       const endOfPreviousMonth = endOfMonth(previousMonth);
-      console.log('📊 Buscando saldo do mês anterior:', {
+
+      console.log('📊 Calculando saldo do mês anterior:', {
         referenceDate: format(referenceDate, 'yyyy-MM-dd'),
         start: format(startOfPreviousMonth, 'yyyy-MM-dd'),
         end: format(endOfPreviousMonth, 'yyyy-MM-dd'),
@@ -168,11 +201,13 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
         0
       );
       const previousBalance = totalRevenues - totalExpenses;
+
       console.log('📊 Saldo do mês anterior calculado:', {
         receitas: totalRevenues,
         despesas: totalExpenses,
         saldo: previousBalance,
       });
+
       return previousBalance;
     } catch (error) {
       console.error('❌ Erro ao buscar saldo do mês anterior:', error);
@@ -191,38 +226,46 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
       // ✅ Buscar saldo inicial do mês anterior
       const saldoInicial = await fetchPreviousMonthBalance();
 
-      // 1. Buscar receitas PAGAS (por date = Data Pgto)
+      // 1. Buscar receitas PAGAS - USAR expected_receipt_date para regime de competência
       const { data: paidRevenues, error: paidRevenuesError } = await supabase
         .from('revenues')
         .select(
           `
           *,
+          fees,
+          payment_method_id,
           category:categories(id, name, category_type),
-          party:parties(id, nome)
+          party:parties(id, nome),
+          payment_method:payment_methods(id, name, fee_percentage)
         `
         )
         .eq('unit_id', globalFilters.unitId)
         .eq('status', 'Received')
         .eq('is_active', true)
-        .gte('date', dateRange.startDate)
-        .lte('date', dateRange.endDate)
-        .order('date');
+        .gte('expected_receipt_date', dateRange.startDate)
+        .lte('expected_receipt_date', dateRange.endDate)
+        .order('expected_receipt_date');
       if (paidRevenuesError) throw paidRevenuesError;
 
-      // 2. Buscar receitas PENDENTES - BUSCAR TODAS E FILTRAR DEPOIS
+      // 2. Buscar receitas PENDENTES - filtrar por expected_receipt_date no período
       const { data: pendingRevenues, error: pendingRevenuesError } =
         await supabase
           .from('revenues')
           .select(
             `
           *,
+          fees,
+          payment_method_id,
           category:categories(id, name, category_type),
-          party:parties(id, nome)
+          party:parties(id, nome),
+          payment_method:payment_methods(id, name, fee_percentage)
         `
           )
           .eq('unit_id', globalFilters.unitId)
           .eq('status', 'Pending')
           .eq('is_active', true)
+          .gte('expected_receipt_date', dateRange.startDate)
+          .lte('expected_receipt_date', dateRange.endDate)
           .order('expected_receipt_date');
       if (pendingRevenuesError) throw pendingRevenuesError;
 
@@ -293,6 +336,16 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
         expenses || [],
         dateRange
       );
+
+      // 🔍 DEBUG CRÍTICO: Ver o que está sendo passado para setCashflowData
+      console.log('🚨 [ANTES-SET-STATE] dailyData retornado:', {
+        length: dailyData.length,
+        isArray: Array.isArray(dailyData),
+        firstItem: dailyData[0],
+        lastItem: dailyData[dailyData.length - 1],
+        allDates: dailyData.map(d => d.date),
+      });
+
       setCashflowData({
         daily: dailyData,
         paid,
@@ -337,11 +390,34 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
     });
 
     // Criar entrada para cada dia do período
-    let currentDate = new Date(startDate);
+    let currentDate = startOfDay(startDate); // ✅ Usar mesmo padrão das receitas
     let dayCount = 0;
+    console.log('🔍 DEBUG: Iniciando criação do dailyMap');
+
+    // ✅ FIX: Extrair ano e mês do range para validação rigorosa
+    const [yearNum, monthNum] = dateRange.startDate.split('-').map(Number);
+
     while (currentDate <= endDate && dayCount < 100) {
       // Safety limit
       const dateKey = format(currentDate, 'yyyy-MM-dd');
+
+      // ✅ VALIDAÇÃO RIGOROSA: Excluir datas fora do mês selecionado
+      const [dateYear, dateMonth] = dateKey.split('-').map(Number);
+      if (dateYear !== yearNum || dateMonth !== monthNum) {
+        console.log(
+          `⚠️ IGNORANDO data fora do mês: ${dateKey} (esperado: ${yearNum}-${monthNum})`
+        );
+        currentDate = addDays(currentDate, 1);
+        dayCount++;
+        continue;
+      }
+
+      const dayOfWeek = format(currentDate, 'EEEE', { locale: ptBR });
+
+      console.log(
+        `📅 Criando entrada para: ${dateKey} (${dayOfWeek}) - DOW=${currentDate.getDay()}`
+      );
+
       dailyMap.set(dateKey, {
         date: dateKey,
         // ✅ SEPARAÇÃO CLARA: RECEBIDAS vs PENDENTES
@@ -368,39 +444,126 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
         },
       });
 
-      // Avançar para o próximo dia usando UTC para evitar problemas de timezone
-      const nextDay = new Date(currentDate);
-      nextDay.setUTCDate(nextDay.getUTCDate() + 1);
-      currentDate = nextDay;
+      // Avançar para o próximo dia usando addDays do date-fns (evita problemas de timezone)
+      currentDate = addDays(currentDate, 1);
       dayCount++;
     }
+
+    console.log('✅ dailyMap criado com', dailyMap.size, 'dias');
 
     // ✅ PROCESSAR RECEITAS COM SEPARAÇÃO POR STATUS - REGIME DE COMPETÊNCIA
     // 💡 SEMPRE usa expected_receipt_date para alocação no fluxo (regime de competência)
     // A data de pagamento (revenue.date) serve apenas para separar PAGO vs PENDENTE
+    console.log('🔍 DEBUG: Processando', revenues.length, 'receitas');
+
+    // 🛡️ VERIFICAR SE HÁ RECEITAS DUPLICADAS POR ID
+    const revenueIds = revenues.map(r => r.id);
+    const uniqueIds = new Set(revenueIds);
+    if (revenueIds.length !== uniqueIds.size) {
+      console.warn('⚠️ AVISO: Receitas duplicadas detectadas!', {
+        total: revenueIds.length,
+        unique: uniqueIds.size,
+        duplicates: revenueIds.filter(
+          (id, index) => revenueIds.indexOf(id) !== index
+        ),
+      });
+    }
+
     revenues.forEach(revenue => {
-      // 🎯 USAR SEMPRE A DATA ESPERADA PARA ALOCAÇÃO NO FLUXO
-      const date = format(
-        new Date(revenue.expected_receipt_date || revenue.date),
-        'yyyy-MM-dd'
-      );
+      // 🎯 NORMALIZAR DATA PARA EVITAR PROBLEMAS DE TIMEZONE
+      const expectedDate = revenue.expected_receipt_date || revenue.date;
+
+      // ✅ USAR parseISO + startOfDay + format para garantir data absolutamente limpa
+      let cleanDate = startOfDay(parseISO(expectedDate));
+
+      // 🚫 REGRA DE NEGÓCIO: Não há trabalho em fins de semana (sábado=6, domingo=0)
+      // Se a data cair em fim de semana, mover para a próxima segunda-feira
+      // ✅ FIX: Usar Date constructor com timezone forçado para evitar bug de getDay()
+      const dayOfWeek = new Date(expectedDate + 'T12:00:00').getDay();
+
+      // 🔍 DEBUG: Log apenas para domingos para rastrear bug
+      if (dayOfWeek === 0) {
+        console.log(
+          `[REVENUE-WEEKEND-DEBUG] Domingo detectado: ${expectedDate}`,
+          {
+            dayOfWeek,
+            isWeekend: true,
+            willMoveToMonday: true,
+          }
+        );
+      }
+
+      if (dayOfWeek === 0) {
+        // Domingo
+        cleanDate = addDays(cleanDate, 1); // Move para segunda-feira
+        console.log(
+          `📅 Data movida de domingo para segunda: ${expectedDate} → ${format(cleanDate, 'yyyy-MM-dd')}`
+        );
+      } else if (dayOfWeek === 6) {
+        // Sábado
+        cleanDate = addDays(cleanDate, 2); // Move para segunda-feira
+        console.log(
+          `📅 Data movida de sábado para segunda: ${expectedDate} → ${format(cleanDate, 'yyyy-MM-dd')}`
+        );
+      }
+
+      const date = format(cleanDate, 'yyyy-MM-dd');
       const category = revenue.status === 'Received' ? 'received' : 'pending';
 
+      console.log(
+        `💰 Processando receita: ${date} - ${revenue.status} - R$ ${revenue.value}`,
+        {
+          id: revenue.id,
+          originalExpectedDate: revenue.expected_receipt_date,
+          originalDate: revenue.date,
+          cleanDateISO: cleanDate.toISOString(),
+          normalizedDate: date,
+          category,
+          grossValue: revenue.value,
+          fees: revenue.fees || 0,
+          dayOfWeek: format(cleanDate, 'EEEE', { locale: ptBR }),
+          wasWeekendAdjusted: dayOfWeek === 0 || dayOfWeek === 6,
+        }
+      );
+
       // ✅ FILTRAR APENAS DATAS DO MÊS VIGENTE - VALIDAÇÃO RIGOROSA
-      const revenueDate = new Date(date);
-      const filterStartDate = new Date(dateRange.startDate);
-      const filterEndDate = new Date(dateRange.endDate);
-      if (
-        revenueDate >= filterStartDate &&
-        revenueDate <= filterEndDate &&
-        dailyMap.has(date)
-      ) {
+      const revenueDate = cleanDate; // Usar a data já limpa
+      const filterStartDate = startOfDay(parseISO(dateRange.startDate));
+      const filterEndDate = startOfDay(parseISO(dateRange.endDate));
+
+      // Debug para verificar se está no range correto
+      const isInRange =
+        revenueDate >= filterStartDate && revenueDate <= filterEndDate;
+      const hasDateEntry = dailyMap.has(date);
+
+      console.log(`🔍 Validação de data para ${date}:`, {
+        isInRange,
+        hasDateEntry,
+        revenueDate: revenueDate.toISOString(),
+        filterStart: filterStartDate.toISOString(),
+        filterEnd: filterEndDate.toISOString(),
+      });
+
+      if (isInRange && hasDateEntry) {
         const dayData = dailyMap.get(date);
+
+        // 💰 CALCULAR VALOR LÍQUIDO (DESCONTANDO TAXAS) - IGUAL AO DRE
+        const grossValue = revenue.value || 0;
+        const fees = revenue.fees || 0;
+        const netValue = grossValue - fees;
+
+        console.log(
+          `✅ Adicionando R$ ${netValue} (líquido) em ${date} como ${category}`
+        );
+
         if (category === 'received') {
-          dayData.received_inflows += revenue.value || 0;
+          // ✅ APENAS RECEITAS RECEBIDAS CONTAM COMO ENTRADA
+          dayData.received_inflows += netValue;
           dayData.revenues.received.push(revenue);
         } else {
-          dayData.pending_inflows += revenue.value || 0;
+          // ❌ RECEITAS PENDENTES NÃO DEVEM APARECER COMO ENTRADAS
+          // Comentado conforme solicitado pelo usuário
+          // dayData.pending_inflows += netValue;
           dayData.revenues.pending.push(revenue);
         }
         dayData.transaction_count++;
@@ -414,6 +577,21 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
         });
       }
     });
+
+    // 🔍 DEBUG: Verificar estado do dailyMap após processamento de receitas
+    console.log('🔍 DEBUG: Estado do dailyMap após receitas:');
+    Array.from(dailyMap.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .forEach(([dateKey, dayData]) => {
+        const dayOfWeek = format(parseISO(dateKey), 'EEEE', { locale: ptBR });
+        console.log(`📅 ${dateKey} (${dayOfWeek}):`, {
+          received_inflows: dayData.received_inflows,
+          pending_inflows: dayData.pending_inflows,
+          total_inflows: dayData.total_inflows,
+          receivedCount: dayData.revenues.received.length,
+          pendingCount: dayData.revenues.pending.length,
+        });
+      });
 
     // ✅ PROCESSAR DESPESAS COM SEPARAÇÃO POR STATUS - REGIME DE COMPETÊNCIA
     // 💡 SEMPRE usa expected_payment_date para alocação no fluxo (regime de competência)
@@ -462,13 +640,15 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
     const result = sortedDates.map((date, index) => {
       const dayData = dailyMap.get(date);
 
-      // Calcular totais
+      // Calcular totais (mantendo para compatibilidade)
       dayData.total_inflows =
         dayData.received_inflows + dayData.pending_inflows;
       dayData.total_outflows = dayData.paid_outflows + dayData.pending_outflows;
 
-      // Calcular saldo do dia
-      dayData.dailyBalance = dayData.total_inflows - dayData.total_outflows;
+      // ✅ CALCULAR SALDO DO DIA USANDO APENAS RECEITAS RECEBIDAS (conforme solicitado)
+      const netInflows = dayData.received_inflows; // Apenas recebidas
+      const netOutflows = dayData.total_outflows; // Pagas + pendentes
+      dayData.dailyBalance = netInflows - netOutflows;
 
       // Calcular acumulado
       dayData.accumulatedBalance = accumulatedBalance + dayData.dailyBalance;
@@ -505,8 +685,110 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
       },
       dayNumber: 0, // Dia 0 = Saldo Inicial
     };
+
+    // 🔍 DEBUG: Verificar dados de sábado e domingo especificamente
+    console.log('🔍 DEBUG: Verificando dados do final de semana...');
+    for (const [dateKey, data] of dailyMap.entries()) {
+      const date = startOfDay(parseISO(dateKey)); // Usar mesmo padrão das receitas
+      const dayOfWeek = format(date, 'EEEE', { locale: ptBR });
+      const dayNumber = date.getDay(); // 0=domingo, 6=sábado
+
+      if (dayOfWeek === 'sábado' || dayOfWeek === 'domingo') {
+        console.log(`📅 ${dayOfWeek} (${dateKey}) - DOW=${dayNumber}:`, {
+          received_inflows: data.received_inflows,
+          revenues_count: data.revenues.received.length,
+          revenues: data.revenues.received.map(r => ({
+            value: r.value,
+            expected_receipt_date: r.expected_receipt_date,
+            date: r.date,
+          })),
+        });
+      }
+    }
+
     const finalResult = [saldoInicialRow, ...result];
-    return finalResult;
+
+    // 🚫 LIMPEZA FINAL: Garantir que fins de semana estejam zerados
+    const cleanedResult = finalResult.map(day => {
+      if (!day.isSaldoInicial) {
+        // ✅ FIX: Usar Date constructor com timezone forçado para evitar bug de getDay()
+        const dayOfWeek = new Date(day.date + 'T12:00:00').getDay(); // 0=domingo, 6=sábado
+
+        // 🔍 DEBUG: Log para rastrear limpeza de finais de semana
+        if (dayOfWeek === 0 || dayOfWeek === 6) {
+          console.log(
+            `[CLEANUP-LAYER] Zerando final de semana: ${day.date} (DOW=${dayOfWeek})`,
+            {
+              before: {
+                received_inflows: day.received_inflows,
+                total_outflows: day.total_outflows,
+              },
+              after: { received_inflows: 0, total_outflows: 0 },
+            }
+          );
+        }
+
+        if (dayOfWeek === 0 || dayOfWeek === 6) {
+          // Forçar zeramento completo de fins de semana
+          return {
+            ...day,
+            received_inflows: 0,
+            pending_inflows: 0,
+            total_inflows: 0,
+            paid_outflows: 0,
+            pending_outflows: 0,
+            total_outflows: 0,
+            dailyBalance: 0,
+            transaction_count: 0,
+            revenues: { received: [], pending: [] },
+            expenses: { paid: [], pending: [] },
+          };
+        }
+      }
+      return day;
+    });
+
+    // 🔍 DEBUG FINAL: Resumo do range processado
+    console.log(`[FLUXO-CAIXA-FINAL] Range processado:`, {
+      totalDays: cleanedResult.length,
+      firstDate: cleanedResult[0]?.date,
+      lastDate: cleanedResult[cleanedResult.length - 1]?.date,
+      weekendDays: cleanedResult.filter(d => {
+        const dow = new Date(d.date + 'T12:00:00').getDay();
+        return dow === 0 || dow === 6;
+      }).length,
+      expectedMonth: dateRange.startDate.substring(0, 7), // 'YYYY-MM'
+    });
+
+    // 🚨 FILTRO FINAL DEFENSIVO: Garantir que APENAS datas do mês selecionado sejam retornadas
+    // (Inclui linha de SALDO INICIAL)
+    const [expectedYear, expectedMonth] = dateRange.startDate
+      .split('-')
+      .map(Number);
+    const filteredByMonth = cleanedResult.filter(day => {
+      // Permitir linha de SALDO INICIAL
+      if (day.isSaldoInicial || day.date === 'SALDO_INICIAL') {
+        return true;
+      }
+
+      // Validar datas reais
+      const [dayYear, dayMonth] = day.date.split('-').map(Number);
+      const isInRange = dayYear === expectedYear && dayMonth === expectedMonth;
+
+      if (!isInRange) {
+        console.warn(
+          `⚠️ [FILTRO-FINAL] Data fora do range REMOVIDA: ${day.date} (esperado: ${expectedYear}-${String(expectedMonth).padStart(2, '0')})`
+        );
+      }
+
+      return isInRange;
+    });
+
+    console.log(
+      `✅ [FILTRO-FINAL] Dias antes: ${cleanedResult.length}, depois: ${filteredByMonth.length}`
+    );
+
+    return filteredByMonth;
   };
 
   // ✅ FUNÇÃO SIMPLIFICADA - AGORA USAMOS APENAS OS DADOS CONSOLIDADOS
@@ -670,6 +952,19 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
     fetchCompleteCashflowData();
   }, [globalFilters.unitId, dateRange.startDate, dateRange.endDate]);
 
+  // 🔍 DEBUG: Monitorar mudanças no cashflowData
+  useEffect(() => {
+    console.log('🔄 [CASHFLOW-STATE-CHANGE] Estado cashflowData atualizado:', {
+      timestamp: new Date().toISOString(),
+      hasCashflowData: !!cashflowData,
+      hasDaily: !!cashflowData?.daily,
+      dailyLength: cashflowData?.daily?.length || 0,
+      dailyIsArray: Array.isArray(cashflowData?.daily),
+      firstItem: cashflowData?.daily?.[0],
+      allDates: cashflowData?.daily?.map(d => d.date) || [],
+    });
+  }, [cashflowData]);
+
   // Handlers
   // NOTA: handleDateRangeChange não é mais necessário pois usamos usePeriodFilter hook
   // const handleDateRangeChange = newRange => {
@@ -752,11 +1047,46 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
     '#EC4899',
     '#6B7280',
   ];
+
+  // 💰 Funções do Modal de Saldo Inicial
+  const handleEditBalance = () => {
+    // SEMPRE usar o mês vigente atual (novembro 2025), não o período do filtro
+    const currentDate = new Date();
+    const period = format(currentDate, 'yyyy-MM');
+    setCurrentPeriod(period);
+    setIsEditBalanceModalOpen(true);
+  };
+
+  const handleBalanceModalClose = () => {
+    setIsEditBalanceModalOpen(false);
+    setCurrentPeriod('');
+  };
+
+  const handleBalanceModalSuccess = () => {
+    // Recarregar dados após sucesso
+    handleRefresh();
+    handleBalanceModalClose();
+  };
+
+  // 🎯 CRIAR COLUNAS DA TABELA TANSTACK
+  const columns = useMemo(
+    () => createCashflowColumns(formatCurrency, handleEditBalance),
+    [formatCurrency, handleEditBalance]
+  );
+
+  // 🎯 CRIAR TABELA COM HOOK CUSTOMIZADO
+  const { table, stats } = useCashflowTable({
+    data: cashflowData.daily,
+    columns,
+    dateRange,
+    includeWeekends: false, // ✅ Fins de semana REMOVIDOS automaticamente
+  });
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-24">
-        <div className="w-12 h-12 mb-4 border-4 rounded-full border-primary border-t-transparent animate-spin"></div>
-        <p className="font-medium text-theme-secondary">
+        <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+        <p className="text-theme-secondary font-medium">
           Carregando fluxo de caixa...
         </p>
       </div>
@@ -765,37 +1095,47 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-24">
-        <TrendingDown className="w-16 h-16 mb-4 text-red-400" />
-        <h3 className="mb-2 text-xl font-semibold text-theme-primary">
+        <TrendingDown className="mb-4 h-16 w-16 text-red-400" />
+        <h3 className="text-theme-primary mb-2 text-xl font-semibold">
           Erro ao carregar dados
         </h3>
-        <p className="mb-6 text-theme-secondary">{error}</p>
+        <p className="text-theme-secondary mb-6">{error}</p>
         <button
           onClick={handleRefresh}
-          className="flex items-center gap-2 px-6 py-3 btn-theme-primary rounded-xl"
+          className="btn-theme-primary flex items-center gap-2 rounded-xl px-6 py-3"
         >
-          <RefreshCw className="w-5 h-5" />
+          <RefreshCw className="h-5 w-5" />
           Tentar Novamente
         </button>
       </div>
     );
   }
+  // DEBUG RENDER: listar as datas que serão renderizadas na tabela
+  // Ajuda a confirmar no console do navegador se o bundle atual já contém o filtro final
+  console.log('🔍 [RENDER-DATA] cashflowData.daily:', {
+    exists: !!cashflowData,
+    hasDaily: !!cashflowData?.daily,
+    dailyLength: cashflowData?.daily?.length || 0,
+    dailyIsArray: Array.isArray(cashflowData?.daily),
+    dates: (cashflowData?.daily || []).map(d => d.date),
+    fullData: cashflowData,
+  });
   return (
     <div className="space-y-6">
       {/* 📊 Header com Controles - DESIGN SYSTEM */}
-      <div className="p-6 card-theme rounded-xl">
+      <div className="card-theme rounded-xl p-6">
         <div className="flex flex-col gap-6">
           {/* Linha 1: Título e Ações */}
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-3 shadow-lg bg-gradient-primary rounded-xl">
-                <BarChart3 className="w-6 h-6 text-dark-text-primary" />
+              <div className="rounded-xl bg-gradient-primary p-3 shadow-lg">
+                <BarChart3 className="text-dark-text-primary h-6 w-6" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-theme-primary">
+                <h2 className="text-theme-primary text-2xl font-bold">
                   Fluxo de Caixa
                 </h2>
-                <p className="text-sm text-theme-secondary">
+                <p className="text-theme-secondary text-sm">
                   Análise consolidada com filtros de período
                 </p>
               </div>
@@ -805,10 +1145,10 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
               {/* Botão Atualizar */}
               <button
                 onClick={handleRefresh}
-                className="p-2.5 text-theme-secondary hover:text-theme-primary hover:bg-light-hover dark:hover:bg-dark-hover rounded-xl transition-all"
+                className="text-theme-secondary hover:text-theme-primary rounded-xl p-2.5 transition-all hover:bg-light-hover dark:hover:bg-dark-hover"
                 title="Atualizar"
               >
-                <RefreshCw className="w-5 h-5" />
+                <RefreshCw className="h-5 w-5" />
               </button>
 
               {/* Botões de Exportação */}
@@ -819,13 +1159,13 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
                   !cashflowData.daily ||
                   cashflowData.daily.length === 0
                 }
-                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-theme-secondary border-2 border-light-border dark:border-dark-border rounded-xl hover:bg-light-hover dark:hover:bg-dark-hover hover:text-theme-primary transition-all disabled:opacity-50"
+                className="text-theme-secondary hover:text-theme-primary flex items-center gap-2 rounded-xl border-2 border-light-border px-4 py-2.5 text-sm font-medium transition-all hover:bg-light-hover disabled:opacity-50 dark:border-dark-border dark:hover:bg-dark-hover"
                 title="Exportar CSV"
               >
                 {exporting ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <FileText className="w-4 h-4" />
+                  <FileText className="h-4 w-4" />
                 )}
                 <span className="hidden sm:inline">CSV</span>
               </button>
@@ -837,13 +1177,13 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
                   !cashflowData.daily ||
                   cashflowData.daily.length === 0
                 }
-                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-theme-secondary border-2 border-light-border dark:border-dark-border rounded-xl hover:bg-light-hover dark:hover:bg-dark-hover hover:text-theme-primary transition-all disabled:opacity-50"
+                className="text-theme-secondary hover:text-theme-primary flex items-center gap-2 rounded-xl border-2 border-light-border px-4 py-2.5 text-sm font-medium transition-all hover:bg-light-hover disabled:opacity-50 dark:border-dark-border dark:hover:bg-dark-hover"
                 title="Exportar Excel"
               >
                 {exporting ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <FileSpreadsheet className="w-4 h-4" />
+                  <FileSpreadsheet className="h-4 w-4" />
                 )}
                 <span className="hidden sm:inline">Excel</span>
               </button>
@@ -855,13 +1195,13 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
                   !cashflowData.daily ||
                   cashflowData.daily.length === 0
                 }
-                className="btn-theme-primary px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+                className="btn-theme-primary flex items-center gap-2 rounded-xl px-4 py-2.5 shadow-lg transition-all hover:shadow-xl disabled:opacity-50"
                 title="Exportar PDF"
               >
                 {exporting ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <Download className="w-4 h-4" />
+                  <Download className="h-4 w-4" />
                 )}
                 PDF
               </button>
@@ -869,7 +1209,7 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
           </div>
 
           {/* Linha 2: Filtros de Período */}
-          <div className="pt-6 border-t-2 border-light-border dark:border-dark-border">
+          <div className="border-t-2 border-light-border pt-6 dark:border-dark-border">
             <PeriodFilter
               selectedPeriod={selectedPeriod}
               onPeriodChange={handlePeriodChange}
@@ -879,30 +1219,30 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
           </div>
 
           {/* Linha 3: Navegação de Período e Descrição */}
-          <div className="flex flex-col items-center justify-between gap-4 p-4 border-2 sm:flex-row bg-primary/5 dark:bg-primary/10 rounded-xl border-light-border dark:border-dark-border">
+          <div className="flex flex-col items-center justify-between gap-4 rounded-xl border-2 border-light-border bg-primary/5 p-4 dark:border-dark-border dark:bg-primary/10 sm:flex-row">
             {/* Navegação */}
             <div className="flex items-center gap-2">
               <button
                 onClick={goToPreviousPeriod}
-                className="p-2 transition-all rounded-lg text-primary hover:bg-light-hover dark:hover:bg-dark-hover"
+                className="rounded-lg p-2 text-primary transition-all hover:bg-light-hover dark:hover:bg-dark-hover"
                 title="Período anterior"
               >
-                <ChevronLeft className="w-5 h-5" />
+                <ChevronLeft className="h-5 w-5" />
               </button>
 
-              <div className="flex items-center gap-2 px-4 py-2 border rounded-lg card-theme dark:bg-dark-surface border-light-border dark:border-dark-border">
-                <Calendar className="w-4 h-4 text-primary" />
-                <span className="text-sm font-bold text-theme-primary">
+              <div className="card-theme flex items-center gap-2 rounded-lg border border-light-border px-4 py-2 dark:border-dark-border dark:bg-dark-surface">
+                <Calendar className="h-4 w-4 text-primary" />
+                <span className="text-theme-primary text-sm font-bold">
                   {periodDescription}
                 </span>
               </div>
 
               <button
                 onClick={goToNextPeriod}
-                className="p-2 transition-all rounded-lg text-primary hover:bg-light-hover dark:hover:bg-dark-hover"
+                className="rounded-lg p-2 text-primary transition-all hover:bg-light-hover dark:hover:bg-dark-hover"
                 title="Próximo período"
               >
-                <ChevronRight className="w-5 h-5" />
+                <ChevronRight className="h-5 w-5" />
               </button>
             </div>
 
@@ -910,7 +1250,7 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
             {!isCurrentPeriod && (
               <button
                 onClick={resetToToday}
-                className="px-4 py-2 transition-all rounded-lg shadow-md btn-theme-primary hover:shadow-lg"
+                className="btn-theme-primary rounded-lg px-4 py-2 shadow-md transition-all hover:shadow-lg"
               >
                 Voltar para Hoje
               </button>
@@ -918,8 +1258,8 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
 
             {/* Badge Período Atual */}
             {isCurrentPeriod && (
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 rounded-full">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <div className="flex items-center gap-2 rounded-full border-2 border-green-200 bg-green-50 px-3 py-1.5 dark:border-green-800 dark:bg-green-900/20">
+                <div className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
                 <span className="text-xs font-bold text-green-600 dark:text-green-400">
                   PERÍODO ATUAL
                 </span>
@@ -930,17 +1270,17 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
       </div>
 
       {/* 📈 Timeline de 12 Meses - DESIGN SYSTEM */}
-      <div className="p-6 transition-all duration-300 border-2 border-transparent card-theme rounded-xl hover:border-purple-300 dark:hover:border-purple-700">
+      <div className="card-theme rounded-xl border-2 border-transparent p-6 transition-all duration-300 hover:border-purple-300 dark:hover:border-purple-700">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-2.5 bg-purple-500 rounded-xl shadow-lg">
-            <TrendingUp className="w-5 h-5 text-dark-text-primary" />
+        <div className="mb-6 flex items-center gap-3">
+          <div className="rounded-xl bg-purple-500 p-2.5 shadow-lg">
+            <TrendingUp className="text-dark-text-primary h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-theme-primary">
+            <h3 className="text-theme-primary text-lg font-bold">
               Timeline dos Últimos 12 Meses
             </h3>
-            <p className="text-sm text-theme-secondary">
+            <p className="text-theme-secondary text-sm">
               Evolução histórica do fluxo de caixa
             </p>
           </div>
@@ -958,143 +1298,12 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
         />
       </div>
 
-      {/* 📊 Tabela Consolidada: ACUMULADO - DESIGN SYSTEM */}
-      <div className="overflow-hidden card-theme rounded-xl">
-        {/* Header */}
-        <div className="px-6 py-4 border-b-2 bg-light-surface dark:bg-dark-surface border-light-border dark:border-dark-border">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
-              <DollarSign className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-            </div>
-            <h3 className="text-lg font-bold text-theme-primary">
-              Fluxo Diário Consolidado
-            </h3>
-          </div>
-        </div>
-
-        {/* Tabela */}
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="border-b-2 bg-light-surface dark:bg-dark-surface border-light-border dark:border-dark-border">
-              <tr>
-                <th className="px-6 py-4 text-xs font-bold tracking-wider text-left uppercase text-theme-secondary">
-                  Data
-                </th>
-                <th className="px-6 py-4 text-xs font-bold tracking-wider text-right uppercase text-theme-secondary">
-                  Entradas
-                </th>
-                <th className="px-6 py-4 text-xs font-bold tracking-wider text-right uppercase text-theme-secondary">
-                  Saídas
-                </th>
-                <th className="px-6 py-4 text-xs font-bold tracking-wider text-right uppercase text-theme-secondary">
-                  Saldo do Dia
-                </th>
-                <th className="px-6 py-4 text-xs font-bold tracking-wider text-right uppercase text-theme-secondary">
-                  Acumulado
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {cashflowData.daily.map((day, index) => {
-                const isWeekend = [0, 6].includes(new Date(day.date).getDay());
-                const totalInflows = day.received_inflows + day.pending_inflows;
-                const totalOutflows = day.paid_outflows + day.pending_outflows;
-                const isSaldoInicial = day.isSaldoInicial;
-                return (
-                  <tr
-                    key={day.date}
-                    className={`group transition-all duration-200 ${isSaldoInicial ? 'bg-primary/5 dark:bg-primary/10 hover:bg-primary/10 dark:hover:bg-primary/15' : isWeekend ? 'bg-light-surface/50 dark:bg-dark-surface/50 hover:bg-light-hover dark:hover:bg-dark-hover' : 'hover:bg-light-hover dark:hover:bg-dark-hover'}`}
-                  >
-                    {/* Data */}
-                    <td className="px-6 py-4">
-                      {isSaldoInicial ? (
-                        <div className="flex items-center gap-2">
-                          <div className="p-1.5 bg-primary/10 dark:bg-primary/20 rounded-lg">
-                            <TrendingUp className="w-4 h-4 text-primary" />
-                          </div>
-                          <span className="text-sm font-bold text-primary">
-                            SALDO INICIAL
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-3">
-                          <span className="text-sm font-semibold text-theme-primary">
-                            {format(new Date(day.date), 'dd/MM', {
-                              locale: ptBR,
-                            })}
-                          </span>
-                          {isWeekend && (
-                            <span className="px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 text-xs font-semibold rounded-full">
-                              {format(new Date(day.date), 'EEE', {
-                                locale: ptBR,
-                              }).toUpperCase()}
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </td>
-
-                    {/* Entradas */}
-                    <td className="px-6 py-4 text-right">
-                      {isSaldoInicial ? (
-                        <span className="text-sm text-theme-secondary">-</span>
-                      ) : totalInflows > 0 ? (
-                        <span className="text-sm font-semibold text-green-600 dark:text-green-400">
-                          {formatCurrency(totalInflows)}
-                        </span>
-                      ) : (
-                        <span className="text-sm text-theme-secondary">-</span>
-                      )}
-                    </td>
-
-                    {/* Saídas */}
-                    <td className="px-6 py-4 text-right">
-                      {isSaldoInicial ? (
-                        <span className="text-sm text-theme-secondary">-</span>
-                      ) : totalOutflows > 0 ? (
-                        <span className="text-sm font-semibold text-red-600 dark:text-red-400">
-                          {formatCurrency(totalOutflows)}
-                        </span>
-                      ) : (
-                        <span className="text-sm text-theme-secondary">-</span>
-                      )}
-                    </td>
-
-                    {/* Saldo do Dia */}
-                    <td className="px-6 py-4 text-right">
-                      {isSaldoInicial ? (
-                        <span className="text-sm text-theme-secondary">-</span>
-                      ) : (
-                        <span
-                          className={`text-sm font-bold ${day.dailyBalance >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
-                        >
-                          {formatCurrency(day.dailyBalance)}
-                        </span>
-                      )}
-                    </td>
-
-                    {/* Acumulado */}
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <span
-                          className={`text-base font-bold ${day.accumulatedBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-orange-600 dark:text-orange-400'}`}
-                        >
-                          {formatCurrency(day.accumulatedBalance)}
-                        </span>
-                        {day.accumulatedBalance >= 0 ? (
-                          <TrendingUp className="w-4 h-4 text-blue-500 dark:text-blue-400 opacity-60" />
-                        ) : (
-                          <TrendingDown className="w-4 h-4 text-orange-500 dark:text-orange-400 opacity-60" />
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      {/* 🎯 TABELA TANSTACK TABLE - Fluxo Diário Consolidado */}
+      <CashflowTable
+        table={table}
+        loading={loading}
+        emptyMessage="Nenhum dado de fluxo de caixa disponível para o período selecionado"
+      />
 
       {/* 📊 Gráficos de Distribuição - PIE CHARTS */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -1116,6 +1325,15 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
           formatValue={formatCurrency}
         />
       </div>
+
+      {/* 💰 Modal de Edição do Saldo Inicial */}
+      <EditInitialBalanceModal
+        isOpen={isEditBalanceModalOpen}
+        onClose={handleBalanceModalClose}
+        onSuccess={handleBalanceModalSuccess}
+        unitId={globalFilters.unitId}
+        period={currentPeriod}
+      />
     </div>
   );
 };
