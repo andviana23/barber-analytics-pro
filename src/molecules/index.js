@@ -7,7 +7,6 @@ export { default as KPICard } from './KPICard';
 export { default as ChartComponent } from './ChartComponent';
 export { default as RankingProfissionais } from './RankingProfissionais';
 export { ReconciliationMatchCard } from './ReconciliationMatchCard';
-export { CashflowChartCard } from './CashflowChartCard';
 export { CashflowTimelineChart } from './CashflowTimelineChart';
 export { MatchTable } from './MatchTable';
 export { CategoryHierarchicalDropdown } from './CategoryHierarchicalDropdown';

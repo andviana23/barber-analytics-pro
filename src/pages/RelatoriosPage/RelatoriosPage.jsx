@@ -710,10 +710,7 @@ const RelatoriosPage = () => {
               <DREDynamicView dreData={dreData} isLoading={loading} />
             </div>
           ) : activeReport === 'fluxo-caixa' ? (
-            <RelatorioFluxoCaixa 
-              filters={filters} 
-              units={allUnits || []} 
-            />
+            <RelatorioFluxoCaixa filters={filters} units={allUnits || []} />
           ) : activeReport === 'comparativo-unidades' ? (
             <RelatorioComparativoUnidades
               filters={{
