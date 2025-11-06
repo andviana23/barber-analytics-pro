@@ -508,6 +508,7 @@ Data: 5 de novembro de 2025
 ## ✅ IMPLEMENTAÇÕES CONCLUÍDAS (6 de nov 2025)
 
 ### 1. Função Helper `isWeekend()` ✅
+
 ```javascript
 const isWeekend = dateString => {
   const dayOfWeek = new Date(dateString + 'T12:00:00').getDay();
@@ -516,6 +517,7 @@ const isWeekend = dateString => {
 ```
 
 ### 2. Função Helper `moveWeekendToMonday()` ✅
+
 ```javascript
 const moveWeekendToMonday = date => {
   const dayOfWeek = date.getDay();
@@ -526,15 +528,17 @@ const moveWeekendToMonday = date => {
 ```
 
 ### 3. Simplificação da Lógica de Receitas ✅
+
 - Removido código duplicado de detecção de fim de semana
 - Aplicada função `moveWeekendToMonday()` diretamente
 - Logs de debug removidos
 
 ### 4. Camada de Limpeza Final Otimizada ✅
+
 ```javascript
 const cleanedResult = finalResult.map(day => {
   if (!day.isSaldoInicial && isWeekend(day.date)) {
-    return { ...day, /* todos os campos zerados */ };
+    return { ...day /* todos os campos zerados */ };
   }
   return day;
 });
