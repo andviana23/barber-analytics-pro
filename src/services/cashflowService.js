@@ -1,4 +1,9 @@
 import { supabase } from './supabase';
+import { demonstrativoFluxoRepository } from '../repositories/demonstrativoFluxoRepository';
+import {
+  DemonstrativoFluxoFiltersDTO,
+  DemonstrativoFluxoSummaryDTO,
+} from '../dtos/demonstrativoFluxoDTO';
 
 /**
  * Service para gerenciar operações de fluxo de caixa
@@ -871,6 +876,273 @@ export class CashflowService {
   }
 
   /**
+   * Busca Demonstrativo de Fluxo de Caixa Acumulado
+   * Novo método para feature "Demonstrativo de Fluxo de Caixa Acumulado"
+   *
+   * @param {string} unitId - ID da unidade (obrigatório, multi-tenant)
+   * @param {string|null} accountId - ID da conta bancária (NULL = todas as contas)
+   * @param {string} startDate - Data inicial (YYYY-MM-DD)
+   * @param {string} endDate - Data final (YYYY-MM-DD)
+   * @returns {Promise<{data: Array|null, error: string|null, summary: Object|null}>}
+   *
+   * @description
+   * Busca dados do demonstrativo de fluxo acumulado usando a VIEW vw_demonstrativo_fluxo.
+   * Calcula saldo inicial antes do período e enriquece dados com formatação monetária.
+   * Retorna array de entradas diárias + resumo com totalizadores.
+   *
+   * Fluxo:
+   * 1. Valida filtros via DTO
+   * 2. Busca saldo inicial (saldo acumulado antes da startDate)
+   * 3. Busca dados da VIEW (receitas/despesas por dia com saldo acumulado)
+   * 4. Enriquece dados com formatação monetária
+   * 5. Calcula summary (totais, variação, tendência)
+   * 6. Valida summary via DTO
+   * 7. Retorna { data, error, summary }
+   *
+   * @example
+   * const result = await cashflowService.getDemonstrativoFluxoAcumulado(
+   *   '123e4567-e89b-12d3-a456-426614174000', // unitId
+   *   '223e4567-e89b-12d3-a456-426614174000', // accountId
+   *   '2025-01-01', // startDate
+   *   '2025-01-31'  // endDate
+   * );
+   *
+   * if (result.error) {
+   *   toast.error(result.error);
+   *   return;
+   * }
+   *
+   * console.log('Entradas diárias:', result.data);
+   * console.log('Resumo:', result.summary);
+   */
+  async getDemonstrativoFluxoAcumulado(unitId, accountId, startDate, endDate) {
+    try {
+      // ========================================
+      // ETAPA 1: Validar filtros via DTO
+      // ========================================
+      const filtersDTO = new DemonstrativoFluxoFiltersDTO({
+        unitId,
+        accountId,
+        startDate,
+        endDate,
+      });
+
+      if (!filtersDTO.isValid()) {
+        const errors = filtersDTO.getErrors();
+        const errorMessage =
+          errors?.map(e => `${e.field}: ${e.message}`).join('; ') ||
+          'Filtros inválidos';
+
+        return {
+          data: null,
+          error: errorMessage,
+          summary: null,
+        };
+      }
+
+      const validatedFilters = filtersDTO.toObject();
+
+      // ========================================
+      // ETAPA 2: Buscar saldo inicial
+      // ========================================
+      const { data: saldoInicial, error: saldoInicialError } =
+        await demonstrativoFluxoRepository.fetchInitialBalance(
+          validatedFilters.unitId,
+          validatedFilters.accountId,
+          validatedFilters.startDate
+        );
+
+      if (saldoInicialError) {
+        return {
+          data: null,
+          error: `Erro ao buscar saldo inicial: ${saldoInicialError}`,
+          summary: null,
+        };
+      }
+
+      // ========================================
+      // ETAPA 3: Buscar dados da VIEW
+      // ========================================
+      const { data: entries, error: entriesError } =
+        await demonstrativoFluxoRepository.fetchDemonstrativoData(
+          validatedFilters.unitId,
+          validatedFilters.accountId,
+          validatedFilters.startDate,
+          validatedFilters.endDate
+        );
+
+      if (entriesError) {
+        return {
+          data: null,
+          error: `Erro ao buscar dados: ${entriesError}`,
+          summary: null,
+        };
+      }
+
+      // ========================================
+      // ETAPA 4: Preencher todos os dias do período
+      // ========================================
+      const completeEntries = this.fillAllDaysInPeriod(
+        entries,
+        validatedFilters.startDate,
+        validatedFilters.endDate,
+        saldoInicial || 0.0
+      );
+
+      // Verificar se há dados após preenchimento
+      if (!completeEntries || completeEntries.length === 0) {
+        return {
+          data: [],
+          error: null,
+          summary: {
+            totalEntradas: 0.0,
+            totalSaidas: 0.0,
+            saldoInicial: saldoInicial || 0.0,
+            saldoFinal: saldoInicial || 0.0,
+            variacao: 0.0,
+            totalDias: 0,
+            // Formatados
+            totalEntradasFormatted: this.formatAmount(0.0),
+            totalSaidasFormatted: this.formatAmount(0.0),
+            saldoInicialFormatted: this.formatAmount(saldoInicial || 0.0),
+            saldoFinalFormatted: this.formatAmount(saldoInicial || 0.0),
+            variacaoFormatted: this.formatAmount(0.0),
+            // Extras
+            mediaEntradaDiaria: 0.0,
+            mediaSaidaDiaria: 0.0,
+            mediaSaldoDiario: 0.0,
+            variacaoPercentual: 0.0,
+            tendencia: 'estável',
+          },
+        };
+      }
+
+      // ========================================
+      // ETAPA 5: Enriquecer dados com formatação
+      // ========================================
+      const enrichedEntries = completeEntries.map((entry, index) => {
+        // Ajustar saldo_acumulado se necessário
+        // (somar saldo inicial se a VIEW não considerar)
+        const saldoAcumuladoAjustado =
+          index === 0 && saldoInicial
+            ? entry.saldo_acumulado + saldoInicial
+            : entry.saldo_acumulado;
+
+        return {
+          ...entry,
+          // Valores originais
+          entradas: entry.entradas || 0.0,
+          saidas: entry.saidas || 0.0,
+          saldo_dia: entry.saldo_dia || 0.0,
+          saldo_acumulado: saldoAcumuladoAjustado,
+
+          // Formatados para exibição
+          entradasFormatted: this.formatAmount(entry.entradas || 0.0),
+          saidasFormatted: this.formatAmount(entry.saidas || 0.0),
+          saldoDiaFormatted: this.formatAmount(entry.saldo_dia || 0.0),
+          saldoAcumuladoFormatted: this.formatAmount(saldoAcumuladoAjustado),
+          dateFormatted: this.formatDate(entry.transaction_date),
+
+          // Indicadores visuais
+          saldoDiaPositivo: (entry.saldo_dia || 0.0) > 0,
+          saldoAcumuladoPositivo: saldoAcumuladoAjustado > 0,
+        };
+      });
+
+      // ========================================
+      // ETAPA 6: Calcular summary (totalizadores)
+      // ========================================
+      const totalEntradas = completeEntries.reduce(
+        (sum, e) => sum + (e.entradas || 0.0),
+        0.0
+      );
+      const totalSaidas = completeEntries.reduce(
+        (sum, e) => sum + (e.saidas || 0.0),
+        0.0
+      );
+      const saldoFinal =
+        enrichedEntries[enrichedEntries.length - 1]?.saldo_acumulado ||
+        saldoInicial ||
+        0.0;
+      const variacao = saldoFinal - (saldoInicial || 0.0);
+      const totalDias = completeEntries.length;
+
+      const summaryRaw = {
+        totalEntradas,
+        totalSaidas,
+        saldoInicial: saldoInicial || 0.0,
+        saldoFinal,
+        variacao,
+        totalDias,
+      };
+
+      // ========================================
+      // ETAPA 6: Validar summary via DTO
+      // ========================================
+      const summaryDTO = new DemonstrativoFluxoSummaryDTO(summaryRaw);
+
+      if (!summaryDTO.isValid()) {
+        // Aviso: summary inválido, mas retorna dados mesmo assim
+        const errors = summaryDTO.getErrors();
+        const errorMessage =
+          errors?.map(e => `${e.field}: ${e.message}`).join('; ') ||
+          'Summary inválido';
+
+        return {
+          data: enrichedEntries,
+          error: null, // Não bloqueia, apenas avisa
+          summary: {
+            ...summaryRaw,
+            validationWarning: errorMessage,
+          },
+        };
+      }
+
+      // Usar toEnrichedObject() para calcular indicadores adicionais
+      const enrichedSummary = summaryDTO.toEnrichedObject();
+
+      // Adicionar formatações monetárias
+      const finalSummary = {
+        ...enrichedSummary,
+        // Formatados
+        totalEntradasFormatted: this.formatAmount(totalEntradas),
+        totalSaidasFormatted: this.formatAmount(totalSaidas),
+        saldoInicialFormatted: this.formatAmount(saldoInicial || 0.0),
+        saldoFinalFormatted: this.formatAmount(saldoFinal),
+        variacaoFormatted: this.formatAmount(variacao),
+        mediaEntradaDiariaFormatted: this.formatAmount(
+          enrichedSummary.mediaEntradaDiaria
+        ),
+        mediaSaidaDiariaFormatted: this.formatAmount(
+          enrichedSummary.mediaSaidaDiaria
+        ),
+        mediaSaldoDiarioFormatted: this.formatAmount(
+          enrichedSummary.mediaSaldoDiario
+        ),
+
+        // Metadata
+        periodFormatted: filtersDTO.toEnrichedObject()?.periodFormatted || '',
+        periodDays: filtersDTO.toEnrichedObject()?.periodDays || 0,
+      };
+
+      // ========================================
+      // ETAPA 7: Retornar { data, error, summary }
+      // ========================================
+      return {
+        data: enrichedEntries,
+        error: null,
+        summary: finalSummary,
+      };
+    } catch (err) {
+      return {
+        data: null,
+        error: `Erro inesperado: ${err.message}`,
+        summary: null,
+      };
+    }
+  }
+
+  /**
    * Formata valor monetário
    * @param {number} amount - Valor a ser formatado
    * @returns {string} Valor formatado
@@ -900,6 +1172,57 @@ export class CashflowService {
     if (isNaN(dateObj.getTime())) return '';
 
     return dateObj.toLocaleDateString('pt-BR');
+  }
+
+  /**
+   * Preenche todos os dias do período com saldo acumulado
+   * @param {Array} entries - Entradas com movimentação (da VIEW)
+   * @param {string} startDate - Data inicial (YYYY-MM-DD)
+   * @param {string} endDate - Data final (YYYY-MM-DD)
+   * @param {number} saldoInicial - Saldo inicial do período
+   * @returns {Array} Array com todos os dias preenchidos
+   * @private
+   */
+  fillAllDaysInPeriod(entries, startDate, endDate, saldoInicial = 0.0) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const allDays = [];
+
+    // Criar mapa de entradas existentes por data
+    const entriesMap = new Map();
+    (entries || []).forEach(entry => {
+      const dateKey = entry.transaction_date.split('T')[0]; // YYYY-MM-DD
+      entriesMap.set(dateKey, entry);
+    });
+
+    // Iterar por todos os dias do período
+    let currentDate = new Date(start);
+    let saldoAcumulado = saldoInicial;
+
+    while (currentDate <= end) {
+      const dateKey = currentDate.toISOString().split('T')[0];
+
+      // Se existe movimentação neste dia, usar dados da VIEW
+      if (entriesMap.has(dateKey)) {
+        const entry = entriesMap.get(dateKey);
+        saldoAcumulado = entry.saldo_acumulado;
+        allDays.push(entry);
+      } else {
+        // Dia sem movimentação - criar entrada zerada
+        allDays.push({
+          transaction_date: dateKey,
+          entradas: 0.0,
+          saidas: 0.0,
+          saldo_dia: 0.0,
+          saldo_acumulado: saldoAcumulado, // Mantém saldo do dia anterior
+        });
+      }
+
+      // Avançar para o próximo dia
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return allDays;
   }
 }
 

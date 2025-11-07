@@ -30,6 +30,7 @@ import { BankAccountsPage } from './pages/BankAccountsPage'; // ✅ Bank account
 import ClientsPage from './pages/ClientsPage'; // ✅ Clients page import
 import { DashboardPage } from './pages/DashboardPage/DashboardPage';
 import { DebugAuthPage } from './pages/DebugAuthPage'; // 🐛 Debug Auth page
+import { DemonstrativoFluxoPage } from './pages/DemonstrativoFluxoPage';
 import { DREPage } from './pages/DREPage';
 import FinanceiroAdvancedPage from './pages/FinanceiroAdvancedPage/FinanceiroAdvancedPage';
 import GoalsPage from './pages/GoalsPage';
@@ -235,6 +236,19 @@ function App() {
                         <ProtectedRoute roles={['admin', 'gerente']}>
                           <Layout activeMenuItem="dre">
                             <DREPage />
+                          </Layout>
+                        </ProtectedRoute>
+                      </ReceptionistRoute>
+                    }
+                  />
+
+                  <Route
+                    path="/demonstrativo-fluxo"
+                    element={
+                      <ReceptionistRoute>
+                        <ProtectedRoute roles={['admin', 'gerente']}>
+                          <Layout activeMenuItem="demonstrativo-fluxo">
+                            <DemonstrativoFluxoPage />
                           </Layout>
                         </ProtectedRoute>
                       </ReceptionistRoute>

@@ -727,6 +727,177 @@ class ExpenseRepository {
       };
     }
   }
+
+  // =====================================================
+  // 🔁 MÉTODOS DE DESPESAS RECORRENTES
+  // =====================================================
+
+  /**
+   * Cria uma configuração de despesa recorrente
+   * @param {Object} recurringData - Dados da recorrência
+   * @returns {Promise<{data: Object|null, error: string|null}>}
+   */
+  async createRecurring(recurringData) {
+    try {
+      const { data, error } = await supabase
+        .from('recurring_expenses')
+        .insert(recurringData)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return { data, error: null };
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('❌ Erro ao criar recorrência:', err);
+      return { data: null, error: this.normalizeError(err) };
+    }
+  }
+
+  /**
+   * Busca configuração de recorrência por ID da despesa original
+   * @param {string} expenseId - ID da despesa original
+   * @returns {Promise<{data: Object|null, error: string|null}>}
+   */
+  async findRecurringByExpenseId(expenseId) {
+    try {
+      const { data, error } = await supabase
+        .from('recurring_expenses')
+        .select('*')
+        .eq('expense_id', expenseId)
+        .eq('is_active', true)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+
+      return { data, error: null };
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('❌ Erro ao buscar recorrência:', err);
+      return { data: null, error: this.normalizeError(err) };
+    }
+  }
+
+  /**
+   * Busca todas as recorrências ativas de uma unidade
+   * @param {string} unitId - ID da unidade
+   * @returns {Promise<{data: Array|null, error: string|null}>}
+   */
+  async findRecurringByUnit(unitId) {
+    try {
+      const { data, error } = await supabase
+        .from('vw_recurring_expenses_summary')
+        .select('*')
+        .eq('unit_id', unitId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      return { data, error: null };
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('❌ Erro ao buscar recorrências:', err);
+      return { data: null, error: this.normalizeError(err) };
+    }
+  }
+
+  /**
+   * Busca todas as despesas de uma série recorrente
+   * @param {string} recurringSeriesId - ID da despesa origem
+   * @returns {Promise<{data: Array|null, error: string|null}>}
+   */
+  async findBySeries(recurringSeriesId) {
+    try {
+      const { data, error } = await supabase
+        .from('expenses')
+        .select('*')
+        .or(
+          `id.eq.${recurringSeriesId},recurring_series_id.eq.${recurringSeriesId}`
+        )
+        .eq('is_active', true)
+        .order('installment_number', { ascending: true });
+
+      if (error) throw error;
+
+      return { data, error: null };
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('❌ Erro ao buscar série recorrente:', err);
+      return { data: null, error: this.normalizeError(err) };
+    }
+  }
+
+  /**
+   * Gera próxima parcela de uma recorrência (chama função SQL)
+   * @param {string} recurringExpenseId - ID da configuração recorrente
+   * @returns {Promise<{data: Object|null, error: string|null}>}
+   */
+  async generateNextInstallment(recurringExpenseId) {
+    try {
+      const { data, error } = await supabase.rpc(
+        'fn_generate_next_recurring_expense',
+        { p_recurring_expense_id: recurringExpenseId }
+      );
+
+      if (error) throw error;
+
+      return { data, error: null };
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('❌ Erro ao gerar próxima parcela:', err);
+      return { data: null, error: this.normalizeError(err) };
+    }
+  }
+
+  /**
+   * Pausa ou retoma uma recorrência
+   * @param {string} recurringExpenseId - ID da configuração
+   * @param {'pause'|'resume'} action - Ação a executar
+   * @returns {Promise<{data: boolean, error: string|null}>}
+   */
+  async toggleRecurring(recurringExpenseId, action) {
+    try {
+      const { data, error } = await supabase.rpc(
+        'fn_toggle_recurring_expense',
+        {
+          p_recurring_expense_id: recurringExpenseId,
+          p_action: action,
+        }
+      );
+
+      if (error) throw error;
+
+      return { data, error: null };
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('❌ Erro ao pausar/retomar recorrência:', err);
+      return { data: false, error: this.normalizeError(err) };
+    }
+  }
+
+  /**
+   * Cancela série completa de despesas recorrentes
+   * @param {string} recurringExpenseId - ID da configuração
+   * @param {boolean} deleteFutureOnly - true = só futuras, false = todas
+   * @returns {Promise<{data: Object|null, error: string|null}>}
+   */
+  async deleteRecurringSeries(recurringExpenseId, deleteFutureOnly = true) {
+    try {
+      const { data, error } = await supabase.rpc('fn_delete_recurring_series', {
+        p_recurring_expense_id: recurringExpenseId,
+        p_delete_future_only: deleteFutureOnly,
+      });
+
+      if (error) throw error;
+
+      return { data, error: null };
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('❌ Erro ao cancelar série recorrente:', err);
+      return { data: null, error: this.normalizeError(err) };
+    }
+  }
 }
 
 // Exportar instância única (Singleton)

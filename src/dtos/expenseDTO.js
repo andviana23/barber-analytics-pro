@@ -376,3 +376,217 @@ export const EXPENSE_STATUSES = [
   { value: 'Cancelled', label: 'Cancelado' },
   { value: 'Overdue', label: 'Vencido' },
 ];
+
+// ========================================
+// 🔁 SCHEMAS DE DESPESAS RECORRENTES
+// ========================================
+
+/**
+ * Schema para criar despesa recorrente
+ */
+export const CreateRecurringExpenseDTO = z.object({
+  // Dados da despesa original
+  expense: CreateExpenseDTO,
+
+  // Configuração de recorrência
+  configuracao: z.enum(
+    ['mensal-12x', 'mensal-36x', 'mensal-8x', 'personalizar'],
+    {
+      errorMap: () => ({
+        message:
+          'Configuração deve ser: mensal-12x, mensal-36x, mensal-8x ou personalizar',
+      }),
+    }
+  ),
+
+  cobrar_sempre_no: z
+    .number()
+    .int()
+    .min(1, 'Dia deve ser entre 1 e 31')
+    .max(31, 'Dia deve ser entre 1 e 31'),
+
+  duracao_personalizada: z
+    .string()
+    .optional()
+    .refine(
+      val => {
+        if (!val) return true;
+        const num = parseInt(val, 10);
+        return !isNaN(num) && num >= 1 && num <= 120;
+      },
+      { message: 'Duração personalizada deve ser entre 1 e 120 meses' }
+    ),
+
+  // Metadados
+  unit_id: z.string().uuid('ID da unidade deve ser um UUID válido'),
+  data_inicio: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}$/,
+      'Data de início deve estar no formato YYYY-MM-DD'
+    ),
+});
+
+/**
+ * Schema para atualizar configuração de recorrência
+ */
+export const UpdateRecurringExpenseDTO = z.object({
+  id: z.string().uuid('ID da recorrência deve ser um UUID válido'),
+  status: z.enum(['ativo', 'pausado', 'finalizado']).optional(),
+  data_fim: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}$/,
+      'Data de fim deve estar no formato YYYY-MM-DD'
+    )
+    .optional(),
+});
+
+/**
+ * Valida dados de despesa recorrente
+ * @param {Object} data - Dados a validar
+ * @returns {{isValid: boolean, data: Object|null, errors: Array<string>}}
+ */
+export function validateRecurringExpense(data) {
+  try {
+    const validated = CreateRecurringExpenseDTO.parse(data);
+
+    // Validação adicional: se personalizar, duracao_personalizada é obrigatória
+    if (
+      validated.configuracao === 'personalizar' &&
+      !validated.duracao_personalizada
+    ) {
+      return {
+        isValid: false,
+        data: null,
+        errors: [
+          'Duração personalizada é obrigatória quando configuração é "personalizar"',
+        ],
+      };
+    }
+
+    return {
+      isValid: true,
+      data: validated,
+      errors: [],
+    };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return {
+        isValid: false,
+        data: null,
+        errors: error.errors.map(
+          err => `${err.path.join('.')}: ${err.message}`
+        ),
+      };
+    }
+
+    return {
+      isValid: false,
+      data: null,
+      errors: ['Erro desconhecido ao validar dados'],
+    };
+  }
+}
+
+/**
+ * Calcula total de parcelas baseado na configuração
+ * @param {string} configuracao - Tipo de configuração
+ * @param {string} duracaoPersonalizada - Duração personalizada (se aplicável)
+ * @returns {number} - Total de parcelas
+ */
+export function calculateTotalInstallments(configuracao, duracaoPersonalizada) {
+  const durationMap = {
+    'mensal-12x': 12,
+    'mensal-36x': 36,
+    'mensal-8x': 8,
+    personalizar: parseInt(duracaoPersonalizada, 10) || 12,
+  };
+
+  return durationMap[configuracao] || 12;
+}
+
+/**
+ * Formata dados de recorrência para exibição
+ * @param {Object} recurring - Dados da recorrência
+ * @returns {Object} - Dados formatados
+ */
+export function formatRecurringExpenseForDisplay(recurring) {
+  return {
+    id: recurring.recurring_id || recurring.id,
+    expenseId: recurring.original_expense_id || recurring.expense_id,
+    unitId: recurring.unit_id,
+    unitName: recurring.unit_name,
+    description: recurring.expense_description,
+    monthlyValue: recurring.monthly_value,
+    formattedMonthlyValue: new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(recurring.monthly_value),
+    configuracao: recurring.configuracao,
+    configLabel: getRecurringConfigLabel(recurring.configuracao),
+    dueDay: recurring.cobrar_sempre_no,
+    totalInstallments: recurring.total_parcelas,
+    generatedInstallments: recurring.parcelas_geradas,
+    remainingInstallments: recurring.parcelas_restantes,
+    status: recurring.status,
+    statusLabel: getRecurringStatusLabel(recurring.status),
+    startDate: recurring.data_inicio,
+    endDate: recurring.data_fim,
+    nextDueDate: recurring.next_due_date,
+    completionPercent: recurring.completion_percent,
+    totalValue: recurring.total_value,
+    generatedValue: recurring.generated_value,
+    formattedTotalValue: new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(recurring.total_value),
+    categoryName: recurring.category_name,
+    partyName: recurring.party_name,
+    createdAt: recurring.created_at,
+  };
+}
+
+/**
+ * Obter label da configuração de recorrência
+ * @param {string} config - Configuração
+ * @returns {string} - Label formatado
+ */
+export function getRecurringConfigLabel(config) {
+  const configLabels = {
+    'mensal-12x': 'Mensal - 12 vezes',
+    'mensal-36x': 'Mensal - 36 vezes',
+    'mensal-8x': 'Mensal - 8 vezes',
+    personalizar: 'Personalizado',
+  };
+
+  return configLabels[config] || config;
+}
+
+/**
+ * Obter label do status da recorrência
+ * @param {string} status - Status
+ * @returns {string} - Label formatado
+ */
+export function getRecurringStatusLabel(status) {
+  const statusLabels = {
+    ativo: 'Ativo',
+    pausado: 'Pausado',
+    finalizado: 'Finalizado',
+  };
+
+  return statusLabels[status] || status;
+}
+
+export const RECURRING_CONFIGS = [
+  { value: 'mensal-12x', label: 'Mensal - 12 vezes (1 ano)' },
+  { value: 'mensal-36x', label: 'Mensal - 36 vezes (3 anos)' },
+  { value: 'mensal-8x', label: 'Mensal - 8 vezes' },
+  { value: 'personalizar', label: 'Personalizar duração' },
+];
+
+export const RECURRING_STATUSES = [
+  { value: 'ativo', label: 'Ativo' },
+  { value: 'pausado', label: 'Pausado' },
+  { value: 'finalizado', label: 'Finalizado' },
+];

@@ -10,7 +10,7 @@
 
 import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
+import { format, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import {
   LineChart,
@@ -27,13 +27,10 @@ import {
 import {
   TrendingUp,
   TrendingDown,
-  Calendar,
   BarChart3,
   Download,
-  Maximize2,
   RefreshCw,
   AlertCircle,
-  CheckCircle,
   Activity,
   DollarSign,
 } from 'lucide-react';
@@ -132,10 +129,19 @@ const CashflowTimelineChart = ({
   showGrid = true,
   onRefresh = null,
   onExport = null,
+  onPeriodChange = null,
   className = '',
 }) => {
   const [chartType, setChartType] = useState('area'); // 'area', 'line'
-  const [timeRange, setTimeRange] = useState('12'); // '6', '12', '24'
+  const [timeRange, setTimeRange] = useState('12'); // '1', '3', '6', '12'
+
+  // Handler para mudança de período
+  const handlePeriodChange = newPeriod => {
+    setTimeRange(newPeriod);
+    if (onPeriodChange) {
+      onPeriodChange(newPeriod);
+    }
+  };
 
   // Processar dados para o gráfico
   const chartData = useMemo(() => {
@@ -149,7 +155,7 @@ const CashflowTimelineChart = ({
       .map(item => ({
         ...item,
         date: item.date,
-        displayDate: formatDateForChart(item.date),
+        displayDate: item.label || formatDateForChart(item.date),
         result: item.revenues - item.expenses,
         margin:
           item.revenues > 0
@@ -272,37 +278,43 @@ const CashflowTimelineChart = ({
                 {title}
               </h3>
               <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
-                Evolução temporal dos últimos {timeRange} meses
+                {timeRange === '1'
+                  ? 'Evolução semanal do último mês'
+                  : timeRange === '3'
+                    ? 'Evolução semanal dos últimos 3 meses'
+                    : timeRange === '6'
+                      ? 'Evolução mensal dos últimos 6 meses'
+                      : 'Evolução mensal do último ano'}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             {/* Controles de período */}
-            <div className="card-theme flex items-center gap-1 rounded-lg p-1 dark:bg-gray-700">
-              {['6', '12', '24'].map(period => (
+            <div className="card-theme flex items-center gap-1 rounded-lg p-1">
+              {['1', '3', '6', '12'].map(period => (
                 <button
                   key={period}
-                  onClick={() => setTimeRange(period)}
-                  className={`rounded-md px-3 py-1 text-sm transition-colors ${timeRange === period ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-600 dark:text-white' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'}`}
+                  onClick={() => handlePeriodChange(period)}
+                  className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${timeRange === period ? 'bg-blue-500 text-white shadow-sm' : 'text-theme-secondary hover:text-theme-primary'}`}
                 >
-                  {period}m
+                  {period === '12' ? '1a' : `${period}m`}
                 </button>
               ))}
             </div>
 
             {/* Controles de tipo de gráfico */}
-            <div className="card-theme flex items-center gap-1 rounded-lg p-1 dark:bg-gray-700">
+            <div className="card-theme flex items-center gap-1 rounded-lg p-1">
               <button
                 onClick={() => setChartType('area')}
-                className={`rounded-md p-2 transition-colors ${chartType === 'area' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-600 dark:text-white' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'}`}
+                className={`rounded-md p-2 transition-colors ${chartType === 'area' ? 'bg-blue-500 text-white shadow-sm' : 'text-theme-secondary hover:text-theme-primary'}`}
                 title="Gráfico de Área"
               >
                 <BarChart3 className="h-4 w-4" />
               </button>
               <button
                 onClick={() => setChartType('line')}
-                className={`rounded-md p-2 transition-colors ${chartType === 'line' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-600 dark:text-white' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'}`}
+                className={`rounded-md p-2 transition-colors ${chartType === 'line' ? 'bg-blue-500 text-white shadow-sm' : 'text-theme-secondary hover:text-theme-primary'}`}
                 title="Gráfico de Linha"
               >
                 <TrendingUp className="h-4 w-4" />
@@ -313,7 +325,7 @@ const CashflowTimelineChart = ({
             {onRefresh && (
               <button
                 onClick={onRefresh}
-                className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary hover:card-theme rounded-lg p-2 transition-colors dark:hover:bg-gray-700"
+                className="text-theme-secondary hover:text-theme-primary rounded-lg p-2 transition-colors"
                 title="Atualizar dados"
               >
                 <RefreshCw className="h-4 w-4" />
@@ -323,7 +335,7 @@ const CashflowTimelineChart = ({
             {onExport && (
               <button
                 onClick={onExport}
-                className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary dark:hover:text-dark-text-primary hover:card-theme rounded-lg p-2 transition-colors dark:hover:bg-gray-700"
+                className="text-theme-secondary hover:text-theme-primary rounded-lg p-2 transition-colors"
                 title="Exportar gráfico"
               >
                 <Download className="h-4 w-4" />
@@ -564,6 +576,7 @@ CashflowTimelineChart.propTypes = {
   showGrid: PropTypes.bool,
   onRefresh: PropTypes.func,
   onExport: PropTypes.func,
+  onPeriodChange: PropTypes.func,
   className: PropTypes.string,
 };
 export default CashflowTimelineChart;

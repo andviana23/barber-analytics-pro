@@ -9,7 +9,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts'],
+    setupFiles: ['./tests/setup.ts'],
     css: true,
     typecheck: {
       tsconfig: './tsconfig.json',
@@ -20,6 +20,7 @@ export default defineConfig({
       exclude: [
         'node_modules/',
         'src/test/',
+        'tests/',
         '**/*.config.{js,ts}',
         '**/*.spec.{js,ts,jsx,tsx}',
         '**/*.test.{js,ts,jsx,tsx}',

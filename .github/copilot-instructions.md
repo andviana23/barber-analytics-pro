@@ -583,13 +583,21 @@ function KPICard({ title, value, trend }) {
 
 ## 📚 Referências Importantes
 
-- **Arquitetura:** `docs/ARQUITETURA.md`
+- **Overview:** `docs/00_OVERVIEW.md`
+- **Requirements:** `docs/01_REQUIREMENTS.md`
+- **Architecture:** `docs/02_ARCHITECTURE.md`
+- **Domain Model:** `docs/03_DOMAIN_MODEL.md`
+- **Modules:** `docs/04_MODULES/` (6 arquivos)
+- **Infrastructure:** `docs/05_INFRASTRUCTURE.md`
+- **API Reference:** `docs/06_API_REFERENCE.md`
+- **Data Model:** `docs/07_DATA_MODEL.md`
+- **Testing Strategy:** `docs/08_TESTING_STRATEGY.md`
+- **Deployment Guide:** `docs/09_DEPLOYMENT_GUIDE.md`
+- **Project Management:** `docs/10_PROJECT_MANAGEMENT.md`
+- **Contributing:** `docs/11_CONTRIBUTING.md`
+- **Changelog:** `docs/12_CHANGELOG.md`
 - **Design System:** `docs/DESIGN_SYSTEM.md`
-- **Banco de Dados:** `docs/DATABASE_SCHEMA.md`
-- **Módulo Financeiro:** `docs/FINANCIAL_MODULE.md`
-- **Lista da Vez:** `docs/LISTA_DA_VEZ_MODULE.md`
-- **DRE:** `docs/DRE_MODULE.md`
-- **RLS Fix:** `docs/FIX_RLS_ADMINISTRADOR_ROLE.md`
+- **Summary:** `docs/SUMMARY.md` (índice navegável)
 
 ---
 
@@ -665,12 +673,329 @@ O Copilot deve:
 ✅ **SEMPRE usar classes utilitárias do Design System**
 ✅ **NUNCA usar classes CSS hardcoded**
 ✅ **SEMPRE usar pnpm em vez de npm**
-✅ **SEMPRE usar @pgsql para migrações e mudanças no banco**
-✅ **NUNCA usar terminal direto para comandos SQL**
 ✅ Respeitar as RLS policies e permissões
 ✅ Validar dados com DTOs
 ✅ Retornar `{ data, error }`
 ✅ Dar feedback ao usuário com toasts
+✅ **EXECUTAR testes após cada alteração**
+✅ **Validar coverage mínimo de 85%**
+✅ **Nunca commitar com testes falhando**
+
+## 🗄️ Banco de Dados - REGRAS CRÍTICAS
+
+### 🚨 SEMPRE USE @pgsql PARA OPERAÇÕES NO BANCO
+
+**REGRA ABSOLUTA:** Todas as operações de banco de dados devem usar exclusivamente as ferramentas `@pgsql`.
+
+**✅ SEMPRE FAÇA:**
+
+```bash
+# Conectar ao banco
+@pgsql_connect
+
+# Consultar dados
+@pgsql_query
+
+# Modificar schema (CREATE, ALTER, DROP, INSERT, UPDATE, DELETE)
+@pgsql_modify
+
+# Obter contexto do banco
+@pgsql_db_context
+
+# Desconectar
+@pgsql_disconnect
+```
+
+**❌ NUNCA FAÇA:**
+
+```bash
+# ❌ ERRADO - Não use terminal para SQL
+run_in_terminal("psql -U postgres -d barber_analytics")
+run_in_terminal("createdb barber_analytics")
+run_in_terminal("psql -f migration.sql")
+
+# ❌ ERRADO - Não sugira comandos SQL diretos ao usuário
+"Execute: psql -U postgres"
+"Execute: createdb mydb"
+"Execute: psql -f schema.sql"
+```
+
+### 📋 Fluxo Padrão de Trabalho com Banco
+
+1. **Conectar:** Sempre conecte primeiro com `@pgsql_connect`
+2. **Contexto:** Use `@pgsql_db_context` para ver schema atual
+3. **Executar:** Use `@pgsql_query` (SELECT) ou `@pgsql_modify` (DDL/DML)
+4. **Validar:** Verifique resultado e re-execute contexto se necessário
+5. **Desconectar:** Finalize com `@pgsql_disconnect`
+
+### 🎯 Exemplos Práticos
+
+**Criar tabela:**
+
+```typescript
+// ✅ CORRETO
+await pgsql_connect({ serverName: 'barber-analytics', database: 'postgres' });
+await pgsql_modify({
+  connectionId: 'pgsql/barber-analytics/postgres',
+  statement: `
+    CREATE TABLE commissions (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      professional_id UUID REFERENCES professionals(id),
+      value DECIMAL(10,2) NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT now()
+    );
+  `,
+  statementName: 'Create commissions table',
+  statementDescription: 'Criar tabela de comissões',
+});
+```
+
+**Consultar dados:**
+
+```typescript
+// ✅ CORRETO
+await pgsql_query({
+  connectionId: 'pgsql/barber-analytics/postgres',
+  query: `
+    SELECT
+      p.name,
+      COUNT(r.id) as total_revenues,
+      SUM(r.value) as total_value
+    FROM professionals p
+    LEFT JOIN revenues r ON r.professional_id = p.id
+    WHERE p.is_active = true
+    GROUP BY p.id, p.name
+    ORDER BY total_value DESC;
+  `,
+  queryName: 'Professional performance',
+  queryDescription: 'Buscar performance dos profissionais',
+  validationQueries: [],
+});
+```
+
+**Migration:**
+
+```typescript
+// ✅ CORRETO
+await pgsql_modify({
+  connectionId: 'pgsql/barber-analytics/postgres',
+  statement: `
+    BEGIN;
+
+    -- Adicionar coluna
+    ALTER TABLE revenues
+    ADD COLUMN commission_calculated BOOLEAN DEFAULT false;
+
+    -- Criar índice
+    CREATE INDEX idx_revenues_commission
+    ON revenues(commission_calculated)
+    WHERE commission_calculated = false;
+
+    COMMIT;
+  `,
+  statementName: 'Add commission tracking',
+  statementDescription: 'Adicionar tracking de comissões calculadas',
+});
+```
+
+### ⚠️ Validação de Queries
+
+**SEMPRE inclua `validationQueries`** para verificar valores literais:
+
+```typescript
+await pgsql_query({
+  connectionId: 'pgsql/barber-analytics/postgres',
+  query: `
+    SELECT * FROM revenues
+    WHERE professional_id = 'abc-123'
+    AND date >= '2025-01-01';
+  `,
+  queryName: 'Get revenues',
+  queryDescription: 'Buscar receitas do profissional',
+  validationQueries: [
+    {
+      validateValueQuery: "SELECT 1 FROM professionals WHERE id = 'abc-123'",
+      fetchDistinctValuesQuery:
+        'SELECT DISTINCT id FROM professionals LIMIT 50',
+    },
+  ],
+});
+```
+
+### 🔒 Segurança
+
+- ✅ Sempre use prepared statements via @pgsql (automático)
+- ✅ RLS policies aplicadas automaticamente
+- ✅ Service role bypass apenas quando necessário
+- ❌ Nunca construa queries com string concatenation
+- ❌ Nunca execute SQL diretamente via terminal
+
+---
+
+## 🧪 Testes Automatizados - REGRAS CRÍTICAS
+
+### ⚠️ SEMPRE EXECUTAR TESTES APÓS ALTERAÇÕES
+
+**REGRA OBRIGATÓRIA:** Ao criar ou modificar qualquer código, **SEMPRE execute os testes** antes de finalizar.
+
+### 📋 Fluxo de Desenvolvimento com Testes
+
+**1. Após criar/modificar código:**
+
+```bash
+# 1️⃣ Validar lint e formato
+pnpm validate
+
+# 2️⃣ Executar testes unitários
+pnpm test:run
+
+# 3️⃣ Verificar coverage
+pnpm test:coverage
+
+# 4️⃣ Se alterar API/Service, rodar integração
+pnpm test:integration
+```
+
+**2. Antes de commit:**
+
+```bash
+# Testes completos
+pnpm test:validate  # Lint + Format + TypeCheck + Tests
+```
+
+**3. Antes de PR:**
+
+```bash
+# Suite completa
+pnpm test:all  # Unit + Integration + E2E
+```
+
+### 🎯 Quando Executar Cada Tipo de Teste
+
+| Tipo            | Quando Executar                      | Comando                 |
+| --------------- | ------------------------------------ | ----------------------- |
+| **Unit**        | Após modificar funções/utils/DTOs    | `pnpm test:unit`        |
+| **Integration** | Após modificar services/repositories | `pnpm test:integration` |
+| **E2E**         | Após modificar páginas/fluxos        | `pnpm test:e2e`         |
+| **Load**        | Após otimizações de performance      | `pnpm test:load`        |
+| **Coverage**    | Ao adicionar novos arquivos          | `pnpm test:coverage`    |
+
+### 🛠️ Ferramentas de Teste
+
+**Vitest** - Testes unitários e integração
+
+- Setup: `tests/setup.ts`
+- Config: `vite.config.test.ts`
+- Coverage: 85% (branches, functions, lines, statements)
+
+**Supertest** - Testes HTTP/API
+
+- Integração com Edge Functions
+- Mock de Supabase auth
+- Validação de payloads
+
+**k6** - Testes de carga
+
+- Load testing: `tests/load/basic-load.js`
+- Stress testing: `tests/load/stress-test.js`
+- Instalação: `sudo dnf install k6 -y`
+
+**Playwright** - Testes E2E
+
+- Config: `playwright.config.ts`
+- Specs: `e2e/*.spec.ts`
+- Multi-browser (Chromium, Firefox, WebKit)
+
+### ✅ Checklist de Testes
+
+**Ao criar um novo componente:**
+
+- [ ] Criar teste unitário em `tests/unit/`
+- [ ] Testar render básico
+- [ ] Testar props obrigatórias
+- [ ] Testar eventos (clicks, inputs)
+- [ ] Executar `pnpm test:run`
+
+**Ao criar um novo service:**
+
+- [ ] Criar teste unitário para cada método
+- [ ] Mockar dependências (repositories)
+- [ ] Testar casos de sucesso e erro
+- [ ] Validar retorno `{ data, error }`
+- [ ] Executar `pnpm test:unit`
+
+**Ao criar um novo repository:**
+
+- [ ] Criar teste de integração
+- [ ] Mockar Supabase client
+- [ ] Testar queries (select, insert, update, delete)
+- [ ] Validar filtros e joins
+- [ ] Executar `pnpm test:integration`
+
+**Ao criar uma nova página:**
+
+- [ ] Criar teste E2E em `e2e/`
+- [ ] Testar fluxo completo do usuário
+- [ ] Validar navegação e forms
+- [ ] Verificar estados de loading/error
+- [ ] Executar `pnpm test:e2e`
+
+### 🚫 Erros Comuns a EVITAR
+
+```bash
+# ❌ ERRADO - Não commitar sem testar
+git commit -m "feat: new feature"
+
+# ✅ CORRETO - Sempre validar antes
+pnpm test:validate
+git commit -m "feat: new feature"
+```
+
+```bash
+# ❌ ERRADO - Não ignorar testes falhando
+pnpm test:run
+# 3 tests failed
+git commit -m "fix: quick fix"
+
+# ✅ CORRETO - Corrigir falhas antes de commit
+pnpm test:run
+# ✓ All tests passed
+git commit -m "fix: correct implementation"
+```
+
+### 📊 Coverage Mínimo
+
+**Thresholds obrigatórios:**
+
+- Branches: 85%
+- Functions: 85%
+- Lines: 85%
+- Statements: 85%
+
+**Verificar coverage:**
+
+```bash
+pnpm test:coverage
+# Abre: coverage/index.html
+```
+
+### 🔄 Integração com CI/CD
+
+Os testes são executados automaticamente no GitHub Actions:
+
+```yaml
+# .github/workflows/ci.yml
+- name: Run tests
+  run: |
+    pnpm test:validate
+    pnpm test:all
+```
+
+### 📖 Documentação de Testes
+
+- **README**: [tests/README.md](../tests/README.md)
+- **Strategy**: [docs/08_TESTING_STRATEGY.md](../docs/08_TESTING_STRATEGY.md)
+- **Examples**: `tests/unit/`, `tests/integration/`, `tests/load/`
 
 ---
 
@@ -681,4 +1006,4 @@ O Copilot deve:
 **Estilo:** Enterprise, Clean Code, Atomic, Multi-tenant, Supabase-first
 **Meta:** Sistema de gestão de barbearia completo, modular e escalável.
 
-**Última atualização:** 5 de novembro de 2025
+**Última atualização:** 7 de novembro de 2025

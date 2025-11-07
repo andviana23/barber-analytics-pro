@@ -21,7 +21,6 @@ import {
   X,
   Building2,
   FolderOpen,
-  ChevronDown,
   ChevronRight,
   CreditCard,
   Package,
@@ -30,6 +29,7 @@ import {
   Scissors,
   FileText,
   TrendingUp,
+  Waves, // Para Fluxo de Caixa
 } from 'lucide-react';
 
 // Estrutura hierárquica do menu organizada por grupos funcionais
@@ -51,6 +51,21 @@ const menuGroups = [
         icon: DollarSign,
         path: '/financial',
         badge: null,
+        hasSubmenu: true,
+        submenu: [
+          {
+            id: 'financial-main',
+            label: 'Gestão Financeira',
+            icon: DollarSign,
+            path: '/financial',
+          },
+          {
+            id: 'demonstrativo-fluxo',
+            label: 'Fluxo de Caixa Acumulado',
+            icon: Waves,
+            path: '/demonstrativo-fluxo',
+          },
+        ],
       },
       {
         id: 'reports',
@@ -319,7 +334,7 @@ export function Sidebar({ isOpen, onClose, activeItem = 'dashboard' }) {
           .sidebar-scroll::-webkit-scrollbar-track {
             background: transparent;
           }
-          
+
           /* Dark mode scrollbar */
           .dark .sidebar-scroll::-webkit-scrollbar-thumb {
             background-color: rgba(77, 163, 255, 0.15);

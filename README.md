@@ -9,7 +9,7 @@
 
 **Plataforma completa de gestão financeira e operacional para redes de barbearias**
 
-[Documentação](docs/README.md) • [Instalação](#-instalação) • [Arquitetura](docs/ARQUITETURA.md) • [Contribuir](docs/guides/CONTRIBUTING.md)
+[📚 Documentação](docs/SUMMARY.md) • [⚙️ Instalação](#-instalação) • [🏗️ Arquitetura](docs/02_ARCHITECTURE.md) • [🤝 Contribuir](docs/11_CONTRIBUTING.md)
 
 </div>
 
@@ -59,6 +59,12 @@ O **Barber Analytics Pro** é uma aplicação web moderna construída com **Reac
 
 - **DRE Automatizado**: Demonstração de Resultado do Exercício com regime de competência
 - **Fluxo de Caixa**: Visualização detalhada de entradas e saídas
+- **📊 Demonstrativo de Fluxo de Caixa Acumulado** ⭐ **NOVO**:
+  - Filtros avançados (Unidade, Conta, Período até 2 anos)
+  - Tabela interativa com sorting e paginação
+  - Dashboard com 6 KPIs (Saldo Inicial, Entradas, Saídas, Variação%, Tendência)
+  - Export Excel/PDF/CSV (em desenvolvimento)
+  - 48 testes (38 unitários + 10 E2E)
 - **Categorização**: Organização hierárquica de despesas e receitas
 - **Conciliação Bancária**: Importação e matching automático de extratos OFX
 - **Metas Financeiras**: Definição e acompanhamento de metas por categoria
@@ -180,7 +186,11 @@ Execute as migrações SQL na ordem correta:
 supabase/migrations/
 ```
 
-Para mais detalhes, consulte o [Guia de Setup Completo](docs/guides/SETUP.md).
+Para mais detalhes, consulte:
+
+- [05 - Infrastructure](docs/05_INFRASTRUCTURE.md) - Configuração do Supabase
+- [07 - Data Model](docs/07_DATA_MODEL.md) - Modelo de dados completo
+- [09 - Deployment Guide](docs/09_DEPLOYMENT_GUIDE.md) - Guia de deploy
 
 ---
 
@@ -251,21 +261,22 @@ Para mais detalhes, consulte a [Documentação de Arquitetura](docs/ARQUITETURA.
 
 ```bash
 # Desenvolvimento
-npm run dev              # Inicia servidor de desenvolvimento
-npm run build            # Build de produção
-npm run preview          # Preview do build
+pnpm dev              # Inicia servidor de desenvolvimento
+pnpm build            # Build de produção
+pnpm preview          # Preview do build
 
 # Qualidade de Código
-npm run lint             # Executa linter
-npm run lint:fix         # Corrige problemas automaticamente
-npm run format           # Formata código com Prettier
-npm run format:check     # Verifica formatação
+pnpm lint             # Executa linter
+pnpm lint:fix         # Corrige problemas automaticamente
+pnpm format           # Formata código com Prettier
+pnpm format:check     # Verifica formatação
 
 # Testes
-npm run test             # Executa testes unitários (watch mode)
-npm run test:run         # Executa testes uma vez
-npm run test:ui          # Interface visual dos testes
-npm run test:coverage    # Relatório de cobertura
+pnpm test             # Executa testes unitários (watch mode)
+pnpm test:run         # Executa testes uma vez
+pnpm test:ui          # Interface visual dos testes
+pnpm test:coverage    # Relatório de cobertura
+pnpm test:e2e         # Testes E2E com Playwright
 ```
 
 ### Workflow de Desenvolvimento
@@ -297,7 +308,11 @@ git commit -m "feat: adiciona nova funcionalidade X"
 
 5. **Abra um Pull Request**
 
-Para mais detalhes, veja o [Guia de Desenvolvimento](docs/guides/DEVELOPMENT.md).
+Para mais detalhes, consulte:
+
+- [11 - Contributing](docs/11_CONTRIBUTING.md) - Guia completo de contribuição
+- [08 - Testing Strategy](docs/08_TESTING_STRATEGY.md) - Estratégia de testes
+- [02 - Architecture](docs/02_ARCHITECTURE.md) - Padrões arquiteturais
 
 ---
 
@@ -352,13 +367,13 @@ O projeto está configurado para deploy automático via Vercel:
 
 ```bash
 # Build deve passar sem erros
-npm run build
+pnpm build
 
 # Testes devem passar
-npm run test:run
+pnpm test:run
 
 # Linting deve estar ok
-npm run lint
+pnpm lint
 ```
 
 ### Configuração de Ambiente
@@ -392,33 +407,43 @@ Para guia completo, consulte [DEPLOY.md](docs/DEPLOY.md).
 3. **Database**: RLS policies em todas as tabelas
 4. **API**: Rate limiting via Supabase
 
-Veja mais em [SECURITY.md](docs/guides/SECURITY.md).
+Veja mais em [05 - Infrastructure](docs/05_INFRASTRUCTURE.md) e [09 - Deployment Guide](docs/09_DEPLOYMENT_GUIDE.md).
 
 ---
 
 ## 📚 Documentação
 
-### Documentação Principal
+### 📖 Documentação Técnica Completa
 
-- [📖 Índice de Documentação](docs/README.md)
-- [🏛️ Arquitetura](docs/ARQUITETURA.md)
-- [🗄️ Banco de Dados](docs/DATABASE_SCHEMA.md)
-- [🎨 Design System](docs/DESIGN_SYSTEM.md)
+Acesse o **[Índice de Documentação](docs/SUMMARY.md)** para navegar por toda a documentação técnica (~13,500 linhas):
 
-### Guias Técnicos
+**Core Documentation:**
 
-- [⚙️ Setup](docs/guides/SETUP.md)
-- [💻 Development](docs/guides/DEVELOPMENT.md)
-- [📝 Code Conventions](docs/guides/CODE_CONVENTIONS.md)
-- [🧩 Components](docs/guides/COMPONENTS.md)
-- [🔌 API](docs/guides/API_DOCUMENTATION.md)
+- [00 - Overview](docs/00_OVERVIEW.md) - Visão executiva do sistema
+- [01 - Requirements](docs/01_REQUIREMENTS.md) - Requisitos funcionais e não-funcionais
+- [02 - Architecture](docs/02_ARCHITECTURE.md) - Clean Architecture + 6 diagramas UML
+- [03 - Domain Model](docs/03_DOMAIN_MODEL.md) - DDD, entities, value objects
+- [05 - Infrastructure](docs/05_INFRASTRUCTURE.md) - Supabase: PostgreSQL, Auth, RLS, Realtime
+- [06 - API Reference](docs/06_API_REFERENCE.md) - Services, Repositories, Hooks, DTOs
+- [07 - Data Model](docs/07_DATA_MODEL.md) - ERD, data dictionary, views, functions
+- [08 - Testing Strategy](docs/08_TESTING_STRATEGY.md) - Vitest + Playwright
+- [09 - Deployment Guide](docs/09_DEPLOYMENT_GUIDE.md) - Vercel + CI/CD
+- [10 - Project Management](docs/10_PROJECT_MANAGEMENT.md) - Scrum/Kanban
+- [11 - Contributing](docs/11_CONTRIBUTING.md) - Git workflow + code style
+- [12 - Changelog](docs/12_CHANGELOG.md) - Histórico de versões
 
-### Módulos de Negócio
+**Module Documentation:**
 
-- [💰 Financial Module](docs/FINANCIAL_MODULE.md)
-- [📊 DRE Module](docs/DRE_MODULE.md)
-- [💈 Lista da Vez](docs/LISTA_DA_VEZ_MODULE.md)
-- [💵 Cash Register](docs/CASH_REGISTER_MODULE.md)
+- [04.01 - Financial Module](docs/04_MODULES/01_FINANCIAL.md) - Gestão financeira + DRE
+- [04.02 - Payments Module](docs/04_MODULES/02_PAYMENTS.md) - Métodos de pagamento
+- [04.03 - Clients Module](docs/04_MODULES/03_CLIENTS.md) - CRM + fidelização
+- [04.04 - Scheduler Module](docs/04_MODULES/04_SCHEDULER.md) - Lista da Vez + agendamentos
+- [04.05 - Reports Module](docs/04_MODULES/05_REPORTS.md) - Dashboard + charts
+- [04.06 - Notifications Module](docs/04_MODULES/06_NOTIFICATIONS.md) - WhatsApp + SMS
+
+**Design & Standards:**
+
+- [Design System](docs/DESIGN_SYSTEM.md) - TailwindCSS theme + componentes
 
 ---
 
@@ -446,21 +471,28 @@ Leia o [Guia de Contribuição](docs/guides/CONTRIBUTING.md) completo.
 
 ## 📝 Licença
 
-Este projeto é proprietário e confidencial. Todos os direitos reservados.
+Este projeto é proprietário e confidencial. Todos os direitos reservados © 2025 Andrey Viana.
 
 ---
 
-## 👥 Equipe
+## � Autor
+
+**Andrey Viana**
+
+- 🏗️ **Arquitetura**: Clean Architecture + Domain-Driven Design (DDD)
+- 🎨 **Design Pattern**: Atomic Design
+- 🛠️ **Stack**: React 19 + Vite + Supabase + TailwindCSS
+- 📦 **Package Manager**: pnpm
 
 **Desenvolvido para**: Barbearia Grupo Mangabeiras
-**Arquitetura**: Clean Architecture + DDD
-**Design System**: Atomic Design
 
 ---
 
 ## 📞 Suporte
 
 - 💬 **Issues**: Use o board do GitHub para reportar bugs
+- 📧 **Email**: suporte@barberanalytics.com
+- 📚 **Documentação**: [docs/SUMMARY.md](docs/SUMMARY.md)
 - 📧 **Email**: suporte@barberanalytics.com
 - 📚 **Docs**: Consulte a [documentação completa](docs/README.md)
 - ❓ **FAQ**: Veja [perguntas frequentes](docs/guides/FAQ.md)

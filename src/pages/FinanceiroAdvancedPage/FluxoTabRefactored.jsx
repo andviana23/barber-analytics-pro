@@ -19,8 +19,6 @@ import {
   FileSpreadsheet,
   FileText,
   Loader2,
-  ChevronLeft,
-  ChevronRight,
 } from 'lucide-react';
 
 // Services
@@ -29,12 +27,11 @@ import fluxoExportService from '../../services/fluxoExportService';
 // Custom Hooks
 import { useCashflowData } from '../../hooks/useCashflowData';
 import useCashflowTimeline from '../../hooks/useCashflowTimeline';
-import usePeriodFilter from '../../hooks/usePeriodFilter';
 import { useToast } from '../../context/ToastContext';
 import { supabase } from '../../services/supabase';
 
 // Components
-import PeriodFilter from '../../atoms/PeriodFilter/PeriodFilter';
+import MonthYearPicker from '../../atoms/MonthYearPicker/MonthYearPicker';
 import { CashflowTimelineChart } from '../../molecules/CashflowTimelineChart';
 import { PieChartCard } from '../../molecules/PieChartCard';
 
@@ -53,38 +50,25 @@ import { PieChartCard } from '../../molecules/PieChartCard';
  * - ✅ UI ultra moderna com hover effects
  * - ✅ Dark mode completo
  */
-const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
+const FluxoTabRefactored = ({ globalFilters }) => {
   const { showToast } = useToast();
   const [exporting, setExporting] = useState(false);
 
-  // �️ Hook para gerenciar filtros de período (Dia/Semana/Mês)
-  // ✅ PADRÃO: Semana vigente
-  const {
-    selectedPeriod,
-    selectedDate,
-    dateRange,
-    periodDescription,
-    isCurrentPeriod,
-    handlePeriodChange,
-    handleDateChange,
-    resetToToday,
-    goToPreviousPeriod,
-    goToNextPeriod,
-  } = usePeriodFilter('week', new Date());
+  // ✅ Estado simplificado: apenas mês selecionado
+  const [selectedMonth, setSelectedMonth] = useState(new Date());
 
-  // 🔍 DEBUG: Log do intervalo de datas calculado
-  useEffect(() => {
-    console.log('📅 Filtro de Período Atualizado:', {
-      selectedPeriod,
-      selectedDate:
-        selectedDate instanceof Date
-          ? format(selectedDate, 'yyyy-MM-dd')
-          : selectedDate,
-      dateRange,
-      periodDescription,
-      isCurrentPeriod,
-    });
-  }, [selectedPeriod, selectedDate, dateRange]);
+  // ✅ Calcular início e fim do mês selecionado (FORMATADO PARA STRING)
+  const dateRange = {
+    startDate: format(startOfMonth(selectedMonth), 'yyyy-MM-dd'),
+    endDate: format(endOfMonth(selectedMonth), 'yyyy-MM-dd'),
+  };
+
+  // ✅ Descrição do período (ex: "novembro de 2025")
+  const periodDescription = format(selectedMonth, "MMMM 'de' yyyy", {
+    locale: ptBR,
+  });
+
+  // ✅ Estados do fluxo de caixa
   const [cashflowData, setCashflowData] = useState({
     daily: [],
     paid: [],
@@ -95,44 +79,35 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [timelinePeriod, setTimelinePeriod] = useState('12'); // Estado para período do timeline
 
   // Hook para dados básicos do fluxo
-  const {
-    entries,
-    summary,
-    loading: cashflowLoading,
-    error: cashflowError,
-    refetch,
-  } = useCashflowData(
+  const { refetch } = useCashflowData(
     globalFilters.unitId,
     dateRange.startDate,
     dateRange.endDate,
     globalFilters.accountId
   );
 
-  // Hook para dados históricos do timeline
+  // Hook para dados históricos do timeline (com período e mês de referência)
   const {
     data: timelineData,
     loading: timelineLoading,
     error: timelineError,
     refetch: refetchTimeline,
-  } = useCashflowTimeline(globalFilters.unitId, 12);
+  } = useCashflowTimeline(
+    globalFilters.unitId,
+    timelinePeriod,
+    timelinePeriod === '1' ? selectedMonth : null
+  );
 
   // ✅ Buscar saldo final do período anterior ao selecionado
   const fetchPreviousMonthBalance = async () => {
     if (!globalFilters.unitId) return 0;
     try {
-      // ✅ CORRIGIDO: Usar selectedDate do filtro ao invés de new Date()
-      const referenceDate =
-        selectedDate instanceof Date ? selectedDate : new Date(selectedDate);
-      const previousMonth = subMonths(referenceDate, 1);
+      const previousMonth = subMonths(selectedMonth, 1);
       const startOfPreviousMonth = startOfMonth(previousMonth);
       const endOfPreviousMonth = endOfMonth(previousMonth);
-      console.log('📊 Buscando saldo do mês anterior:', {
-        referenceDate: format(referenceDate, 'yyyy-MM-dd'),
-        start: format(startOfPreviousMonth, 'yyyy-MM-dd'),
-        end: format(endOfPreviousMonth, 'yyyy-MM-dd'),
-      });
 
       // Buscar receitas do mês anterior
       const { data: prevRevenues } = await supabase
@@ -654,29 +629,23 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
 
   // ✅ Carregar dados automaticamente quando período ou unidade mudar
   useEffect(() => {
-    console.log('🔄 FluxoTab: Recarregando dados...', {
-      period: selectedPeriod,
-      startDate: dateRange.startDate,
-      endDate: dateRange.endDate,
-      unitId: globalFilters.unitId,
-      description: periodDescription,
-    });
-    fetchCompleteCashflowData();
+    if (globalFilters.unitId && dateRange.startDate && dateRange.endDate) {
+      fetchCompleteCashflowData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalFilters.unitId, dateRange.startDate, dateRange.endDate]);
 
   // Handlers
-  const handleDateRangeChange = newRange => {
-    if (newRange.startDate && newRange.endDate) {
-      setDateRange({
-        startDate: format(new Date(newRange.startDate), 'yyyy-MM-dd'),
-        endDate: format(new Date(newRange.endDate), 'yyyy-MM-dd'),
-      });
-    }
-  };
   const handleRefresh = () => {
     fetchCompleteCashflowData();
     refetch();
   };
+
+  // Handler para mudança de período do timeline
+  const handleTimelinePeriodChange = newPeriod => {
+    setTimelinePeriod(newPeriod);
+  };
+
   const handleExport = async format => {
     const dataToExport = cashflowData.daily || [];
     if (dataToExport.length === 0) {
@@ -860,63 +829,26 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
             </div>
           </div>
 
-          {/* Linha 2: Filtros de Período */}
+          {/* Linha 2: Seletor de Mês */}
           <div className="border-t-2 border-light-border pt-6 dark:border-dark-border">
-            <PeriodFilter
-              selectedPeriod={selectedPeriod}
-              onPeriodChange={handlePeriodChange}
-              selectedDate={selectedDate}
-              onDateChange={handleDateChange}
-            />
+            <div className="flex items-center justify-center gap-4">
+              <MonthYearPicker
+                selectedDate={selectedMonth}
+                onChange={setSelectedMonth}
+                label="Mês de Referência"
+                className="w-full max-w-md"
+              />
+            </div>
           </div>
 
-          {/* Linha 3: Navegação de Período e Descrição */}
-          <div className="flex flex-col items-center justify-between gap-4 rounded-xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-4 dark:border-blue-800 dark:from-blue-900/20 dark:to-indigo-900/20 sm:flex-row">
-            {/* Navegação */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={goToPreviousPeriod}
-                className="rounded-lg p-2 text-blue-600 transition-all hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-blue-900/30"
-                title="Período anterior"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </button>
-
-              <div className="card-theme flex items-center gap-2 rounded-lg border border-blue-200 px-4 py-2 dark:border-blue-700 dark:bg-dark-surface">
-                <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                <span className="text-theme-primary text-sm font-bold">
-                  {periodDescription}
-                </span>
-              </div>
-
-              <button
-                onClick={goToNextPeriod}
-                className="rounded-lg p-2 text-blue-600 transition-all hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-blue-900/30"
-                title="Próximo período"
-              >
-                <ChevronRight className="h-5 w-5" />
-              </button>
+          {/* Linha 3: Descrição do Período */}
+          <div className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-4 dark:border-blue-800 dark:from-blue-900/20 dark:to-indigo-900/20">
+            <div className="card-theme flex items-center gap-2 rounded-lg border border-blue-200 px-4 py-2 dark:border-blue-700 dark:bg-dark-surface">
+              <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <span className="text-theme-primary text-sm font-bold capitalize">
+                {periodDescription}
+              </span>
             </div>
-
-            {/* Botão Hoje */}
-            {!isCurrentPeriod && (
-              <button
-                onClick={resetToToday}
-                className="text-dark-text-primary rounded-lg bg-blue-600 px-4 py-2 font-semibold shadow-md transition-all hover:bg-blue-700 hover:shadow-lg"
-              >
-                Voltar para Hoje
-              </button>
-            )}
-
-            {/* Badge Período Atual */}
-            {isCurrentPeriod && (
-              <div className="flex items-center gap-2 rounded-full border-2 border-green-300 bg-green-100 px-3 py-1.5 dark:border-green-700 dark:bg-green-900/30">
-                <div className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
-                <span className="text-xs font-bold text-green-700 dark:text-green-300">
-                  PERÍODO ATUAL
-                </span>
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -947,6 +879,7 @@ const FluxoTabRefactored = ({ globalFilters, units = [] }) => {
           height={400}
           onRefresh={refetchTimeline}
           onExport={handleExport}
+          onPeriodChange={handleTimelinePeriodChange}
         />
       </div>
 

@@ -83,12 +83,12 @@ export function DashboardPage() {
       }
 
       if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-line no-undef
+         
         console.log(
           '📊 Receitas carregadas:',
           revenues?.length || 0,
           revenues?.slice(0, 3)
-        ); // eslint-disable-line no-console
+        );  
       }
 
       // Processar dados por mês
@@ -112,7 +112,7 @@ export function DashboardPage() {
         const competenciaDate = rev.data_competencia || rev.date;
         if (!competenciaDate) {
           if (process.env.NODE_ENV === 'development') {
-            // eslint-disable-line no-undef
+             
             console.warn('⚠️ Receita sem data:', rev); // eslint-disable-line no-console
           }
           return;
@@ -125,7 +125,7 @@ export function DashboardPage() {
           const amount = parseFloat(rev.value) || 0;
 
           if (process.env.NODE_ENV === 'development') {
-            // eslint-disable-line no-undef
+             
             console.log(`📅 ${monthKey}: ${categoryName} = R$ ${amount}`); // eslint-disable-line no-console
           }
 
@@ -150,7 +150,7 @@ export function DashboardPage() {
       // Converter para array para o gráfico
       const chartArray = Object.values(monthlyData);
       if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-line no-undef
+         
         console.log('📈 Dados do gráfico:', chartArray); // eslint-disable-line no-console
       }
       setChartData(chartArray);
@@ -170,7 +170,7 @@ export function DashboardPage() {
       };
 
       if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-line no-undef
+         
         console.log('📊 Dados do mês atual:', currentData); // eslint-disable-line no-console
         console.log('📊 Dados do mês anterior:', previousData); // eslint-disable-line no-console
       }
@@ -200,7 +200,7 @@ export function DashboardPage() {
       };
 
       if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-line no-undef
+         
         console.log('🎯 Metas carregadas:', goalsData); // eslint-disable-line no-console
       }
 
@@ -240,7 +240,7 @@ export function DashboardPage() {
       });
 
       if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-line no-undef
+         
         console.log('✅ KPIs calculados com sucesso'); // eslint-disable-line no-console
       }
     } catch (error) {

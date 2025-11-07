@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { bankAccountsService } from '../services';
 
 /**
@@ -12,24 +12,46 @@ export function useBankAccounts(initialFilters = {}) {
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState(initialFilters);
 
+  // Track last requested unitId to prevent race conditions
+  const lastRequestedUnitId = useRef(null);
+
   /**
    * Carrega a lista de contas bancárias
    */
   const loadBankAccounts = useCallback(async () => {
     try {
+      const { unitId, incluirInativas = false } = filters;
+
+      // Early return se unitId não estiver definido
+      if (!unitId) {
+        setBankAccounts([]);
+        setError(null);
+        lastRequestedUnitId.current = null;
+        return;
+      }
+
       setLoading(true);
       setError(null);
 
-      const { unitId, incluirInativas = false } = filters;
+      // Store current request unitId
+      lastRequestedUnitId.current = unitId;
+      const requestUnitId = unitId;
+
       const data = await bankAccountsService.getBankAccounts(
         unitId,
         incluirInativas
       );
 
-      setBankAccounts(data);
+      // Ignore response if unitId changed during request (race condition)
+      if (requestUnitId === lastRequestedUnitId.current) {
+        setBankAccounts(data);
+      }
     } catch (err) {
-      setError(err.message);
-      setBankAccounts([]);
+      // Only update error if this is still the current request
+      if (filters.unitId === lastRequestedUnitId.current) {
+        setError(err.message);
+        setBankAccounts([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -222,6 +244,35 @@ export function useBankAccounts(initialFilters = {}) {
   const refetch = useCallback(() => {
     loadBankAccounts();
   }, [loadBankAccounts]);
+
+  // Sincroniza filtros com initialFilters quando mudam (unitId e incluirInativas)
+  useEffect(() => {
+    setFilters(prev => {
+      const hasUnitId = Object.prototype.hasOwnProperty.call(
+        initialFilters,
+        'unitId'
+      );
+      const hasInclude = Object.prototype.hasOwnProperty.call(
+        initialFilters,
+        'incluirInativas'
+      );
+
+      const nextUnitId = hasUnitId ? initialFilters.unitId ?? null : prev.unitId;
+      const nextInclude = hasInclude
+        ? initialFilters.incluirInativas ?? false
+        : prev.incluirInativas ?? false;
+
+      if (prev.unitId === nextUnitId && prev.incluirInativas === nextInclude) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        unitId: nextUnitId,
+        incluirInativas: nextInclude,
+      };
+    });
+  }, [initialFilters.unitId, initialFilters.incluirInativas]);
 
   // Carrega os dados iniciais quando os filtros mudam
   useEffect(() => {
