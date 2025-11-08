@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useId } from 'react';
+import { ChevronUp, ChevronDown } from 'lucide-react';
+import { formatCurrency, parseCurrency } from '@/utils/formatters';
 import PropTypes from 'prop-types';
 
 /**
@@ -66,6 +68,7 @@ const CurrencyInput = ({
     if (!isFocused) {
       setDisplayValue(formatCurrency(value));
     }
+    // Ignorar displayValue nas dependências para evitar loops
   }, [value, isFocused]);
 
   // Handler de mudança
@@ -102,8 +105,8 @@ const CurrencyInput = ({
   };
 
   // Gera ID único se não fornecido
-  const inputId =
-    id || `currency-input-${name || Math.random().toString(36).substr(2, 9)}`;
+  const generatedId = useId();
+  const inputId = id || `currency-input-${name || generatedId}`;
 
   return (
     <div className={`w-full ${className}`}>

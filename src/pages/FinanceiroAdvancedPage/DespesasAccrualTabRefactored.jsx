@@ -460,7 +460,7 @@ const DespesasAccrualTabRefactored = ({
                 </tr> : filteredExpenses.length === 0 ? <tr>
                   <td colSpan="8" className="px-6 py-16 text-center text-theme-secondary">
                     <div className="flex flex-col items-center gap-3">
-                      <CreditCard className="w-12 h-12 text-gray-300 dark:text-theme-secondary" />
+                      <CreditCard className="w-12 h-12 text-gray-300 dark:text-gray-600 dark:text-theme-secondary" />
                       <p className="font-medium">Nenhuma despesa encontrada</p>
                       <p className="text-xs">
                         Tente ajustar os filtros ou adicione uma nova despesa
@@ -598,7 +598,7 @@ const DespesasAccrualTabRefactored = ({
             {/* Body */}
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary mb-2">
                   Data do Pagamento *
                 </label>
                 <input type="date" value={selectedPaymentDate} onChange={e => setSelectedPaymentDate(e.target.value)} max={format(new Date(), 'yyyy-MM-dd')} // Não permite datas futuras
@@ -630,7 +630,7 @@ const DespesasAccrualTabRefactored = ({
             setIsPaymentDateModalOpen(false);
             setSelectedExpenseForAction(null);
             setSelectedPaymentDate(format(new Date(), 'yyyy-MM-dd'));
-          }} className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 card-theme dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors">
+          }} className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary card-theme dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors">
                 Cancelar
               </button>
               <button type="button" onClick={handleConfirmDarBaixa} disabled={!selectedPaymentDate} className="flex-1 px-4 py-2.5 text-sm font-medium text-dark-text-primary bg-gradient-success hover:from-green-600 hover:to-green-700 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg flex items-center justify-center gap-2">

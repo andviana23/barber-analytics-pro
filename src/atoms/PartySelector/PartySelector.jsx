@@ -24,7 +24,7 @@ const PartySelector = ({
   disabled = false,
   clearable = true,
   allowCreate = false,
-  onCreateNew,
+  onCreateNew
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -37,7 +37,9 @@ const PartySelector = ({
   const searchRef = useRef(null);
   const containerRef = useRef(null);
   const createInputRef = useRef(null);
-  const { addToast } = useToast();
+  const {
+    addToast
+  } = useToast();
 
   // Carregar parties ao abrir ou mudar filtros
   useEffect(() => {
@@ -59,10 +61,7 @@ const PartySelector = ({
   // Fechar dropdown ao clicar fora
   useEffect(() => {
     const handleClickOutside = event => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target)
-      ) {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
         setIsOpen(false);
         setSearchTerm('');
       }
@@ -85,12 +84,15 @@ const PartySelector = ({
         return tipo;
       })();
       const filters = {
-        unitId,
+        unitId
       };
       if (normalizedTipo) {
         filters.tipo = normalizedTipo;
       }
-      const { data, error } = await partiesService.getParties(filters);
+      const {
+        data,
+        error
+      } = await partiesService.getParties(filters);
       if (error) {
         addToast(error, 'error');
         return;
@@ -107,11 +109,7 @@ const PartySelector = ({
   const filteredParties = parties.filter(party => {
     if (!searchTerm) return true;
     const searchLower = searchTerm.toLowerCase();
-    return (
-      party.nome.toLowerCase().includes(searchLower) ||
-      (party.cpf_cnpj && party.cpf_cnpj.includes(searchTerm)) ||
-      (party.email && party.email.toLowerCase().includes(searchLower))
-    );
+    return party.nome.toLowerCase().includes(searchLower) || party.cpf_cnpj && party.cpf_cnpj.includes(searchTerm) || party.email && party.email.toLowerCase().includes(searchLower);
   });
 
   // Selecionar party
@@ -165,7 +163,7 @@ const PartySelector = ({
       addToast({
         type: 'error',
         title: 'Nome obrigatório',
-        message: 'Digite um nome para continuar.',
+        message: 'Digite um nome para continuar.'
       });
       return;
     }
@@ -215,11 +213,7 @@ const PartySelector = ({
 
   // Ícone baseado no tipo
   const getPartyIcon = partyTipo => {
-    return partyTipo === 'cliente' ? (
-      <User className="h-4 w-4 text-blue-500" />
-    ) : (
-      <Building className="h-4 w-4 text-green-500" />
-    );
+    return partyTipo === 'cliente' ? <User className="h-4 w-4 text-blue-500" /> : <Building className="h-4 w-4 text-green-500" />;
   };
   const containerClasses = `relative ${className}`;
   const triggerClasses = `
@@ -228,24 +222,14 @@ const PartySelector = ({
     ${disabled ? 'bg-gray-50 cursor-not-allowed' : 'cursor-pointer'}
     ${selectedParty ? 'text-gray-900' : 'text-gray-500'}
   `;
-  return (
-    <div className={containerClasses} ref={containerRef}>
+  return <div className={containerClasses} ref={containerRef}>
       {/* Trigger */}
-      <div
-        className={triggerClasses}
-        onClick={disabled ? undefined : handleOpen}
-        role="button"
-        tabIndex={disabled ? -1 : 0}
-        onKeyDown={e => {
-          if (!disabled && (e.key === 'Enter' || e.key === ' ')) {
-            e.preventDefault();
-            handleOpen();
-          }
-        }}
-        aria-haspopup="listbox"
-        aria-expanded={isOpen}
-        aria-disabled={disabled}
-      >
+      <div className={triggerClasses} onClick={disabled ? undefined : handleOpen} role="button" tabIndex={disabled ? -1 : 0} onKeyDown={e => {
+      if (!disabled && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault();
+        handleOpen();
+      }
+    }} aria-haspopup="listbox" aria-expanded={isOpen} aria-disabled={disabled}>
         <div className="flex min-w-0 flex-1 items-center">
           {selectedParty && getPartyIcon(selectedParty.tipo)}
           <span className="ml-2 truncate">
@@ -254,123 +238,69 @@ const PartySelector = ({
         </div>
 
         <div className="ml-2 flex flex-shrink-0 items-center">
-          {clearable && selectedParty && (
-            <button
-              type="button"
-              onClick={e => {
-                e.stopPropagation();
-                handleClear(e);
-              }}
-              className="hover:card-theme rounded p-0.5 transition-colors dark:hover:bg-gray-700"
-              title="Limpar"
-              aria-label="Limpar seleção"
-            >
+          {clearable && selectedParty && <button type="button" onClick={e => {
+          e.stopPropagation();
+          handleClear(e);
+        }} className="hover:card-theme rounded p-0.5 transition-colors dark:hover:bg-gray-700" title="Limpar" aria-label="Limpar seleção">
               <X className="text-light-text-muted dark:text-dark-text-muted h-3 w-3" />
-            </button>
-          )}
-          <ChevronDown
-            className={`ml-1 h-4 w-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          />
+            </button>}
+          <ChevronDown className={`ml-1 h-4 w-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </div>
       </div>
 
       {/* Dropdown */}
-      {isOpen && (
-        <div className="card-theme absolute z-50 mt-1 flex max-h-80 w-full flex-col overflow-hidden rounded-md border border-light-border shadow-lg dark:border-dark-border dark:bg-dark-surface">
+      {isOpen && <div className="card-theme absolute z-50 mt-1 flex max-h-80 w-full flex-col overflow-hidden rounded-md border border-light-border shadow-lg dark:border-dark-border dark:bg-dark-surface">
           {/* Search */}
           <div className="flex-shrink-0 border-b border-light-border p-3 dark:border-dark-border">
             <div className="relative">
               <Search className="text-light-text-muted dark:text-dark-text-muted absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform" />
-              <input
-                ref={searchRef}
-                type="text"
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                placeholder="Buscar por nome, CPF/CNPJ ou email..."
-                className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-md border border-light-border py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
-              />
+              <input ref={searchRef} type="text" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder="Buscar por nome, CPF/CNPJ ou email..." className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-md border border-light-border py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700" />
             </div>
           </div>
 
           {/* Lista de parties */}
-          <div
-            className="flex-1 overflow-y-auto"
-            style={{
-              maxHeight: '240px',
-            }}
-          >
-            {loading ? (
-              <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted p-3 text-center text-sm">
+          <div className="flex-1 overflow-y-auto" style={{
+        maxHeight: '240px'
+      }}>
+            {loading ? <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted p-3 text-center text-sm">
                 Carregando...
-              </div>
-            ) : filteredParties.length > 0 ? (
-              <>
-                {filteredParties.map(party => (
-                  <button
-                    key={party.id}
-                    type="button"
-                    onClick={() => handleSelectParty(party)}
-                    className={`flex w-full items-center px-3 py-2 text-left text-sm transition-colors hover:bg-gray-50 dark:hover:bg-gray-700 ${selectedParty?.id === party.id ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-900 dark:text-gray-100'} `}
-                  >
+              </div> : filteredParties.length > 0 ? <>
+                {filteredParties.map(party => <button key={party.id} type="button" onClick={() => handleSelectParty(party)} className={`flex w-full items-center px-3 py-2 text-left text-sm transition-colors hover:bg-gray-50 dark:hover:bg-gray-700 ${selectedParty?.id === party.id ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-900 dark:text-gray-100'} `}>
                     {getPartyIcon(party.tipo)}
                     <div className="ml-2 min-w-0 flex-1">
                       <div className="truncate font-medium">{party.nome}</div>
-                      {party.cpf_cnpj && (
-                        <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted truncate text-xs">
+                      {party.cpf_cnpj && <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted truncate text-xs">
                           {party.cpf_cnpj} • {party.tipo}
-                        </div>
-                      )}
-                      {party.email && (
-                        <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted truncate text-xs">
+                        </div>}
+                      {party.email && <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted truncate text-xs">
                           {party.email}
-                        </div>
-                      )}
+                        </div>}
                     </div>
-                  </button>
-                ))}
-              </>
-            ) : (
-              <div className="p-3">
+                  </button>)}
+              </> : <div className="p-3">
                 <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-center text-sm">
-                  {searchTerm
-                    ? 'Nenhum resultado encontrado'
-                    : 'Nenhum cliente/fornecedor cadastrado'}
+                  {searchTerm ? 'Nenhum resultado encontrado' : 'Nenhum cliente/fornecedor cadastrado'}
                 </div>
 
                 {/* Opção para criar novo com termo de busca */}
-                {allowCreate && searchTerm && (
-                  <button
-                    type="button"
-                    onClick={handleCreateNew}
-                    className="mt-2 flex w-full items-center justify-center rounded-md px-3 py-2 text-sm text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
-                  >
+                {allowCreate && searchTerm && <button type="button" onClick={handleCreateNew} className="mt-2 flex w-full items-center justify-center rounded-md px-3 py-2 text-sm text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20">
                     <Plus className="mr-2 h-4 w-4" />
                     Criar "{searchTerm}"
-                  </button>
-                )}
-              </div>
-            )}
+                  </button>}
+              </div>}
           </div>
 
           {/* Footer com ação de criar */}
-          {allowCreate && (
-            <div className="card-theme flex-shrink-0 border-t border-light-border p-2 dark:border-dark-border dark:bg-dark-surface">
-              <button
-                type="button"
-                onClick={handleCreateNew}
-                className="flex w-full items-center justify-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
-              >
+          {allowCreate && <div className="card-theme flex-shrink-0 border-t border-light-border p-2 dark:border-dark-border dark:bg-dark-surface">
+              <button type="button" onClick={handleCreateNew} className="flex w-full items-center justify-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20">
                 <Plus className="h-4 w-4" />
                 Cadastrar novo fornecedor
               </button>
-            </div>
-          )}
-        </div>
-      )}
+            </div>}
+        </div>}
 
       {/* Modal Inline de Criação Rápida */}
-      {showCreateModal && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black bg-opacity-50 p-4">
+      {showCreateModal && <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black bg-opacity-50 p-4">
           <div className="card-theme w-full max-w-md animate-fadeIn space-y-4 rounded-lg p-6 shadow-2xl dark:bg-dark-surface">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-light-border pb-4 dark:border-dark-border">
@@ -387,30 +317,17 @@ const PartySelector = ({
                   </p>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={handleCancelCreate}
-                className="hover:card-theme rounded-lg p-1 transition-colors dark:hover:bg-gray-700"
-              >
+              <button type="button" onClick={handleCancelCreate} className="hover:card-theme rounded-lg p-1 transition-colors dark:hover:bg-gray-700">
                 <X className="text-theme-secondary h-5 w-5" />
               </button>
             </div>
 
             {/* Input */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                 Nome do Fornecedor *
               </label>
-              <input
-                ref={createInputRef}
-                type="text"
-                value={newPartyName}
-                onChange={e => setNewPartyName(e.target.value)}
-                onKeyDown={handleCreateKeyDown}
-                placeholder="Ex: João da Silva, Empresa LTDA..."
-                disabled={isCreating}
-                className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border-2 border-light-border px-4 py-3 text-sm placeholder-gray-400 transition-all duration-200 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-border dark:bg-gray-700 dark:placeholder-gray-500"
-              />
+              <input ref={createInputRef} type="text" value={newPartyName} onChange={e => setNewPartyName(e.target.value)} onKeyDown={handleCreateKeyDown} placeholder="Ex: João da Silva, Empresa LTDA..." disabled={isCreating} className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border-2 border-light-border px-4 py-3 text-sm placeholder-gray-400 transition-all duration-200 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-border dark:bg-gray-700 dark:placeholder-gray-500" />
               <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-xs">
                 Você poderá adicionar CPF/CNPJ e outros dados depois.
               </p>
@@ -418,38 +335,22 @@ const PartySelector = ({
 
             {/* Actions */}
             <div className="flex gap-3 pt-2">
-              <button
-                type="button"
-                onClick={handleCancelCreate}
-                disabled={isCreating}
-                className="card-theme flex-1 rounded-lg px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-700 dark:text-gray-300 dark:text-gray-600 dark:hover:bg-gray-600"
-              >
+              <button type="button" onClick={handleCancelCreate} disabled={isCreating} className="card-theme flex-1 rounded-lg px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 transition-colors hover:bg-gray-200 dark:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50 dark:text-theme-secondary dark:hover:bg-gray-600">
                 Cancelar
               </button>
-              <button
-                type="button"
-                onClick={handleConfirmCreate}
-                disabled={isCreating || !newPartyName.trim()}
-                className="text-dark-text-primary flex flex-1 items-center justify-center gap-2 rounded-lg bg-gradient-primary px-4 py-2.5 text-sm font-medium shadow-md transition-all hover:from-blue-600 hover:to-blue-700 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {isCreating ? (
-                  <>
+              <button type="button" onClick={handleConfirmCreate} disabled={isCreating || !newPartyName.trim()} className="text-dark-text-primary flex flex-1 items-center justify-center gap-2 rounded-lg bg-gradient-primary px-4 py-2.5 text-sm font-medium shadow-md transition-all hover:from-blue-600 hover:to-blue-700 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50">
+                {isCreating ? <>
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-light-surface border-t-transparent dark:border-dark-surface" />
                     Criando...
-                  </>
-                ) : (
-                  <>
+                  </> : <>
                     <Plus className="h-4 w-4" />
                     Criar Fornecedor
-                  </>
-                )}
+                  </>}
               </button>
             </div>
           </div>
-        </div>
-      )}
-    </div>
-  );
+        </div>}
+    </div>;
 };
 PartySelector.propTypes = {
   /**
@@ -491,7 +392,7 @@ PartySelector.propTypes = {
   /**
    * Callback para criar novo party
    */
-  onCreateNew: PropTypes.func,
+  onCreateNew: PropTypes.func
 };
 
 // Componente de preview para demonstração
@@ -505,68 +406,40 @@ export const PartySelectorPreview = () => {
   const handleCreateNew = searchTerm => {
     alert(`Criar novo com termo: "${searchTerm}"`);
   };
-  return (
-    <div className="max-w-md space-y-6 p-4">
+  return <div className="max-w-md space-y-6 p-4">
       <h3 className="text-lg font-semibold">PartySelector Preview</h3>
 
       <div>
-        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
           Apenas Clientes:
         </label>
-        <PartySelector
-          value={selectedClient}
-          onChange={setSelectedClient}
-          unitId={mockUnitId}
-          tipo="cliente"
-          placeholder="Selecione um cliente"
-          allowCreate={true}
-          onCreateNew={handleCreateNew}
-        />
+        <PartySelector value={selectedClient} onChange={setSelectedClient} unitId={mockUnitId} tipo="cliente" placeholder="Selecione um cliente" allowCreate={true} onCreateNew={handleCreateNew} />
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
           Apenas Fornecedores:
         </label>
-        <PartySelector
-          value={selectedSupplier}
-          onChange={setSelectedSupplier}
-          unitId={mockUnitId}
-          tipo="fornecedor"
-          placeholder="Selecione um fornecedor"
-        />
+        <PartySelector value={selectedSupplier} onChange={setSelectedSupplier} unitId={mockUnitId} tipo="fornecedor" placeholder="Selecione um fornecedor" />
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
           Clientes e Fornecedores:
         </label>
-        <PartySelector
-          value={selectedAny}
-          onChange={setSelectedAny}
-          unitId={mockUnitId}
-          tipo="all"
-          placeholder="Selecione qualquer party"
-          clearable={false}
-        />
+        <PartySelector value={selectedAny} onChange={setSelectedAny} unitId={mockUnitId} tipo="all" placeholder="Selecione qualquer party" clearable={false} />
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
           Desabilitado:
         </label>
-        <PartySelector
-          value={selectedAny}
-          onChange={setSelectedAny}
-          unitId={mockUnitId}
-          disabled={true}
-          placeholder="Componente desabilitado"
-        />
+        <PartySelector value={selectedAny} onChange={setSelectedAny} unitId={mockUnitId} disabled={true} placeholder="Componente desabilitado" />
       </div>
 
       {/* Display dos valores selecionados */}
       <div className="mt-6 rounded-md bg-light-bg p-3 dark:bg-dark-bg">
-        <h4 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+        <h4 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
           Valores selecionados:
         </h4>
         <div className="space-y-1 text-xs">
@@ -575,7 +448,6 @@ export const PartySelectorPreview = () => {
           <div>Qualquer: {selectedAny || 'nenhum'}</div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
 export default PartySelector;

@@ -6,12 +6,14 @@ import { useAuth } from '../../context/AuthContext';
  * Componente para diagnosticar problemas de autenticação e RLS
  */
 export function AuthDiagnostic() {
-  const { user } = useAuth();
+  const {
+    user
+  } = useAuth();
   const [diagnostics, setDiagnostics] = useState({
     authContext: null,
     supabaseSession: null,
     rlsTest: null,
-    professionalQuery: null,
+    professionalQuery: null
   });
   useEffect(() => {
     async function runDiagnostics() {
@@ -22,55 +24,56 @@ export function AuthDiagnostic() {
         hasUser: !!user,
         userId: user?.id,
         email: user?.email,
-        role: user?.user_metadata?.role,
+        role: user?.user_metadata?.role
       };
 
       // 2. Sessão do Supabase
       const {
-        data: { session },
-        error: sessionError,
+        data: {
+          session
+        },
+        error: sessionError
       } = await supabase.auth.getSession();
       const supabaseSessionData = {
         hasSession: !!session,
         userId: session?.user?.id,
         email: session?.user?.email,
         role: session?.user?.user_metadata?.role,
-        tokenExpiry: session?.expires_at
-          ? new Date(session.expires_at * 1000)
-          : null,
-        error: sessionError,
+        tokenExpiry: session?.expires_at ? new Date(session.expires_at * 1000) : null,
+        error: sessionError
       };
 
       // 3. Teste de RLS com função auth.uid()
-      const { data: rlsData, error: rlsError } = await supabase
-        .rpc('get_current_user_info')
-        .single();
+      const {
+        data: rlsData,
+        error: rlsError
+      } = await supabase.rpc('get_current_user_info').single();
       const rlsTestData = {
         data: rlsData,
-        error: rlsError,
+        error: rlsError
       };
 
       // 4. Teste direto da tabela professionals
-      const { data: profData, error: profError } = await supabase
-        .from('professionals')
-        .select('id, name, role, unit_id')
-        .limit(3);
+      const {
+        data: profData,
+        error: profError
+      } = await supabase.from('professionals').select('id, name, role, unit_id').limit(3);
       const professionalQueryData = {
         data: profData,
         error: profError,
-        count: profData?.length || 0,
+        count: profData?.length || 0
       };
       setDiagnostics({
         authContext: authContextData,
         supabaseSession: supabaseSessionData,
         rlsTest: rlsTestData,
-        professionalQuery: professionalQueryData,
+        professionalQuery: professionalQueryData
       });
       console.log('📊 Diagnósticos completos:', {
         authContextData,
         supabaseSessionData,
         rlsTestData,
-        professionalQueryData,
+        professionalQueryData
       });
     }
     if (user) {
@@ -78,19 +81,16 @@ export function AuthDiagnostic() {
     }
   }, [user]);
   if (!user) {
-    return (
-      <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+    return <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
         <h3 className="font-semibold text-yellow-800">
           ⚠️ Usuário não autenticado
         </h3>
         <p className="text-yellow-700">
           Faça login para executar os diagnósticos.
         </p>
-      </div>
-    );
+      </div>;
   }
-  return (
-    <div className="space-y-4">
+  return <div className="space-y-4">
       <h2 className="mb-4 text-2xl font-bold">
         🔍 Diagnóstico de Autenticação
       </h2>
@@ -129,14 +129,12 @@ export function AuthDiagnostic() {
         <pre className="whitespace-pre-wrap text-sm text-orange-700">
           {JSON.stringify(diagnostics.professionalQuery, null, 2)}
         </pre>
-        {diagnostics.professionalQuery?.error && (
-          <div className="mt-2 rounded border border-red-300 bg-red-100 p-2">
+        {diagnostics.professionalQuery?.error && <div className="mt-2 rounded border border-red-300 bg-red-100 p-2">
             <p className="font-semibold text-red-800">❌ Erro identificado:</p>
             <p className="text-red-700">
               {diagnostics.professionalQuery.error.message}
             </p>
-          </div>
-        )}
+          </div>}
       </div>
 
       {/* Recomendações */}
@@ -144,7 +142,7 @@ export function AuthDiagnostic() {
         <h3 className="text-theme-primary mb-2 font-semibold">
           🎯 Recomendações
         </h3>
-        <ul className="list-inside list-disc space-y-1 text-gray-700 dark:text-gray-300 dark:text-gray-600">
+        <ul className="list-inside list-disc space-y-1 text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
           <li>
             Se RLS Test falhar: Problema nas políticas RLS ou usuário sem perfil
           </li>
@@ -159,6 +157,5 @@ export function AuthDiagnostic() {
           <li>Se token estiver expirado: Necessário refresh da sessão</li>
         </ul>
       </div>
-    </div>
-  );
+    </div>;
 }

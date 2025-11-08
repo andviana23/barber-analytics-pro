@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  X,
-  DollarSign,
-  AlertCircle,
-  Save,
-  Edit3,
-  TrendingUp,
-  TrendingDown,
-} from 'lucide-react';
+import { X, DollarSign, AlertCircle, Save, Edit3, TrendingUp, TrendingDown } from 'lucide-react';
 import { bankAccountsService } from '../../services';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
@@ -16,12 +8,21 @@ import { useToast } from '../../context/ToastContext';
  * Modal para editar saldo inicial de conta bancária
  * Registra log de auditoria com motivo da alteração
  */
-const EditInitialBalanceModal = ({ isOpen, onClose, onSuccess, account }) => {
-  const { user } = useAuth();
-  const { showToast } = useToast();
+const EditInitialBalanceModal = ({
+  isOpen,
+  onClose,
+  onSuccess,
+  account
+}) => {
+  const {
+    user
+  } = useAuth();
+  const {
+    showToast
+  } = useToast();
   const [formData, setFormData] = useState({
     newBalance: '',
-    reason: '',
+    reason: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -31,16 +32,19 @@ const EditInitialBalanceModal = ({ isOpen, onClose, onSuccess, account }) => {
     if (account && isOpen) {
       setFormData({
         newBalance: account.initial_balance?.toString() || '0',
-        reason: '',
+        reason: ''
       });
       setError(null);
     }
   }, [account, isOpen]);
   const handleChange = e => {
-    const { name, value } = e.target;
+    const {
+      name,
+      value
+    } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value,
+      [name]: value
     }));
     setError(null);
   };
@@ -66,25 +70,19 @@ const EditInitialBalanceModal = ({ isOpen, onClose, onSuccess, account }) => {
       setError(null);
 
       // Chamar o service para atualizar saldo inicial
-      const { data, error: updateError } =
-        await bankAccountsService.updateInitialBalance(
-          account.id,
-          newBalanceValue,
-          user?.id,
-          formData.reason.trim()
-        );
+      const {
+        data,
+        error: updateError
+      } = await bankAccountsService.updateInitialBalance(account.id, newBalanceValue, user?.id, formData.reason.trim());
       if (updateError) {
         throw new Error(updateError);
       }
-      showToast(
-        'Saldo inicial atualizado com sucesso! Os saldos foram recalculados.',
-        'success'
-      );
+      showToast('Saldo inicial atualizado com sucesso! Os saldos foram recalculados.', 'success');
 
       // Resetar formulário
       setFormData({
         newBalance: '',
-        reason: '',
+        reason: ''
       });
 
       // Callback de sucesso
@@ -104,7 +102,7 @@ const EditInitialBalanceModal = ({ isOpen, onClose, onSuccess, account }) => {
     if (!loading) {
       setFormData({
         newBalance: '',
-        reason: '',
+        reason: ''
       });
       setError(null);
       onClose();
@@ -113,7 +111,7 @@ const EditInitialBalanceModal = ({ isOpen, onClose, onSuccess, account }) => {
   const formatCurrency = value => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
-      currency: 'BRL',
+      currency: 'BRL'
     }).format(value || 0);
   };
   if (!isOpen || !account) return null;
@@ -121,13 +119,9 @@ const EditInitialBalanceModal = ({ isOpen, onClose, onSuccess, account }) => {
   const newBalance = parseFloat(formData.newBalance) || 0;
   const difference = newBalance - oldBalance;
   const isIncrease = difference > 0;
-  return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+  return <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Overlay */}
-      <div
-        className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
-        onClick={handleClose}
-      />
+      <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={handleClose} />
 
       {/* Modal */}
       <div className="flex min-h-screen items-center justify-center p-4">
@@ -147,11 +141,7 @@ const EditInitialBalanceModal = ({ isOpen, onClose, onSuccess, account }) => {
                 </p>
               </div>
             </div>
-            <button
-              onClick={handleClose}
-              disabled={loading}
-              className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary hover:card-theme rounded-lg p-2 transition-colors dark:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
-            >
+            <button onClick={handleClose} disabled={loading} className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary hover:card-theme rounded-lg p-2 transition-colors dark:text-theme-secondary dark:hover:bg-gray-700 dark:hover:text-gray-300 dark:text-gray-600">
               <X className="h-5 w-5" />
             </button>
           </div>
@@ -169,24 +159,14 @@ const EditInitialBalanceModal = ({ isOpen, onClose, onSuccess, account }) => {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Novo Saldo */}
             <div>
-              <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600">
+              <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                 Novo Saldo Inicial *
               </label>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                   <DollarSign className="text-light-text-muted dark:text-dark-text-muted h-5 w-5" />
                 </div>
-                <input
-                  type="number"
-                  step="0.01"
-                  name="newBalance"
-                  value={formData.newBalance}
-                  onChange={handleChange}
-                  disabled={loading}
-                  placeholder="0,00"
-                  className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-xl border border-light-border px-4 py-3 pl-11 text-lg font-semibold placeholder-gray-400 transition-all focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
-                  required
-                />
+                <input type="number" step="0.01" name="newBalance" value={formData.newBalance} onChange={handleChange} disabled={loading} placeholder="0,00" className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-xl border border-light-border px-4 py-3 pl-11 text-lg font-semibold placeholder-gray-400 transition-all focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700" required />
               </div>
               <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1.5 text-xs">
                 Digite o valor correto do saldo inicial da conta
@@ -194,47 +174,26 @@ const EditInitialBalanceModal = ({ isOpen, onClose, onSuccess, account }) => {
             </div>
 
             {/* Preview da Diferença */}
-            {difference !== 0 && !isNaN(difference) && (
-              <div
-                className={`rounded-xl border p-4 ${isIncrease ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20' : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'}`}
-              >
+            {difference !== 0 && !isNaN(difference) && <div className={`rounded-xl border p-4 ${isIncrease ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20' : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'}`}>
                 <div className="flex items-center space-x-3">
-                  {isIncrease ? (
-                    <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
-                  ) : (
-                    <TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
-                  )}
+                  {isIncrease ? <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" /> : <TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />}
                   <div>
-                    <p
-                      className={`text-xs font-semibold uppercase tracking-wide ${isIncrease ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
-                    >
+                    <p className={`text-xs font-semibold uppercase tracking-wide ${isIncrease ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                       {isIncrease ? 'Aumento' : 'Redução'} de:
                     </p>
-                    <p
-                      className={`text-lg font-bold ${isIncrease ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}`}
-                    >
+                    <p className={`text-lg font-bold ${isIncrease ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}`}>
                       {formatCurrency(Math.abs(difference))}
                     </p>
                   </div>
                 </div>
-              </div>
-            )}
+              </div>}
 
             {/* Motivo */}
             <div>
-              <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600">
+              <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                 Motivo da Alteração *
               </label>
-              <textarea
-                name="reason"
-                value={formData.reason}
-                onChange={handleChange}
-                disabled={loading}
-                rows={4}
-                placeholder="Ex: Ajuste de saldo para conciliação bancária, correção de valor inicial, etc."
-                className="card-theme text-theme-primary dark:text-dark-text-primary w-full resize-none rounded-xl border border-light-border px-4 py-3 placeholder-gray-400 transition-all focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
-                required
-              />
+              <textarea name="reason" value={formData.reason} onChange={handleChange} disabled={loading} rows={4} placeholder="Ex: Ajuste de saldo para conciliação bancária, correção de valor inicial, etc." className="card-theme text-theme-primary dark:text-dark-text-primary w-full resize-none rounded-xl border border-light-border px-4 py-3 placeholder-gray-400 transition-all focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700" required />
               <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1.5 text-xs">
                 Informe o motivo desta alteração para fins de auditoria
               </p>
@@ -258,53 +217,33 @@ const EditInitialBalanceModal = ({ isOpen, onClose, onSuccess, account }) => {
             </div>
 
             {/* Erro */}
-            {error && (
-              <div className="rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
+            {error && <div className="rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
                 <div className="flex items-start space-x-3">
                   <AlertCircle className="h-5 w-5 flex-shrink-0 text-red-600 dark:text-red-400" />
                   <p className="text-sm text-red-700 dark:text-red-300">
                     {error}
                   </p>
                 </div>
-              </div>
-            )}
+              </div>}
 
             {/* Botões */}
             <div className="flex items-center justify-end space-x-3 border-t border-light-border pt-4 dark:border-dark-border">
-              <button
-                type="button"
-                onClick={handleClose}
-                disabled={loading}
-                className="card-theme rounded-xl border border-light-border px-6 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-light-bg disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-border dark:bg-dark-bg dark:bg-gray-700 dark:text-gray-300 dark:text-gray-600 dark:hover:bg-gray-600"
-              >
+              <button type="button" onClick={handleClose} disabled={loading} className="card-theme rounded-xl border border-light-border px-6 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-600 transition-colors hover:bg-light-bg disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-border dark:bg-dark-bg dark:bg-gray-700 dark:text-theme-secondary dark:hover:bg-gray-600">
                 Cancelar
               </button>
-              <button
-                type="submit"
-                disabled={
-                  loading ||
-                  !formData.reason.trim() ||
-                  isNaN(parseFloat(formData.newBalance))
-                }
-                className="text-dark-text-primary inline-flex items-center rounded-xl bg-gradient-primary px-6 py-2.5 text-sm font-semibold shadow-lg transition-all hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {loading ? (
-                  <>
+              <button type="submit" disabled={loading || !formData.reason.trim() || isNaN(parseFloat(formData.newBalance))} className="text-dark-text-primary inline-flex items-center rounded-xl bg-gradient-primary px-6 py-2.5 text-sm font-semibold shadow-lg transition-all hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50">
+                {loading ? <>
                     <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-light-surface dark:border-dark-surface"></div>
                     Salvando...
-                  </>
-                ) : (
-                  <>
+                  </> : <>
                     <Save className="mr-2 h-4 w-4" />
                     Salvar Alteração
-                  </>
-                )}
+                  </>}
               </button>
             </div>
           </form>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
 export default EditInitialBalanceModal;

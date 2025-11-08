@@ -1,0 +1,368 @@
+import React, { useState } from 'react';
+import CurrencyInput from '../atoms/CurrencyInput';
+import TimeInput from '../atoms/TimeInput';
+import ProtectedButton from '../atoms/ProtectedButton';
+import { Card, CardHeader, CardTitle, CardContent } from '../atoms/Card/Card';
+
+/**
+ * AtomsDemo - Página de demonstração dos novos atoms
+ *
+ * Demonstra os componentes CurrencyInput, TimeInput e ProtectedButton
+ * Útil para desenvolvimento e testes visuais
+ */
+const AtomsDemo = () => {
+  // Estados para CurrencyInput
+  const [saldoInicial, setSaldoInicial] = useState(500.0);
+  const [valorComErro, setValorComErro] = useState(0);
+  const [valorDesabilitado] = useState(1234.56);
+
+  // Estados para TimeInput
+  const [duracao, setDuracao] = useState(45);
+  const [duracaoComErro, setDuracaoComErro] = useState(0);
+  const [duracaoDesabilitada] = useState(120);
+
+  // Estados para ProtectedButton
+  const [loading, setLoading] = useState(false);
+  const handleSimularCarregamento = () => {
+    setLoading(true);
+    setTimeout(() => setLoading(false), 2000);
+  };
+  return (
+    <div className="min-h-screen bg-light-bg p-6 dark:bg-dark-bg">
+      <div className="mx-auto max-w-6xl space-y-8">
+        {/* Header */}
+        <div>
+          <h1 className="text-theme-primary mb-2 text-3xl font-bold">
+            Atoms Demo - FASE 1
+          </h1>
+          <p className="text-theme-secondary">
+            Demonstração dos novos componentes: CurrencyInput, TimeInput e
+            ProtectedButton
+          </p>
+        </div>
+
+        {/* CurrencyInput Examples */}
+        <Card className="p-6">
+          <h2 className="text-theme-primary mb-4 text-2xl font-semibold">
+            💰 CurrencyInput
+          </h2>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {/* Normal */}
+            <div>
+              <CurrencyInput
+                label="Saldo Inicial"
+                value={saldoInicial}
+                onChange={setSaldoInicial}
+                placeholder="Digite o saldo inicial"
+                min={0}
+                max={100000}
+              />
+              <p className="text-theme-secondary mt-2 text-sm">
+                Valor atual: R$ {saldoInicial.toFixed(2)}
+              </p>
+            </div>
+
+            {/* Com Required */}
+            <div>
+              <CurrencyInput
+                label="Saldo de Fechamento"
+                value={valorComErro}
+                onChange={setValorComErro}
+                required
+                error={valorComErro === 0 ? 'Campo obrigatório' : null}
+              />
+            </div>
+
+            {/* Desabilitado */}
+            <div>
+              <CurrencyInput
+                label="Valor Bloqueado"
+                value={valorDesabilitado}
+                onChange={() => {}}
+                disabled
+              />
+            </div>
+
+            {/* Com Range */}
+            <div>
+              <CurrencyInput
+                label="Valor com Limite"
+                value={saldoInicial}
+                onChange={setSaldoInicial}
+                min={100}
+                max={10000}
+              />
+            </div>
+          </div>
+
+          {/* Código de exemplo */}
+          <details className="mt-6">
+            <summary className="cursor-pointer text-sm font-medium text-primary hover:text-primary-hover">
+              Ver código de exemplo
+            </summary>
+            <pre className="card-theme mt-2 overflow-x-auto rounded-md p-4 text-xs">
+              <code>{`<CurrencyInput
+  label="Saldo Inicial"
+  value={saldoInicial}
+  onChange={setSaldoInicial}
+  placeholder="Digite o saldo inicial"
+  min={0}
+  max={100000}
+  required
+/>`}</code>
+            </pre>
+          </details>
+        </Card>
+
+        {/* TimeInput Examples */}
+        <Card className="p-6">
+          <h2 className="text-theme-primary mb-4 text-2xl font-semibold">
+            ⏱️ TimeInput
+          </h2>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {/* Normal */}
+            <div>
+              <TimeInput
+                label="Duração do Serviço"
+                value={duracao}
+                onChange={setDuracao}
+                placeholder="Digite a duração"
+                min={15}
+                max={480}
+                step={15}
+              />
+              <p className="text-theme-secondary mt-2 text-sm">
+                Valor atual: {duracao} minutos ({Math.floor(duracao / 60)}h{' '}
+                {duracao % 60}min)
+              </p>
+            </div>
+
+            {/* Com Required */}
+            <div>
+              <TimeInput
+                label="Tempo de Atendimento"
+                value={duracaoComErro}
+                onChange={setDuracaoComErro}
+                required
+                error={duracaoComErro === 0 ? 'Duração obrigatória' : null}
+              />
+            </div>
+
+            {/* Desabilitado */}
+            <div>
+              <TimeInput
+                label="Duração Fixa"
+                value={duracaoDesabilitada}
+                onChange={() => {}}
+                disabled
+              />
+            </div>
+
+            {/* Sem formatação */}
+            <div>
+              <TimeInput
+                label="Apenas Minutos"
+                value={duracao}
+                onChange={setDuracao}
+                showFormatted={false}
+              />
+            </div>
+          </div>
+
+          {/* Código de exemplo */}
+          <details className="mt-6">
+            <summary className="cursor-pointer text-sm font-medium text-primary hover:text-primary-hover">
+              Ver código de exemplo
+            </summary>
+            <pre className="card-theme mt-2 overflow-x-auto rounded-md p-4 text-xs">
+              <code>{`<TimeInput
+  label="Duração do Serviço"
+  value={duracao}
+  onChange={setDuracao}
+  min={15}
+  max={480}
+  step={15}
+  required
+/>`}</code>
+            </pre>
+          </details>
+        </Card>
+
+        {/* ProtectedButton Examples */}
+        <Card className="p-6">
+          <h2 className="text-theme-primary mb-4 text-2xl font-semibold">
+            🔐 ProtectedButton
+          </h2>
+
+          <div className="space-y-6">
+            {/* Variantes */}
+            <div>
+              <h3 className="text-theme-primary mb-3 text-lg font-medium">
+                Variantes
+              </h3>
+              <div className="flex flex-wrap gap-3">
+                <ProtectedButton
+                  variant="primary"
+                  onClick={() => alert('Primary clicked')}
+                >
+                  Primary
+                </ProtectedButton>
+                <ProtectedButton
+                  variant="secondary"
+                  onClick={() => alert('Secondary clicked')}
+                >
+                  Secondary
+                </ProtectedButton>
+                <ProtectedButton
+                  variant="danger"
+                  onClick={() => alert('Danger clicked')}
+                >
+                  Danger
+                </ProtectedButton>
+                <ProtectedButton
+                  variant="success"
+                  onClick={() => alert('Success clicked')}
+                >
+                  Success
+                </ProtectedButton>
+                <ProtectedButton
+                  variant="ghost"
+                  onClick={() => alert('Ghost clicked')}
+                >
+                  Ghost
+                </ProtectedButton>
+                <ProtectedButton
+                  variant="outline"
+                  onClick={() => alert('Outline clicked')}
+                >
+                  Outline
+                </ProtectedButton>
+              </div>
+            </div>
+
+            {/* Tamanhos */}
+            <div>
+              <h3 className="text-theme-primary mb-3 text-lg font-medium">
+                Tamanhos
+              </h3>
+              <div className="flex flex-wrap items-center gap-3">
+                <ProtectedButton size="xs">Extra Small</ProtectedButton>
+                <ProtectedButton size="sm">Small</ProtectedButton>
+                <ProtectedButton size="md">Medium</ProtectedButton>
+                <ProtectedButton size="lg">Large</ProtectedButton>
+                <ProtectedButton size="xl">Extra Large</ProtectedButton>
+              </div>
+            </div>
+
+            {/* Estados */}
+            <div>
+              <h3 className="text-theme-primary mb-3 text-lg font-medium">
+                Estados
+              </h3>
+              <div className="flex flex-wrap gap-3">
+                <ProtectedButton
+                  onClick={handleSimularCarregamento}
+                  loading={loading}
+                >
+                  {loading ? 'Carregando...' : 'Simular Loading'}
+                </ProtectedButton>
+                <ProtectedButton disabled>Desabilitado</ProtectedButton>
+              </div>
+            </div>
+
+            {/* Com Permissões */}
+            <div>
+              <h3 className="text-theme-primary mb-3 text-lg font-medium">
+                Controle de Acesso (Role-based)
+              </h3>
+              <div className="flex flex-wrap gap-3">
+                <ProtectedButton
+                  requiredRoles={['admin', 'gerente']}
+                  onClick={() => alert('Apenas Admin/Gerente')}
+                  showTooltipWhenHidden={true}
+                  tooltipMessage="Apenas Gerentes e Administradores podem executar esta ação"
+                >
+                  Apenas Admin/Gerente
+                </ProtectedButton>
+                <ProtectedButton
+                  requiredRoles={['recepcionista', 'gerente', 'admin']}
+                  onClick={() => alert('Abrir Caixa')}
+                  showTooltipWhenHidden={true}
+                >
+                  Abrir Caixa
+                </ProtectedButton>
+                <ProtectedButton
+                  requiredRoles={['profissional']}
+                  onClick={() => alert('Apenas Profissional')}
+                  showTooltipWhenHidden={false}
+                >
+                  Apenas Profissional (esconde se não tiver permissão)
+                </ProtectedButton>
+              </div>
+              <p className="text-theme-secondary mt-3 text-sm">
+                💡 Passe o mouse sobre os botões bloqueados para ver o tooltip
+              </p>
+            </div>
+
+            {/* Full Width */}
+            <div>
+              <h3 className="text-theme-primary mb-3 text-lg font-medium">
+                Full Width
+              </h3>
+              <ProtectedButton fullWidth variant="primary">
+                Botão com Largura Total
+              </ProtectedButton>
+            </div>
+          </div>
+
+          {/* Código de exemplo */}
+          <details className="mt-6">
+            <summary className="cursor-pointer text-sm font-medium text-primary hover:text-primary-hover">
+              Ver código de exemplo
+            </summary>
+            <pre className="card-theme mt-2 overflow-x-auto rounded-md p-4 text-xs">
+              <code>{`<ProtectedButton
+  requiredRoles={['gerente', 'admin']}
+  onClick={handleCadastrarServico}
+  variant="primary"
+  loading={loading}
+  showTooltipWhenHidden={true}
+  tooltipMessage="Apenas Gerentes podem cadastrar serviços"
+>
+  Novo Serviço
+</ProtectedButton>`}</code>
+            </pre>
+          </details>
+        </Card>
+
+        {/* Resumo */}
+        <Card className="border-2 border-primary/20 bg-primary/5 p-6">
+          <h3 className="mb-2 text-lg font-semibold text-primary">
+            ✅ FASE 1 Completa
+          </h3>
+          <p className="text-theme-secondary">
+            Todos os 3 atoms essenciais foram implementados seguindo o Design
+            System:
+          </p>
+          <ul className="text-theme-secondary mt-3 space-y-1">
+            <li>
+              ✅ <strong>CurrencyInput</strong> - Formatação automática de moeda
+              brasileira
+            </li>
+            <li>
+              ✅ <strong>TimeInput</strong> - Input de duração com formatação
+              inteligente
+            </li>
+            <li>
+              ✅ <strong>ProtectedButton</strong> - Controle de acesso baseado
+              em roles
+            </li>
+          </ul>
+        </Card>
+      </div>
+    </div>
+  );
+};
+export default AtomsDemo;

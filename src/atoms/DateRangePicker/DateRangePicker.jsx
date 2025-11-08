@@ -19,7 +19,6 @@ import {
   startOfMonth,
   endOfMonth,
   subDays,
-  addDays,
   parseISO,
   isValid,
 } from 'date-fns';
@@ -136,11 +135,13 @@ const DateRangePicker = ({
           presetValue.endDate.getTime() === currentEnd
         );
       });
+
       setSelectedPreset(matchingPreset?.id || 'custom');
 
       // Se é customizado, preencher campos
       if (!matchingPreset) {
         setCustomStartDate(format(new Date(value.startDate), 'yyyy-MM-dd'));
+
         setCustomEndDate(format(new Date(value.endDate), 'yyyy-MM-dd'));
       }
     } else {
@@ -261,7 +262,7 @@ const DateRangePicker = ({
             {/* Presets */}
             {presets && (
               <div className="mb-4">
-                <h4 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+                <h4 className="dark:text-theme-secondary mb-2 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                   Períodos Rápidos
                 </h4>
                 <div className="grid grid-cols-2 gap-2">
@@ -286,7 +287,7 @@ const DateRangePicker = ({
 
             {/* Datas customizadas */}
             <div className="-mx-4 px-4">
-              <h4 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+              <h4 className="dark:text-theme-secondary mb-3 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                 Período Personalizado
               </h4>
 
@@ -394,7 +395,7 @@ export const DateRangePickerPreview = () => {
       <h3 className="text-lg font-semibold">DateRangePicker Preview</h3>
 
       <div>
-        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+        <label className="dark:text-theme-secondary mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
           Selecione um período:
         </label>
         <DateRangePicker
@@ -406,7 +407,7 @@ export const DateRangePickerPreview = () => {
 
       {selectedRange && (
         <div className="mt-4 rounded-md bg-light-bg p-3 dark:bg-dark-bg">
-          <h4 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+          <h4 className="dark:text-theme-secondary mb-2 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
             Valor selecionado:
           </h4>
           <pre className="text-theme-secondary text-xs">
@@ -427,7 +428,7 @@ export const DateRangePickerPreview = () => {
 
       {/* Versão sem presets */}
       <div>
-        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+        <label className="dark:text-theme-secondary mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
           Sem presets:
         </label>
         <DateRangePicker
@@ -440,7 +441,7 @@ export const DateRangePickerPreview = () => {
 
       {/* Versão desabilitada */}
       <div>
-        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+        <label className="dark:text-theme-secondary mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
           Desabilitado:
         </label>
         <DateRangePicker

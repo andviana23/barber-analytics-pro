@@ -92,7 +92,6 @@ const TRANSFORMATION_RULES = {
     'bg-gradient-to-r from-red-500 to-red-600': 'bg-gradient-error',
     'bg-gradient-to-r from-red-500 to-pink-600': 'bg-gradient-error',
     'bg-gradient-to-br from-red-500 to-red-600': 'bg-gradient-error',
-    'bg-gradient-to-r from-red-600 to-red-700': 'bg-gradient-error',
 
     // Gradientes de warning (laranja/amarelo)
     'bg-gradient-to-r from-yellow-500 to-orange-600': 'bg-gradient-warning',
@@ -160,9 +159,9 @@ const TRANSFORMATION_RULES = {
     'bg-gradient-to-r from-green-300 to-green-500': 'bg-gradient-success',
     'bg-gradient-to-r from-green-600 to-emerald-700': 'bg-gradient-success',
     'bg-gradient-to-r from-red-300 to-red-500': 'bg-gradient-error',
-    'bg-gradient-to-r from-red-600 to-red-700': 'bg-gradient-error',
+    'bg-gradient-to-r from-red-600 to-red-700': 'bg-gradient-error-dark',
     'bg-gradient-to-r from-purple-300 to-purple-500': 'bg-gradient-purple',
-    'bg-gradient-to-r from-purple-600 to-purple-700': 'bg-gradient-purple',
+    'bg-gradient-to-r from-purple-600 to-purple-700': 'bg-gradient-purple-dark',
     'bg-gradient-to-r from-orange-300 to-orange-500': 'bg-gradient-orange',
     'bg-gradient-to-r from-orange-600 to-orange-700': 'bg-gradient-orange',
 
@@ -195,7 +194,6 @@ const TRANSFORMATION_RULES = {
     // Sprint 4: Gradientes específicos do GoalsPage
     'bg-gradient-to-r from-blue-500 to-indigo-600': 'bg-gradient-primary',
     'bg-gradient-to-r from-emerald-500 to-green-600': 'bg-gradient-success',
-    'bg-gradient-to-r from-violet-500 to-purple-600': 'bg-gradient-purple',
     'bg-gradient-to-r from-sky-400 to-blue-500': 'bg-gradient-info',
     'bg-gradient-to-r from-amber-500 to-yellow-600': 'bg-gradient-warning',
 

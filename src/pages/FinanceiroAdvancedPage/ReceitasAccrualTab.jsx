@@ -737,7 +737,7 @@ const ReceitasAccrualTab = ({
                       Deletar
                     </button>
                   </>}
-                <button onClick={() => setIsDetailsModalOpen(false)} className="px-5 py-2.5 bg-gray-200 dark:bg-gray-700 text-theme-primary font-semibold rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all">
+                <button onClick={() => setIsDetailsModalOpen(false)} className="px-5 py-2.5 bg-gray-200 dark:bg-gray-700 text-theme-primary font-semibold rounded-xl hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-600 transition-all">
                   Fechar
                 </button>
               </div>
@@ -806,7 +806,7 @@ const ReceitasAccrualTab = ({
                 <button onClick={() => {
               setIsDeleteModalOpen(false);
               setSelectedReceita(null);
-            }} disabled={deletingId === selectedReceita.id} className="px-5 py-2.5 bg-gray-200 dark:bg-gray-700 text-theme-primary font-semibold rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all disabled:opacity-50">
+            }} disabled={deletingId === selectedReceita.id} className="px-5 py-2.5 bg-gray-200 dark:bg-gray-700 text-theme-primary font-semibold rounded-xl hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-600 transition-all disabled:opacity-50">
                   Cancelar
                 </button>
                 <button onClick={confirmDelete} disabled={deletingId === selectedReceita.id} className="px-5 py-2.5 bg-red-600 text-dark-text-primary font-semibold rounded-xl hover:bg-red-700 transition-all flex items-center gap-2 disabled:opacity-50">

@@ -27,7 +27,7 @@ const DiscountModal = ({
   adjustmentType = 'discount',
   // 'discount' ou 'fee'
   currentDiscount = null,
-  currentFee = null,
+  currentFee = null
 }) => {
   const [valueType, setValueType] = useState('percentage'); // 'percentage' ou 'fixed'
   const [value, setValue] = useState('');
@@ -41,10 +41,8 @@ const DiscountModal = ({
   const calculateAdjustmentAmount = () => {
     const numValue = parseFloat(value) || 0;
     if (valueType === 'percentage') {
-      const base = isDiscount
-        ? orderSubtotal
-        : orderSubtotal - calculateDiscountAmount();
-      return (base * numValue) / 100;
+      const base = isDiscount ? orderSubtotal : orderSubtotal - calculateDiscountAmount();
+      return base * numValue / 100;
     }
     return numValue;
   };
@@ -53,7 +51,7 @@ const DiscountModal = ({
   const calculateDiscountAmount = () => {
     if (!currentDiscount) return 0;
     if (currentDiscount.type === 'percentage') {
-      return (orderSubtotal * currentDiscount.value) / 100;
+      return orderSubtotal * currentDiscount.value / 100;
     }
     return currentDiscount.value;
   };
@@ -73,10 +71,7 @@ const DiscountModal = ({
     if (!isDiscount) {
       total += calculateAdjustmentAmount();
     } else if (currentFee) {
-      const feeAmount =
-        currentFee.type === 'percentage'
-          ? (total * currentFee.value) / 100
-          : currentFee.value;
+      const feeAmount = currentFee.type === 'percentage' ? total * currentFee.value / 100 : currentFee.value;
       total += feeAmount;
     }
     return Math.max(0, total);
@@ -109,18 +104,14 @@ const DiscountModal = ({
         type: valueType,
         value: parseFloat(value),
         reason: reason.trim(),
-        adjustmentType,
+        adjustmentType
       });
 
       // Resetar form
       setValue('');
       setReason('');
       setValueType('percentage');
-      toast.success(
-        isDiscount
-          ? 'Desconto aplicado com sucesso!'
-          : 'Taxa aplicada com sucesso!'
-      );
+      toast.success(isDiscount ? 'Desconto aplicado com sucesso!' : 'Taxa aplicada com sucesso!');
       onClose();
     } catch (error) {
       toast.error(error.message || 'Erro ao aplicar ajuste');
@@ -136,38 +127,23 @@ const DiscountModal = ({
       onClose();
     }
   };
-  return (
-    <Modal isOpen={isOpen} onClose={handleClose} title={title} size="md">
+  return <Modal isOpen={isOpen} onClose={handleClose} title={title} size="md">
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Tipo de Ajuste */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
             Tipo de {isDiscount ? 'Desconto' : 'Taxa'}
           </label>
           <div className="flex gap-4">
             <label className="flex cursor-pointer items-center">
-              <input
-                type="radio"
-                name="valueType"
-                value="percentage"
-                checked={valueType === 'percentage'}
-                onChange={e => setValueType(e.target.value)}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600">
+              <input type="radio" name="valueType" value="percentage" checked={valueType === 'percentage'} onChange={e => setValueType(e.target.value)} className="h-4 w-4 text-blue-600 focus:ring-blue-500" />
+              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                 Percentual (%)
               </span>
             </label>
             <label className="flex cursor-pointer items-center">
-              <input
-                type="radio"
-                name="valueType"
-                value="fixed"
-                checked={valueType === 'fixed'}
-                onChange={e => setValueType(e.target.value)}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600">
+              <input type="radio" name="valueType" value="fixed" checked={valueType === 'fixed'} onChange={e => setValueType(e.target.value)} className="h-4 w-4 text-blue-600 focus:ring-blue-500" />
+              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                 Valor Fixo (R$)
               </span>
             </label>
@@ -176,41 +152,22 @@ const DiscountModal = ({
 
         {/* Valor */}
         <div>
-          <Input
-            label={valueType === 'percentage' ? 'Percentual (%)' : 'Valor (R$)'}
-            type="number"
-            step={valueType === 'percentage' ? '0.01' : '0.01'}
-            min="0"
-            max={valueType === 'percentage' ? '100' : undefined}
-            value={value}
-            onChange={e => setValue(e.target.value)}
-            placeholder={valueType === 'percentage' ? 'Ex: 10' : 'Ex: 15.00'}
-            required
-          />
+          <Input label={valueType === 'percentage' ? 'Percentual (%)' : 'Valor (R$)'} type="number" step={valueType === 'percentage' ? '0.01' : '0.01'} min="0" max={valueType === 'percentage' ? '100' : undefined} value={value} onChange={e => setValue(e.target.value)} placeholder={valueType === 'percentage' ? 'Ex: 10' : 'Ex: 15.00'} required />
         </div>
 
         {/* Motivo */}
         <div>
-          <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+          <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
             Motivo *
           </label>
-          <textarea
-            value={reason}
-            onChange={e => setReason(e.target.value)}
-            placeholder={`Descreva o motivo ${isDiscount ? 'do desconto' : 'da taxa'}...`}
-            rows={3}
-            className="w-full resize-none rounded-lg border border-light-border px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-dark-border"
-            required
-            minLength={3}
-          />
+          <textarea value={reason} onChange={e => setReason(e.target.value)} placeholder={`Descreva o motivo ${isDiscount ? 'do desconto' : 'da taxa'}...`} rows={3} className="w-full resize-none rounded-lg border border-light-border px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-dark-border" required minLength={3} />
           <p className="text-theme-secondary mt-1 text-xs">
             Obrigatório para auditoria (mínimo 3 caracteres)
           </p>
         </div>
 
         {/* Resumo de Valores */}
-        {value && parseFloat(value) > 0 && (
-          <div className="space-y-2 rounded-lg border border-light-border bg-light-bg p-4 dark:border-dark-border dark:bg-dark-bg">
+        {value && parseFloat(value) > 0 && <div className="space-y-2 rounded-lg border border-light-border bg-light-bg p-4 dark:border-dark-border dark:bg-dark-bg">
             <h4 className="text-theme-primary mb-3 font-medium">Resumo</h4>
 
             <div className="flex justify-between text-sm">
@@ -220,23 +177,17 @@ const DiscountModal = ({
               </span>
             </div>
 
-            {currentDiscount && isDiscount === false && (
-              <div className="flex justify-between text-sm">
+            {currentDiscount && isDiscount === false && <div className="flex justify-between text-sm">
                 <span className="text-theme-secondary">Desconto Atual:</span>
                 <span className="font-medium text-green-600">
                   - {formatCurrency(calculateDiscountAmount())}
                 </span>
-              </div>
-            )}
+              </div>}
 
-            <div
-              className={`flex justify-between text-sm font-medium ${isDiscount ? 'text-green-600' : 'text-orange-600'}`}
-            >
+            <div className={`flex justify-between text-sm font-medium ${isDiscount ? 'text-green-600' : 'text-orange-600'}`}>
               <span>
                 {isDiscount ? 'Desconto' : 'Taxa'} (
-                {valueType === 'percentage'
-                  ? `${value}%`
-                  : formatCurrency(parseFloat(value))}
+                {valueType === 'percentage' ? `${value}%` : formatCurrency(parseFloat(value))}
                 ):
               </span>
               <span>
@@ -244,21 +195,13 @@ const DiscountModal = ({
               </span>
             </div>
 
-            {currentFee && isDiscount === true && (
-              <div className="flex justify-between text-sm">
+            {currentFee && isDiscount === true && <div className="flex justify-between text-sm">
                 <span className="text-theme-secondary">Taxa Atual:</span>
                 <span className="font-medium text-orange-600">
                   +{' '}
-                  {formatCurrency(
-                    currentFee.type === 'percentage'
-                      ? ((orderSubtotal - adjustmentAmount) *
-                          currentFee.value) /
-                          100
-                      : currentFee.value
-                  )}
+                  {formatCurrency(currentFee.type === 'percentage' ? (orderSubtotal - adjustmentAmount) * currentFee.value / 100 : currentFee.value)}
                 </span>
-              </div>
-            )}
+              </div>}
 
             <div className="border-t border-light-border pt-2 dark:border-dark-border">
               <div className="flex justify-between text-base font-bold">
@@ -268,31 +211,19 @@ const DiscountModal = ({
                 </span>
               </div>
             </div>
-          </div>
-        )}
+          </div>}
 
         {/* Ações */}
         <div className="flex justify-end gap-3 border-t border-light-border pt-4 dark:border-dark-border">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={handleClose}
-            disabled={loading}
-          >
+          <Button type="button" variant="secondary" onClick={handleClose} disabled={loading}>
             Cancelar
           </Button>
-          <Button
-            type="submit"
-            variant="primary"
-            loading={loading}
-            disabled={!value || !reason}
-          >
+          <Button type="submit" variant="primary" loading={loading} disabled={!value || !reason}>
             {isDiscount ? 'Aplicar Desconto' : 'Aplicar Taxa'}
           </Button>
         </div>
       </form>
-    </Modal>
-  );
+    </Modal>;
 };
 DiscountModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
@@ -302,11 +233,11 @@ DiscountModal.propTypes = {
   adjustmentType: PropTypes.oneOf(['discount', 'fee']),
   currentDiscount: PropTypes.shape({
     type: PropTypes.oneOf(['percentage', 'fixed']),
-    value: PropTypes.number,
+    value: PropTypes.number
   }),
   currentFee: PropTypes.shape({
     type: PropTypes.oneOf(['percentage', 'fixed']),
-    value: PropTypes.number,
-  }),
+    value: PropTypes.number
+  })
 };
 export default DiscountModal;

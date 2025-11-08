@@ -1,9 +1,9 @@
 {
-  "totalFiles": 367,
-  "totalViolations": 31,
+  "totalFiles": 403,
+  "totalViolations": 76,
   "violations": {
     "inlineStyles": {
-      "total": 22,
+      "total": 26,
       "files": [
         {
           "file": "src/utils/performance.jsx",
@@ -15,6 +15,14 @@
         },
         {
           "file": "src/molecules/OrderItemRow.jsx",
+          "count": 1
+        },
+        {
+          "file": "src/molecules/FluxoCaixaTimeline.jsx",
+          "count": 2
+        },
+        {
+          "file": "src/molecules/ChartContainer.jsx",
           "count": 1
         },
         {
@@ -46,8 +54,8 @@
           "count": 2
         },
         {
-          "file": "src/molecules/CashflowChartCard/CashflowChartCard.jsx",
-          "count": 1
+          "file": "src/molecules/CashflowTable/CashflowTable.jsx",
+          "count": 2
         },
         {
           "file": "src/components/ThemeValidator/ThemeValidator.jsx",
@@ -65,8 +73,19 @@
       "severity": "MEDIUM",
       "description": "Estilos inline (evitar quando possível)"
     },
+    "hexColors": {
+      "total": 14,
+      "files": [
+        {
+          "file": "src/templates/NovaDespesaModal/index.jsx",
+          "count": 14
+        }
+      ],
+      "severity": "CRITICAL",
+      "description": "Valores hexadecimais inline (bg-[#...], text-[#...], border-[#...])"
+    },
     "inlineGradients": {
-      "total": 5,
+      "total": 31,
       "files": [
         {
           "file": "src/pages/LoginPage/LoginPage.jsx",
@@ -75,6 +94,26 @@
         {
           "file": "src/pages/GoalsPage/GoalsPage.jsx",
           "count": 1
+        },
+        {
+          "file": "src/pages/FinanceiroAdvancedPage/ReceitasAccrualTab.jsx",
+          "count": 5
+        },
+        {
+          "file": "src/pages/FinanceiroAdvancedPage/FluxoTabRefactored.jsx",
+          "count": 3
+        },
+        {
+          "file": "src/pages/FinanceiroAdvancedPage/FinanceiroAdvancedPage.jsx",
+          "count": 3
+        },
+        {
+          "file": "src/pages/FinanceiroAdvancedPage/DespesasAccrualTabRefactored.jsx",
+          "count": 5
+        },
+        {
+          "file": "src/pages/FinanceiroAdvancedPage/ContasBancariasTab.jsx",
+          "count": 10
         },
         {
           "file": "src/organisms/BarbeiroHeader/BarbeiroHeader.jsx",
@@ -93,10 +132,10 @@
       "description": "Gradientes inline sem tokens (bg-gradient-to-*)"
     },
     "hardcodedColors": {
-      "total": 4,
+      "total": 5,
       "files": [
         {
-          "file": "src/pages/FinanceiroAdvancedPage/ContasBancariasTab.jsx",
+          "file": "src/pages/FinanceiroAdvancedPage/DespesasAccrualTabRefactored.jsx",
           "count": 1
         },
         {
@@ -105,6 +144,10 @@
         },
         {
           "file": "src/molecules/SupplierModals/SupplierInfoModal.jsx",
+          "count": 1
+        },
+        {
+          "file": "src/components/templates/modals/ServiceFormModal.jsx",
           "count": 1
         },
         {
@@ -117,6 +160,78 @@
     }
   },
   "fileDetails": [
+    {
+      "file": "src/templates/NovaDespesaModal/index.jsx",
+      "violations": {
+        "hexColors": {
+          "count": 14,
+          "severity": "CRITICAL",
+          "description": "Valores hexadecimais inline (bg-[#...], text-[#...], border-[#...])",
+          "examples": [
+            "className=\"flex items-center justify-between rounded-t-lg border-b border-light-border bg-[#EF4444] px-6 py-4 dark:border-dark-border\"",
+            "className=\"rounded-lg border border-light-border bg-[#3B82F6]/5 dark:border-dark-border\"",
+            "className=\"flex h-8 w-8 items-center justify-center rounded-lg bg-[#3B82F6]\""
+          ]
+        }
+      },
+      "totalViolations": 14
+    },
+    {
+      "file": "src/pages/FinanceiroAdvancedPage/ContasBancariasTab.jsx",
+      "violations": {
+        "inlineGradients": {
+          "count": 10,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg\"",
+            "className=\"p-4 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl border border-blue-100 dark:border-blue-800/30\"",
+            "className=\"p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl border border-green-100 dark:border-green-800/30\""
+          ]
+        }
+      },
+      "totalViolations": 10
+    },
+    {
+      "file": "src/pages/FinanceiroAdvancedPage/DespesasAccrualTabRefactored.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 1,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"w-12 h-12 text-gray-300 dark:text-theme-secondary\""
+          ]
+        },
+        "inlineGradients": {
+          "count": 5,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"p-3 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl shadow-lg\"",
+            "className=\"p-3 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl shadow-lg\"",
+            "className=\"flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-dark-text-primary bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl\""
+          ]
+        }
+      },
+      "totalViolations": 6
+    },
+    {
+      "file": "src/pages/FinanceiroAdvancedPage/ReceitasAccrualTab.jsx",
+      "violations": {
+        "inlineGradients": {
+          "count": 5,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl\"",
+            "className=\"p-3 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl\"",
+            "className=\"p-2.5 bg-gradient-to-br from-purple-100 to-violet-100 dark:from-purple-900/30 dark:to-violet-900/30 rounded-xl\""
+          ]
+        }
+      },
+      "totalViolations": 5
+    },
     {
       "file": "src/utils/performance.jsx",
       "violations": {
@@ -150,6 +265,38 @@
       "totalViolations": 3
     },
     {
+      "file": "src/pages/FinanceiroAdvancedPage/FluxoTabRefactored.jsx",
+      "violations": {
+        "inlineGradients": {
+          "count": 3,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 p-3\"",
+            "className=\"flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-4 dark:border-blue-800 dark:from-blue-900/20 dark:to-indigo-900/20\"",
+            "className=\"rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 p-2.5 shadow-lg\""
+          ]
+        }
+      },
+      "totalViolations": 3
+    },
+    {
+      "file": "src/pages/FinanceiroAdvancedPage/FinanceiroAdvancedPage.jsx",
+      "violations": {
+        "inlineGradients": {
+          "count": 3,
+          "severity": "HIGH",
+          "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
+          "examples": [
+            "className=\"rounded-full bg-gradient-to-br from-red-500 to-pink-600 p-6 shadow-2xl\"",
+            "className=\"rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 p-3 shadow-lg\"",
+            "className=\"absolute left-0 right-0 top-0 h-1 rounded-b-full bg-gradient-to-r from-primary to-primary-hover\""
+          ]
+        }
+      },
+      "totalViolations": 3
+    },
+    {
       "file": "src/pages/DashboardPage/DashboardPage.jsx",
       "violations": {
         "inlineStyles": {
@@ -166,6 +313,21 @@
       "totalViolations": 3
     },
     {
+      "file": "src/molecules/FluxoCaixaTimeline.jsx",
+      "violations": {
+        "inlineStyles": {
+          "count": 2,
+          "severity": "MEDIUM",
+          "description": "Estilos inline (evitar quando possível)",
+          "examples": [
+            "style={{ color: entry.color }}",
+            "style={{ color: entry.color }}"
+          ]
+        }
+      },
+      "totalViolations": 2
+    },
+    {
       "file": "src/molecules/CategoryHierarchicalDropdown/CategoryHierarchicalDropdown.jsx",
       "violations": {
         "inlineStyles": {
@@ -175,6 +337,21 @@
           "examples": [
             "style={{\n            fontWeight: 'bold',\n            color: '#1f2937',\n            // gray-800\n            backgroundColor: '#f9fafb', // gray-50\n          }}",
             "style={{\n                paddingLeft: '1.5rem',\n              }}"
+          ]
+        }
+      },
+      "totalViolations": 2
+    },
+    {
+      "file": "src/molecules/CashflowTable/CashflowTable.jsx",
+      "violations": {
+        "inlineStyles": {
+          "count": 2,
+          "severity": "MEDIUM",
+          "description": "Estilos inline (evitar quando possível)",
+          "examples": [
+            "style={{\n                      width: header.getSize(),\n                      textAlign: header.column.id === 'date' ? 'left' : 'right',\n                    }}",
+            "style={{\n                        textAlign: cell.column.id === 'date' ? 'left' : 'right',\n                      }}"
           ]
         }
       },
@@ -203,7 +380,7 @@
           "severity": "HIGH",
           "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
           "examples": [
-            "className=\"w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center\""
+            "className=\"flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-600\""
           ]
         },
         "inlineStyles": {
@@ -225,7 +402,7 @@
           "severity": "CRITICAL",
           "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
           "examples": [
-            "className=\"flex items-center justify-between card-theme border border-gray-100 rounded-lg p-3\""
+            "className=\"card-theme flex items-center justify-between rounded-lg border border-gray-100 p-3\""
           ]
         },
         "inlineGradients": {
@@ -233,7 +410,7 @@
           "severity": "HIGH",
           "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
           "examples": [
-            "className=\"bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg mb-4\""
+            "className=\"mb-4 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 p-4\""
           ]
         }
       },
@@ -268,13 +445,29 @@
       "totalViolations": 1
     },
     {
+      "file": "src/molecules/ChartContainer.jsx",
+      "violations": {
+        "inlineStyles": {
+          "count": 1,
+          "severity": "MEDIUM",
+          "description": "Estilos inline (evitar quando possível)",
+          "examples": [
+            "style={{ height }}"
+          ]
+        }
+      },
+      "totalViolations": 1
+    },
+    {
       "file": "src/atoms/AnimatedComponents.jsx",
       "violations": {
         "inlineStyles": {
           "count": 1,
           "severity": "MEDIUM",
           "description": "Estilos inline (evitar quando possível)",
-          "examples": ["style={{ overflow: 'hidden' }}"]
+          "examples": [
+            "style={{ overflow: 'hidden' }}"
+          ]
         }
       },
       "totalViolations": 1
@@ -301,7 +494,7 @@
           "severity": "HIGH",
           "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
           "examples": [
-            "className=\"h-screen flex items-center justify-center bg-gradient-to-br from-light-bg via-light-surface to-light-bg dark:from-dark-bg dark:via-dark-surface dark:to-dark-bg px-4 sm:px-6 lg:px-8 relative overflow-hidden\""
+            "className=\"relative flex h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-light-bg via-light-surface to-light-bg px-4 dark:from-dark-bg dark:via-dark-surface dark:to-dark-bg sm:px-6 lg:px-8\""
           ]
         }
       },
@@ -315,21 +508,7 @@
           "severity": "HIGH",
           "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
           "examples": [
-            "className=\"absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse\""
-          ]
-        }
-      },
-      "totalViolations": 1
-    },
-    {
-      "file": "src/pages/FinanceiroAdvancedPage/ContasBancariasTab.jsx",
-      "violations": {
-        "hardcodedColors": {
-          "count": 1,
-          "severity": "CRITICAL",
-          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
-          "examples": [
-            "className=\"bg-gray-50 dark:bg-gray-700/50 rounded-xl p-5 border border-light-border dark:border-dark-border\""
+            "className=\"absolute inset-0 animate-pulse bg-gradient-to-r from-transparent via-white/30 to-transparent\""
           ]
         }
       },
@@ -357,7 +536,7 @@
           "severity": "CRITICAL",
           "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
           "examples": [
-            "className=\"px-3 py-1 bg-gray-600 text-dark-text-primary rounded text-sm hover:bg-gray-700\""
+            "className=\"text-dark-text-primary rounded bg-gray-600 px-3 py-1 text-sm hover:bg-gray-700\""
           ]
         }
       },
@@ -371,7 +550,7 @@
           "severity": "HIGH",
           "description": "Gradientes inline sem tokens (bg-gradient-to-*)",
           "examples": [
-            "className=\"relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary-dark to-primary-dark/90 text-dark-text-primary shadow-xl\""
+            "className=\"via-primary-dark to-primary-dark/90 text-dark-text-primary relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary shadow-xl\""
           ]
         }
       },
@@ -385,7 +564,7 @@
           "severity": "CRITICAL",
           "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
           "examples": [
-            "className=\"flex items-start gap-4 py-4 border-b-2 border-gray-100 dark:border-dark-border last:border-0 hover:bg-light-bg dark:bg-dark-bg/50 dark:hover:bg-gray-750/50 transition-colors px-4 rounded-lg\""
+            "className=\"dark:hover:bg-gray-750/50 flex items-start gap-4 rounded-lg border-b-2 border-gray-100 px-4 py-4 transition-colors last:border-0 hover:bg-light-bg dark:border-dark-border dark:bg-dark-bg/50\""
           ]
         }
       },
@@ -398,20 +577,8 @@
           "count": 1,
           "severity": "MEDIUM",
           "description": "Estilos inline (evitar quando possível)",
-          "examples": ["style={{\n          height: height + 100,\n        }}"]
-        }
-      },
-      "totalViolations": 1
-    },
-    {
-      "file": "src/molecules/CashflowChartCard/CashflowChartCard.jsx",
-      "violations": {
-        "inlineStyles": {
-          "count": 1,
-          "severity": "MEDIUM",
-          "description": "Estilos inline (evitar quando possível)",
           "examples": [
-            "style={{\n                  backgroundColor: entry.color,\n                }}"
+            "style={{\n          height: height + 100,\n        }}"
           ]
         }
       },
@@ -430,15 +597,29 @@
         }
       },
       "totalViolations": 1
+    },
+    {
+      "file": "src/components/templates/modals/ServiceFormModal.jsx",
+      "violations": {
+        "hardcodedColors": {
+          "count": 1,
+          "severity": "CRITICAL",
+          "description": "Cores hardcoded (bg-white, bg-gray-*, text-gray-*, border-gray-*)",
+          "examples": [
+            "className=\"peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 after:card-theme peer-checked:bg-primary-600 peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-light-border after:transition-all after:content-['"
+          ]
+        }
+      },
+      "totalViolations": 1
     }
   ],
   "summary": {
-    "totalFiles": 367,
-    "filesWithViolations": 21,
-    "filesClean": 346,
-    "totalViolations": 31,
-    "criticalFiles": 4,
-    "highFiles": 4,
-    "conformityRate": "94.28"
+    "totalFiles": 403,
+    "filesWithViolations": 29,
+    "filesClean": 374,
+    "totalViolations": 76,
+    "criticalFiles": 6,
+    "highFiles": 8,
+    "conformityRate": "92.80"
   }
 }

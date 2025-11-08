@@ -1,0 +1,909 @@
+import React, { useState, useEffect } from 'react';
+import {
+  format,
+  subMonths,
+  startOfMonth,
+  endOfMonth,
+  startOfDay,
+  parseISO,
+  differenceInDays,
+} from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import {
+  TrendingUp,
+  TrendingDown,
+  Calendar,
+  BarChart3,
+  RefreshCw,
+  Download,
+  FileSpreadsheet,
+  FileText,
+  Loader2,
+} from 'lucide-react';
+
+// Services
+import fluxoExportService from '../../services/fluxoExportService';
+
+// Custom Hooks
+import { useCashflowData } from '../../hooks/useCashflowData';
+import useCashflowTimeline from '../../hooks/useCashflowTimeline';
+import { useToast } from '../../context/ToastContext';
+import { supabase } from '../../services/supabase';
+
+// Components
+import MonthYearPicker from '../../atoms/MonthYearPicker/MonthYearPicker';
+import { CashflowTimelineChart } from '../../molecules/CashflowTimelineChart';
+import { PieChartCard } from '../../molecules/PieChartCard';
+
+/**
+ * 📊 Tab do Fluxo de Caixa - 100% REFATORADO COM DESIGN SYSTEM
+ *
+ * Features:
+ * - ✅ Design System completo aplicado
+ * - ✅ Filtros de período: Dia, Semana, Mês
+ * - ✅ Semana vigente como padrão
+ * - ✅ Tabela de fluxo diário consolidado (PAGO/EM ABERTO)
+ * - ✅ KPIs principais com gradientes temáticos
+ * - ✅ Gráfico de linha da evolução (12 meses)
+ * - ✅ Gráficos de pizza (Receitas/Despesas)
+ * - ✅ Análise completa de entradas/saídas
+ * - ✅ UI ultra moderna com hover effects
+ * - ✅ Dark mode completo
+ */
+const FluxoTabRefactored = ({ globalFilters }) => {
+  const { showToast } = useToast();
+  const [exporting, setExporting] = useState(false);
+
+  // ✅ Estado simplificado: apenas mês selecionado
+  const [selectedMonth, setSelectedMonth] = useState(new Date());
+
+  // ✅ Calcular início e fim do mês selecionado (FORMATADO PARA STRING)
+  const dateRange = {
+    startDate: format(startOfMonth(selectedMonth), 'yyyy-MM-dd'),
+    endDate: format(endOfMonth(selectedMonth), 'yyyy-MM-dd'),
+  };
+
+  // ✅ Descrição do período (ex: "novembro de 2025")
+  const periodDescription = format(selectedMonth, "MMMM 'de' yyyy", {
+    locale: ptBR,
+  });
+
+  // ✅ Estados do fluxo de caixa
+  const [cashflowData, setCashflowData] = useState({
+    daily: [],
+    paid: [],
+    pending: [],
+    kpis: {},
+    revenueDistribution: [],
+    expenseDistribution: [],
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [timelinePeriod, setTimelinePeriod] = useState('12'); // Estado para período do timeline
+
+  // Hook para dados básicos do fluxo
+  const { refetch } = useCashflowData(
+    globalFilters.unitId,
+    dateRange.startDate,
+    dateRange.endDate,
+    globalFilters.accountId
+  );
+
+  // Hook para dados históricos do timeline (com período e mês de referência)
+  const {
+    data: timelineData,
+    loading: timelineLoading,
+    error: timelineError,
+    refetch: refetchTimeline,
+  } = useCashflowTimeline(
+    globalFilters.unitId,
+    timelinePeriod,
+    timelinePeriod === '1' ? selectedMonth : null
+  );
+
+  // ✅ Buscar saldo final do período anterior ao selecionado
+  const fetchPreviousMonthBalance = async () => {
+    if (!globalFilters.unitId) return 0;
+    try {
+      const previousMonth = subMonths(selectedMonth, 1);
+      const startOfPreviousMonth = startOfMonth(previousMonth);
+      const endOfPreviousMonth = endOfMonth(previousMonth);
+
+      // Buscar receitas do mês anterior
+      const { data: prevRevenues } = await supabase
+        .from('revenues')
+        .select('value, status, date, expected_receipt_date')
+        .eq('unit_id', globalFilters.unitId)
+        .eq('is_active', true)
+        .gte('date', format(startOfPreviousMonth, 'yyyy-MM-dd'))
+        .lte('date', format(endOfPreviousMonth, 'yyyy-MM-dd'));
+
+      // Buscar despesas do mês anterior
+      const { data: prevExpenses } = await supabase
+        .from('expenses')
+        .select('value, status, date, expected_payment_date')
+        .eq('unit_id', globalFilters.unitId)
+        .eq('is_active', true)
+        .gte('date', format(startOfPreviousMonth, 'yyyy-MM-dd'))
+        .lte('date', format(endOfPreviousMonth, 'yyyy-MM-dd'));
+
+      // Calcular saldo do mês anterior
+      const totalRevenues = (prevRevenues || []).reduce(
+        (sum, r) => sum + (r.value || 0),
+        0
+      );
+      const totalExpenses = (prevExpenses || []).reduce(
+        (sum, e) => sum + (e.value || 0),
+        0
+      );
+      const previousBalance = totalRevenues - totalExpenses;
+      console.log('📊 Saldo do mês anterior calculado:', {
+        receitas: totalRevenues,
+        despesas: totalExpenses,
+        saldo: previousBalance,
+      });
+      return previousBalance;
+    } catch (error) {
+      console.error('❌ Erro ao buscar saldo do mês anterior:', error);
+      return 0;
+    }
+  };
+
+  // Buscar dados completos do fluxo de caixa
+  const fetchCompleteCashflowData = async () => {
+    if (!globalFilters.unitId) return;
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('🔄 Buscando dados completos do fluxo de caixa...');
+
+      // ✅ Buscar saldo inicial do mês anterior
+      const saldoInicial = await fetchPreviousMonthBalance();
+
+      // 1. Buscar receitas PAGAS (por date = Data Pgto)
+      const { data: paidRevenues, error: paidRevenuesError } = await supabase
+        .from('revenues')
+        .select(
+          `
+          *,
+          category:categories(id, name, category_type),
+          party:parties(id, nome)
+        `
+        )
+        .eq('unit_id', globalFilters.unitId)
+        .eq('status', 'Received')
+        .eq('is_active', true)
+        .gte('date', dateRange.startDate)
+        .lte('date', dateRange.endDate)
+        .order('date');
+      if (paidRevenuesError) throw paidRevenuesError;
+
+      // 2. Buscar receitas PENDENTES - BUSCAR TODAS E FILTRAR DEPOIS
+      const { data: pendingRevenues, error: pendingRevenuesError } =
+        await supabase
+          .from('revenues')
+          .select(
+            `
+          *,
+          category:categories(id, name, category_type),
+          party:parties(id, nome)
+        `
+          )
+          .eq('unit_id', globalFilters.unitId)
+          .eq('status', 'Pending')
+          .eq('is_active', true)
+          .order('expected_receipt_date');
+      if (pendingRevenuesError) throw pendingRevenuesError;
+
+      // Combinar receitas pagas e pendentes
+      const revenues = [...(paidRevenues || []), ...(pendingRevenues || [])];
+
+      // 3. Buscar despesas PAGAS (por date = Data Pgto)
+      const { data: paidExpenses, error: paidExpensesError } = await supabase
+        .from('expenses')
+        .select(
+          `
+          *,
+          category:categories(id, name, category_type),
+          party:parties(id, nome)
+        `
+        )
+        .eq('unit_id', globalFilters.unitId)
+        .eq('status', 'Paid')
+        .eq('is_active', true)
+        .gte('date', dateRange.startDate)
+        .lte('date', dateRange.endDate)
+        .order('date');
+      if (paidExpensesError) throw paidExpensesError;
+
+      // 4. Buscar despesas PENDENTES (por expected_payment_date = Prev. Pgto)
+      // 4. Buscar despesas PENDENTES - BUSCAR TODAS E FILTRAR DEPOIS
+      const { data: pendingExpenses, error: pendingExpensesError } =
+        await supabase
+          .from('expenses')
+          .select(
+            `
+          *,
+          category:categories(id, name, category_type),
+          party:parties(id, nome)
+        `
+          )
+          .eq('unit_id', globalFilters.unitId)
+          .eq('status', 'Pending')
+          .eq('is_active', true)
+          .order('expected_payment_date');
+      if (pendingExpensesError) throw pendingExpensesError;
+
+      // Combinar despesas pagas e pendentes
+      const expenses = [...(paidExpenses || []), ...(pendingExpenses || [])];
+
+      // 3. Processar dados diários com saldo inicial
+      const dailyData = processDailyData(
+        revenues || [],
+        expenses || [],
+        saldoInicial,
+        dateRange
+      );
+
+      // 4. Separar PAGO vs EM ABERTO
+      const { paid, pending } = separatePaidPending(dailyData);
+
+      // 5. Calcular KPIs
+      const kpis = calculateKPIs(revenues || [], expenses || []);
+
+      // 6. Distribuição de receitas (baseado em data de competência)
+      const revenueDistribution = calculateRevenueDistribution(
+        revenues || [],
+        dateRange
+      );
+
+      // 7. Distribuição de despesas (baseado em data de competência)
+      const expenseDistribution = calculateExpenseDistribution(
+        expenses || [],
+        dateRange
+      );
+      setCashflowData({
+        daily: dailyData,
+        paid,
+        pending,
+        kpis,
+        revenueDistribution,
+        expenseDistribution,
+      });
+      console.log('✅ Dados do fluxo de caixa carregados:', {
+        daily: dailyData.length,
+        paid: paid.length,
+        pending: pending.length,
+        kpis,
+        revenueDistribution: revenueDistribution.length,
+        expenseDistribution: expenseDistribution.length,
+      });
+    } catch (error) {
+      console.error('❌ Erro ao buscar dados do fluxo:', error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Processar dados diários - LÓGICA MELHORADA COM SEPARAÇÃO CLARA E SALDO INICIAL
+  const processDailyData = (
+    revenues,
+    expenses,
+    saldoInicial = 0,
+    dateRange
+  ) => {
+    const dailyMap = new Map();
+
+    // ✅ PREENCHER TODOS OS DIAS DO PERÍODO SELECIONADO (CORRIGIDO TIMEZONE)
+    // 🔧 FIX: Usar parseISO + startOfDay para garantir timezone consistente
+    const startDate = startOfDay(parseISO(dateRange.startDate));
+    const endDate = startOfDay(parseISO(dateRange.endDate));
+    console.log('📊 Processando período:', {
+      startDate: format(startDate, 'yyyy-MM-dd'),
+      endDate: format(endDate, 'yyyy-MM-dd'),
+      totalDays: differenceInDays(endDate, startDate) + 1,
+    });
+
+    // Criar entrada para cada dia do período
+    let currentDate = new Date(startDate);
+    let dayCount = 0;
+    while (currentDate <= endDate && dayCount < 100) {
+      // Safety limit
+      const dateKey = format(currentDate, 'yyyy-MM-dd');
+      dailyMap.set(dateKey, {
+        date: dateKey,
+        // ✅ SEPARAÇÃO CLARA: RECEBIDAS vs PENDENTES
+        received_inflows: 0,
+        pending_inflows: 0,
+        total_inflows: 0,
+        // ✅ SEPARAÇÃO CLARA: PAGAS vs PENDENTES
+        paid_outflows: 0,
+        pending_outflows: 0,
+        total_outflows: 0,
+        // ✅ SALDOS CALCULADOS
+        dailyBalance: 0,
+        accumulatedBalance: 0,
+        // ✅ CONTAGEM DE TRANSAÇÕES
+        transaction_count: 0,
+        // ✅ DETALHES PARA AUDITORIA
+        revenues: {
+          received: [],
+          pending: [],
+        },
+        expenses: {
+          paid: [],
+          pending: [],
+        },
+      });
+
+      // Avançar para o próximo dia usando UTC para evitar problemas de timezone
+      const nextDay = new Date(currentDate);
+      nextDay.setUTCDate(nextDay.getUTCDate() + 1);
+      currentDate = nextDay;
+      dayCount++;
+    }
+
+    // ✅ PROCESSAR RECEITAS COM SEPARAÇÃO POR STATUS - REGIME DE COMPETÊNCIA
+    // 💡 SEMPRE usa expected_receipt_date para alocação no fluxo (regime de competência)
+    // A data de pagamento (revenue.date) serve apenas para separar PAGO vs PENDENTE
+    revenues.forEach(revenue => {
+      // 🎯 USAR SEMPRE A DATA ESPERADA PARA ALOCAÇÃO NO FLUXO
+      const date = format(
+        new Date(revenue.expected_receipt_date || revenue.date),
+        'yyyy-MM-dd'
+      );
+      const category = revenue.status === 'Received' ? 'received' : 'pending';
+
+      // ✅ FILTRAR APENAS DATAS DO MÊS VIGENTE - VALIDAÇÃO RIGOROSA
+      const revenueDate = new Date(date);
+      const filterStartDate = new Date(dateRange.startDate);
+      const filterEndDate = new Date(dateRange.endDate);
+      if (
+        revenueDate >= filterStartDate &&
+        revenueDate <= filterEndDate &&
+        dailyMap.has(date)
+      ) {
+        const dayData = dailyMap.get(date);
+        if (category === 'received') {
+          dayData.received_inflows += revenue.value || 0;
+          dayData.revenues.received.push(revenue);
+        } else {
+          dayData.pending_inflows += revenue.value || 0;
+          dayData.revenues.pending.push(revenue);
+        }
+        dayData.transaction_count++;
+      } else {
+        console.log('🚫 Receita filtrada fora do mês vigente:', {
+          revenueId: revenue.id,
+          date: date,
+          expectedDate: revenue.expected_receipt_date,
+          status: revenue.status,
+          monthRange: `${dateRange.startDate} - ${dateRange.endDate}`,
+        });
+      }
+    });
+
+    // ✅ PROCESSAR DESPESAS COM SEPARAÇÃO POR STATUS - REGIME DE COMPETÊNCIA
+    // 💡 SEMPRE usa expected_payment_date para alocação no fluxo (regime de competência)
+    // A data de pagamento (expense.date) serve apenas para separar PAGO vs PENDENTE
+    expenses.forEach(expense => {
+      // 🎯 USAR SEMPRE A DATA ESPERADA PARA ALOCAÇÃO NO FLUXO
+      const date = format(
+        new Date(expense.expected_payment_date || expense.date),
+        'yyyy-MM-dd'
+      );
+      const category = expense.status === 'Paid' ? 'paid' : 'pending';
+
+      // ✅ FILTRAR APENAS DATAS DO MÊS VIGENTE - VALIDAÇÃO RIGOROSA
+      const expenseDate = new Date(date);
+      const filterStartDate = new Date(dateRange.startDate);
+      const filterEndDate = new Date(dateRange.endDate);
+      if (
+        expenseDate >= filterStartDate &&
+        expenseDate <= filterEndDate &&
+        dailyMap.has(date)
+      ) {
+        const dayData = dailyMap.get(date);
+        if (category === 'paid') {
+          dayData.paid_outflows += expense.value || 0;
+          dayData.expenses.paid.push(expense);
+        } else {
+          dayData.pending_outflows += expense.value || 0;
+          dayData.expenses.pending.push(expense);
+        }
+        dayData.transaction_count++;
+      } else {
+        console.log('🚫 Despesa filtrada fora do mês vigente:', {
+          expenseId: expense.id,
+          date: date,
+          expectedDate: expense.expected_payment_date,
+          status: expense.status,
+          monthRange: `${dateRange.startDate} - ${dateRange.endDate}`,
+        });
+      }
+    });
+
+    // ✅ CALCULAR TOTAIS E SALDOS - ORDENADO POR DATA COM SALDO INICIAL
+    const sortedDates = Array.from(dailyMap.keys()).sort();
+    let accumulatedBalance = saldoInicial; // ✅ Começar com saldo inicial
+
+    const result = sortedDates.map((date, index) => {
+      const dayData = dailyMap.get(date);
+
+      // Calcular totais
+      dayData.total_inflows =
+        dayData.received_inflows + dayData.pending_inflows;
+      dayData.total_outflows = dayData.paid_outflows + dayData.pending_outflows;
+
+      // Calcular saldo do dia
+      dayData.dailyBalance = dayData.total_inflows - dayData.total_outflows;
+
+      // Calcular acumulado
+      dayData.accumulatedBalance = accumulatedBalance + dayData.dailyBalance;
+      accumulatedBalance = dayData.accumulatedBalance;
+      return {
+        ...dayData,
+        dayNumber: index + 1,
+      };
+    });
+
+    // ✅ ADICIONAR LINHA DE SALDO INICIAL NO INÍCIO (com chave única)
+    const saldoInicialRow = {
+      date: 'SALDO_INICIAL',
+      // Chave única para evitar conflito com primeiro dia
+      displayDate: dateRange.startDate,
+      // Data para exibição
+      isSaldoInicial: true,
+      received_inflows: 0,
+      pending_inflows: 0,
+      total_inflows: 0,
+      paid_outflows: 0,
+      pending_outflows: 0,
+      total_outflows: 0,
+      dailyBalance: 0,
+      accumulatedBalance: saldoInicial,
+      transaction_count: 0,
+      revenues: {
+        received: [],
+        pending: [],
+      },
+      expenses: {
+        paid: [],
+        pending: [],
+      },
+      dayNumber: 0, // Dia 0 = Saldo Inicial
+    };
+    const finalResult = [saldoInicialRow, ...result];
+    return finalResult;
+  };
+
+  // ✅ FUNÇÃO SIMPLIFICADA - AGORA USAMOS APENAS OS DADOS CONSOLIDADOS
+  const separatePaidPending = dailyData => {
+    // Como agora temos uma tabela única consolidada,
+    // esta função apenas retorna os dados já processados
+    return {
+      paid: dailyData,
+      // Mesmos dados para ambos
+      pending: dailyData,
+      // pois já estão separados por status
+      daily: dailyData, // Dados consolidados para a nova tabela
+    };
+  };
+
+  // Calcular KPIs
+  const calculateKPIs = (revenues, expenses) => {
+    const currentMonth = format(new Date(), 'yyyy-MM');
+    const lastMonth = format(subMonths(new Date(), 1), 'yyyy-MM');
+    const lastYear = format(subMonths(new Date(), 12), 'yyyy-MM');
+
+    // Receitas do mês atual
+    const currentMonthRevenues = revenues
+      .filter(r => format(new Date(r.date), 'yyyy-MM') === currentMonth)
+      .reduce((sum, r) => sum + (r.value || 0), 0);
+
+    // Despesas do mês atual
+    const currentMonthExpenses = expenses
+      .filter(e => format(new Date(e.date), 'yyyy-MM') === currentMonth)
+      .reduce((sum, e) => sum + (e.value || 0), 0);
+
+    // Resultado do mês atual
+    const currentMonthResult = currentMonthRevenues - currentMonthExpenses;
+
+    // Receitas dos últimos 12 meses
+    const last12MonthsRevenues = revenues
+      .filter(r => format(new Date(r.date), 'yyyy-MM') >= lastYear)
+      .reduce((sum, r) => sum + (r.value || 0), 0);
+
+    // Despesas dos últimos 12 meses
+    const last12MonthsExpenses = expenses
+      .filter(e => format(new Date(e.date), 'yyyy-MM') >= lastYear)
+      .reduce((sum, e) => sum + (e.value || 0), 0);
+
+    // Resultado dos últimos 12 meses
+    const last12MonthsResult = last12MonthsRevenues - last12MonthsExpenses;
+
+    // Margem de lucro
+    const profitMargin =
+      last12MonthsRevenues > 0
+        ? (last12MonthsResult / last12MonthsRevenues) * 100
+        : 0;
+    return {
+      currentMonth: {
+        revenues: currentMonthRevenues,
+        expenses: currentMonthExpenses,
+        result: currentMonthResult,
+        month: format(new Date(), 'MMM/yy', {
+          locale: ptBR,
+        }),
+      },
+      last12Months: {
+        revenues: last12MonthsRevenues,
+        expenses: last12MonthsExpenses,
+        result: last12MonthsResult,
+        profitMargin,
+      },
+    };
+  };
+
+  // Distribuição de receitas por categoria (baseado em data de pagamento)
+  const calculateRevenueDistribution = (revenues, dateRange) => {
+    const distribution = new Map();
+
+    // Filtrar receitas pela data de pagamento (date) dentro do período
+    const filteredRevenues = revenues.filter(revenue => {
+      if (!revenue.date) {
+        return false; // Ignora receitas sem data de pagamento
+      }
+      const paymentDate = new Date(revenue.date + 'T00:00:00');
+      const periodStart = new Date(dateRange.startDate + 'T00:00:00');
+      const periodEnd = new Date(dateRange.endDate + 'T23:59:59');
+
+      // Incluir se a data de pagamento está dentro do período selecionado
+      return paymentDate >= periodStart && paymentDate <= periodEnd;
+    });
+    filteredRevenues.forEach(revenue => {
+      const categoryName = revenue.category?.name || 'Outras Receitas';
+      if (!distribution.has(categoryName)) {
+        distribution.set(categoryName, 0);
+      }
+      distribution.set(
+        categoryName,
+        distribution.get(categoryName) + (revenue.value || 0)
+      );
+    });
+    const total = Array.from(distribution.values()).reduce(
+      (sum, val) => sum + val,
+      0
+    );
+    return Array.from(distribution.entries())
+      .map(([name, value]) => ({
+        name,
+        value,
+        percentage: total > 0 ? (value / total) * 100 : 0,
+      }))
+      .sort((a, b) => b.value - a.value);
+  };
+
+  // Distribuição de despesas por categoria (baseado em data de vencimento esperada)
+  const calculateExpenseDistribution = (expenses, dateRange) => {
+    const distribution = new Map();
+
+    // Filtrar despesas pela data de vencimento esperada (expected_payment_date)
+    // independente do status (paga ou pendente)
+    const filteredExpenses = expenses.filter(expense => {
+      // Usar expected_payment_date se disponível, senão usar date
+      const referenceDate = expense.expected_payment_date || expense.date;
+      if (!referenceDate) {
+        return false; // Ignora despesas sem data
+      }
+      const expenseDate = new Date(referenceDate + 'T00:00:00');
+      const periodStart = new Date(dateRange.startDate + 'T00:00:00');
+      const periodEnd = new Date(dateRange.endDate + 'T23:59:59');
+
+      // Incluir se a data de vencimento esperada está dentro do período
+      return expenseDate >= periodStart && expenseDate <= periodEnd;
+    });
+    filteredExpenses.forEach(expense => {
+      const categoryName = expense.category?.name || 'Outras Despesas';
+      if (!distribution.has(categoryName)) {
+        distribution.set(categoryName, 0);
+      }
+      distribution.set(
+        categoryName,
+        distribution.get(categoryName) + (expense.value || 0)
+      );
+    });
+    const total = Array.from(distribution.values()).reduce(
+      (sum, val) => sum + val,
+      0
+    );
+    return Array.from(distribution.entries())
+      .map(([name, value]) => ({
+        name,
+        value,
+        percentage: total > 0 ? (value / total) * 100 : 0,
+      }))
+      .sort((a, b) => b.value - a.value);
+  };
+
+  // ✅ Carregar dados automaticamente quando período ou unidade mudar
+  useEffect(() => {
+    if (globalFilters.unitId && dateRange.startDate && dateRange.endDate) {
+      fetchCompleteCashflowData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalFilters.unitId, dateRange.startDate, dateRange.endDate]);
+
+  // Handlers
+  const handleRefresh = () => {
+    fetchCompleteCashflowData();
+    refetch();
+  };
+
+  // Handler para mudança de período do timeline
+  const handleTimelinePeriodChange = newPeriod => {
+    setTimelinePeriod(newPeriod);
+  };
+
+  const handleExport = async format => {
+    const dataToExport = cashflowData.daily || [];
+    if (dataToExport.length === 0) {
+      showToast('Não há dados para exportar', 'warning');
+      return;
+    }
+    setExporting(true);
+    try {
+      const filters = {
+        periodo: {
+          tipo: 'custom',
+          dataInicio: dateRange.startDate,
+          dataFim: dateRange.endDate,
+        },
+      };
+      let result;
+      switch (format) {
+        case 'csv':
+          result = fluxoExportService.exportAsCSV(dataToExport, filters);
+          break;
+        case 'excel':
+          result = fluxoExportService.exportAsExcel(dataToExport, filters);
+          break;
+        case 'pdf':
+          result = fluxoExportService.exportAsPDF(dataToExport, filters);
+          break;
+        default:
+          throw new Error('Formato não suportado');
+      }
+      if (result.success) {
+        showToast(
+          `Relatório exportado como ${format.toUpperCase()}`,
+          'success'
+        );
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      showToast(`Erro ao exportar: ${error.message}`, 'error');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  // Formatação de moeda
+  const formatCurrency = value => {
+    return value.toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  };
+
+  // Cores para gráficos
+  const chartColors = [
+    '#3B82F6',
+    '#EF4444',
+    '#10B981',
+    '#F59E0B',
+    '#8B5CF6',
+    '#06B6D4',
+    '#84CC16',
+    '#F97316',
+    '#EC4899',
+    '#6B7280',
+  ];
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24">
+        <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+        <p className="text-theme-secondary font-medium">
+          Carregando fluxo de caixa...
+        </p>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24">
+        <TrendingDown className="mb-4 h-16 w-16 text-red-400" />
+        <h3 className="text-theme-primary mb-2 text-xl font-semibold">
+          Erro ao carregar dados
+        </h3>
+        <p className="text-theme-secondary mb-6">{error}</p>
+        <button
+          onClick={handleRefresh}
+          className="btn-theme-primary flex items-center gap-2 rounded-xl px-6 py-3"
+        >
+          <RefreshCw className="h-5 w-5" />
+          Tentar Novamente
+        </button>
+      </div>
+    );
+  }
+  return (
+    <div className="space-y-6">
+      {/* 📊 Header com Controles - DESIGN SYSTEM */}
+      <div className="card-theme rounded-xl p-6">
+        <div className="flex flex-col gap-6">
+          {/* Linha 1: Título e Ações */}
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex items-center gap-3">
+              <div className="rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 p-3">
+                <BarChart3 className="text-dark-text-primary h-6 w-6" />
+              </div>
+              <div>
+                <h2 className="text-theme-primary text-2xl font-bold">
+                  Fluxo de Caixa
+                </h2>
+                <p className="text-theme-secondary text-sm">
+                  Análise consolidada com filtros de período
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Botão Atualizar */}
+              <button
+                onClick={handleRefresh}
+                className="text-theme-secondary hover:text-theme-primary hover:card-theme rounded-xl p-2.5 transition-all dark:hover:bg-gray-700"
+                title="Atualizar"
+              >
+                <RefreshCw className="h-5 w-5" />
+              </button>
+
+              {/* Botões de Exportação */}
+              <button
+                onClick={() => handleExport('csv')}
+                disabled={
+                  exporting ||
+                  !cashflowData.daily ||
+                  cashflowData.daily.length === 0
+                }
+                className="text-theme-secondary hover:text-theme-primary flex items-center gap-2 rounded-xl border-2 border-light-border px-4 py-2.5 text-sm font-medium transition-all hover:bg-light-bg disabled:opacity-50 dark:border-dark-border dark:bg-dark-bg dark:hover:bg-gray-700"
+                title="Exportar CSV"
+              >
+                {exporting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <FileText className="h-4 w-4" />
+                )}
+                <span className="hidden sm:inline">CSV</span>
+              </button>
+
+              <button
+                onClick={() => handleExport('excel')}
+                disabled={
+                  exporting ||
+                  !cashflowData.daily ||
+                  cashflowData.daily.length === 0
+                }
+                className="text-theme-secondary hover:text-theme-primary flex items-center gap-2 rounded-xl border-2 border-light-border px-4 py-2.5 text-sm font-medium transition-all hover:bg-light-bg disabled:opacity-50 dark:border-dark-border dark:bg-dark-bg dark:hover:bg-gray-700"
+                title="Exportar Excel"
+              >
+                {exporting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <FileSpreadsheet className="h-4 w-4" />
+                )}
+                <span className="hidden sm:inline">Excel</span>
+              </button>
+
+              <button
+                onClick={() => handleExport('pdf')}
+                disabled={
+                  exporting ||
+                  !cashflowData.daily ||
+                  cashflowData.daily.length === 0
+                }
+                className="btn-theme-primary flex items-center gap-2 rounded-xl px-4 py-2.5 shadow-lg transition-all hover:shadow-xl disabled:opacity-50"
+                title="Exportar PDF"
+              >
+                {exporting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4" />
+                )}
+                PDF
+              </button>
+            </div>
+          </div>
+
+          {/* Linha 2: Seletor de Mês */}
+          <div className="border-t-2 border-light-border pt-6 dark:border-dark-border">
+            <div className="flex items-center justify-center gap-4">
+              <MonthYearPicker
+                selectedDate={selectedMonth}
+                onChange={setSelectedMonth}
+                label="Mês de Referência"
+                className="w-full max-w-md"
+              />
+            </div>
+          </div>
+
+          {/* Linha 3: Descrição do Período */}
+          <div className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-4 dark:border-blue-800 dark:from-blue-900/20 dark:to-indigo-900/20">
+            <div className="card-theme flex items-center gap-2 rounded-lg border border-blue-200 px-4 py-2 dark:border-blue-700 dark:bg-dark-surface">
+              <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <span className="text-theme-primary text-sm font-bold capitalize">
+                {periodDescription}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 📈 Timeline de 12 Meses - DESIGN SYSTEM */}
+      <div className="card-theme rounded-xl border-2 border-transparent p-6 transition-all duration-300 hover:border-purple-300 dark:hover:border-purple-700">
+        {/* Header */}
+        <div className="mb-6 flex items-center gap-3">
+          <div className="rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 p-2.5 shadow-lg">
+            <TrendingUp className="text-dark-text-primary h-5 w-5" />
+          </div>
+          <div>
+            <h3 className="text-theme-primary text-lg font-bold">
+              Timeline dos Últimos 12 Meses
+            </h3>
+            <p className="text-theme-secondary text-sm">
+              Evolução histórica do fluxo de caixa
+            </p>
+          </div>
+        </div>
+
+        {/* Chart Component */}
+        <CashflowTimelineChart
+          data={timelineData}
+          loading={timelineLoading}
+          error={timelineError}
+          title="Evolução do Fluxo de Caixa"
+          height={400}
+          onRefresh={refetchTimeline}
+          onExport={handleExport}
+          onPeriodChange={handleTimelinePeriodChange}
+        />
+      </div>
+
+      {/* 📊 Gráficos de Distribuição - PIE CHARTS */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* Distribuição de Receitas */}
+        <PieChartCard
+          title="Distribuição de Receitas"
+          subtitle="Por categoria (data de pagamento)"
+          data={cashflowData.revenueDistribution}
+          type="revenue"
+          formatValue={formatCurrency}
+        />
+
+        {/* Distribuição de Despesas */}
+        <PieChartCard
+          title="Distribuição de Despesas"
+          subtitle="Por categoria (data de vencimento)"
+          data={cashflowData.expenseDistribution}
+          type="expense"
+          formatValue={formatCurrency}
+        />
+      </div>
+    </div>
+  );
+};
+export default FluxoTabRefactored;

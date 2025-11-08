@@ -12,10 +12,7 @@ import { X, DollarSign, Clock, Percent, Calculator } from 'lucide-react';
 import { Button } from '../../../atoms/Button/Button';
 import { Input } from '../../../atoms/Input/Input';
 import categoriesService from '../../../services/categoriesService';
-import {
-  validateCreateService,
-  validateUpdateService,
-} from '../../../dtos/ServiceDTO';
+import { validateCreateService, validateUpdateService } from '../../../dtos/ServiceDTO';
 import { formatCurrency } from '../../../utils/formatters';
 
 /**
@@ -28,7 +25,7 @@ const ServiceFormModal = ({
   onSubmit,
   service = null,
   unitId,
-  loading = false,
+  loading = false
 }) => {
   const isEditing = !!service;
   const [formData, setFormData] = useState({
@@ -37,7 +34,7 @@ const ServiceFormModal = ({
     price: '',
     commissionPercentage: '',
     active: true,
-    categoryId: '',
+    categoryId: ''
   });
   const [errors, setErrors] = useState({});
 
@@ -47,9 +44,7 @@ const ServiceFormModal = ({
   const [categoriesError, setCategoriesError] = useState(null);
 
   // Calcula valor da comissão em tempo real
-  const commissionValue =
-    (parseFloat(formData.price) || 0) *
-    ((parseFloat(formData.commissionPercentage) || 0) / 100);
+  const commissionValue = (parseFloat(formData.price) || 0) * ((parseFloat(formData.commissionPercentage) || 0) / 100);
 
   // 🔄 Carrega categorias quando o modal abre
   useEffect(() => {
@@ -66,16 +61,14 @@ const ServiceFormModal = ({
       const result = await categoriesService.getRevenueCategories();
       if (result && Array.isArray(result)) {
         // Filtra apenas categorias de serviço (não de produto)
-        const serviceCategories = result.filter(
-          cat => cat.revenue_type === 'service'
-        );
+        const serviceCategories = result.filter(cat => cat.revenue_type === 'service');
         setCategories(serviceCategories);
 
         // Se não há categoria selecionada e há categorias disponíveis, seleciona a primeira
         if (!formData.categoryId && serviceCategories.length > 0) {
           setFormData(prev => ({
             ...prev,
-            categoryId: serviceCategories[0].id,
+            categoryId: serviceCategories[0].id
           }));
         }
       } else {
@@ -84,9 +77,7 @@ const ServiceFormModal = ({
       }
     } catch (error) {
       console.error('❌ Erro ao carregar categorias:', error);
-      setCategoriesError(
-        'Erro ao carregar categorias. Por favor, tente novamente.'
-      );
+      setCategoriesError('Erro ao carregar categorias. Por favor, tente novamente.');
       setCategories([]);
     } finally {
       setLoadingCategories(false);
@@ -102,7 +93,7 @@ const ServiceFormModal = ({
         price: service.price?.toString() || '',
         commissionPercentage: service.commission_percentage?.toString() || '',
         categoryId: service.category_id || '',
-        active: service.active !== false,
+        active: service.active !== false
       });
     } else {
       setFormData({
@@ -111,7 +102,7 @@ const ServiceFormModal = ({
         price: '',
         commissionPercentage: '',
         categoryId: '',
-        active: true,
+        active: true
       });
     }
     setErrors({});
@@ -119,12 +110,12 @@ const ServiceFormModal = ({
   const handleChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
-      [field]: value,
+      [field]: value
     }));
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,
-        [field]: null,
+        [field]: null
       }));
     }
   };
@@ -138,7 +129,7 @@ const ServiceFormModal = ({
     if (!unitId) {
       console.error('❌ unitId não fornecido!');
       setErrors({
-        form: 'Erro: Unidade não identificada. Selecione uma unidade no seletor de unidades.',
+        form: 'Erro: Unidade não identificada. Selecione uma unidade no seletor de unidades.'
       });
       return;
     }
@@ -149,19 +140,17 @@ const ServiceFormModal = ({
       commissionPercentage: parseFloat(formData.commissionPercentage) || 0,
       categoryId: formData.categoryId,
       unitId: unitId,
-      active: formData.active,
+      active: formData.active
     };
     console.log('📋 Dados preparados para validação:', data);
 
     // Valida com Zod
-    const validation = isEditing
-      ? validateUpdateService(data)
-      : validateCreateService(data);
+    const validation = isEditing ? validateUpdateService(data) : validateCreateService(data);
     console.log('✅ Validação resultado:', validation);
     if (!validation.success) {
       console.error('❌ Erro na validação:', validation.error);
       setErrors({
-        form: validation.error,
+        form: validation.error
       });
       return;
     }
@@ -179,7 +168,7 @@ const ServiceFormModal = ({
         price: '',
         commissionPercentage: '',
         categoryId: '',
-        active: true,
+        active: true
       });
     }
     setErrors({});
@@ -192,15 +181,14 @@ const ServiceFormModal = ({
         price: '',
         commissionPercentage: '',
         categoryId: '',
-        active: true,
+        active: true
       });
       setErrors({});
       onClose();
     }
   };
   if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+  return <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
       <div className="card-theme max-h-[90vh] w-full max-w-2xl overflow-y-auto">
         {/* Header */}
         <div className="border-theme-border flex items-center justify-between border-b p-6">
@@ -209,17 +197,10 @@ const ServiceFormModal = ({
               {isEditing ? 'Editar Serviço' : 'Novo Serviço'}
             </h2>
             <p className="text-theme-muted mt-1 text-sm">
-              {isEditing
-                ? 'Atualize as informações do serviço'
-                : 'Cadastre um novo serviço com preço e comissão'}
+              {isEditing ? 'Atualize as informações do serviço' : 'Cadastre um novo serviço com preço e comissão'}
             </p>
           </div>
-          <button
-            onClick={handleClose}
-            disabled={loading}
-            className="hover:card-theme rounded-lg p-2 transition-colors disabled:opacity-50 dark:hover:bg-dark-surface"
-            aria-label="Fechar modal"
-          >
+          <button onClick={handleClose} disabled={loading} className="hover:card-theme rounded-lg p-2 transition-colors disabled:opacity-50 dark:hover:bg-dark-surface" aria-label="Fechar modal">
             <X size={20} className="text-theme-muted" />
           </button>
         </div>
@@ -231,15 +212,7 @@ const ServiceFormModal = ({
             <label className="text-theme-primary mb-2 block text-sm font-medium">
               Nome do Serviço *
             </label>
-            <Input
-              type="text"
-              value={formData.name}
-              onChange={e => handleChange('name', e.target.value)}
-              placeholder="Ex: Corte Masculino, Barba, Degradê..."
-              disabled={loading}
-              required
-              maxLength={100}
-            />
+            <Input type="text" value={formData.name} onChange={e => handleChange('name', e.target.value)} placeholder="Ex: Corte Masculino, Barba, Degradê..." disabled={loading} required maxLength={100} />
             <p className="text-theme-muted mt-1 text-xs">
               {formData.name.length}/100 caracteres
             </p>
@@ -250,47 +223,31 @@ const ServiceFormModal = ({
             <label className="text-theme-primary mb-2 block text-sm font-medium">
               Categoria *
             </label>
-            {loadingCategories ? (
-              <div className="flex items-center gap-2 rounded-lg border border-light-border bg-light-surface px-4 py-2.5 dark:border-dark-border dark:bg-dark-hover">
+            {loadingCategories ? <div className="flex items-center gap-2 rounded-lg border border-light-border bg-light-surface px-4 py-2.5 dark:border-dark-border dark:bg-dark-hover">
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                 <span className="text-theme-secondary text-sm">
                   Carregando categorias...
                 </span>
-              </div>
-            ) : categories.length > 0 ? (
-              <>
-                <select
-                  value={formData.categoryId}
-                  onChange={e => handleChange('categoryId', e.target.value)}
-                  disabled={loading}
-                  className="card-theme text-theme-primary w-full rounded-lg border border-light-border px-4 py-2.5 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-dark-border dark:bg-dark-surface"
-                  required
-                >
+              </div> : categories.length > 0 ? <>
+                <select value={formData.categoryId} onChange={e => handleChange('categoryId', e.target.value)} disabled={loading} className="card-theme text-theme-primary w-full rounded-lg border border-light-border px-4 py-2.5 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-dark-border dark:bg-dark-surface" required>
                   <option value="">Selecione uma categoria</option>
-                  {categories.map(cat => (
-                    <option key={cat.id} value={cat.id}>
+                  {categories.map(cat => <option key={cat.id} value={cat.id}>
                       {cat.name}
                       {cat.parent?.name ? ` (${cat.parent.name})` : ''}
-                    </option>
-                  ))}
+                    </option>)}
                 </select>
-                {errors.categoryId && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                {errors.categoryId && <p className="mt-1 text-sm text-red-600 dark:text-red-400">
                     {errors.categoryId}
-                  </p>
-                )}
+                  </p>}
                 <p className="text-theme-muted mt-1 text-xs">
                   Apenas categorias de "Receita de Serviço" são exibidas
                 </p>
-              </>
-            ) : (
-              <div className="rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 dark:border-yellow-800 dark:bg-yellow-900/20">
+              </> : <div className="rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 dark:border-yellow-800 dark:bg-yellow-900/20">
                 <p className="text-sm text-yellow-800 dark:text-yellow-200">
                   ⚠️ Nenhuma categoria de serviço cadastrada. Cadastre
                   categorias na página de Categorias primeiro.
                 </p>
-              </div>
-            )}
+              </div>}
           </div>
 
           {/* Grid: Duração e Preço */}
@@ -304,19 +261,7 @@ const ServiceFormModal = ({
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                   <Clock size={18} className="text-theme-muted" />
                 </div>
-                <Input
-                  type="number"
-                  min="1"
-                  max="480"
-                  value={formData.durationMinutes}
-                  onChange={e =>
-                    handleChange('durationMinutes', e.target.value)
-                  }
-                  placeholder="30"
-                  className="pl-10"
-                  disabled={loading}
-                  required
-                />
+                <Input type="number" min="1" max="480" value={formData.durationMinutes} onChange={e => handleChange('durationMinutes', e.target.value)} placeholder="30" className="pl-10" disabled={loading} required />
               </div>
               <p className="text-theme-muted mt-1 text-xs">
                 Tempo médio de execução
@@ -332,23 +277,11 @@ const ServiceFormModal = ({
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                   <DollarSign size={18} className="text-theme-muted" />
                 </div>
-                <Input
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  value={formData.price}
-                  onChange={e => handleChange('price', e.target.value)}
-                  placeholder="50,00"
-                  className="pl-10"
-                  disabled={loading}
-                  required
-                />
+                <Input type="number" step="0.01" min="0.01" value={formData.price} onChange={e => handleChange('price', e.target.value)} placeholder="50,00" className="pl-10" disabled={loading} required />
               </div>
-              {formData.price && (
-                <p className="text-theme-muted mt-1 text-xs">
+              {formData.price && <p className="text-theme-muted mt-1 text-xs">
                   {formatCurrency(parseFloat(formData.price) || 0)}
-                </p>
-              )}
+                </p>}
             </div>
           </div>
 
@@ -361,20 +294,7 @@ const ServiceFormModal = ({
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                 <Percent size={18} className="text-theme-muted" />
               </div>
-              <Input
-                type="number"
-                step="0.01"
-                min="0"
-                max="100"
-                value={formData.commissionPercentage}
-                onChange={e =>
-                  handleChange('commissionPercentage', e.target.value)
-                }
-                placeholder="30"
-                className="pl-10"
-                disabled={loading}
-                required
-              />
+              <Input type="number" step="0.01" min="0" max="100" value={formData.commissionPercentage} onChange={e => handleChange('commissionPercentage', e.target.value)} placeholder="30" className="pl-10" disabled={loading} required />
             </div>
             <p className="text-theme-muted mt-1 text-xs">
               Percentual que o profissional recebe por serviço
@@ -382,13 +302,9 @@ const ServiceFormModal = ({
           </div>
 
           {/* Cálculo da Comissão */}
-          {formData.price && formData.commissionPercentage && (
-            <div className="rounded-lg border border-purple-200 bg-purple-50 p-4 dark:border-purple-800 dark:bg-purple-900/20">
+          {formData.price && formData.commissionPercentage && <div className="rounded-lg border border-purple-200 bg-purple-50 p-4 dark:border-purple-800 dark:bg-purple-900/20">
               <div className="mb-2 flex items-center gap-2">
-                <Calculator
-                  size={20}
-                  className="text-purple-600 dark:text-purple-400"
-                />
+                <Calculator size={20} className="text-purple-600 dark:text-purple-400" />
                 <span className="text-sm font-medium text-purple-800 dark:text-purple-200">
                   Cálculo de Comissão
                 </span>
@@ -413,12 +329,10 @@ const ServiceFormModal = ({
                   </span>
                 </div>
               </div>
-            </div>
-          )}
+            </div>}
 
           {/* Status (apenas ao editar) */}
-          {isEditing && (
-            <div className="border-theme-border flex items-center justify-between rounded-lg border bg-light-bg p-4 dark:bg-dark-bg dark:bg-dark-surface/50">
+          {isEditing && <div className="border-theme-border flex items-center justify-between rounded-lg border bg-light-bg p-4 dark:bg-dark-bg dark:bg-dark-surface/50">
               <div>
                 <label className="text-theme-primary text-sm font-medium">
                   Status do Serviço
@@ -428,29 +342,20 @@ const ServiceFormModal = ({
                 </p>
               </div>
               <label className="relative inline-flex cursor-pointer items-center">
-                <input
-                  type="checkbox"
-                  checked={formData.active}
-                  onChange={e => handleChange('active', e.target.checked)}
-                  disabled={loading}
-                  className="peer sr-only"
-                />
-                <div className="peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 after:card-theme peer-checked:bg-primary-600 peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-light-border after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-light-surface peer-focus:outline-none peer-focus:ring-4 dark:border-dark-border dark:border-dark-surface dark:bg-gray-700" />
+                <input type="checkbox" checked={formData.active} onChange={e => handleChange('active', e.target.checked)} disabled={loading} className="peer sr-only" />
+                <div className="peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 after:card-theme peer-checked:bg-primary-600 peer h-6 w-11 rounded-full bg-gray-200 dark:bg-gray-700 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-light-border after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-light-surface peer-focus:outline-none peer-focus:ring-4 dark:border-dark-border dark:border-dark-surface" />
                 <span className="text-theme-primary ml-3 text-sm font-medium">
                   {formData.active ? 'Ativo' : 'Inativo'}
                 </span>
               </label>
-            </div>
-          )}
+            </div>}
 
           {/* Erro de validação */}
-          {errors.form && (
-            <div className="rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/20">
+          {errors.form && <div className="rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/20">
               <p className="text-sm text-red-600 dark:text-red-400">
                 {errors.form}
               </p>
-            </div>
-          )}
+            </div>}
 
           {/* Info */}
           <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
@@ -462,34 +367,16 @@ const ServiceFormModal = ({
 
           {/* Actions */}
           <div className="flex gap-3">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={handleClose}
-              disabled={loading}
-              className="flex-1"
-            >
+            <Button type="button" variant="secondary" onClick={handleClose} disabled={loading} className="flex-1">
               Cancelar
             </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              disabled={loading}
-              className="flex-1"
-            >
-              {loading
-                ? isEditing
-                  ? 'Salvando...'
-                  : 'Criando...'
-                : isEditing
-                  ? 'Salvar Alterações'
-                  : 'Criar Serviço'}
+            <Button type="submit" variant="primary" disabled={loading} className="flex-1">
+              {loading ? isEditing ? 'Salvando...' : 'Criando...' : isEditing ? 'Salvar Alterações' : 'Criar Serviço'}
             </Button>
           </div>
         </form>
       </div>
-    </div>
-  );
+    </div>;
 };
 ServiceFormModal.propTypes = {
   /** Se o modal está aberto */
@@ -506,11 +393,11 @@ ServiceFormModal.propTypes = {
     price: PropTypes.number,
     commission_percentage: PropTypes.number,
     category_id: PropTypes.string,
-    active: PropTypes.bool,
+    active: PropTypes.bool
   }),
   /** ID da unidade (obrigatório) */
   unitId: PropTypes.string.isRequired,
   /** Estado de loading */
-  loading: PropTypes.bool,
+  loading: PropTypes.bool
 };
 export default ServiceFormModal;

@@ -17,9 +17,16 @@ import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 const TurnHistoryPage = () => {
   const navigate = useNavigate();
-  const { user, userRole } = useAuth();
-  const { selectedUnit } = useUnit();
-  const { showToast } = useToast();
+  const {
+    user,
+    userRole
+  } = useAuth();
+  const {
+    selectedUnit
+  } = useUnit();
+  const {
+    showToast
+  } = useToast();
   const [loading, setLoading] = useState(true);
   const [tableData, setTableData] = useState([]);
   const [professionals, setProfessionals] = useState([]);
@@ -33,11 +40,10 @@ const TurnHistoryPage = () => {
     const fetchProfessionalId = async () => {
       if (userRole === 'barbeiro' && user) {
         try {
-          const { data, error } = await supabase
-            .from('professionals')
-            .select('id')
-            .eq('user_id', user.id)
-            .single();
+          const {
+            data,
+            error
+          } = await supabase.from('professionals').select('id').eq('user_id', user.id).single();
           if (error) throw error;
           setCurrentProfessionalId(data?.id);
         } catch (error) {
@@ -57,37 +63,33 @@ const TurnHistoryPage = () => {
       }
       setLoading(true);
       try {
-        const startDate = startOfMonth(
-          new Date(selectedYear, selectedMonth - 1)
-        );
+        const startDate = startOfMonth(new Date(selectedYear, selectedMonth - 1));
         const endDate = endOfMonth(new Date(selectedYear, selectedMonth - 1));
-        const { tableData, professionals, totals, error } =
-          await turnHistoryService.getDailyTableData(
-            selectedUnit.id,
-            format(startDate, 'yyyy-MM-dd'),
-            format(endDate, 'yyyy-MM-dd')
-          );
+        const {
+          tableData,
+          professionals,
+          totals,
+          error
+        } = await turnHistoryService.getDailyTableData(selectedUnit.id, format(startDate, 'yyyy-MM-dd'), format(endDate, 'yyyy-MM-dd'));
         if (error) throw new Error(error);
 
         // Se for barbeiro, filtrar apenas suas colunas
         if (userRole === 'barbeiro' && currentProfessionalId) {
-          const { data: professional } = await supabase
-            .from('professionals')
-            .select('name')
-            .eq('id', currentProfessionalId)
-            .single();
+          const {
+            data: professional
+          } = await supabase.from('professionals').select('name').eq('id', currentProfessionalId).single();
           if (professional) {
             const myName = professional.name;
             const filteredProfessionals = [myName];
             const filteredTableData = tableData.map(row => ({
               date: row.date,
               [myName]: row[myName] || 0,
-              total: row[myName] || 0,
+              total: row[myName] || 0
             }));
             const filteredTotals = {
               date: 'Total',
               [myName]: totals[myName] || 0,
-              total: totals[myName] || 0,
+              total: totals[myName] || 0
             };
             setProfessionals(filteredProfessionals);
             setTableData(filteredTableData);
@@ -102,27 +104,20 @@ const TurnHistoryPage = () => {
         console.error('Erro ao carregar histórico:', error);
         showToast({
           type: 'error',
-          message: 'Erro ao carregar histórico',
+          message: 'Erro ao carregar histórico'
         });
       } finally {
         setLoading(false);
       }
     };
     loadHistory();
-  }, [
-    selectedUnit,
-    selectedMonth,
-    selectedYear,
-    userRole,
-    currentProfessionalId,
-    showToast,
-  ]);
+  }, [selectedUnit, selectedMonth, selectedYear, userRole, currentProfessionalId, showToast]);
 
   // Função para formatar data
   const formatDate = dateString => {
     const date = new Date(dateString + 'T00:00:00');
     return format(date, "dd/MM/yyyy - EEE'.'", {
-      locale: ptBR,
+      locale: ptBR
     });
   };
 
@@ -131,29 +126,15 @@ const TurnHistoryPage = () => {
     if (tableData.length === 0) {
       showToast({
         type: 'warning',
-        message: 'Não há dados para exportar',
+        message: 'Não há dados para exportar'
       });
       return;
     }
     const headers = ['Data', ...professionals, 'Total'];
-    const rows = [
-      headers.join(','),
-      ...tableData.map(row =>
-        [
-          formatDate(row.date),
-          ...professionals.map(prof => row[prof] || 0),
-          row.total,
-        ].join(',')
-      ),
-      [
-        'TOTAL',
-        ...professionals.map(prof => totals[prof] || 0),
-        totals.total,
-      ].join(','),
-    ];
+    const rows = [headers.join(','), ...tableData.map(row => [formatDate(row.date), ...professionals.map(prof => row[prof] || 0), row.total].join(',')), ['TOTAL', ...professionals.map(prof => totals[prof] || 0), totals.total].join(',')];
     const csv = rows.join('\n');
     const blob = new Blob([csv], {
-      type: 'text/csv;charset=utf-8;',
+      type: 'text/csv;charset=utf-8;'
     });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
@@ -161,7 +142,7 @@ const TurnHistoryPage = () => {
     link.click();
     showToast({
       type: 'success',
-      message: 'CSV exportado com sucesso!',
+      message: 'CSV exportado com sucesso!'
     });
   };
 
@@ -172,17 +153,12 @@ const TurnHistoryPage = () => {
     if (value === 2) return 'bg-yellow-100 dark:bg-yellow-900/30';
     return 'bg-red-100 dark:bg-red-900/30';
   };
-  return (
-    <div className="space-y-6 p-6">
+  return <div className="space-y-6 p-6">
       {/* Header */}
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button
-              onClick={() => navigate('/queue')}
-              variant="secondary"
-              className="flex items-center gap-2"
-            >
+            <Button onClick={() => navigate('/queue')} variant="secondary" className="flex items-center gap-2">
               <FiArrowLeft />
               Voltar
             </Button>
@@ -191,19 +167,12 @@ const TurnHistoryPage = () => {
                 Histórico da Lista da Vez
               </h1>
               <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
-                {userRole === 'barbeiro'
-                  ? 'Visualize seu histórico de atendimentos'
-                  : 'Visualize o histórico completo de atendimentos'}
+                {userRole === 'barbeiro' ? 'Visualize seu histórico de atendimentos' : 'Visualize o histórico completo de atendimentos'}
               </p>
             </div>
           </div>
 
-          <Button
-            onClick={handleExportCSV}
-            variant="secondary"
-            className="flex items-center gap-2"
-            disabled={loading || tableData.length === 0}
-          >
+          <Button onClick={handleExportCSV} variant="secondary" className="flex items-center gap-2" disabled={loading || tableData.length === 0}>
             <FiDownload />
             Exportar CSV
           </Button>
@@ -215,51 +184,33 @@ const TurnHistoryPage = () => {
         <div className="flex items-center gap-4">
           <FiCalendar className="text-theme-secondary" />
           <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
               Mês:
             </label>
-            <select
-              value={selectedMonth}
-              onChange={e => setSelectedMonth(Number(e.target.value))}
-              className="card-theme rounded-lg border border-light-border px-3 py-2 text-sm dark:border-dark-border dark:bg-dark-surface"
-            >
-              {Array.from(
-                {
-                  length: 12,
-                },
-                (_, i) => (
-                  <option key={i + 1} value={i + 1}>
+            <select value={selectedMonth} onChange={e => setSelectedMonth(Number(e.target.value))} className="card-theme rounded-lg border border-light-border px-3 py-2 text-sm dark:border-dark-border dark:bg-dark-surface">
+              {Array.from({
+              length: 12
+            }, (_, i) => <option key={i + 1} value={i + 1}>
                     {format(new Date(2000, i), 'MMMM', {
-                      locale: ptBR,
-                    })}
-                  </option>
-                )
-              )}
+                locale: ptBR
+              })}
+                  </option>)}
             </select>
           </div>
 
           <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
               Ano:
             </label>
-            <select
-              value={selectedYear}
-              onChange={e => setSelectedYear(Number(e.target.value))}
-              className="card-theme rounded-lg border border-light-border px-3 py-2 text-sm dark:border-dark-border dark:bg-dark-surface"
-            >
-              {Array.from(
-                {
-                  length: 5,
-                },
-                (_, i) => {
-                  const year = new Date().getFullYear() - i;
-                  return (
-                    <option key={year} value={year}>
+            <select value={selectedYear} onChange={e => setSelectedYear(Number(e.target.value))} className="card-theme rounded-lg border border-light-border px-3 py-2 text-sm dark:border-dark-border dark:bg-dark-surface">
+              {Array.from({
+              length: 5
+            }, (_, i) => {
+              const year = new Date().getFullYear() - i;
+              return <option key={year} value={year}>
                       {year}
-                    </option>
-                  );
-                }
-              )}
+                    </option>;
+            })}
             </select>
           </div>
         </div>
@@ -267,85 +218,56 @@ const TurnHistoryPage = () => {
 
       {/* Tabela */}
       <Card className="p-4">
-        {loading ? (
-          <div className="flex justify-center py-8">
+        {loading ? <div className="flex justify-center py-8">
             <LoadingSpinner />
-          </div>
-        ) : !selectedUnit ? (
-          <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted py-8 text-center">
+          </div> : !selectedUnit ? <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted py-8 text-center">
             Selecione uma unidade para visualizar o histórico
-          </div>
-        ) : tableData.length === 0 ? (
-          <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted py-8 text-center">
+          </div> : tableData.length === 0 ? <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted py-8 text-center">
             Nenhum dado encontrado para este período
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
+          </div> : <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead className="card-theme text-xs uppercase dark:bg-dark-surface">
                 <tr>
-                  <th className="px-4 py-3 text-gray-700 dark:text-gray-300 dark:text-gray-600">
+                  <th className="px-4 py-3 text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                     Dia
                   </th>
-                  {professionals.map(prof => (
-                    <th
-                      key={prof}
-                      className="card-theme px-4 py-3 text-center text-gray-700 dark:bg-dark-surface dark:text-gray-300 dark:text-gray-600"
-                    >
+                  {professionals.map(prof => <th key={prof} className="card-theme px-4 py-3 text-center text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:bg-dark-surface dark:text-theme-secondary">
                       {prof}
-                    </th>
-                  ))}
-                  <th className="text-theme-primary dark:text-dark-text-primary bg-gray-200 px-4 py-3 text-center font-bold dark:bg-gray-700">
+                    </th>)}
+                  <th className="text-theme-primary dark:text-dark-text-primary bg-gray-200 dark:bg-gray-700 px-4 py-3 text-center font-bold">
                     Total
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {tableData.map((row, index) => (
-                  <tr
-                    key={row.date}
-                    className="border-b hover:bg-light-bg dark:border-dark-border dark:bg-dark-bg dark:hover:bg-dark-surface"
-                  >
+                {tableData.map((row, index) => <tr key={row.date} className="border-b hover:bg-light-bg dark:border-dark-border dark:bg-dark-bg dark:hover:bg-dark-surface">
                     <td className="text-theme-primary dark:text-dark-text-primary whitespace-nowrap px-4 py-3 font-medium">
                       {formatDate(row.date)}
                     </td>
-                    {professionals.map(prof => (
-                      <td
-                        key={prof}
-                        className={`px-4 py-3 text-center font-semibold ${getCellColor(row[prof])}`}
-                      >
+                    {professionals.map(prof => <td key={prof} className={`px-4 py-3 text-center font-semibold ${getCellColor(row[prof])}`}>
                         {row[prof] || ''}
-                      </td>
-                    ))}
+                      </td>)}
                     <td className="text-theme-primary dark:text-dark-text-primary px-4 py-3 text-center font-bold">
                       {row.total}
                     </td>
-                  </tr>
-                ))}
+                  </tr>)}
 
                 {/* Linha de Total */}
-                <tr className="bg-gray-200 font-bold dark:bg-gray-700">
+                <tr className="bg-gray-200 dark:bg-gray-700 font-bold">
                   <td className="text-theme-primary dark:text-dark-text-primary px-4 py-3">
                     Total
                   </td>
-                  {professionals.map(prof => (
-                    <td
-                      key={prof}
-                      className="text-theme-primary dark:text-dark-text-primary px-4 py-3 text-center"
-                    >
+                  {professionals.map(prof => <td key={prof} className="text-theme-primary dark:text-dark-text-primary px-4 py-3 text-center">
                       {totals[prof] || 0}
-                    </td>
-                  ))}
-                  <td className="text-theme-primary dark:text-dark-text-primary bg-gray-300 px-4 py-3 text-center dark:bg-gray-600">
+                    </td>)}
+                  <td className="text-theme-primary dark:text-dark-text-primary bg-gray-300 dark:bg-gray-600 px-4 py-3 text-center">
                     {totals.total || 0}
                   </td>
                 </tr>
               </tbody>
             </table>
-          </div>
-        )}
+          </div>}
       </Card>
-    </div>
-  );
+    </div>;
 };
 export default TurnHistoryPage;

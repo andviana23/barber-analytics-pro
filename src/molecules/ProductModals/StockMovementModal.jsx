@@ -1,22 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import {
-  X,
-  Package,
-  ArrowUp,
-  ArrowDown,
-  RotateCcw,
-  DollarSign,
-  Calendar,
-  FileText,
-  Loader,
-} from 'lucide-react';
+import { X, Package, ArrowUp, ArrowDown, RotateCcw, DollarSign, Calendar, FileText, Loader } from 'lucide-react';
 const StockMovementModal = ({
   isOpen,
   onClose,
   onCreateMovement,
   product,
-  loading = false,
+  loading = false
 }) => {
   const [formData, setFormData] = useState({
     movementType: 'in',
@@ -26,63 +16,51 @@ const StockMovementModal = ({
     reason: '',
     referenceDocument: '',
     movementDate: new Date().toISOString().split('T')[0],
-    notes: '',
+    notes: ''
   });
   const [errors, setErrors] = useState({});
 
   // Opções de tipos de movimentação
-  const movementTypes = [
-    {
-      value: 'in',
-      label: 'Entrada',
-      icon: ArrowUp,
-      color: 'green',
-    },
-    {
-      value: 'out',
-      label: 'Saída',
-      icon: ArrowDown,
-      color: 'red',
-    },
-    {
-      value: 'adjustment',
-      label: 'Ajuste',
-      icon: RotateCcw,
-      color: 'blue',
-    },
-  ];
+  const movementTypes = [{
+    value: 'in',
+    label: 'Entrada',
+    icon: ArrowUp,
+    color: 'green'
+  }, {
+    value: 'out',
+    label: 'Saída',
+    icon: ArrowDown,
+    color: 'red'
+  }, {
+    value: 'adjustment',
+    label: 'Ajuste',
+    icon: RotateCcw,
+    color: 'blue'
+  }];
 
   // Opções de motivos
-  const reasonOptions = [
-    {
-      value: 'compra',
-      label: 'Compra',
-    },
-    {
-      value: 'venda',
-      label: 'Venda',
-    },
-    {
-      value: 'ajuste',
-      label: 'Ajuste de Inventário',
-    },
-    {
-      value: 'perda',
-      label: 'Perda/Avaria',
-    },
-    {
-      value: 'transferencia',
-      label: 'Transferência',
-    },
-    {
-      value: 'devolucao',
-      label: 'Devolução',
-    },
-    {
-      value: 'outros',
-      label: 'Outros',
-    },
-  ];
+  const reasonOptions = [{
+    value: 'compra',
+    label: 'Compra'
+  }, {
+    value: 'venda',
+    label: 'Venda'
+  }, {
+    value: 'ajuste',
+    label: 'Ajuste de Inventário'
+  }, {
+    value: 'perda',
+    label: 'Perda/Avaria'
+  }, {
+    value: 'transferencia',
+    label: 'Transferência'
+  }, {
+    value: 'devolucao',
+    label: 'Devolução'
+  }, {
+    value: 'outros',
+    label: 'Outros'
+  }];
 
   // Resetar formulário quando abrir/fechar
   useEffect(() => {
@@ -95,7 +73,7 @@ const StockMovementModal = ({
         reason: '',
         referenceDocument: '',
         movementDate: new Date().toISOString().split('T')[0],
-        notes: '',
+        notes: ''
       });
       setErrors({});
     }
@@ -104,11 +82,10 @@ const StockMovementModal = ({
   // Calcular custo total automaticamente
   useEffect(() => {
     if (formData.quantity && formData.unitCost) {
-      const total =
-        parseFloat(formData.quantity) * parseFloat(formData.unitCost);
+      const total = parseFloat(formData.quantity) * parseFloat(formData.unitCost);
       setFormData(prev => ({
         ...prev,
-        totalCost: total.toFixed(2),
+        totalCost: total.toFixed(2)
       }));
     }
   }, [formData.quantity, formData.unitCost]);
@@ -116,23 +93,13 @@ const StockMovementModal = ({
   // Validar formulário
   const validateForm = () => {
     const newErrors = {};
-    if (
-      !formData.quantity ||
-      isNaN(formData.quantity) ||
-      parseFloat(formData.quantity) <= 0
-    ) {
+    if (!formData.quantity || isNaN(formData.quantity) || parseFloat(formData.quantity) <= 0) {
       newErrors.quantity = 'Quantidade deve ser um número maior que zero';
     }
-    if (
-      formData.unitCost &&
-      (isNaN(formData.unitCost) || parseFloat(formData.unitCost) < 0)
-    ) {
+    if (formData.unitCost && (isNaN(formData.unitCost) || parseFloat(formData.unitCost) < 0)) {
       newErrors.unitCost = 'Custo unitário deve ser um número válido';
     }
-    if (
-      formData.totalCost &&
-      (isNaN(formData.totalCost) || parseFloat(formData.totalCost) < 0)
-    ) {
+    if (formData.totalCost && (isNaN(formData.totalCost) || parseFloat(formData.totalCost) < 0)) {
       newErrors.totalCost = 'Custo total deve ser um número válido';
     }
     if (!formData.reason) {
@@ -142,15 +109,18 @@ const StockMovementModal = ({
     return Object.keys(newErrors).length === 0;
   };
   const handleChange = e => {
-    const { name, value } = e.target;
+    const {
+      name,
+      value
+    } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value,
+      [name]: value
     }));
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
-        [name]: '',
+        [name]: ''
       }));
     }
   };
@@ -168,7 +138,7 @@ const StockMovementModal = ({
       reason: formData.reason,
       referenceDocument: formData.referenceDocument || null,
       movementDate: formData.movementDate,
-      notes: formData.notes || null,
+      notes: formData.notes || null
     };
     await onCreateMovement(dataToSubmit);
   };
@@ -185,8 +155,7 @@ const StockMovementModal = ({
     return movementType ? movementType.color : 'gray';
   };
   if (!isOpen || !product) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+  return <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
       <div className="card-theme max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg shadow-xl dark:bg-dark-surface">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-light-border p-6 dark:border-dark-border">
@@ -204,10 +173,7 @@ const StockMovementModal = ({
             </div>
           </div>
 
-          <button
-            onClick={handleClose}
-            className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary hover:card-theme flex h-8 w-8 items-center justify-center rounded-lg transition-colors dark:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
-          >
+          <button onClick={handleClose} className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-secondary hover:card-theme flex h-8 w-8 items-center justify-center rounded-lg transition-colors dark:text-theme-secondary dark:hover:bg-gray-700 dark:hover:text-gray-300 dark:text-gray-600">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -216,7 +182,7 @@ const StockMovementModal = ({
         <form onSubmit={handleSubmit} className="space-y-6 p-6">
           {/* Informações do Produto */}
           <div className="rounded-lg bg-light-bg p-4 dark:bg-dark-bg dark:bg-gray-700">
-            <h3 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+            <h3 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
               Produto Selecionado
             </h3>
             <div className="flex items-center gap-3">
@@ -235,41 +201,26 @@ const StockMovementModal = ({
 
           {/* Tipo de Movimentação */}
           <div>
-            <label className="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+            <label className="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
               Tipo de Movimentação <span className="text-red-500">*</span>
             </label>
             <div className="grid grid-cols-3 gap-3">
               {movementTypes.map(type => {
-                const IconComponent = type.icon;
-                const isSelected = formData.movementType === type.value;
-                const colorClasses = {
-                  green: isSelected
-                    ? 'bg-green-100 border-green-500 text-green-700 dark:bg-green-900 dark:text-green-300'
-                    : 'border-gray-300 dark:border-gray-600',
-                  red: isSelected
-                    ? 'bg-red-100 border-red-500 text-red-700 dark:bg-red-900 dark:text-red-300'
-                    : 'border-gray-300 dark:border-gray-600',
-                  blue: isSelected
-                    ? 'bg-blue-100 border-blue-500 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
-                    : 'border-gray-300 dark:border-gray-600',
-                };
-                return (
-                  <button
-                    key={type.value}
-                    type="button"
-                    onClick={() =>
-                      setFormData(prev => ({
-                        ...prev,
-                        movementType: type.value,
-                      }))
-                    }
-                    className={`flex flex-col items-center gap-2 rounded-lg border p-3 transition-colors ${colorClasses[type.color]}`}
-                  >
+              const IconComponent = type.icon;
+              const isSelected = formData.movementType === type.value;
+              const colorClasses = {
+                green: isSelected ? 'bg-green-100 border-green-500 text-green-700 dark:bg-green-900 dark:text-green-300' : 'border-gray-300 dark:border-gray-600',
+                red: isSelected ? 'bg-red-100 border-red-500 text-red-700 dark:bg-red-900 dark:text-red-300' : 'border-gray-300 dark:border-gray-600',
+                blue: isSelected ? 'bg-blue-100 border-blue-500 text-blue-700 dark:bg-blue-900 dark:text-blue-300' : 'border-gray-300 dark:border-gray-600'
+              };
+              return <button key={type.value} type="button" onClick={() => setFormData(prev => ({
+                ...prev,
+                movementType: type.value
+              }))} className={`flex flex-col items-center gap-2 rounded-lg border p-3 transition-colors ${colorClasses[type.color]}`}>
                     <IconComponent className="h-5 w-5" />
                     <span className="text-sm font-medium">{type.label}</span>
-                  </button>
-                );
-              })}
+                  </button>;
+            })}
             </div>
           </div>
 
@@ -277,21 +228,11 @@ const StockMovementModal = ({
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             {/* Quantidade */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                 Quantidade <span className="text-red-500">*</span>
               </label>
-              <input
-                type="number"
-                name="quantity"
-                value={formData.quantity}
-                onChange={handleChange}
-                placeholder="0"
-                min="1"
-                className={`w-full border px-3 py-2 ${errors.quantity ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white`}
-              />
-              {errors.quantity && (
-                <p className="mt-1 text-sm text-red-500">{errors.quantity}</p>
-              )}
+              <input type="number" name="quantity" value={formData.quantity} onChange={handleChange} placeholder="0" min="1" className={`w-full border px-3 py-2 ${errors.quantity ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white`} />
+              {errors.quantity && <p className="mt-1 text-sm text-red-500">{errors.quantity}</p>}
               <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-xs">
                 {product.unit_of_measure}
               </p>
@@ -299,52 +240,30 @@ const StockMovementModal = ({
 
             {/* Custo Unitário */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                 Custo Unitário
               </label>
               <div className="relative">
                 <span className="text-theme-secondary absolute left-3 top-1/2 -translate-y-1/2 transform">
                   R$
                 </span>
-                <input
-                  type="number"
-                  name="unitCost"
-                  value={formData.unitCost}
-                  onChange={handleChange}
-                  placeholder="0,00"
-                  step="0.01"
-                  min="0"
-                  className={`w-full border py-2 pl-8 pr-3 ${errors.unitCost ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white`}
-                />
+                <input type="number" name="unitCost" value={formData.unitCost} onChange={handleChange} placeholder="0,00" step="0.01" min="0" className={`w-full border py-2 pl-8 pr-3 ${errors.unitCost ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white`} />
               </div>
-              {errors.unitCost && (
-                <p className="mt-1 text-sm text-red-500">{errors.unitCost}</p>
-              )}
+              {errors.unitCost && <p className="mt-1 text-sm text-red-500">{errors.unitCost}</p>}
             </div>
 
             {/* Custo Total */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                 Custo Total
               </label>
               <div className="relative">
                 <span className="text-theme-secondary absolute left-3 top-1/2 -translate-y-1/2 transform">
                   R$
                 </span>
-                <input
-                  type="number"
-                  name="totalCost"
-                  value={formData.totalCost}
-                  onChange={handleChange}
-                  placeholder="0,00"
-                  step="0.01"
-                  min="0"
-                  className={`w-full border py-2 pl-8 pr-3 ${errors.totalCost ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white`}
-                />
+                <input type="number" name="totalCost" value={formData.totalCost} onChange={handleChange} placeholder="0,00" step="0.01" min="0" className={`w-full border py-2 pl-8 pr-3 ${errors.totalCost ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white`} />
               </div>
-              {errors.totalCost && (
-                <p className="mt-1 text-sm text-red-500">{errors.totalCost}</p>
-              )}
+              {errors.totalCost && <p className="mt-1 text-sm text-red-500">{errors.totalCost}</p>}
             </div>
           </div>
 
@@ -352,42 +271,26 @@ const StockMovementModal = ({
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {/* Motivo */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                 Motivo <span className="text-red-500">*</span>
               </label>
-              <select
-                name="reason"
-                value={formData.reason}
-                onChange={handleChange}
-                className={`w-full border px-3 py-2 ${errors.reason ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white`}
-              >
+              <select name="reason" value={formData.reason} onChange={handleChange} className={`w-full border px-3 py-2 ${errors.reason ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-lg bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white`}>
                 <option value="">Selecione o motivo</option>
-                {reasonOptions.map(option => (
-                  <option key={option.value} value={option.value}>
+                {reasonOptions.map(option => <option key={option.value} value={option.value}>
                     {option.label}
-                  </option>
-                ))}
+                  </option>)}
               </select>
-              {errors.reason && (
-                <p className="mt-1 text-sm text-red-500">{errors.reason}</p>
-              )}
+              {errors.reason && <p className="mt-1 text-sm text-red-500">{errors.reason}</p>}
             </div>
 
             {/* Documento de Referência */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                 Documento de Referência
               </label>
               <div className="relative">
                 <FileText className="text-light-text-muted dark:text-dark-text-muted absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
-                <input
-                  type="text"
-                  name="referenceDocument"
-                  value={formData.referenceDocument}
-                  onChange={handleChange}
-                  placeholder="Ex: NF 123456, Pedido 789"
-                  className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border py-2 pl-10 pr-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
-                />
+                <input type="text" name="referenceDocument" value={formData.referenceDocument} onChange={handleChange} placeholder="Ex: NF 123456, Pedido 789" className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border py-2 pl-10 pr-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700" />
               </div>
             </div>
           </div>
@@ -396,40 +299,26 @@ const StockMovementModal = ({
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {/* Data da Movimentação */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                 Data da Movimentação
               </label>
               <div className="relative">
                 <Calendar className="text-light-text-muted dark:text-dark-text-muted absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
-                <input
-                  type="date"
-                  name="movementDate"
-                  value={formData.movementDate}
-                  onChange={handleChange}
-                  className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border py-2 pl-10 pr-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
-                />
+                <input type="date" name="movementDate" value={formData.movementDate} onChange={handleChange} className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border py-2 pl-10 pr-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700" />
               </div>
             </div>
 
             {/* Observações */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                 Observações
               </label>
-              <textarea
-                name="notes"
-                value={formData.notes}
-                onChange={handleChange}
-                placeholder="Observações adicionais"
-                rows={2}
-                className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
-              />
+              <textarea name="notes" value={formData.notes} onChange={handleChange} placeholder="Observações adicionais" rows={2} className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700" />
             </div>
           </div>
 
           {/* Preview do Estoque */}
-          {formData.quantity && (
-            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+          {formData.quantity && <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
               <h4 className="mb-2 text-sm font-medium text-blue-700 dark:text-blue-300">
                 Previsão de Estoque
               </h4>
@@ -442,57 +331,34 @@ const StockMovementModal = ({
                   →
                 </span>
                 <span className="font-medium text-blue-700 dark:text-blue-300">
-                  {formData.movementType === 'in'
-                    ? product.current_stock + parseInt(formData.quantity || 0)
-                    : formData.movementType === 'out'
-                      ? Math.max(
-                          0,
-                          product.current_stock -
-                            parseInt(formData.quantity || 0)
-                        )
-                      : parseInt(formData.quantity || 0)}{' '}
+                  {formData.movementType === 'in' ? product.current_stock + parseInt(formData.quantity || 0) : formData.movementType === 'out' ? Math.max(0, product.current_stock - parseInt(formData.quantity || 0)) : parseInt(formData.quantity || 0)}{' '}
                   {product.unit_of_measure}
                 </span>
               </div>
-            </div>
-          )}
+            </div>}
 
           {/* Footer */}
           <div className="flex items-center justify-end gap-3 border-t border-light-border pt-4 dark:border-dark-border">
-            <button
-              type="button"
-              onClick={handleClose}
-              className="rounded-lg border border-light-border px-4 py-2 text-gray-700 transition-colors hover:bg-light-bg dark:border-dark-border dark:bg-dark-bg dark:text-gray-300 dark:text-gray-600 dark:hover:bg-gray-700"
-              disabled={loading}
-            >
+            <button type="button" onClick={handleClose} className="rounded-lg border border-light-border px-4 py-2 text-gray-700 dark:text-gray-300 dark:text-gray-600 transition-colors hover:bg-light-bg dark:border-dark-border dark:bg-dark-bg dark:text-theme-secondary dark:hover:bg-gray-700" disabled={loading}>
               Cancelar
             </button>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="text-dark-text-primary flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2 transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {loading ? (
-                <>
+            <button type="submit" disabled={loading} className="text-dark-text-primary flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2 transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
+              {loading ? <>
                   <Loader className="h-4 w-4 animate-spin" />
                   Registrando...
-                </>
-              ) : (
-                'Registrar Movimentação'
-              )}
+                </> : 'Registrar Movimentação'}
             </button>
           </div>
         </form>
       </div>
-    </div>
-  );
+    </div>;
 };
 StockMovementModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onCreateMovement: PropTypes.func.isRequired,
   product: PropTypes.object,
-  loading: PropTypes.bool,
+  loading: PropTypes.bool
 };
 export default StockMovementModal;

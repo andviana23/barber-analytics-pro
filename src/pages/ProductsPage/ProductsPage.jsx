@@ -1,44 +1,21 @@
 import React, { useState, useMemo } from 'react';
-import {
-  Plus,
-  Search,
-  Package,
-  Edit2,
-  Trash2,
-  CheckCircle,
-  XCircle,
-  Loader,
-  AlertTriangle,
-  TrendingUp,
-  TrendingDown,
-  RotateCcw,
-  Filter,
-  Download,
-  Eye,
-  EyeOff,
-  DollarSign,
-  Box,
-  ShoppingBag,
-  BarChart3,
-  Boxes,
-  RefreshCw,
-  ChevronLeft,
-  ChevronRight,
-} from 'lucide-react';
+import { Plus, Search, Package, Edit2, Trash2, CheckCircle, XCircle, Loader, AlertTriangle, TrendingUp, TrendingDown, RotateCcw, Filter, Download, Eye, EyeOff, DollarSign, Box, ShoppingBag, BarChart3, Boxes, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Layout } from '../../components/Layout/Layout';
 import { useAuth } from '../../context/AuthContext';
 import { useUnit } from '../../context/UnitContext';
 import { useToast } from '../../context/ToastContext';
 import { useProducts } from '../../hooks/useProducts';
-import {
-  CreateProductModal,
-  EditProductModal,
-  StockMovementModal,
-} from '../../molecules/ProductModals';
+import { CreateProductModal, EditProductModal, StockMovementModal } from '../../molecules/ProductModals';
 const ProductsPage = () => {
-  const { user } = useAuth();
-  const { selectedUnit } = useUnit();
-  const { showToast } = useToast();
+  const {
+    user
+  } = useAuth();
+  const {
+    selectedUnit
+  } = useUnit();
+  const {
+    showToast
+  } = useToast();
 
   // Estados
   const [searchTerm, setSearchTerm] = useState('');
@@ -66,7 +43,7 @@ const ProductsPage = () => {
     deleteProduct,
     createStockMovement,
     getProductCategories,
-    getProductBrands,
+    getProductBrands
   } = useProducts({
     includeInactive: showInactive,
     enableCache: true,
@@ -74,8 +51,8 @@ const ProductsPage = () => {
       search: searchTerm,
       category: selectedCategory,
       brand: selectedBrand,
-      lowStock: lowStockOnly,
-    },
+      lowStock: lowStockOnly
+    }
   });
 
   // Verificar permissões - Admin e Gerente podem gerenciar
@@ -87,27 +64,16 @@ const ProductsPage = () => {
   const filteredProducts = useMemo(() => {
     let filtered = products;
     if (searchTerm) {
-      filtered = filtered.filter(
-        product =>
-          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          product.sku?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          product.barcode?.includes(searchTerm) ||
-          product.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          product.brand?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      filtered = filtered.filter(product => product.name.toLowerCase().includes(searchTerm.toLowerCase()) || product.sku?.toLowerCase().includes(searchTerm.toLowerCase()) || product.barcode?.includes(searchTerm) || product.category?.toLowerCase().includes(searchTerm.toLowerCase()) || product.brand?.toLowerCase().includes(searchTerm.toLowerCase()));
     }
     if (selectedCategory) {
-      filtered = filtered.filter(
-        product => product.category === selectedCategory
-      );
+      filtered = filtered.filter(product => product.category === selectedCategory);
     }
     if (selectedBrand) {
       filtered = filtered.filter(product => product.brand === selectedBrand);
     }
     if (lowStockOnly) {
-      filtered = filtered.filter(
-        product => product.current_stock <= product.min_stock
-      );
+      filtered = filtered.filter(product => product.current_stock <= product.min_stock);
     }
     return filtered;
   }, [products, searchTerm, selectedCategory, selectedBrand, lowStockOnly]);
@@ -142,25 +108,33 @@ const ProductsPage = () => {
     await toggleProductStatus(id, currentStatus);
   };
   const handleCreateProduct = async productData => {
-    const { success } = await createProduct(productData);
+    const {
+      success
+    } = await createProduct(productData);
     if (success) {
       setIsCreateModalOpen(false);
     }
   };
   const handleUpdateProduct = async (id, productData) => {
-    const { success } = await updateProduct(id, productData);
+    const {
+      success
+    } = await updateProduct(id, productData);
     if (success) {
       setIsEditModalOpen(false);
     }
   };
   const handleDeleteProduct = async id => {
-    const { success } = await deleteProduct(id);
+    const {
+      success
+    } = await deleteProduct(id);
     if (success) {
       // A lista será atualizada automaticamente pelo hook
     }
   };
   const handleCreateMovement = async movementData => {
-    const { success } = await createStockMovement(movementData);
+    const {
+      success
+    } = await createStockMovement(movementData);
     if (success) {
       setIsMovementModalOpen(false);
     }
@@ -168,7 +142,7 @@ const ProductsPage = () => {
   const formatCurrency = value => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
-      currency: 'BRL',
+      currency: 'BRL'
     }).format(value || 0);
   };
   const getStockStatus = product => {
@@ -176,35 +150,32 @@ const ProductsPage = () => {
       return {
         status: 'out',
         color: 'red',
-        text: 'Sem Estoque',
+        text: 'Sem Estoque'
       };
     } else if (product.current_stock <= product.min_stock) {
       return {
         status: 'low',
         color: 'yellow',
-        text: 'Estoque Baixo',
+        text: 'Estoque Baixo'
       };
     } else {
       return {
         status: 'ok',
         color: 'green',
-        text: 'Em Estoque',
+        text: 'Em Estoque'
       };
     }
   };
   if (!selectedUnit) {
-    return (
-      <Layout>
+    return <Layout>
         <div className="flex h-full items-center justify-center">
           <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
             Selecione uma unidade para gerenciar produtos.
           </p>
         </div>
-      </Layout>
-    );
+      </Layout>;
   }
-  return (
-    <Layout activeMenuItem="cadastros" subMenuItem="products">
+  return <Layout activeMenuItem="cadastros" subMenuItem="products">
       <div className="flex flex-1 flex-col space-y-6 p-6">
         {/* 📊 Header */}
         <div className="flex items-center justify-between">
@@ -217,22 +188,13 @@ const ProductsPage = () => {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => {}}
-              className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary hover:card-theme rounded-xl p-2.5 transition-all dark:hover:bg-gray-700"
-              title="Atualizar"
-            >
+            <button onClick={() => {}} className="text-light-text-muted dark:text-dark-text-muted hover:text-theme-primary hover:card-theme rounded-xl p-2.5 transition-all dark:hover:bg-gray-700" title="Atualizar">
               <RefreshCw className="h-5 w-5" />
             </button>
-            {canManage && (
-              <button
-                onClick={handleCreateClick}
-                className="btn-theme-primary flex items-center gap-2 rounded-xl px-5 py-2.5 shadow-lg transition-all hover:shadow-xl"
-              >
+            {canManage && <button onClick={handleCreateClick} className="btn-theme-primary flex items-center gap-2 rounded-xl px-5 py-2.5 shadow-lg transition-all hover:shadow-xl">
                 <Plus className="h-5 w-5" />
                 Novo Produto
-              </button>
-            )}
+              </button>}
           </div>
         </div>
 
@@ -321,35 +283,19 @@ const ProductsPage = () => {
             <div className="flex w-full flex-1 flex-col items-start gap-3 sm:flex-row sm:items-center">
               <div className="relative max-w-md flex-1">
                 <Search className="text-light-text-muted dark:text-dark-text-muted absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
-                <input
-                  type="text"
-                  placeholder="Pesquisar produtos..."
-                  value={searchTerm}
-                  onChange={e => setSearchTerm(e.target.value)}
-                  className="card-theme text-theme-primary w-full rounded-xl border border-light-border py-2.5 pl-11 pr-4 placeholder-gray-400 transition-all focus:border-primary focus:ring-2 focus:ring-primary/50 dark:border-dark-border dark:bg-gray-700"
-                />
+                <input type="text" placeholder="Pesquisar produtos..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="card-theme text-theme-primary w-full rounded-xl border border-light-border py-2.5 pl-11 pr-4 placeholder-gray-400 transition-all focus:border-primary focus:ring-2 focus:ring-primary/50 dark:border-dark-border dark:bg-gray-700" />
               </div>
 
               <div className="flex items-center gap-3">
                 <label className="group flex cursor-pointer items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={showInactive}
-                    onChange={() => setShowInactive(!showInactive)}
-                    className="form-checkbox h-4 w-4 rounded border-light-border text-primary focus:ring-primary dark:border-dark-border"
-                  />
+                  <input type="checkbox" checked={showInactive} onChange={() => setShowInactive(!showInactive)} className="form-checkbox h-4 w-4 rounded border-light-border text-primary focus:ring-primary dark:border-dark-border" />
                   <span className="text-theme-secondary group-hover:text-theme-primary text-sm font-medium transition-colors">
                     Mostrar Inativos
                   </span>
                 </label>
 
                 <label className="group flex cursor-pointer items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={lowStockOnly}
-                    onChange={() => setLowStockOnly(!lowStockOnly)}
-                    className="form-checkbox h-4 w-4 rounded border-light-border text-yellow-500 focus:ring-yellow-500 dark:border-dark-border"
-                  />
+                  <input type="checkbox" checked={lowStockOnly} onChange={() => setLowStockOnly(!lowStockOnly)} className="form-checkbox h-4 w-4 rounded border-light-border text-yellow-500 focus:ring-yellow-500 dark:border-dark-border" />
                   <span className="text-theme-secondary group-hover:text-theme-primary text-sm font-medium transition-colors">
                     Estoque Baixo
                   </span>
@@ -373,46 +319,32 @@ const ProductsPage = () => {
 
         {/* 📋 Tabela de Produtos */}
         <div className="card-theme flex-1 overflow-hidden rounded-xl">
-          {loading ? (
-            <div className="flex items-center justify-center py-24">
+          {loading ? <div className="flex items-center justify-center py-24">
               <div className="flex flex-col items-center gap-4">
                 <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
                 <p className="text-theme-secondary font-medium">
                   Carregando produtos...
                 </p>
               </div>
-            </div>
-          ) : error ? (
-            <div className="flex flex-col items-center justify-center py-24">
+            </div> : error ? <div className="flex flex-col items-center justify-center py-24">
               <AlertTriangle className="mb-4 h-16 w-16 text-red-400" />
               <p className="text-xl font-semibold text-red-600 dark:text-red-400">
                 Erro ao carregar produtos
               </p>
               <p className="text-theme-secondary mt-2">{error}</p>
-            </div>
-          ) : paginatedProducts.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-24">
+            </div> : paginatedProducts.length === 0 ? <div className="flex flex-col items-center justify-center py-24">
               <Package className="dark:text-theme-secondary mb-4 h-16 w-16 text-gray-300 dark:text-gray-600" />
               <p className="text-theme-primary mb-2 text-xl font-semibold">
                 Nenhum produto encontrado
               </p>
               <p className="text-theme-secondary">
-                {searchTerm
-                  ? 'Tente ajustar os filtros de pesquisa'
-                  : 'Adicione seu primeiro produto para começar'}
+                {searchTerm ? 'Tente ajustar os filtros de pesquisa' : 'Adicione seu primeiro produto para começar'}
               </p>
-              {canManage && !searchTerm && (
-                <button
-                  onClick={handleCreateClick}
-                  className="btn-theme-primary mt-6 flex items-center gap-2 rounded-xl px-6 py-3"
-                >
+              {canManage && !searchTerm && <button onClick={handleCreateClick} className="btn-theme-primary mt-6 flex items-center gap-2 rounded-xl px-6 py-3">
                   <Plus className="h-5 w-5" />
                   Criar Primeiro Produto
-                </button>
-              )}
-            </div>
-          ) : (
-            <>
+                </button>}
+            </div> : <>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="border-b-2 border-light-border bg-gradient-light dark:border-dark-border dark:from-gray-800 dark:to-gray-700">
@@ -432,21 +364,15 @@ const ProductsPage = () => {
                       <th className="text-theme-secondary px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                         Status
                       </th>
-                      {canManage && (
-                        <th className="text-theme-secondary px-6 py-4 text-right text-xs font-bold uppercase tracking-wider">
+                      {canManage && <th className="text-theme-secondary px-6 py-4 text-right text-xs font-bold uppercase tracking-wider">
                           Ações
-                        </th>
-                      )}
+                        </th>}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                     {paginatedProducts.map(product => {
-                      const stockStatus = getStockStatus(product);
-                      return (
-                        <tr
-                          key={product.id}
-                          className="group transition-all duration-200 hover:bg-light-hover dark:hover:bg-dark-hover"
-                        >
+                  const stockStatus = getStockStatus(product);
+                  return <tr key={product.id} className="group transition-all duration-200 hover:bg-light-hover dark:hover:bg-dark-hover">
                           {/* Produto */}
                           <td className="whitespace-nowrap px-6 py-4">
                             <div className="flex items-center gap-3">
@@ -457,11 +383,9 @@ const ProductsPage = () => {
                                 <p className="text-theme-primary font-semibold">
                                   {product.name}
                                 </p>
-                                {product.sku && (
-                                  <p className="text-theme-secondary text-xs">
+                                {product.sku && <p className="text-theme-secondary text-xs">
                                     SKU: {product.sku}
-                                  </p>
-                                )}
+                                  </p>}
                               </div>
                             </div>
                           </td>
@@ -503,170 +427,87 @@ const ProductsPage = () => {
                           <td className="whitespace-nowrap px-6 py-4">
                             <div className="flex flex-col gap-1.5">
                               {/* Status Ativo/Inativo */}
-                              {product.is_active ? (
-                                <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700 dark:bg-green-900/30 dark:text-green-300">
+                              {product.is_active ? <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700 dark:bg-green-900/30 dark:text-green-300">
                                   <CheckCircle className="h-3.5 w-3.5" />
                                   Ativo
-                                </span>
-                              ) : (
-                                <span className="card-theme text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold dark:bg-gray-700">
+                                </span> : <span className="card-theme text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold dark:bg-gray-700">
                                   <EyeOff className="h-3.5 w-3.5" />
                                   Inativo
-                                </span>
-                              )}
+                                </span>}
 
                               {/* Status Estoque */}
-                              <span
-                                className={`inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${stockStatus.color === 'green' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : stockStatus.color === 'yellow' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'}`}
-                              >
+                              <span className={`inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${stockStatus.color === 'green' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : stockStatus.color === 'yellow' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'}`}>
                                 {stockStatus.text}
                               </span>
                             </div>
                           </td>
 
                           {/* Ações */}
-                          {canManage && (
-                            <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                          {canManage && <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                               <div className="flex items-center justify-end gap-2">
-                                <button
-                                  onClick={() => handleMovementClick(product)}
-                                  className="rounded-lg p-2 text-blue-600 transition-all hover:bg-blue-100 dark:hover:bg-blue-900/30"
-                                  title="Movimentação de Estoque"
-                                >
+                                <button onClick={() => handleMovementClick(product)} className="rounded-lg p-2 text-blue-600 transition-all hover:bg-blue-100 dark:hover:bg-blue-900/30" title="Movimentação de Estoque">
                                   <Boxes className="h-4 w-4" />
                                 </button>
-                                <button
-                                  onClick={() => handleEditClick(product)}
-                                  className="rounded-lg p-2 text-green-600 transition-all hover:bg-green-100 dark:hover:bg-green-900/30"
-                                  title="Editar Produto"
-                                >
+                                <button onClick={() => handleEditClick(product)} className="rounded-lg p-2 text-green-600 transition-all hover:bg-green-100 dark:hover:bg-green-900/30" title="Editar Produto">
                                   <Edit2 className="h-4 w-4" />
                                 </button>
-                                <button
-                                  onClick={() => handleDeleteClick(product.id)}
-                                  className="rounded-lg p-2 text-red-600 transition-all hover:bg-red-100 dark:hover:bg-red-900/30"
-                                  title="Excluir Produto"
-                                  disabled={deletingId === product.id}
-                                >
-                                  {deletingId === product.id ? (
-                                    <Loader className="h-4 w-4 animate-spin" />
-                                  ) : (
-                                    <Trash2 className="h-4 w-4" />
-                                  )}
+                                <button onClick={() => handleDeleteClick(product.id)} className="rounded-lg p-2 text-red-600 transition-all hover:bg-red-100 dark:hover:bg-red-900/30" title="Excluir Produto" disabled={deletingId === product.id}>
+                                  {deletingId === product.id ? <Loader className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
                                 </button>
                               </div>
-                            </td>
-                          )}
-                        </tr>
-                      );
-                    })}
+                            </td>}
+                        </tr>;
+                })}
                   </tbody>
                 </table>
               </div>
 
               {/* Paginação */}
-              {totalPages > 1 && (
-                <div className="flex items-center justify-between border-t border-light-border bg-light-bg px-6 py-4 dark:border-dark-border dark:bg-dark-bg dark:bg-dark-surface/50">
+              {totalPages > 1 && <div className="flex items-center justify-between border-t border-light-border bg-light-bg px-6 py-4 dark:border-dark-border dark:bg-dark-bg dark:bg-dark-surface/50">
                   <div className="text-theme-secondary flex items-center gap-2 text-sm">
                     <span className="font-medium">
                       Mostrando {(currentPage - 1) * itemsPerPage + 1} a{' '}
-                      {Math.min(
-                        currentPage * itemsPerPage,
-                        filteredProducts.length
-                      )}{' '}
+                      {Math.min(currentPage * itemsPerPage, filteredProducts.length)}{' '}
                       de {filteredProducts.length} produtos
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={() =>
-                        setCurrentPage(prev => Math.max(prev - 1, 1))
-                      }
-                      disabled={currentPage === 1}
-                      className="text-theme-secondary hover:text-theme-primary rounded-lg p-2 transition-all hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-gray-700 dark:hover:bg-gray-700"
-                    >
+                    <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="text-theme-secondary hover:text-theme-primary rounded-lg p-2 transition-all hover:bg-gray-200 dark:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-gray-700">
                       <ChevronLeft className="h-5 w-5" />
                     </button>
 
                     <div className="flex items-center gap-1">
-                      {Array.from(
-                        {
-                          length: totalPages,
-                        },
-                        (_, i) => i + 1
-                      ).map(page => {
-                        if (
-                          page === 1 ||
-                          page === totalPages ||
-                          (page >= currentPage - 1 && page <= currentPage + 1)
-                        ) {
-                          return (
-                            <button
-                              key={page}
-                              onClick={() => setCurrentPage(page)}
-                              className={`h-10 min-w-[2.5rem] rounded-lg font-semibold transition-all ${currentPage === page ? 'bg-primary text-white shadow-lg' : 'text-theme-secondary hover:bg-gray-200 dark:hover:bg-gray-700'}`}
-                            >
+                      {Array.from({
+                  length: totalPages
+                }, (_, i) => i + 1).map(page => {
+                  if (page === 1 || page === totalPages || page >= currentPage - 1 && page <= currentPage + 1) {
+                    return <button key={page} onClick={() => setCurrentPage(page)} className={`h-10 min-w-[2.5rem] rounded-lg font-semibold transition-all ${currentPage === page ? 'bg-primary text-white shadow-lg' : 'text-theme-secondary hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
                               {page}
-                            </button>
-                          );
-                        } else if (
-                          page === currentPage - 2 ||
-                          page === currentPage + 2
-                        ) {
-                          return (
-                            <span
-                              key={page}
-                              className="text-theme-secondary px-2"
-                            >
+                            </button>;
+                  } else if (page === currentPage - 2 || page === currentPage + 2) {
+                    return <span key={page} className="text-theme-secondary px-2">
                               ...
-                            </span>
-                          );
-                        }
-                        return null;
-                      })}
+                            </span>;
+                  }
+                  return null;
+                })}
                     </div>
 
-                    <button
-                      onClick={() =>
-                        setCurrentPage(prev => Math.min(prev + 1, totalPages))
-                      }
-                      disabled={currentPage === totalPages}
-                      className="text-theme-secondary hover:text-theme-primary rounded-lg p-2 transition-all hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-gray-700 dark:hover:bg-gray-700"
-                    >
+                    <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} className="text-theme-secondary hover:text-theme-primary rounded-lg p-2 transition-all hover:bg-gray-200 dark:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-gray-700">
                       <ChevronRight className="h-5 w-5" />
                     </button>
                   </div>
-                </div>
-              )}
-            </>
-          )}
+                </div>}
+            </>}
         </div>
 
         {/* Modais */}
-        <CreateProductModal
-          isOpen={isCreateModalOpen}
-          onClose={() => setIsCreateModalOpen(false)}
-          onCreate={handleCreateProduct}
-          loading={loading}
-        />
+        <CreateProductModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} onCreate={handleCreateProduct} loading={loading} />
 
-        <EditProductModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          onUpdate={handleUpdateProduct}
-          product={selectedProduct}
-          loading={loading}
-        />
+        <EditProductModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} onUpdate={handleUpdateProduct} product={selectedProduct} loading={loading} />
 
-        <StockMovementModal
-          isOpen={isMovementModalOpen}
-          onClose={() => setIsMovementModalOpen(false)}
-          onCreateMovement={handleCreateMovement}
-          product={selectedProduct}
-          loading={loading}
-        />
+        <StockMovementModal isOpen={isMovementModalOpen} onClose={() => setIsMovementModalOpen(false)} onCreateMovement={handleCreateMovement} product={selectedProduct} loading={loading} />
       </div>
-    </Layout>
-  );
+    </Layout>;
 };
 export default ProductsPage;

@@ -1,19 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Download,
-  FileText,
-  Filter,
-  TrendingUp,
-  Calendar,
-  User,
-} from 'lucide-react';
+import { Download, FileText, Filter, TrendingUp, Calendar, User } from 'lucide-react';
 import { Button } from '../atoms/Button/Button';
 import CommissionSummaryCard from '../components/organisms/CommissionSummaryCard';
 import { formatCurrency, formatDate } from '../utils/formatters';
-import {
-  exportCommissionsToCSV,
-  exportCommissionsToPDF,
-} from '../utils/exportCommissions';
+import { exportCommissionsToCSV, exportCommissionsToPDF } from '../utils/exportCommissions';
 import toast from 'react-hot-toast';
 
 /**
@@ -40,7 +30,7 @@ const CommissionReportPage = () => {
     endDate: '',
     status: 'all',
     // all, paid, pending
-    orderId: '',
+    orderId: ''
   });
 
   // Estado de dados
@@ -63,20 +53,16 @@ const CommissionReportPage = () => {
         // setProfessionals(data);
 
         // Mock temporário
-        setProfessionals([
-          {
-            id: '1',
-            name: 'João Silva',
-          },
-          {
-            id: '2',
-            name: 'Maria Santos',
-          },
-          {
-            id: '3',
-            name: 'Pedro Costa',
-          },
-        ]);
+        setProfessionals([{
+          id: '1',
+          name: 'João Silva'
+        }, {
+          id: '2',
+          name: 'Maria Santos'
+        }, {
+          id: '3',
+          name: 'Pedro Costa'
+        }]);
       } catch (error) {
         console.error('Erro ao buscar profissionais:', error);
         toast.error('Erro ao carregar profissionais');
@@ -97,55 +83,51 @@ const CommissionReportPage = () => {
       // setCommissions(data);
 
       // Mock temporário
-      const mockCommissions = [
-        {
-          id: '1',
-          orderId: 'abc-123',
-          orderNumber: '001',
-          professionalId: '1',
-          professionalName: 'João Silva',
-          clientName: 'Cliente A',
-          serviceName: 'Corte de Cabelo',
-          quantity: 1,
-          unitPrice: 50.0,
-          commissionPercentage: 30,
-          commissionValue: 15.0,
-          status: 'paid',
-          date: '2025-01-20',
-          paymentDate: '2025-01-25',
-        },
-        {
-          id: '2',
-          orderId: 'abc-124',
-          orderNumber: '002',
-          professionalId: '1',
-          professionalName: 'João Silva',
-          clientName: 'Cliente B',
-          serviceName: 'Barba',
-          quantity: 1,
-          unitPrice: 30.0,
-          commissionPercentage: 30,
-          commissionValue: 9.0,
-          status: 'pending',
-          date: '2025-01-22',
-        },
-        {
-          id: '3',
-          orderId: 'abc-125',
-          orderNumber: '003',
-          professionalId: '2',
-          professionalName: 'Maria Santos',
-          clientName: 'Cliente C',
-          serviceName: 'Corte + Barba',
-          quantity: 1,
-          unitPrice: 80.0,
-          commissionPercentage: 35,
-          commissionValue: 28.0,
-          status: 'paid',
-          date: '2025-01-23',
-          paymentDate: '2025-01-28',
-        },
-      ];
+      const mockCommissions = [{
+        id: '1',
+        orderId: 'abc-123',
+        orderNumber: '001',
+        professionalId: '1',
+        professionalName: 'João Silva',
+        clientName: 'Cliente A',
+        serviceName: 'Corte de Cabelo',
+        quantity: 1,
+        unitPrice: 50.0,
+        commissionPercentage: 30,
+        commissionValue: 15.0,
+        status: 'paid',
+        date: '2025-01-20',
+        paymentDate: '2025-01-25'
+      }, {
+        id: '2',
+        orderId: 'abc-124',
+        orderNumber: '002',
+        professionalId: '1',
+        professionalName: 'João Silva',
+        clientName: 'Cliente B',
+        serviceName: 'Barba',
+        quantity: 1,
+        unitPrice: 30.0,
+        commissionPercentage: 30,
+        commissionValue: 9.0,
+        status: 'pending',
+        date: '2025-01-22'
+      }, {
+        id: '3',
+        orderId: 'abc-125',
+        orderNumber: '003',
+        professionalId: '2',
+        professionalName: 'Maria Santos',
+        clientName: 'Cliente C',
+        serviceName: 'Corte + Barba',
+        quantity: 1,
+        unitPrice: 80.0,
+        commissionPercentage: 35,
+        commissionValue: 28.0,
+        status: 'paid',
+        date: '2025-01-23',
+        paymentDate: '2025-01-28'
+      }];
       setCommissions(mockCommissions);
     } catch (error) {
       console.error('Erro ao buscar comissões:', error);
@@ -161,7 +143,7 @@ const CommissionReportPage = () => {
   const handleFilterChange = (field, value) => {
     setFilters(prev => ({
       ...prev,
-      [field]: value,
+      [field]: value
     }));
   };
 
@@ -181,7 +163,7 @@ const CommissionReportPage = () => {
       startDate: '',
       endDate: '',
       status: 'all',
-      orderId: '',
+      orderId: ''
     };
     setFilters(clearedFilters);
     fetchCommissions(clearedFilters);
@@ -232,7 +214,7 @@ const CommissionReportPage = () => {
           items: [],
           total: 0,
           paid: 0,
-          pending: 0,
+          pending: 0
         };
       }
       acc[key].items.push(item);
@@ -251,24 +233,21 @@ const CommissionReportPage = () => {
    * Calcula totais gerais
    */
   const calculateTotals = () => {
-    return commissions.reduce(
-      (acc, item) => {
-        acc.total += item.commissionValue;
-        if (item.status === 'paid') {
-          acc.paid += item.commissionValue;
-        } else {
-          acc.pending += item.commissionValue;
-        }
-        acc.count++;
-        return acc;
-      },
-      {
-        total: 0,
-        paid: 0,
-        pending: 0,
-        count: 0,
+    return commissions.reduce((acc, item) => {
+      acc.total += item.commissionValue;
+      if (item.status === 'paid') {
+        acc.paid += item.commissionValue;
+      } else {
+        acc.pending += item.commissionValue;
       }
-    );
+      acc.count++;
+      return acc;
+    }, {
+      total: 0,
+      paid: 0,
+      pending: 0,
+      count: 0
+    });
   };
   const totals = calculateTotals();
 
@@ -276,8 +255,7 @@ const CommissionReportPage = () => {
   useEffect(() => {
     fetchCommissions();
   }, []);
-  return (
-    <div className="min-h-screen bg-gradient-light p-6 dark:from-gray-900 dark:to-gray-800">
+  return <div className="min-h-screen bg-gradient-light p-6 dark:from-gray-900 dark:to-gray-800">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
@@ -293,21 +271,11 @@ const CommissionReportPage = () => {
 
           {/* Botões de Exportação */}
           <div className="flex gap-3">
-            <Button
-              variant="outline"
-              onClick={handleExportCSV}
-              disabled={exportLoading || commissions.length === 0}
-              className="flex items-center gap-2"
-            >
+            <Button variant="outline" onClick={handleExportCSV} disabled={exportLoading || commissions.length === 0} className="flex items-center gap-2">
               <Download className="h-4 w-4" />
               Exportar CSV
             </Button>
-            <Button
-              variant="primary"
-              onClick={handleExportPDF}
-              disabled={exportLoading || commissions.length === 0}
-              className="flex items-center gap-2"
-            >
+            <Button variant="primary" onClick={handleExportPDF} disabled={exportLoading || commissions.length === 0} className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
               Exportar PDF
             </Button>
@@ -317,17 +285,10 @@ const CommissionReportPage = () => {
 
       {/* Summary Card */}
       <div className="mb-8">
-        <CommissionSummaryCard
-          professionals={professionals}
-          onFetchCommissions={fetchCommissions}
-          onExport={handleExportCSV}
-          onViewDetails={() =>
-            window.scrollTo({
-              top: 600,
-              behavior: 'smooth',
-            })
-          }
-        />
+        <CommissionSummaryCard professionals={professionals} onFetchCommissions={fetchCommissions} onExport={handleExportCSV} onViewDetails={() => window.scrollTo({
+        top: 600,
+        behavior: 'smooth'
+      })} />
       </div>
 
       {/* Filtros Avançados */}
@@ -342,64 +303,42 @@ const CommissionReportPage = () => {
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5">
           {/* Profissional */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
               <User className="mr-1 inline h-4 w-4" />
               Profissional
             </label>
-            <select
-              value={filters.professionalId}
-              onChange={e =>
-                handleFilterChange('professionalId', e.target.value)
-              }
-              className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:ring-2 focus:ring-purple-500 dark:border-dark-border dark:bg-gray-700"
-            >
+            <select value={filters.professionalId} onChange={e => handleFilterChange('professionalId', e.target.value)} className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:ring-2 focus:ring-purple-500 dark:border-dark-border dark:bg-gray-700">
               <option value="">Todos</option>
-              {professionals.map(prof => (
-                <option key={prof.id} value={prof.id}>
+              {professionals.map(prof => <option key={prof.id} value={prof.id}>
                   {prof.name}
-                </option>
-              ))}
+                </option>)}
             </select>
           </div>
 
           {/* Data Início */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
               <Calendar className="mr-1 inline h-4 w-4" />
               Data Início
             </label>
-            <input
-              type="date"
-              value={filters.startDate}
-              onChange={e => handleFilterChange('startDate', e.target.value)}
-              className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:ring-2 focus:ring-purple-500 dark:border-dark-border dark:bg-gray-700"
-            />
+            <input type="date" value={filters.startDate} onChange={e => handleFilterChange('startDate', e.target.value)} className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:ring-2 focus:ring-purple-500 dark:border-dark-border dark:bg-gray-700" />
           </div>
 
           {/* Data Fim */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
               <Calendar className="mr-1 inline h-4 w-4" />
               Data Fim
             </label>
-            <input
-              type="date"
-              value={filters.endDate}
-              onChange={e => handleFilterChange('endDate', e.target.value)}
-              className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:ring-2 focus:ring-purple-500 dark:border-dark-border dark:bg-gray-700"
-            />
+            <input type="date" value={filters.endDate} onChange={e => handleFilterChange('endDate', e.target.value)} className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:ring-2 focus:ring-purple-500 dark:border-dark-border dark:bg-gray-700" />
           </div>
 
           {/* Status */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
               Status
             </label>
-            <select
-              value={filters.status}
-              onChange={e => handleFilterChange('status', e.target.value)}
-              className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:ring-2 focus:ring-purple-500 dark:border-dark-border dark:bg-gray-700"
-            >
+            <select value={filters.status} onChange={e => handleFilterChange('status', e.target.value)} className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:ring-2 focus:ring-purple-500 dark:border-dark-border dark:bg-gray-700">
               <option value="all">Todas</option>
               <option value="paid">Pagas</option>
               <option value="pending">Pendentes</option>
@@ -408,16 +347,10 @@ const CommissionReportPage = () => {
 
           {/* Comanda */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
               Nº Comanda
             </label>
-            <input
-              type="text"
-              value={filters.orderId}
-              onChange={e => handleFilterChange('orderId', e.target.value)}
-              placeholder="Ex: 001"
-              className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:ring-2 focus:ring-purple-500 dark:border-dark-border dark:bg-gray-700"
-            />
+            <input type="text" value={filters.orderId} onChange={e => handleFilterChange('orderId', e.target.value)} placeholder="Ex: 001" className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border border-light-border px-3 py-2 focus:ring-2 focus:ring-purple-500 dark:border-dark-border dark:bg-gray-700" />
           </div>
         </div>
 
@@ -430,13 +363,8 @@ const CommissionReportPage = () => {
             Limpar
           </Button>
           <label className="ml-auto flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={groupByProfessional}
-              onChange={e => setGroupByProfessional(e.target.checked)}
-              className="h-4 w-4 rounded text-purple-600 focus:ring-purple-500"
-            />
-            <span className="text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600">
+            <input type="checkbox" checked={groupByProfessional} onChange={e => setGroupByProfessional(e.target.checked)} className="h-4 w-4 rounded text-purple-600 focus:ring-purple-500" />
+            <span className="text-sm text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
               Agrupar por profissional
             </span>
           </label>
@@ -445,21 +373,15 @@ const CommissionReportPage = () => {
 
       {/* Tabela de Comissões */}
       <div className="card-theme overflow-hidden rounded-xl shadow-md dark:bg-dark-surface">
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
+        {loading ? <div className="flex items-center justify-center py-12">
             <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-purple-600"></div>
-          </div>
-        ) : commissions.length === 0 ? (
-          <div className="py-12 text-center">
+          </div> : commissions.length === 0 ? <div className="py-12 text-center">
             <FileText className="text-light-text-muted dark:text-dark-text-muted mx-auto mb-4 h-16 w-16" />
             <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted">
               Nenhuma comissão encontrada com os filtros aplicados
             </p>
-          </div>
-        ) : groupByProfessional /* Visualização Agrupada */ ? (
-          <div className="divide-y divide-gray-200 dark:divide-gray-700">
-            {groupedCommissions().map((group, index) => (
-              <div key={index} className="p-6">
+          </div> : groupByProfessional /* Visualização Agrupada */ ? <div className="divide-y divide-gray-200 dark:divide-gray-700">
+            {groupedCommissions().map((group, index) => <div key={index} className="p-6">
                 <div className="mb-4 flex items-center justify-between">
                   <h3 className="text-theme-primary dark:text-dark-text-primary text-lg font-semibold">
                     {group.professional}
@@ -483,38 +405,34 @@ const CommissionReportPage = () => {
                   <table className="min-w-full">
                     <thead className="bg-light-bg dark:bg-dark-bg dark:bg-gray-700">
                       <tr>
-                        <th className="text-theme-secondary px-4 py-2 text-left text-xs font-medium dark:text-gray-300 dark:text-gray-600">
+                        <th className="text-theme-secondary px-4 py-2 text-left text-xs font-medium dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                           Data
                         </th>
-                        <th className="text-theme-secondary px-4 py-2 text-left text-xs font-medium dark:text-gray-300 dark:text-gray-600">
+                        <th className="text-theme-secondary px-4 py-2 text-left text-xs font-medium dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                           Comanda
                         </th>
-                        <th className="text-theme-secondary px-4 py-2 text-left text-xs font-medium dark:text-gray-300 dark:text-gray-600">
+                        <th className="text-theme-secondary px-4 py-2 text-left text-xs font-medium dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                           Cliente
                         </th>
-                        <th className="text-theme-secondary px-4 py-2 text-left text-xs font-medium dark:text-gray-300 dark:text-gray-600">
+                        <th className="text-theme-secondary px-4 py-2 text-left text-xs font-medium dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                           Serviço
                         </th>
-                        <th className="text-theme-secondary px-4 py-2 text-right text-xs font-medium dark:text-gray-300 dark:text-gray-600">
+                        <th className="text-theme-secondary px-4 py-2 text-right text-xs font-medium dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                           Valor
                         </th>
-                        <th className="text-theme-secondary px-4 py-2 text-right text-xs font-medium dark:text-gray-300 dark:text-gray-600">
+                        <th className="text-theme-secondary px-4 py-2 text-right text-xs font-medium dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                           %
                         </th>
-                        <th className="text-theme-secondary px-4 py-2 text-right text-xs font-medium dark:text-gray-300 dark:text-gray-600">
+                        <th className="text-theme-secondary px-4 py-2 text-right text-xs font-medium dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                           Comissão
                         </th>
-                        <th className="text-theme-secondary px-4 py-2 text-center text-xs font-medium dark:text-gray-300 dark:text-gray-600">
+                        <th className="text-theme-secondary px-4 py-2 text-center text-xs font-medium dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                           Status
                         </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                      {group.items.map(item => (
-                        <tr
-                          key={item.id}
-                          className="hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700"
-                        >
+                      {group.items.map(item => <tr key={item.id} className="hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700">
                           <td className="text-theme-primary dark:text-dark-text-primary px-4 py-3 text-sm">
                             {formatDate(item.date)}
                           </td>
@@ -537,60 +455,50 @@ const CommissionReportPage = () => {
                             {formatCurrency(item.commissionValue)}
                           </td>
                           <td className="px-4 py-3 text-center">
-                            <span
-                              className={`rounded-full px-2 py-1 text-xs font-medium ${item.status === 'paid' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'}`}
-                            >
+                            <span className={`rounded-full px-2 py-1 text-xs font-medium ${item.status === 'paid' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'}`}>
                               {item.status === 'paid' ? 'Paga' : 'Pendente'}
                             </span>
                           </td>
-                        </tr>
-                      ))}
+                        </tr>)}
                     </tbody>
                   </table>
                 </div>
-              </div>
-            ))}
-          </div> /* Visualização Normal */
-        ) : (
-          <div className="overflow-x-auto">
+              </div>)}
+          </div> /* Visualização Normal */ : <div className="overflow-x-auto">
             <table className="min-w-full">
               <thead className="bg-light-bg dark:bg-dark-bg dark:bg-gray-700">
                 <tr>
-                  <th className="text-theme-secondary px-6 py-3 text-left text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600">
+                  <th className="text-theme-secondary px-6 py-3 text-left text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                     Data
                   </th>
-                  <th className="text-theme-secondary px-6 py-3 text-left text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600">
+                  <th className="text-theme-secondary px-6 py-3 text-left text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                     Comanda
                   </th>
-                  <th className="text-theme-secondary px-6 py-3 text-left text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600">
+                  <th className="text-theme-secondary px-6 py-3 text-left text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                     Profissional
                   </th>
-                  <th className="text-theme-secondary px-6 py-3 text-left text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600">
+                  <th className="text-theme-secondary px-6 py-3 text-left text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                     Cliente
                   </th>
-                  <th className="text-theme-secondary px-6 py-3 text-left text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600">
+                  <th className="text-theme-secondary px-6 py-3 text-left text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                     Serviço
                   </th>
-                  <th className="text-theme-secondary px-6 py-3 text-right text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600">
+                  <th className="text-theme-secondary px-6 py-3 text-right text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                     Valor
                   </th>
-                  <th className="text-theme-secondary px-6 py-3 text-right text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600">
+                  <th className="text-theme-secondary px-6 py-3 text-right text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                     %
                   </th>
-                  <th className="text-theme-secondary px-6 py-3 text-right text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600">
+                  <th className="text-theme-secondary px-6 py-3 text-right text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                     Comissão
                   </th>
-                  <th className="text-theme-secondary px-6 py-3 text-center text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600">
+                  <th className="text-theme-secondary px-6 py-3 text-center text-xs font-medium uppercase dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
                     Status
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {commissions.map(item => (
-                  <tr
-                    key={item.id}
-                    className="hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700"
-                  >
+                {commissions.map(item => <tr key={item.id} className="hover:bg-light-bg dark:bg-dark-bg dark:hover:bg-gray-700">
                     <td className="text-theme-primary dark:text-dark-text-primary px-6 py-4 text-sm">
                       {formatDate(item.date)}
                     </td>
@@ -616,22 +524,17 @@ const CommissionReportPage = () => {
                       {formatCurrency(item.commissionValue)}
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-medium ${item.status === 'paid' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'}`}
-                      >
+                      <span className={`rounded-full px-3 py-1 text-xs font-medium ${item.status === 'paid' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'}`}>
                         {item.status === 'paid' ? 'Paga' : 'Pendente'}
                       </span>
                     </td>
-                  </tr>
-                ))}
+                  </tr>)}
               </tbody>
             </table>
-          </div>
-        )}
+          </div>}
 
         {/* Footer com Totais */}
-        {commissions.length > 0 && (
-          <div className="border-t border-light-border bg-light-bg px-6 py-4 dark:border-dark-border dark:bg-dark-bg dark:bg-gray-700">
+        {commissions.length > 0 && <div className="border-t border-light-border bg-light-bg px-6 py-4 dark:border-dark-border dark:bg-dark-bg dark:bg-gray-700">
             <div className="flex items-center justify-between">
               <div className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted text-sm">
                 Total de {totals.count} {totals.count === 1 ? 'item' : 'itens'}
@@ -651,10 +554,8 @@ const CommissionReportPage = () => {
                 </span>
               </div>
             </div>
-          </div>
-        )}
+          </div>}
       </div>
-    </div>
-  );
+    </div>;
 };
 export default CommissionReportPage;

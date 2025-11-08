@@ -40,7 +40,7 @@ const CategoryHierarchicalDropdown = ({
   helperText = null,
   className = '',
   label = null,
-  showIcon = true,
+  showIcon = true
 }) => {
   /**
    * Valida se categorias possui formato correto
@@ -48,14 +48,7 @@ const CategoryHierarchicalDropdown = ({
    */
   const isValidCategoriesFormat = useMemo(() => {
     if (!Array.isArray(categories) || categories.length === 0) return false;
-    return categories.every(
-      cat =>
-        cat &&
-        typeof cat === 'object' &&
-        'id' in cat &&
-        'name' in cat &&
-        'children' in cat
-    );
+    return categories.every(cat => cat && typeof cat === 'object' && 'id' in cat && 'name' in cat && 'children' in cat);
   }, [categories]);
 
   /**
@@ -70,35 +63,23 @@ const CategoryHierarchicalDropdown = ({
     const options = [];
     categories.forEach(parent => {
       // Categoria PAI (não selecionável)
-      options.push(
-        <option
-          key={`parent-${parent.id}`}
-          disabled
-          style={{
-            fontWeight: 'bold',
-            color: '#1f2937',
-            // gray-800
-            backgroundColor: '#f9fafb', // gray-50
-          }}
-        >
+      options.push(<option key={`parent-${parent.id}`} disabled style={{
+        fontWeight: 'bold',
+        color: '#1f2937',
+        // gray-800
+        backgroundColor: '#f9fafb' // gray-50
+      }}>
           {parent.name}
-        </option>
-      );
+        </option>);
 
       // Categorias FILHAS (selecionáveis)
       if (parent.children && parent.children.length > 0) {
         parent.children.forEach(child => {
-          options.push(
-            <option
-              key={child.id}
-              value={child.id}
-              style={{
-                paddingLeft: '1.5rem',
-              }}
-            >
+          options.push(<option key={child.id} value={child.id} style={{
+            paddingLeft: '1.5rem'
+          }}>
               └─ {child.name}
-            </option>
-          );
+            </option>);
         });
       }
     });
@@ -119,43 +100,22 @@ const CategoryHierarchicalDropdown = ({
    * Classes CSS dinâmicas baseadas no estado
    */
   const selectClasses = useMemo(() => {
-    const baseClasses =
-      'w-full px-3 py-2 pr-10 border rounded-lg transition-colors focus:outline-none focus:ring-2';
-    const stateClasses = error
-      ? 'border-red-300 dark:border-red-600 focus:ring-red-500 focus:border-red-500 bg-red-50 dark:bg-red-900/10'
-      : 'border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700';
-    const textClasses =
-      'text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500';
-    const disabledClasses = disabled
-      ? 'opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800'
-      : 'cursor-pointer';
+    const baseClasses = 'w-full px-3 py-2 pr-10 border rounded-lg transition-colors focus:outline-none focus:ring-2';
+    const stateClasses = error ? 'border-red-300 dark:border-red-600 focus:ring-red-500 focus:border-red-500 bg-red-50 dark:bg-red-900/10' : 'border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700';
+    const textClasses = 'text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500';
+    const disabledClasses = disabled ? 'opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800' : 'cursor-pointer';
     return `${baseClasses} ${stateClasses} ${textClasses} ${disabledClasses} ${className}`;
   }, [error, disabled, className]);
-  return (
-    <div className="w-full">
+  return <div className="w-full">
       {/* Label */}
-      {label && (
-        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+      {label && <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
           {label}
           {required && <span className="ml-1 text-red-500">*</span>}
-        </label>
-      )}
+        </label>}
 
       {/* Select Container */}
       <div className="relative">
-        <select
-          value={value}
-          onChange={handleChange}
-          disabled={disabled}
-          required={required}
-          className={selectClasses}
-          aria-label={label || 'Categoria'}
-          aria-required={required}
-          aria-invalid={!!error}
-          aria-describedby={
-            error ? 'error-message' : helperText ? 'helper-text' : undefined
-          }
-        >
+        <select value={value} onChange={handleChange} disabled={disabled} required={required} className={selectClasses} aria-label={label || 'Categoria'} aria-required={required} aria-invalid={!!error} aria-describedby={error ? 'error-message' : helperText ? 'helper-text' : undefined}>
           {/* Placeholder Option */}
           <option value="" disabled={required}>
             {placeholder}
@@ -166,48 +126,30 @@ const CategoryHierarchicalDropdown = ({
         </select>
 
         {/* Ícone de Dropdown */}
-        {showIcon && (
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-            <ChevronDown
-              className={`h-5 w-5 ${error ? 'text-red-400 dark:text-red-500' : 'text-gray-400 dark:text-gray-500'}`}
-            />
-          </div>
-        )}
+        {showIcon && <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+            <ChevronDown className={`h-5 w-5 ${error ? 'text-red-400 dark:text-red-500' : 'text-gray-400 dark:text-gray-500'}`} />
+          </div>}
       </div>
 
       {/* Helper Text */}
-      {helperText && !error && (
-        <p
-          id="helper-text"
-          className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-sm"
-        >
+      {helperText && !error && <p id="helper-text" className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-1 text-sm">
           {helperText}
-        </p>
-      )}
+        </p>}
 
       {/* Error Message */}
-      {error && (
-        <p
-          id="error-message"
-          className="mt-1 text-sm text-red-600 dark:text-red-400"
-          role="alert"
-        >
+      {error && <p id="error-message" className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
           {error}
-        </p>
-      )}
-    </div>
-  );
+        </p>}
+    </div>;
 };
 CategoryHierarchicalDropdown.propTypes = {
   /** Árvore de categorias (formato: [{id, name, parent_id, children: [...]}]) */
-  categories: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      parent_id: PropTypes.string,
-      children: PropTypes.array,
-    })
-  ),
+  categories: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    parent_id: PropTypes.string,
+    children: PropTypes.array
+  })),
   /** ID da categoria selecionada */
   value: PropTypes.string,
   /** Callback executado ao selecionar categoria */
@@ -227,6 +169,6 @@ CategoryHierarchicalDropdown.propTypes = {
   /** Label do campo */
   label: PropTypes.string,
   /** Se deve exibir ícone de dropdown */
-  showIcon: PropTypes.bool,
+  showIcon: PropTypes.bool
 };
 export default CategoryHierarchicalDropdown;

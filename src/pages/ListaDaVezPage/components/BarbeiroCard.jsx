@@ -1,14 +1,5 @@
 import React, { useState } from 'react';
-import {
-  User,
-  Play,
-  Pause,
-  Square,
-  SkipForward,
-  Clock,
-  Trophy,
-  AlertCircle,
-} from 'lucide-react';
+import { User, Play, Pause, Square, SkipForward, Clock, Trophy, AlertCircle } from 'lucide-react';
 import { Button } from '../../../atoms';
 import filaService from '../../../services/filaService';
 import { useAuth } from '../../../context';
@@ -16,9 +7,11 @@ export default function BarbeiroCard({
   barbeiro,
   posicao,
   unidadeId,
-  onUpdate,
+  onUpdate
 }) {
-  const { user } = useAuth();
+  const {
+    user
+  } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -37,18 +30,10 @@ export default function BarbeiroCard({
           await filaService.pausarBarbeiro(barbeiro.barbeiro_id, unidadeId);
           break;
         case 'iniciar':
-          await filaService.iniciarAtendimento(
-            barbeiro.barbeiro_id,
-            unidadeId,
-            additionalData.tipoServico
-          );
+          await filaService.iniciarAtendimento(barbeiro.barbeiro_id, unidadeId, additionalData.tipoServico);
           break;
         case 'finalizar':
-          await filaService.finalizarAtendimento(
-            additionalData.historicoId,
-            additionalData.valorServico,
-            additionalData.observacoes
-          );
+          await filaService.finalizarAtendimento(additionalData.historicoId, additionalData.valorServico, additionalData.observacoes);
           break;
         case 'pular':
           if (!canManage) {
@@ -78,7 +63,7 @@ export default function BarbeiroCard({
           color: 'text-green-600',
           bg: 'bg-green-50 dark:bg-green-900/20',
           border: 'border-green-200 dark:border-green-800',
-          icon: <Play className="h-4 w-4" />,
+          icon: <Play className="h-4 w-4" />
         };
       case 'attending':
         return {
@@ -86,7 +71,7 @@ export default function BarbeiroCard({
           color: 'text-blue-600',
           bg: 'bg-blue-50 dark:bg-blue-900/20',
           border: 'border-blue-200 dark:border-blue-800',
-          icon: <Clock className="h-4 w-4" />,
+          icon: <Clock className="h-4 w-4" />
         };
       case 'paused':
         return {
@@ -94,7 +79,7 @@ export default function BarbeiroCard({
           color: 'text-gray-600',
           bg: 'bg-gray-50 dark:bg-gray-700',
           border: 'border-gray-200 dark:border-gray-600',
-          icon: <Pause className="h-4 w-4" />,
+          icon: <Pause className="h-4 w-4" />
         };
       default:
         return {
@@ -102,7 +87,7 @@ export default function BarbeiroCard({
           color: 'text-gray-600',
           bg: 'bg-gray-50 dark:bg-gray-700',
           border: 'border-gray-200 dark:border-gray-600',
-          icon: <AlertCircle className="h-4 w-4" />,
+          icon: <AlertCircle className="h-4 w-4" />
         };
     }
   };
@@ -116,7 +101,7 @@ export default function BarbeiroCard({
             label: 'Entrar na Fila',
             icon: <Play className="h-4 w-4" />,
             variant: 'default',
-            color: 'bg-green-600 hover:bg-green-700',
+            color: 'bg-green-600 hover:bg-green-700'
           });
         }
         break;
@@ -126,14 +111,14 @@ export default function BarbeiroCard({
             key: 'pausar',
             label: 'Pausar',
             icon: <Pause className="h-4 w-4" />,
-            variant: 'outline',
+            variant: 'outline'
           });
           actions.push({
             key: 'iniciar',
             label: 'Iniciar',
             icon: <Play className="h-4 w-4" />,
             variant: 'default',
-            color: 'bg-blue-600 hover:bg-blue-700',
+            color: 'bg-blue-600 hover:bg-blue-700'
           });
         }
         if (canManage) {
@@ -141,7 +126,7 @@ export default function BarbeiroCard({
             key: 'pular',
             label: 'Pular',
             icon: <SkipForward className="h-4 w-4" />,
-            variant: 'outline',
+            variant: 'outline'
           });
         }
         break;
@@ -152,7 +137,7 @@ export default function BarbeiroCard({
             label: 'Finalizar',
             icon: <Square className="h-4 w-4" />,
             variant: 'default',
-            color: 'bg-green-600 hover:bg-green-700',
+            color: 'bg-green-600 hover:bg-green-700'
           });
         }
         break;
@@ -161,26 +146,19 @@ export default function BarbeiroCard({
   };
   const statusConfig = getStatusConfig();
   const actions = getAvailableActions();
-  return (
-    <div
-      className={`relative rounded-lg border p-4 transition-all duration-200 ${statusConfig.bg} ${statusConfig.border} ${barbeiro.status === 'attending' ? 'ring-2 ring-blue-200 dark:ring-blue-800' : ''} ${posicao === 1 && barbeiro.status === 'active' ? 'ring-2 ring-yellow-200 dark:ring-yellow-800' : ''} `}
-    >
+  return <div className={`relative rounded-lg border p-4 transition-all duration-200 ${statusConfig.bg} ${statusConfig.border} ${barbeiro.status === 'attending' ? 'ring-2 ring-blue-200 dark:ring-blue-800' : ''} ${posicao === 1 && barbeiro.status === 'active' ? 'ring-2 ring-yellow-200 dark:ring-yellow-800' : ''} `}>
       {/* Badge de posição */}
       <div className="card-theme absolute -left-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full border-2 border-light-border dark:border-dark-border dark:bg-dark-surface">
-        {posicao === 1 && barbeiro.status === 'active' ? (
-          <Trophy className="h-4 w-4 text-yellow-600" />
-        ) : (
-          <span className="text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-600">
+        {posicao === 1 && barbeiro.status === 'active' ? <Trophy className="h-4 w-4 text-yellow-600" /> : <span className="text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-theme-secondary">
             {posicao}
-          </span>
-        )}
+          </span>}
       </div>
 
       <div className="flex items-start justify-between">
         {/* Informações do barbeiro */}
         <div className="flex flex-1 items-start gap-3">
           {/* Avatar */}
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-600 dark:bg-gray-700">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 dark:bg-gray-600">
             <User className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted h-6 w-6" />
           </div>
 
@@ -192,9 +170,7 @@ export default function BarbeiroCard({
               </h3>
 
               {/* Badge de status */}
-              <span
-                className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium ${statusConfig.color} ${statusConfig.bg} ${statusConfig.border} border`}
-              >
+              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium ${statusConfig.color} ${statusConfig.bg} ${statusConfig.border} border`}>
                 {statusConfig.icon}
                 {statusConfig.label}
               </span>
@@ -217,42 +193,27 @@ export default function BarbeiroCard({
 
         {/* Ações */}
         <div className="ml-4 flex items-center gap-2">
-          {actions.map(action => (
-            <Button
-              key={action.key}
-              onClick={() => handleAction(action.key)}
-              disabled={loading}
-              variant={action.variant}
-              className={`flex items-center gap-1 px-3 py-1 text-xs ${action.color || ''} `}
-            >
+          {actions.map(action => <Button key={action.key} onClick={() => handleAction(action.key)} disabled={loading} variant={action.variant} className={`flex items-center gap-1 px-3 py-1 text-xs ${action.color || ''} `}>
               {action.icon}
               <span className="hidden sm:inline">{action.label}</span>
-            </Button>
-          ))}
+            </Button>)}
         </div>
       </div>
 
       {/* Mensagem de erro */}
-      {error && (
-        <div className="mt-3 flex items-start gap-2 rounded border border-red-200 bg-red-50 p-2 text-sm text-red-600 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
+      {error && <div className="mt-3 flex items-start gap-2 rounded border border-red-200 bg-red-50 p-2 text-sm text-red-600 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <span>{error}</span>
-        </div>
-      )}
+        </div>}
 
       {/* Indicador de próximo */}
-      {posicao === 1 && barbeiro.status === 'active' && (
-        <div className="mt-3 text-center text-xs font-medium text-yellow-700 dark:text-yellow-300">
+      {posicao === 1 && barbeiro.status === 'active' && <div className="mt-3 text-center text-xs font-medium text-yellow-700 dark:text-yellow-300">
           🎯 Próximo da fila
-        </div>
-      )}
+        </div>}
 
       {/* Indicador de atendendo */}
-      {barbeiro.status === 'attending' && (
-        <div className="mt-3 animate-pulse text-center text-xs font-medium text-blue-700 dark:text-blue-300">
+      {barbeiro.status === 'attending' && <div className="mt-3 animate-pulse text-center text-xs font-medium text-blue-700 dark:text-blue-300">
           🔵 Atendendo cliente
-        </div>
-      )}
-    </div>
-  );
+        </div>}
+    </div>;
 }
