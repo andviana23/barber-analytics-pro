@@ -193,9 +193,10 @@ Implementar sistema completo de análise financeira com IA (GPT-5/GPT-4o) para m
 
 ### 3.1 Pipeline ETL Diário
 
-- [ ] **3.1.1** Desenvolver função `etlDaily(unitId, runDate)`
+- [x] **3.1.1** Desenvolver função `etlDaily(unitId, runDate)` ✅
   - **Tecnologia:** TypeScript, Danfo.js
   - **Localização:** `lib/analytics/etl.ts`
+  - **Status:** ✅ IMPLEMENTADO
   - **Fluxo:**
     1. Buscar receitas do período (via `revenueRepository`)
     2. Buscar despesas do período (via `expenseRepository`)
@@ -204,7 +205,17 @@ Implementar sistema completo de análise financeira com IA (GPT-5/GPT-4o) para m
     5. Calcular métricas consolidadas
     6. Salvar em `ai_metrics_daily`
   - **Dependências:** `revenueRepository`, `expenseRepository`, `aiMetricsRepository`
-  - **Critério:** Função processa dados corretamente, salva métricas válidas
+  - **Arquivos criados:**
+    - `lib/analytics/etl.ts` - Pipeline ETL completo
+    - `lib/repositories/aiMetricsRepository.ts` - Acesso aos dados
+  - **Funções implementadas:**
+    - `etlDaily()` - Função principal do pipeline
+    - `extractData()` - Extração de dados
+    - `transformData()` - Transformação e agregação
+    - `loadMetrics()` - Carregamento no banco
+    - `validateInputData()` - Validação
+    - `deduplicateData()` - Remoção de duplicatas
+  - **Critério:** ✅ Função processa dados corretamente, salva métricas válidas
   - **Teste:** Executar com dados reais das unidades Mangabeiras e Nova Lima
 
 - [ ] **3.1.2** Implementar processamento paralelo em batches
@@ -230,11 +241,33 @@ Implementar sistema completo de análise financeira com IA (GPT-5/GPT-4o) para m
 
 ### 3.2 Cálculos de KPIs
 
-- [ ] **3.2.1** Implementar cálculo de margem percentual
+- [x] **3.2.1** Implementar cálculo de margem percentual ✅
   - **Tecnologia:** Math.js
+  - **Status:** ✅ IMPLEMENTADO
   - **Fórmula:** `(receita_liquida - despesas_totais) / receita_bruta * 100`
   - **Localização:** `lib/analytics/calculations.ts`
-  - **Critério:** Cálculo correto para dados conhecidos
+  - **Arquivo criado:** `lib/analytics/calculations.ts` (487 linhas)
+  - **Funções implementadas:**
+    - `calculateMargin()` - Margem de lucro percentual
+    - `calculateAverageTicket()` - Ticket médio
+    - `calculateMovingAverage()` - Média móvel simples
+    - `calculateLinearRegression()` - Regressão linear (mínimos quadrados)
+    - `forecastValue()` - Previsão com intervalo de confiança
+    - `calculateGrowthRate()` - Taxa de crescimento
+    - `projectMonthlyRevenue()` - Projeção de receita mensal
+    - `detectSeasonality()` - Detecção de padrões semanais
+  - **Extras implementados:**
+    - `lib/analytics/anomalies.ts` - Detecção de anomalias completa
+      - `calculateZScore()` - Escore padronizado
+      - `detectAnomaly()` - Detecção via z-score
+      - `detectTrendBreak()` - Quebra de tendência
+      - `detectSuddenDrop()` - Queda súbita (-40%)
+      - `detectSuddenSpike()` - Pico súbito (+200%)
+      - `generateAnomalyAlerts()` - Geração de alertas estruturados
+  - **Dependências adicionadas:**
+    - `danfojs-node@1.1.2` - DataFrames
+    - `mathjs@12.0.0` - Biblioteca matemática
+  - **Critério:** ✅ Cálculo correto para dados conhecidos
 
 - [ ] **3.2.2** Implementar cálculo de ticket médio
   - **Fórmula:** `receita_bruta / numero_de_transacoes`
