@@ -356,5 +356,216 @@ export function detectSeasonality(timeSeries: TimeSeriesData[]): number[] {
     return Math.round((dayMean / overallMean) * 100) / 100;
   });
 
-  return seasonalityIndexes;
+/**
+ * Calcula saldo acumulado usando rolling sum (Danfo.js)
+ *
+ * Simula o comportamento da VIEW vw_demonstrativo_fluxo usando DataFrame.
+ * Calcula saldo acumulado por unidade e conta bancária.
+ *
+ * @param timeSeries - Array de dados com entradas e saídas por dia
+ * @param groupBy - Campo para agrupar (ex: 'unit_id', 'account_id')
+ * @returns Array com saldo acumulado calculado
+ *
+ * @example
+ * ```typescript
+ * const data = [
+ *   { date: new Date('2025-11-01'), unit_id: 'unit-1', entradas: 1000, saidas: 500 },
+ *   { date: new Date('2025-11-02'), unit_id: 'unit-1', entradas: 1200, saidas: 600 },
+ * ];
+ * const accumulated = calculateAccumulatedBalance(data, 'unit_id');
+ * // Retorna: [
+ * //   { date: ..., saldo_dia: 500, saldo_acumulado: 500 },
+ * //   { date: ..., saldo_dia: 600, saldo_acumulado: 1100 }
+ * // ]
+ * ```
+ */
+export function calculateAccumulatedBalance<T extends { date: Date | string; entradas: number; saidas: number }>(
+  timeSeries: T[],
+  groupBy?: keyof T
+): Array<T & { saldo_dia: number; saldo_acumulado: number }> {
+  if (timeSeries.length === 0) {
+    return [];
+  }
+
+  // Ordenar por data
+  const sorted = [...timeSeries].sort((a, b) => {
+    const dateA = typeof a.date === 'string' ? new Date(a.date) : a.date;
+    const dateB = typeof b.date === 'string' ? new Date(b.date) : b.date;
+    return dateA.getTime() - dateB.getTime();
+  });
+
+  // Se não há agrupamento, calcular saldo acumulado simples
+  if (!groupBy) {
+    let accumulated = 0;
+    return sorted.map(item => {
+      const saldo_dia = item.entradas - item.saidas;
+      accumulated += saldo_dia;
+      return {
+        ...item,
+        saldo_dia,
+        saldo_acumulado: Math.round(accumulated * 100) / 100,
+      };
+    });
+  }
+
+  // Agrupar por campo especificado
+  const groups: { [key: string]: T[] } = {};
+  sorted.forEach(item => {
+    const key = String(item[groupBy] || 'default');
+    if (!groups[key]) {
+      groups[key] = [];
+    }
+    groups[key].push(item);
+  });
+
+  // Calcular saldo acumulado para cada grupo
+  const result: Array<T & { saldo_dia: number; saldo_acumulado: number }> = [];
+
+  Object.values(groups).forEach(group => {
+    let accumulated = 0;
+    group.forEach(item => {
+      const saldo_dia = item.entradas - item.saidas;
+      accumulated += saldo_dia;
+      result.push({
+        ...item,
+        saldo_dia: Math.round(saldo_dia * 100) / 100,
+        saldo_acumulado: Math.round(accumulated * 100) / 100,
+      });
+    });
+  });
+
+  // Reordenar por data
+  return result.sort((a, b) => {
+    const dateA = typeof a.date === 'string' ? new Date(a.date) : a.date;
+    const dateB = typeof b.date === 'string' ? new Date(b.date) : b.date;
+    return dateA.getTime() - dateB.getTime();
+  });
 }
+
+/**
+ * Prevê fluxo de caixa usando média móvel de 30 dias + tendência linear
+ *
+ * Algoritmo:
+ * 1. Calcular média móvel de 30 dias dos últimos valores
+ * 2. Aplicar regressão linear para identificar tendência
+ * 3. Projetar valores futuros combinando média móvel + tendência
+ * 4. Calcular intervalo de confiança baseado na variabilidade histórica
+ *
+ * @param cashflowHistory - Histórico de fluxo de caixa (mínimo 30 dias)
+ * @param daysAhead - Número de dias a prever (padrão: 30)
+ * @returns Array de previsões com intervalo de confiança
+ *
+ * @example
+ * ```typescript
+ * const history = [
+ *   { date: new Date('2025-10-01'), balance: 10000 },
+ *   // ... mais 29 dias
+ * ];
+ * const forecast = forecastCashflow(history, 30);
+ * // Retorna: [
+ * //   { date: new Date('2025-11-01'), forecasted_balance: 12000, confidence_interval: {...} },
+ * //   ...
+ * // ]
+ * ```
+ */
+export function forecastCashflow(
+  cashflowHistory: Array<{ date: Date | string; balance: number }>,
+  daysAhead: number = 30
+): Array<{
+  date: Date;
+  forecasted_balance: number;
+  confidence_interval: { lower: number; upper: number };
+  trend: 'up' | 'down' | 'stable';
+}> {
+  if (cashflowHistory.length < 30) {
+    // Dados insuficientes - usar último valor conhecido
+    const lastValue = cashflowHistory[cashflowHistory.length - 1]?.balance || 0;
+    const lastDate = cashflowHistory[cashflowHistory.length - 1]?.date
+      ? (typeof cashflowHistory[cashflowHistory.length - 1].date === 'string'
+          ? new Date(cashflowHistory[cashflowHistory.length - 1].date)
+          : cashflowHistory[cashflowHistory.length - 1].date)
+      : new Date();
+
+    return Array.from({ length: daysAhead }, (_, i) => {
+      const forecastDate = new Date(lastDate);
+      forecastDate.setDate(forecastDate.getDate() + i + 1);
+
+      return {
+        date: forecastDate,
+        forecasted_balance: lastValue,
+        confidence_interval: {
+          lower: lastValue * 0.9,
+          upper: lastValue * 1.1,
+        },
+        trend: 'stable' as const,
+      };
+    });
+  }
+
+  // Ordenar por data
+  const sorted = [...cashflowHistory].sort((a, b) => {
+    const dateA = typeof a.date === 'string' ? new Date(a.date) : a.date;
+    const dateB = typeof b.date === 'string' ? new Date(b.date) : b.date;
+    return dateA.getTime() - dateB.getTime();
+  });
+
+  // 1. Calcular média móvel de 30 dias dos últimos valores
+  const last30Days = sorted.slice(-30);
+  const values = last30Days.map(item => item.balance);
+  const movingAverage30 = values.reduce((sum, val) => sum + val, 0) / values.length;
+
+  // 2. Calcular regressão linear para tendência
+  const timeSeriesData: TimeSeriesData[] = last30Days.map((item, index) => ({
+    date: typeof item.date === 'string' ? new Date(item.date) : item.date,
+    value: item.balance,
+  }));
+
+  const { slope } = calculateLinearRegression(timeSeriesData);
+
+  // 3. Calcular desvio padrão para intervalo de confiança
+  const mean = movingAverage30;
+  const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+  const stdDev = Math.sqrt(variance);
+
+  // 4. Determinar tendência
+  const trend: 'up' | 'down' | 'stable' =
+    slope > mean * 0.02 ? 'up' : slope < -mean * 0.02 ? 'down' : 'stable';
+
+  // 5. Gerar previsões
+  const lastDate = typeof sorted[sorted.length - 1].date === 'string'
+    ? new Date(sorted[sorted.length - 1].date)
+    : sorted[sorted.length - 1].date;
+  const lastBalance = sorted[sorted.length - 1].balance;
+
+  const forecasts: Array<{
+    date: Date;
+    forecasted_balance: number;
+    confidence_interval: { lower: number; upper: number };
+    trend: 'up' | 'down' | 'stable';
+  }> = [];
+
+  for (let i = 1; i <= daysAhead; i++) {
+    const forecastDate = new Date(lastDate);
+    forecastDate.setDate(forecastDate.getDate() + i);
+
+    // Previsão = média móvel + (tendência * dias à frente)
+    const trendComponent = slope * i;
+    const forecastedBalance = movingAverage30 + trendComponent;
+
+    // Intervalo de confiança de 95% (±1.96 desvios padrão)
+    const confidenceMargin = 1.96 * stdDev;
+
+    forecasts.push({
+      date: forecastDate,
+      forecasted_balance: Math.round(forecastedBalance * 100) / 100,
+      confidence_interval: {
+        lower: Math.round((forecastedBalance - confidenceMargin) * 100) / 100,
+        upper: Math.round((forecastedBalance + confidenceMargin) * 100) / 100,
+      },
+      trend,
+    });
+  }
+
+  return forecasts;
+}
+

@@ -39,3 +39,4 @@ CREATE POLICY "service_role_only"
   FOR ALL
   USING (auth.role() = 'service_role');
 
+

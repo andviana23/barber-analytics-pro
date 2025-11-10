@@ -60,6 +60,16 @@
       "path": "/api/cron/health-check",
       "schedule": "*/5 * * * *",
       "description": "Health Check - A cada 5 minutos"
+    },
+    {
+      "path": "/api/cron/validate-balance",
+      "schedule": "0 4 * * *",
+      "description": "Validação de Saldo Acumulado - Diariamente às 04:00 BRT (após ETL)"
+    },
+    {
+      "path": "/api/cron/gerar-despesas-recorrentes",
+      "schedule": "0 2 * * *",
+      "description": "Geração de Despesas Recorrentes - Diariamente às 02:00 BRT (antes do ETL)"
     }
   ],
   "headers": [

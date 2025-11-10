@@ -1,16 +1,17 @@
 /**
  * AI Metrics Repository - Acesso aos dados de métricas diárias da IA
- * 
+ *
  * Responsável por:
  * - CRUD de métricas diárias (ai_metrics_daily)
  * - Consultas históricas para análise de tendências
  * - Agregações para relatórios
- * 
+ *
  * @module lib/repositories/aiMetricsRepository
  * @see CHECKLIST_IA_FINANCEIRA.md - Seção 3
  */
 
-import { supabase } from '@/lib/supabase';
+// @ts-expect-error - supabase.js não tem tipos exportados
+import { supabase } from '@/services/supabase';
 
 /**
  * Interface para métricas diárias
@@ -45,13 +46,13 @@ export interface AiMetricInput {
 
 /**
  * Insere ou atualiza métricas diárias (upsert)
- * 
+ *
  * Se já existir registro para a mesma unidade e data, atualiza.
  * Caso contrário, cria novo registro.
- * 
+ *
  * @param data - Dados das métricas a salvar
  * @returns Promise com resultado da operação
- * 
+ *
  * @example
  * ```typescript
  * const result = await aiMetricsRepository.upsert({
@@ -76,7 +77,10 @@ export async function upsert(data: AiMetricInput): Promise<{
       .upsert(
         {
           unit_id: data.unit_id,
-          date: typeof data.date === 'string' ? data.date : data.date.toISOString().split('T')[0],
+          date:
+            typeof data.date === 'string'
+              ? data.date
+              : data.date.toISOString().split('T')[0],
           gross_revenue: data.gross_revenue,
           total_expenses: data.total_expenses,
           margin_percentage: data.margin_percentage,
@@ -105,12 +109,12 @@ export async function upsert(data: AiMetricInput): Promise<{
 
 /**
  * Busca métricas de uma unidade em um período
- * 
+ *
  * @param unitId - ID da unidade
  * @param startDate - Data inicial
  * @param endDate - Data final
  * @returns Promise com array de métricas
- * 
+ *
  * @example
  * ```typescript
  * const metrics = await aiMetricsRepository.findByPeriod(
@@ -151,11 +155,11 @@ export async function findByPeriod(
 
 /**
  * Busca métricas de um dia específico
- * 
+ *
  * @param unitId - ID da unidade
  * @param date - Data a buscar
  * @returns Promise com métrica do dia
- * 
+ *
  * @example
  * ```typescript
  * const metric = await aiMetricsRepository.findByDate(
@@ -193,11 +197,11 @@ export async function findByDate(
 
 /**
  * Busca últimas N métricas de uma unidade
- * 
+ *
  * @param unitId - ID da unidade
  * @param limit - Quantidade de registros
  * @returns Promise com array de métricas
- * 
+ *
  * @example
  * ```typescript
  * const last30Days = await aiMetricsRepository.findLast('unit-123', 30);
@@ -233,12 +237,12 @@ export async function findLast(
 
 /**
  * Busca agregação mensal de métricas
- * 
+ *
  * @param unitId - ID da unidade
  * @param year - Ano
  * @param month - Mês (1-12)
  * @returns Promise com totais do mês
- * 
+ *
  * @example
  * ```typescript
  * const monthly = await aiMetricsRepository.findMonthlyAggregation(
@@ -269,13 +273,18 @@ export async function findMonthlyAggregation(
 
     const { data, error } = await supabase
       .from('ai_metrics_daily')
-      .select('gross_revenue, total_expenses, margin_percentage, revenues_count, expenses_count')
+      .select(
+        'gross_revenue, total_expenses, margin_percentage, revenues_count, expenses_count'
+      )
       .eq('unit_id', unitId)
       .gte('date', startDate.toISOString().split('T')[0])
       .lte('date', endDate.toISOString().split('T')[0]);
 
     if (error) {
-      console.error('[aiMetricsRepository] Error finding monthly aggregation:', error);
+      console.error(
+        '[aiMetricsRepository] Error finding monthly aggregation:',
+        error
+      );
       return { data: null, error };
     }
 
@@ -295,25 +304,43 @@ export async function findMonthlyAggregation(
 
     // Agregar dados manualmente
     const aggregated = {
-      total_gross_revenue: data.reduce((sum: number, row: any) => sum + (row.gross_revenue || 0), 0),
-      total_expenses: data.reduce((sum: number, row: any) => sum + (row.total_expenses || 0), 0),
+      total_gross_revenue: data.reduce(
+        (sum: number, row: any) => sum + (row.gross_revenue || 0),
+        0
+      ),
+      total_expenses: data.reduce(
+        (sum: number, row: any) => sum + (row.total_expenses || 0),
+        0
+      ),
       avg_margin:
-        data.reduce((sum: number, row: any) => sum + (row.margin_percentage || 0), 0) / data.length,
-      total_revenues_count: data.reduce((sum: number, row: any) => sum + (row.revenues_count || 0), 0),
-      total_expenses_count: data.reduce((sum: number, row: any) => sum + (row.expenses_count || 0), 0),
+        data.reduce(
+          (sum: number, row: any) => sum + (row.margin_percentage || 0),
+          0
+        ) / data.length,
+      total_revenues_count: data.reduce(
+        (sum: number, row: any) => sum + (row.revenues_count || 0),
+        0
+      ),
+      total_expenses_count: data.reduce(
+        (sum: number, row: any) => sum + (row.expenses_count || 0),
+        0
+      ),
       days_count: data.length,
     };
 
     return { data: aggregated, error: null };
   } catch (error) {
-    console.error('[aiMetricsRepository] Exception in findMonthlyAggregation:', error);
+    console.error(
+      '[aiMetricsRepository] Exception in findMonthlyAggregation:',
+      error
+    );
     return { data: null, error };
   }
 }
 
 /**
  * Deleta métricas de uma data específica
- * 
+ *
  * @param unitId - ID da unidade
  * @param date - Data a deletar
  * @returns Promise com resultado da operação

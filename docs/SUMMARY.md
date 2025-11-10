@@ -1,7 +1,7 @@
 # Barber Analytics Pro - Documentação Técnica
 
-**Versão:** 1.0.0
-**Última Atualização:** 7 de novembro de 2025
+**Versão:** 1.1.0
+**Última Atualização:** 8 de novembro de 2025
 **Autor:** Andrey Viana
 
 ---
@@ -89,12 +89,13 @@ Documentação detalhada de cada módulo do sistema.
 
 **Módulos Planejados**:
 
-- **04.01 - Financial Module**: Receitas, despesas, fluxo de caixa, DRE
-- **04.02 - Payments Module**: Formas de pagamento, gateway, conciliação
-- **04.03 - Clients Module**: CRM, fidelização, assinaturas
-- **04.04 - Scheduler Module**: Agendamentos, calendário, lista da vez
-- **04.05 - Reports Module**: Dashboards, KPIs, rankings
-- **04.06 - Notifications Module**: WhatsApp, SMS, e-mail, push
+- **04.01 - Financial Module**: Receitas, despesas, fluxo de caixa, DRE ✅
+- **04.02 - Payments Module**: Formas de pagamento, gateway, conciliação ✅
+- **04.03 - AI Financial Module**: IA Financeira, alertas, análises ✅
+- **04.04 - Clients Module**: CRM, fidelização, assinaturas
+- **04.05 - Scheduler Module**: Agendamentos, calendário, lista da vez
+- **04.06 - Reports Module**: Dashboards, KPIs, rankings ✅
+- **04.07 - Notifications Module**: WhatsApp, SMS, e-mail, push
 
 ---
 
@@ -115,18 +116,19 @@ Infraestrutura e serviços externos.
 
 ---
 
-### [06 - API Reference](./06_API_REFERENCE.md) 🚧
+### [06 - API Reference](./06_API_REFERENCE.md) ✅
 
 Referência completa de Services, Repositories, Hooks e DTOs.
 
-**Status**: Em desenvolvimento
+**Status**: Parcialmente implementado
 
-**Planejado**:
+**Implementado**:
 
-- Services (cashflowService, revenueService, expenseService)
-- Repositories (demonstrativoFluxoRepository, revenueRepository)
-- Hooks (useDemonstrativoFluxo, useRevenues, useExpenses)
-- DTOs (CreateRevenueDTO, UpdateExpenseDTO)
+- Services (cashflowService, revenueService, expenseService) ✅
+- Repositories (demonstrativoFluxoRepository, revenueRepository, aiMetricsRepository, alertsRepository) ✅
+- Hooks (useDemonstrativoFluxo, useRevenues, useExpenses, useHealthKPIs) ✅
+- DTOs (CreateRevenueDTO, UpdateExpenseDTO) ✅
+- API Routes Next.js (KPIs, Alertas, Relatórios, Cron Jobs) ✅
 
 ---
 
@@ -283,8 +285,9 @@ Sistema de design completo com tokens, classes utilitárias e componentes.
 | **Fase 1: MVP**            | ✅ Concluída    | Financeiro, Caixa, Comandas      | Q1 2025 |
 | **Fase 2: Fluxo de Caixa** | ✅ Concluída    | Demonstrativo Acumulado, Filtros | Q2 2025 |
 | **Fase 3: Agendamentos**   | 🔄 Em Progresso | Calendário, Lista da Vez         | Q3 2025 |
-| **Fase 4: CRM Avançado**   | 📋 Planejada    | Assinaturas, Fidelização         | Q4 2025 |
-| **Fase 5: BI & Analytics** | 📋 Planejada    | Análise Preditiva, AI            | Q1 2026 |
+| **Fase 4: IA Financeira**  | ✅ Concluída    | Análise preditiva, alertas, bot | Q4 2025 |
+| **Fase 5: CRM Avançado**   | 📋 Planejada    | Assinaturas, Fidelização         | Q1 2026 |
+| **Fase 6: BI & Analytics** | 📋 Planejada    | Análise avançada, ML             | Q2 2026 |
 
 ---
 
@@ -306,8 +309,9 @@ Sistema de design completo com tokens, classes utilitárias e componentes.
 
 | Data       | Versão | Descrição                     |
 | ---------- | ------ | ----------------------------- |
+| 08/11/2025 | 1.1.0  | Adicionado módulo IA Financeira |
 | 07/11/2025 | 1.0.0  | Documentação inicial completa |
 
 ---
 
-**Última compilação:** 7 de novembro de 2025, 20:30 BRT
+**Última compilação:** 8 de novembro de 2025, 22:00 BRT

@@ -5,8 +5,8 @@
 **Documento:** 07_DATA_MODEL.md
 **Título:** Modelo de Dados
 **Autor:** Andrey Viana
-**Versão:** 1.0.0
-**Última Atualização:** 7 de novembro de 2025
+**Versão:** 1.1.0
+**Última Atualização:** 8 de novembro de 2025
 **Licença:** Proprietary
 
 ---
@@ -625,6 +625,116 @@ BEGIN
 END;
 $$;
 ```
+
+### Módulo de IA Financeira
+
+```plantuml
+@startuml ERD AI Financial Module
+!define table(x) entity x << (T,#FFAAAA) >>
+
+table(ai_metrics_daily) {
+    *id: UUID <<PK>>
+    --
+    unit_id: UUID <<FK>>
+    date: DATE
+    gross_revenue: DECIMAL(12,2)
+    total_expenses: DECIMAL(12,2)
+    margin_percentage: DECIMAL(5,2)
+    average_ticket: DECIMAL(10,2)
+    revenues_count: INTEGER
+    expenses_count: INTEGER
+    created_at: TIMESTAMPTZ
+    updated_at: TIMESTAMPTZ
+}
+
+table(alerts_events) {
+    *id: UUID <<PK>>
+    --
+    unit_id: UUID <<FK>>
+    alert_type: VARCHAR(50)
+    severity: VARCHAR(20)
+    message: TEXT
+    status: VARCHAR(20)
+    metadata: JSONB
+    created_at: TIMESTAMPTZ
+    acknowledged_at: TIMESTAMPTZ
+}
+
+table(kpi_targets) {
+    *id: UUID <<PK>>
+    --
+    unit_id: UUID <<FK>>
+    kpi_name: VARCHAR(50)
+    target_value: DECIMAL(12,2)
+    period: VARCHAR(20)
+    created_at: TIMESTAMPTZ
+    updated_at: TIMESTAMPTZ
+}
+
+table(forecasts_cashflow) {
+    *id: UUID <<PK>>
+    --
+    unit_id: UUID <<FK>>
+    forecast_date: DATE
+    forecasted_revenue: DECIMAL(12,2)
+    forecasted_expense: DECIMAL(12,2)
+    forecasted_balance: DECIMAL(12,2)
+    confidence_level: DECIMAL(5,2)
+    created_at: TIMESTAMPTZ
+}
+
+table(openai_cache) {
+    *id: UUID <<PK>>
+    --
+    cache_key: VARCHAR(255) <<UNIQUE>>
+    content: TEXT
+    expires_at: TIMESTAMPTZ
+    created_at: TIMESTAMPTZ
+}
+
+table(openai_cost_tracking) {
+    *id: UUID <<PK>>
+    --
+    unit_id: UUID <<FK>>
+    date: DATE
+    tokens_used: INTEGER
+    model: VARCHAR(50)
+    cost_usd: DECIMAL(10,6)
+    created_at: TIMESTAMPTZ
+}
+
+table(etl_runs) {
+    *id: UUID <<PK>>
+    --
+    run_type: VARCHAR(50)
+    run_id: VARCHAR(255) <<UNIQUE>>
+    status: VARCHAR(20)
+    units_processed: INTEGER
+    duration_ms: INTEGER
+    error_message: TEXT
+    created_at: TIMESTAMPTZ
+    completed_at: TIMESTAMPTZ
+}
+
+units ||--o{ ai_metrics_daily : "tem métricas"
+units ||--o{ alerts_events : "tem alertas"
+units ||--o{ kpi_targets : "tem targets"
+units ||--o{ forecasts_cashflow : "tem previsões"
+units ||--o{ openai_cost_tracking : "tem custos"
+@enduml
+```
+
+**Tabelas Principais:**
+
+- `ai_metrics_daily`: Métricas diárias agregadas por unidade
+- `alerts_events`: Eventos de alerta gerados pelo sistema
+- `kpi_targets`: Metas de KPIs por unidade
+- `forecasts_cashflow`: Previsões de fluxo de caixa
+- `openai_cache`: Cache de análises geradas pela IA
+- `openai_cost_tracking`: Rastreamento de custos OpenAI
+- `etl_runs`: Registro de execuções do ETL
+
+---
 
 ## 📚 Referências
 

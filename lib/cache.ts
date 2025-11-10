@@ -165,3 +165,75 @@ export async function getCacheStats(): Promise<{
   }
 }
 
+/**
+ * Cache genérico para qualquer tipo de dado
+ * Usa a tabela openai_cache com chaves prefixadas
+ */
+
+/**
+ * Busca um valor do cache genérico
+ * @param cacheKey Chave do cache
+ * @param ttl Time to live em segundos (padrão: 300 = 5 minutos)
+ * @returns Valor em cache ou null se não encontrado/expirado
+ */
+export async function getFromCache<T>(cacheKey: string, ttl: number = 300): Promise<T | null> {
+  try {
+    const prefixedKey = `generic:${cacheKey}`;
+    const { data, error } = await supabase
+      .from('openai_cache')
+      .select('response, created_at')
+      .eq('cache_key', prefixedKey)
+      .single();
+
+    if (error || !data) {
+      return null;
+    }
+
+    const createdAt = new Date(data.created_at);
+    const ageInSeconds = (Date.now() - createdAt.getTime()) / 1000;
+
+    if (ageInSeconds > ttl) {
+      // Cache expirado, remover
+      await supabase.from('openai_cache').delete().eq('cache_key', prefixedKey);
+      return null;
+    }
+
+    // Parsear JSON do cache
+    try {
+      return JSON.parse(data.response) as T;
+    } catch (parseError) {
+      console.error('Erro ao parsear cache:', parseError);
+      return null;
+    }
+  } catch (error) {
+    console.error('Erro ao buscar cache genérico:', error);
+    return null;
+  }
+}
+
+/**
+ * Salva um valor no cache genérico
+ * @param cacheKey Chave do cache
+ * @param value Valor a ser cacheado (será convertido para JSON)
+ * @param ttl Time to live em segundos (padrão: 300 = 5 minutos)
+ */
+export async function setToCache<T>(cacheKey: string, value: T, ttl: number = 300): Promise<void> {
+  try {
+    const prefixedKey = `generic:${cacheKey}`;
+    const jsonValue = JSON.stringify(value);
+
+    const { error } = await supabase.from('openai_cache').upsert({
+      cache_key: prefixedKey,
+      response: jsonValue,
+      created_at: new Date().toISOString()
+    });
+
+    if (error) {
+      console.error('Erro ao salvar cache genérico:', error);
+    }
+  } catch (error) {
+    console.error('Erro ao salvar cache genérico:', error);
+  }
+}
+
+

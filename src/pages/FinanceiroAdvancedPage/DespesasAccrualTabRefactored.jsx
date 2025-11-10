@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { CreditCard, Plus, Search, Calendar, DollarSign, Building2, Edit, Eye, X, CheckCircle, Clock, AlertCircle, Trash2, Download, Filter, TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react';
+import { CreditCard, Plus, Search, Calendar, DollarSign, Building2, Edit, Eye, X, CheckCircle, Clock, AlertCircle, Trash2, Download, Filter, TrendingUp, TrendingDown, AlertTriangle, Repeat, Pause, Play } from 'lucide-react';
 import { supabase } from '../../services/supabase';
 import { useToast } from '../../context/ToastContext';
 import { format, parseISO, startOfMonth, endOfMonth, isBefore, isAfter } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import ExpenseDetailsModal from '../../components/modals/ExpenseDetailsModal';
-import NovaDespesaModal from '../../templates/NovaDespesaModal';
-import DeleteConfirmationModal from '../../components/modals/DeleteConfirmationModal';
-import ImportExpensesFromOFXButton from '../../components/finance/ImportExpensesFromOFXButton';
+import expenseRepository from '../../repositories/expenseRepository';
+import expenseService from '../../services/expenseService';
+import { useToggleRecurring } from '../../hooks/useExpenses';
 
 /**
  * 💳 Tab de Despesas (Competência) - 100% REFATORADO COM DESIGN SYSTEM
@@ -41,12 +40,17 @@ const DespesasAccrualTabRefactored = ({
   const [isPaymentDateModalOpen, setIsPaymentDateModalOpen] = useState(false);
   const [selectedExpenseForAction, setSelectedExpenseForAction] = useState(null);
   const [selectedPaymentDate, setSelectedPaymentDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [recurringConfigs, setRecurringConfigs] = useState({}); // Cache de configurações de recorrência
+  const [expandingSeries, setExpandingSeries] = useState(new Set()); // IDs de séries expandidas
+  const [seriesData, setSeriesData] = useState({}); // Cache de séries de parcelas
+  const { mutate: toggleRecurring, isLoading: isTogglingRecurring } = useToggleRecurring();
 
   // Filtros compactos
   const [filters, setFilters] = useState({
     dueDateFrom: format(startOfMonth(new Date()), 'yyyy-MM-dd'),
     dueDateTo: format(endOfMonth(new Date()), 'yyyy-MM-dd'),
-    status: 'all' // all, paid, pending, overdue
+    status: 'all', // all, paid, pending, overdue
+    recurring: 'all' // all, recurring, non-recurring
   });
 
   // Buscar despesas
@@ -62,6 +66,13 @@ const DespesasAccrualTabRefactored = ({
         `).eq('unit_id', globalFilters.unitId).eq('is_active', true).order('expected_payment_date', {
         ascending: false
       });
+
+      // Aplicar filtro de recorrência
+      if (filters.recurring === 'recurring') {
+        query = query.eq('is_recurring', true);
+      } else if (filters.recurring === 'non-recurring') {
+        query = query.eq('is_recurring', false);
+      }
 
       // Aplicar filtro de data
       if (filters.dueDateFrom) {
@@ -89,7 +100,7 @@ const DespesasAccrualTabRefactored = ({
   };
   useEffect(() => {
     fetchExpenses();
-  }, [globalFilters.unitId, filters.dueDateFrom, filters.dueDateTo]);
+  }, [globalFilters.unitId, filters.dueDateFrom, filters.dueDateTo, filters.recurring]);
 
   // Calcular KPIs
   const kpis = useMemo(() => {
@@ -235,6 +246,97 @@ const DespesasAccrualTabRefactored = ({
       });
     }
   };
+
+  // Carregar configuração de recorrência para uma despesa
+  const loadRecurringConfig = async (expenseId) => {
+    if (recurringConfigs[expenseId]) {
+      return recurringConfigs[expenseId];
+    }
+
+    try {
+      const { data, error } = await expenseRepository.findRecurringByExpenseId(expenseId);
+      if (error || !data) {
+        return null;
+      }
+
+      setRecurringConfigs(prev => ({
+        ...prev,
+        [expenseId]: data,
+      }));
+
+      return data;
+    } catch (error) {
+      console.error('Erro ao carregar configuração de recorrência:', error);
+      return null;
+    }
+  };
+
+  // Carregar série de parcelas
+  const loadSeries = async (seriesId) => {
+    if (seriesData[seriesId]) {
+      return seriesData[seriesId];
+    }
+
+    try {
+      const { data, error } = await expenseRepository.findBySeries(seriesId);
+      if (error || !data) {
+        return [];
+      }
+
+      setSeriesData(prev => ({
+        ...prev,
+        [seriesId]: data,
+      }));
+
+      return data;
+    } catch (error) {
+      console.error('Erro ao carregar série:', error);
+      return [];
+    }
+  };
+
+  // Toggle expandir série
+  const toggleSeriesExpansion = async (expense) => {
+    const seriesId = expense.recurring_series_id || expense.id;
+
+    if (expandingSeries.has(seriesId)) {
+      setExpandingSeries(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(seriesId);
+        return newSet;
+      });
+    } else {
+      setExpandingSeries(prev => new Set(prev).add(seriesId));
+      await loadSeries(seriesId);
+    }
+  };
+
+  // Pausar/Retomar recorrência
+  const handleToggleRecurring = async (expense) => {
+    const seriesId = expense.recurring_series_id || expense.id;
+    const config = await loadRecurringConfig(seriesId);
+    if (!config) {
+      showToast({
+        type: 'error',
+        message: 'Erro',
+        description: 'Configuração de recorrência não encontrada',
+      });
+      return;
+    }
+
+    toggleRecurring({
+      recurringExpenseId: config.id,
+      currentStatus: config.status,
+    }, {
+      onSuccess: () => {
+        fetchExpenses();
+        setRecurringConfigs(prev => ({
+          ...prev,
+          [seriesId]: null, // Limpar cache para recarregar
+        }));
+      },
+    });
+  };
   return <div className="space-y-6">
       {/* 💳 KPI Cards Premium - DESIGN SYSTEM */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -321,6 +423,16 @@ const DespesasAccrualTabRefactored = ({
                 <option value="paid">✅ Pagas</option>
                 <option value="pending">⏳ Pendentes</option>
                 <option value="overdue">⚠️ Atrasadas</option>
+              </select>
+
+              {/* Filtro de Recorrência */}
+              <select value={filters.recurring} onChange={e => setFilters(prev => ({
+              ...prev,
+              recurring: e.target.value
+            }))} className="px-4 py-3 card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-xl text-sm font-semibold text-theme-primary focus:ring-2 focus:ring-blue-500 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer">
+                <option value="all">🔄 Todas</option>
+                <option value="recurring">🔁 Recorrentes</option>
+                <option value="non-recurring">📝 Não Recorrentes</option>
               </select>
 
               {/* Data Início */}
@@ -482,11 +594,24 @@ const DespesasAccrualTabRefactored = ({
                         <div className="p-2 bg-gradient-to-br from-red-100 to-pink-100 dark:from-red-900/30 dark:to-pink-900/30 rounded-lg">
                           <CreditCard className="w-4 h-4 text-red-600 dark:text-red-400" />
                         </div>
-                        <div>
-                          <p className="text-sm font-semibold text-theme-primary">
-                            {expense.description || 'Sem descrição'}
-                          </p>
-                          <p className="text-xs text-theme-secondary">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-semibold text-theme-primary">
+                              {expense.description || 'Sem descrição'}
+                            </p>
+                            {expense.is_recurring && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
+                                <Repeat className="w-3 h-3" />
+                                Recorrente
+                              </span>
+                            )}
+                            {expense.installment_number && (
+                              <span className="text-xs text-theme-secondary">
+                                Parcela {expense.installment_number}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-theme-secondary mt-1">
                             {expense.category?.name || 'Sem categoria'}
                           </p>
                         </div>
@@ -529,7 +654,35 @@ const DespesasAccrualTabRefactored = ({
                             <CheckCircle className="w-4 h-4" />
                           </button>}
 
-                        <button onClick={() => handleEdit(expense)} className="p-2 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-all duration-200" title="Editar">
+                        {/* Botões para Despesas Recorrentes */}
+                        {expense.is_recurring && (
+                          <>
+                            {/* Botão Ver Série */}
+                            <button
+                              onClick={() => toggleSeriesExpansion(expense)}
+                              className="p-2 text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg transition-all duration-200"
+                              title="Ver série de parcelas"
+                            >
+                              <Repeat className="w-4 h-4" />
+                            </button>
+
+                            {/* Botão Pausar/Retomar */}
+                            <button
+                              onClick={() => handleToggleRecurring(expense)}
+                              disabled={isTogglingRecurring}
+                              className="p-2 text-orange-600 dark:text-orange-400 hover:bg-orange-100 dark:hover:bg-orange-900/30 rounded-lg transition-all duration-200 disabled:opacity-50"
+                              title="Pausar/Retomar recorrência"
+                            >
+                              {recurringConfigs[expense.recurring_series_id || expense.id]?.status === 'pausado' ? (
+                                <Play className="w-4 h-4" />
+                              ) : (
+                                <Pause className="w-4 h-4" />
+                              )}
+                            </button>
+                          </>
+                        )}
+
+                        <button onClick={() => handleEdit(expense)} className="p-2 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 rounded-lg transition-all duration-200" title="Editar">
                           <Edit className="w-4 h-4" />
                         </button>
                         <button onClick={() => handleDelete(expense)} className="p-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-all duration-200" title="Excluir">
@@ -537,7 +690,54 @@ const DespesasAccrualTabRefactored = ({
                         </button>
                       </div>
                     </td>
-                  </tr>)}
+                  </tr>
+
+                  {/* Linha expandida mostrando série de parcelas */}
+                  {expense.is_recurring && expandingSeries.has(expense.recurring_series_id || expense.id) && seriesData[expense.recurring_series_id || expense.id] && (
+                    <tr className="bg-purple-50/50 dark:bg-purple-900/10">
+                      <td colSpan="8" className="px-6 py-4">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Repeat className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                            <h4 className="text-sm font-semibold text-theme-primary">
+                              Série de Parcelas ({seriesData[expense.recurring_series_id || expense.id]?.length || 0} parcelas)
+                            </h4>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                            {seriesData[expense.recurring_series_id || expense.id]?.map((installment) => (
+                              <div
+                                key={installment.id}
+                                className={`p-3 rounded-lg border-2 ${
+                                  installment.id === expense.id
+                                    ? 'border-purple-500 bg-purple-100 dark:bg-purple-900/30'
+                                    : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <p className="text-xs font-semibold text-theme-primary">
+                                      Parcela {installment.installment_number}
+                                    </p>
+                                    <p className="text-xs text-theme-secondary">
+                                      {formatDate(installment.expected_payment_date)}
+                                    </p>
+                                  </div>
+                                  <div className="text-right">
+                                    <p className="text-sm font-bold text-red-600 dark:text-red-400">
+                                      {formatCurrency(installment.value)}
+                                    </p>
+                                    {installment.status === 'Paid' && (
+                                      <span className="text-xs text-green-600 dark:text-green-400">✓ Paga</span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
             </tbody>
           </table>
         </div>

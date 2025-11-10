@@ -11,6 +11,12 @@
  */
 
 import type { Database } from '@/types/supabase';
+import { logger } from '@/lib/logger';
+import { calculateAverageTicket } from '@/lib/analytics/calculations';
+import { detectAndGenerateAlerts } from '@/lib/analytics/anomalies';
+import { alertsRepository } from '@/lib/repositories/alertsRepository';
+import { kpiTargetsRepository } from '@/lib/repositories/kpiTargetsRepository';
+import { aiMetricsRepository } from '@/lib/repositories/aiMetricsRepository';
 
 /**
  * Interface para dados de entrada do ETL
@@ -28,8 +34,8 @@ interface CalculatedMetrics {
   total_expenses: number;
   margin_percentage: number;
   average_ticket: number;
-  revenues_count: number;
-  expenses_count: number;
+  revenue_count: number;
+  expense_count: number;
 }
 
 /**
@@ -66,17 +72,34 @@ interface ETLResult {
  */
 export async function etlDaily(
   unitId: string,
-  runDate: Date
+  runDate: Date,
+  correlationId?: string
 ): Promise<ETLResult> {
-  try {
-    console.log(
-      `[ETL] Starting ETL for unit ${unitId} on ${runDate.toISOString()}`
-    );
+  const etlCorrelationId = correlationId || `etl-${unitId}-${Date.now()}`;
+  const startTime = Date.now();
 
+  logger.info('ETL iniciado para unidade', {
+    correlationId: etlCorrelationId,
+    unitId,
+    runDate: runDate.toISOString(),
+  });
+
+  try {
     // 1. Extract - Buscar dados do banco
-    const inputData = await extractData(unitId, runDate);
+    logger.info('Extraindo dados do banco', {
+      correlationId: etlCorrelationId,
+      unitId,
+      runDate: runDate.toISOString(),
+    });
+
+    const inputData = await extractData(unitId, runDate, etlCorrelationId);
 
     if (!inputData) {
+      logger.error('Falha ao extrair dados', {
+        correlationId: etlCorrelationId,
+        unitId,
+      });
+
       return {
         success: false,
         metricsProcessed: 0,
@@ -84,10 +107,27 @@ export async function etlDaily(
       };
     }
 
+    logger.info('Dados extraídos com sucesso', {
+      correlationId: etlCorrelationId,
+      unitId,
+      revenuesCount: inputData.revenues.length,
+      expensesCount: inputData.expenses.length,
+    });
+
     // 2. Transform - Calcular métricas
-    const metrics = await transformData(inputData, unitId, runDate);
+    logger.info('Transformando dados e calculando métricas', {
+      correlationId: etlCorrelationId,
+      unitId,
+    });
+
+    const metrics = await transformData(inputData, unitId, runDate, etlCorrelationId);
 
     if (!metrics) {
+      logger.error('Falha ao transformar dados', {
+        correlationId: etlCorrelationId,
+        unitId,
+      });
+
       return {
         success: false,
         metricsProcessed: 0,
@@ -95,10 +135,31 @@ export async function etlDaily(
       };
     }
 
+    logger.info('Métricas calculadas', {
+      correlationId: etlCorrelationId,
+      unitId,
+      metricsCount: metrics.length,
+      grossRevenue: metrics[0]?.gross_revenue,
+      totalExpenses: metrics[0]?.total_expenses,
+      marginPercentage: metrics[0]?.margin_percentage,
+    });
+
     // 3. Load - Salvar no banco
-    const loadResult = await loadMetrics(metrics, unitId, runDate);
+    logger.info('Carregando métricas no banco', {
+      correlationId: etlCorrelationId,
+      unitId,
+      metricsCount: metrics.length,
+    });
+
+    const loadResult = await loadMetrics(metrics, unitId, runDate, etlCorrelationId);
 
     if (!loadResult.success) {
+      logger.error('Falha ao carregar métricas', {
+        correlationId: etlCorrelationId,
+        unitId,
+        errors: loadResult.errors,
+      });
+
       return {
         success: false,
         metricsProcessed: 0,
@@ -106,16 +167,43 @@ export async function etlDaily(
       };
     }
 
-    console.log(
-      `[ETL] Successfully processed ${metrics.length} metrics for unit ${unitId}`
+    // 4. Detectar anomalias e gerar alertas
+    logger.info('Detectando anomalias e gerando alertas', {
+      correlationId: etlCorrelationId,
+      unitId,
+    });
+
+    await detectAnomaliesAndCreateAlerts(
+      unitId,
+      metrics[0],
+      runDate,
+      etlCorrelationId
     );
+
+    const durationMs = Date.now() - startTime;
+
+    logger.info('ETL concluído com sucesso', {
+      correlationId: etlCorrelationId,
+      unitId,
+      metricsProcessed: metrics.length,
+      durationMs,
+    });
 
     return {
       success: true,
       metricsProcessed: metrics.length,
     };
   } catch (error) {
-    console.error('[ETL] Error in etlDaily:', error);
+    const durationMs = Date.now() - startTime;
+
+    logger.error('Erro no ETL', {
+      correlationId: etlCorrelationId,
+      unitId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      durationMs,
+    });
+
     return {
       success: false,
       metricsProcessed: 0,
@@ -129,16 +217,13 @@ export async function etlDaily(
  */
 async function extractData(
   unitId: string,
-  runDate: Date
+  runDate: Date,
+  correlationId?: string
 ): Promise<ETLInputData | null> {
   try {
     // TODO: Implementar busca real via repositories
     // const revenues = await revenueRepository.findByUnitAndDate(unitId, runDate);
     // const expenses = await expenseRepository.findByUnitAndDate(unitId, runDate);
-
-    console.log(
-      `[ETL] Extracting data for unit ${unitId} on ${runDate.toISOString()}`
-    );
 
     // Mock data temporário para desenvolvimento
     return {
@@ -146,7 +231,11 @@ async function extractData(
       expenses: [],
     };
   } catch (error) {
-    console.error('[ETL] Error extracting data:', error);
+    logger.error('Erro ao extrair dados', {
+      correlationId,
+      unitId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
     return null;
   }
 }
@@ -157,13 +246,10 @@ async function extractData(
 async function transformData(
   inputData: ETLInputData,
   unitId: string,
-  runDate: Date
+  runDate: Date,
+  correlationId?: string
 ): Promise<CalculatedMetrics[] | null> {
   try {
-    console.log(
-      `[ETL] Transforming ${inputData.revenues.length} revenues and ${inputData.expenses.length} expenses`
-    );
-
     // TODO: Implementar transformação com Danfo.js
     // import * as dfd from 'danfojs-node';
     // const df = new dfd.DataFrame(inputData.revenues);
@@ -187,14 +273,18 @@ async function transformData(
         grossRevenue > 0
           ? ((grossRevenue - totalExpenses) / grossRevenue) * 100
           : 0,
-      average_ticket: revenuesCount > 0 ? grossRevenue / revenuesCount : 0,
-      revenues_count: revenuesCount,
-      expenses_count: expensesCount,
+      average_ticket: calculateAverageTicket(grossRevenue, revenuesCount),
+      revenue_count: revenuesCount,
+      expense_count: expensesCount,
     };
 
     return [metrics];
   } catch (error) {
-    console.error('[ETL] Error transforming data:', error);
+    logger.error('Erro ao transformar dados', {
+      correlationId,
+      unitId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
     return null;
   }
 }
@@ -205,11 +295,10 @@ async function transformData(
 async function loadMetrics(
   metrics: CalculatedMetrics[],
   unitId: string,
-  runDate: Date
+  runDate: Date,
+  correlationId?: string
 ): Promise<{ success: boolean; errors?: string[] }> {
   try {
-    console.log(`[ETL] Loading ${metrics.length} metrics to database`);
-
     // TODO: Implementar salvamento via aiMetricsRepository
     // await aiMetricsRepository.upsert({
     //   unit_id: unitId,
@@ -219,7 +308,13 @@ async function loadMetrics(
 
     return { success: true };
   } catch (error) {
-    console.error('[ETL] Error loading metrics:', error);
+    logger.error('Erro ao carregar métricas', {
+      correlationId,
+      unitId,
+      metricsCount: metrics.length,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+
     return {
       success: false,
       errors: [error instanceof Error ? error.message : 'Unknown error'],
@@ -247,7 +342,7 @@ function validateInputData(data: ETLInputData): boolean {
 /**
  * Detecta e remove duplicatas nos dados de entrada
  */
-function deduplicateData(data: ETLInputData): ETLInputData {
+function deduplicateData(data: ETLInputData, correlationId?: string): ETLInputData {
   const uniqueRevenues = Array.from(
     new Map(data.revenues.map(r => [r.id, r])).values()
   );
@@ -256,12 +351,127 @@ function deduplicateData(data: ETLInputData): ETLInputData {
     new Map(data.expenses.map(e => [e.id, e])).values()
   );
 
-  console.log(
-    `[ETL] Deduplicated: ${data.revenues.length - uniqueRevenues.length} revenues, ${data.expenses.length - uniqueExpenses.length} expenses`
-  );
+  const duplicatesRemoved = {
+    revenues: data.revenues.length - uniqueRevenues.length,
+    expenses: data.expenses.length - uniqueExpenses.length,
+  };
+
+  if (duplicatesRemoved.revenues > 0 || duplicatesRemoved.expenses > 0) {
+    logger.info('Duplicatas removidas', {
+      correlationId,
+      duplicatesRemoved,
+    });
+  }
 
   return {
     revenues: uniqueRevenues,
     expenses: uniqueExpenses,
   };
+}
+
+/**
+ * Detecta anomalias e cria alertas após processar métricas
+ *
+ * Esta função:
+ * 1. Busca métricas históricas dos últimos 30 dias
+ * 2. Busca target de margem (kpi_targets)
+ * 3. Detecta anomalias usando z-score, quedas de receita e margem baixa
+ * 4. Cria alertas na tabela alerts_events
+ *
+ * @param unitId - ID da unidade
+ * @param currentMetric - Métrica atual calculada
+ * @param runDate - Data de referência
+ * @param correlationId - ID de correlação para logs
+ */
+async function detectAnomaliesAndCreateAlerts(
+  unitId: string,
+  currentMetric: CalculatedMetrics,
+  runDate: Date,
+  correlationId?: string
+): Promise<void> {
+  try {
+    // Buscar métricas históricas dos últimos 30 dias
+    const thirtyDaysAgo = new Date(runDate);
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const { data: historicalMetrics, error: metricsError } =
+      await aiMetricsRepository.findByPeriod(unitId, thirtyDaysAgo, runDate);
+
+    if (metricsError || !historicalMetrics || historicalMetrics.length < 7) {
+      logger.warn('Dados históricos insuficientes para detecção de anomalias', {
+        correlationId,
+        unitId,
+        historicalCount: historicalMetrics?.length || 0,
+      });
+      return;
+    }
+
+    // Buscar target de margem
+    const { data: marginTarget } = await kpiTargetsRepository.findByKPI(
+      unitId,
+      'MARGIN'
+    );
+
+    // Preparar dados para detecção
+    const currentMetricData = {
+      gross_revenue: currentMetric.gross_revenue,
+      margin_percentage: currentMetric.margin_percentage,
+      date: runDate,
+    };
+
+    const historicalMetricsData = historicalMetrics.map(m => ({
+      gross_revenue: m.gross_revenue,
+      margin_percentage: m.margin_percentage,
+      date: m.date,
+    }));
+
+    // Detectar anomalias e gerar alertas
+    const detectedAlerts = await detectAndGenerateAlerts(
+      unitId,
+      currentMetricData,
+      historicalMetricsData,
+      marginTarget?.target_value
+    );
+
+    // Criar alertas no banco
+    for (const alert of detectedAlerts) {
+      const { error: alertError } = await alertsRepository.create({
+        unit_id: unitId,
+        alert_type: alert.alert_type,
+        severity: alert.severity,
+        message: alert.message,
+        metadata: alert.metadata,
+      });
+
+      if (alertError) {
+        logger.error('Erro ao criar alerta', {
+          correlationId,
+          unitId,
+          alertType: alert.alert_type,
+          error: alertError,
+        });
+      } else {
+        logger.info('Alerta criado com sucesso', {
+          correlationId,
+          unitId,
+          alertType: alert.alert_type,
+          severity: alert.severity,
+        });
+      }
+    }
+
+    if (detectedAlerts.length > 0) {
+      logger.info('Anomalias detectadas e alertas criados', {
+        correlationId,
+        unitId,
+        alertsCount: detectedAlerts.length,
+      });
+    }
+  } catch (error) {
+    logger.error('Erro ao detectar anomalias e criar alertas', {
+      correlationId,
+      unitId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
 }

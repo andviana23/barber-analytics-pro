@@ -27,6 +27,9 @@ import { getPaymentMethods } from '../../services/paymentMethodsService';
 import { addCalendarDaysAndAdjustToBusinessDay } from '../../utils/businessDays';
 import financeiroService from '../../services/financeiroService';
 import { useToast } from '../../context/ToastContext';
+import AttachmentUploader from '../../components/molecules/AttachmentUploader';
+import AttachmentCard from '../../components/molecules/AttachmentCard';
+import { useFileUpload } from '../../hooks/useFileUpload';
 export const EditarReceitaModal = ({
   isOpen = false,
   onClose,
@@ -55,6 +58,24 @@ export const EditarReceitaModal = ({
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+
+  // Hook para upload de arquivos
+  const {
+    uploading,
+    attachments,
+    loading: loadingAttachments,
+    uploadProgress,
+    uploadAttachment,
+    removeAttachment,
+    loadAttachments,
+  } = useFileUpload(receita?.unit_id, receita?.id, 'revenue');
+
+  // Carregar anexos quando modal abrir com receita existente
+  useEffect(() => {
+    if (isOpen && receita?.id) {
+      loadAttachments();
+    }
+  }, [isOpen, receita?.id, loadAttachments]);
 
   // Pré-preencher formulário quando receita mudar
   useEffect(() => {
@@ -394,6 +415,34 @@ export const EditarReceitaModal = ({
             </label>
             <textarea value={formData.observacoes} onChange={e => handleInputChange('observacoes', e.target.value)} placeholder="Adicione observações sobre esta receita..." rows={3} className="card-theme text-theme-primary w-full resize-none rounded-xl border-2 border-light-border px-4 py-3 font-medium transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-dark-surface" disabled={loading} />
           </div>
+
+          {/* 📎 Seção: Anexos */}
+          {receita?.id && (
+            <div>
+              <label className="text-theme-secondary mb-2 flex items-center gap-2 text-sm font-bold uppercase tracking-wider">
+                <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                Comprovantes Anexados
+              </label>
+              <AttachmentUploader
+                onUpload={uploadAttachment}
+                uploading={uploading}
+                uploadProgress={uploadProgress}
+                disabled={loading || uploading}
+                className="mb-4"
+              />
+              {attachments.length > 0 && (
+                <div className="space-y-2">
+                  {attachments.map((attachment) => (
+                    <AttachmentCard
+                      key={attachment.id}
+                      attachment={attachment}
+                      onDelete={removeAttachment}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* 🎯 Botões de Ação */}
           <div className="flex gap-3 border-t-2 border-light-border pt-4 dark:border-dark-border">

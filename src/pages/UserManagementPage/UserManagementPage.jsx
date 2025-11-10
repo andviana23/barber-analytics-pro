@@ -107,25 +107,33 @@ const UserManagementPage = () => {
     }
   };
 
-  // Função para excluir profissional
+  // Função para desativar profissional (SOFT DELETE)
   const handleDeleteProfessional = async professionalId => {
-    if (!window.confirm('Tem certeza que deseja excluir este profissional?')) {
+    if (
+      !window.confirm(
+        'Tem certeza que deseja remover este profissional? Ele será desativado do sistema.'
+      )
+    ) {
       return;
     }
     try {
       setLoading(true);
       const professional = professionals.find(p => p.id === professionalId);
+
+      // ✅ SOFT DELETE: Apenas desativa o profissional (is_active = false)
+      // O trigger fn_remove_inactive_from_turn_list remove automaticamente da lista da vez
       const { error } = await supabase
         .from('professionals')
-        .delete()
+        .update({ is_active: false })
         .eq('id', professionalId);
+
       if (error) throw error;
       auditService.logDelete('professionals', professionalId, professional);
 
       // Remover da lista local
       setProfessionals(professionals.filter(p => p.id !== professionalId));
     } catch (err) {
-      setError(err.message);
+      setError(`Erro ao remover profissional: ${err.message}`);
       auditService.logError('delete-professional', err);
     } finally {
       setLoading(false);

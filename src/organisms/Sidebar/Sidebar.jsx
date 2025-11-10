@@ -65,6 +65,13 @@ const menuGroups = [
             icon: Waves,
             path: '/demonstrativo-fluxo',
           },
+          {
+            id: 'commissions',
+            label: 'Comissões',
+            icon: DollarSign,
+            path: '/commissions',
+            roles: ['admin', 'gerente'],
+          },
         ],
       },
       {
