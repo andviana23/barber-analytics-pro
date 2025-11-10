@@ -342,6 +342,15 @@ export const exportManualCommissionsToPDF = async (commissions, filters = {}) =>
 };
 
 /**
+ * Exporta comissões para PDF (alias para exportManualCommissionsToPDF)
+ * 
+ * @deprecated Use exportManualCommissionsToPDF instead
+ * @param {Array} commissions - Array de comissões
+ * @param {Object} filters - Filtros aplicados
+ */
+export const exportCommissionsToPDF = exportManualCommissionsToPDF;
+
+/**
  * Exporta comissões agrupadas por profissional para PDF
  *
  * @param {Array} groupedData - Dados agrupados por profissional
