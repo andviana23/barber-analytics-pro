@@ -43,6 +43,7 @@ import SuppliersPage from './pages/SuppliersPage/SuppliersPage';
 import { TurnHistoryPage } from './pages/TurnHistoryPage';
 import UnitsPage from './pages/UnitsPage/UnitsPage';
 import CommissionsPage from './pages/CommissionsPage';
+import { UserProfilePage } from './pages/UserProfilePage';
 
 // Páginas do módulo de Caixa, Comandas e Serviços
 import CashRegisterPage from './pages/CashRegisterPage';
