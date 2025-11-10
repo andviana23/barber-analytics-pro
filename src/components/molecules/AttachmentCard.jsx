@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { FileText, Download, Trash2, Image as ImageIcon, Eye, X, Loader2 } from 'lucide-react';
-import { Button } from '../atoms/Button/Button';
+import {
+  FileText,
+  Download,
+  Trash2,
+  Image as ImageIcon,
+  Eye,
+  X,
+  Loader2,
+} from 'lucide-react';
+import { Button } from '../../atoms/Button/Button';
 import { getSignedUrl } from '../../services/storageService';
 
 /**
@@ -29,7 +37,9 @@ const AttachmentCard = ({ attachment, onDelete, className = '' }) => {
 
   const isImage =
     attachment.mime_type?.startsWith('image/') ||
-    ['JPG', 'JPEG', 'PNG', 'WEBP'].includes(attachment.file_type?.toUpperCase());
+    ['JPG', 'JPEG', 'PNG', 'WEBP'].includes(
+      attachment.file_type?.toUpperCase()
+    );
 
   const isPDF = attachment.file_type?.toUpperCase() === 'PDF';
 
@@ -83,7 +93,7 @@ const AttachmentCard = ({ attachment, onDelete, className = '' }) => {
   /**
    * Formata tamanho do arquivo
    */
-  const formatFileSize = (bytes) => {
+  const formatFileSize = bytes => {
     if (!bytes) return '0 B';
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -93,36 +103,37 @@ const AttachmentCard = ({ attachment, onDelete, className = '' }) => {
   return (
     <>
       <div
-        className={`card-theme rounded-lg p-4 border border-light-border dark:border-dark-border transition-all duration-200 hover:shadow-md ${className}`}
+        className={`card-theme rounded-lg border border-light-border p-4 transition-all duration-200 hover:shadow-md dark:border-dark-border ${className}`}
       >
         <div className="flex items-start gap-3">
           {/* Ícone do tipo de arquivo */}
           <div className="flex-shrink-0">
             {isImage ? (
-              <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                <ImageIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                <ImageIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
             ) : isPDF ? (
-              <div className="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                <FileText className="w-5 h-5 text-red-600 dark:text-red-400" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/30">
+                <FileText className="h-5 w-5 text-red-600 dark:text-red-400" />
               </div>
             ) : (
-              <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                <FileText className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+                <FileText className="h-5 w-5 text-gray-600 dark:text-gray-400" />
               </div>
             )}
           </div>
 
           {/* Informações do arquivo */}
-          <div className="flex-1 min-w-0">
-            <h4 className="text-sm font-medium text-light-text-primary dark:text-dark-text-primary truncate">
+          <div className="min-w-0 flex-1">
+            <h4 className="text-light-text-primary dark:text-dark-text-primary truncate text-sm font-medium">
               {attachment.original_filename || attachment.filename}
             </h4>
-            <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary mt-1">
-              {formatFileSize(attachment.file_size)} • {attachment.file_type || 'Arquivo'}
+            <p className="text-light-text-secondary dark:text-dark-text-secondary mt-1 text-xs">
+              {formatFileSize(attachment.file_size)} •{' '}
+              {attachment.file_type || 'Arquivo'}
             </p>
             {attachment.created_at && (
-              <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary mt-1">
+              <p className="text-light-text-secondary dark:text-dark-text-secondary mt-1 text-xs">
                 {new Date(attachment.created_at).toLocaleDateString('pt-BR')}
               </p>
             )}
@@ -140,9 +151,9 @@ const AttachmentCard = ({ attachment, onDelete, className = '' }) => {
                 disabled={loadingPreview}
               >
                 {loadingPreview ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <Eye className="w-4 h-4" />
+                  <Eye className="h-4 w-4" />
                 )}
               </Button>
             )}
@@ -153,17 +164,17 @@ const AttachmentCard = ({ attachment, onDelete, className = '' }) => {
               className="p-2"
               title="Download"
             >
-              <Download className="w-4 h-4" />
+              <Download className="h-4 w-4" />
             </Button>
             {onDelete && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => onDelete(attachment.id, attachment.file_path)}
-                className="p-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
+                className="p-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                 title="Remover"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="h-4 w-4" />
               </Button>
             )}
           </div>
@@ -171,9 +182,9 @@ const AttachmentCard = ({ attachment, onDelete, className = '' }) => {
 
         {/* Preview inline */}
         {showPreview && previewUrl && (
-          <div className="mt-4 border-t border-light-border dark:border-dark-border pt-4">
-            <div className="flex items-center justify-between mb-2">
-              <h5 className="text-xs font-medium text-light-text-primary dark:text-dark-text-primary">
+          <div className="mt-4 border-t border-light-border pt-4 dark:border-dark-border">
+            <div className="mb-2 flex items-center justify-between">
+              <h5 className="text-light-text-primary dark:text-dark-text-primary text-xs font-medium">
                 Preview
               </h5>
               <Button
@@ -185,20 +196,20 @@ const AttachmentCard = ({ attachment, onDelete, className = '' }) => {
                 }}
                 className="p-1"
               >
-                <X className="w-3 h-3" />
+                <X className="h-3 w-3" />
               </Button>
             </div>
-            <div className="rounded-lg overflow-hidden border border-light-border dark:border-dark-border bg-light-surface dark:bg-dark-surface">
+            <div className="overflow-hidden rounded-lg border border-light-border bg-light-surface dark:border-dark-border dark:bg-dark-surface">
               {isImage ? (
                 <img
                   src={previewUrl}
                   alt={attachment.original_filename}
-                  className="w-full h-auto max-h-64 object-contain"
+                  className="h-auto max-h-64 w-full object-contain"
                 />
               ) : isPDF ? (
                 <iframe
                   src={`${previewUrl}#toolbar=0`}
-                  className="w-full h-96 border-0"
+                  className="h-96 w-full border-0"
                   title={attachment.original_filename}
                 />
               ) : null}
@@ -226,4 +237,3 @@ AttachmentCard.propTypes = {
 };
 
 export default AttachmentCard;
-

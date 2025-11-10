@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save, Calendar, DollarSign, Users, FileText, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
-import { useToast } from '../../context/ToastContext';
-import { useCreateCommission, useUpdateCommission } from '../../hooks/useCommissions';
+import { useToast } from '../context/ToastContext';
+import { useCreateCommission, useUpdateCommission } from '../hooks/useCommissions';
 import { ProfissionaisService } from '../../services/profissionaisService';
 import orderRepository from '../../repositories/orderRepository';
 
