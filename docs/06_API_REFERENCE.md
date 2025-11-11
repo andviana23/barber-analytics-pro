@@ -1,8 +1,8 @@
 ---
 title: 'Barber Analytics Pro - API Reference'
 author: 'Andrey Viana'
-version: '1.0.0'
-last_updated: '07/11/2025'
+version: '1.1.0'
+last_updated: '08/11/2025'
 license: 'Proprietary - All Rights Reserved © 2025 Andrey Viana'
 ---
 
@@ -18,6 +18,10 @@ Referência completa das **APIs internas** do Barber Analytics Pro: Services, Re
 - [Repositories Layer](#repositories-layer)
 - [Hooks Layer](#hooks-layer)
 - [DTOs (Data Transfer Objects)](#dtos-data-transfer-objects)
+- [Next.js API Routes](#nextjs-api-routes)
+- [AI Services](#ai-services)
+- [Repositories (IA Financeira)](#repositories-ia-financeira)
+- [Hooks (IA Financeira)](#hooks-ia-financeira)
 - [Utilities](#utilities)
 
 ---
@@ -1094,14 +1098,398 @@ getMonthName(11); // "Dezembro"
 
 ---
 
+---
+
+## 🌐 Next.js API Routes
+
+### GET /api/kpis/health
+
+Endpoint para buscar KPIs de saúde financeira.
+
+**Query Parameters:**
+
+- `unitId` (obrigatório): ID da unidade
+- `startDate` (opcional): Data inicial (YYYY-MM-DD)
+- `endDate` (opcional): Data final (YYYY-MM-DD)
+- `granularity` (opcional): `daily` | `weekly` | `monthly` (padrão: `daily`)
+
+**Response:**
+
+```typescript
+{
+  success: true,
+  grossRevenue: number,
+  totalExpenses: number,
+  marginPercentage: number,
+  averageTicket: number,
+  trend: 'INCREASING' | 'DECREASING' | 'STABLE',
+  alerts: Array<{
+    type: string,
+    severity: string,
+    message: string
+  }>,
+  period: {
+    startDate: string,
+    endDate: string,
+    granularity: string
+  }
+}
+```
+
+**Autenticação:** Bearer JWT (Supabase Auth)
+
+**Cache:** TTL de 5 minutos
+
+---
+
+### GET /api/alerts/query
+
+Endpoint para buscar e filtrar alertas.
+
+**Query Parameters:**
+
+- `unitId` (obrigatório): ID da unidade
+- `status` (opcional): `OPEN` | `RESOLVED` | `IGNORED`
+- `severity` (opcional): `LOW` | `MEDIUM` | `HIGH` | `CRITICAL`
+- `startDate` (opcional): Data inicial (YYYY-MM-DD)
+- `endDate` (opcional): Data final (YYYY-MM-DD)
+- `page` (opcional): Número da página (padrão: 1)
+- `limit` (opcional): Itens por página (padrão: 20, máximo: 100)
+
+**Response:**
+
+```typescript
+{
+  success: true,
+  alerts: Array<{
+    id: string,
+    unitId: string,
+    alertType: string,
+    severity: string,
+    message: string,
+    status: string,
+    createdAt: string,
+    acknowledgedAt?: string
+  }>,
+  pagination: {
+    page: number,
+    limit: number,
+    total: number,
+    totalPages: number
+  }
+}
+```
+
+**Autenticação:** Bearer JWT (Supabase Auth)
+
+---
+
+### GET /api/reports/weekly
+
+Endpoint para gerar relatório semanal completo com análise IA.
+
+**Query Parameters:**
+
+- `unitId` (obrigatório): ID da unidade
+- `weekStartDate` (opcional): Data de início da semana (YYYY-MM-DD, padrão: início da semana atual)
+
+**Response:**
+
+```typescript
+{
+  success: true,
+  report: {
+    period: {
+      startDate: string,
+      endDate: string
+    },
+    metrics: {
+      grossRevenue: number,
+      totalExpenses: number,
+      marginPercentage: number,
+      averageTicket: number,
+      transactionsCount: number
+    },
+    analysis: {
+      summary: string,
+      insights: string[],
+      recommendations: string[]
+    }
+  }
+}
+```
+
+**Autenticação:** Bearer JWT (Supabase Auth)
+
+**Cache:** TTL de 24 horas para análise IA
+
+---
+
+### GET /api/forecasts/cashflow
+
+Endpoint para buscar previsões de fluxo de caixa.
+
+**Query Parameters:**
+
+- `unitId` (obrigatório): ID da unidade
+- `days` (opcional): Período de previsão em dias (padrão: 30)
+- `startDate` (opcional): Data inicial para histórico
+- `endDate` (opcional): Data final para histórico
+
+**Response:**
+
+```typescript
+{
+  success: true,
+  historical: Array<{
+    date: string,
+    balance: number,
+    revenue: number,
+    expense: number
+  }>,
+  forecast: Array<{
+    forecastDate: string,
+    forecastedBalance: number,
+    forecastedRevenue: number,
+    forecastedExpense: number,
+    upperBound?: number,
+    lowerBound?: number
+  }>
+}
+```
+
+**Autenticação:** Bearer JWT (Supabase Auth)
+
+---
+
+### POST /api/telegram/webhook
+
+Webhook para receber updates do Telegram Bot.
+
+**Headers:**
+
+- `x-telegram-bot-api-secret-token`: Secret token para validação
+
+**Body:**
+
+```typescript
+{
+  update_id: number,
+  message?: {
+    message_id: number,
+    from: {
+      id: number,
+      username?: string,
+      first_name: string
+    },
+    chat: {
+      id: number
+    },
+    text: string,
+    date: number
+  }
+}
+```
+
+**Response:**
+
+```typescript
+{
+  ok: true
+}
+```
+
+---
+
+### Cron Jobs
+
+#### GET /api/cron/etl-diario
+
+Executa ETL diário para processar métricas.
+
+**Headers:**
+
+- `Authorization: Bearer {CRON_SECRET}`
+
+**Schedule:** `0 3 * * *` (03:00 BRT diariamente)
+
+**Response:**
+
+```typescript
+{
+  success: true,
+  runId: string,
+  unitsProcessed: number,
+  durationMs: number
+}
+```
+
+#### GET /api/cron/relatorio-semanal
+
+Gera e envia relatório semanal via Telegram.
+
+**Headers:**
+
+- `Authorization: Bearer {CRON_SECRET}`
+
+**Schedule:** `0 6 * * 1` (Segunda-feira às 06:00 BRT)
+
+#### GET /api/cron/fechamento-mensal
+
+Calcula DRE e gera sumário executivo mensal.
+
+**Headers:**
+
+- `Authorization: Bearer {CRON_SECRET}`
+
+**Schedule:** `0 7 1 * *` (Dia 1 do mês às 07:00 BRT)
+
+#### GET /api/cron/enviar-alertas
+
+Envia alertas pendentes via Telegram.
+
+**Headers:**
+
+- `Authorization: Bearer {CRON_SECRET}`
+
+**Schedule:** `*/15 * * * *` (A cada 15 minutos)
+
+#### GET /api/cron/health-check
+
+Executa health checks do sistema.
+
+**Headers:**
+
+- `Authorization: Bearer {CRON_SECRET}`
+
+**Schedule:** `*/5 * * * *` (A cada 5 minutos)
+
+---
+
+## 🤖 AI Services
+
+### generateAnalysis
+
+Gera análise usando OpenAI com cache e anonimização.
+
+```typescript
+async function generateAnalysis(
+  unitId: string,
+  metrics: WeeklyMetrics | MonthlyMetrics,
+  promptType: 'WEEKLY' | 'ALERT' | 'WHAT_IF' | 'MONTHLY_EXECUTIVE',
+  options?: {
+    scenario?: string,
+    alertType?: AlertType,
+    alertData?: Record<string, any>
+  }
+): Promise<AnalysisResult>;
+```
+
+**Retorno:**
+
+```typescript
+{
+  content: string,
+  parsed?: any,
+  cached: boolean,
+  tokensUsed?: number,
+  cost?: number
+}
+```
+
+**Cache:** TTL de 24 horas
+
+**Anonimização:** Dados PII removidos antes de enviar à OpenAI
+
+---
+
+## 📊 Repositories (IA Financeira)
+
+### aiMetricsRepository
+
+```typescript
+class AIMetricsRepository {
+  async findByPeriod(
+    unitId: string,
+    startDate: Date,
+    endDate: Date
+  ): Promise<{ data: AIMetricsDaily[] | null; error: string | null }>;
+
+  async create(metrics: CreateAIMetricsInput): Promise<{ data: AIMetricsDaily | null; error: string | null }>;
+}
+```
+
+### alertsRepository
+
+```typescript
+class AlertsRepository {
+  async findByUnit(
+    unitId: string,
+    status?: AlertStatus,
+    limit?: number
+  ): Promise<{ data: AlertEvent[] | null; error: string | null }>;
+
+  async create(alert: CreateAlertInput): Promise<{ data: AlertEvent | null; error: string | null }>;
+
+  async updateStatus(
+    alertId: string,
+    status: AlertStatus
+  ): Promise<{ data: AlertEvent | null; error: string | null }>;
+}
+```
+
+### kpiTargetsRepository
+
+```typescript
+class KPITargetsRepository {
+  async findByUnitAndKPI(
+    unitId: string,
+    kpiName: string
+  ): Promise<{ data: KPITarget | null; error: string | null }>;
+}
+```
+
+---
+
+## 🎣 Hooks (IA Financeira)
+
+### useHealthKPIs
+
+Hook para buscar KPIs de saúde financeira.
+
+```typescript
+function useHealthKPIs(params: {
+  unitId: string,
+  startDate?: Date | string,
+  endDate?: Date | string,
+  granularity?: 'daily' | 'weekly' | 'monthly'
+}): UseQueryResult<HealthKPIsData>;
+```
+
+**Cache:** `staleTime: 5min`, `gcTime: 10min`
+
+**Exemplo:**
+
+```typescript
+const { data, isLoading, error } = useHealthKPIs({
+  unitId: 'uuid',
+  startDate: '2025-11-01',
+  endDate: '2025-11-30',
+  granularity: 'daily'
+});
+```
+
+---
+
 ## 📖 Referências
 
 1. **TanStack Query v5**. https://tanstack.com/query/latest
 2. **React Hooks**. https://react.dev/reference/react/hooks
 3. **TypeScript Handbook**. https://www.typescriptlang.org/docs/handbook/
+4. **Next.js App Router**. https://nextjs.org/docs/app
 
 ---
 
-**Última atualização:** 7 de novembro de 2025
-**Versão:** 1.0.0
+**Última atualização:** 8 de novembro de 2025
+**Versão:** 1.1.0
 **Autor:** Andrey Viana

@@ -5,7 +5,7 @@
 **Documento:** 00_OVERVIEW.md
 **Título:** Visão Geral do Sistema
 **Autor:** Andrey Viana
-**Versão:** 1.0.0
+**Versão:** 1.1.0
 **Última Atualização:** 8 de novembro de 2025
 **Licença:** Proprietary
 
@@ -56,6 +56,7 @@ Barbearias enfrentam desafios críticos:
 | 👥 **Clientes**     | CRM, histórico de atendimentos, fidelização         | Aumento de retenção em 30%         |
 | 📅 **Agendamentos** | Calendário inteligente, lembretes automáticos       | Redução de no-shows em 40%         |
 | 📈 **Relatórios**   | KPIs, dashboards interativos, análise preditiva     | Decisões baseadas em dados reais   |
+| 🤖 **IA Financeira** | Análise preditiva, alertas automáticos, insights IA | Previsões e alertas em tempo real  |
 | 🔔 **Notificações** | WhatsApp, SMS, e-mail e push notifications          | Engajamento de clientes 24/7       |
 
 ## 👥 Stakeholders
@@ -165,6 +166,17 @@ Barbearias enfrentam desafios críticos:
 - ✅ **Evolução MRR/ARR**: Receita recorrente mensal/anual
 - ✅ **Taxa de Churn**: Monitoramento de cancelamentos
 
+### Módulo de IA Financeira
+
+- ✅ **ETL Diário Automatizado**: Processamento de métricas às 03:00 BRT
+- ✅ **Detecção de Anomalias**: Z-score, quedas de receita, margem baixa
+- ✅ **Alertas Automáticos**: Notificações via Telegram em tempo real
+- ✅ **Análises com OpenAI**: Relatórios semanais e mensais com insights
+- ✅ **Previsões de Fluxo de Caixa**: Projeções 30/60/90 dias
+- ✅ **Dashboards de Saúde Financeira**: KPIs visuais e tendências
+- ✅ **Bot Telegram**: Comandos `/status`, `/semanal`, `/alertas`, `/whatif`
+- ✅ **Monitoramento de Custos**: Controle de gastos com OpenAI
+
 ## 📊 Métricas de Sucesso
 
 ### KPIs Técnicos
@@ -188,8 +200,9 @@ Barbearias enfrentam desafios críticos:
 | **Fase 1: MVP**            | Q1 2025 | ✅ Concluída    | Financeiro, Caixa, Comandas      |
 | **Fase 2: Fluxo de Caixa** | Q2 2025 | ✅ Concluída    | Demonstrativo Acumulado, Filtros |
 | **Fase 3: Agendamentos**   | Q3 2025 | 🔄 Em Progresso | Calendário, Lista da Vez         |
-| **Fase 4: CRM Avançado**   | Q4 2025 | 📋 Planejada    | Assinaturas, Fidelização         |
-| **Fase 5: BI & Analytics** | Q1 2026 | 📋 Planejada    | Análise Preditiva, AI Insights   |
+| **Fase 4: IA Financeira**  | Q4 2025 | ✅ Concluída    | Análise preditiva, alertas, bot  |
+| **Fase 5: CRM Avançado**   | Q1 2026 | 📋 Planejada    | Assinaturas, Fidelização         |
+| **Fase 6: BI & Analytics** | Q2 2026 | 📋 Planejada    | Análise avançada, ML             |
 
 ## 🔒 Segurança e Compliance
 
@@ -212,7 +225,9 @@ Barbearias enfrentam desafios críticos:
 | Serviço                   | Uso                      | Status       |
 | ------------------------- | ------------------------ | ------------ |
 | **Supabase**              | Database, Auth, Realtime | ✅ Ativo     |
-| **Vercel**                | Hosting, CI/CD           | ✅ Ativo     |
+| **Vercel**                | Hosting, CI/CD, Cron     | ✅ Ativo     |
+| **OpenAI**                | Análises e insights IA   | ✅ Ativo     |
+| **Telegram Bot API**      | Notificações e bot       | ✅ Ativo     |
 | **Asaas**                 | Gateway de pagamentos    | 🔄 Em Teste  |
 | **WhatsApp Business API** | Notificações             | 📋 Planejada |
 | **Google Calendar**       | Sincronização de agenda  | 📋 Planejada |

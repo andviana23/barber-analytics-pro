@@ -1,6 +1,6 @@
 # 📋 Funcionalidades Pendentes - Barber Analytics Pro
 
-**Data:** 7 de novembro de 2025 (Atualizado)
+**Data:** 8 de novembro de 2025 (Atualizado)
 **Baseado em:** Documentação oficial (docs/00-12)
 
 ---
@@ -69,49 +69,47 @@ As seguintes funcionalidades **NÃO** serão implementadas neste sistema, pois v
 
 ## 🟠 MÉDIA PRIORIDADE (Fase 4 - Q4 2025)
 
----
+Nenhuma funcionalidade de média prioridade no momento.
 
 ---
 
-### RF-01.04: Despesas Recorrentes
+### Módulo de Comissões (Gestão Manual) ✅
 
 **Complexidade:** Média
 **Estimativa:** 8 pontos (1.5 dias)
-
----
-
-### Módulo de Comissões (Gestão Manual)
-
-**Complexidade:** Média
-**Estimativa:** 8 pontos (1.5 dias)
+**Status:** ✅ CONCLUÍDO
 
 **Escopo Ajustado:** Gestão totalmente manual de comissões, sem cálculo automático.
 
 **Critérios de Aceitação:**
 
-- [ ] Cadastrar comissão manualmente por profissional
-- [ ] Vincular comissão a serviço/comanda (opcional)
-- [ ] Editar valor de comissão
-- [ ] Marcar comissão como paga/pendente
-- [ ] Filtrar comissões por período, profissional, status
-- [ ] **Exportar relatório de comissões para PDF**
-- [ ] Exibir totalizadores (total pago, pendente, por profissional)
+- [x] Cadastrar comissão manualmente por profissional
+- [x] Vincular comissão a serviço/comanda (opcional)
+- [x] Editar valor de comissão
+- [x] Marcar comissão como paga/pendente
+- [x] Filtrar comissões por período, profissional, status
+- [x] Exportar relatório de comissões para PDF
+- [x] Exibir totalizadores (total pago, pendente, por profissional)
 
 **Fluxo de Uso:**
+
 1. Gerente/Admin acessa página de comissões
 2. Cadastra manualmente comissão (profissional, valor, data, descrição)
 3. Marca como "Paga" quando efetuar o pagamento
 4. Exporta relatório mensal em PDF para prestação de contas
 
-**Arquivos a Criar:**
+**Arquivos Criados/Modificados:**
 
-- `src/services/commissionService.js`
-- `src/repositories/commissionRepository.js`
-- `src/hooks/useCommissions.js`
-- `src/dtos/CommissionDTO.js`
-- `src/pages/CommissionsPage.jsx`
-- `src/organisms/CommissionFormModal.jsx`
-- `src/organisms/CommissionReportPDF.jsx`
+- ✅ `supabase/migrations/create_commissions_table_and_rls_policies.sql` - Tabela e políticas RLS
+- ✅ `src/services/commissionService.js` - Serviço de comissões
+- ✅ `src/repositories/commissionRepository.js` - Repositório de comissões
+- ✅ `src/hooks/useCommissions.js` - Hooks React Query para comissões
+- ✅ `src/dtos/CommissionDTO.js` - DTOs e validação com Zod
+- ✅ `src/pages/CommissionsPage.jsx` - Página principal de gestão de comissões
+- ✅ `src/organisms/CommissionFormModal.jsx` - Modal de criação/edição de comissões
+- ✅ `src/utils/exportCommissions.js` - Função de exportação PDF (adaptada)
+- ✅ `src/organisms/Sidebar/Sidebar.jsx` - Adicionado item de menu "Comissões"
+- ✅ `src/App.jsx` - Adicionada rota `/commissions`
 
 **Banco de Dados:**
 
@@ -148,6 +146,7 @@ USING (
 ```
 
 **Nota Importante:**
+
 - ❌ **NÃO haverá cálculo automático de comissões**
 - ❌ **NÃO haverá regras de comissão por serviço**
 - ✅ **Gestão 100% manual pelo gerente/admin**
@@ -155,62 +154,86 @@ USING (
 
 ---
 
-### RF-01.04: Despesas Recorrentes
+### RF-01.04: Despesas Recorrentes ✅
 
 **Complexidade:** Média
 **Estimativa:** 8 pontos (1.5 dias)
+**Status:** ✅ CONCLUÍDO
 
 **Critérios de Aceitação:**
 
-- [ ] Suportar despesas recorrentes (mensal, trimestral, anual)
-- [ ] Gerar parcelas automaticamente
-- [ ] Notificar vencimentos próximos
-- [ ] Marcar parcelas como pagas
+- [x] Suportar despesas recorrentes (mensal, trimestral, anual)
+- [x] Gerar parcelas automaticamente
+- [x] Notificar vencimentos próximos
+- [x] Marcar parcelas como pagas
+- [x] Filtro "Recorrentes" na lista de despesas
+- [x] Visualizar série de parcelas vinculadas
+- [x] Pausar/retomar recorrência
 
-**Arquivos a Modificar:**
+**Arquivos Criados/Modificados:**
 
-- `src/services/expenseService.js`
-- `src/dtos/ExpenseDTO.js`
-- `supabase/functions/process-recurring-expenses/index.ts`
+- ✅ `app/api/cron/gerar-despesas-recorrentes/route.ts` - Cron job para gerar parcelas automaticamente
+- ✅ `lib/services/recurringExpenseNotifications.ts` - Serviço de notificações de vencimento
+- ✅ `app/api/cron/enviar-alertas/route.ts` - Integração de notificações de vencimento
+- ✅ `src/pages/FinanceiroAdvancedPage/DespesasAccrualTabRefactored.jsx` - UI melhorada com filtros e ações
+- ✅ `vercel.json` - Configuração do cron job diário
 
 **Banco de Dados:**
 
 ```sql
+-- Já implementado anteriormente
 ALTER TABLE expenses ADD COLUMN is_recurring BOOLEAN DEFAULT false;
-ALTER TABLE expenses ADD COLUMN recurrence_type VARCHAR(20) CHECK (recurrence_type IN ('MONTHLY', 'QUARTERLY', 'YEARLY'));
-ALTER TABLE expenses ADD COLUMN parent_expense_id UUID REFERENCES expenses(id);
+ALTER TABLE expenses ADD COLUMN recurring_series_id UUID REFERENCES expenses(id);
 ALTER TABLE expenses ADD COLUMN installment_number INTEGER;
-ALTER TABLE expenses ADD COLUMN total_installments INTEGER;
+ALTER TABLE expenses ADD COLUMN recurrence_metadata JSONB;
 ```
 
 ---
 
-### RF-01.04: Anexar Comprovantes
+### RF-01.04: Anexar Comprovantes ✅
 
 **Complexidade:** Baixa
 **Estimativa:** 5 pontos (1 dia)
+**Status:** ✅ CONCLUÍDO
 
 **Critérios de Aceitação:**
 
-- [ ] Upload de arquivos (PDF, imagem)
-- [ ] Armazenar no Supabase Storage
-- [ ] Exibir preview do comprovante
-- [ ] Download de comprovante
+- [x] Upload de arquivos (PDF, imagem)
+- [x] Armazenar no Supabase Storage
+- [x] Exibir preview do comprovante
+- [x] Download de comprovante
 
-**Arquivos a Criar:**
+**Arquivos Criados/Modificados:**
 
-- `src/services/storageService.js`
-- `src/hooks/useFileUpload.js`
+- ✅ `src/services/storageService.js` - Serviço completo de upload/download/delete
+- ✅ `src/hooks/useFileUpload.js` - Hook React Query para gerenciar uploads
+- ✅ `src/repositories/expenseAttachmentRepository.js` - Repositório de anexos de despesas
+- ✅ `src/repositories/revenueAttachmentRepository.js` - Repositório de anexos de receitas
+- ✅ `src/components/molecules/AttachmentCard.jsx` - Componente de preview e ações
+- ✅ `src/components/molecules/AttachmentUploader.jsx` - Componente de upload com drag & drop
+- ✅ `src/templates/NovaDespesaModal/index.jsx` - Integração de upload em despesas
+- ✅ `src/components/modals/ExpenseEditModal.jsx` - Integração de upload em edição de despesas
+- ✅ `src/templates/NovaReceitaAccrualModal/NovaReceitaAccrualModal.jsx` - Integração de upload em receitas
+- ✅ `src/templates/EditarReceitaModal/EditarReceitaModal.jsx` - Integração de upload em edição de receitas
+
+**Funcionalidades Implementadas:**
+
+- ✅ Upload de arquivos (PDF, JPG, PNG, WEBP) até 5MB
+- ✅ Armazenamento no Supabase Storage (bucket 'receipts')
+- ✅ Preview inline de imagens e PDFs
+- ✅ Download de comprovantes via URL assinada
+- ✅ Exclusão de anexos
+- ✅ Suporte para múltiplos anexos por transação
+- ✅ Validação de tipo e tamanho de arquivo
+- ✅ Progresso de upload visual
+- ✅ Drag & drop para facilitar upload
 
 **Supabase Storage:**
 
 ```javascript
-// Criar bucket 'receipts'
-const { data, error } = await supabase.storage.createBucket('receipts', {
-  public: false,
-  fileSizeLimit: 5242880, // 5MB
-  allowedMimeTypes: ['image/jpeg', 'image/png', 'application/pdf'],
-});
+// Bucket 'receipts' configurado
+// Path: {unit_id}/{expense_id|revenue_id}/{timestamp}-{randomId}.{extension}
+// Suporte para: image/jpeg, image/png, image/webp, application/pdf
 ```
 
 ---
@@ -241,24 +264,24 @@ const { data, error } = await supabase.storage.createBucket('receipts', {
 
 ## 📊 Resumo Executivo
 
-### Implementado: ~85% das funcionalidades (Escopo Ajustado)
+### Implementado: ~90% das funcionalidades (Escopo Ajustado)
 
-- ✅ Módulo Financeiro: **92%**
+- ✅ Módulo Financeiro: **95%**
 - ✅ Módulo de Caixa: **100%**
 - ✅ Módulo de Comandas: **100%**
 - ✅ Módulo de Clientes: **60%**
 - ✅ Módulo de Lista da Vez: **100%**
 - ✅ Infraestrutura: **90%**
 
-### Pendente: ~15% das funcionalidades
+### Pendente: ~10% das funcionalidades
 
 #### Alta Prioridade (Fase 3 - Sprint Atual)
 
-- 🔴 **Módulo de Comissões (Manual)** - 8 pontos (1.5 dias)
-- 🔴 **Despesas Recorrentes** - 8 pontos (1.5 dias)
-- 🔴 **Anexar Comprovantes** - 5 pontos (1 dia)
+- ✅ **Módulo de Comissões (Manual)** - 8 pontos (1.5 dias) - **CONCLUÍDO**
+- ✅ **Despesas Recorrentes** - 8 pontos (1.5 dias) - **CONCLUÍDO**
+- ✅ **Anexar Comprovantes** - 5 pontos (1 dia) - **CONCLUÍDO**
 
-**Estimativa Total Fase 3:** 21 pontos (~4 dias de desenvolvimento)
+**Estimativa Total Fase 3:** 21 pontos (~4 dias de desenvolvimento) - **100% CONCLUÍDO ✅**
 
 #### Média Prioridade (Fase 4 - Futuro)
 
@@ -289,26 +312,36 @@ As seguintes funcionalidades **NÃO** serão desenvolvidas neste sistema:
 
 ## 🎯 Próximos Passos Recomendados
 
-### Sprint Atual (Fase 3 - Finalização Core)
+### Sprint Atual (Fase 3 - Finalização Core) ✅
 
-**Objetivo:** Completar 100% do core do sistema
+**Objetivo:** Completar 100% do core do sistema - **CONCLUÍDO ✅**
 
-1. **Módulo de Comissões (Manual)** - 1.5 dias
-   - Cadastro manual de comissões
-   - Gestão de pagamentos
-   - Exportação de relatório PDF
+1. ✅ **Módulo de Comissões (Manual)** - 1.5 dias - **CONCLUÍDO**
+   - ✅ Cadastro manual de comissões
+   - ✅ Gestão de pagamentos
+   - ✅ Exportação de relatório PDF
+   - ✅ Filtros por período, profissional e status
+   - ✅ Totalizadores (pago, pendente, cancelado)
 
-2. **Despesas Recorrentes** - 1.5 dias
-   - Configurar despesas recorrentes
-   - Geração automática de parcelas
-   - Notificações de vencimento
+2. ✅ **Despesas Recorrentes** - 1.5 dias - **CONCLUÍDO**
+   - ✅ Configurar despesas recorrentes
+   - ✅ Geração automática de parcelas (cron job diário)
+   - ✅ Notificações de vencimento (integração Telegram)
+   - ✅ Filtro "Recorrentes" na lista
+   - ✅ Visualização de série de parcelas
+   - ✅ Pausar/retomar recorrência
 
-3. **Anexar Comprovantes** - 1 dia
-   - Upload de PDF/imagens
-   - Vincular a receitas/despesas
-   - Preview e download
+3. ✅ **Anexar Comprovantes** - 1 dia - **CONCLUÍDO**
+   - ✅ Upload de PDF/imagens (com drag & drop)
+   - ✅ Vincular a receitas/despesas
+   - ✅ Preview inline de imagens e PDFs
+   - ✅ Download de comprovantes
+   - ✅ Exclusão de anexos
+   - ✅ Suporte para múltiplos anexos por transação
 
-**Total:** 4 dias de desenvolvimento
+**Total:** 4 dias de desenvolvimento (4 dias concluídos ✅)
+
+**Status da Fase 3:** ✅ **100% CONCLUÍDA**
 
 ---
 
@@ -318,10 +351,11 @@ As seguintes funcionalidades **NÃO** serão desenvolvidas neste sistema:
 
 ---
 
-**Última atualização:** 7 de novembro de 2025
+**Última atualização:** 8 de novembro de 2025
 **Baseado em:** docs/00_OVERVIEW.md, docs/01_REQUIREMENTS.md
 
 **Notas Importantes:**
+
 - ❌ Gateway Asaas removido do escopo
 - ❌ Calendário, Fidelização, Assinaturas → Sistema externo via API
 - ✅ Comissões: Modelo manual simplificado

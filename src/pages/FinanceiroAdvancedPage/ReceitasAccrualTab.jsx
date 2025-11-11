@@ -293,17 +293,17 @@ const ReceitasAccrualTab = ({
 
       // Salvar receita no banco via service
       const result = await financeiroService.createRevenue(receita);
-      if (!result.success || result.error) {
+      if (result.error || !result.data) {
         console.error('❌ Erro ao criar receita:', result.error);
-        return;
+        throw new Error(result.error || 'Erro ao criar receita');
       }
       console.log('✅ Receita criada com sucesso:', result.data);
 
-      // Fechar modal e recarregar lista
-      setIsModalOpen(false);
-      await fetchReceitas();
+      // Retornar a receita criada para o modal poder anexar comprovantes
+      return result.data;
     } catch (error) {
       console.error('❌ Erro ao processar receita:', error);
+      throw error;
     } finally {
       setLoading(false);
     }

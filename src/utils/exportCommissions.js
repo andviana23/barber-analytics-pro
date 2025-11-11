@@ -162,7 +162,18 @@ export const exportCommissionsToCSV = async (commissions, filters = {}) => {
  * @param {Array} commissions - Array de comissões
  * @param {Object} filters - Filtros aplicados
  */
-export const exportCommissionsToPDF = async (commissions, filters = {}) => {
+/**
+ * Exporta comissões MANUAIS para PDF
+ *
+ * Utiliza jsPDF e autoTable para gerar PDF formatado.
+ *
+ * @param {Array} commissions - Array de comissões manuais
+ * @param {Object} filters - Filtros aplicados
+ */
+export const exportManualCommissionsToPDF = async (
+  commissions,
+  filters = {}
+) => {
   try {
     // Lazy load jsPDF e autoTable
     const { default: jsPDF } = await import('jspdf');
@@ -178,9 +189,14 @@ export const exportCommissionsToPDF = async (commissions, filters = {}) => {
     // Header
     doc.setFontSize(18);
     doc.setFont(undefined, 'bold');
-    doc.text('Relatório de Comissões', pageWidth / 2, yPosition, {
-      align: 'center',
-    });
+    doc.text(
+      'Relatório de Comissões (Gestão Manual)',
+      pageWidth / 2,
+      yPosition,
+      {
+        align: 'center',
+      }
+    );
 
     yPosition += 10;
     doc.setFontSize(10);
@@ -194,51 +210,49 @@ export const exportCommissionsToPDF = async (commissions, filters = {}) => {
 
     // Filtros aplicados
     yPosition += 8;
-    if (filters.startDate || filters.endDate) {
+    if (filters.start_date || filters.end_date) {
       let periodText = 'Período: ';
-      if (filters.startDate) periodText += `${formatDate(filters.startDate)}`;
-      if (filters.startDate && filters.endDate) periodText += ' a ';
-      if (filters.endDate) periodText += `${formatDate(filters.endDate)}`;
+      if (filters.start_date) periodText += `${formatDate(filters.start_date)}`;
+      if (filters.start_date && filters.end_date) periodText += ' a ';
+      if (filters.end_date) periodText += `${formatDate(filters.end_date)}`;
       doc.text(periodText, pageWidth / 2, yPosition, { align: 'center' });
       yPosition += 6;
     }
 
-    if (filters.professionalId && commissions.length > 0) {
-      doc.text(
-        `Profissional: ${commissions[0].professionalName || commissions[0].professional_name}`,
-        pageWidth / 2,
-        yPosition,
-        { align: 'center' }
-      );
+    if (filters.professional_id && commissions.length > 0) {
+      const professionalName = commissions[0].professional?.name || 'N/A';
+      doc.text(`Profissional: ${professionalName}`, pageWidth / 2, yPosition, {
+        align: 'center',
+      });
       yPosition += 6;
     }
 
     // Tabela de dados
     const tableData = commissions.map(item => [
-      formatDate(item.date),
-      item.orderNumber || item.order_id?.substring(0, 8) || '-',
-      item.professionalName || item.professional_name || '-',
-      item.clientName || item.client_name || '-',
-      item.serviceName || item.service_name || '-',
-      formatCurrency(item.unitPrice || item.unit_price || 0),
-      `${item.commissionPercentage || item.commission_percentage || 0}%`,
-      formatCurrency(item.commissionValue || item.commission_value || 0),
-      item.status === 'paid' ? 'Paga' : 'Pendente',
+      formatDate(item.reference_date),
+      item.professional?.name || 'N/A',
+      item.description || '-',
+      item.order ? `#${item.order.id.slice(0, 8)}` : '-',
+      formatCurrency(item.amount || 0),
+      item.status === 'PAID'
+        ? 'Paga'
+        : item.status === 'CANCELLED'
+          ? 'Cancelada'
+          : 'Pendente',
+      item.paid_at ? formatDate(item.paid_at) : '-',
     ]);
 
     doc.autoTable({
       startY: yPosition + 5,
       head: [
         [
-          'Data',
-          'Comanda',
+          'Data Ref.',
           'Profissional',
-          'Cliente',
-          'Serviço',
+          'Descrição',
+          'Comanda',
           'Valor',
-          '%',
-          'Comissão',
           'Status',
+          'Data Pagamento',
         ],
       ],
       body: tableData,
@@ -254,14 +268,12 @@ export const exportCommissionsToPDF = async (commissions, filters = {}) => {
       },
       columnStyles: {
         0: { cellWidth: 20 }, // Data
-        1: { cellWidth: 18 }, // Comanda
-        2: { cellWidth: 30 }, // Profissional
-        3: { cellWidth: 28 }, // Cliente
-        4: { cellWidth: 30 }, // Serviço
-        5: { cellWidth: 20, halign: 'right' }, // Valor
-        6: { cellWidth: 12, halign: 'center' }, // %
-        7: { cellWidth: 22, halign: 'right' }, // Comissão
-        8: { cellWidth: 18, halign: 'center' }, // Status
+        1: { cellWidth: 35 }, // Profissional
+        2: { cellWidth: 40 }, // Descrição
+        3: { cellWidth: 18 }, // Comanda
+        4: { cellWidth: 22, halign: 'right' }, // Valor
+        5: { cellWidth: 20, halign: 'center' }, // Status
+        6: { cellWidth: 25 }, // Data Pagamento
       },
       margin: { left: 10, right: 10 },
       didDrawPage: data => {
@@ -279,15 +291,18 @@ export const exportCommissionsToPDF = async (commissions, filters = {}) => {
     // Totais
     const totals = commissions.reduce(
       (acc, item) => {
-        acc.total += item.commissionValue || item.commission_value || 0;
-        if (item.status === 'paid') {
-          acc.paid += item.commissionValue || item.commission_value || 0;
-        } else {
-          acc.pending += item.commissionValue || item.commission_value || 0;
+        const amount = parseFloat(item.amount || 0);
+        acc.total += amount;
+        if (item.status === 'PAID') {
+          acc.paid += amount;
+        } else if (item.status === 'PENDING') {
+          acc.pending += amount;
+        } else if (item.status === 'CANCELLED') {
+          acc.cancelled += amount;
         }
         return acc;
       },
-      { total: 0, paid: 0, pending: 0 }
+      { total: 0, paid: 0, pending: 0, cancelled: 0 }
     );
 
     const finalY = doc.lastAutoTable.finalY + 10;
@@ -304,10 +319,19 @@ export const exportCommissionsToPDF = async (commissions, filters = {}) => {
     doc.setTextColor(249, 115, 22); // orange-600
     doc.text(`Pendentes: ${formatCurrency(totals.pending)}`, 14, finalY + 12);
 
+    if (totals.cancelled > 0) {
+      doc.setTextColor(239, 68, 68); // red-600
+      doc.text(
+        `Canceladas: ${formatCurrency(totals.cancelled)}`,
+        14,
+        finalY + 18
+      );
+    }
+
     doc.setTextColor(0, 0, 0); // reset
 
     // Assinatura
-    const signatureY = finalY + 30;
+    const signatureY = finalY + (totals.cancelled > 0 ? 30 : 24);
     doc.setFontSize(9);
     doc.line(14, signatureY, 80, signatureY);
     doc.text('Assinatura do Responsável', 14, signatureY + 5);
@@ -317,8 +341,8 @@ export const exportCommissionsToPDF = async (commissions, filters = {}) => {
 
     // Salvar arquivo
     const timestamp = new Date().toISOString().split('T')[0];
-    const professionalFilter = filters.professionalId ? '_profissional' : '';
-    const fileName = `comissoes${professionalFilter}_${timestamp}.pdf`;
+    const professionalFilter = filters.professional_id ? '_profissional' : '';
+    const fileName = `comissoes_manuais${professionalFilter}_${timestamp}.pdf`;
 
     doc.save(fileName);
 
@@ -328,6 +352,15 @@ export const exportCommissionsToPDF = async (commissions, filters = {}) => {
     return { success: false, error: error.message };
   }
 };
+
+/**
+ * Exporta comissões para PDF (alias para exportManualCommissionsToPDF)
+ *
+ * @deprecated Use exportManualCommissionsToPDF instead
+ * @param {Array} commissions - Array de comissões
+ * @param {Object} filters - Filtros aplicados
+ */
+export const exportCommissionsToPDF = exportManualCommissionsToPDF;
 
 /**
  * Exporta comissões agrupadas por profissional para PDF

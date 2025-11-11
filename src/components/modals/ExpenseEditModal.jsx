@@ -15,6 +15,9 @@ import {
 import { supabase } from '../../services/supabase';
 import { useToast } from '../../context/ToastContext';
 import { format } from 'date-fns';
+import AttachmentUploader from '../molecules/AttachmentUploader';
+import AttachmentCard from '../molecules/AttachmentCard';
+import { useFileUpload } from '../../hooks/useFileUpload';
 
 /**
  * 🎨 Modal de Edição/Criação de Despesa - 100% Refatorado
@@ -57,6 +60,25 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
   const [bankAccounts, setBankAccounts] = useState([]);
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
+
+  // Hook para upload de arquivos
+  const currentUnitId = expense?.unit_id || unitId;
+  const {
+    uploading,
+    attachments,
+    loading: loadingAttachments,
+    uploadProgress,
+    uploadAttachment,
+    removeAttachment,
+    loadAttachments,
+  } = useFileUpload(currentUnitId, expense?.id, 'expense');
+
+  // Carregar anexos quando modal abrir com despesa existente
+  useEffect(() => {
+    if (isOpen && expense?.id) {
+      loadAttachments();
+    }
+  }, [isOpen, expense?.id, loadAttachments]);
 
   // Detectar se categoria selecionada é "Comissão"
   const isComissaoCategory =
@@ -645,7 +667,7 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
           </div>
 
           {/* 📝 Seção: Observações */}
-          <div>
+          <div className="mb-8">
             <FormField label="Observações" icon={FileText}>
               <textarea
                 value={formData.observations}
@@ -661,6 +683,34 @@ const ExpenseEditModal = ({ expense, isOpen, onClose, onSave, unitId }) => {
               />
             </FormField>
           </div>
+
+          {/* 📎 Seção: Anexos */}
+          {expense?.id && (
+            <div className="mb-8">
+              <h3 className="text-theme-primary mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide">
+                <FileText className="h-4 w-4" />
+                Comprovantes Anexados
+              </h3>
+              <AttachmentUploader
+                onUpload={uploadAttachment}
+                uploading={uploading}
+                uploadProgress={uploadProgress}
+                disabled={loading || uploading}
+                className="mb-4"
+              />
+              {attachments.length > 0 && (
+                <div className="space-y-2">
+                  {attachments.map((attachment) => (
+                    <AttachmentCard
+                      key={attachment.id}
+                      attachment={attachment}
+                      onDelete={removeAttachment}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </form>
 
         {/* 🎯 Footer com ações */}

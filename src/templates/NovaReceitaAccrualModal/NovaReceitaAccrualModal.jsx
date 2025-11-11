@@ -35,6 +35,9 @@ import bankAccountsService from '../../services/bankAccountsService';
 import { getPaymentMethods } from '../../services/paymentMethodsService';
 import { addCalendarDaysAndAdjustToBusinessDay } from '../../utils/businessDays';
 import { supabase } from '../../services/supabase';
+import AttachmentUploader from '../../components/molecules/AttachmentUploader';
+import AttachmentCard from '../../components/molecules/AttachmentCard';
+import { useFileUpload } from '../../hooks/useFileUpload';
 const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
   // 🎨 Toast para feedback
   const { showSuccess, showError } = useToast();
@@ -63,6 +66,27 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
+
+  // Estado para receita criada (para anexos)
+  const [createdRevenueId, setCreatedRevenueId] = useState(null);
+
+  // Hook para upload de arquivos (só funciona após criar receita)
+  const {
+    uploading,
+    attachments,
+    loading: loadingAttachments,
+    uploadProgress,
+    uploadAttachment,
+    removeAttachment,
+    loadAttachments,
+  } = useFileUpload(formData.unit_id, createdRevenueId, 'revenue');
+
+  // Carregar anexos quando receita for criada
+  useEffect(() => {
+    if (createdRevenueId) {
+      loadAttachments();
+    }
+  }, [createdRevenueId, loadAttachments]);
 
   // 🔄 Carregar dados iniciais ao abrir modal
   useEffect(() => {
@@ -263,12 +287,22 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
         is_active: true,
       };
       console.log('📤 Modal: Enviando receita:', receita);
-      await onSubmit(receita);
-      showSuccess(
-        `Receita criada com sucesso! ${formData.titulo} - R$ ${valorNumerico.toFixed(2)}`
-      );
-      resetForm();
-      onClose();
+      const createdRevenue = await onSubmit(receita);
+
+      // Se a receita foi criada com sucesso e tem ID, permitir anexar comprovantes
+      if (createdRevenue?.id) {
+        setCreatedRevenueId(createdRevenue.id);
+        showSuccess(
+          `Receita criada com sucesso! ${formData.titulo} - R$ ${valorNumerico.toFixed(2)}`
+        );
+        // Modal permanece aberto para permitir anexar comprovantes
+      } else {
+        showSuccess(
+          `Receita criada com sucesso! ${formData.titulo} - R$ ${valorNumerico.toFixed(2)}`
+        );
+        resetForm();
+        onClose();
+      }
     } catch (error) {
       console.error('Erro ao salvar receita:', error);
       showError(error.message || 'Erro ao salvar receita. Tente novamente.');
@@ -292,6 +326,7 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
     });
     setErrors({});
     setSelectedPaymentMethod(null);
+    setCreatedRevenueId(null);
   };
 
   // 🎨 Renderizar categorias hierárquicas
@@ -588,6 +623,40 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
               />
             </div>
 
+            {/* 📎 Anexar Comprovantes */}
+            {createdRevenueId ? (
+              <div>
+                <label className="text-theme-secondary mb-2 flex items-center gap-2 text-sm font-semibold">
+                  <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  Anexar Comprovantes
+                </label>
+                <AttachmentUploader
+                  onUpload={uploadAttachment}
+                  uploading={uploading}
+                  uploadProgress={uploadProgress}
+                  disabled={loading || uploading}
+                  className="mb-3"
+                />
+                {attachments.length > 0 && (
+                  <div className="space-y-2 mt-3">
+                    {attachments.map((attachment) => (
+                      <AttachmentCard
+                        key={attachment.id}
+                        attachment={attachment}
+                        onDelete={removeAttachment}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="rounded-xl border-2 border-gray-200 bg-gray-50/50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
+                <p className="text-xs text-gray-600 dark:text-gray-400 text-center">
+                  Os comprovantes poderão ser anexados após criar a receita
+                </p>
+              </div>
+            )}
+
             {/* ✅ Info: Data de Recebimento Calculada */}
             {selectedPaymentMethod && formData.prev_recebimento && (
               <div className="rounded-xl border-2 border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
@@ -635,23 +704,38 @@ const NovaReceitaAccrualModal = ({ isOpen = false, onClose, onSubmit }) => {
             >
               Cancelar
             </button>
-            <button
-              type="submit"
-              disabled={loading || loadingData}
-              className="text-dark-text-primary flex items-center rounded-xl bg-gradient-success px-6 py-2.5 font-semibold shadow-lg shadow-green-500/30 transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Salvando...
-                </>
-              ) : (
-                <>
-                  <Save className="mr-2 h-4 w-4" />
-                  Salvar Receita
-                </>
-              )}
-            </button>
+            {createdRevenueId ? (
+              <button
+                type="button"
+                onClick={() => {
+                  resetForm();
+                  onClose();
+                }}
+                disabled={loading}
+                className="text-dark-text-primary flex items-center rounded-xl bg-gradient-success px-6 py-2.5 font-semibold shadow-lg shadow-green-500/30 transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <CheckCircle2 className="mr-2 h-4 w-4" />
+                Concluir
+              </button>
+            ) : (
+              <button
+                type="submit"
+                disabled={loading || loadingData}
+                className="text-dark-text-primary flex items-center rounded-xl bg-gradient-success px-6 py-2.5 font-semibold shadow-lg shadow-green-500/30 transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Criando...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Criar Receita
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </form>
       </div>

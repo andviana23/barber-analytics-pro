@@ -16,6 +16,9 @@ import {
 } from '@/hooks/useExpenses';
 import { PartySelector } from '@/atoms/PartySelector';
 import { categoryRepository } from '@/repositories/categoryRepository';
+import AttachmentUploader from '@/components/molecules/AttachmentUploader';
+import AttachmentCard from '@/components/molecules/AttachmentCard';
+import { useFileUpload } from '@/hooks/useFileUpload';
 
 /**
  * Modal de Nova Despesa
@@ -66,6 +69,27 @@ function NovaDespesaModal({
   // Validação
   const [errors, setErrors] = useState({});
   const [status] = useState('pendente');
+
+  // Estado para despesa criada (para anexos)
+  const [createdExpenseId, setCreatedExpenseId] = useState(null);
+
+  // Hook para upload de arquivos (só funciona após criar despesa)
+  const {
+    uploading,
+    attachments,
+    loading: loadingAttachments,
+    uploadProgress,
+    uploadAttachment,
+    removeAttachment,
+    loadAttachments,
+  } = useFileUpload(unitId, createdExpenseId, 'expense');
+
+  // Carregar anexos quando despesa for criada
+  useEffect(() => {
+    if (createdExpenseId) {
+      loadAttachments();
+    }
+  }, [createdExpenseId, loadAttachments]);
 
   /**
    * Carregar categorias de despesas ao abrir modal
@@ -200,9 +224,14 @@ function NovaDespesaModal({
       };
 
       createExpense(expenseData, {
-        onSuccess: () => {
-          onClose();
-          resetForm();
+        onSuccess: (data) => {
+          if (data?.id) {
+            setCreatedExpenseId(data.id);
+            // Modal permanece aberto para permitir anexar comprovantes
+          } else {
+            onClose();
+            resetForm();
+          }
         },
       });
     }
@@ -231,6 +260,7 @@ function NovaDespesaModal({
       duracao_personalizada: '',
     });
     setErrors({});
+    setCreatedExpenseId(null);
   };
 
   /**
@@ -628,21 +658,39 @@ function NovaDespesaModal({
               />
             </div>
 
-            {/* Anexar */}
+            {/* Anexar Comprovantes */}
             <div>
               <label className="text-theme-primary mb-1.5 block text-xs font-medium">
-                Anexar
+                Anexar Comprovantes
               </label>
-              <button
-                type="button"
-                disabled={isLoading}
-                className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-light-border bg-light-bg px-4 py-3 text-sm transition-colors hover:border-primary hover:bg-primary/5 dark:border-dark-border dark:bg-dark-hover"
-              >
-                <Upload className="text-theme-secondary h-4 w-4" />
-                <span className="text-theme-secondary">
-                  Clique para adicionar arquivos (em breve)
-                </span>
-              </button>
+              {createdExpenseId ? (
+                <>
+                  <AttachmentUploader
+                    onUpload={uploadAttachment}
+                    uploading={uploading}
+                    uploadProgress={uploadProgress}
+                    disabled={isLoading || uploading}
+                    className="mb-3"
+                  />
+                  {attachments.length > 0 && (
+                    <div className="space-y-2 mt-3">
+                      {attachments.map((attachment) => (
+                        <AttachmentCard
+                          key={attachment.id}
+                          attachment={attachment}
+                          onDelete={removeAttachment}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="rounded-lg border border-light-border bg-light-bg/50 p-4 dark:border-dark-border dark:bg-dark-hover/50">
+                  <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary text-center">
+                    Os comprovantes poderão ser anexados após criar a despesa
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </form>
@@ -665,15 +713,29 @@ function NovaDespesaModal({
             >
               Cancelar
             </button>
-            <button
-              type="submit"
-              onClick={handleSubmit}
-              disabled={isLoading}
-              className="flex items-center gap-2 rounded-lg bg-[#EF4444] px-6 py-2 text-sm font-semibold text-light-surface transition-colors hover:bg-[#DC2626] dark:text-dark-surface"
-            >
-              <FileText className="h-4 w-4" />
-              {isLoading ? 'Salvando...' : 'Criar Despesa'}
-            </button>
+            {createdExpenseId ? (
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  resetForm();
+                }}
+                className="flex items-center gap-2 rounded-lg bg-[#16A34A] px-6 py-2 text-sm font-semibold text-light-surface transition-colors hover:bg-[#15803D] dark:text-dark-surface"
+              >
+                <FileText className="h-4 w-4" />
+                Concluir
+              </button>
+            ) : (
+              <button
+                type="submit"
+                onClick={handleSubmit}
+                disabled={isLoading}
+                className="flex items-center gap-2 rounded-lg bg-[#EF4444] px-6 py-2 text-sm font-semibold text-light-surface transition-colors hover:bg-[#DC2626] dark:text-dark-surface"
+              >
+                <FileText className="h-4 w-4" />
+                {isLoading ? 'Salvando...' : 'Criar Despesa'}
+              </button>
+            )}
           </div>
         </div>
       </div>

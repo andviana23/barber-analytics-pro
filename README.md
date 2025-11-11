@@ -2,9 +2,10 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
-![React](https://img.shields.io/badge/React-19.2.0-61dafb.svg)
-![Vite](https://img.shields.io/badge/Vite-7.1.9-646cff.svg)
+![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)
+![Next.js](https://img.shields.io/badge/Next.js-15.0-000000.svg)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178c6.svg)
+![Vercel](https://img.shields.io/badge/Vercel-Serverless-white.svg)
 ![License](https://img.shields.io/badge/license-Private-red.svg)
 
 **Plataforma completa de gestão financeira e operacional para redes de barbearias**
@@ -17,7 +18,7 @@
 
 ## 🎯 Visão Geral
 
-O **Barber Analytics Pro** é uma aplicação web moderna construída com **React + Vite** que oferece uma solução completa de gestão para redes de barbearias. Desenvolvido seguindo os princípios de **Clean Architecture** e **Domain-Driven Design (DDD)**, o sistema integra-se nativamente com o **Supabase** para fornecer:
+O **Barber Analytics Pro** é uma aplicação web moderna construída com **Next.js 15 + TypeScript** hospedada 100% na **Vercel**. Todo o frontend, APIs serverless e cron jobs convivem no mesmo repositório, integrando-se ao **Supabase** (PostgreSQL + Auth) e à **OpenAI API** para gerar relatórios inteligentes:
 
 - 💰 **Gestão Financeira Completa**: DRE automatizado, fluxo de caixa, controle de despesas e receitas
 - 📊 **Dashboards Inteligentes**: KPIs em tempo real com visualizações interativas
@@ -28,11 +29,12 @@ O **Barber Analytics Pro** é uma aplicação web moderna construída com **Reac
 
 ### Principais Diferenciais
 
-- ⚡ **Tempo Real**: Sincronização instantânea via Supabase Realtime
+- ⚡ **Tempo Real**: Sincronização instantânea via Supabase Realtime e server components
 - 🎨 **Design System**: Interface consistente baseada em Atomic Design
 - 🔒 **Segurança**: Row-Level Security (RLS) no nível de banco de dados
 - 📱 **Responsivo**: Funciona perfeitamente em desktop, tablet e mobile
-- 🧪 **Testado**: Cobertura de testes unitários e E2E
+- 🤖 **IA Assistida**: Relatórios diários com GPT-4o via rota `/api/generate-report`
+- 🧪 **Testado**: Cobertura de testes unitários, integração (Vitest) e E2E (Playwright)
 
 ---
 
@@ -93,39 +95,36 @@ O **Barber Analytics Pro** é uma aplicação web moderna construída com **Reac
 
 ## 🛠️ Stack Tecnológica
 
-### Frontend
+### Aplicação (Next.js Monorepo)
 
-| Tecnologia      | Versão   | Uso                            |
-| --------------- | -------- | ------------------------------ |
-| React           | 19.2.0   | Framework principal            |
-| Vite            | 7.1.9    | Build tool e dev server        |
-| Tailwind CSS    | 3.4.18   | Estilização                    |
-| React Router    | 7.9.4    | Roteamento                     |
-| TanStack Query  | 5.90.3   | Gerenciamento de estado server |
-| Framer Motion   | 12.23.24 | Animações                      |
-| Recharts        | 3.3.0    | Gráficos e visualizações       |
-| React Hook Form | 7.65.0   | Formulários                    |
-| Zod             | 4.1.12   | Validação de schemas           |
+| Tecnologia      | Versão | Uso |
+| --------------- | ------ | --- |
+| Next.js         | 15.x   | Framework full-stack (RSC + `/app/api`) |
+| React           | 19.x   | UI declarativa e componentes compartilhados |
+| TypeScript      | 5.6+   | Tipagem estática e DX consistente |
+| Tailwind CSS    | 3.4+   | Estilização utilitária |
+| TanStack Query  | 5.x    | Sincronização de dados client-side |
+| Recharts        | 3.x    | Gráficos e dashboards |
+| Zod / RHF       | 4.x / 7.x | Validação + formulários |
 
-### Backend & Infraestrutura
+### Serviços & Infra
 
-| Tecnologia         | Uso                                                        |
-| ------------------ | ---------------------------------------------------------- |
-| Supabase           | Backend as a Service (PostgreSQL, Auth, Realtime, Storage) |
-| PostgreSQL         | Banco de dados relacional                                  |
-| Row-Level Security | Segurança granular de dados                                |
-| Edge Functions     | Serverless functions (Deno)                                |
-| Vercel             | Hospedagem e CI/CD                                         |
+| Tecnologia/Serviço | Uso |
+| ------------------ | --- |
+| Vercel (Serverless + Cron) | Deploy automático, previews e cron `0 8 * * *` para `/api/generate-report` |
+| Supabase (Postgres/Auth/Storage) | Persistência, RLS, Realtime e backups |
+| OpenAI (GPT‑4o/GPT‑5) | Geração de relatórios e insights via SDK oficial |
+| Telegram Bot API | Notificações operacionais (falhas de cron, alertas financeiros) |
+| Vercel Analytics/Logs | Observabilidade nativa e log drains opcionais |
 
 ### Qualidade & Testes
 
-| Tecnologia      | Versão | Uso                   |
-| --------------- | ------ | --------------------- |
-| Vitest          | 3.2.4  | Testes unitários      |
-| Testing Library | 16.3.0 | Testes de componentes |
-| Playwright      | 1.56.0 | Testes E2E            |
-| ESLint          | 9.37.0 | Linting               |
-| Prettier        | 3.6.2  | Formatação de código  |
+| Tecnologia      | Versão | Uso |
+| --------------- | ------ | --- |
+| Vitest          | 3.x    | Testes unitários/integração |
+| Testing Library | 16.x   | Testes de componentes |
+| Playwright      | 1.56+  | Testes E2E |
+| ESLint / Prettier | 9.x / 3.x | Linting e formatação |
 
 ---
 
@@ -133,9 +132,10 @@ O **Barber Analytics Pro** é uma aplicação web moderna construída com **Reac
 
 ### Pré-requisitos
 
-- Node.js >= 20.19.0
-- npm >= 10.0.0
-- Conta no Supabase
+- Node.js >= 20.0 (ou `nvm use 20`)
+- pnpm >= 9 (ou npm/yarn, se preferir)
+- Conta no Supabase + acesso à Vercel CLI
+- Chave da API OpenAI e bot do Telegram configurados
 
 ### Passo a Passo
 
@@ -149,85 +149,89 @@ cd barber-analytics-pro
 2. **Instale as dependências**
 
 ```bash
-npm install
+pnpm install
 ```
 
 3. **Configure as variáveis de ambiente**
 
 ```bash
-cp .env.example .env
+cp .env.example .env.local
+# ou sincronize da Vercel:
+vercel env pull .env.local
 ```
 
-Edite o arquivo `.env` com suas credenciais do Supabase:
+Edite `.env.local` (ou use o painel da Vercel) com:
 
 ```env
-VITE_SUPABASE_URL=https://seu-projeto.supabase.co
-VITE_SUPABASE_ANON_KEY=sua-chave-anon-aqui
+OPENAI_API_KEY=
+OPENAI_MODEL=gpt-4o-mini
+SUPABASE_URL=https://seu-projeto.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_CHAT_ID=
+INTERNAL_SECRET=
 ```
 
 4. **Inicie o servidor de desenvolvimento**
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 5. **Acesse a aplicação**
 
 ```
-http://localhost:5173
+http://localhost:3000
 ```
 
 ### Configuração do Banco de Dados
 
-Execute as migrações SQL na ordem correta:
+As migrações são versionadas via Supabase CLI:
 
 ```bash
-# Conecte-se ao seu projeto Supabase e execute os scripts em:
-supabase/migrations/
+# login/configuração inicial
+supabase login
+supabase link --project-ref your-project-ref
+
+# aplicar migrations locais
+supabase db push
 ```
 
-Para mais detalhes, consulte:
+Documentação complementar:
 
-- [05 - Infrastructure](docs/05_INFRASTRUCTURE.md) - Configuração do Supabase
-- [07 - Data Model](docs/07_DATA_MODEL.md) - Modelo de dados completo
-- [09 - Deployment Guide](docs/09_DEPLOYMENT_GUIDE.md) - Guia de deploy
+- [INFRASTRUCTURE_v3.0.md](INFRASTRUCTURE_v3.0.md) — guia completo da arquitetura 100% Vercel
+- [docs/02_ARCHITECTURE.md](docs/02_ARCHITECTURE.md) — visão de arquitetura de software
+- [docs/09_DEPLOYMENT_GUIDE.md](docs/09_DEPLOYMENT_GUIDE.md) — detalhes de deploy e CI/CD
 
 ---
 
 ## 📁 Estrutura do Projeto
 
-O projeto segue os princípios de **Clean Architecture** e **Atomic Design**:
+O repositório segue os princípios de **Clean Architecture** + **Atomic Design** sobre o `/app` do Next.js:
 
 ```
 barber-analytics-pro/
-├── src/
-│   ├── atoms/              # 🔹 Componentes básicos (Button, Input, Card)
-│   ├── molecules/          # 🔸 Componentes compostos (KPICard, FormField)
-│   ├── organisms/          # 🔶 Seções complexas (Sidebar, ConciliacaoPanel)
-│   ├── templates/          # 📄 Layouts e estruturas de página
-│   ├── pages/              # 📱 Páginas completas da aplicação
-│   │
-│   ├── hooks/              # 🪝 Custom hooks (useDRE, useListaDaVez)
-│   ├── context/            # 🌐 Context providers (Auth, Theme, Unit)
-│   ├── services/           # 💼 Lógica de negócio e orquestração
-│   ├── repositories/       # 🗄️ Camada de acesso a dados (Supabase)
-│   ├── dtos/               # 📋 Data Transfer Objects e validações
-│   ├── utils/              # 🛠️ Funções utilitárias
-│   └── types/              # 📝 Definições de tipos TypeScript
+├── app/
+│   ├── page.tsx                  # Dashboard principal
+│   ├── relatorios/page.tsx       # Histórico e alertas
+│   └── api/
+│       ├── generate-report/route.ts  # Cron diário (Vercel Cron)
+│       ├── telegram/route.ts        # Webhook de alerta
+│       └── health/route.ts          # Healthcheck
 │
-├── docs/                   # 📚 Documentação técnica completa
-│   ├── guides/             # 📖 Guias de desenvolvimento
-│   ├── ARQUITETURA.md      # Arquitetura do sistema
-│   ├── DATABASE_SCHEMA.md  # Esquema do banco de dados
-│   └── ...
-│
+├── components/                # Design System (atoms → organisms)
+├── lib/
+│   ├── supabase.ts           # Client/server helpers
+│   ├── openai.ts             # Cliente GPT-4o/GPT-5
+│   └── analytics.ts          # danfojs-node + simple-statistics
 ├── supabase/
-│   ├── migrations/         # 🗃️ Migrações SQL
-│   └── functions/          # ⚡ Edge Functions (Deno)
-│
-├── tests/                  # 🧪 Testes E2E e fixtures
-├── e2e/                    # 🎭 Testes Playwright
-└── playwright-artifacts/   # 📊 Resultados de testes E2E
+│   └── migrations/           # Migrações versionadas
+├── tests/                    # Unit/Integration (Vitest)
+├── e2e/                      # Playwright specs
+├── scripts/                  # Automação (lint, release, etc.)
+├── docs/                     # Documentação técnica
+└── vercel.json               # Headers, redirects e regiões
 ```
 
 ### Organização por Camadas
@@ -263,7 +267,7 @@ Para mais detalhes, consulte a [Documentação de Arquitetura](docs/ARQUITETURA.
 # Desenvolvimento
 pnpm dev              # Inicia servidor de desenvolvimento
 pnpm build            # Build de produção
-pnpm preview          # Preview do build
+pnpm start            # Sobe build em modo produção local
 
 # Qualidade de Código
 pnpm lint             # Executa linter
@@ -295,9 +299,9 @@ git checkout -b feature/nome-da-feature
 3. **Valide** seu código
 
 ```bash
-npm run lint
-npm run test
-npm run build
+pnpm lint
+pnpm test
+pnpm build
 ```
 
 4. **Commit** usando Conventional Commits
@@ -323,9 +327,9 @@ O projeto utiliza uma estratégia de testes em múltiplas camadas:
 ### Testes Unitários (Vitest)
 
 ```bash
-npm run test              # Watch mode
-npm run test:run          # Single run
-npm run test:coverage     # Com cobertura
+pnpm test              # Watch mode
+pnpm test:run          # Single run
+pnpm test:coverage     # Com cobertura
 ```
 
 ### Testes E2E (Playwright)
@@ -338,7 +342,7 @@ npx playwright test --debug      # Modo debug
 
 ### Estrutura de Testes
 
-- `src/__tests__/` - Testes unitários de componentes e hooks
+- `tests/unit/` - Testes unitários de componentes, hooks e libs
 - `e2e/` - Testes end-to-end com Playwright
 - `tests/` - Fixtures e utilitários de teste
 
@@ -381,8 +385,14 @@ pnpm lint
 Variáveis necessárias em produção:
 
 ```env
-VITE_SUPABASE_URL=https://seu-projeto.supabase.co
-VITE_SUPABASE_ANON_KEY=sua-chave-anon
+OPENAI_API_KEY=
+OPENAI_MODEL=gpt-4o-mini
+SUPABASE_URL=https://seu-projeto.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_CHAT_ID=
+INTERNAL_SECRET=
 ```
 
 Para guia completo, consulte [DEPLOY.md](docs/DEPLOY.md).
@@ -393,21 +403,23 @@ Para guia completo, consulte [DEPLOY.md](docs/DEPLOY.md).
 
 ### Boas Práticas Implementadas
 
-- ✅ **Row-Level Security (RLS)**: Isolamento de dados por unidade
-- ✅ **Autenticação JWT**: Via Supabase Auth
-- ✅ **Variáveis de Ambiente**: Credenciais nunca no código
-- ✅ **Validação de Dados**: Zod em todos os DTOs
-- ✅ **Audit Trail**: Logs de ações críticas
-- ✅ **HTTPS Only**: Comunicação criptografada
+- ✅ **Row-Level Security (RLS)** por tenant/unidade
+- ✅ **Autenticação Supabase Auth** com helpers Next.js
+- ✅ **Variáveis de Ambiente** isoladas por ambiente na Vercel
+- ✅ **Validação de Dados** (Zod) em DTOs e rotas `/app/api`
+- ✅ **Anonimização de PII** antes de enviar dados ao OpenAI
+- ✅ **Audit Trail** (Supabase + logs serverless)
+- ✅ **HTTPS Only** + headers seguros (CSP, HSTS, Referrer-Policy)
 
 ### Políticas de Segurança
 
-1. **Frontend**: Apenas chaves públicas (`VITE_*`)
-2. **Backend**: Secrets em Edge Functions/Environment
-3. **Database**: RLS policies em todas as tabelas
-4. **API**: Rate limiting via Supabase
+1. **Client-side**: apenas chaves públicas `NEXT_PUBLIC_*`
+2. **Serverless APIs**: secrets (`OPENAI_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `INTERNAL_SECRET`) apenas no Server Runtime
+3. **Banco**: RLS obrigatório + verificações de policies nas migrations
+4. **APIs**: Rate limiting via Supabase + proteção adicional com `INTERNAL_SECRET`
+5. **OpenAI**: payloads agregados (sem PII) e logging de `requestId`
 
-Veja mais em [05 - Infrastructure](docs/05_INFRASTRUCTURE.md) e [09 - Deployment Guide](docs/09_DEPLOYMENT_GUIDE.md).
+Veja mais em [INFRASTRUCTURE_v3.0.md](INFRASTRUCTURE_v3.0.md) e [09 - Deployment Guide](docs/09_DEPLOYMENT_GUIDE.md).
 
 ---
 
@@ -422,6 +434,7 @@ Acesse o **[Índice de Documentação](docs/SUMMARY.md)** para navegar por toda 
 - [00 - Overview](docs/00_OVERVIEW.md) - Visão executiva do sistema
 - [01 - Requirements](docs/01_REQUIREMENTS.md) - Requisitos funcionais e não-funcionais
 - [02 - Architecture](docs/02_ARCHITECTURE.md) - Clean Architecture + 6 diagramas UML
+- [INFRASTRUCTURE_v3.0.md](INFRASTRUCTURE_v3.0.md) - Infra 100% Vercel + OpenAI
 - [03 - Domain Model](docs/03_DOMAIN_MODEL.md) - DDD, entities, value objects
 - [05 - Infrastructure](docs/05_INFRASTRUCTURE.md) - Supabase: PostgreSQL, Auth, RLS, Realtime
 - [06 - API Reference](docs/06_API_REFERENCE.md) - Services, Repositories, Hooks, DTOs
@@ -475,13 +488,13 @@ Este projeto é proprietário e confidencial. Todos os direitos reservados © 20
 
 ---
 
-## � Autor
+## 👤 Autor
 
 **Andrey Viana**
 
 - 🏗️ **Arquitetura**: Clean Architecture + Domain-Driven Design (DDD)
 - 🎨 **Design Pattern**: Atomic Design
-- 🛠️ **Stack**: React 19 + Vite + Supabase + TailwindCSS
+- 🛠️ **Stack**: Next.js 15 + Supabase + OpenAI + TailwindCSS
 - 📦 **Package Manager**: pnpm
 
 **Desenvolvido para**: Barbearia Grupo Mangabeiras
@@ -492,9 +505,7 @@ Este projeto é proprietário e confidencial. Todos os direitos reservados © 20
 
 - 💬 **Issues**: Use o board do GitHub para reportar bugs
 - 📧 **Email**: suporte@barberanalytics.com
-- 📚 **Documentação**: [docs/SUMMARY.md](docs/SUMMARY.md)
-- 📧 **Email**: suporte@barberanalytics.com
-- 📚 **Docs**: Consulte a [documentação completa](docs/README.md)
+- 📚 **Documentação**: [docs/SUMMARY.md](docs/SUMMARY.md) + [INFRASTRUCTURE_v3.0.md](INFRASTRUCTURE_v3.0.md)
 - ❓ **FAQ**: Veja [perguntas frequentes](docs/guides/FAQ.md)
 
 ---

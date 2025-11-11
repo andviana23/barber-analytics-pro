@@ -42,6 +42,7 @@ import RelatoriosPage from './pages/RelatoriosPage/RelatoriosPage';
 import SuppliersPage from './pages/SuppliersPage/SuppliersPage';
 import { TurnHistoryPage } from './pages/TurnHistoryPage';
 import UnitsPage from './pages/UnitsPage/UnitsPage';
+import CommissionsPage from './pages/CommissionsPage';
 import { UserProfilePage } from './pages/UserProfilePage';
 
 // Páginas do módulo de Caixa, Comandas e Serviços
@@ -156,10 +157,18 @@ function App() {
                     }
                   />
 
-                  {/* Alias /financeiro → redireciona para /financial */}
+                  {/* 💰 Página de Comissões (Gestão Manual) */}
                   <Route
-                    path="/financeiro"
-                    element={<Navigate to="/financial" replace />}
+                    path="/commissions"
+                    element={
+                      <ReceptionistRoute>
+                        <ProtectedRoute roles={['admin', 'gerente']}>
+                          <Layout activeMenuItem="financial">
+                            <CommissionsPage />
+                          </Layout>
+                        </ProtectedRoute>
+                      </ReceptionistRoute>
+                    }
                   />
 
                   <Route

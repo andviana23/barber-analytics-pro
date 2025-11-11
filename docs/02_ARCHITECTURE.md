@@ -5,8 +5,8 @@
 **Documento:** 02_ARCHITECTURE.md
 **Título:** Arquitetura do Sistema
 **Autor:** Andrey Viana
-**Versão:** 1.0.0
-**Última Atualização:** 7 de novembro de 2025
+**Versão:** 1.1.0
+**Última Atualização:** 8 de novembro de 2025
 **Licença:** Proprietary
 
 ---
@@ -499,7 +499,102 @@ cloud "Supabase Cloud" {
 @enduml
 ```
 
-## 📊 Performance & Caching
+## 🤖 Módulo de IA Financeira
+
+### Arquitetura do Módulo
+
+O módulo de IA Financeira segue a mesma estrutura Clean Architecture, com componentes específicos:
+
+**Camada de Apresentação:**
+- `/app/ia-financeira/saude/page.tsx` - Dashboard de Saúde Financeira
+- `/app/ia-financeira/fluxo/page.tsx` - Dashboard de Fluxo de Caixa
+- `/app/ia-financeira/alertas/page.tsx` - Dashboard de Alertas
+- `/components/molecules/KPICard.tsx` - Card de KPI reutilizável
+- `/components/molecules/TrendChart.tsx` - Gráfico de tendência
+- `/components/molecules/ForecastAreaChart.tsx` - Gráfico de previsão
+
+**Camada de Aplicação:**
+- `/hooks/useHealthKPIs.ts` - Hook para KPIs de saúde
+- `/lib/analytics/etl.ts` - Pipeline ETL diário
+- `/lib/analytics/anomalies.ts` - Detecção de anomalias
+- `/lib/analytics/cashflowForecast.ts` - Previsões de fluxo
+
+**Camada de Domínio:**
+- Entidades: `AIMetricsDaily`, `AlertEvent`, `KPITarget`
+- Value Objects: `Trend`, `Severity`, `AlertType`
+
+**Camada de Infraestrutura:**
+- `/lib/repositories/aiMetricsRepository.ts`
+- `/lib/repositories/alertsRepository.ts`
+- `/lib/repositories/kpiTargetsRepository.ts`
+- `/lib/ai/openai.ts` - Cliente OpenAI com circuit breaker
+- `/lib/ai/analysis.ts` - Geração de análises
+- `/lib/ai/anonymization.ts` - Anonimização de dados
+- `/lib/telegram.ts` - Envio de alertas via Telegram
+- `/lib/telegram/commands.ts` - Comandos do bot
+
+### Fluxo de Dados
+
+```plaintext
+┌─────────────────────────────────────────────────────────────┐
+│                    CRON JOBS (Vercel)                       │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
+│  │ ETL Diário   │  │ Relatório    │  │ Enviar       │     │
+│  │ (03:00)      │  │ Semanal      │  │ Alertas      │     │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘     │
+└─────────┼──────────────────┼──────────────────┼────────────┘
+          │                  │                  │
+          ▼                  ▼                  ▼
+┌─────────────────────────────────────────────────────────────┐
+│              APPLICATION LAYER (ETL & Analytics)            │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
+│  │ etlDaily()   │  │ detectAnomalies() │ generateAnalysis() │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘     │
+└─────────┼──────────────────┼──────────────────┼────────────┘
+          │                  │                  │
+          ▼                  ▼                  ▼
+┌─────────────────────────────────────────────────────────────┐
+│              INFRASTRUCTURE LAYER (Repositories)             │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
+│  │ aiMetrics    │  │ alerts       │  │ OpenAI       │     │
+│  │ Repository   │  │ Repository   │  │ Client       │     │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘     │
+└─────────┼──────────────────┼──────────────────┼────────────┘
+          │                  │                  │
+          ▼                  ▼                  ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    SUPABASE (PostgreSQL)                    │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
+│  │ ai_metrics_  │  │ alerts_events │  │ openai_cache │     │
+│  │ daily        │  │              │  │              │     │
+│  └──────────────┘  └──────────────┘  └──────────────┘     │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Padrões Específicos do Módulo
+
+**Circuit Breaker Pattern:**
+- Proteção contra falhas do OpenAI e Telegram
+- Configuração: `failureThreshold: 5`, `resetTimeout: 60000ms`
+
+**Retry com Exponential Backoff:**
+- Retry automático para chamadas externas
+- Configuração: `maxAttempts: 3`, `initialDelay: 1000ms`
+
+**Cache Strategy:**
+- Cache genérico com TTL configurável
+- Cache específico para análises IA (TTL: 24h)
+- Redução de custos OpenAI em 40-60%
+
+**Idempotência:**
+- ETL diário usa `etl_runs` para garantir idempotência
+- Evita processamento duplicado
+
+**Anonimização:**
+- Dados PII removidos antes de enviar à OpenAI
+- Função `anonymizeMetrics` implementada
+
+---
 
 ### Cache Strategy (TanStack Query)
 
@@ -526,6 +621,14 @@ CREATE INDEX idx_revenues_unit_date ON revenues(unit_id, date);
 CREATE INDEX idx_expenses_unit_date ON expenses(unit_id, date);
 CREATE INDEX idx_orders_unit_status ON orders(unit_id, status);
 CREATE INDEX idx_professionals_unit_active ON professionals(unit_id, is_active);
+
+-- Índices para módulo IA Financeira
+CREATE INDEX idx_ai_metrics_unit_date ON ai_metrics_daily(unit_id, date);
+CREATE INDEX idx_alerts_unit_status ON alerts_events(unit_id, status, created_at);
+CREATE INDEX idx_forecasts_unit_date ON forecasts_cashflow(unit_id, forecast_date);
+CREATE INDEX idx_openai_cache_key ON openai_cache(cache_key);
+CREATE INDEX idx_openai_cost_unit_date ON openai_cost_tracking(unit_id, date);
+CREATE INDEX idx_etl_runs_type_status ON etl_runs(run_type, status, created_at);
 ```
 
 ## 🔧 Padrões de Código

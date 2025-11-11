@@ -1,6 +1,4 @@
-import React, { useState, useRef, useEffect, useId } from 'react';
-import { ChevronUp, ChevronDown } from 'lucide-react';
-import { formatCurrency, parseCurrency } from '@/utils/formatters';
+import React, { useState, useEffect, useId } from 'react';
 import PropTypes from 'prop-types';
 
 /**

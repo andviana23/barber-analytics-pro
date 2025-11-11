@@ -1,8 +1,8 @@
 ---
 title: 'Barber Analytics Pro - Changelog'
 author: 'Andrey Viana'
-version: '1.0.0'
-last_updated: '07/11/2025'
+version: '1.1.0'
+last_updated: '08/11/2025'
 license: 'Proprietary - All Rights Reserved © 2025 Andrey Viana'
 ---
 
@@ -18,6 +18,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 ## 📋 Índice
 
 - [Unreleased](#unreleased)
+- [v0.4.0 - 2025-11-08](#v040---2025-11-08)
 - [v0.3.0 - 2025-11-07](#v030---2025-11-07)
 - [v0.2.0 - 2025-10-15](#v020---2025-10-15)
 - [v0.1.0 - 2025-09-01](#v010---2025-09-01)
@@ -28,22 +29,140 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ### 🚧 Em Desenvolvimento
 
-#### Fase 3 - CRM Avançado (Q1 2026)
+#### Fase 3 - Agendamentos (Q3 2025)
 
-- **Fidelização**
-  - Sistema de pontos (R$ 10 = 1 ponto)
-  - Níveis: Bronze, Prata, Ouro, Platina
-  - Recompensas automáticas
+- **Calendário Multi-profissional**
+  - Visualização por barbeiro
+  - Bloqueios e folgas
+  - Integração com Google Calendar
 
-- **Assinaturas**
-  - Planos mensais (R$ 99, R$ 189, R$ 299)
-  - Integração com Asaas
-  - Cobrança recorrente automática
+- **Lista da Vez**
+  - Sistema de fila inteligente
+  - Notificações automáticas
 
-- **Marketing**
-  - Campanhas por WhatsApp
-  - Segmentação de clientes
-  - Templates de mensagens
+---
+
+## [v0.4.0] - 2025-11-08
+
+### 🎉 Adicionado
+
+#### Módulo de IA Financeira
+
+- **ETL Diário Automatizado** ([#100](https://github.com/andviana23/barber-analytics-pro/issues/100))
+  - Processamento automático de métricas às 03:00 BRT
+  - Cálculo de KPIs diários (receita, despesas, margem, ticket médio)
+  - Idempotência e processamento em batches paralelos
+  - Logging estruturado completo
+
+- **Detecção de Anomalias** ([#105](https://github.com/andviana23/barber-analytics-pro/issues/105))
+  - Detecção via Z-score (limite: |z-score| > 2)
+  - Detecção de quedas de receita (> 10% vs média 7 dias)
+  - Detecção de margem abaixo do target
+  - Geração automática de alertas
+
+- **Sistema de Alertas** ([#110](https://github.com/andviana23/barber-analytics-pro/pull/110))
+  - Tipos: `LOW_MARGIN`, `REVENUE_DROP`, `ANOMALY`, `HIGH_EXPENSE`
+  - Severidades: `LOW`, `MEDIUM`, `HIGH`, `CRITICAL`
+  - Envio automático via Telegram
+  - Dashboard de alertas com filtros e paginação
+
+- **Análises com OpenAI** ([#115](https://github.com/andviana23/barber-analytics-pro/issues/115))
+  - Relatórios semanais com análise IA
+  - Sumário executivo mensal
+  - Simulações "what-if" via comando `/whatif`
+  - Cache de análises (TTL: 24 horas)
+  - Anonimização de dados antes de enviar à OpenAI
+
+- **Previsões de Fluxo de Caixa** ([#120](https://github.com/andviana23/barber-analytics-pro/pull/120))
+  - Projeções 30/60/90 dias
+  - Intervalo de confiança visual
+  - Gráficos combinando histórico e previsão
+
+- **Dashboards de Saúde Financeira** ([#125](https://github.com/andviana23/barber-analytics-pro/issues/125))
+  - Dashboard de Saúde Financeira (`/ia-financeira/saude`)
+  - Dashboard de Fluxo de Caixa (`/ia-financeira/fluxo`)
+  - Dashboard de Alertas (`/ia-financeira/alertas`)
+  - Componentes reutilizáveis: `KPICard`, `TrendChart`, `ForecastAreaChart`
+
+- **Bot Telegram** ([#130](https://github.com/andviana23/barber-analytics-pro/issues/130))
+  - Comando `/status` - Saúde financeira atual
+  - Comando `/semanal` - Relatório semanal completo
+  - Comando `/alertas` - Lista de alertas pendentes
+  - Comando `/whatif <cenário>` - Simulação financeira
+  - Webhook configurado e funcional
+
+- **Cron Jobs Automatizados** ([#135](https://github.com/andviana23/barber-analytics-pro/pull/135))
+  - ETL Diário (03:00 BRT)
+  - Relatório Semanal (Segunda 06:00 BRT)
+  - Fechamento Mensal (Dia 1, 07:00 BRT)
+  - Envio de Alertas (A cada 15 minutos)
+  - Health Check (A cada 5 minutos)
+  - Validação de Saldo (04:00 BRT)
+
+#### Infraestrutura
+
+- **Circuit Breaker** ([#140](https://github.com/andviana23/barber-analytics-pro/pull/140))
+  - Proteção contra falhas do OpenAI
+  - Proteção contra falhas do Telegram
+  - Configuração: `failureThreshold: 5`, `resetTimeout: 60000ms`
+
+- **Retry com Exponential Backoff** ([#145](https://github.com/andviana23/barber-analytics-pro/issues/145))
+  - Retry automático para chamadas externas
+  - Configuração: `maxAttempts: 3`, `initialDelay: 1000ms`
+
+- **Sistema de Cache** ([#150](https://github.com/andviana23/barber-analytics-pro/pull/150))
+  - Cache genérico com TTL configurável
+  - Cache específico para análises IA (TTL: 24h)
+  - Redução de custos OpenAI em 40-60%
+
+- **Monitoramento de Custos** ([#155](https://github.com/andviana23/barber-analytics-pro/issues/155))
+  - Rastreamento de custos OpenAI por unidade
+  - Alertas quando custo excede 80% do threshold
+  - Tabela `openai_cost_tracking` para histórico
+
+- **Rate Limiting** ([#160](https://github.com/andviana23/barber-analytics-pro/pull/160))
+  - Limite: 100 req/min por IP
+  - Limite: 10 req/hora por usuário no Telegram
+  - Middleware reutilizável
+
+- **Autenticação de Cron Jobs** ([#165](https://github.com/andviana23/barber-analytics-pro/issues/165))
+  - Validação de `CRON_SECRET` em todas as rotas `/api/cron/*`
+  - Middleware `cronAuthMiddleware`
+
+### 🔧 Alterado
+
+- **Design System** ([#170](https://github.com/andviana23/barber-analytics-pro/issues/170))
+  - Componentes de dashboard seguem Design System completo
+  - Classes utilitárias: `.card-theme`, `.text-theme-*`, `.btn-theme-*`
+  - Suporte completo a dark mode
+
+- **Performance** ([#175](https://github.com/andviana23/barber-analytics-pro/pull/175))
+  - Processamento paralelo em batches (batch size: 5)
+  - Cache de KPIs reduz tempo de resposta em 70%
+  - Lazy loading de dashboards
+
+### 🐛 Corrigido
+
+- **Validação de Saldo Acumulado** ([#180](https://github.com/andviana23/barber-analytics-pro/issues/180))
+  - Corrigido cálculo de saldo acumulado vs VIEW `vw_demonstrativo_fluxo`
+  - Validação diária automática
+
+### 🔒 Segurança
+
+- **Anonimização de Dados** ([#185](https://github.com/andviana23/barber-analytics-pro/pull/185))
+  - Remoção de PII antes de enviar à OpenAI
+  - Função `anonymizeMetrics` implementada
+
+- **Secrets Centralizados** ([#190](https://github.com/andviana23/barber-analytics-pro/issues/190))
+  - Todas as variáveis sensíveis no Vercel
+  - `.env.example` atualizado com todas as variáveis
+
+### 📚 Documentação
+
+- Documentação completa do módulo IA Financeira
+- Guia de uso do Bot Telegram
+- Documentação de APIs atualizada
+- Changelog atualizado
 
 ---
 

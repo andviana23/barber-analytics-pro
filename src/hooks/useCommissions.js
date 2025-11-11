@@ -1,312 +1,206 @@
-import { useState, useCallback } from 'react';
-import orderService from '../services/orderService';
-import toast from 'react-hot-toast';
-
 /**
- * 💰 useCommissions Hook
- *
- * Hook customizado para gerenciar comissões de profissionais.
- *
- * Features:
- * - Busca comissões por profissional e período
- * - Cálculo automático de totais (pagas, pendentes)
- * - Filtros avançados (status, comanda, data)
- * - Agrupamento por profissional
- * - Cache de dados
- * - Loading states
+ * @fileoverview React Hook para gerenciamento de comissões
+ * @module hooks/useCommissions
+ * @requires services/commissionService
+ * @requires @tanstack/react-query
+ * @description
+ * Custom React Hook com TanStack Query para estado e cache de comissões.
+ * Segue Clean Architecture - Hook Pattern.
+ * Gerencia loading, error, refetch e cache invalidation.
  *
  * @author Andrey Viana
- * @module hooks/useCommissions
+ * @date 08/11/2025
  */
-const useCommissions = () => {
-  const [commissions, setCommissions] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
-  /**
-   * Busca comissões com filtros
-   */
-  const fetchCommissions = useCallback(async (filters = {}) => {
-    setLoading(true);
-    setError(null);
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'react-hot-toast';
+import commissionService from '../services/commissionService';
+import { useAuth } from '../context/AuthContext';
 
-    try {
-      console.log('🔍 Buscando comissões com filtros:', filters);
+/**
+ * Hook principal: busca comissões com filtros
+ * @param {Object} filters - Filtros de busca
+ * @param {Object} options - Opções do React Query
+ * @returns {{data: Array, isLoading: boolean, error: any, refetch: Function, count: number}}
+ */
+export function useCommissions(filters = {}, options = {}) {
+  const { user } = useAuth();
+  const queryKey = ['commissions', filters, user?.id];
 
-      const { data, error: serviceError } =
-        await orderService.getCommissionReport(filters);
-
-      if (serviceError) {
-        throw new Error(serviceError);
+  return useQuery({
+    queryKey,
+    queryFn: async () => {
+      const result = await commissionService.findByFilters(filters, user);
+      if (result.error) {
+        throw new Error(result.error);
       }
+      return result.data || [];
+    },
+    enabled: !!user,
+    staleTime: 1000 * 60 * 5, // 5 minutos
+    ...options,
+  });
+}
 
-      console.log(`✅ ${data?.length || 0} comissões carregadas`);
-      setCommissions(data || []);
-
-      return { data, error: null };
-    } catch (err) {
-      const errorMsg = err.message || 'Erro ao buscar comissões';
-      console.error('❌ Erro ao buscar comissões:', err);
-      setError(errorMsg);
-      toast.error(errorMsg);
-
-      return { data: null, error: errorMsg };
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  /**
-   * Calcula totais de comissões
-   */
-  const calculateTotals = useCallback(() => {
-    return commissions.reduce(
-      (acc, item) => {
-        const value = item.commission_value || 0;
-
-        acc.totalCommissions += value;
-        acc.itemsCount++;
-
-        if (item.status === 'paid') {
-          acc.paidCommissions += value;
-          acc.paidCount++;
-        } else if (item.status === 'pending') {
-          acc.pendingCommissions += value;
-          acc.pendingCount++;
-        }
-
-        return acc;
-      },
-      {
-        totalCommissions: 0,
-        paidCommissions: 0,
-        pendingCommissions: 0,
-        itemsCount: 0,
-        paidCount: 0,
-        pendingCount: 0,
+/**
+ * Hook para buscar uma comissão por ID
+ * @param {string} commissionId - ID da comissão
+ * @returns {{data: Object, isLoading: boolean, error: any}}
+ */
+export function useCommission(commissionId) {
+  return useQuery({
+    queryKey: ['commission', commissionId],
+    queryFn: async () => {
+      const result = await commissionService.findById(commissionId);
+      if (result.error) {
+        throw new Error(result.error);
       }
-    );
-  }, [commissions]);
+      return result.data;
+    },
+    enabled: !!commissionId,
+  });
+}
 
-  /**
-   * Agrupa comissões por profissional
-   */
-  const groupByProfessional = useCallback(() => {
-    const grouped = commissions.reduce((acc, item) => {
-      const professionalId = item.professional_id;
+/**
+ * Hook para criar comissão
+ * @returns {{mutate: Function, isLoading: boolean, error: any}}
+ */
+export function useCreateCommission() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
 
-      if (!acc[professionalId]) {
-        acc[professionalId] = {
-          professionalId,
-          professionalName: item.professional_name,
-          items: [],
-          total: 0,
-          paid: 0,
-          pending: 0,
-          itemCount: 0,
-        };
+  return useMutation({
+    mutationFn: async commissionData => {
+      const result = await commissionService.create(commissionData, user);
+      if (result.error) {
+        throw new Error(result.error);
       }
+      return result.data;
+    },
+    onSuccess: () => {
+      // Invalidar cache de comissões
+      queryClient.invalidateQueries({ queryKey: ['commissions'] });
+      queryClient.invalidateQueries({ queryKey: ['commission-totals'] });
+      toast.success('Comissão criada com sucesso!');
+    },
+    onError: error => {
+      toast.error(error.message || 'Erro ao criar comissão');
+    },
+  });
+}
 
-      acc[professionalId].items.push(item);
-      acc[professionalId].total += item.commission_value || 0;
-      acc[professionalId].itemCount++;
+/**
+ * Hook para atualizar comissão
+ * @returns {{mutate: Function, isLoading: boolean, error: any}}
+ */
+export function useUpdateCommission() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
 
-      if (item.status === 'paid') {
-        acc[professionalId].paid += item.commission_value || 0;
-      } else if (item.status === 'pending') {
-        acc[professionalId].pending += item.commission_value || 0;
+  return useMutation({
+    mutationFn: async ({ id, ...commissionData }) => {
+      const result = await commissionService.update(id, commissionData, user);
+      if (result.error) {
+        throw new Error(result.error);
       }
+      return result.data;
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['commissions'] });
+      queryClient.invalidateQueries({ queryKey: ['commission', variables.id] });
+      queryClient.invalidateQueries({ queryKey: ['commission-totals'] });
+      toast.success('Comissão atualizada com sucesso!');
+    },
+    onError: error => {
+      toast.error(error.message || 'Erro ao atualizar comissão');
+    },
+  });
+}
 
-      return acc;
-    }, {});
+/**
+ * Hook para marcar comissão como paga
+ * @returns {{mutate: Function, isLoading: boolean, error: any}}
+ */
+export function useMarkCommissionPaid() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
 
-    return Object.values(grouped);
-  }, [commissions]);
-
-  /**
-   * Agrupa comissões por data
-   */
-  const groupByDate = useCallback(() => {
-    const grouped = commissions.reduce((acc, item) => {
-      const date = item.date;
-
-      if (!acc[date]) {
-        acc[date] = {
-          date,
-          items: [],
-          total: 0,
-          count: 0,
-        };
+  return useMutation({
+    mutationFn: async ({ id, notes }) => {
+      const result = await commissionService.markAsPaid(id, user, notes);
+      if (result.error) {
+        throw new Error(result.error);
       }
-
-      acc[date].items.push(item);
-      acc[date].total += item.commission_value || 0;
-      acc[date].count++;
-
-      return acc;
-    }, {});
-
-    return Object.values(grouped).sort(
-      (a, b) => new Date(b.date) - new Date(a.date)
-    );
-  }, [commissions]);
-
-  /**
-   * Filtra comissões localmente
-   */
-  const filterCommissions = useCallback(
-    filterFn => {
-      return commissions.filter(filterFn);
+      return result.data;
     },
-    [commissions]
-  );
-
-  /**
-   * Busca comissão específica por ID
-   */
-  const getCommissionById = useCallback(
-    id => {
-      return commissions.find(item => item.id === id);
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['commissions'] });
+      queryClient.invalidateQueries({ queryKey: ['commission', variables.id] });
+      queryClient.invalidateQueries({ queryKey: ['commission-totals'] });
+      toast.success('Comissão marcada como paga!');
     },
-    [commissions]
-  );
-
-  /**
-   * Busca comissões de um profissional específico
-   */
-  const getCommissionsByProfessional = useCallback(
-    professionalId => {
-      return commissions.filter(
-        item => item.professional_id === professionalId
-      );
+    onError: error => {
+      toast.error(error.message || 'Erro ao marcar comissão como paga');
     },
-    [commissions]
-  );
+  });
+}
 
-  /**
-   * Busca comissões de uma comanda específica
-   */
-  const getCommissionsByOrder = useCallback(
-    orderId => {
-      return commissions.filter(item => item.order_id === orderId);
+/**
+ * Hook para excluir comissão
+ * @returns {{mutate: Function, isLoading: boolean, error: any}}
+ */
+export function useDeleteCommission() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: async id => {
+      const result = await commissionService.delete(id, user);
+      if (result.error) {
+        throw new Error(result.error);
+      }
+      return result.data;
     },
-    [commissions]
-  );
-
-  /**
-   * Calcula média de comissão por profissional
-   */
-  const calculateAverageByProfessional = useCallback(() => {
-    const grouped = groupByProfessional();
-
-    return grouped.map(group => ({
-      professionalId: group.professionalId,
-      professionalName: group.professionalName,
-      average: group.itemCount > 0 ? group.total / group.itemCount : 0,
-      itemCount: group.itemCount,
-    }));
-  }, [groupByProfessional]);
-
-  /**
-   * Calcula comissões por período
-   */
-  const calculateByPeriod = useCallback(
-    (period = 'month') => {
-      const grouped = commissions.reduce((acc, item) => {
-        const date = new Date(item.date);
-        let key;
-
-        switch (period) {
-          case 'day':
-            key = date.toISOString().split('T')[0];
-            break;
-          case 'week':
-            const week = Math.ceil((date.getDate() - date.getDay() + 1) / 7);
-            key = `${date.getFullYear()}-W${week}`;
-            break;
-          case 'month':
-            key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-            break;
-          case 'year':
-            key = String(date.getFullYear());
-            break;
-          default:
-            key = date.toISOString().split('T')[0];
-        }
-
-        if (!acc[key]) {
-          acc[key] = {
-            period: key,
-            total: 0,
-            count: 0,
-            paid: 0,
-            pending: 0,
-          };
-        }
-
-        acc[key].total += item.commission_value || 0;
-        acc[key].count++;
-
-        if (item.status === 'paid') {
-          acc[key].paid += item.commission_value || 0;
-        } else if (item.status === 'pending') {
-          acc[key].pending += item.commission_value || 0;
-        }
-
-        return acc;
-      }, {});
-
-      return Object.values(grouped).sort((a, b) =>
-        b.period.localeCompare(a.period)
-      );
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['commissions'] });
+      queryClient.invalidateQueries({ queryKey: ['commission-totals'] });
+      toast.success('Comissão excluída com sucesso!');
     },
-    [commissions]
-  );
-
-  /**
-   * Refetch (recarrega dados)
-   */
-  const refetch = useCallback(
-    async filters => {
-      return await fetchCommissions(filters);
+    onError: error => {
+      toast.error(error.message || 'Erro ao excluir comissão');
     },
-    [fetchCommissions]
-  );
+  });
+}
 
-  /**
-   * Limpa dados
-   */
-  const clearCommissions = useCallback(() => {
-    setCommissions([]);
-    setError(null);
-  }, []);
+/**
+ * Hook para buscar totalizadores de comissões
+ * @param {Object} filters - Filtros de busca
+ * @returns {{data: Object, isLoading: boolean, error: any}}
+ */
+export function useCommissionTotals(filters = {}) {
+  const { user } = useAuth();
+  const queryKey = ['commission-totals', filters, user?.id];
 
-  return {
-    // Estado
-    commissions,
-    loading,
-    error,
+  return useQuery({
+    queryKey,
+    queryFn: async () => {
+      const result = await commissionService.getTotals(filters);
+      if (result.error) {
+        throw new Error(result.error);
+      }
+      return result.data;
+    },
+    enabled: !!user,
+    staleTime: 1000 * 60 * 5, // 5 minutos
+  });
+}
 
-    // Operações principais
-    fetchCommissions,
-    refetch,
-    clearCommissions,
-
-    // Cálculos
-    calculateTotals,
-    calculateAverageByProfessional,
-    calculateByPeriod,
-
-    // Agrupamentos
-    groupByProfessional,
-    groupByDate,
-
-    // Filtros e buscas
-    filterCommissions,
-    getCommissionById,
-    getCommissionsByProfessional,
-    getCommissionsByOrder,
-  };
+export default {
+  useCommissions,
+  useCommission,
+  useCreateCommission,
+  useUpdateCommission,
+  useMarkCommissionPaid,
+  useDeleteCommission,
+  useCommissionTotals,
 };
-
-export default useCommissions;
