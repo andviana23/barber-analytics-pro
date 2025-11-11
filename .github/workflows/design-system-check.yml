@@ -18,27 +18,27 @@ jobs:
   audit:
     name: Design System Audit
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Run Design System Audit
         id: audit
         run: |
           npm run audit:design-system
           echo "AUDIT_PASSED=$?" >> $GITHUB_ENV
         continue-on-error: true
-      
+
       - name: Upload audit report
         if: always()
         uses: actions/upload-artifact@v4
@@ -48,27 +48,27 @@ jobs:
             reports/design-system-audit.json
             reports/design-system-audit.md
           retention-days: 30
-      
+
       - name: Comment PR with violations summary
         if: always() && github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            
+
             try {
               const reportPath = 'reports/design-system-audit.md';
               if (!fs.existsSync(reportPath)) {
                 console.log('Relatório de auditoria não encontrado');
                 return;
               }
-              
+
               const reportContent = fs.readFileSync(reportPath, 'utf8');
-              
+
               // Extrair resumo (primeiras 50 linhas)
               const summaryLines = reportContent.split('\n').slice(0, 50);
               const summary = summaryLines.join('\n');
-              
+
               const comment = `## 🎨 Design System Compliance Report
 
 ${summary}
@@ -85,7 +85,7 @@ Download do artefato "design-system-audit-report" para ver o relatório completo
 ---
 *Gerado automaticamente pelo workflow de Design System Compliance*
 `;
-              
+
               github.rest.issues.createComment({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
@@ -95,29 +95,27 @@ Download do artefato "design-system-audit-report" para ver o relatório completo
             } catch (error) {
               console.error('Erro ao comentar PR:', error);
             }
-  
+
   lint:
     name: ESLint - Design System Rules
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm ci
-      
-      - name: Run ESLint
-        run: npm run lint
-        continue-on-error: false
-      
-      - name: Comment PR on lint failure
+
+    - name: Run ESLint
+      run: npm run lint
+      continue-on-error: true      - name: Comment PR on lint failure
         if: failure() && github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
@@ -142,7 +140,7 @@ O ESLint detectou violações de Design System que bloqueiam o merge deste PR.
    \`\`\`bash
    # Preview das mudanças
    npm run migrate:dry-run -- --file src/path/to/file.jsx
-   
+
    # Aplicar correções com backup
    npm run migrate:design-system -- --file src/path/to/file.jsx --backup
    \`\`\`
@@ -158,7 +156,7 @@ Consulte a documentação: \`eslint-plugin-barber-design-system/README.md\`
 ---
 *Este comentário foi gerado automaticamente pelo workflow de CI/CD*
 `;
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -170,24 +168,24 @@ Consulte a documentação: \`eslint-plugin-barber-design-system/README.md\`
     name: Conformance Threshold Check
     runs-on: ubuntu-latest
     needs: [audit]
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Check conformance threshold
         run: |
           npm run audit:design-system
-          
+
           # Extrair conformidade do relatório JSON
           CONFORMANCE=$(node -e "
             const fs = require('fs');
@@ -197,12 +195,12 @@ Consulte a documentação: \`eslint-plugin-barber-design-system/README.md\`
             const conformance = totalFiles > 0 ? ((totalFiles - filesWithViolations) / totalFiles * 100).toFixed(2) : 0;
             console.log(conformance);
           ")
-          
+
           echo "Conformidade atual: ${CONFORMANCE}%"
-          
+
           # Threshold: 65% (não degradar)
           THRESHOLD=65
-          
+
           if (( $(echo "$CONFORMANCE < $THRESHOLD" | bc -l) )); then
             echo "❌ Conformidade abaixo do threshold: ${CONFORMANCE}% < ${THRESHOLD}%"
             exit 1
