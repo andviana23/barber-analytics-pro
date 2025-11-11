@@ -7,8 +7,8 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { logger } from '@/lib/logger';
-import { sendTelegramMessage } from '@/lib/telegram';
+import { logger } from '../logger';
+import { sendTelegramMessage } from '../telegram';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -32,7 +32,8 @@ export async function getUpcomingRecurringExpenses(daysAhead = 7) {
     // Buscar despesas recorrentes pendentes com vencimento nos próximos N dias
     const { data: expenses, error } = await supabase
       .from('expenses')
-      .select(`
+      .select(
+        `
         id,
         description,
         value,
@@ -53,7 +54,8 @@ export async function getUpcomingRecurringExpenses(daysAhead = 7) {
           id,
           nome
         )
-      `)
+      `
+      )
       .eq('is_recurring', true)
       .eq('is_active', true)
       .eq('status', 'pending')
@@ -90,17 +92,20 @@ export async function sendUpcomingExpenseNotifications(
   }
 
   // Agrupar por unidade
-  const byUnit = expenses.reduce((acc, expense) => {
-    const unitId = expense.unit_id;
-    if (!acc[unitId]) {
-      acc[unitId] = {
-        unitName: expense.units?.name || 'Unidade Desconhecida',
-        expenses: [],
-      };
-    }
-    acc[unitId].expenses.push(expense);
-    return acc;
-  }, {} as Record<string, { unitName: string; expenses: any[] }>);
+  const byUnit = expenses.reduce(
+    (acc, expense) => {
+      const unitId = expense.unit_id;
+      if (!acc[unitId]) {
+        acc[unitId] = {
+          unitName: expense.units?.name || 'Unidade Desconhecida',
+          expenses: [],
+        };
+      }
+      acc[unitId].expenses.push(expense);
+      return acc;
+    },
+    {} as Record<string, { unitName: string; expenses: any[] }>
+  );
 
   let sent = 0;
   let errors = 0;
@@ -114,18 +119,24 @@ export async function sendUpcomingExpenseNotifications(
       );
 
       const expensesList = data.expenses
-        .map((exp) => {
+        .map(exp => {
           const date = new Date(exp.expected_payment_date);
           const daysUntil = Math.ceil(
             (date.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
           );
-          const daysLabel = daysUntil === 0 ? 'hoje' : daysUntil === 1 ? 'amanhã' : `em ${daysUntil} dias`;
+          const daysLabel =
+            daysUntil === 0
+              ? 'hoje'
+              : daysUntil === 1
+                ? 'amanhã'
+                : `em ${daysUntil} dias`;
 
           return `  • ${exp.description || 'Sem descrição'} - R$ ${parseFloat(exp.value || 0).toFixed(2)} (${daysLabel})`;
         })
         .join('\n');
 
-      const message = `🔔 *Despesas Recorrentes com Vencimento Próximo*\n\n` +
+      const message =
+        `🔔 *Despesas Recorrentes com Vencimento Próximo*\n\n` +
         `🏢 *${data.unitName}*\n\n` +
         `${expensesList}\n\n` +
         `💰 *Total:* R$ ${totalValue.toFixed(2)}\n` +
@@ -174,9 +185,12 @@ export async function checkAndNotifyUpcomingExpenses(
     const expenses = await getUpcomingRecurringExpenses(daysAhead);
 
     if (expenses.length === 0) {
-      logger.info('Nenhuma despesa recorrente com vencimento próximo encontrada', {
-        daysAhead,
-      });
+      logger.info(
+        'Nenhuma despesa recorrente com vencimento próximo encontrada',
+        {
+          daysAhead,
+        }
+      );
       return {
         success: true,
         expensesFound: 0,
@@ -211,4 +225,3 @@ export async function checkAndNotifyUpcomingExpenses(
     };
   }
 }
-

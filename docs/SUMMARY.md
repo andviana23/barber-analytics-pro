@@ -1,7 +1,7 @@
 # Barber Analytics Pro - Documentação Técnica
 
-**Versão:** 1.1.0
-**Última Atualização:** 8 de novembro de 2025
+**Versão:** 1.2.0
+**Última Atualização:** 11 de novembro de 2025
 **Autor:** Andrey Viana
 
 ---
@@ -240,6 +240,66 @@ Sistema de design completo com tokens, classes utilitárias e componentes.
 
 ---
 
+## 🤖 Inteligência Artificial
+
+### [AI Features](./AI_FEATURES.md) ✅
+
+Documentação completa das funcionalidades de IA integradas ao sistema.
+
+**Conteúdo**:
+
+- **ApoIA**: Assistente financeiro com OpenAI
+- **Relatórios Diários Automatizados**: Envio via Telegram às 21:00
+- **Sistema de Aprendizado**: Detecção de padrões e tendências
+- **Alertas Inteligentes**: Custos, metas, quedas acentuadas
+- **Custos e Monitoramento**: Tracking de uso da OpenAI
+- **Configuração por Unidade**: Telegram independente
+- **Troubleshooting**: Guia completo de resolução de problemas
+
+**Status**: ✅ Implementado e testado
+
+**Modelos**:
+
+- Primário: GPT-4o-mini (~$0.000074/relatório)
+- Fallback: GPT-3.5-turbo
+- Custo estimado: ~$4.44/mês para 2 unidades
+
+---
+
+### [Relatórios Diários - Guia Técnico](./guides/RELATORIO_DIARIO_AUTOMATICO.md) ✅
+
+Guia técnico detalhado do sistema de relatórios diários.
+
+**Conteúdo**:
+
+- Arquitetura do sistema
+- Fluxo de execução (6 etapas)
+- Serviços implementados (5 arquivos)
+- Estrutura do banco de dados
+- Exemplos de relatórios
+- Configuração e deployment
+- Monitoramento e logs
+
+---
+
+### [Deploy Checklist](./DEPLOY_CHECKLIST.md) ✅
+
+Checklist completo para deploy em produção.
+
+**Conteúdo**:
+
+- Status geral (IA, Telegram, BD, Config, Testes)
+- Verificação de funcionalidades
+- Configuração do Vercel
+- Processo de deploy (staging → produção)
+- Pós-deploy e monitoramento
+- Plano de contingência
+- Próximos passos imediatos
+
+**Status Atual**: ⚠️ 85% Completo - Pronto para Deploy
+
+---
+
 ## 🔧 Ferramentas e Tecnologias
 
 ### Frontend
@@ -280,14 +340,14 @@ Sistema de design completo com tokens, classes utilitárias e componentes.
 
 ## 📊 Status do Projeto
 
-| Fase                       | Status          | Entregáveis                      | Data    |
-| -------------------------- | --------------- | -------------------------------- | ------- |
-| **Fase 1: MVP**            | ✅ Concluída    | Financeiro, Caixa, Comandas      | Q1 2025 |
-| **Fase 2: Fluxo de Caixa** | ✅ Concluída    | Demonstrativo Acumulado, Filtros | Q2 2025 |
-| **Fase 3: Agendamentos**   | 🔄 Em Progresso | Calendário, Lista da Vez         | Q3 2025 |
-| **Fase 4: IA Financeira**  | ✅ Concluída    | Análise preditiva, alertas, bot | Q4 2025 |
-| **Fase 5: CRM Avançado**   | 📋 Planejada    | Assinaturas, Fidelização         | Q1 2026 |
-| **Fase 6: BI & Analytics** | 📋 Planejada    | Análise avançada, ML             | Q2 2026 |
+| Fase                       | Status          | Entregáveis                          | Data    |
+| -------------------------- | --------------- | ------------------------------------ | ------- |
+| **Fase 1: MVP**            | ✅ Concluída    | Financeiro, Caixa, Comandas          | Q1 2025 |
+| **Fase 2: Fluxo de Caixa** | ✅ Concluída    | Demonstrativo Acumulado, Filtros     | Q2 2025 |
+| **Fase 3: Agendamentos**   | 🔄 Em Progresso | Calendário, Lista da Vez             | Q3 2025 |
+| **Fase 4: IA Financeira**  | ✅ Concluída    | ApoIA, Relatórios, Alertas, Telegram | Q4 2025 |
+| **Fase 5: CRM Avançado**   | 📋 Planejada    | Assinaturas, Fidelização             | Q1 2026 |
+| **Fase 6: BI & Analytics** | 📋 Planejada    | Análise avançada, ML                 | Q2 2026 |
 
 ---
 
@@ -307,11 +367,12 @@ Sistema de design completo com tokens, classes utilitárias e componentes.
 
 ## 🔄 Histórico de Atualizações
 
-| Data       | Versão | Descrição                     |
-| ---------- | ------ | ----------------------------- |
-| 08/11/2025 | 1.1.0  | Adicionado módulo IA Financeira |
-| 07/11/2025 | 1.0.0  | Documentação inicial completa |
+| Data       | Versão | Descrição                                                        |
+| ---------- | ------ | ---------------------------------------------------------------- |
+| 11/11/2025 | 1.2.0  | Adicionado IA completa, relatórios diários, Telegram por unidade |
+| 08/11/2025 | 1.1.0  | Adicionado módulo IA Financeira                                  |
+| 07/11/2025 | 1.0.0  | Documentação inicial completa                                    |
 
 ---
 
-**Última compilação:** 8 de novembro de 2025, 22:00 BRT
+**Última compilação:** 11 de novembro de 2025, 16:55 BRT

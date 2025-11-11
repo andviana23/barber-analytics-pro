@@ -11,12 +11,11 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { logger } from '@/lib/logger';
+import { logger } from '../logger';
+import { supabaseAdmin } from '../supabaseAdmin';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Mantém compatibilidade com código legado, mas usa supabaseAdmin
+const supabase = supabaseAdmin;
 
 /**
  * Tipos de alerta suportados
@@ -266,4 +265,3 @@ export const alertsRepository = {
   findByType,
   resolve: resolveAlert,
 };
-

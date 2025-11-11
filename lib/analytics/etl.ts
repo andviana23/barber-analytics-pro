@@ -11,12 +11,13 @@
  */
 
 import type { Database } from '@/types/supabase';
-import { logger } from '@/lib/logger';
-import { calculateAverageTicket } from '@/lib/analytics/calculations';
-import { detectAndGenerateAlerts } from '@/lib/analytics/anomalies';
-import { alertsRepository } from '@/lib/repositories/alertsRepository';
-import { kpiTargetsRepository } from '@/lib/repositories/kpiTargetsRepository';
-import { aiMetricsRepository } from '@/lib/repositories/aiMetricsRepository';
+import { supabaseAdmin as supabase } from '../supabaseAdmin';
+import { logger } from '../logger';
+import { calculateAverageTicket } from './calculations';
+import { detectAndGenerateAlerts } from './anomalies';
+import { alertsRepository } from '../repositories/alertsRepository';
+import { kpiTargetsRepository } from '../repositories/kpiTargetsRepository';
+import { aiMetricsRepository } from '../repositories/aiMetricsRepository';
 
 /**
  * Interface para dados de entrada do ETL
@@ -28,14 +29,15 @@ interface ETLInputData {
 
 /**
  * Interface para métricas calculadas
+ * Alinhado com schema ai_metrics_daily (docs/07_DATA_MODEL.md:635)
  */
 interface CalculatedMetrics {
   gross_revenue: number;
   total_expenses: number;
   margin_percentage: number;
   average_ticket: number;
-  revenue_count: number;
-  expense_count: number;
+  revenues_count: number; // Alinhado com schema
+  expenses_count: number; // Alinhado com schema
 }
 
 /**
@@ -120,7 +122,12 @@ export async function etlDaily(
       unitId,
     });
 
-    const metrics = await transformData(inputData, unitId, runDate, etlCorrelationId);
+    const metrics = await transformData(
+      inputData,
+      unitId,
+      runDate,
+      etlCorrelationId
+    );
 
     if (!metrics) {
       logger.error('Falha ao transformar dados', {
@@ -151,7 +158,12 @@ export async function etlDaily(
       metricsCount: metrics.length,
     });
 
-    const loadResult = await loadMetrics(metrics, unitId, runDate, etlCorrelationId);
+    const loadResult = await loadMetrics(
+      metrics,
+      unitId,
+      runDate,
+      etlCorrelationId
+    );
 
     if (!loadResult.success) {
       logger.error('Falha ao carregar métricas', {
@@ -220,21 +232,88 @@ async function extractData(
   runDate: Date,
   correlationId?: string
 ): Promise<ETLInputData | null> {
-  try {
-    // TODO: Implementar busca real via repositories
-    // const revenues = await revenueRepository.findByUnitAndDate(unitId, runDate);
-    // const expenses = await expenseRepository.findByUnitAndDate(unitId, runDate);
+  const startTime = Date.now();
 
-    // Mock data temporário para desenvolvimento
-    return {
-      revenues: [],
-      expenses: [],
+  try {
+    // Converter runDate para formato YYYY-MM-DD (as colunas são date, não timestamp)
+    const dateStr = runDate.toISOString().split('T')[0];
+
+    logger.info('Extraindo dados do banco', {
+      correlationId,
+      unitId,
+      date: dateStr,
+    });
+
+    // Buscar receitas do dia (apenas registros ativos)
+    const { data: revenues, error: revenuesError } = await supabase
+      .from('revenues')
+      .select(
+        'id, value, date, status, unit_id, category_id, payment_method_id'
+      )
+      .eq('unit_id', unitId)
+      .eq('is_active', true)
+      .eq('date', dateStr);
+
+    if (revenuesError) {
+      logger.error('Erro ao buscar receitas', {
+        correlationId,
+        unitId,
+        error: revenuesError.message,
+      });
+      return null;
+    }
+
+    // Buscar despesas do dia (apenas registros ativos)
+    const { data: expenses, error: expensesError } = await supabase
+      .from('expenses')
+      .select('id, value, date, status, unit_id, category_id')
+      .eq('unit_id', unitId)
+      .eq('is_active', true)
+      .eq('date', dateStr);
+
+    if (expensesError) {
+      logger.error('Erro ao buscar despesas', {
+        correlationId,
+        unitId,
+        error: expensesError.message,
+      });
+      return null;
+    }
+
+    const extractTime = Date.now() - startTime;
+
+    logger.info('Dados extraídos com sucesso', {
+      correlationId,
+      unitId,
+      revenuesCount: revenues?.length || 0,
+      expensesCount: expenses?.length || 0,
+      extractTimeMs: extractTime,
+    });
+
+    // Validar estrutura dos dados
+    const inputData: ETLInputData = {
+      revenues: revenues || [],
+      expenses: expenses || [],
     };
+
+    if (!validateInputData(inputData)) {
+      logger.error('Dados inválidos após extração', {
+        correlationId,
+        unitId,
+      });
+      return null;
+    }
+
+    // Remover duplicatas (por segurança)
+    const cleanData = deduplicateData(inputData, correlationId);
+
+    return cleanData;
   } catch (error) {
     logger.error('Erro ao extrair dados', {
       correlationId,
       unitId,
       error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
     });
     return null;
   }
@@ -274,8 +353,8 @@ async function transformData(
           ? ((grossRevenue - totalExpenses) / grossRevenue) * 100
           : 0,
       average_ticket: calculateAverageTicket(grossRevenue, revenuesCount),
-      revenue_count: revenuesCount,
-      expense_count: expensesCount,
+      revenues_count: revenuesCount,
+      expenses_count: expensesCount,
     };
 
     return [metrics];
@@ -298,21 +377,102 @@ async function loadMetrics(
   runDate: Date,
   correlationId?: string
 ): Promise<{ success: boolean; errors?: string[] }> {
-  try {
-    // TODO: Implementar salvamento via aiMetricsRepository
-    // await aiMetricsRepository.upsert({
-    //   unit_id: unitId,
-    //   date: runDate,
-    //   ...metrics[0]
-    // });
+  const startTime = Date.now();
+  const errors: string[] = [];
 
-    return { success: true };
+  try {
+    // Converter runDate para string ISO (YYYY-MM-DD)
+    const dateStr = runDate.toISOString().split('T')[0];
+
+    logger.info('Carregando métricas no banco', {
+      correlationId,
+      unitId,
+      date: dateStr,
+      metricsCount: metrics.length,
+    });
+
+    // Iterar pelo array de métricas e fazer upsert de cada uma
+    for (let i = 0; i < metrics.length; i++) {
+      const metric = metrics[i];
+
+      try {
+        // Preparar dados para upsert (alinhado com schema ai_metrics_daily)
+        const metricData = {
+          unit_id: unitId,
+          date: dateStr,
+          gross_revenue: metric.gross_revenue,
+          total_expenses: metric.total_expenses,
+          margin_percentage: metric.margin_percentage,
+          average_ticket: metric.average_ticket,
+          revenues_count: metric.revenues_count,
+          expenses_count: metric.expenses_count,
+        };
+
+        // Upsert via repository
+        const { data, error } = await aiMetricsRepository.upsert(metricData);
+
+        if (error) {
+          const errorMsg = `Erro ao salvar métrica ${i + 1}: ${error}`;
+          logger.error('Falha no upsert de métrica', {
+            correlationId,
+            unitId,
+            date: dateStr,
+            metricIndex: i,
+            error: error,
+          });
+          errors.push(errorMsg);
+        } else {
+          logger.info('Métrica salva com sucesso', {
+            correlationId,
+            unitId,
+            date: dateStr,
+            metricIndex: i,
+            metricId: data?.id,
+          });
+        }
+      } catch (metricError: any) {
+        const errorMsg = `Exceção ao salvar métrica ${i + 1}: ${metricError.message || metricError}`;
+        logger.error('Exceção no upsert de métrica', {
+          correlationId,
+          unitId,
+          metricIndex: i,
+          error: metricError.message || metricError,
+          stack: metricError.stack,
+        });
+        errors.push(errorMsg);
+      }
+    }
+
+    const loadTime = Date.now() - startTime;
+
+    if (errors.length === 0) {
+      logger.info('Todas as métricas carregadas com sucesso', {
+        correlationId,
+        unitId,
+        metricsCount: metrics.length,
+        loadTimeMs: loadTime,
+      });
+      return { success: true };
+    } else {
+      logger.warn('Métricas carregadas com falhas parciais', {
+        correlationId,
+        unitId,
+        metricsCount: metrics.length,
+        errorsCount: errors.length,
+        loadTimeMs: loadTime,
+      });
+      return {
+        success: false,
+        errors,
+      };
+    }
   } catch (error) {
-    logger.error('Erro ao carregar métricas', {
+    logger.error('Erro crítico ao carregar métricas', {
       correlationId,
       unitId,
       metricsCount: metrics.length,
       error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
     });
 
     return {
@@ -342,7 +502,10 @@ function validateInputData(data: ETLInputData): boolean {
 /**
  * Detecta e remove duplicatas nos dados de entrada
  */
-function deduplicateData(data: ETLInputData, correlationId?: string): ETLInputData {
+function deduplicateData(
+  data: ETLInputData,
+  correlationId?: string
+): ETLInputData {
   const uniqueRevenues = Array.from(
     new Map(data.revenues.map(r => [r.id, r])).values()
   );

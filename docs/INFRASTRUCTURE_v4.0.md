@@ -1,13 +1,13 @@
-# Barber-IA-Core / Barber Analytics Pro — Infraestrutura v4.0
+# Barber-IA-Core / Barber Analytics Pro — Infraestrutura v5.0
 
-**Versão:** 4.0
-**Atualizado em:** 8 de novembro de 2025
+**Versão:** 5.0
+**Atualizado em:** 11 de novembro de 2025
 **Autor:** Andrey Viana
-**Changelog:** Melhorias de resiliência, observabilidade e performance baseadas em análise crítica da v3.0
+**Changelog:** Atualização crítica refletindo arquitetura real (Vite+React), mapeamento completo do sistema, fluxogramas de comunicação e checklist de implementação
 
 ## 🟢 Resumo Operacional
 
-Toda a plataforma roda em um único projeto Next.js/TypeScript hospedado na Vercel: frontend, APIs serverless e cron jobs diários. Supabase continua como banco/autenticação com RLS, enquanto a camada de IA usa a API da OpenAI (GPT‑4o/GPT‑5) a partir das rotas `/app/api`. **v4.0 introduz:** idempotência garantida em cron jobs, health checks automáticos, retry com backoff exponencial, cache inteligente para OpenAI, circuit breaker para APIs externas, processamento paralelo no ETL, monitoramento proativo de custos e structured logging centralizado. Relatórios são gerados a cada manhã pelo Vercel Cron com garantias de execução, persistidos no Supabase e notificados via Telegram. Observabilidade unificada via Vercel Analytics/Logs, Supabase Logs e dashboard customizado, sem dependência de VPS ou modelos locais.
+A plataforma é um **híbrido Vite+React para frontend e Vercel Serverless Functions para backend**, não Next.js puro como documentado anteriormente. O frontend roda em **Vite 7 + React 19 + React Router DOM 7**, enquanto o backend opera como **Serverless Functions na Vercel** (`/app/api/*`). Supabase continua como banco/autenticação com RLS, e a camada de IA usa a API da OpenAI (GPT-4o-mini) com cache inteligente. **v5.0 documenta a arquitetura REAL:** separação clara entre frontend (Vite) e backend (Serverless), 516 arquivos de código, 19 páginas React, 43+ serviços, 25+ repositórios, design atômico completo, ETL com processamento paralelo, 7 cron jobs Vercel, 23+ tabelas no banco, e padrões enterprise (idempotência, circuit breaker, retry, cache, health checks). Relatórios diários gerados às 03:00 BRT, notificações via Telegram, observabilidade completa.
 
 ## 🎨 Legendas de Cor
 
@@ -15,41 +15,166 @@ Toda a plataforma roda em um único projeto Next.js/TypeScript hospedado na Verc
 - 🟢 Verde: práticas recomendadas e orientações operacionais
 - 🟠 Laranja: riscos, alertas ou pontos de atenção
 - 🆕 Novo: melhorias introduzidas na v4.0
+- ⚡ Atualizado v5.0: correções e atualizações críticas baseadas na análise real do sistema
 
 ## 📚 Índice
 
 1. Resumo Operacional
-2. Visão Geral da Infraestrutura
-3. Diagrama Geral de Arquitetura
-4. Componentes Principais
-5. Fluxo de Dados
-6. Camadas de Infraestrutura
-7. Automação & CI/CD
-8. Segurança e Privacidade
-9. Escalabilidade e Manutenção
-10. Configurações Críticas (.env)
-11. 🆕 Melhorias v4.0 (Idempotência, Health Checks, Retry, Cache, Circuit Breaker)
-12. 🆕 Observabilidade Avançada
-13. 🆕 Processamento Paralelo e Incremental
-14. 🆕 Monitoramento de Custos
+2. ⚡ Visão Geral da Infraestrutura Real (v5.0)
+3. ⚡ Stack Tecnológica Completa (v5.0)
+4. ⚡ Diagrama Geral de Arquitetura (v5.0)
+5. ⚡ Estrutura do Projeto (516 arquivos mapeados)
+6. ⚡ Componentes Principais
+7. ⚡ Fluxo de Dados e Comunicação
+8. ⚡ Banco de Dados (23+ tabelas mapeadas)
+9. ⚡ Integrações Externas
+10. Camadas de Infraestrutura
+11. Automação & CI/CD (7 cron jobs)
+12. Segurança e Privacidade
+13. Escalabilidade e Manutenção
+14. Configurações Críticas (.env)
+15. 🆕 Melhorias v4.0 (Idempotência, Health Checks, Retry, Cache, Circuit Breaker)
+16. 🆕 Observabilidade Avançada
+17. 🆕 Processamento Paralelo e Incremental
+18. 🆕 Monitoramento de Custos
+19. ⚡ Checklist de Implementação v5.0
+20. ⚡ Fluxogramas de Comunicação
+21. ⚡ Guia de Migração v4.0 → v5.0
 
-## 🔵 Visão Geral da Infraestrutura
+## ⚡ Visão Geral da Infraestrutura Real (v5.0)
 
-- Monorepo Next.js 14/15 em TypeScript hospedado na Vercel, com `/app` unificando páginas e APIs serverless.
-- Supabase (PostgreSQL + Auth + Storage + Realtime) permanece como fonte única de dados com RLS por unidade/tenant.
-- IA migra para OpenAI via SDK oficial, eliminando modelos locais; analítica é feita em `lib/analytics.ts` usando `danfojs-node` + `simple-statistics`.
-- 🆕 **Idempotência garantida**: cron jobs verificam execuções anteriores antes de processar, evitando duplicação.
-- 🆕 **Health checks automáticos**: verificação proativa a cada 5 minutos via cron dedicado.
-- 🆕 **Retry inteligente**: backoff exponencial com circuit breaker para APIs externas.
-- 🆕 **Cache de análises**: respostas OpenAI cacheadas por 24h para métricas similares, reduzindo custos em até 60%.
-- Agendamentos críticos são executados por Vercel Cron (`0 3 * * *` ETL, `0 6 * * 1` relatório semanal) com garantias de execução.
-- Observabilidade unificada via Vercel Analytics/Logs, Supabase Logs, structured logging e dashboard customizado; integrações externas opcionais (Datadog/Loki).
-- Integrações externas (Telegram, email) são tratadas dentro das próprias rotas serverless, com segredos mantidos no painel da Vercel.
+### Arquitetura Híbrida: Frontend Vite + Backend Serverless
+
+- ⚡ **Frontend:** **Vite 7 + React 19 + React Router DOM 7** (NÃO Next.js) hospedado na Vercel como SPA
+  - Build: `vite build` gera bundle otimizado servido estaticamente
+  - Roteamento: React Router DOM v7 (client-side)
+  - Entry point: `src/main.jsx`
+  - 19 páginas React organizadas por feature
+  - Design Atômico: atoms → molecules → organisms → templates → pages
+  - State management: React Context + TanStack Query (React Query v5)
+
+- ⚡ **Backend:** **Vercel Serverless Functions** em TypeScript (`/app/api/*`)
+  - Runtime: Node.js 20
+  - Timeout: 10s por função (300s para Pro plan)
+  - Memory: até 1GB
+  - Regions: `gru1` (São Paulo) para menor latência
+  - 7 cron jobs agendados via `vercel.json`
+  - APIs REST síncronas com suporte a streaming
+
+- ⚡ **Banco de Dados:** Supabase (PostgreSQL 15 + Auth + Storage + Realtime)
+  - 23+ tabelas core mapeadas
+  - 38 migrations SQL versionadas
+  - RLS (Row Level Security) por unidade/tenant
+  - PgBouncer habilitado (conexão pooling)
+  - Views materializadas para relatórios pesados
+
+- ⚡ **IA/Analytics:** OpenAI API (GPT-4o-mini) + Processamento local (Danfo.js)
+  - OpenAI para insights generativos
+  - Danfojs-node para ETL e cálculos (pandas-like)
+  - Decimal.js para precisão financeira
+  - Cache inteligente (24h TTL) reduz custos em 40-60%
+
+- 🆕 **Padrões Enterprise:** Implementados e funcionais
+  - ✅ Idempotência garantida (tabela `etl_runs`)
+  - ✅ Circuit breaker para APIs externas
+  - ✅ Retry com backoff exponencial
+  - ✅ Health checks automáticos (a cada 5min)
+  - ✅ Structured logging com correlation IDs
+  - ✅ Processamento paralelo (batches de 5 unidades)
+  - ✅ Monitoramento de custos OpenAI
+
+- ⚡ **Integrações:** Telegram Bot, OFX/Excel imports, PDF/Excel exports
+- ⚡ **Observabilidade:** Vercel Logs + Supabase Logs + Dashboard customizado + Telegram alerts
+- ⚡ **CI/CD:** GitHub Actions + Vercel auto-deploy (preview + production)
+
+### Estatísticas do Projeto
+
+| Métrica | Valor |
+|---------|-------|
+| Total de arquivos | 516 |
+| Páginas React | 19 |
+| Serviços (business logic) | 43+ |
+| Repositórios (data access) | 25+ |
+| Custom Hooks | 30+ |
+| Componentes | 100+ (atoms, molecules, organisms) |
+| API Routes | 12+ endpoints |
+| Cron Jobs | 7 agendados |
+| Tabelas no Banco | 23+ core |
+| Migrations SQL | 38 |
+| Linhas de código | ~50.000+ |
+
+## ⚡ Stack Tecnológica Completa (v5.0)
+
+### Frontend Stack
+
+| Tecnologia | Versão | Propósito | Status |
+|------------|--------|-----------|--------|
+| **React** | 19.2.0 | Framework UI principal | ✅ Produção |
+| **Vite** | 7.1.12 | Build tool e dev server | ✅ Produção |
+| **React Router DOM** | 7.9.4 | Roteamento client-side | ✅ Produção |
+| **TypeScript** | 5.9.3 + JSDoc | Type safety | ✅ Produção |
+| **TailwindCSS** | 3.4.18 | Styling framework | ✅ Produção |
+| **@tanstack/react-query** | 5.90.6 | Server state management | ✅ Produção |
+| **@tanstack/react-table** | 8.21.3 | Tabelas avançadas | ✅ Produção |
+| **React Hook Form** | 7.66.0 | Gerenciamento de forms | ✅ Produção |
+| **Zod** | 4.1.12 | Validação de schemas | ✅ Produção |
+| **Chart.js** | 4.5.1 | Gráficos | ✅ Produção |
+| **Recharts** | 3.3.0 | Gráficos React | ✅ Produção |
+| **Framer Motion** | 12.23.24 | Animações | ✅ Produção |
+| **Lucide React** | 0.545.0 | Ícones | ✅ Produção |
+| **@radix-ui/react-*** | Várias | Componentes headless UI | ✅ Produção |
+| **React Hot Toast** | 2.6.0 | Notificações | ✅ Produção |
+| **Sonner** | 2.0.7 | Toast notifications | ✅ Produção |
+
+### Backend Stack
+
+| Tecnologia | Versão | Propósito | Status |
+|------------|--------|-----------|--------|
+| **Vercel Serverless** | - | Runtime serverless Node 20 | ✅ Produção |
+| **TypeScript** | 5.9.3 | Type safety backend | ✅ Produção |
+| **@supabase/supabase-js** | 2.78.0 | Cliente database | ✅ Produção |
+| **OpenAI SDK** | 4.67.0 | Integração IA | ✅ Produção |
+| **Axios** | 1.13.1 | HTTP client | ✅ Produção |
+| **Pino** | 10.1.0 | Logging estruturado | 🟡 Parcial |
+| **Date-fns** | 4.1.0 | Manipulação de datas | ✅ Produção |
+| **Lodash** | 4.17.21 | Utilitários | ✅ Produção |
+| **UUID** | 13.0.0 | Geração de IDs | ✅ Produção |
+
+### Data Processing & Analytics
+
+| Tecnologia | Versão | Propósito | Status |
+|------------|--------|-----------|--------|
+| **Danfojs-node** | 1.1.2 | DataFrame analysis (pandas-like) | ✅ Produção |
+| **Decimal.js** | 10.6.0 | Cálculos precisos financeiros | ✅ Produção |
+| **Currency.js** | 2.0.4 | Operações monetárias | ✅ Produção |
+| **Mathjs** | 12.0.0 | Operações matemáticas | ✅ Produção |
+
+### File Processing
+
+| Tecnologia | Versão | Propósito | Status |
+|------------|--------|-----------|--------|
+| **XLSX** | 0.18.5 | Excel read/write | ✅ Produção |
+| **jsPDF** | 3.0.3 | Geração de PDFs | ✅ Produção |
+| **jspdf-autotable** | 5.0.2 | Tabelas em PDF | ✅ Produção |
+| **html2canvas** | 1.4.1 | Screenshots/canvas | ✅ Produção |
+| **fast-xml-parser** | 5.3.0 | Parser XML/OFX | ✅ Produção |
+| **Multer** | 2.0.2 | Upload de arquivos | ✅ Produção |
+
+### Testing & Quality
+
+| Tecnologia | Versão | Propósito | Status |
+|------------|--------|-----------|--------|
+| **Vitest** | 3.2.4 | Unit testing | 🟡 Configurado |
+| **@testing-library/react** | 16.3.0 | Component testing | 🟡 Configurado |
+| **Playwright** | 1.56.1 | E2E testing | 🟡 Configurado |
+| **ESLint** | 9.39.0 | Linting | ✅ Produção |
+| **Prettier** | 3.6.2 | Formatação de código | ✅ Produção |
+| **Husky** | 9.1.7 | Git hooks | ✅ Produção |
 
 ## 🔵 Arquitetura Técnica de Referência
 
-- **Objetivos**: oferecer stack 100% serverless/gerenciada, reduzir manutenção de infraestrutura própria, manter relatórios diários com IA generativa, garantir resiliência e observabilidade de nível enterprise.
-- **Escopo**: frontend Next.js, APIs internas `/app/api/*`, cron jobs idempotentes, OpenAI com cache, Supabase, Telegram e práticas de segurança/monitoramento centralizadas.
+- **Objetivos**: oferecer stack 100% serverless/gerenciada com frontend moderno (Vite+React) e backend escalável (Serverless Functions), reduzir manutenção de infraestrutura própria, manter relatórios diários com IA generativa, garantir resiliência e observabilidade de nível enterprise.
+- ⚡ **Escopo REAL**: frontend Vite+React SPA, APIs serverless `/app/api/*`, cron jobs idempotentes, OpenAI com cache, Supabase, Telegram e práticas de segurança/monitoramento centralizadas.
 - **Diretrizes**:
   - Nenhum VPS ou workload stateful fora da Vercel/Supabase.
   - Service Role do Supabase utilizado apenas em rotas server-side seguras.
@@ -59,26 +184,115 @@ Toda a plataforma roda em um único projeto Next.js/TypeScript hospedado na Verc
   - 🆕 **Idempotência obrigatória**: todos os cron jobs devem verificar execuções anteriores.
   - 🆕 **Circuit breaker**: proteção contra falhas em cascata em APIs externas.
   - 🆕 **Cache estratégico**: reduzir custos OpenAI sem perder qualidade.
+  - ⚡ **Separação Frontend/Backend**: Frontend Vite (SPA) + Backend Serverless (APIs)
 
-## 🔵 Diagrama Geral de Arquitetura
+## ⚡ Diagrama Geral de Arquitetura (v5.0)
 
 ```mermaid
-flowchart LR
-    U[Usuário/Admin] -->|HTTPS| VercelFE[Vercel (Next.js: Frontend + APIs)]
-    VercelFE -->|Supabase JS| DB[(Supabase Postgres + Auth + Storage)]
-    VercelFE -->|Cron Diário| API[/api/cron/etl-diario]
-    API -->|Idempotência Check| DB
-    API -->|Consulta dados| DB
-    API -->|Circuit Breaker| GPT[(OpenAI Models)]
-    API -->|Cache Check| Cache[(Redis/Supabase Cache)]
-    API -->|Salvar relatório| DB
-    API -->|sendMessage| Telegram[(Telegram Bot)]
-    VercelFE -->|Health Check| Health[/api/health]
-    Health -->|Monitoramento| Monitor[Dashboard Observabilidade]
-    VercelFE -->|Leitura relatórios| DB
+flowchart TB
+    subgraph User Layer
+        U[👤 Usuário/Admin<br/>Browser]
+    end
+
+    subgraph Vercel CDN Edge
+        CDN[🌐 Vercel Edge Network<br/>CDN Global]
+    end
+
+    subgraph Vercel Frontend
+        SPA[⚛️ Vite + React 19 SPA<br/>Static Assets<br/>React Router DOM]
+    end
+
+    subgraph Vercel Backend - Serverless Functions
+        API[📡 API Routes /app/api/*]
+        CRON[⏰ Cron Jobs<br/>7 scheduled tasks]
+        HEALTH[❤️ Health Checks<br/>Every 5min]
+
+        subgraph Core APIs
+            ETL[ETL Diário<br/>03:00 BRT]
+            WEEKLY[Relatório Semanal<br/>Mon 06:00]
+            MONTHLY[Fechamento Mensal<br/>1st 07:00]
+            ALERTS[Envio Alertas<br/>Every 15min]
+            BALANCE[Validação Saldo<br/>04:00 BRT]
+            RECURRING[Despesas Recorrentes<br/>02:00 BRT]
+        end
+    end
+
+    subgraph Business Logic Layer
+        SERVICES[🔧 Services Layer<br/>43+ serviços]
+        REPOS[💾 Repositories Layer<br/>25+ repositórios]
+        ANALYTICS[📊 Analytics Engine<br/>Danfo.js + Decimal.js]
+        RESILIENCE[🛡️ Resilience Patterns<br/>Circuit Breaker + Retry<br/>Idempotency]
+    end
+
+    subgraph External Services
+        DB[(🗄️ Supabase<br/>PostgreSQL 15<br/>Auth + Storage + Realtime<br/>23+ tables)]
+        AI[🤖 OpenAI API<br/>GPT-4o-mini<br/>Cache 24h TTL]
+        TG[📱 Telegram Bot<br/>Notifications]
+        CACHE[(💾 Cache Layer<br/>OpenAI Responses<br/>Supabase table)]
+    end
+
+    subgraph Monitoring & Observability
+        LOGS[📝 Structured Logging<br/>Pino + Correlation IDs]
+        METRICS[📈 Metrics & Monitoring<br/>Cost tracking<br/>Performance]
+        VERCEL_LOGS[☁️ Vercel Logs<br/>Function execution]
+        SUPABASE_LOGS[🗄️ Supabase Logs<br/>Query performance]
+    end
+
+    %% User interactions
+    U -->|HTTPS| CDN
+    CDN -->|Serve Static| SPA
+    SPA -->|API Calls| API
+    SPA -->|Supabase Client| DB
+
+    %% Backend flows
+    API --> SERVICES
+    SERVICES --> REPOS
+    REPOS --> DB
+
+    %% Cron jobs
+    CRON --> ETL
+    CRON --> WEEKLY
+    CRON --> MONTHLY
+    CRON --> ALERTS
+    CRON --> BALANCE
+    CRON --> RECURRING
+    CRON --> HEALTH
+
+    %% Core flows
+    ETL -->|Idempotency Check| RESILIENCE
+    ETL --> ANALYTICS
+    ANALYTICS --> REPOS
+    ANALYTICS -->|Circuit Breaker| AI
+    AI -->|Save| CACHE
+    ETL -->|Notify| TG
+
+    %% Monitoring
+    API --> LOGS
+    CRON --> LOGS
+    LOGS --> VERCEL_LOGS
+    REPOS --> SUPABASE_LOGS
+    SERVICES --> METRICS
+
+    %% Health checks
+    HEALTH -->|Check| DB
+    HEALTH -->|Check| AI
+    HEALTH -->|Check| TG
+    HEALTH -->|Alert if fail| TG
+
+    style SPA fill:#61dafb
+    style API fill:#000000
+    style DB fill:#3ecf8e
+    style AI fill:#10a37f
+    style RESILIENCE fill:#ff6b6b
+    style ANALYTICS fill:#4ecdc4
 ```
 
-_Legenda_: Toda a lógica vive dentro do projeto Vercel; cron diário com idempotência, circuit breaker, cache e health checks automáticos.
+_Legenda_:
+- Frontend: Vite+React SPA servido estaticamente pelo Vercel CDN
+- Backend: Serverless Functions isoladas com auto-scaling
+- Separação clara de responsabilidades: Presentation → Business Logic → Data Access
+- Padrões de resiliência aplicados em todas as integrações externas
+- Observabilidade end-to-end com logs estruturados
 
 ## 🔵 Componentes Principais
 

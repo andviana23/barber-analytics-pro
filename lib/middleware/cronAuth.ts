@@ -7,7 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { logger } from '@/lib/logger';
+import { logger } from '../logger';
 
 /**
  * Valida CRON_SECRET em requisições de rotas cron
@@ -64,4 +64,3 @@ export function cronAuthMiddleware(request: NextRequest): NextResponse | null {
 
   return null; // null indica que a requisição pode prosseguir
 }
-

@@ -6,9 +6,9 @@ Você está colaborando no desenvolvimento do sistema **Barber Analytics Pro** �
 
 O sistema é **React 19 + Vite + TailwindCSS** no frontend, com **Supabase (PostgreSQL + Auth + Realtime + Edge Functions)** no backend.
 Adota **Clean Architecture**, **Domain-Driven Design (DDD)** e **Atomic Design**.
-**Package Manager**: **pnpm** (substituindo npm para melhor performance e cache).
+**Package Manager**: **npm** (gerenciador de pacotes padrão do Node.js).
 
-**Data atual:** 4 de novembro de 2025
+**Data atual:** 10 de novembro de 2025
 
 ---
 
@@ -601,61 +601,52 @@ function KPICard({ title, value, trend }) {
 
 ---
 
-## 📦 Comandos e Scripts (pnpm)
+## 📦 Comandos e Scripts (npm)
 
-### ⚠️ IMPORTANTE: Usamos PNPM, não npm
+### ⚠️ IMPORTANTE: Usamos NPM como gerenciador de pacotes
 
-**SEMPRE use `pnpm` nos comandos e scripts:**
+**SEMPRE use `npm` nos comandos e scripts:**
 
 ```bash
 # ✅ CORRETO
-pnpm install
-pnpm dev
-pnpm build
-pnpm test
-pnpm lint
-
-# ❌ ERRADO
 npm install
 npm run dev
 npm run build
+npm test
+npm run lint
 ```
 
 ### 🔧 Scripts Principais
 
 ```bash
 # Desenvolvimento
-pnpm dev                    # Servidor dev (localhost:5173)
-pnpm build                  # Build produção
-pnpm preview                # Preview build
+npm run dev                 # Servidor dev (localhost:5173)
+npm run build               # Build produção
+npm run preview             # Preview build
 
 # Qualidade
-pnpm lint                   # ESLint check
-pnpm lint:fix               # ESLint fix
-pnpm format                 # Prettier format
-pnpm format:check           # Prettier check
+npm run lint                # ESLint check
+npm run lint:fix            # ESLint fix
+npm run format              # Prettier format
+npm run format:check        # Prettier check
 
 # Testes
-pnpm test                   # Vitest unit tests
-pnpm test:e2e               # Playwright E2E
-pnpm test:all               # Todos os testes
+npm test                    # Vitest unit tests
+npm run test:e2e            # Playwright E2E
+npm run test:all            # Todos os testes
 
 # Design System
-pnpm audit:design-system    # Audita classes hardcoded
-pnpm migrate:design-system  # Migra para design system
+npm run audit:design-system    # Audita classes hardcoded
+npm run migrate:design-system  # Migra para design system
 ```
 
 ### 🛠️ Quando gerar comandos para o usuário:
 
 ```bash
-# ✅ Sempre usar pnpm
-"Execute: pnpm install"
-"Execute: pnpm dev"
-"Execute: pnpm lint:fix"
-
-# ❌ Nunca usar npm
-"Execute: npm install"  # ERRADO
-"Execute: npm run dev"  # ERRADO
+# ✅ Sempre usar npm
+"Execute: npm install"
+"Execute: npm run dev"
+"Execute: npm run lint:fix"
 ```
 
 ---
@@ -672,7 +663,7 @@ O Copilot deve:
 ✅ Evitar redundância e manter alta legibilidade
 ✅ **SEMPRE usar classes utilitárias do Design System**
 ✅ **NUNCA usar classes CSS hardcoded**
-✅ **SEMPRE usar pnpm em vez de npm**
+✅ **SEMPRE usar npm como gerenciador de pacotes**
 ✅ Respeitar as RLS policies e permissões
 ✅ Validar dados com DTOs
 ✅ Retornar `{ data, error }`
@@ -844,41 +835,41 @@ await pgsql_query({
 
 ```bash
 # 1️⃣ Validar lint e formato
-pnpm validate
+npm run validate
 
 # 2️⃣ Executar testes unitários
-pnpm test:run
+npm run test:run
 
 # 3️⃣ Verificar coverage
-pnpm test:coverage
+npm run test:coverage
 
 # 4️⃣ Se alterar API/Service, rodar integração
-pnpm test:integration
+npm run test:integration
 ```
 
 **2. Antes de commit:**
 
 ```bash
 # Testes completos
-pnpm test:validate  # Lint + Format + TypeCheck + Tests
+npm run test:validate  # Lint + Format + TypeCheck + Tests
 ```
 
 **3. Antes de PR:**
 
 ```bash
 # Suite completa
-pnpm test:all  # Unit + Integration + E2E
+npm run test:all  # Unit + Integration + E2E
 ```
 
 ### 🎯 Quando Executar Cada Tipo de Teste
 
-| Tipo            | Quando Executar                      | Comando                 |
-| --------------- | ------------------------------------ | ----------------------- |
-| **Unit**        | Após modificar funções/utils/DTOs    | `pnpm test:unit`        |
-| **Integration** | Após modificar services/repositories | `pnpm test:integration` |
-| **E2E**         | Após modificar páginas/fluxos        | `pnpm test:e2e`         |
-| **Load**        | Após otimizações de performance      | `pnpm test:load`        |
-| **Coverage**    | Ao adicionar novos arquivos          | `pnpm test:coverage`    |
+| Tipo            | Quando Executar                      | Comando                    |
+| --------------- | ------------------------------------ | -------------------------- |
+| **Unit**        | Após modificar funções/utils/DTOs    | `npm run test:unit`        |
+| **Integration** | Após modificar services/repositories | `npm run test:integration` |
+| **E2E**         | Após modificar páginas/fluxos        | `npm run test:e2e`         |
+| **Load**        | Após otimizações de performance      | `npm run test:load`        |
+| **Coverage**    | Ao adicionar novos arquivos          | `npm run test:coverage`    |
 
 ### 🛠️ Ferramentas de Teste
 
@@ -914,7 +905,7 @@ pnpm test:all  # Unit + Integration + E2E
 - [ ] Testar render básico
 - [ ] Testar props obrigatórias
 - [ ] Testar eventos (clicks, inputs)
-- [ ] Executar `pnpm test:run`
+- [ ] Executar `npm run test:run`
 
 **Ao criar um novo service:**
 
@@ -922,7 +913,7 @@ pnpm test:all  # Unit + Integration + E2E
 - [ ] Mockar dependências (repositories)
 - [ ] Testar casos de sucesso e erro
 - [ ] Validar retorno `{ data, error }`
-- [ ] Executar `pnpm test:unit`
+- [ ] Executar `npm run test:unit`
 
 **Ao criar um novo repository:**
 
@@ -930,7 +921,7 @@ pnpm test:all  # Unit + Integration + E2E
 - [ ] Mockar Supabase client
 - [ ] Testar queries (select, insert, update, delete)
 - [ ] Validar filtros e joins
-- [ ] Executar `pnpm test:integration`
+- [ ] Executar `npm run test:integration`
 
 **Ao criar uma nova página:**
 
@@ -938,7 +929,7 @@ pnpm test:all  # Unit + Integration + E2E
 - [ ] Testar fluxo completo do usuário
 - [ ] Validar navegação e forms
 - [ ] Verificar estados de loading/error
-- [ ] Executar `pnpm test:e2e`
+- [ ] Executar `npm run test:e2e`
 
 ### 🚫 Erros Comuns a EVITAR
 

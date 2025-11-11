@@ -356,6 +356,9 @@ export function detectSeasonality(timeSeries: TimeSeriesData[]): number[] {
     return Math.round((dayMean / overallMean) * 100) / 100;
   });
 
+  return seasonalityIndexes;
+}
+
 /**
  * Calcula saldo acumulado usando rolling sum (Danfo.js)
  *
@@ -379,7 +382,9 @@ export function detectSeasonality(timeSeries: TimeSeriesData[]): number[] {
  * // ]
  * ```
  */
-export function calculateAccumulatedBalance<T extends { date: Date | string; entradas: number; saidas: number }>(
+export function calculateAccumulatedBalance<
+  T extends { date: Date | string; entradas: number; saidas: number },
+>(
   timeSeries: T[],
   groupBy?: keyof T
 ): Array<T & { saldo_dia: number; saldo_acumulado: number }> {
@@ -481,9 +486,9 @@ export function forecastCashflow(
     // Dados insuficientes - usar último valor conhecido
     const lastValue = cashflowHistory[cashflowHistory.length - 1]?.balance || 0;
     const lastDate = cashflowHistory[cashflowHistory.length - 1]?.date
-      ? (typeof cashflowHistory[cashflowHistory.length - 1].date === 'string'
-          ? new Date(cashflowHistory[cashflowHistory.length - 1].date)
-          : cashflowHistory[cashflowHistory.length - 1].date)
+      ? typeof cashflowHistory[cashflowHistory.length - 1].date === 'string'
+        ? new Date(cashflowHistory[cashflowHistory.length - 1].date)
+        : cashflowHistory[cashflowHistory.length - 1].date
       : new Date();
 
     return Array.from({ length: daysAhead }, (_, i) => {
@@ -512,7 +517,8 @@ export function forecastCashflow(
   // 1. Calcular média móvel de 30 dias dos últimos valores
   const last30Days = sorted.slice(-30);
   const values = last30Days.map(item => item.balance);
-  const movingAverage30 = values.reduce((sum, val) => sum + val, 0) / values.length;
+  const movingAverage30 =
+    values.reduce((sum, val) => sum + val, 0) / values.length;
 
   // 2. Calcular regressão linear para tendência
   const timeSeriesData: TimeSeriesData[] = last30Days.map((item, index) => ({
@@ -524,7 +530,9 @@ export function forecastCashflow(
 
   // 3. Calcular desvio padrão para intervalo de confiança
   const mean = movingAverage30;
-  const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+  const variance =
+    values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
+    values.length;
   const stdDev = Math.sqrt(variance);
 
   // 4. Determinar tendência
@@ -532,9 +540,10 @@ export function forecastCashflow(
     slope > mean * 0.02 ? 'up' : slope < -mean * 0.02 ? 'down' : 'stable';
 
   // 5. Gerar previsões
-  const lastDate = typeof sorted[sorted.length - 1].date === 'string'
-    ? new Date(sorted[sorted.length - 1].date)
-    : sorted[sorted.length - 1].date;
+  const lastDate =
+    typeof sorted[sorted.length - 1].date === 'string'
+      ? new Date(sorted[sorted.length - 1].date)
+      : sorted[sorted.length - 1].date;
   const lastBalance = sorted[sorted.length - 1].balance;
 
   const forecasts: Array<{
@@ -568,4 +577,3 @@ export function forecastCashflow(
 
   return forecasts;
 }
-

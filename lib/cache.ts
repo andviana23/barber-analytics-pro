@@ -4,12 +4,40 @@
  * @description Cache inteligente para análises OpenAI, reduzindo custos em até 60%
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Lazy loading para evitar erro com env vars
+let _supabase: SupabaseClient | null = null;
+
+function getSupabase(): SupabaseClient {
+  if (_supabase) return _supabase;
+
+  const url =
+    process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!url) {
+    throw new Error(
+      'SUPABASE_URL deve ser configurado (NEXT_PUBLIC_SUPABASE_URL ou VITE_SUPABASE_URL)'
+    );
+  }
+  if (!key) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY deve ser configurado');
+  }
+
+  _supabase = createClient(url, key);
+  return _supabase;
+}
+
+// Proxy para acesso lazy
+const supabase = new Proxy({} as SupabaseClient, {
+  get(target, prop) {
+    return getSupabase()[prop as keyof SupabaseClient];
+  },
+});
+
+// Export supabase para uso em services
+export { supabase };
 
 export interface CacheOptions {
   ttl?: number; // Time to live em segundos
@@ -27,7 +55,7 @@ export function generateCacheKey(unitId: string, metrics: any): string {
     despesasTotais: Math.round((metrics.despesasTotais || 0) / 100) * 100,
     margemPercentual: Math.round(metrics.margemPercentual || 0),
     period: metrics.period || 'daily',
-    reportType: metrics.reportType || 'standard'
+    reportType: metrics.reportType || 'standard',
   };
 
   return `openai:${unitId}:${JSON.stringify(keyData)}`;
@@ -87,7 +115,7 @@ export async function setCachedAnalysis(
     const { error } = await supabase.from('openai_cache').upsert({
       cache_key: cacheKey,
       response,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     });
 
     if (error) {
@@ -144,7 +172,7 @@ export async function getCacheStats(): Promise<{
         totalEntries: 0,
         hitRate: 0,
         oldestEntry: null,
-        newestEntry: null
+        newestEntry: null,
       };
     }
 
@@ -152,7 +180,7 @@ export async function getCacheStats(): Promise<{
       totalEntries: data.length,
       hitRate: 0, // Seria calculado com métricas de acesso
       oldestEntry: data[data.length - 1]?.created_at || null,
-      newestEntry: data[0]?.created_at || null
+      newestEntry: data[0]?.created_at || null,
     };
   } catch (error) {
     console.error('Erro ao buscar estatísticas de cache:', error);
@@ -160,7 +188,7 @@ export async function getCacheStats(): Promise<{
       totalEntries: 0,
       hitRate: 0,
       oldestEntry: null,
-      newestEntry: null
+      newestEntry: null,
     };
   }
 }
@@ -176,7 +204,10 @@ export async function getCacheStats(): Promise<{
  * @param ttl Time to live em segundos (padrão: 300 = 5 minutos)
  * @returns Valor em cache ou null se não encontrado/expirado
  */
-export async function getFromCache<T>(cacheKey: string, ttl: number = 300): Promise<T | null> {
+export async function getFromCache<T>(
+  cacheKey: string,
+  ttl: number = 300
+): Promise<T | null> {
   try {
     const prefixedKey = `generic:${cacheKey}`;
     const { data, error } = await supabase
@@ -217,7 +248,11 @@ export async function getFromCache<T>(cacheKey: string, ttl: number = 300): Prom
  * @param value Valor a ser cacheado (será convertido para JSON)
  * @param ttl Time to live em segundos (padrão: 300 = 5 minutos)
  */
-export async function setToCache<T>(cacheKey: string, value: T, ttl: number = 300): Promise<void> {
+export async function setToCache<T>(
+  cacheKey: string,
+  value: T,
+  ttl: number = 300
+): Promise<void> {
   try {
     const prefixedKey = `generic:${cacheKey}`;
     const jsonValue = JSON.stringify(value);
@@ -225,7 +260,7 @@ export async function setToCache<T>(cacheKey: string, value: T, ttl: number = 30
     const { error } = await supabase.from('openai_cache').upsert({
       cache_key: prefixedKey,
       response: jsonValue,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     });
 
     if (error) {
@@ -235,5 +270,3 @@ export async function setToCache<T>(cacheKey: string, value: T, ttl: number = 30
     console.error('Erro ao salvar cache genérico:', error);
   }
 }
-
-

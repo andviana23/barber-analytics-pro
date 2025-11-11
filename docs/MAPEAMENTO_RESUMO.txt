@@ -1,0 +1,507 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                 ARQUITETURA E FLUXO DE DADOS COMPLETO                       ║
+║               Barber Analytics Pro - Sistema de Analytics Financeiro         ║
+║                                                                              ║
+║  Documento gerado em: 11 de Novembro de 2025                                ║
+║  Versão: 1.0                                                                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+DOCUMENTO PRINCIPAL:
+├─ /home/andrey/projetos/barber-analytics-pro/MAPEAMENTO_FLUXO_DADOS.md
+│  └─ Detalhes técnicos completos (8 seções, 1500+ linhas)
+│
+└─ Este arquivo (RESUMO)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+ÍNDICE DE CONTEÚDO
+═══════════════════════════════════════════════════════════════════════════════
+
+SEÇÃO 1: Fluxo Frontend para Backend
+────────────────────────────────────
+Descreve como dados fluem do usuário final até o banco de dados:
+- Formulários React (CommissionsPage, CashRegisterPage)
+- Validação local (React Hook Form)
+- APIs Next.js (/api/revenues/*, /api/expenses/*)
+- Autenticação e Autorização
+- Persistência em Supabase PostgreSQL
+- React Query cache e atualização de UI
+
+Tempo de leitura: 10 minutos
+
+
+SEÇÃO 2: Processamento Backend e Banco de Dados
+────────────────────────────────────────────────
+Estrutura completa do banco de dados:
+- Tabelas principais (revenues, expenses, ai_metrics_daily, alerts_events)
+- Índices estratégicos e performance
+- Row Level Security (RLS) policies
+- Fluxo de dados no backend
+
+Tempo de leitura: 15 minutos
+
+
+SEÇÃO 3: Processamento de Cron Jobs
+────────────────────────────────────
+Cronograma e fluxo de jobs automáticos:
+- 8 cron jobs com horários específicos
+- Fluxo geral (autenticação, idempotência, execução)
+- ETL Diário (Extract-Transform-Load)
+- Envio de Alertas
+- Relatórios (diário e semanal)
+
+Tempo de leitura: 20 minutos
+
+
+SEÇÃO 4: Integrações (OpenAI e Telegram)
+─────────────────────────────────────────
+Integração com sistemas externos:
+- OpenAI API (gpt-4o-mini)
+- Cache inteligente (60% economia de custo)
+- Circuit breaker e retry
+- Telegram Bot (envio e recepção)
+- Webhook Telegram
+
+Tempo de leitura: 15 minutos
+
+
+SEÇÃO 5: Ciclo de Vida de Receita e Despesa
+──────────────────────────────────────────
+Estados e transições de dados financeiros:
+- Criação de receita (status: Pending)
+- Processamento por ETL
+- Recepcção efetiva
+- Relatórios
+- Arquivamento/Soft delete
+- Ciclo completo de despesascorrentes
+
+Tempo de leitura: 12 minutos
+
+
+SEÇÃO 6: Ciclo de Vida do ETL Diário
+──────────────────────────────────────
+Pipeline completo de processamento analítico:
+- Timeline de execução (03:00 BRT)
+- 4 fases: Extract, Transform, Load, Anomaly Detection
+- Processamento em batches paralelos
+- Cálculo de métricas diárias
+- Detecção de anomalias com z-score
+
+Tempo de leitura: 18 minutos
+
+
+SEÇÃO 7: Sistema de Notificações
+─────────────────────────────────
+Como o sistema notifica usuários:
+- Tipos de notificações (alertas, relatórios, avisos)
+- Fluxo completo de criação até entrega
+- Integração Telegram
+- Formatação com emojis
+- Status de notificações (OPEN, ACKNOWLEDGED, RESOLVED)
+
+Tempo de leitura: 10 minutos
+
+
+SEÇÃO 8: Arquitetura Geral
+──────────────────────────
+Visão holística do sistema:
+- Diagrama de componentes
+- Fluxo de dados geral
+- Segurança em múltiplas camadas
+- Escalabilidade
+- Métricas de performance
+
+Tempo de leitura: 20 minutos
+
+
+═══════════════════════════════════════════════════════════════════════════════
+FLUXO RÁPIDO DE 30 SEGUNDOS
+═══════════════════════════════════════════════════════════════════════════════
+
+1. USUÁRIO cria receita no frontend (React)
+        ↓
+2. API valida e persiste em Supabase (PostgreSQL)
+        ↓
+3. React Query atualiza cache automaticamente
+        ↓
+4. ETL Diário (03:00 BRT) processa dados
+        ├─ Extract: lê receitas/despesas
+        ├─ Transform: calcula métricas
+        ├─ Load: salva em ai_metrics_daily
+        └─ Anomalies: detecta alterações
+        ↓
+5. Alertas criados automaticamente
+        ↓
+6. Cron: enviar-alertas (*/15) envia via Telegram
+        ↓
+7. Relatório Diário (21:00) com OpenAI insights
+        ↓
+8. Notificação formatada em Markdown via Telegram
+
+
+═══════════════════════════════════════════════════════════════════════════════
+CRONOGRAMA DE JOBS
+═══════════════════════════════════════════════════════════════════════════════
+
+03:00 BRT → ETL Diário (extract-transform-load de receitas/despesas)
+04:00 BRT → Validar Saldo (compara bank_accounts com teórico)
+06:00 BRT → Relatório Semanal (segunda-feira)
+08:00 BRT → Gerar Despesas Recorrentes (cria instâncias futuras)
+*/5       → Health Check (verifica sistema)
+*/15      → Enviar Alertas (processa pendências)
+21:00 BRT → Relatório Diário (resumo com IA)
+00:00 BRT → Fechamento Mensal (1º do mês)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+PRINCIPAIS COMPONENTES
+═══════════════════════════════════════════════════════════════════════════════
+
+FRONTEND
+├─ React/Vite
+├─ Pages: CommissionsPage, CashRegisterPage, DREPage, RelatoriosPage
+├─ Context API (UnitContext, AuthContext)
+├─ React Query (TanStack Query)
+└─ Supabase JS Client
+
+BACKEND
+├─ Next.js TypeScript
+├─ API Routes (app/api/*)
+├─ Cron Jobs (Vercel)
+└─ Libraries:
+    ├─ lib/analytics/ (ETL, calculations, anomalies)
+    ├─ lib/ai/ (OpenAI integration, analysis)
+    ├─ lib/telegram/ (Telegram bot)
+    ├─ lib/repositories/ (Data access layer)
+    ├─ lib/services/ (Business logic)
+    └─ lib/middleware/ (Auth, rate limiting)
+
+BANCO DE DADOS
+├─ Supabase (PostgreSQL)
+├─ Tabelas principais:
+    ├─ revenues (receitas)
+    ├─ expenses (despesas)
+    ├─ ai_metrics_daily (métricas)
+    ├─ alerts_events (alertas)
+    ├─ etl_runs (histórico de jobs)
+    └─ openai_cache (cache de análises)
+└─ RLS Policies (segurança)
+
+INTEGRAÇÕES
+├─ OpenAI API (gpt-4o-mini para análises)
+├─ Telegram Bot (notificações)
+└─ Vercel Cron (jobs automáticos)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+FLUXO DE DADOS FINANCEIROS
+═══════════════════════════════════════════════════════════════════════════════
+
+RECEITA
+└─ Criada no frontend → INSERT revenues (status=Pending)
+   ├─ ETL Diário extrai e processa
+   ├─ Salva agregados em ai_metrics_daily
+   ├─ Detecta anomalias
+   ├─ Usuário marca como recebida (status=Received)
+   ├─ Relatório Diário compara com histórico
+   ├─ OpenAI gera insights
+   └─ Telegram notifica usuário
+
+DESPESA
+└─ Criada no frontend → INSERT expenses
+   ├─ Se recorrente: Cron gera próximas instâncias
+   ├─ Cron: enviar-alertas notifica vencimentos
+   ├─ ETL Diário afeta margin_percentage
+   ├─ Alertas se margem baixa
+   ├─ Validação de saldo compara com banco
+   └─ Fechamento mensal no DRE
+
+
+═══════════════════════════════════════════════════════════════════════════════
+DETECÇÃO DE ANOMALIAS
+═══════════════════════════════════════════════════════════════════════════════
+
+Algoritmo 1: Z-Score
+└─ Calcula (valor - média) / desvio_padrão
+   └─ Se |Z| > 2σ → Alerta HIGH
+
+Algoritmo 2: Queda de Receita
+└─ Se queda > 20% em relação à média histórica
+   └─ Alerta HIGH
+
+Algoritmo 3: Margem Baixa
+└─ Se margem_atual < kpi_target
+   └─ Alerta MEDIUM
+
+Resultado: INSERT alerts_events (status='OPEN')
+└─ Aguarda cron enviar-alertas processar
+
+
+═══════════════════════════════════════════════════════════════════════════════
+CACHE OPENAI (ECONOMIA 60%)
+═══════════════════════════════════════════════════════════════════════════════
+
+Fluxo com Cache:
+1. generateAnalysis(unitId, metrics)
+2. Anonimizar dados
+3. Gerar cache_key baseado em agregados
+4. SELECT FROM openai_cache WHERE cache_key=?
+5. Se encontrado (TTL 24h): RETURN (cached=true)
+6. Senão: Chamar OpenAI, salvar cache, RETURN
+
+Benefícios:
+├─ Reduz 60% das chamadas OpenAI
+├─ Economia ~$100/mês
+├─ Latência menor (banco vs API)
+└─ Mais estável (menos dependência externa)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+SEGURANÇA
+═══════════════════════════════════════════════════════════════════════════════
+
+Autenticação:
+├─ JWT via Supabase Auth
+├─ Session management
+└─ CRON_SECRET para jobs
+
+Autorização:
+├─ RLS Policies no banco
+├─ Usuário vê apenas suas unidades
+└─ Queries filtram automaticamente por auth.uid()
+
+Proteção de APIs:
+├─ Rate limiting
+├─ Validação de input (class-validator)
+├─ Sanitização (DOMPurify)
+└─ CORS configurado
+
+Proteção de Jobs:
+├─ Idempotência (evita execução duplicada)
+├─ Circuit Breaker (5 falhas = trip)
+├─ Retry com backoff exponencial
+└─ Timeout enforcement
+
+Anonimização:
+├─ Para OpenAI: remove IDs, nomes específicos
+├─ Mantém apenas agregados numéricos
+└─ Cache com TTL (24h)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+PERFORMANCE
+═══════════════════════════════════════════════════════════════════════════════
+
+ETL Diário
+├─ Duração total: 30-40 segundos (5 unidades)
+├─ Extract: 100-200ms
+├─ Transform: 50-100ms
+├─ Load: 100-200ms
+├─ Anomaly: 200-300ms
+└─ Parallelização: BATCH_SIZE=5
+
+OpenAI
+├─ Cache hit rate: ~60%
+├─ Latência API: 2-5 segundos
+├─ TTL: 24 horas
+└─ Tokens/request: 1000-2000
+
+Telegram
+├─ Latência: <1 segundo
+├─ Retry: 3 tentativas
+├─ Circuit breaker: 5 falhas = trip
+└─ Rate limit: 30 msg/segundo
+
+Banco de Dados
+├─ Índices em (unit_id, date)
+├─ RLS policies otimizadas
+├─ Connection pooling (Supabase)
+└─ Archive dados >2 anos
+
+
+═══════════════════════════════════════════════════════════════════════════════
+ARQUIVOS CHAVE DO CÓDIGO
+═══════════════════════════════════════════════════════════════════════════════
+
+ETL:
+├─ lib/analytics/etl.ts (Pipeline ETL)
+├─ lib/analytics/calculations.ts (Cálculos KPI)
+├─ lib/analytics/anomalies.ts (Detecção)
+└─ app/api/cron/etl-diario/route.ts (Orchestration)
+
+Notificações:
+├─ app/api/cron/enviar-alertas/route.ts (Dispatcher)
+├─ lib/telegram.ts (Envio)
+└─ app/api/telegram/webhook/route.ts (Webhook)
+
+OpenAI:
+├─ lib/ai/openai.ts (API calls)
+├─ lib/ai/analysis.ts (Analysis logic)
+├─ lib/ai/prompts.ts (Prompt templates)
+└─ lib/cache.ts (Cache management)
+
+Relatórios:
+├─ app/api/cron/relatorio-diario/route.ts (Daily)
+├─ app/api/cron/relatorio-semanal/route.ts (Weekly)
+└─ lib/services/reportLearning.ts (Learning)
+
+Repositórios:
+├─ lib/repositories/aiMetricsRepository.ts
+├─ lib/repositories/alertsRepository.ts
+└─ lib/repositories/kpiTargetsRepository.ts
+
+
+═══════════════════════════════════════════════════════════════════════════════
+EXEMPLO PRÁTICO - FLUXO COMPLETO
+═══════════════════════════════════════════════════════════════════════════════
+
+[11/11/2025 14:30]
+  Usuário cria receita R$ 150 (CommissionsPage)
+  └─> INSERT revenues (status='Pending')
+
+[11/11/2025 21:00]
+  Relatório Diário (Cron)
+  ├─ getDailyRevenues() = R$ 5000 total
+  ├─ compareWithLastWeek() = +10%
+  ├─ generateAnalysis(openai)
+  │  └─> "Receita em alta, mantenha ritmo"
+  └─> sendTelegramMessage()
+
+[12/11/2025 03:00]
+  ETL Diário (Cron)
+  ├─ EXTRACT: 10 receitas, 5 despesas
+  ├─ TRANSFORM: margin 70%
+  ├─ LOAD: ai_metrics_daily
+  ├─ ANOMALIES: detecta queda
+  └─> INSERT alerts_events
+
+[12/11/2025 03:15]
+  Enviar Alertas (Cron)
+  ├─ SELECT alerts WHERE status='OPEN'
+  ├─ sendTelegramAlert()
+  └─> UPDATE status='ACKNOWLEDGED'
+
+[12/11/2025 15:20]
+  Usuário envia /whatif "aumento 30%"
+  ├─ POST /api/telegram/webhook
+  ├─ generateAnalysis(WHAT_IF)
+  └─> "Margem subiria para 75%"
+
+
+═══════════════════════════════════════════════════════════════════════════════
+TABELAS PRINCIPAIS DO BANCO
+═══════════════════════════════════════════════════════════════════════════════
+
+revenues (Receitas)
+├─ id (UUID PK)
+├─ unit_id (FK)
+├─ value (DECIMAL 15,2)
+├─ date (DATE)
+├─ status ('Pending', 'Received', 'Cancelled')
+└─ Índices: (unit_id, date), source_hash
+
+expenses (Despesas)
+├─ id (UUID PK)
+├─ unit_id (FK)
+├─ value (DECIMAL 15,2)
+├─ date (DATE)
+├─ is_recurring (BOOLEAN)
+└─ Índices: (unit_id, date)
+
+ai_metrics_daily (Métricas)
+├─ unit_id (FK)
+├─ date (DATE) - UNIQUE per unit
+├─ gross_revenue, total_expenses
+├─ margin_percentage, average_ticket
+└─ Índices: (unit_id, date)
+
+alerts_events (Alertas)
+├─ unit_id (FK)
+├─ alert_type (VARCHAR)
+├─ severity ('LOW', 'MEDIUM', 'HIGH', 'CRITICAL')
+├─ status ('OPEN', 'ACKNOWLEDGED', 'RESOLVED')
+└─ Índices: (unit_id), (status)
+
+etl_runs (Histórico)
+├─ run_type (VARCHAR)
+├─ run_date (DATE)
+├─ status ('RUNNING', 'SUCCESS', 'FAILED', 'PARTIAL')
+└─ Índices: (run_type, run_date)
+
+openai_cache (Cache)
+├─ cache_key (VARCHAR UNIQUE)
+├─ response (TEXT)
+├─ expires_at (TIMESTAMPTZ)
+└─ TTL: 24 horas
+
+
+═══════════════════════════════════════════════════════════════════════════════
+ESTATÍSTICAS TÉCNICAS
+═══════════════════════════════════════════════════════════════════════════════
+
+Linhas de código analisadas: 5000+
+Arquivos principais: 35
+Componentes React: 50+
+APIs REST: 13
+Cron Jobs: 8
+Tabelas BD: 6 principais
+Índices DB: 15+
+
+Stack Tecnológico:
+├─ Frontend: React 18, Vite, Tailwind CSS
+├─ Backend: Next.js 14, TypeScript
+├─ BD: Supabase (PostgreSQL 15)
+├─ APIs: OpenAI, Telegram
+├─ Deploy: Vercel
+├─ Cache: Redis (Supabase)
+└─ Logging: Structured (JSON)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+COMO USAR ESTE DOCUMENTO
+═══════════════════════════════════════════════════════════════════════════════
+
+Para Compreensão Geral:
+1. Leia este resumo (MAPEAMENTO_RESUMO.txt)
+2. Revise seção 1 (Frontend) e seção 8 (Arquitetura)
+3. Olhe exemplos na seção "EXEMPLO PRÁTICO"
+
+Para Desenvolvimento:
+1. Seção 2 (Banco de Dados) - estrutura
+2. Seção 3 (Cron Jobs) - como adicionar novos jobs
+3. Seção 4 (Integrações) - OpenAI/Telegram
+4. Arquivos chave do código
+
+Para Debugging:
+1. Seção 6 (Ciclo de Vida ETL) - rastrear processamento
+2. Seção 7 (Notificações) - rastrear alertas
+3. Verifique logs em etl_runs e alerts_events
+
+Para Escalabilidade:
+1. Seção 8 (Arquitetura) - componentes
+2. Seção 8 (Performance) - métricas atuais
+3. Considere: particionamento, archival, async queues
+
+
+═══════════════════════════════════════════════════════════════════════════════
+PRÓXIMOS PASSOS RECOMENDADOS
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Adicionar Queue System (Bull/BullMQ para jobs complexos)
+2. Implementar Dead Letter Queue (para alertas falhados)
+3. Adicionar Monitoring/Alerting (Sentry, DataDog)
+4. Implementar A/B Testing para prompts OpenAI
+5. Criar Dashboard de Analytics (jobs, custos, performance)
+6. Adicionar Webhook para integrações externas
+7. Implementar Audit Trail (quem fez o quê, quando)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Documento gerado: 11 de Novembro de 2025
+Versão: 1.0
+Autor: Análise Automática de Código
+
+Para mais detalhes, consulte: MAPEAMENTO_FLUXO_DADOS.md
+
+═══════════════════════════════════════════════════════════════════════════════

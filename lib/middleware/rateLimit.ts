@@ -11,7 +11,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { logger } from '@/lib/logger';
+import { logger } from '../logger';
 
 /**
  * Armazenamento em memória para rate limiting
@@ -181,4 +181,3 @@ export const telegramRateLimit = {
   windowMs: 60 * 60 * 1000, // 1 hora
   maxRequests: 10,
 };
-

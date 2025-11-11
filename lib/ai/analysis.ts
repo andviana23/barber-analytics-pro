@@ -16,8 +16,12 @@ import {
   type MonthlyMetrics,
   type AlertType,
 } from './prompts';
-import { getCachedAnalysis, setCachedAnalysis, generateCacheKey } from '@/lib/cache';
-import { logger } from '@/lib/logger';
+import {
+  getCachedAnalysis,
+  setCachedAnalysis,
+  generateCacheKey,
+} from '../cache';
+import { logger } from '../logger';
 import { anonymizeMetrics } from './anonymization';
 
 /**
@@ -124,7 +128,9 @@ export async function generateAnalysis(
         messages = getWhatIfPrompt(options.scenario, anonymizedMetrics);
         break;
       case 'MONTHLY_EXECUTIVE':
-        messages = getMonthlyExecutiveSummary(anonymizedMetrics as MonthlyMetrics);
+        messages = getMonthlyExecutiveSummary(
+          anonymizedMetrics as MonthlyMetrics
+        );
         break;
       default:
         throw new Error(`Tipo de prompt inválido: ${promptType}`);
@@ -135,7 +141,10 @@ export async function generateAnalysis(
       unitId,
       model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
       temperature: 0.7,
-      maxTokens: parseInt(process.env.OPENAI_MAX_TOKENS_PER_REQUEST || '2000', 10),
+      maxTokens: parseInt(
+        process.env.OPENAI_MAX_TOKENS_PER_REQUEST || '2000',
+        10
+      ),
     });
 
     const content = response.choices[0]?.message?.content || '';
@@ -152,7 +161,8 @@ export async function generateAnalysis(
     } catch (parseError) {
       logger.warn('Não foi possível parsear JSON da resposta', {
         correlationId,
-        error: parseError instanceof Error ? parseError.message : 'Unknown error',
+        error:
+          parseError instanceof Error ? parseError.message : 'Unknown error',
       });
     }
 
@@ -190,4 +200,3 @@ export async function generateAnalysis(
     throw error;
   }
 }
-

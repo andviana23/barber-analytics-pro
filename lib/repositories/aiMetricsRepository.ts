@@ -10,8 +10,7 @@
  * @see CHECKLIST_IA_FINANCEIRA.md - Seção 3
  */
 
-// @ts-expect-error - supabase.js não tem tipos exportados
-import { supabase } from '@/services/supabase';
+import { supabaseAdmin } from '../supabaseAdmin';
 
 /**
  * Interface para métricas diárias
@@ -72,7 +71,7 @@ export async function upsert(data: AiMetricInput): Promise<{
   error: any;
 }> {
   try {
-    const { data: result, error } = await supabase
+    const { data: result, error } = await supabaseAdmin
       .from('ai_metrics_daily')
       .upsert(
         {
@@ -81,12 +80,12 @@ export async function upsert(data: AiMetricInput): Promise<{
             typeof data.date === 'string'
               ? data.date
               : data.date.toISOString().split('T')[0],
-          gross_revenue: data.gross_revenue,
-          total_expenses: data.total_expenses,
-          margin_percentage: data.margin_percentage,
-          average_ticket: data.average_ticket,
-          revenues_count: data.revenues_count,
-          expenses_count: data.expenses_count,
+          receita_bruta: data.gross_revenue,
+          despesas_totais: data.total_expenses,
+          margem_percentual: data.margin_percentage,
+          ticket_medio: data.average_ticket,
+          receitas_count: data.revenues_count,
+          despesas_count: data.expenses_count,
         },
         {
           onConflict: 'unit_id,date', // Chave de conflito
@@ -133,7 +132,7 @@ export async function findByPeriod(
   error: any;
 }> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('ai_metrics_daily')
       .select('*')
       .eq('unit_id', unitId)
@@ -176,7 +175,7 @@ export async function findByDate(
   error: any;
 }> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('ai_metrics_daily')
       .select('*')
       .eq('unit_id', unitId)
@@ -215,7 +214,7 @@ export async function findLast(
   error: any;
 }> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('ai_metrics_daily')
       .select('*')
       .eq('unit_id', unitId)
@@ -271,7 +270,7 @@ export async function findMonthlyAggregation(
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0); // Último dia do mês
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('ai_metrics_daily')
       .select(
         'gross_revenue, total_expenses, margin_percentage, revenues_count, expenses_count'
@@ -353,7 +352,7 @@ export async function deleteByDate(
   error: any;
 }> {
   try {
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('ai_metrics_daily')
       .delete()
       .eq('unit_id', unitId)

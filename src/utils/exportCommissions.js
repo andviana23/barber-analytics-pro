@@ -170,7 +170,10 @@ export const exportCommissionsToCSV = async (commissions, filters = {}) => {
  * @param {Array} commissions - Array de comissões manuais
  * @param {Object} filters - Filtros aplicados
  */
-export const exportManualCommissionsToPDF = async (commissions, filters = {}) => {
+export const exportManualCommissionsToPDF = async (
+  commissions,
+  filters = {}
+) => {
   try {
     // Lazy load jsPDF e autoTable
     const { default: jsPDF } = await import('jspdf');
@@ -186,9 +189,14 @@ export const exportManualCommissionsToPDF = async (commissions, filters = {}) =>
     // Header
     doc.setFontSize(18);
     doc.setFont(undefined, 'bold');
-    doc.text('Relatório de Comissões (Gestão Manual)', pageWidth / 2, yPosition, {
-      align: 'center',
-    });
+    doc.text(
+      'Relatório de Comissões (Gestão Manual)',
+      pageWidth / 2,
+      yPosition,
+      {
+        align: 'center',
+      }
+    );
 
     yPosition += 10;
     doc.setFontSize(10);
@@ -212,25 +220,25 @@ export const exportManualCommissionsToPDF = async (commissions, filters = {}) =>
     }
 
     if (filters.professional_id && commissions.length > 0) {
-      const professionalName =
-        commissions[0].professional?.name || 'N/A';
-      doc.text(
-        `Profissional: ${professionalName}`,
-        pageWidth / 2,
-        yPosition,
-        { align: 'center' }
-      );
+      const professionalName = commissions[0].professional?.name || 'N/A';
+      doc.text(`Profissional: ${professionalName}`, pageWidth / 2, yPosition, {
+        align: 'center',
+      });
       yPosition += 6;
     }
 
     // Tabela de dados
-    const tableData = commissions.map((item) => [
+    const tableData = commissions.map(item => [
       formatDate(item.reference_date),
       item.professional?.name || 'N/A',
       item.description || '-',
       item.order ? `#${item.order.id.slice(0, 8)}` : '-',
       formatCurrency(item.amount || 0),
-      item.status === 'PAID' ? 'Paga' : item.status === 'CANCELLED' ? 'Cancelada' : 'Pendente',
+      item.status === 'PAID'
+        ? 'Paga'
+        : item.status === 'CANCELLED'
+          ? 'Cancelada'
+          : 'Pendente',
       item.paid_at ? formatDate(item.paid_at) : '-',
     ]);
 
@@ -268,7 +276,7 @@ export const exportManualCommissionsToPDF = async (commissions, filters = {}) =>
         6: { cellWidth: 25 }, // Data Pagamento
       },
       margin: { left: 10, right: 10 },
-      didDrawPage: (data) => {
+      didDrawPage: data => {
         // Footer com número da página
         doc.setFontSize(8);
         doc.text(
@@ -313,7 +321,11 @@ export const exportManualCommissionsToPDF = async (commissions, filters = {}) =>
 
     if (totals.cancelled > 0) {
       doc.setTextColor(239, 68, 68); // red-600
-      doc.text(`Canceladas: ${formatCurrency(totals.cancelled)}`, 14, finalY + 18);
+      doc.text(
+        `Canceladas: ${formatCurrency(totals.cancelled)}`,
+        14,
+        finalY + 18
+      );
     }
 
     doc.setTextColor(0, 0, 0); // reset
@@ -343,7 +355,7 @@ export const exportManualCommissionsToPDF = async (commissions, filters = {}) =>
 
 /**
  * Exporta comissões para PDF (alias para exportManualCommissionsToPDF)
- * 
+ *
  * @deprecated Use exportManualCommissionsToPDF instead
  * @param {Array} commissions - Array de comissões
  * @param {Object} filters - Filtros aplicados

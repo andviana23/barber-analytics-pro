@@ -4,12 +4,7 @@
  * @description Garante que cron jobs não sejam executados múltiplas vezes para a mesma data
  */
 
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { supabaseAdmin as supabase } from './supabaseAdmin';
 
 export interface IdempotencyResult {
   canProceed: boolean;
@@ -40,7 +35,7 @@ export async function ensureIdempotency(
     return {
       canProceed: false,
       existingRunId: existingRun.id,
-      reason: `Execução bem-sucedida já existe para ${runDate}`
+      reason: `Execução bem-sucedida já existe para ${runDate}`,
     };
   }
 
@@ -66,26 +61,26 @@ export async function ensureIdempotency(
         .update({
           status: 'FAILED',
           error_message: 'Timeout - execução travada por mais de 10 minutos',
-          finished_at: new Date().toISOString()
+          finished_at: new Date().toISOString(),
         })
         .eq('id', runningRun.id);
 
       return {
         canProceed: true,
-        reason: 'Execução anterior travada, marcada como falha'
+        reason: 'Execução anterior travada, marcada como falha',
       };
     }
 
     return {
       canProceed: false,
       existingRunId: runningRun.id,
-      reason: `Execução em andamento desde ${startedAt.toISOString()}`
+      reason: `Execução em andamento desde ${startedAt.toISOString()}`,
     };
   }
 
   return {
     canProceed: true,
-    reason: 'Nenhuma execução encontrada, pode prosseguir'
+    reason: 'Nenhuma execução encontrada, pode prosseguir',
   };
 }
 
@@ -108,7 +103,7 @@ export async function createRunRecord(
       run_date: runDate,
       status: 'RUNNING',
       trigger_source: triggerSource,
-      started_at: new Date().toISOString()
+      started_at: new Date().toISOString(),
     })
     .select('id')
     .single();
@@ -133,7 +128,7 @@ export async function updateRunStatus(
 ): Promise<void> {
   const updateData: any = {
     status,
-    finished_at: new Date().toISOString()
+    finished_at: new Date().toISOString(),
   };
 
   if (errorMessage) {
@@ -149,5 +144,3 @@ export async function updateRunStatus(
     throw new Error(`Falha ao atualizar status: ${error.message}`);
   }
 }
-
-

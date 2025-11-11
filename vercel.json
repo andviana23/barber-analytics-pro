@@ -70,23 +70,44 @@
       "path": "/api/cron/gerar-despesas-recorrentes",
       "schedule": "0 2 * * *",
       "description": "Geração de Despesas Recorrentes - Diariamente às 02:00 BRT (antes do ETL)"
+    },
+    {
+      "path": "/api/cron/relatorio-diario",
+      "schedule": "0 21 * * *",
+      "description": "Relatório Diário de Receitas - Todos os dias às 21:00 BRT (com IA ApoIA)"
     }
   ],
   "headers": [
     {
-      "source": "/api/(.*)",
+      "source": "/(.*)",
       "headers": [
         {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; connect-src 'self' https://*.supabase.co https://api.openai.com https://api.telegram.org wss://*.supabase.co; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains; preload"
         },
         {
           "key": "X-Frame-Options",
           "value": "DENY"
         },
         {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
           "key": "X-XSS-Protection",
           "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()"
         }
       ]
     }

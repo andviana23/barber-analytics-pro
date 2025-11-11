@@ -6,13 +6,8 @@
  * @see CHECKLIST_IA_FINANCEIRA.md - Seção 5.4
  */
 
-import { createClient } from '@supabase/supabase-js';
-import { logger } from '@/lib/logger';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { supabaseAdmin as supabase } from './supabaseAdmin';
+import { logger } from './logger';
 
 export interface CostTracking {
   date: string;
@@ -105,7 +100,11 @@ export async function getMonthlyOpenAICost(): Promise<number> {
       return 0;
     }
 
-    const total = data?.reduce((sum, record) => sum + parseFloat(record.cost_usd || '0'), 0) || 0;
+    const total =
+      data?.reduce(
+        (sum, record) => sum + parseFloat(record.cost_usd || '0'),
+        0
+      ) || 0;
 
     logger.debug('Custo mensal calculado', {
       total: total.toFixed(2),
@@ -140,7 +139,9 @@ export async function checkCostThreshold(): Promise<{
   alertSent: boolean;
 }> {
   const correlationId = `cost-threshold-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  const threshold = parseFloat(process.env.OPENAI_COST_ALERT_THRESHOLD || '100');
+  const threshold = parseFloat(
+    process.env.OPENAI_COST_ALERT_THRESHOLD || '100'
+  );
   const current = await getMonthlyOpenAICost();
   const percentage = (current / threshold) * 100;
   let alertSent = false;
@@ -157,18 +158,19 @@ export async function checkCostThreshold(): Promise<{
     try {
       const { sendTelegramAlert } = await import('./telegram');
       const severity = current >= threshold ? 'CRITICAL' : 'HIGH';
-      const alertMessage = current >= threshold
-        ? `Custo OpenAI EXCEDEU o limite: $${current.toFixed(2)} / $${threshold}`
-        : `Custo OpenAI próximo do limite: $${current.toFixed(2)} / $${threshold} (${percentage.toFixed(1)}%)`;
+      const alertMessage =
+        current >= threshold
+          ? `Custo OpenAI EXCEDEU o limite: $${current.toFixed(2)} / $${threshold}`
+          : `Custo OpenAI próximo do limite: $${current.toFixed(2)} / $${threshold} (${percentage.toFixed(1)}%)`;
 
       await sendTelegramAlert({
         message: alertMessage,
         severity,
         metadata: {
           'Custo Atual': `$${current.toFixed(2)}`,
-          'Limite': `$${threshold}`,
-          'Percentual': `${percentage.toFixed(1)}%`,
-          'Status': current >= threshold ? 'EXCEDIDO' : 'PRÓXIMO DO LIMITE',
+          Limite: `$${threshold}`,
+          Percentual: `${percentage.toFixed(1)}%`,
+          Status: current >= threshold ? 'EXCEDIDO' : 'PRÓXIMO DO LIMITE',
         },
       });
 
@@ -276,15 +278,21 @@ export async function getCostByUnit(
       return [];
     }
 
-    const costsByUnit = data.reduce((acc, record) => {
-      const unitId = record.unit_id;
-      if (!acc[unitId]) {
-        acc[unitId] = { unitId, totalCost: 0, requests: 0 };
-      }
-      acc[unitId].totalCost += parseFloat(record.cost_usd || '0');
-      acc[unitId].requests += 1;
-      return acc;
-    }, {} as Record<string, { unitId: string; totalCost: number; requests: number }>);
+    const costsByUnit = data.reduce(
+      (acc, record) => {
+        const unitId = record.unit_id;
+        if (!acc[unitId]) {
+          acc[unitId] = { unitId, totalCost: 0, requests: 0 };
+        }
+        acc[unitId].totalCost += parseFloat(record.cost_usd || '0');
+        acc[unitId].requests += 1;
+        return acc;
+      },
+      {} as Record<
+        string,
+        { unitId: string; totalCost: number; requests: number }
+      >
+    );
 
     const result = Object.values(costsByUnit);
 
@@ -306,5 +314,3 @@ export async function getCostByUnit(
     return [];
   }
 }
-
-

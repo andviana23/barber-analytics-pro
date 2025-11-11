@@ -1,10 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, Calendar, DollarSign, Users, FileText, Loader2 } from 'lucide-react';
+import {
+  X,
+  Save,
+  Calendar,
+  DollarSign,
+  Users,
+  FileText,
+  Loader2,
+} from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '../context/ToastContext';
-import { useCreateCommission, useUpdateCommission } from '../hooks/useCommissions';
-import { ProfissionaisService } from '../../services/profissionaisService';
-import orderRepository from '../../repositories/orderRepository';
+import {
+  useCreateCommission,
+  useUpdateCommission,
+} from '../hooks/useCommissions';
+import { ProfissionaisService } from '../services/profissionaisService';
+import orderRepository from '../repositories/orderRepository';
 
 /**
  * Modal de Formulário de Comissão
@@ -16,11 +27,19 @@ import orderRepository from '../../repositories/orderRepository';
  * - Tipografia consistente
  * - Acessibilidade (ARIA, foco visível)
  */
-const CommissionFormModal = ({ isOpen, onClose, commission, unitId, onSuccess }) => {
+const CommissionFormModal = ({
+  isOpen,
+  onClose,
+  commission,
+  unitId,
+  onSuccess,
+}) => {
   const isEditMode = !!commission;
   const { showToast } = useToast();
-  const { mutate: createCommission, isLoading: isCreating } = useCreateCommission();
-  const { mutate: updateCommission, isLoading: isUpdating } = useUpdateCommission();
+  const { mutate: createCommission, isLoading: isCreating } =
+    useCreateCommission();
+  const { mutate: updateCommission, isLoading: isUpdating } =
+    useUpdateCommission();
 
   const [formData, setFormData] = useState({
     professional_id: '',
@@ -85,7 +104,8 @@ const CommissionFormModal = ({ isOpen, onClose, commission, unitId, onSuccess })
       setFormData({
         professional_id: commission.professional_id || '',
         amount: commission.amount || '',
-        reference_date: commission.reference_date || format(new Date(), 'yyyy-MM-dd'),
+        reference_date:
+          commission.reference_date || format(new Date(), 'yyyy-MM-dd'),
         order_id: commission.order_id || '',
         description: commission.description || '',
         notes: commission.notes || '',
@@ -95,7 +115,7 @@ const CommissionFormModal = ({ isOpen, onClose, commission, unitId, onSuccess })
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
 
     // Validação básica
@@ -182,7 +202,7 @@ const CommissionFormModal = ({ isOpen, onClose, commission, unitId, onSuccess })
     >
       <div
         className="card-theme flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
       >
         {/* Header */}
         <div className="border-b border-light-border bg-primary/10 px-6 py-5 dark:border-dark-border dark:bg-primary/20">
@@ -212,7 +232,10 @@ const CommissionFormModal = ({ isOpen, onClose, commission, unitId, onSuccess })
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 py-6">
+        <form
+          onSubmit={handleSubmit}
+          className="flex-1 overflow-y-auto px-6 py-6"
+        >
           <div className="space-y-6">
             {/* Profissional */}
             <div>
@@ -221,15 +244,18 @@ const CommissionFormModal = ({ isOpen, onClose, commission, unitId, onSuccess })
               </label>
               <select
                 value={formData.professional_id}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, professional_id: e.target.value }))
+                onChange={e =>
+                  setFormData(prev => ({
+                    ...prev,
+                    professional_id: e.target.value,
+                  }))
                 }
                 required
                 disabled={isLoading}
-                className="w-full rounded-lg border-2 border-light-border bg-light-surface px-4 py-3 text-sm font-medium text-theme-primary transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-dark-border dark:bg-dark-surface disabled:opacity-50"
+                className="text-theme-primary w-full rounded-lg border-2 border-light-border bg-light-surface px-4 py-3 text-sm font-medium transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50 dark:border-dark-border dark:bg-dark-surface"
               >
                 <option value="">Selecione um profissional</option>
-                {professionals.map((prof) => (
+                {professionals.map(prof => (
                   <option key={prof.id} value={prof.id}>
                     {prof.name}
                   </option>
@@ -250,13 +276,13 @@ const CommissionFormModal = ({ isOpen, onClose, commission, unitId, onSuccess })
                     step="0.01"
                     min="0.01"
                     value={formData.amount}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, amount: e.target.value }))
+                    onChange={e =>
+                      setFormData(prev => ({ ...prev, amount: e.target.value }))
                     }
                     required
                     disabled={isLoading}
                     placeholder="0,00"
-                    className="w-full rounded-lg border-2 border-light-border bg-light-surface pl-11 pr-4 py-3 text-sm font-medium text-theme-primary transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-dark-border dark:bg-dark-surface disabled:opacity-50"
+                    className="text-theme-primary w-full rounded-lg border-2 border-light-border bg-light-surface py-3 pl-11 pr-4 text-sm font-medium transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50 dark:border-dark-border dark:bg-dark-surface"
                   />
                 </div>
               </div>
@@ -270,12 +296,15 @@ const CommissionFormModal = ({ isOpen, onClose, commission, unitId, onSuccess })
                   <input
                     type="date"
                     value={formData.reference_date}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, reference_date: e.target.value }))
+                    onChange={e =>
+                      setFormData(prev => ({
+                        ...prev,
+                        reference_date: e.target.value,
+                      }))
                     }
                     required
                     disabled={isLoading}
-                    className="w-full rounded-lg border-2 border-light-border bg-light-surface pl-11 pr-4 py-3 text-sm font-medium text-theme-primary transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-dark-border dark:bg-dark-surface disabled:opacity-50"
+                    className="text-theme-primary w-full rounded-lg border-2 border-light-border bg-light-surface py-3 pl-11 pr-4 text-sm font-medium transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50 dark:border-dark-border dark:bg-dark-surface"
                   />
                 </div>
               </div>
@@ -288,10 +317,10 @@ const CommissionFormModal = ({ isOpen, onClose, commission, unitId, onSuccess })
                   type="checkbox"
                   id="link-order"
                   checked={showOrderSelector}
-                  onChange={(e) => {
+                  onChange={e => {
                     setShowOrderSelector(e.target.checked);
                     if (!e.target.checked) {
-                      setFormData((prev) => ({ ...prev, order_id: '' }));
+                      setFormData(prev => ({ ...prev, order_id: '' }));
                     }
                   }}
                   disabled={isLoading}
@@ -308,16 +337,17 @@ const CommissionFormModal = ({ isOpen, onClose, commission, unitId, onSuccess })
               {showOrderSelector && (
                 <select
                   value={formData.order_id}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, order_id: e.target.value }))
+                  onChange={e =>
+                    setFormData(prev => ({ ...prev, order_id: e.target.value }))
                   }
                   disabled={isLoading}
-                  className="w-full rounded-lg border-2 border-light-border bg-light-surface px-4 py-3 text-sm font-medium text-theme-primary transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-dark-border dark:bg-dark-surface disabled:opacity-50"
+                  className="text-theme-primary w-full rounded-lg border-2 border-light-border bg-light-surface px-4 py-3 text-sm font-medium transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50 dark:border-dark-border dark:bg-dark-surface"
                 >
                   <option value="">Selecione uma comanda</option>
-                  {orders.map((order) => (
+                  {orders.map(order => (
                     <option key={order.id} value={order.id}>
-                      Comanda #{order.id.slice(0, 8)} - {order.professional?.name || 'N/A'} -{' '}
+                      Comanda #{order.id.slice(0, 8)} -{' '}
+                      {order.professional?.name || 'N/A'} -{' '}
                       {new Intl.NumberFormat('pt-BR', {
                         style: 'currency',
                         currency: 'BRL',
@@ -337,14 +367,17 @@ const CommissionFormModal = ({ isOpen, onClose, commission, unitId, onSuccess })
                 <FileText className="text-theme-secondary absolute left-3 top-3 h-5 w-5" />
                 <textarea
                   value={formData.description}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, description: e.target.value }))
+                  onChange={e =>
+                    setFormData(prev => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
                   }
                   disabled={isLoading}
                   rows={3}
                   maxLength={500}
                   placeholder="Descrição da comissão..."
-                  className="w-full rounded-lg border-2 border-light-border bg-light-surface pl-11 pr-4 py-3 text-sm font-medium text-theme-primary transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-dark-border dark:bg-dark-surface disabled:opacity-50"
+                  className="text-theme-primary w-full rounded-lg border-2 border-light-border bg-light-surface py-3 pl-11 pr-4 text-sm font-medium transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50 dark:border-dark-border dark:bg-dark-surface"
                 />
               </div>
             </div>
@@ -356,14 +389,14 @@ const CommissionFormModal = ({ isOpen, onClose, commission, unitId, onSuccess })
               </label>
               <textarea
                 value={formData.notes}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, notes: e.target.value }))
+                onChange={e =>
+                  setFormData(prev => ({ ...prev, notes: e.target.value }))
                 }
                 disabled={isLoading}
                 rows={3}
                 maxLength={1000}
                 placeholder="Observações adicionais..."
-                className="w-full rounded-lg border-2 border-light-border bg-light-surface px-4 py-3 text-sm font-medium text-theme-primary transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-dark-border dark:bg-dark-surface disabled:opacity-50"
+                className="text-theme-primary w-full rounded-lg border-2 border-light-border bg-light-surface px-4 py-3 text-sm font-medium transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50 dark:border-dark-border dark:bg-dark-surface"
               />
             </div>
 
@@ -375,11 +408,11 @@ const CommissionFormModal = ({ isOpen, onClose, commission, unitId, onSuccess })
                 </label>
                 <select
                   value={formData.status}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, status: e.target.value }))
+                  onChange={e =>
+                    setFormData(prev => ({ ...prev, status: e.target.value }))
                   }
                   disabled={isLoading}
-                  className="w-full rounded-lg border-2 border-light-border bg-light-surface px-4 py-3 text-sm font-medium text-theme-primary transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-dark-border dark:bg-dark-surface disabled:opacity-50"
+                  className="text-theme-primary w-full rounded-lg border-2 border-light-border bg-light-surface px-4 py-3 text-sm font-medium transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50 dark:border-dark-border dark:bg-dark-surface"
                 >
                   <option value="PENDING">Pendente</option>
                   <option value="PAID">Paga</option>
@@ -395,14 +428,14 @@ const CommissionFormModal = ({ isOpen, onClose, commission, unitId, onSuccess })
               type="button"
               onClick={handleClose}
               disabled={isLoading}
-              className="rounded-lg border-2 border-light-border bg-light-surface px-6 py-2.5 text-sm font-semibold text-theme-primary transition-all hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 dark:border-dark-border dark:bg-dark-surface dark:hover:bg-gray-800"
+              className="text-theme-primary rounded-lg border-2 border-light-border bg-light-surface px-6 py-2.5 text-sm font-semibold transition-all hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 dark:border-dark-border dark:bg-dark-surface dark:hover:bg-gray-800"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="flex items-center gap-2 rounded-lg bg-gradient-primary px-6 py-2.5 text-sm font-semibold text-dark-text-primary shadow-lg transition-all hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50"
+              className="text-dark-text-primary flex items-center gap-2 rounded-lg bg-gradient-primary px-6 py-2.5 text-sm font-semibold shadow-lg transition-all hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50"
             >
               {isLoading ? (
                 <>
@@ -424,5 +457,3 @@ const CommissionFormModal = ({ isOpen, onClose, commission, unitId, onSuccess })
 };
 
 export default CommissionFormModal;
-
-

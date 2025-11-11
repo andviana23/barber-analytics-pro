@@ -18,12 +18,21 @@ import {
 import { format, startOfMonth, endOfMonth, parseISO } from 'date-fns';
 import { useToast } from '../context/ToastContext';
 import { useUnit } from '../context/UnitContext';
-import { useCommissions, useDeleteCommission, useMarkCommissionPaid, useCommissionTotals } from '../../hooks/useCommissions';
-import { getCommissionStatusLabel, getCommissionStatusColor, formatCommissionForDisplay } from '../../dtos/CommissionDTO';
+import {
+  useCommissions,
+  useDeleteCommission,
+  useMarkCommissionPaid,
+  useCommissionTotals,
+} from '../hooks/useCommissions';
+import {
+  getCommissionStatusLabel,
+  getCommissionStatusColor,
+  formatCommissionForDisplay,
+} from '../dtos/CommissionDTO';
 import CommissionFormModal from '../organisms/CommissionFormModal';
-import { exportManualCommissionsToPDF } from '../../utils/exportCommissions';
-import { ProfissionaisService } from '../../services/profissionaisService';
-import DeleteConfirmationModal from '../modals/DeleteConfirmationModal';
+import { exportManualCommissionsToPDF } from '../utils/exportCommissions';
+import { ProfissionaisService } from '../services/profissionaisService';
+import DeleteConfirmationModal from '../components/modals/DeleteConfirmationModal';
 
 /**
  * Página de Comissões (Gestão Manual)
@@ -110,7 +119,7 @@ const CommissionsPage = () => {
 
     const search = searchTerm.toLowerCase();
     return commissions.filter(
-      (c) =>
+      c =>
         c.description?.toLowerCase().includes(search) ||
         c.professional?.name?.toLowerCase().includes(search) ||
         c.notes?.toLowerCase().includes(search)
@@ -118,16 +127,18 @@ const CommissionsPage = () => {
   }, [commissions, searchTerm]);
 
   // Formatação
-  const formatCurrency = (value) => {
+  const formatCurrency = value => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
     }).format(value || 0);
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     if (!dateString) return '-';
-    return format(parseISO(dateString), 'dd/MM/yyyy', { locale: require('date-fns/locale/pt-BR') });
+    return format(parseISO(dateString), 'dd/MM/yyyy', {
+      locale: require('date-fns/locale/pt-BR'),
+    });
   };
 
   // Handlers
@@ -136,12 +147,12 @@ const CommissionsPage = () => {
     setIsFormModalOpen(true);
   };
 
-  const handleEdit = (commission) => {
+  const handleEdit = commission => {
     setSelectedCommission(commission);
     setIsFormModalOpen(true);
   };
 
-  const handleDelete = (commission) => {
+  const handleDelete = commission => {
     setSelectedCommission(commission);
     setIsDeleteModalOpen(true);
   };
@@ -158,7 +169,7 @@ const CommissionsPage = () => {
     }
   };
 
-  const handleMarkAsPaid = (commission) => {
+  const handleMarkAsPaid = commission => {
     markAsPaid(
       { id: commission.id },
       {
@@ -171,7 +182,10 @@ const CommissionsPage = () => {
 
   const handleExportPDF = async () => {
     try {
-      const result = await exportManualCommissionsToPDF(filteredCommissions, filters);
+      const result = await exportManualCommissionsToPDF(
+        filteredCommissions,
+        filters
+      );
       if (result.success) {
         showToast({
           type: 'success',
@@ -189,13 +203,14 @@ const CommissionsPage = () => {
     }
   };
 
-  const getStatusBadge = (commission) => {
+  const getStatusBadge = commission => {
     const status = commission.status;
     const color = getCommissionStatusColor(status);
     const label = getCommissionStatusLabel(status);
 
     const colorClasses = {
-      PENDING: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+      PENDING:
+        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
       PAID: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
       CANCELLED: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
     };
@@ -217,7 +232,9 @@ const CommissionsPage = () => {
   if (!unitId) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <p className="text-theme-secondary">Selecione uma unidade para visualizar comissões</p>
+        <p className="text-theme-secondary">
+          Selecione uma unidade para visualizar comissões
+        </p>
       </div>
     );
   }
@@ -225,81 +242,88 @@ const CommissionsPage = () => {
   return (
     <div className="space-y-6">
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {/* Total */}
-        <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-300">
-          <div className="flex items-center justify-between mb-3">
-            <div className="p-3 bg-gradient-primary rounded-xl shadow-lg">
-              <DollarSign className="w-6 h-6 text-dark-text-primary" />
+        <div className="card-theme rounded-xl border-2 border-transparent p-5 transition-all duration-300 hover:border-blue-300 dark:hover:border-blue-700">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="rounded-xl bg-gradient-primary p-3 shadow-lg">
+              <DollarSign className="text-dark-text-primary h-6 w-6" />
             </div>
-            <TrendingUp className="w-5 h-5 text-blue-500 dark:text-blue-400 opacity-60" />
+            <TrendingUp className="h-5 w-5 text-blue-500 opacity-60 dark:text-blue-400" />
           </div>
-          <p className="text-xs font-bold text-theme-secondary uppercase tracking-wider mb-2">
+          <p className="text-theme-secondary mb-2 text-xs font-bold uppercase tracking-wider">
             Total de Comissões
           </p>
-          <p className="text-3xl font-bold text-theme-primary mb-1">
+          <p className="text-theme-primary mb-1 text-3xl font-bold">
             {formatCurrency(totals?.total || 0)}
           </p>
-          <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-            {filteredCommissions.length} comissão{filteredCommissions.length !== 1 ? 'ões' : ''} no período
+          <p className="text-xs font-medium text-blue-600 dark:text-blue-400">
+            {filteredCommissions.length} comissão
+            {filteredCommissions.length !== 1 ? 'ões' : ''} no período
           </p>
         </div>
 
         {/* Pagas */}
-        <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-green-300 dark:hover:border-green-700 transition-all duration-300">
-          <div className="flex items-center justify-between mb-3">
-            <div className="p-3 bg-gradient-success rounded-xl shadow-lg">
-              <CheckCircle className="w-6 h-6 text-dark-text-primary" />
+        <div className="card-theme rounded-xl border-2 border-transparent p-5 transition-all duration-300 hover:border-green-300 dark:hover:border-green-700">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="rounded-xl bg-gradient-success p-3 shadow-lg">
+              <CheckCircle className="text-dark-text-primary h-6 w-6" />
             </div>
-            <TrendingUp className="w-5 h-5 text-green-500 dark:text-green-400 opacity-60" />
+            <TrendingUp className="h-5 w-5 text-green-500 opacity-60 dark:text-green-400" />
           </div>
-          <p className="text-xs font-bold text-theme-secondary uppercase tracking-wider mb-2">
+          <p className="text-theme-secondary mb-2 text-xs font-bold uppercase tracking-wider">
             Comissões Pagas
           </p>
-          <p className="text-3xl font-bold text-theme-primary mb-1">
+          <p className="text-theme-primary mb-1 text-3xl font-bold">
             {formatCurrency(totals?.paid || 0)}
           </p>
-          <p className="text-xs text-green-600 dark:text-green-400 font-medium">
-            {filteredCommissions.filter((c) => c.status === 'PAID').length} paga
-            {filteredCommissions.filter((c) => c.status === 'PAID').length !== 1 ? 's' : ''}
+          <p className="text-xs font-medium text-green-600 dark:text-green-400">
+            {filteredCommissions.filter(c => c.status === 'PAID').length} paga
+            {filteredCommissions.filter(c => c.status === 'PAID').length !== 1
+              ? 's'
+              : ''}
           </p>
         </div>
 
         {/* Pendentes */}
-        <div className="card-theme p-5 rounded-xl border-2 border-transparent hover:border-yellow-300 dark:hover:border-yellow-700 transition-all duration-300">
-          <div className="flex items-center justify-between mb-3">
-            <div className="p-3 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl shadow-lg">
-              <Clock className="w-6 h-6 text-dark-text-primary" />
+        <div className="card-theme rounded-xl border-2 border-transparent p-5 transition-all duration-300 hover:border-yellow-300 dark:hover:border-yellow-700">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="rounded-xl bg-gradient-to-br from-yellow-500 to-orange-600 p-3 shadow-lg">
+              <Clock className="text-dark-text-primary h-6 w-6" />
             </div>
-            <TrendingUp className="w-5 h-5 text-yellow-500 dark:text-yellow-400 opacity-60" />
+            <TrendingUp className="h-5 w-5 text-yellow-500 opacity-60 dark:text-yellow-400" />
           </div>
-          <p className="text-xs font-bold text-theme-secondary uppercase tracking-wider mb-2">
+          <p className="text-theme-secondary mb-2 text-xs font-bold uppercase tracking-wider">
             Comissões Pendentes
           </p>
-          <p className="text-3xl font-bold text-theme-primary mb-1">
+          <p className="text-theme-primary mb-1 text-3xl font-bold">
             {formatCurrency(totals?.pending || 0)}
           </p>
-          <p className="text-xs text-yellow-600 dark:text-yellow-400 font-medium">
-            {filteredCommissions.filter((c) => c.status === 'PENDING').length} pendente
-            {filteredCommissions.filter((c) => c.status === 'PENDING').length !== 1 ? 's' : ''}
+          <p className="text-xs font-medium text-yellow-600 dark:text-yellow-400">
+            {filteredCommissions.filter(c => c.status === 'PENDING').length}{' '}
+            pendente
+            {filteredCommissions.filter(c => c.status === 'PENDING').length !==
+            1
+              ? 's'
+              : ''}
           </p>
         </div>
       </div>
 
       {/* Filtros e Ações */}
-      <div className="card-theme rounded-xl p-5 border-2 border-transparent hover:border-light-border dark:border-dark-border dark:hover:border-dark-border transition-all duration-300">
+      <div className="card-theme rounded-xl border-2 border-transparent p-5 transition-all duration-300 hover:border-light-border dark:border-dark-border dark:hover:border-dark-border">
         <div className="flex flex-col gap-4">
           {/* Linha 1: Busca e Botões */}
-          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+          <div className="flex flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
             {/* Busca */}
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-text-muted dark:text-dark-text-muted w-5 h-5" />
+            <div className="relative max-w-md flex-1">
+              <Search className="text-light-text-muted dark:text-dark-text-muted absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
               <input
                 type="text"
                 placeholder="Buscar por descrição, profissional..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-xl text-theme-primary placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md"
+                onChange={e => setSearchTerm(e.target.value)}
+                className="card-theme text-theme-primary w-full rounded-xl border-2 border-light-border py-3 pl-11 pr-4 placeholder-gray-400 shadow-sm transition-all duration-200 hover:shadow-md focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-dark-surface dark:placeholder-gray-500"
               />
             </div>
 
@@ -307,17 +331,17 @@ const CommissionsPage = () => {
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={handleCreate}
-                className="flex items-center gap-2 px-5 py-3 bg-gradient-primary hover:from-blue-700 hover:to-indigo-700 text-dark-text-primary font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                className="text-dark-text-primary flex transform items-center gap-2 rounded-xl bg-gradient-primary px-5 py-3 font-semibold shadow-lg transition-all duration-200 hover:scale-105 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl"
               >
-                <Plus className="w-5 h-5" />
+                <Plus className="h-5 w-5" />
                 Nova Comissão
               </button>
               <button
                 onClick={handleExportPDF}
                 disabled={filteredCommissions.length === 0}
-                className="flex items-center gap-2 px-5 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 rounded-xl bg-green-600 px-5 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:bg-green-700 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <Download className="w-5 h-5" />
+                <Download className="h-5 w-5" />
                 Exportar PDF
               </button>
             </div>
@@ -328,13 +352,16 @@ const CommissionsPage = () => {
             {/* Profissional */}
             <select
               value={filters.professional_id}
-              onChange={(e) =>
-                setFilters((prev) => ({ ...prev, professional_id: e.target.value }))
+              onChange={e =>
+                setFilters(prev => ({
+                  ...prev,
+                  professional_id: e.target.value,
+                }))
               }
-              className="px-4 py-3 card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-xl text-sm font-semibold text-theme-primary focus:ring-2 focus:ring-blue-500 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
+              className="card-theme text-theme-primary cursor-pointer rounded-xl border-2 border-light-border px-4 py-3 text-sm font-semibold shadow-sm transition-all duration-200 hover:shadow-md focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-dark-surface"
             >
               <option value="">👤 Todos os Profissionais</option>
-              {professionals.map((prof) => (
+              {professionals.map(prof => (
                 <option key={prof.id} value={prof.id}>
                   {prof.name}
                 </option>
@@ -344,8 +371,10 @@ const CommissionsPage = () => {
             {/* Status */}
             <select
               value={filters.status}
-              onChange={(e) => setFilters((prev) => ({ ...prev, status: e.target.value }))}
-              className="px-4 py-3 card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-xl text-sm font-semibold text-theme-primary focus:ring-2 focus:ring-blue-500 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
+              onChange={e =>
+                setFilters(prev => ({ ...prev, status: e.target.value }))
+              }
+              className="card-theme text-theme-primary cursor-pointer rounded-xl border-2 border-light-border px-4 py-3 text-sm font-semibold shadow-sm transition-all duration-200 hover:shadow-md focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-dark-surface"
             >
               <option value="">📋 Todos os Status</option>
               <option value="PENDING">⏳ Pendentes</option>
@@ -354,28 +383,28 @@ const CommissionsPage = () => {
             </select>
 
             {/* Data Início */}
-            <div className="flex items-center gap-2 px-4 py-3 card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-xl shadow-sm hover:shadow-md transition-all duration-200">
-              <Calendar className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+            <div className="card-theme flex items-center gap-2 rounded-xl border-2 border-light-border px-4 py-3 shadow-sm transition-all duration-200 hover:shadow-md dark:border-dark-border dark:bg-dark-surface">
+              <Calendar className="h-4 w-4 text-blue-500 dark:text-blue-400" />
               <input
                 type="date"
                 value={filters.start_date}
-                onChange={(e) =>
-                  setFilters((prev) => ({ ...prev, start_date: e.target.value }))
+                onChange={e =>
+                  setFilters(prev => ({ ...prev, start_date: e.target.value }))
                 }
-                className="bg-transparent text-sm font-medium text-theme-primary focus:outline-none cursor-pointer"
+                className="text-theme-primary cursor-pointer bg-transparent text-sm font-medium focus:outline-none"
               />
             </div>
 
             {/* Data Fim */}
-            <div className="flex items-center gap-2 px-4 py-3 card-theme dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-xl shadow-sm hover:shadow-md transition-all duration-200">
-              <Calendar className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+            <div className="card-theme flex items-center gap-2 rounded-xl border-2 border-light-border px-4 py-3 shadow-sm transition-all duration-200 hover:shadow-md dark:border-dark-border dark:bg-dark-surface">
+              <Calendar className="h-4 w-4 text-blue-500 dark:text-blue-400" />
               <input
                 type="date"
                 value={filters.end_date}
-                onChange={(e) =>
-                  setFilters((prev) => ({ ...prev, end_date: e.target.value }))
+                onChange={e =>
+                  setFilters(prev => ({ ...prev, end_date: e.target.value }))
                 }
-                className="bg-transparent text-sm font-medium text-theme-primary focus:outline-none cursor-pointer"
+                className="text-theme-primary cursor-pointer bg-transparent text-sm font-medium focus:outline-none"
               />
             </div>
           </div>
@@ -383,27 +412,27 @@ const CommissionsPage = () => {
       </div>
 
       {/* Tabela */}
-      <div className="card-theme rounded-xl overflow-hidden border-2 border-light-border dark:border-dark-border shadow-lg">
+      <div className="card-theme overflow-hidden rounded-xl border-2 border-light-border shadow-lg dark:border-dark-border">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gradient-primary">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-bold text-dark-text-primary uppercase tracking-wider">
+                <th className="text-dark-text-primary px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                   Profissional
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-dark-text-primary uppercase tracking-wider">
+                <th className="text-dark-text-primary px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                   Descrição
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-dark-text-primary uppercase tracking-wider">
+                <th className="text-dark-text-primary px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                   Data Referência
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-dark-text-primary uppercase tracking-wider">
+                <th className="text-dark-text-primary px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                   Valor
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-dark-text-primary uppercase tracking-wider">
+                <th className="text-dark-text-primary px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-4 text-center text-xs font-bold text-dark-text-primary uppercase tracking-wider">
+                <th className="text-dark-text-primary px-6 py-4 text-center text-xs font-bold uppercase tracking-wider">
                   Ações
                 </th>
               </tr>
@@ -413,7 +442,7 @@ const CommissionsPage = () => {
                 <tr>
                   <td colSpan="6" className="px-6 py-16 text-center">
                     <div className="flex flex-col items-center justify-center gap-3">
-                      <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                      <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
                       <span className="text-theme-secondary font-medium">
                         Carregando comissões...
                       </span>
@@ -422,9 +451,12 @@ const CommissionsPage = () => {
                 </tr>
               ) : filteredCommissions.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="px-6 py-16 text-center text-theme-secondary">
+                  <td
+                    colSpan="6"
+                    className="text-theme-secondary px-6 py-16 text-center"
+                  >
                     <div className="flex flex-col items-center gap-3">
-                      <DollarSign className="w-12 h-12 text-gray-300 dark:text-gray-600" />
+                      <DollarSign className="h-12 w-12 text-gray-300 dark:text-gray-600" />
                       <p className="font-medium">Nenhuma comissão encontrada</p>
                       <p className="text-xs">
                         Tente ajustar os filtros ou adicione uma nova comissão
@@ -433,22 +465,22 @@ const CommissionsPage = () => {
                   </td>
                 </tr>
               ) : (
-                filteredCommissions.map((commission) => (
+                filteredCommissions.map(commission => (
                   <tr
                     key={commission.id}
-                    className="group transition-all duration-200 hover:bg-gradient-to-r hover:from-gray-50/50 hover:to-gray-100/50 dark:hover:from-gray-800/50 dark:hover:to-gray-750/50"
+                    className="dark:hover:to-gray-750/50 group transition-all duration-200 hover:bg-gradient-to-r hover:from-gray-50/50 hover:to-gray-100/50 dark:hover:from-gray-800/50"
                   >
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-gradient-primary/10 rounded-lg">
-                          <Users className="w-4 h-4 text-primary" />
+                        <div className="bg-gradient-primary/10 rounded-lg p-2">
+                          <Users className="h-4 w-4 text-primary" />
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-theme-primary">
+                          <p className="text-theme-primary text-sm font-semibold">
                             {commission.professional?.name || 'N/A'}
                           </p>
                           {commission.order && (
-                            <p className="text-xs text-theme-secondary">
+                            <p className="text-theme-secondary text-xs">
                               Comanda #{commission.order.id.slice(0, 8)}
                             </p>
                           )}
@@ -456,19 +488,21 @@ const CommissionsPage = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-sm font-medium text-theme-primary">
+                      <p className="text-theme-primary text-sm font-medium">
                         {commission.description || '-'}
                       </p>
                       {commission.notes && (
-                        <p className="text-xs text-theme-secondary mt-1">{commission.notes}</p>
+                        <p className="text-theme-secondary mt-1 text-xs">
+                          {commission.notes}
+                        </p>
                       )}
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-sm font-medium text-theme-primary">
+                      <p className="text-theme-primary text-sm font-medium">
                         {formatDate(commission.reference_date)}
                       </p>
                       {commission.paid_at && (
-                        <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+                        <p className="mt-1 text-xs text-green-600 dark:text-green-400">
                           Paga em {formatDate(commission.paid_at)}
                         </p>
                       )}
@@ -484,26 +518,26 @@ const CommissionsPage = () => {
                         {commission.status === 'PENDING' && (
                           <button
                             onClick={() => handleMarkAsPaid(commission)}
-                            className="p-2 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-all duration-200"
+                            className="rounded-lg p-2 text-green-600 transition-all duration-200 hover:bg-green-100 dark:text-green-400 dark:hover:bg-green-900/30"
                             title="Marcar como paga"
                           >
-                            <CheckCircle className="w-4 h-4" />
+                            <CheckCircle className="h-4 w-4" />
                           </button>
                         )}
                         <button
                           onClick={() => handleEdit(commission)}
-                          className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-all duration-200"
+                          className="rounded-lg p-2 text-blue-600 transition-all duration-200 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-blue-900/30"
                           title="Editar"
                         >
-                          <Edit className="w-4 h-4" />
+                          <Edit className="h-4 w-4" />
                         </button>
                         {commission.status !== 'PAID' && (
                           <button
                             onClick={() => handleDelete(commission)}
-                            className="p-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-all duration-200"
+                            className="rounded-lg p-2 text-red-600 transition-all duration-200 hover:bg-red-100 dark:text-red-400 dark:hover:bg-red-900/30"
                             title="Excluir"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="h-4 w-4" />
                           </button>
                         )}
                       </div>
@@ -545,4 +579,3 @@ const CommissionsPage = () => {
 };
 
 export default CommissionsPage;
-

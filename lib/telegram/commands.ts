@@ -7,12 +7,15 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { logger } from '@/lib/logger';
-import { sendTelegramMessage } from '@/lib/telegram';
-import { aiMetricsRepository } from '@/lib/repositories/aiMetricsRepository';
-import { alertsRepository } from '@/lib/repositories/alertsRepository';
-import { generateAnalysis } from '@/lib/ai/analysis';
-import { calculateAverageTicket, calculateGrowthRate } from '@/lib/analytics/calculations';
+import { logger } from '../logger';
+import { sendTelegramMessage } from '../telegram';
+import { aiMetricsRepository } from '../repositories/aiMetricsRepository';
+import { alertsRepository } from '../repositories/alertsRepository';
+import { generateAnalysis } from '../ai/analysis';
+import {
+  calculateAverageTicket,
+  calculateGrowthRate,
+} from '../analytics/calculations';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -22,7 +25,9 @@ const supabase = createClient(
 /**
  * Busca unidade associada ao usuário do Telegram
  */
-async function getUserUnit(telegramUserId: string): Promise<{ unitId: string; unitName: string } | null> {
+async function getUserUnit(
+  telegramUserId: string
+): Promise<{ unitId: string; unitName: string } | null> {
   try {
     // Buscar usuário por telegram_user_id ou criar mapeamento
     // Assumindo que há uma tabela users com campo telegram_user_id ou similar
@@ -66,7 +71,9 @@ interface TelegramCommand {
 /**
  * Processa comandos do Telegram
  */
-export async function handleTelegramCommand(cmd: TelegramCommand): Promise<void> {
+export async function handleTelegramCommand(
+  cmd: TelegramCommand
+): Promise<void> {
   const { chatId, userId, command, correlationId } = cmd;
 
   try {
@@ -120,10 +127,13 @@ export async function handleTelegramCommand(cmd: TelegramCommand): Promise<void>
       stack: error.stack,
     });
 
-    await sendTelegramMessage('❌ Erro ao processar comando. Tente novamente mais tarde.', {
-      chatId,
-      parseMode: 'Markdown',
-    });
+    await sendTelegramMessage(
+      '❌ Erro ao processar comando. Tente novamente mais tarde.',
+      {
+        chatId,
+        parseMode: 'Markdown',
+      }
+    );
   }
 }
 
@@ -149,30 +159,55 @@ async function handleStatusCommand(
 
     if (error || !metrics || metrics.length === 0) {
       await sendTelegramMessage(
-        `📊 *Status Financeiro - ${userUnit.unitName}*\n\n` + `❌ Nenhuma métrica encontrada.`,
+        `📊 *Status Financeiro - ${userUnit.unitName}*\n\n` +
+          `❌ Nenhuma métrica encontrada.`,
         { chatId, parseMode: 'Markdown' }
       );
       return;
     }
 
     // Calcular métricas agregadas
-    const totalRevenue = metrics.reduce((sum, m) => sum + (m.gross_revenue || 0), 0);
-    const totalExpenses = metrics.reduce((sum, m) => sum + (m.total_expenses || 0), 0);
+    const totalRevenue = metrics.reduce(
+      (sum, m) => sum + (m.gross_revenue || 0),
+      0
+    );
+    const totalExpenses = metrics.reduce(
+      (sum, m) => sum + (m.total_expenses || 0),
+      0
+    );
     const marginPercentage =
-      totalRevenue > 0 ? ((totalRevenue - totalExpenses) / totalRevenue) * 100 : 0;
-    const transactionsCount = metrics.reduce((sum, m) => sum + (m.revenues_count || 0), 0);
-    const averageTicket = calculateAverageTicket(totalRevenue, transactionsCount);
+      totalRevenue > 0
+        ? ((totalRevenue - totalExpenses) / totalRevenue) * 100
+        : 0;
+    const transactionsCount = metrics.reduce(
+      (sum, m) => sum + (m.revenues_count || 0),
+      0
+    );
+    const averageTicket = calculateAverageTicket(
+      totalRevenue,
+      transactionsCount
+    );
 
     // Buscar alertas abertos
-    const { data: alerts } = await alertsRepository.findByUnit(userUnit.unitId, 'OPEN', 5);
+    const { data: alerts } = await alertsRepository.findByUnit(
+      userUnit.unitId,
+      'OPEN',
+      5
+    );
 
     // Calcular tendência
     let trend = 'STABLE';
     if (metrics.length >= 2) {
       const recent = metrics.slice(-7);
       const older = metrics.slice(-14, -7);
-      const recentRevenue = recent.reduce((sum, m) => sum + (m.gross_revenue || 0), 0);
-      const olderRevenue = older.reduce((sum, m) => sum + (m.gross_revenue || 0), 0);
+      const recentRevenue = recent.reduce(
+        (sum, m) => sum + (m.gross_revenue || 0),
+        0
+      );
+      const olderRevenue = older.reduce(
+        (sum, m) => sum + (m.gross_revenue || 0),
+        0
+      );
       const growth = calculateGrowthRate(recentRevenue, olderRevenue);
       if (growth > 5) trend = '📈 CRESCENDO';
       else if (growth < -5) trend = '📉 DIMINUINDO';
@@ -212,7 +247,10 @@ async function handleSemanalCommand(
   correlationId: string
 ): Promise<void> {
   try {
-    await sendTelegramMessage('⏳ Gerando relatório semanal...', { chatId, parseMode: 'Markdown' });
+    await sendTelegramMessage('⏳ Gerando relatório semanal...', {
+      chatId,
+      parseMode: 'Markdown',
+    });
 
     // Calcular semana anterior
     const today = new Date();
@@ -245,23 +283,37 @@ async function handleSemanalCommand(
     // Calcular métricas agregadas
     const aggregated = {
       grossRevenue: metrics.reduce((sum, m) => sum + (m.gross_revenue || 0), 0),
-      totalExpenses: metrics.reduce((sum, m) => sum + (m.total_expenses || 0), 0),
+      totalExpenses: metrics.reduce(
+        (sum, m) => sum + (m.total_expenses || 0),
+        0
+      ),
       marginPercentage: 0,
       averageTicket: 0,
-      transactionsCount: metrics.reduce((sum, m) => sum + (m.revenues_count || 0), 0),
+      transactionsCount: metrics.reduce(
+        (sum, m) => sum + (m.revenues_count || 0),
+        0
+      ),
     };
 
     if (aggregated.grossRevenue > 0) {
       aggregated.marginPercentage =
-        ((aggregated.grossRevenue - aggregated.totalExpenses) / aggregated.grossRevenue) * 100;
+        ((aggregated.grossRevenue - aggregated.totalExpenses) /
+          aggregated.grossRevenue) *
+        100;
     }
 
     if (aggregated.transactionsCount > 0) {
-      aggregated.averageTicket = aggregated.grossRevenue / aggregated.transactionsCount;
+      aggregated.averageTicket =
+        aggregated.grossRevenue / aggregated.transactionsCount;
     }
 
     // Gerar análise via OpenAI
-    const analysis = await generateAnalysis(userUnit.unitId, aggregated, 'WEEKLY', {});
+    const analysis = await generateAnalysis(
+      userUnit.unitId,
+      aggregated,
+      'WEEKLY',
+      {}
+    );
 
     const analysisText = analysis.parsed
       ? `📝 *Análise:*\n${analysis.parsed.summary || analysis.content.substring(0, 300)}`
@@ -297,11 +349,16 @@ async function handleAlertasCommand(
   correlationId: string
 ): Promise<void> {
   try {
-    const { data: alerts, error } = await alertsRepository.findByUnit(userUnit.unitId, 'OPEN', 10);
+    const { data: alerts, error } = await alertsRepository.findByUnit(
+      userUnit.unitId,
+      'OPEN',
+      10
+    );
 
     if (error || !alerts || alerts.length === 0) {
       await sendTelegramMessage(
-        `⚠️ *Alertas - ${userUnit.unitName}*\n\n` + `✅ Nenhum alerta pendente.`,
+        `⚠️ *Alertas - ${userUnit.unitName}*\n\n` +
+          `✅ Nenhum alerta pendente.`,
         { chatId, parseMode: 'Markdown' }
       );
       return;
@@ -353,7 +410,10 @@ async function handleWhatIfCommand(
       return;
     }
 
-    await sendTelegramMessage('⏳ Gerando simulação...', { chatId, parseMode: 'Markdown' });
+    await sendTelegramMessage('⏳ Gerando simulação...', {
+      chatId,
+      parseMode: 'Markdown',
+    });
 
     // Buscar métricas atuais (últimos 30 dias)
     const endDate = new Date();
@@ -367,25 +427,36 @@ async function handleWhatIfCommand(
     );
 
     if (!metrics || metrics.length === 0) {
-      await sendTelegramMessage('❌ Nenhuma métrica encontrada para simulação.', {
-        chatId,
-        parseMode: 'Markdown',
-      });
+      await sendTelegramMessage(
+        '❌ Nenhuma métrica encontrada para simulação.',
+        {
+          chatId,
+          parseMode: 'Markdown',
+        }
+      );
       return;
     }
 
     // Calcular métricas atuais
     const current = {
       grossRevenue: metrics.reduce((sum, m) => sum + (m.gross_revenue || 0), 0),
-      totalExpenses: metrics.reduce((sum, m) => sum + (m.total_expenses || 0), 0),
+      totalExpenses: metrics.reduce(
+        (sum, m) => sum + (m.total_expenses || 0),
+        0
+      ),
       marginPercentage: 0,
       averageTicket: 0,
-      transactionsCount: metrics.reduce((sum, m) => sum + (m.revenues_count || 0), 0),
+      transactionsCount: metrics.reduce(
+        (sum, m) => sum + (m.revenues_count || 0),
+        0
+      ),
     };
 
     if (current.grossRevenue > 0) {
       current.marginPercentage =
-        ((current.grossRevenue - current.totalExpenses) / current.grossRevenue) * 100;
+        ((current.grossRevenue - current.totalExpenses) /
+          current.grossRevenue) *
+        100;
     }
 
     if (current.transactionsCount > 0) {
@@ -393,15 +464,21 @@ async function handleWhatIfCommand(
     }
 
     // Gerar simulação via OpenAI
-    const simulation = await generateAnalysis(userUnit.unitId, current, 'WHAT_IF', {
-      scenario: scenario.trim(),
-    });
+    const simulation = await generateAnalysis(
+      userUnit.unitId,
+      current,
+      'WHAT_IF',
+      {
+        scenario: scenario.trim(),
+      }
+    );
 
     const simData = simulation.parsed;
 
     if (!simData) {
       await sendTelegramMessage(
-        `📊 *Simulação: ${scenario}*\n\n` + `❌ Erro ao gerar simulação. Tente novamente.`,
+        `📊 *Simulação: ${scenario}*\n\n` +
+          `❌ Erro ao gerar simulação. Tente novamente.`,
         { chatId, parseMode: 'Markdown' }
       );
       return;
@@ -446,4 +523,3 @@ async function handleHelpCommand(chatId: number): Promise<void> {
 
   await sendTelegramMessage(message, { chatId, parseMode: 'Markdown' });
 }
-

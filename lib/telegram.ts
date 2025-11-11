@@ -13,12 +13,19 @@
  */
 
 import { logger } from './logger';
-import { retry } from './retry';
+import { retryWithBackoff } from './retry';
 import { CircuitBreaker } from './circuitBreaker';
 
 const TELEGRAM_API_URL = 'https://api.telegram.org/bot';
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+
+// Getters para variáveis de ambiente (lazy loading)
+function getBotToken(): string | undefined {
+  return process.env.TELEGRAM_BOT_TOKEN;
+}
+
+function getChatId(): string | undefined {
+  return process.env.TELEGRAM_CHAT_ID;
+}
 
 // Circuit breaker para Telegram
 const telegramCircuitBreaker = new CircuitBreaker('Telegram', {
@@ -32,6 +39,7 @@ const telegramCircuitBreaker = new CircuitBreaker('Telegram', {
  * @param {string} message - Mensagem a enviar
  * @param {Object} options - Opções adicionais
  * @param {string|number} [options.chatId] - ID do chat (se não fornecido, usa CHAT_ID do env)
+ * @param {string} [options.botToken] - Token do bot (se não fornecido, usa BOT_TOKEN do env)
  * @param {string} [options.parseMode='Markdown'] - Modo de parsing (Markdown ou HTML)
  * @param {boolean} [options.disablePreview=true] - Desabilitar preview de links
  * @returns {Promise<{success: boolean, messageId?: number, error?: string}>}
@@ -40,15 +48,17 @@ export async function sendTelegramMessage(
   message: string,
   options: {
     chatId?: string | number;
+    botToken?: string;
     parseMode?: 'Markdown' | 'HTML';
     disablePreview?: boolean;
   } = {}
 ): Promise<{ success: boolean; messageId?: number; error?: string }> {
-  const chatId = options.chatId || CHAT_ID;
+  const botToken = options.botToken || getBotToken();
+  const chatId = options.chatId || getChatId();
 
-  if (!BOT_TOKEN || !chatId) {
+  if (!botToken || !chatId) {
     logger.warn('Telegram não configurado', {
-      hasBotToken: !!BOT_TOKEN,
+      hasBotToken: !!botToken,
       hasChatId: !!chatId,
     });
     return {
@@ -59,10 +69,10 @@ export async function sendTelegramMessage(
 
   try {
     const result = await telegramCircuitBreaker.execute(async () => {
-      return await retry(
+      return await retryWithBackoff(
         async () => {
           const response = await fetch(
-            `${TELEGRAM_API_URL}${BOT_TOKEN}/sendMessage`,
+            `${TELEGRAM_API_URL}${botToken}/sendMessage`,
             {
               method: 'POST',
               headers: {
@@ -80,15 +90,18 @@ export async function sendTelegramMessage(
           if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
             throw new Error(
-              errorData.description || `HTTP ${response.status}: ${response.statusText}`
+              errorData.description ||
+                `HTTP ${response.status}: ${response.statusText}`
             );
           }
 
           const data = await response.json();
           return data;
         },
-        3, // 3 tentativas
-        1000 // delay inicial de 1 segundo
+        {
+          maxAttempts: 3,
+          initialDelay: 1000,
+        }
       );
     });
 
@@ -190,7 +203,9 @@ export async function sendBalanceValidationAlert(validationResult: {
     return { success: true };
   }
 
-  const invalidUnits = validationResult.results.filter((r) => !r.isValid || r.differences > 0);
+  const invalidUnits = validationResult.results.filter(
+    r => !r.isValid || r.differences > 0
+  );
 
   if (invalidUnits.length === 0) {
     return { success: true };
@@ -199,7 +214,7 @@ export async function sendBalanceValidationAlert(validationResult: {
   let message = `⚠️ *Validação de Saldo Acumulado*\n\n`;
   message += `Diferenças encontradas em ${invalidUnits.length} unidade(s):\n\n`;
 
-  invalidUnits.forEach((unit) => {
+  invalidUnits.forEach(unit => {
     message += `📍 *${unit.unitName}*\n`;
     message += `• Diferenças: ${unit.differences}\n`;
     message += `• Maior diferença: ${unit.maxDifference.toFixed(2)}\n\n`;
@@ -214,4 +229,3 @@ export async function sendBalanceValidationAlert(validationResult: {
 
   return { success: result.success };
 }
-

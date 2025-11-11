@@ -12,6 +12,19 @@ export default defineConfig({
     port: 5173,
     open: true,
     host: true, // Permite acesso via rede local
+    proxy: {
+      // Proxy temporário para contornar CORS durante desenvolvimento
+      '/supabase-auth': {
+        target: 'https://cwfrtqtienguzwsybvwm.supabase.co',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/supabase-auth/, ''),
+        configure: (proxy, options) => {
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            console.log('🔀 Proxy request:', req.method, req.url);
+          });
+        },
+      },
+    },
   },
   build: {
     outDir: 'dist',

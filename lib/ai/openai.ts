@@ -7,16 +7,40 @@
  */
 
 import OpenAI from 'openai';
-import { openaiCircuitBreaker } from '@/lib/circuitBreaker';
-import { retryWithBackoff } from '@/lib/retry';
-import { logger } from '@/lib/logger';
-import { trackOpenAICost } from '@/lib/monitoring';
+import { openaiCircuitBreaker } from '../circuitBreaker';
+import { retryWithBackoff } from '../retry';
+import { logger } from '../logger';
+import { trackOpenAICost } from '../monitoring';
+
+let _openai: OpenAI | null = null;
 
 /**
- * Cliente OpenAI configurado
+ * Getter lazy para OpenAI client - cria apenas quando necessário
+ * Permite que variáveis de ambiente sejam carregadas antes da criação
  */
-export const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+function getOpenAI(): OpenAI {
+  if (_openai) {
+    return _openai;
+  }
+
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error('OPENAI_API_KEY deve estar configurado');
+  }
+
+  _openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+
+  return _openai;
+}
+
+/**
+ * Cliente OpenAI configurado (proxy para lazy loading)
+ */
+export const openai = new Proxy({} as OpenAI, {
+  get(target, prop) {
+    return getOpenAI()[prop as keyof OpenAI];
+  },
 });
 
 /**
@@ -24,7 +48,10 @@ export const openai = new OpenAI({
  */
 const DEFAULT_MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini';
 const FALLBACK_MODEL = process.env.OPENAI_MODEL_FALLBACK || 'gpt-3.5-turbo';
-const MAX_TOKENS = parseInt(process.env.OPENAI_MAX_TOKENS_PER_REQUEST || '2000', 10);
+const MAX_TOKENS = parseInt(
+  process.env.OPENAI_MAX_TOKENS_PER_REQUEST || '2000',
+  10
+);
 
 /**
  * Preços por token (USD) - atualizados para modelos atuais
@@ -143,7 +170,12 @@ export async function callOpenAI(
       {
         maxAttempts: 3,
         initialDelay: 1000,
-        retryableErrors: ['ECONNRESET', 'ETIMEDOUT', 'ENOTFOUND', 'ECONNREFUSED'],
+        retryableErrors: [
+          'ECONNRESET',
+          'ETIMEDOUT',
+          'ENOTFOUND',
+          'ECONNREFUSED',
+        ],
       }
     );
   });
@@ -178,4 +210,3 @@ export async function testOpenAIConnection(): Promise<boolean> {
     return false;
   }
 }
-

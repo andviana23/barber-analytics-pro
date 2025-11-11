@@ -10,17 +10,20 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { logger } from '@/lib/logger';
+import { logger } from '../logger';
+import { supabaseAdmin } from '../supabaseAdmin';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Mantém compatibilidade com código legado, mas usa supabaseAdmin
+const supabase = supabaseAdmin;
 
 /**
  * Nomes de KPI suportados
  */
-export type KPIName = 'MARGIN' | 'AVERAGE_TICKET' | 'MONTHLY_REVENUE' | 'MAX_EXPENSE';
+export type KPIName =
+  | 'MARGIN'
+  | 'AVERAGE_TICKET'
+  | 'MONTHLY_REVENUE'
+  | 'MAX_EXPENSE';
 
 /**
  * Períodos de target
@@ -157,4 +160,3 @@ export const kpiTargetsRepository = {
   findByKPI,
   findByUnit,
 };
-

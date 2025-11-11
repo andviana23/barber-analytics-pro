@@ -270,16 +270,57 @@ export function AuthProvider({ children }) {
 
   // Função de login
   const signIn = async (email, password) => {
+    console.log('🔐 AUTH: Iniciando login...');
+    console.log('📧 Email:', email);
+    console.log('🌐 Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
+
     try {
       setLoading(true);
-      const { data, error } = await supabase.auth.signInWithPassword({
+      console.log('⏳ Estado loading ativado');
+
+      // Adicionar timeout de 10 segundos para evitar travamento
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => {
+          console.error('⏱️ TIMEOUT! Login demorou mais de 10 segundos');
+          reject(
+            new Error(
+              '⏱️ Timeout: A requisição demorou muito.\n\n' +
+                '🔧 Possíveis causas:\n' +
+                '1. CORS não configurado no Supabase\n' +
+                '2. Problema de rede\n' +
+                '3. Supabase fora do ar\n\n' +
+                '📝 Solução:\n' +
+                '1. Abra: https://supabase.com/dashboard/project/cwfrtqtienguzwsybvwm/settings/auth\n' +
+                '2. Configure "Site URL": http://localhost:5173\n' +
+                '3. Adicione em "Redirect URLs": http://localhost:5173/**\n' +
+                '4. Salve e aguarde 30 segundos'
+            )
+          );
+        }, 10000);
+      });
+
+      console.log('🚀 Enviando requisição de login para Supabase...');
+      const signInPromise = supabase.auth.signInWithPassword({
         email,
         password,
       });
 
+      const { data, error } = await Promise.race([
+        signInPromise,
+        timeoutPromise,
+      ]);
+
+      console.log('📬 Resposta recebida do Supabase');
+      console.log('  Data:', data ? '✅ Presente' : '❌ Null');
+      console.log('  Error:', error ? `❌ ${error.message}` : '✅ Nenhum');
+
       if (error) {
+        console.error('❌ Erro no login:', error);
         throw error;
       }
+
+      console.log('✅ Login bem-sucedido!');
+      console.log('👤 Usuário:', data.user?.email);
 
       // TODO: Registrar login no sistema de auditoria (desabilitado temporariamente)
       // if (data.user) {
@@ -291,6 +332,7 @@ export function AuthProvider({ children }) {
 
       return { data, error: null };
     } catch (error) {
+      console.error('❌ Erro no signIn:', error);
       return { data: null, error };
     } finally {
       setLoading(false);
