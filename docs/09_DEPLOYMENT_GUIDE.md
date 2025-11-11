@@ -873,7 +873,7 @@ const queryClient = new QueryClient({
 
 - [← 08 - Testing Strategy](./08_TESTING_STRATEGY.md)
 - [→ 10 - Project Management](./10_PROJECT_MANAGEMENT.md)
-- [📚 Summary](./SUMMARY.md)
+- [📚 Documentação](./DOCUMENTACAO_INDEX.md)
 
 ---
 

@@ -674,6 +674,6 @@ async function fetchData() {
 
 - **Anterior**: [01 - Requirements](./01_REQUIREMENTS.md)
 - **Próximo**: [03 - Domain Model](./03_DOMAIN_MODEL.md)
-- **Índice Geral**: [SUMMARY.md](./SUMMARY.md)
+- **Índice Geral**: [Documentação](./DOCUMENTACAO_INDEX.md)
 
 ---

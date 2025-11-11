@@ -185,15 +185,15 @@ Cada unidade possui seu próprio bot Telegram:
 
 #### 🏢 **Unidade Mangabeiras**
 - **Bot:** `@tratoemangabeirasbot`
-- **Token:** `8573847906:AAEZJVhpfGcpiLJs8lkerUM51f_haXF_G10`
-- **Chat ID:** `6799154772`
+- **Token:** `<TELEGRAM_BOT_TOKEN_MANGABEIRAS>`
+- **Chat ID:** `<TELEGRAM_CHAT_ID_MANGABEIRAS>`
 - **Status:** ✅ Ativo
 
 #### 🏢 **Unidade Nova Lima**
 - **Bot:** `@tratonovalimabot`
-- **Token:** `8195784375:AAHhhgVPXAsHy1byr_pX7wSDeFgw9koBUTc`
-- **Chat ID:** `6799154772`
-- **Webhook Secret:** `7eb09d8fef41bbc0df56684b42f5d92bffcaab1ad929a8302ffe7d30659f80e3`
+- **Token:** `<TELEGRAM_BOT_TOKEN_NOVA_LIMA>`
+- **Chat ID:** `<TELEGRAM_CHAT_ID_NOVA_LIMA>`
+- **Webhook Secret:** `<TELEGRAM_WEBHOOK_SECRET_NOVA_LIMA>`
 - **Status:** ✅ Ativo
 
 ---
@@ -414,13 +414,13 @@ OPENAI_COST_ALERT_THRESHOLD=80
 OPENAI_MAX_TOKENS_PER_REQUEST=2000
 
 # Telegram - Mangabeiras
-# Bot Token: 8573847906:AAEZJVhpfGcpiLJs8lkerUM51f_haXF_G10
-# Chat ID: 6799154772
+# Bot Token: <TELEGRAM_BOT_TOKEN_MANGABEIRAS>
+# Chat ID: <TELEGRAM_CHAT_ID_MANGABEIRAS>
 
 # Telegram - Nova Lima
-# Bot Token: 8195784375:AAHhhgVPXAsHy1byr_pX7wSDeFgw9koBUTc
-# Chat ID: 6799154772
-# Webhook Secret: 7eb09d8fef41bbc0df56684b42f5d92bffcaab1ad929a8302ffe7d30659f80e3
+# Bot Token: <TELEGRAM_BOT_TOKEN_NOVA_LIMA>
+# Chat ID: <TELEGRAM_CHAT_ID_NOVA_LIMA>
+# Webhook Secret: <TELEGRAM_WEBHOOK_SECRET_NOVA_LIMA>
 
 # Cron
 CRON_SECRET=your-secret-here

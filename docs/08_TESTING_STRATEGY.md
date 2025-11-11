@@ -1063,7 +1063,7 @@ pnpm test:ci                 # Rodar todos (unit + E2E)
 
 - [← 06 - API Reference](./06_API_REFERENCE.md)
 - [→ 09 - Deployment Guide](./09_DEPLOYMENT_GUIDE.md)
-- [📚 Summary](./SUMMARY.md)
+- [📚 Documentação](./DOCUMENTACAO_INDEX.md)
 
 ---
 

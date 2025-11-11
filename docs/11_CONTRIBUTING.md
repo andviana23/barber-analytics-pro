@@ -866,7 +866,7 @@ pnpm tsc --noEmit
 
 - [← 10 - Project Management](./10_PROJECT_MANAGEMENT.md)
 - [→ 12 - Changelog](./12_CHANGELOG.md)
-- [📚 Summary](./SUMMARY.md)
+- [📚 Documentação](./DOCUMENTACAO_INDEX.md)
 
 ---
 

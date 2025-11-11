@@ -253,7 +253,7 @@ Barbearias enfrentam desafios críticos:
 ## 🔗 Navegação
 
 - **Próximo**: [01 - Requirements](./01_REQUIREMENTS.md)
-- **Índice Geral**: [SUMMARY.md](./SUMMARY.md)
+- **Índice Geral**: [Documentação](./DOCUMENTACAO_INDEX.md)
 
 ---
 

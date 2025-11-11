@@ -473,7 +473,6 @@ barber-analytics-pro/
 │   ├── 11_CONTRIBUTING.md
 │   ├── 12_CHANGELOG.md
 │   ├── DESIGN_SYSTEM.md
-│   ├── SUMMARY.md
 │   └── guides/
 │       ├── CODE_CONVENTIONS.md
 │       ├── FAQ.md
@@ -551,11 +550,10 @@ barber-analytics-pro/
     ├── ANALISE_*.md             # Análises e documentações
     ├── CHECKLIST_*.md
     ├── CORS_FIX_*.md/html
-    ├── ETL_VS_OPENAI.md
+    ├── ETL_SEM_OPENAI.md
     ├── ESCOPO_FINAL.md
     ├── FUNCIONALIDADES_PENDENTES.md
     ├── INFRASTRUCTURE_v*.md     # Documentação infraestrutura
-    ├── MODULO_FINANCEIRO_STATUS.md
     ├── PRD_BARBER_ANALYTICS_PRO.md
     ├── README.md
     ├── VALIDACAO_SEGURANCA.md
@@ -1338,4 +1336,3 @@ chore(scope): descrição       # Tarefas
 - **Deploy Automático**: Vercel CI/CD
 
 Total de **500+ componentes, serviços e hooks** organizados em camadas bem definidas, com documentação técnica completa e padrões de código rigorosos.
-

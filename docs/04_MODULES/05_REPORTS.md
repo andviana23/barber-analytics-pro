@@ -547,7 +547,7 @@ GROUP BY p.id, p.name, p.unit_id, DATE_TRUNC('month', r.date);
 
 - [← 04.04 - Scheduler Module](./04_SCHEDULER.md)
 - [→ 04.06 - Notifications Module](./06_NOTIFICATIONS.md)
-- [📚 Summary](../SUMMARY.md)
+- [📚 Documentação](../DOCUMENTACAO_INDEX.md)
 
 ---
 

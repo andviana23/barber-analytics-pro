@@ -586,7 +586,7 @@ async function checkRateLimit(clientId) {
 
 - [← 04.05 - Reports Module](./05_REPORTS.md)
 - [→ 05 - Infrastructure](../05_INFRASTRUCTURE.md)
-- [📚 Summary](../SUMMARY.md)
+- [📚 Documentação](../DOCUMENTACAO_INDEX.md)
 
 ---
 

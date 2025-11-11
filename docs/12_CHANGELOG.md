@@ -526,7 +526,7 @@ pnpm dev
 ## 🔗 Navegação
 
 - [← 11 - Contributing](./11_CONTRIBUTING.md)
-- [📚 Summary](./SUMMARY.md)
+- [📚 Documentação](./DOCUMENTACAO_INDEX.md)
 
 ---
 

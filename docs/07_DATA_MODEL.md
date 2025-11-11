@@ -749,6 +749,6 @@ units ||--o{ openai_cost_tracking : "tem custos"
 
 - **Anterior**: [06 - API Reference](./06_API_REFERENCE.md)
 - **Próximo**: [08 - Testing Strategy](./08_TESTING_STRATEGY.md)
-- **Índice Geral**: [SUMMARY.md](./SUMMARY.md)
+- **Índice Geral**: [Documentação](./DOCUMENTACAO_INDEX.md)
 
 ---

@@ -737,7 +737,6 @@ barber-analytics-pro/
 │
 ├── docs/                       # Documentation
 │   ├── ETL_SEM_OPENAI.md
-│   ├── ETL_VS_OPENAI.md
 │   └── ...
 │
 ├── components/                 # Shared Component Library

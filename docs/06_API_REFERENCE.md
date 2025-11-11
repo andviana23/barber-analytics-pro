@@ -1094,7 +1094,7 @@ getMonthName(11); // "Dezembro"
 
 - [← 05 - Infrastructure](./05_INFRASTRUCTURE.md)
 - [→ 08 - Testing Strategy](./08_TESTING_STRATEGY.md)
-- [📚 Summary](./SUMMARY.md)
+- [📚 Documentação](./DOCUMENTACAO_INDEX.md)
 
 ---
 

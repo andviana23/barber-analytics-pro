@@ -599,7 +599,7 @@ useQuery({
 
 - [← 03 - Domain Model](../03_DOMAIN_MODEL.md)
 - [→ 04.02 - Payments Module](./02_PAYMENTS.md)
-- [📚 Summary](../SUMMARY.md)
+- [📚 Documentação](../DOCUMENTACAO_INDEX.md)
 
 ---
 

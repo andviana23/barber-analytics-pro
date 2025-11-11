@@ -211,7 +211,7 @@ Verificação completa antes do deploy no Vercel com funcionalidades de IA.
 
 ### ⚠️ Recomendado
 
-- [ ] **Adicionar ao SUMMARY.md** 🟡 IMPORTANTE
+- [ ] **Adicionar ao DOCUMENTACAO_INDEX.md** 🟡 IMPORTANTE
   ```markdown
   ## 🤖 Inteligência Artificial
 
@@ -461,7 +461,7 @@ git push origin main
 1. 🔴 **Configurar variáveis de ambiente no Vercel**
 2. 🔴 **Fazer deploy (staging → produção)**
 3. 🔴 **Testar cron job no Vercel**
-4. 🟡 **Atualizar SUMMARY.md**
+4. 🟡 **Atualizar DOCUMENTACAO_INDEX.md**
 5. 🟡 **Monitorar primeira semana**
 
 ### Tempo Estimado para Produção

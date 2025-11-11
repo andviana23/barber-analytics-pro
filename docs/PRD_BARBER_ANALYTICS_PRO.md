@@ -2682,7 +2682,7 @@ Com execução das Fases 3 e 4, o sistema estará **100% pronto para produção 
 ### 13.2 Referências
 
 **Documentação Interna**:
-- [SUMMARY.md](docs/SUMMARY.md) - Índice geral
+- [DOCUMENTACAO_INDEX.md](docs/DOCUMENTACAO_INDEX.md) - Índice geral
 - [00_OVERVIEW.md](docs/00_OVERVIEW.md) - Visão executiva
 - [02_ARCHITECTURE.md](docs/02_ARCHITECTURE.md) - Arquitetura detalhada
 - [README.md](README.md) - Documentação principal
@@ -2707,7 +2707,7 @@ Com execução das Fases 3 e 4, o sistema estará **100% pronto para produção 
 **Licença**: Proprietary - All Rights Reserved © 2025
 
 **Repositório**: github.com/andviana23/barber-analytics-pro
-**Documentação**: [/docs/SUMMARY.md](docs/SUMMARY.md)
+**Documentação**: [/docs/DOCUMENTACAO_INDEX.md](docs/DOCUMENTACAO_INDEX.md)
 
 ---
 

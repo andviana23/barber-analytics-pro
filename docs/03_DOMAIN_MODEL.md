@@ -1108,7 +1108,7 @@ Client ..> Email : uses
 
 - [← 02 - Architecture](./02_ARCHITECTURE.md)
 - [→ 04 - Modules](./04_MODULES/)
-- [📚 Summary](./SUMMARY.md)
+- [📚 Documentação](./DOCUMENTACAO_INDEX.md)
 
 ---
 

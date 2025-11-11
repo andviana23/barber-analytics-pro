@@ -553,7 +553,7 @@ async calculateBalance(accountId) {
 
 - [← 04.01 - Financial Module](./01_FINANCIAL.md)
 - [→ 04.03 - Clients Module](./03_CLIENTS.md)
-- [📚 Summary](../SUMMARY.md)
+- [📚 Documentação](../DOCUMENTACAO_INDEX.md)
 
 ---
 

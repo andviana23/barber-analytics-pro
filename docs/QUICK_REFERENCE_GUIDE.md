@@ -364,7 +364,7 @@ DATABASE (PostgreSQL)
 ## DOCUMENTAÇÃO
 
 - `README.md` - Overview do projeto
-- `docs/SUMMARY.md` - Índice completo
+- `docs/DOCUMENTACAO_INDEX.md` - Índice completo
 - `docs/02_ARCHITECTURE.md` - Arquitetura detalhada
 - `INFRASTRUCTURE_v4.0.md` - Setup e infraestrutura
 - `ESTRUTURA_COMPLETA_REPOSITORIO.md` - Este documento completo

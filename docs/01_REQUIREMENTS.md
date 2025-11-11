@@ -334,6 +334,6 @@ Este documento detalha os requisitos funcionais, não-funcionais e de qualidade 
 
 - **Anterior**: [00 - Overview](./00_OVERVIEW.md)
 - **Próximo**: [02 - Architecture](./02_ARCHITECTURE.md)
-- **Índice Geral**: [SUMMARY.md](./SUMMARY.md)
+- **Índice Geral**: [Documentação](./DOCUMENTACAO_INDEX.md)
 
 ---

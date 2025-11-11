@@ -948,7 +948,7 @@ Sentry.init({
 
 - [← 04.06 - Notifications Module](./04_MODULES/06_NOTIFICATIONS.md)
 - [→ 06 - API Reference](./06_API_REFERENCE.md)
-- [📚 Summary](./SUMMARY.md)
+- [📚 Documentação](./DOCUMENTACAO_INDEX.md)
 
 ---
 

@@ -121,7 +121,6 @@ Contém:
 - **docs/guides/PERMISSOES_GERENTE_ANALISE.md** - Permissões específicas
 
 #### Referência Rápida
-- **docs/SUMMARY.md** - Índice completo de documentação
 - **README.md** - Overview geral do projeto
 
 ### Documentação de Análise
@@ -130,11 +129,10 @@ Contém:
 - **ANALISE_TELEGRAM_SEM_WEBHOOK.md** - Análise Telegram
 - **CHECKLIST_IA_FINANCEIRA.md** - Checklist IA Financeira
 - **CORS_FIX_GUIDE.md** - Guia CORS
-- **ETL_VS_OPENAI.md** - Comparação ETL vs OpenAI
+- **ETL_SEM_OPENAI.md** - Guia do ETL sem dependência de IA
 - **ESCOPO_FINAL.md** - Escopo final do projeto
 - **FUNCIONALIDADES_PENDENTES.md** - Funcionalidades pendentes
 - **INFRASTRUCTURE_v5.0_IMPLEMENTATION.md** - Implementação v5.0
-- **MODULO_FINANCEIRO_STATUS.md** - Status módulo financeiro
 - **PRD_BARBER_ANALYTICS_PRO.md** - Product Requirements Document
 - **VALIDACAO_SEGURANCA.md** - Validação de segurança
 
@@ -336,4 +334,3 @@ Para dúvidas sobre:
 **Repositório**: barber-analytics-pro  
 **Branch**: feature/ai-finance-integration  
 **Total de docs**: 20+ documentos
-

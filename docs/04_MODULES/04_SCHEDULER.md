@@ -537,7 +537,7 @@ async syncToGoogleCalendar(appointment) {
 
 - [← 04.03 - Clients Module](./03_CLIENTS.md)
 - [→ 04.05 - Reports Module](./05_REPORTS.md)
-- [📚 Summary](../SUMMARY.md)
+- [📚 Documentação](../DOCUMENTACAO_INDEX.md)
 
 ---
 

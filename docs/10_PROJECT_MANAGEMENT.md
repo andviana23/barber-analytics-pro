@@ -422,7 +422,7 @@ Sem migrações necessárias. Atualização automática.
 ## 🔗 Links
 
 - [Changelog Completo](./CHANGELOG.md)
-- [Documentation](./docs/SUMMARY.md)
+- [Documentation](./docs/DOCUMENTACAO_INDEX.md)
 - [Issues Fechadas](https://github.com/andviana23/barber-analytics-pro/milestone/3)
 ```
 
@@ -669,7 +669,7 @@ Sem migrações necessárias. Atualização automática.
 
 - [← 09 - Deployment Guide](./09_DEPLOYMENT_GUIDE.md)
 - [→ 11 - Contributing](./11_CONTRIBUTING.md)
-- [📚 Summary](./SUMMARY.md)
+- [📚 Documentação](./DOCUMENTACAO_INDEX.md)
 
 ---
 

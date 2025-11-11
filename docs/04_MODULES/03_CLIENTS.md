@@ -426,7 +426,7 @@ async createSubscription(clientId, planId) {
 
 - [← 04.02 - Payments Module](./02_PAYMENTS.md)
 - [→ 04.04 - Scheduler Module](./04_SCHEDULER.md)
-- [📚 Summary](../SUMMARY.md)
+- [📚 Documentação](../DOCUMENTACAO_INDEX.md)
 
 ---
 
