@@ -41,6 +41,7 @@ const BARBER_COLORS = [
 ];
 const ListaDaVezPage = () => {
   const navigate = useNavigate();
+  const { showToast } = useToast(); // ✅ Importar showToast
   const {
     turnList,
     stats,

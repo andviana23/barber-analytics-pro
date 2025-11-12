@@ -50,7 +50,13 @@ export function useListaDaVez(initialFilters = {}) {
    * Carrega a lista da vez para a unidade selecionada
    */
   const loadTurnList = useCallback(
-    async (unitId = selectedUnit) => {
+    async unitIdParam => {
+      // ✅ Garantir que sempre usa string UUID, não objeto
+      const unitId =
+        typeof unitIdParam === 'object' && unitIdParam?.id
+          ? unitIdParam.id
+          : unitIdParam || selectedUnit?.id;
+
       if (!unitId) return;
 
       console.log('🔄 Carregando lista da vez...', { unitId });
@@ -91,7 +97,13 @@ export function useListaDaVez(initialFilters = {}) {
    * Carrega estatísticas da lista da vez
    */
   const loadStats = useCallback(
-    async (unitId = selectedUnit) => {
+    async unitIdParam => {
+      // ✅ Garantir que sempre usa string UUID, não objeto
+      const unitId =
+        typeof unitIdParam === 'object' && unitIdParam?.id
+          ? unitIdParam.id
+          : unitIdParam || selectedUnit?.id;
+
       if (!unitId) return;
 
       try {
@@ -151,7 +163,7 @@ export function useListaDaVez(initialFilters = {}) {
         setTurnList(updatedList);
 
         // Recarregar estatísticas
-        await loadStats();
+        await loadStats(selectedUnit.id); // ✅ Passar o ID explicitamente
 
         showToast({
           type: 'success',
@@ -405,14 +417,14 @@ export function useListaDaVez(initialFilters = {}) {
       loadTurnList(selectedUnit.id); // ✅ Passar apenas o ID (UUID string)
       loadStats(selectedUnit.id); // ✅ Passar apenas o ID (UUID string)
     }
-  }, [selectedUnit, unitsLoading, loadTurnList, loadStats]);
+  }, [selectedUnit?.id, unitsLoading, loadTurnList, loadStats]); // ✅ Observar apenas o ID
 
   // Carregar histórico quando mês/ano forem selecionados
   useEffect(() => {
     if (selectedUnit?.id && selectedMonth && selectedYear) {
       loadMonthlyHistory(selectedUnit.id, selectedMonth, selectedYear); // ✅ Passar apenas o ID
     }
-  }, [selectedUnit, selectedMonth, selectedYear, loadMonthlyHistory]);
+  }, [selectedUnit?.id, selectedMonth, selectedYear, loadMonthlyHistory]); // ✅ Observar apenas o ID
 
   return {
     // Estados

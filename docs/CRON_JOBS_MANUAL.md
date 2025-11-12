@@ -3,12 +3,14 @@
 ## ⚡ Crons Automáticos (Vercel Hobby - 2 slots)
 
 ### 1. 📊 Relatório Diário (IA Financeira)
+
 - **Horário:** 21:00 BRT (todos os dias)
 - **Endpoint:** `/api/cron/relatorio-diario`
 - **Função:** Gera relatório diário com análise de IA e envia via Telegram
 - **Status:** ✅ Ativo (automático)
 
 ### 2. 🔄 ETL Diário
+
 - **Horário:** 03:00 BRT (todos os dias)
 - **Endpoint:** `/api/cron/etl-diario`
 - **Função:** Processa métricas e consolida dados analíticos
@@ -29,55 +31,67 @@ https://seu-dominio.vercel.app/api/cron/NOME_DO_ENDPOINT?secret=SEU_CRON_SECRET
 ```
 
 ### 3. 💰 Gerar Despesas Recorrentes
+
 - **Endpoint:** `/api/cron/gerar-despesas-recorrentes`
 - **Função:** Gera automaticamente despesas recorrentes do mês
 - **Recomendação:** Executar **dia 1 de cada mês** antes do ETL
 - **Comando:**
+
 ```bash
 curl "https://seu-dominio.vercel.app/api/cron/gerar-despesas-recorrentes?secret=$CRON_SECRET"
 ```
 
 ### 4. ✅ Validar Saldo Acumulado
+
 - **Endpoint:** `/api/cron/validate-balance`
 - **Função:** Valida consistência dos saldos acumulados
 - **Recomendação:** Executar **após fechamentos importantes** ou quando suspeitar de inconsistência
 - **Comando:**
+
 ```bash
 curl "https://seu-dominio.vercel.app/api/cron/validate-balance?secret=$CRON_SECRET"
 ```
 
 ### 5. 🔔 Enviar Alertas
+
 - **Endpoint:** `/api/cron/enviar-alertas`
 - **Função:** Envia alertas de saúde e anomalias via Telegram
 - **Recomendação:** Executar **quando quiser verificar alertas pendentes**
 - **Comando:**
+
 ```bash
 curl "https://seu-dominio.vercel.app/api/cron/enviar-alertas?secret=$CRON_SECRET"
 ```
 
 ### 6. ❤️ Health Check
+
 - **Endpoint:** `/api/cron/health-check`
 - **Função:** Verifica saúde do sistema e envia status
 - **Recomendação:** Usar **Vercel Analytics** ao invés de cron
 - **Comando:**
+
 ```bash
 curl "https://seu-dominio.vercel.app/api/cron/health-check?secret=$CRON_SECRET"
 ```
 
 ### 7. 📅 Relatório Semanal
+
 - **Endpoint:** `/api/cron/relatorio-semanal`
 - **Função:** Gera relatório semanal consolidado
 - **Recomendação:** Executar **toda segunda-feira de manhã**
 - **Comando:**
+
 ```bash
 curl "https://seu-dominio.vercel.app/api/cron/relatorio-semanal?secret=$CRON_SECRET"
 ```
 
 ### 8. 📆 Fechamento Mensal
+
 - **Endpoint:** `/api/cron/fechamento-mensal`
 - **Função:** Gera relatório de fechamento mensal
 - **Recomendação:** Executar **dia 1 de cada mês**
 - **Comando:**
+
 ```bash
 curl "https://seu-dominio.vercel.app/api/cron/fechamento-mensal?secret=$CRON_SECRET"
 ```
@@ -87,17 +101,21 @@ curl "https://seu-dominio.vercel.app/api/cron/fechamento-mensal?secret=$CRON_SEC
 ## 🎯 Rotina Recomendada
 
 ### Diária (Automática)
+
 - ✅ **03:00** - ETL Diário (automático)
 - ✅ **21:00** - Relatório Diário com IA (automático)
 
 ### Diária (Manual - Opcional)
+
 - 🔧 **02:00** - Gerar Despesas Recorrentes (dia 1 do mês)
 - 🔧 **04:00** - Validar Saldo (quando necessário)
 
 ### Semanal (Manual)
+
 - 🔧 **Segunda 08:00** - Relatório Semanal
 
 ### Mensal (Manual)
+
 - 🔧 **Dia 1 às 08:00** - Fechamento Mensal
 
 ---
@@ -162,11 +180,13 @@ if (secret !== process.env.CRON_SECRET) {
 ### Configurar CRON_SECRET
 
 1. Gerar secret seguro:
+
 ```bash
 openssl rand -base64 32
 ```
 
 2. Adicionar no Vercel:
+
 ```bash
 vercel env add CRON_SECRET
 ```
@@ -178,6 +198,7 @@ vercel env add CRON_SECRET
 ### Logs dos Crons
 
 Ver logs no Vercel Dashboard:
+
 ```
 https://vercel.com/seu-usuario/barber-analytics-pro/logs
 ```
@@ -185,6 +206,7 @@ https://vercel.com/seu-usuario/barber-analytics-pro/logs
 ### Alertas de Falha
 
 Os crons automaticamente enviam alertas via Telegram quando:
+
 - ❌ Falha na execução
 - ⚠️ Timeout (>10min)
 - 🔴 Dados inconsistentes detectados
@@ -196,11 +218,13 @@ Os crons automaticamente enviam alertas via Telegram quando:
 ### Cron não executou
 
 1. **Verificar secret:**
+
    ```bash
    echo $CRON_SECRET
    ```
 
 2. **Testar endpoint manualmente:**
+
    ```bash
    curl -v "https://seu-dominio.vercel.app/api/cron/health-check?secret=$CRON_SECRET"
    ```
@@ -219,6 +243,7 @@ vercel upgrade pro
 ```
 
 Benefícios:
+
 - ✅ 40 cron jobs
 - ✅ Execuções ilimitadas
 - ✅ Prioridade no processamento
@@ -233,5 +258,5 @@ Benefícios:
 
 ---
 
-**Última atualização:** 12 de novembro de 2025  
+**Última atualização:** 12 de novembro de 2025
 **Autor:** Andrey Viana
