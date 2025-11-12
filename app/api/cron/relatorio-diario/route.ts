@@ -67,13 +67,20 @@ export async function GET(request: NextRequest) {
     }
 
     const results = [];
+    // ⚠️ IMPORTANTE: Buscar dados do DIA ANTERIOR (D-1)
+    // Motivo: Cron roda às 21:00, mas queremos dados do dia que já fechou
     const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    const reportDate = yesterday; // Data para o relatório (dia anterior)
 
     // 3. Gerar relatório para cada unidade
     for (const unit of units) {
       try {
         logger.info(`Gerando relatório para unidade: ${unit.unitName}`, {
           unitId: unit.unitId,
+          reportDate: reportDate.toISOString().split('T')[0],
         });
 
         // Validar configuração do Telegram
@@ -85,17 +92,17 @@ export async function GET(request: NextRequest) {
           continue;
         }
 
-        // 3.1. Buscar receitas do dia
-        const revenue = await getDailyRevenues(unit.unitId, today);
+        // 3.1. Buscar receitas do DIA ANTERIOR
+        const revenue = await getDailyRevenues(unit.unitId, reportDate);
 
-        // 3.2. Comparar com semana anterior
-        const comparison = await compareWithLastWeek(unit.unitId, today);
+        // 3.2. Comparar com semana anterior (baseado no dia anterior)
+        const comparison = await compareWithLastWeek(unit.unitId, reportDate);
 
-        // 3.3. Calcular progresso das metas
+        // 3.3. Calcular progresso das metas (mês do dia anterior)
         const goals = await calculateAllGoalsProgress(
           unit.unitId,
-          today.getFullYear(),
-          today.getMonth() + 1
+          reportDate.getFullYear(),
+          reportDate.getMonth() + 1
         );
 
         // 3.4. Detectar padrões
@@ -103,7 +110,7 @@ export async function GET(request: NextRequest) {
 
         // 3.5. Gerar insights com IA
         const reportData: DailyReportData = {
-          date: today.toISOString().split('T')[0],
+          date: reportDate.toISOString().split('T')[0], // Data do dia anterior
           unit_id: unit.unitId,
           revenue,
           comparison,
@@ -119,8 +126,8 @@ export async function GET(request: NextRequest) {
         );
         reportData.insights = insights;
 
-        // 3.6. Formatar mensagem Telegram
-        const message = formatTelegramMessage(unit.unitName, today, reportData);
+        // 3.6. Formatar mensagem Telegram (passando data do relatório)
+        const message = formatTelegramMessage(unit.unitName, reportDate, reportData);
 
         // 3.7. Enviar via Telegram usando credenciais da unidade
         await sendTelegramMessage(message, {
@@ -195,17 +202,20 @@ export async function GET(request: NextRequest) {
 
 /**
  * Formata mensagem do relatório para Telegram
+ * @param unitName Nome da unidade
+ * @param reportDate Data do relatório (DIA ANTERIOR)
+ * @param reportData Dados consolidados
  */
 function formatTelegramMessage(
   unitName: string,
-  date: Date,
+  reportDate: Date,
   reportData: DailyReportData
 ): string {
   const { revenue, comparison, goals } = reportData;
 
   const message = `
 📊 *RELATÓRIO DIÁRIO - ${unitName}*
-_${date.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}_
+_${reportDate.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}_
 
 ━━━━━━━━━━━━━━━━━━
 
@@ -244,7 +254,7 @@ ${
 
 ${reportData.patterns.length > 0 ? `📊 *Padrões Detectados*\n${reportData.patterns.map((p: string) => `• ${p}`).join('\n')}\n\n━━━━━━━━━━━━━━━━━━\n\n` : ''}
 
-_Relatório gerado automaticamente às ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}_
+_Relatório gerado automaticamente às ${new Date().getHours()}:${String(new Date().getMinutes()).padStart(2, '0')}_
   `.trim();
 
   return message;

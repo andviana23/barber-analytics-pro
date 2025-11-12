@@ -51,6 +51,14 @@ global.console = {
   warn: vi.fn(),
 };
 
+// Setup de variáveis de ambiente para testes
+process.env.NEXT_PUBLIC_SUPABASE_URL =
+  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://test.supabase.co';
+process.env.SUPABASE_SERVICE_ROLE_KEY =
+  process.env.SUPABASE_SERVICE_ROLE_KEY || 'test-service-role-key';
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'test-anon-key';
+
 // Setup antes de todos os testes
 beforeAll(() => {
   console.log('🧪 Iniciando testes com Vitest + Supertest');

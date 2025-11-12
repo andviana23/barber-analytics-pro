@@ -1,260 +1,242 @@
 # 🕐 Guia de Cron Jobs - Barber Analytics Pro
 
-## ⚡ Crons Automáticos (Vercel Hobby - 2 slots)
+## ⚡ Status Atual: 11 Crons Automáticos Ativos
 
-### 1. 📊 Relatório Diário (IA Financeira)
+**Última atualização:** 12 de novembro de 2025
 
-- **Horário:** 21:00 BRT (todos os dias)
+### ✅ TODOS OS CRONS ESTÃO ATIVOS E AUTOMATIZADOS VIA pg_cron
+
+Os cron jobs estão configurados para executar automaticamente usando `pg_cron` do Supabase + `net.http_post` para chamar endpoints da API.
+
+### ⚠️ MUDANÇA IMPORTANTE: DADOS DO DIA ANTERIOR (D-1)
+
+Todos os relatórios agora processam dados do **DIA ANTERIOR** ao invés do dia atual:
+- **Motivo:** Garantir que os dados estejam completos e fechados
+- **Exemplo:** Cron das 21:00 de terça-feira envia relatório de segunda-feira
+
+---
+
+## 📊 Crons Diários
+
+### 1. 📊 Relatório Diário de Receitas (21:00 BRT)
+
 - **Endpoint:** `/api/cron/relatorio-diario`
-- **Função:** Gera relatório diário com análise de IA e envia via Telegram
+- **Horário:** 21:00 todos os dias
+- **Função:** Gera relatório do DIA ANTERIOR com análise de IA (ApoIA) e envia via Telegram
 - **Status:** ✅ Ativo (automático)
+- **Cron Expression:** `0 21 * * *`
+- **Inclui:**
+  - Categorização de receitas (assinaturas, produtos, avulso)
+  - Comparação com semana anterior
+  - Progresso das metas
+  - Padrões comportamentais
+  - Insights gerados por IA
 
-### 2. 🔄 ETL Diário
+### 2. 🔄 ETL Diário (03:00 BRT)
 
-- **Horário:** 03:00 BRT (todos os dias)
 - **Endpoint:** `/api/cron/etl-diario`
+- **Horário:** 03:00 todos os dias
 - **Função:** Processa métricas e consolida dados analíticos
 - **Status:** ✅ Ativo (automático)
+- **Cron Expression:** `0 3 * * *`
 
----
-
-## 🔧 Crons Manuais (executar via curl ou navegador)
-
-### Como Executar Manualmente
-
-```bash
-# Template
-curl -X GET "https://seu-dominio.vercel.app/api/cron/NOME_DO_ENDPOINT?secret=SEU_CRON_SECRET"
-
-# Ou diretamente no navegador
-https://seu-dominio.vercel.app/api/cron/NOME_DO_ENDPOINT?secret=SEU_CRON_SECRET
-```
-
-### 3. 💰 Gerar Despesas Recorrentes
-
-- **Endpoint:** `/api/cron/gerar-despesas-recorrentes`
-- **Função:** Gera automaticamente despesas recorrentes do mês
-- **Recomendação:** Executar **dia 1 de cada mês** antes do ETL
-- **Comando:**
-
-```bash
-curl "https://seu-dominio.vercel.app/api/cron/gerar-despesas-recorrentes?secret=$CRON_SECRET"
-```
-
-### 4. ✅ Validar Saldo Acumulado
+### 3. ✅ Validar Saldos (04:00 BRT)
 
 - **Endpoint:** `/api/cron/validate-balance`
+- **Horário:** 04:00 todos os dias
 - **Função:** Valida consistência dos saldos acumulados
-- **Recomendação:** Executar **após fechamentos importantes** ou quando suspeitar de inconsistência
-- **Comando:**
+- **Status:** ✅ Ativo (automático)
+- **Cron Expression:** `0 4 * * *`
 
-```bash
-curl "https://seu-dominio.vercel.app/api/cron/validate-balance?secret=$CRON_SECRET"
-```
-
-### 5. 🔔 Enviar Alertas
-
-- **Endpoint:** `/api/cron/enviar-alertas`
-- **Função:** Envia alertas de saúde e anomalias via Telegram
-- **Recomendação:** Executar **quando quiser verificar alertas pendentes**
-- **Comando:**
-
-```bash
-curl "https://seu-dominio.vercel.app/api/cron/enviar-alertas?secret=$CRON_SECRET"
-```
-
-### 6. ❤️ Health Check
+### 4. ❤️ Health Check (05:00 BRT)
 
 - **Endpoint:** `/api/cron/health-check`
+- **Horário:** 05:00 todos os dias
 - **Função:** Verifica saúde do sistema e envia status
-- **Recomendação:** Usar **Vercel Analytics** ao invés de cron
-- **Comando:**
+- **Status:** ✅ Ativo (automático)
+- **Cron Expression:** `0 5 * * *`
 
-```bash
-curl "https://seu-dominio.vercel.app/api/cron/health-check?secret=$CRON_SECRET"
-```
+### 5. 🔔 Enviar Alertas (22:00 BRT)
 
-### 7. 📅 Relatório Semanal
+- **Endpoint:** `/api/cron/enviar-alertas`
+- **Horário:** 22:00 todos os dias
+- **Função:** Envia alertas de saúde e anomalias via Telegram
+- **Status:** ✅ Ativo (automático)
+- **Cron Expression:** `0 22 * * *`
+
+### 6. 📋 Backup Diário Lista da Vez (23:30 BRT)
+
+- **Função:** `fn_backup_turn_list('daily')`
+- **Horário:** 23:30 todos os dias
+- **Função:** Faz backup diário da Lista da Vez
+- **Status:** ✅ Ativo (automático)
+- **Cron Expression:** `30 23 * * *`
+
+---
+
+## 📅 Crons Semanais
+
+### 7. 📅 Relatório Semanal (08:00 segundas-feiras)
 
 - **Endpoint:** `/api/cron/relatorio-semanal`
+- **Horário:** 08:00 toda segunda-feira
 - **Função:** Gera relatório semanal consolidado
-- **Recomendação:** Executar **toda segunda-feira de manhã**
-- **Comando:**
+- **Status:** ✅ Ativo (automático)
+- **Cron Expression:** `0 8 * * 1`
 
-```bash
-curl "https://seu-dominio.vercel.app/api/cron/relatorio-semanal?secret=$CRON_SECRET"
-```
+---
 
-### 8. 📆 Fechamento Mensal
+## 📆 Crons Mensais
+
+### 8. � Gerar Despesas Recorrentes (02:00, dia 1)
+
+- **Endpoint:** `/api/cron/gerar-despesas-recorrentes`
+- **Horário:** 02:00 do dia 1 de cada mês
+- **Função:** Gera automaticamente despesas recorrentes do mês
+- **Status:** ✅ Ativo (automático)
+- **Cron Expression:** `0 2 1 * *`
+
+### 9. 🧹 Cleanup Backups (02:00, dia 1)
+
+- **Função:** `fn_cleanup_old_backups(30)`
+- **Horário:** 02:00 do dia 1 de cada mês
+- **Função:** Remove backups antigos (>30 dias)
+- **Status:** ✅ Ativo (automático)
+- **Cron Expression:** `0 2 1 * *`
+
+### 10. 📆 Fechamento Mensal (09:00, dia 1)
 
 - **Endpoint:** `/api/cron/fechamento-mensal`
+- **Horário:** 09:00 do dia 1 de cada mês
 - **Função:** Gera relatório de fechamento mensal
-- **Recomendação:** Executar **dia 1 de cada mês**
-- **Comando:**
+- **Status:** ✅ Ativo (automático)
+- **Cron Expression:** `0 9 1 * *`
+
+### 11. 🔄 Reset Mensal Lista da Vez (23:00, fim do mês)
+
+- **Função:** `fn_monthly_reset_turn_list()`
+- **Horário:** 23:00 dos dias 28-31 (verifica se é último dia)
+- **Função:** Reseta lista da vez no fim do mês
+- **Status:** ✅ Ativo (automático)
+- **Cron Expression:** `0 23 28-31 * *`
+
+---
+
+## 🧪 Como Testar
+
+### Teste Rápido do Telegram
 
 ```bash
-curl "https://seu-dominio.vercel.app/api/cron/fechamento-mensal?secret=$CRON_SECRET"
+npx tsx scripts/test-telegram-report.ts
 ```
 
----
+Este script:
+- ✅ Gera relatório de teste com dados fictícios
+- ✅ Envia para o Telegram da unidade Mangabeiras
+- ✅ Usa dados do DIA ANTERIOR
+- ✅ Valida formatação Markdown
 
-## 🎯 Rotina Recomendada
-
-### Diária (Automática)
-
-- ✅ **03:00** - ETL Diário (automático)
-- ✅ **21:00** - Relatório Diário com IA (automático)
-
-### Diária (Manual - Opcional)
-
-- 🔧 **02:00** - Gerar Despesas Recorrentes (dia 1 do mês)
-- 🔧 **04:00** - Validar Saldo (quando necessário)
-
-### Semanal (Manual)
-
-- 🔧 **Segunda 08:00** - Relatório Semanal
-
-### Mensal (Manual)
-
-- 🔧 **Dia 1 às 08:00** - Fechamento Mensal
-
----
-
-## 🚀 Automação Avançada
-
-### Opção 1: GitHub Actions (Gratuito)
-
-Criar `.github/workflows/cron-jobs.yml`:
-
-```yaml
-name: Cron Jobs Backup
-
-on:
-  schedule:
-    # Gerar Despesas Recorrentes - Dia 1 às 02:00
-    - cron: '0 2 1 * *'
-    # Validar Saldo - Diariamente às 04:00
-    - cron: '0 4 * * *'
-    # Relatório Semanal - Segunda às 06:00
-    - cron: '0 6 * * 1'
-    # Fechamento Mensal - Dia 1 às 07:00
-    - cron: '0 7 1 * *'
-
-jobs:
-  trigger-cron:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger Vercel Cron
-        run: |
-          curl -X GET "${{ secrets.VERCEL_URL }}/api/cron/${{ github.event.schedule }}?secret=${{ secrets.CRON_SECRET }}"
-```
-
-### Opção 2: Serviço Externo (cron-job.org)
-
-1. Acesse https://cron-job.org
-2. Crie conta gratuita
-3. Adicione os endpoints como cron jobs
-4. Configure horários conforme necessário
-
-### Opção 3: Upgrade Vercel Pro ($20/mês)
-
-- **40 cron jobs** ilimitados
-- **Unlimited cron invocations**
-- Vale a pena se o sistema for crítico
-
----
-
-## 🔒 Segurança
-
-### Proteção dos Endpoints
-
-Todos os crons verificam o `CRON_SECRET`:
-
-```typescript
-const secret = req.query.secret || req.headers['x-vercel-cron-secret'];
-if (secret !== process.env.CRON_SECRET) {
-  return res.status(401).json({ error: 'Unauthorized' });
-}
-```
-
-### Configurar CRON_SECRET
-
-1. Gerar secret seguro:
+### Teste Manual de Endpoint
 
 ```bash
-openssl rand -base64 32
-```
-
-2. Adicionar no Vercel:
-
-```bash
-vercel env add CRON_SECRET
+curl "https://seu-dominio.vercel.app/api/cron/relatorio-diario?secret=$CRON_SECRET"
 ```
 
 ---
 
-## 📊 Monitoramento
+## � Monitoramento
 
-### Logs dos Crons
+### Ver logs dos crons no PostgreSQL
 
-Ver logs no Vercel Dashboard:
-
+```sql
+SELECT * FROM cron.job_run_details
+WHERE jobid = (SELECT jobid FROM cron.job WHERE jobname = 'relatorio-diario-telegram')
+ORDER BY start_time DESC
+LIMIT 10;
 ```
-https://vercel.com/seu-usuario/barber-analytics-pro/logs
+
+### Ver todos os crons ativos
+
+```sql
+SELECT 
+  jobid,
+  jobname,
+  schedule,
+  active,
+  database,
+  CASE 
+    WHEN schedule = '0 21 * * *' THEN '21:00 diariamente'
+    WHEN schedule = '0 3 * * *' THEN '03:00 diariamente'
+    WHEN schedule = '0 2 1 * *' THEN '02:00 dia 1'
+    WHEN schedule = '0 4 * * *' THEN '04:00 diariamente'
+    WHEN schedule = '0 22 * * *' THEN '22:00 diariamente'
+    WHEN schedule = '0 5 * * *' THEN '05:00 diariamente'
+    WHEN schedule = '0 8 * * 1' THEN '08:00 segunda-feira'
+    WHEN schedule = '0 9 1 * *' THEN '09:00 dia 1'
+    WHEN schedule = '0 23 28-31 * *' THEN '23:00 fim do mês'
+    WHEN schedule = '30 23 * * *' THEN '23:30 diariamente'
+    ELSE schedule
+  END AS descricao_horario
+FROM cron.job
+ORDER BY jobid;
 ```
-
-### Alertas de Falha
-
-Os crons automaticamente enviam alertas via Telegram quando:
-
-- ❌ Falha na execução
-- ⚠️ Timeout (>10min)
-- 🔴 Dados inconsistentes detectados
 
 ---
 
-## 🆘 Troubleshooting
+## 🔧 Configuração do Telegram por Unidade
 
-### Cron não executou
+Cada unidade tem sua própria configuração de Telegram:
 
-1. **Verificar secret:**
-
-   ```bash
-   echo $CRON_SECRET
-   ```
-
-2. **Testar endpoint manualmente:**
-
-   ```bash
-   curl -v "https://seu-dominio.vercel.app/api/cron/health-check?secret=$CRON_SECRET"
-   ```
-
-3. **Ver logs do Vercel:**
-   ```bash
-   vercel logs --follow
-   ```
-
-### Upgrade para Pro se necessário
-
-Se os crons manuais forem inconvenientes:
-
-```bash
-vercel upgrade pro
+```sql
+-- Verificar configuração
+SELECT 
+  name,
+  telegram_bot_token,
+  telegram_chat_id,
+  telegram_enabled
+FROM units
+WHERE is_active = true;
 ```
 
-Benefícios:
+**Unidades configuradas:**
+- ✅ **Mangabeiras**: Bot 8573847906, Chat 6799154772
+- ✅ **Nova Lima**: Bot 8195784375, Chat 6799154772
 
-- ✅ 40 cron jobs
-- ✅ Execuções ilimitadas
-- ✅ Prioridade no processamento
-- ✅ Suporte técnico
+---
+
+## � Deployment no VPS
+
+Quando migrar para VPS, os crons do PostgreSQL continuarão funcionando:
+
+1. **pg_cron** roda no Supabase (nuvem)
+2. **http_post** chama endpoints da API no VPS
+3. **Atualizar URLs** nos crons:
+
+```sql
+-- Atualizar URL do endpoint
+SELECT cron.unschedule('relatorio-diario-telegram');
+SELECT cron.schedule(
+  'relatorio-diario-telegram',
+  '0 21 * * *',
+  $$
+    SELECT net.http_post(
+      url := 'https://seu-vps.com/api/cron/relatorio-diario?secret=...',
+      headers := '{"Content-Type": "application/json"}'::jsonb
+    );
+  $$
+);
+```
 
 ---
 
 ## 📝 Changelog
 
-- **2025-11-12** - Redução de 8 → 2 crons automáticos (limite Hobby)
+- **2025-11-12** - ✅ **TODOS OS 11 CRONS ATIVADOS**
+  - Mudança para dados do DIA ANTERIOR (D-1)
+  - Criação de script de teste do Telegram
+  - Automatização completa via pg_cron
 - **2025-11-10** - Implementação inicial com 8 crons
+- **2025-11-07** - Setup do pg_cron e primeiros crons
 
 ---
 
