@@ -1,0 +1,39 @@
+# ESLint Ignore File
+# Arquivos e diretórios ignorados pelo ESLint
+
+# Build outputs
+dist/
+build/
+coverage/
+playwright-report/
+test-results/
+
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.development
+
+# Config files
+*.config.js
+*.config.ts
+
+# Server files (Node.js backend)
+server.js
+server/
+
+# Tests
+tests/
+e2e/
+
+# Scripts
+scripts/
+
+# Documentation
+docs/
+
+# Generated files
+reports/

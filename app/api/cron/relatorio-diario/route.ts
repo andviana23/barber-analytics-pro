@@ -127,7 +127,11 @@ export async function GET(request: NextRequest) {
         reportData.insights = insights;
 
         // 3.6. Formatar mensagem Telegram (passando data do relatório)
-        const message = formatTelegramMessage(unit.unitName, reportDate, reportData);
+        const message = formatTelegramMessage(
+          unit.unitName,
+          reportDate,
+          reportData
+        );
 
         // 3.7. Enviar via Telegram usando credenciais da unidade
         await sendTelegramMessage(message, {

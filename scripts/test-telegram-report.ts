@@ -1,14 +1,14 @@
 /**
  * 🧪 SCRIPT DE TESTE - Relatório Telegram
- * 
+ *
  * Testa o envio de relatório diário para o Telegram
  * usando dados do DIA ANTERIOR (D-1)
- * 
+ *
  * Uso:
  * ```bash
  * npx tsx scripts/test-telegram-report.ts
  * ```
- * 
+ *
  * @author Andrey Viana
  * @date 2025-11-12
  */

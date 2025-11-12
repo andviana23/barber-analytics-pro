@@ -11,6 +11,7 @@ Os cron jobs estão configurados para executar automaticamente usando `pg_cron` 
 ### ⚠️ MUDANÇA IMPORTANTE: DADOS DO DIA ANTERIOR (D-1)
 
 Todos os relatórios agora processam dados do **DIA ANTERIOR** ao invés do dia atual:
+
 - **Motivo:** Garantir que os dados estejam completos e fechados
 - **Exemplo:** Cron das 21:00 de terça-feira envia relatório de segunda-feira
 
@@ -131,6 +132,7 @@ npx tsx scripts/test-telegram-report.ts
 ```
 
 Este script:
+
 - ✅ Gera relatório de teste com dados fictícios
 - ✅ Envia para o Telegram da unidade Mangabeiras
 - ✅ Usa dados do DIA ANTERIOR
@@ -158,13 +160,13 @@ LIMIT 10;
 ### Ver todos os crons ativos
 
 ```sql
-SELECT 
+SELECT
   jobid,
   jobname,
   schedule,
   active,
   database,
-  CASE 
+  CASE
     WHEN schedule = '0 21 * * *' THEN '21:00 diariamente'
     WHEN schedule = '0 3 * * *' THEN '03:00 diariamente'
     WHEN schedule = '0 2 1 * *' THEN '02:00 dia 1'
@@ -189,7 +191,7 @@ Cada unidade tem sua própria configuração de Telegram:
 
 ```sql
 -- Verificar configuração
-SELECT 
+SELECT
   name,
   telegram_bot_token,
   telegram_chat_id,
@@ -199,6 +201,7 @@ WHERE is_active = true;
 ```
 
 **Unidades configuradas:**
+
 - ✅ **Mangabeiras**: Bot 8573847906, Chat 6799154772
 - ✅ **Nova Lima**: Bot 8195784375, Chat 6799154772
 
