@@ -11,7 +11,7 @@
  * @see CHECKLIST_IA_FINANCEIRA.md - Seção 3.2.3 e 3.2.4
  */
 
-import { calculateAccumulatedBalance, forecastCashflow } from '../calculations';
+import { calculateAccumulatedBalance, forecastCashflow } from './calculations';
 import { createClient } from '@supabase/supabase-js';
 import { logger } from '../logger';
 
@@ -69,8 +69,14 @@ export async function fetchHistoricalCashflow(
   endDate: Date | string
 ): Promise<DailyCashflowData[]> {
   try {
-    const startDateStr = typeof startDate === 'string' ? startDate : startDate.toISOString().split('T')[0];
-    const endDateStr = typeof endDate === 'string' ? endDate : endDate.toISOString().split('T')[0];
+    const startDateStr =
+      typeof startDate === 'string'
+        ? startDate
+        : startDate.toISOString().split('T')[0];
+    const endDateStr =
+      typeof endDate === 'string'
+        ? endDate
+        : endDate.toISOString().split('T')[0];
 
     let query = supabase
       .from('vw_demonstrativo_fluxo')
@@ -122,7 +128,13 @@ export async function fetchHistoricalCashflow(
  * @returns Dados com saldo acumulado calculado
  */
 export function calculateAccumulatedBalanceFromData(
-  dailyData: Array<{ date: Date | string; entradas: number; saidas: number; unit_id?: string; account_id?: string }>,
+  dailyData: Array<{
+    date: Date | string;
+    entradas: number;
+    saidas: number;
+    unit_id?: string;
+    account_id?: string;
+  }>,
   groupBy: 'unit_id' | 'account_id' = 'unit_id'
 ): DailyCashflowData[] {
   return calculateAccumulatedBalance(dailyData, groupBy) as DailyCashflowData[];
@@ -157,7 +169,12 @@ export async function generateCashflowForecast(
     });
 
     // 1. Buscar histórico da VIEW
-    const historical = await fetchHistoricalCashflow(unitId, accountId, startDate, endDate);
+    const historical = await fetchHistoricalCashflow(
+      unitId,
+      accountId,
+      startDate,
+      endDate
+    );
 
     if (historical.length === 0) {
       logger.warn('Nenhum dado histórico encontrado para forecast', {
@@ -179,10 +196,14 @@ export async function generateCashflowForecast(
     const forecast90 = forecastCashflow(balanceHistory, 90);
 
     // 4. Calcular resumo
-    const currentBalance = balanceHistory[balanceHistory.length - 1]?.balance || 0;
-    const forecastedBalance30d = forecast30[forecast30.length - 1]?.forecasted_balance || currentBalance;
-    const forecastedBalance60d = forecast60[forecast60.length - 1]?.forecasted_balance || currentBalance;
-    const forecastedBalance90d = forecast90[forecast90.length - 1]?.forecasted_balance || currentBalance;
+    const currentBalance =
+      balanceHistory[balanceHistory.length - 1]?.balance || 0;
+    const forecastedBalance30d =
+      forecast30[forecast30.length - 1]?.forecasted_balance || currentBalance;
+    const forecastedBalance60d =
+      forecast60[forecast60.length - 1]?.forecasted_balance || currentBalance;
+    const forecastedBalance90d =
+      forecast90[forecast90.length - 1]?.forecasted_balance || currentBalance;
 
     // Determinar tendência geral (baseado na última previsão)
     const overallTrend = forecast90[forecast90.length - 1]?.trend || 'stable';
@@ -236,7 +257,12 @@ export async function validateAccumulatedBalance(
 ): Promise<{ isValid: boolean; differences: number; maxDifference: number }> {
   try {
     // Buscar dados da VIEW
-    const viewData = await fetchHistoricalCashflow(unitId, accountId, startDate, endDate);
+    const viewData = await fetchHistoricalCashflow(
+      unitId,
+      accountId,
+      startDate,
+      endDate
+    );
 
     if (viewData.length === 0) {
       return { isValid: true, differences: 0, maxDifference: 0 };
@@ -265,7 +291,8 @@ export async function validateAccumulatedBalance(
         const calculatedBalance = calculatedItem.saldo_acumulado || 0;
         const difference = Math.abs(viewBalance - calculatedBalance);
 
-        if (difference > 0.01) { // Tolerância de 1 centavo
+        if (difference > 0.01) {
+          // Tolerância de 1 centavo
           differences++;
           maxDifference = Math.max(maxDifference, difference);
         }
@@ -293,4 +320,3 @@ export async function validateAccumulatedBalance(
     return { isValid: false, differences: -1, maxDifference: -1 };
   }
 }
-

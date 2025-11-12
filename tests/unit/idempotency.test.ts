@@ -13,7 +13,7 @@ import {
 } from '../../lib/idempotency';
 
 // Mock do Supabase
-vi.mock('../../lib/supabase', () => ({
+vi.mock('../../src/services/supabase', () => ({
   supabase: {
     from: vi.fn(() => ({
       select: vi.fn().mockReturnThis(),
@@ -34,7 +34,7 @@ describe('Idempotência do ETL', () => {
   describe('ensureIdempotency', () => {
     it('deve permitir execução se não houver registro anterior', async () => {
       // Simular: nenhuma execução anterior
-      const { supabase } = await import('../../lib/supabase');
+      const { supabase } = await import('../../src/services/supabase');
       supabase.from().select().eq().maybeSingle.mockResolvedValue({
         data: null,
         error: null,
@@ -51,7 +51,7 @@ describe('Idempotência do ETL', () => {
 
     it('deve bloquear execução se já existe com status SUCCESS', async () => {
       // Simular: execução anterior bem-sucedida
-      const { supabase } = await import('../../lib/supabase');
+      const { supabase } = await import('../../src/services/supabase');
       supabase
         .from()
         .select()
@@ -76,7 +76,7 @@ describe('Idempotência do ETL', () => {
 
     it('deve permitir retry se execução anterior falhou', async () => {
       // Simular: execução anterior falhou
-      const { supabase } = await import('../../lib/supabase');
+      const { supabase } = await import('../../src/services/supabase');
       supabase
         .from()
         .select()
@@ -104,7 +104,7 @@ describe('Idempotência do ETL', () => {
       const tenMinutesAgo = new Date();
       tenMinutesAgo.setMinutes(tenMinutesAgo.getMinutes() - 15);
 
-      const { supabase } = await import('../../lib/supabase');
+      const { supabase } = await import('../../src/services/supabase');
       supabase
         .from()
         .select()
@@ -133,7 +133,7 @@ describe('Idempotência do ETL', () => {
       const fiveMinutesAgo = new Date();
       fiveMinutesAgo.setMinutes(fiveMinutesAgo.getMinutes() - 5);
 
-      const { supabase } = await import('../../lib/supabase');
+      const { supabase } = await import('../../src/services/supabase');
       supabase
         .from()
         .select()
@@ -160,7 +160,7 @@ describe('Idempotência do ETL', () => {
 
   describe('createRunRecord', () => {
     it('deve criar registro com status RUNNING', async () => {
-      const { supabase } = await import('../../lib/supabase');
+      const { supabase } = await import('../../src/services/supabase');
       supabase
         .from()
         .insert()
@@ -185,7 +185,7 @@ describe('Idempotência do ETL', () => {
     });
 
     it('deve incluir trigger_source no registro', async () => {
-      const { supabase } = await import('../../lib/supabase');
+      const { supabase } = await import('../../src/services/supabase');
       const insertSpy = vi.spyOn(supabase.from(), 'insert');
 
       await createRunRecord('ETL_DIARIO', new Date('2025-11-10'), 'CRON');
@@ -200,7 +200,7 @@ describe('Idempotência do ETL', () => {
 
   describe('updateRunStatus', () => {
     it('deve atualizar status para SUCCESS com duração', async () => {
-      const { supabase } = await import('../../lib/supabase');
+      const { supabase } = await import('../../src/services/supabase');
       const updateSpy = vi.spyOn(supabase.from(), 'update');
 
       await updateRunStatus('run-123', 'SUCCESS', {
@@ -218,7 +218,7 @@ describe('Idempotência do ETL', () => {
     });
 
     it('deve incluir error_message quando status é FAILED', async () => {
-      const { supabase } = await import('../../lib/supabase');
+      const { supabase } = await import('../../src/services/supabase');
       const updateSpy = vi.spyOn(supabase.from(), 'update');
 
       await updateRunStatus('run-456', 'FAILED', {
@@ -236,7 +236,7 @@ describe('Idempotência do ETL', () => {
 
   describe('Cenários de negócio', () => {
     it('deve permitir reprocessar apenas dias com falha', async () => {
-      const { supabase } = await import('../../lib/supabase');
+      const { supabase } = await import('../../src/services/supabase');
 
       // Simular: 10/11 = SUCCESS, 11/11 = FAILED
       const checkDay10 = ensureIdempotency(
@@ -265,7 +265,7 @@ describe('Idempotência do ETL', () => {
     });
 
     it('deve evitar race condition de múltiplas execuções simultâneas', async () => {
-      const { supabase } = await import('../../lib/supabase');
+      const { supabase } = await import('../../src/services/supabase');
 
       // Simular: primeira chamada cria RUNNING, segunda detecta RUNNING
       supabase

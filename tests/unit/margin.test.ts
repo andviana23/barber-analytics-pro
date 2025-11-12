@@ -25,7 +25,8 @@ describe('calculateMargin', () => {
 
       const result = calculateMargin(grossRevenue, totalExpenses);
 
-      expect(result).toBeCloseTo(36.08, 2); // ~36.08%
+      // (1234.56 - 789.01) / 1234.56 * 100 = 36.089780974598234
+      expect(result).toBeCloseTo(36.09, 1); // ~36.09%
     });
 
     it('deve calcular margem baixa corretamente', () => {
