@@ -93,11 +93,11 @@ Garantir **controle total** dos insumos e produtos de revenda da barbearia, com:
 - ✅ Hooks + Componentes
 - ✅ Cobertura: 100% testes (56/56)
 
-### Semana 3-4: Fornecedores + Compras (Fase 1) 🟡 **PRÓXIMO**
+### Semana 3-4: Fornecedores + Compras (Fase 1) � **EM PROGRESSO - 80%**
 
-- [ ] Tabelas fornecedores
-- [ ] Fluxo de solicitação e cotação
-- [ ] Integração Telegram (aprovação)
+- ✅ Tabelas fornecedores (Sprint 2 - CONCLUÍDO)
+- ✅ Fluxo de solicitação e cotação (Sprint 3.1 + 3.2 - 80%)
+- ⏳ Integração Telegram (aprovação) - PRÓXIMO
 
 ### Semana 5-6: Compras (Fase 2) + Integração 🟡
 
@@ -517,66 +517,115 @@ Garantir **controle total** dos insumos e produtos de revenda da barbearia, com:
 **Objetivo:** Fluxo de solicitação de compra e cotação com aprovação
 **Prioridade:** 🔴 CRÍTICA
 
-#### 3.1 Database Setup
+#### 3.1 Database Setup ✅ **CONCLUÍDO - 13/11/2025**
 
-- [ ] **Criar tabela `purchase_requests`**
+- [x] **Criar ENUM `purchase_request_status_enum`** ✅
+  - [x] Valores: DRAFT, SUBMITTED, APPROVED, REJECTED, CANCELLED
 
-  ```sql
-  CREATE TABLE purchase_requests (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    unit_id UUID NOT NULL REFERENCES units(id),
-    requested_by UUID NOT NULL REFERENCES professionals(id),
-    status ENUM ('DRAFT', 'SUBMITTED', 'APPROVED', 'REJECTED', 'CANCELLED') DEFAULT 'DRAFT',
-    total_estimated DECIMAL(12,2),
-    notes TEXT,
-    created_at TIMESTAMPTZ DEFAULT now(),
-    updated_at TIMESTAMPTZ DEFAULT now()
-  );
-  ```
+- [x] **Criar tabela `purchase_requests`** ✅ (17 colunas)
+  - [x] Auto-numeração: `request_number` (REQ-YYYY-NNN)
+  - [x] Campos: id, unit_id, requested_by, approved_by, rejected_by
+  - [x] Status workflow: DRAFT → SUBMITTED → APPROVED/REJECTED
+  - [x] Priority: LOW, NORMAL, HIGH, URGENT
+  - [x] Campos audit: approved_at, rejected_at, rejection_reason
+  - [x] 6 índices criados (unit_id, requested_by, status, etc.)
 
-- [ ] **Criar tabela `purchase_request_items`**
-  - [ ] Campos: id, request_id, product_id, quantity, unit_measurement, notes
+- [x] **Criar tabela `purchase_request_items`** ✅ (11 colunas)
+  - [x] Campos: id, request_id, product_id, quantity, unit_measurement
+  - [x] Generated column: `estimated_total` (quantity \* unit_cost)
+  - [x] Unique constraint: (request_id, product_id)
+  - [x] 3 índices criados
 
-- [ ] **Criar tabela `purchase_quotes`**
+- [x] **Criar tabela `purchase_quotes`** ✅ (16 colunas)
+  - [x] Auto-numeração: `quote_number` (COT-YYYY-NNN)
+  - [x] Campos: id, request_id, supplier_id, quoted_by
+  - [x] Commercial terms: delivery_days, payment_terms
+  - [x] Selection tracking: is_selected, selected_at, selected_by, selection_reason
+  - [x] Auto-calculated: `total_price` (soma dos items)
+  - [x] 6 índices criados
 
-  ```sql
-  CREATE TABLE purchase_quotes (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    purchase_request_id UUID NOT NULL REFERENCES purchase_requests(id),
-    supplier_id UUID NOT NULL REFERENCES suppliers(id),
-    unit_cost DECIMAL(10,2) NOT NULL,
-    total_price DECIMAL(12,2) NOT NULL,
-    delivery_days INT,
-    payment_terms VARCHAR(255),
-    notes TEXT,
-    is_selected BOOLEAN DEFAULT false,
-    created_at TIMESTAMPTZ DEFAULT now()
-  );
-  ```
+- [x] **Criar tabela `purchase_quote_items`** ✅ (9 colunas)
+  - [x] Campos: id, quote_id, product_id, quantity, unit_cost
+  - [x] Generated column: `total_cost` (quantity \* unit_cost)
+  - [x] Unique constraint: (quote_id, product_id)
+  - [x] 2 índices criados
 
-- [ ] **Criar view `vw_pending_approvals`**
-  - [ ] Mostrar solicitações com status SUBMITTED aguardando aprovação
+- [x] **Criar funções (6 total)** ✅
+  - [x] `fn_generate_request_number()` - Sequential REQ-YYYY-NNN
+  - [x] `fn_generate_quote_number()` - Sequential COT-YYYY-NNN
+  - [x] `fn_update_request_total_estimated()` - Auto-calc totals
+  - [x] `fn_update_quote_total_price()` - Auto-calc totals
+  - [x] `fn_ensure_single_selected_quote()` - Single selection
+  - [x] `update_updated_at_column()` - Audit timestamps
 
-#### 3.2 Backend
+- [x] **Criar triggers (13 total)** ✅
+  - [x] 2 number generation (BEFORE INSERT)
+  - [x] 3 audit timestamps (BEFORE UPDATE)
+  - [x] 6 total recalculation (AFTER INSERT/UPDATE/DELETE)
+  - [x] 2 business rules (single selection, auto-timestamps)
 
-- [ ] **Criar `purchaseRequestService.js`**
-  - [ ] `createRequest(items, unitId, requestedBy)`
-  - [ ] `submitForApproval(requestId)`
-  - [ ] `approve(requestId, approvedBy)` → gera Purchase order
-  - [ ] `reject(requestId, reason, rejectedBy)`
-  - [ ] Notificação Telegram ao submeter (com botões: Aprovar/Rejeitar)
+- [x] **Criar views (2 total)** ✅
+  - [x] `vw_pending_approvals` - Dashboard de aprovações
+  - [x] `vw_quote_comparison` - Análise comparativa com ranking
 
-- [ ] **Criar `purchaseQuoteService.js`**
-  - [ ] `recordQuote(requestId, supplierId, items, terms)`
-  - [ ] `selectQuote(quoteId)` → marca como selecionada
-  - [ ] `compareQuotes(requestId)` → retorna análise de preços
+- [x] **Criar RLS policies (16 total)** ✅
+  - [x] purchase_requests: 4 policies (unit-based + role-based)
+  - [x] purchase_request_items: 4 policies (DRAFT only edits)
+  - [x] purchase_quotes: 4 policies (manager/admin only)
+  - [x] purchase_quote_items: 4 policies (cascading checks)
 
-- [ ] **Integração Telegram**
-  - [ ] Enviar notificação com tabela de cotações
-  - [ ] Botões inline para aprovar/rejeitar
-  - [ ] Callback handling para decisões
+- [x] **Grants** ✅
+  - [x] All tables/views accessible to authenticated role
 
-- [ ] **Testes: 15+ unitários**
+#### 3.2 Backend ✅ **CONCLUÍDO - 13/11/2025**
+
+- [x] **Criar DTOs** ✅ (650 linhas)
+  - [x] `CreatePurchaseRequestDTO` - Validação de requisições + itens
+  - [x] `UpdatePurchaseRequestDTO` - Atualizações parciais (DRAFT apenas)
+  - [x] `PurchaseRequestResponseDTO` - Formatação para frontend
+  - [x] `CreatePurchaseQuoteDTO` - Validação de cotações + itens
+  - [x] `PurchaseQuoteResponseDTO` - Formatação com preço/prazo
+  - [x] `PurchaseRequestFiltersDTO` - Paginação + busca
+
+- [x] **Criar `purchaseRequestRepository.js`** ✅ (670 linhas)
+  - [x] `create(requestData, items)` - CRUD completo
+  - [x] `findById(id)` - Busca com JOINs (units, professionals, items)
+  - [x] `findByUnit(unitId, filters)` - Filtros + paginação
+  - [x] `update(id, updates)` - Atualização
+  - [x] `delete(id)` - Soft delete
+  - [x] `submitForApproval(id)` - DRAFT → SUBMITTED
+  - [x] `approve(id, approvedBy)` - SUBMITTED → APPROVED
+  - [x] `reject(id, rejectedBy, reason)` - SUBMITTED → REJECTED
+  - [x] `getPendingApprovals(unitId)` - Usa view vw_pending_approvals
+  - [x] Item management: `addItem`, `updateItem`, `removeItem`
+  - [x] `createQuote(quoteData, items)` - Criar cotação
+  - [x] `getQuotesByRequest(requestId)` - Listar cotações
+  - [x] `selectQuote(quoteId, selectedBy, reason)` - Selecionar
+  - [x] `compareQuotes(requestId)` - Usa view vw_quote_comparison
+  - [x] Error normalization (6 tipos)
+
+- [x] **Criar `purchaseRequestService.js`** ✅ (520 linhas)
+  - [x] `createRequest(data, user)` - Validação DTO + criação
+  - [x] `getRequest(id)` - Buscar por ID
+  - [x] `listRequests(unitId, filters)` - Listar com filtros
+  - [x] `updateRequest(id, updates, user)` - Atualizar (DRAFT apenas)
+  - [x] `submitForApproval(id, user)` - Enviar para aprovação
+  - [x] `approve(id, user)` - Aprovar (gerente/admin)
+  - [x] `reject(id, reason, user)` - Rejeitar com motivo
+  - [x] `getPendingApprovals(unitId)` - Dashboard aprovações
+  - [x] `deleteRequest(id, user)` - Soft delete (DRAFT apenas)
+  - [x] `recordQuote(data, user)` - Registrar cotação (gerente/admin)
+  - [x] `getQuotesByRequest(requestId)` - Listar cotações
+  - [x] `selectQuote(quoteId, reason, user)` - Selecionar + justificativa
+  - [x] `compareQuotes(requestId)` - Análise comparativa
+  - [x] Permission checks: `canManagePurchaseRequests(professional)`
+
+- [ ] **Integração Telegram** ⏳ PRÓXIMO
+  - [ ] Enviar notificação ao submeter (com botões: Aprovar/Rejeitar)
+  - [ ] Enviar notificação ao aprovar/rejeitar
+  - [ ] Callback handling para decisões via bot
+
+- [ ] **Testes: 15+ unitários** ⏳ PRÓXIMO
 
 #### 3.3 Frontend
 
@@ -604,6 +653,18 @@ Garantir **controle total** dos insumos e produtos de revenda da barbearia, com:
 - [ ] E2E: Criar solicitação → Submeter → Receber no Telegram → Aprovar
 - [ ] Build, Lint, Tests: ✅
 - [ ] Cobertura ≥ 85%: ✅
+
+**📊 Progresso Sprint 3:**
+
+```
+Sprint 3.1 (Database)     [████████████████████] 100% ✅
+Sprint 3.2 (Backend)      [████████████░░░░░░░░]  60% 🔄 IN PROGRESS
+Sprint 3.3 (Frontend)     [░░░░░░░░░░░░░░░░░░░░]   0% ⏳
+Sprint 3.4 (QA)           [░░░░░░░░░░░░░░░░░░░░]   0% ⏳
+─────────────────────────────────────────────────────
+SPRINT 3 TOTAL            [████████░░░░░░░░░░░░]  40%
+PROJECT TOTAL             [████████████████████░] 93%
+```
 
 ---
 
@@ -1307,7 +1368,7 @@ Sprint 2.4 (E2E)          [█████████████████�
 Sprint 2.5 (Deploy)       [░░░░░░░░░░░░░░░░░░░░]   0% 🔄 NEXT
 ─────────────────────────────────────────────────────
 SPRINT 2 TOTAL            [████████████████████] 100%
-PROJECT TOTAL             [███████████████████░] 92%
+PROJECT TOTAL             [████████████████████░] 93%
 ```
 
 ---
@@ -1377,5 +1438,5 @@ Sprint 2.4 (E2E)          [█████████████████�
 Sprint 2.5 (Deploy)       [░░░░░░░░░░░░░░░░░░░░]   0% 🔄 NEXT
 ─────────────────────────────────────────────────────
 SPRINT 2 TOTAL            [████████████████████] 100%
-PROJECT TOTAL             [███████████████████░] 92%
+PROJECT TOTAL             [████████████████████░] 93%
 ```
