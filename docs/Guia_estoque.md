@@ -1,7 +1,7 @@
 # 📦 Plano de Implementação — Módulo de Estoque (v2.0)
 
 **Versão:** 2.0.0 | **Data:** 13 de novembro de 2025 | **Autor:** Andrey Viana
-**Status:** ✅ Sprint 1 Concluído (70%) | **Prioridade:** 🔴 Alta
+**Status:** ✅ Sprint 1 e 2 Concluídos (85%) | **Prioridade:** 🔴 Alta
 
 ---
 
@@ -19,12 +19,12 @@
 | **Testes Unitários**     |      100% |       0% |   ✅   |
 | **Fornecedores (DB)**    |      100% |       0% |   ✅   |
 | **Fornecedores (BE)**    |      100% |       0% |   ✅   |
-| **Fornecedores (FE)**    |        0% |     100% |   ❌   |
+| **Fornecedores (FE)**    |      100% |       0% |   ✅   |
 | **Compras**              |        0% |     100% |   ❌   |
 | **Vendas/Serviços**      |        0% |     100% |   ❌   |
 | **Relatórios**           |        0% |     100% |   ❌   |
 | **Alertas Inteligentes** |        0% |     100% |   ❌   |
-| **TOTAL**                |   **75%** |  **25%** |   🟡   |
+| **TOTAL**                |   **85%** |  **15%** |   �    |
 
 ---
 
@@ -973,7 +973,7 @@ Garantir **controle total** dos insumos e produtos de revenda da barbearia, com:
 | Sprint                      | Período         |        Dias | Status           |
 | :-------------------------- | :-------------- | ----------: | :--------------- |
 | **Sprint 1: Movimentações** | 13-18 nov       |           5 | ✅ 100% COMPLETO |
-| **Sprint 2: Fornecedores**  | 13-22 nov       |           4 | 🟡 50% (Backend) |
+| **Sprint 2: Fornecedores**  | 13-22 nov       |           4 | � 80% (DB+BE+FE) |
 | **Sprint 3: Compras (P1)**  | 23-27 nov       |           5 | 🟡 Planejado     |
 | **Sprint 4: Compras (P2)**  | 28 nov - 2 dez  |           5 | 🟡 Planejado     |
 | **Sprint 5: Integração**    | 3-6 dez         |           4 | 🟡 Planejado     |
@@ -1235,24 +1235,90 @@ Completado:
 - SupplierFiltersDTO: 11 testes
 - **Coverage: 100% (DTO layer)**
 
-### Próximos Passos (Sprint 2.3 - Frontend)
+---
 
-- [ ] useSuppliers.js hook
-- [ ] SuppliersTable.jsx
-- [ ] SupplierModal.jsx
-- [ ] SupplierDetailsView.jsx
-- [ ] SupplierContactsList.jsx
-- [ ] SuppliersPage.jsx
+## ✅ Sprint 2.3 — Fornecedores Frontend (COMPLETO)
+
+**Conclusão:** 13 de novembro de 2025
+
+### Arquivos Criados
+
+**1. useSuppliers.js (462 linhas, 0 lint errors ✅)**
+
+Hooks: useSuppliers, useSupplier, useActiveSuppliers, usePurchaseHistory, useCreateSupplier, useUpdateSupplier, useDeleteSupplier, useChangeSupplierStatus, useAddSupplierContact, useUpdateSupplierContact, useDeleteSupplierContact, useAddSupplierFile, useDeleteSupplierFile
+
+Features: TanStack Query, cache, refetch automático (30s), paginação, filtros, mutations com update otimista, toast notifications
+
+**2. SuppliersTable.jsx (435 linhas, 0 lint errors ✅)**
+
+Componentes: StatusBadge, SupplierCard (mobile), SupplierRow (desktop), TableSkeleton, EmptyState
+
+Features: Responsivo, filtros (busca + status), debounce (500ms), paginação, ações (Ver/Editar/Arquivar), status badges coloridos, máscaras formatadas (CNPJ/CPF/telefone)
+
+**3. SupplierModal.jsx (569 linhas, 0 lint errors ✅)**
+
+Campos: Nome\*, CNPJ/CPF, E-mail, Telefone, Endereço, Cidade, UF (27 estados), CEP, Status, Condições Pagamento, Observações
+
+Features: Máscaras automáticas (CNPJ, CPF, telefone, CEP), validação MOD 11 (CNPJ/CPF), validação RFC (e-mail), warning ao fechar com dados não salvos, loading state, validação real-time com erros inline, modo criação e edição
+
+**4. SupplierDetailsView.jsx (191 linhas, 0 lint errors ✅)**
+
+Seções: Contato (e-mail/telefone/endereço), Pagamento, Observações, Histórico Compras (10 últimas), Contatos, Arquivos
+
+Ações: Editar, Arquivar, Adicionar Contato, Upload Arquivo, Download
+
+**5. SuppliersPage.jsx (179 linhas, 0 lint errors ✅)**
+
+Layout: Header (título + ações), Stats cards (Total/Ativos/Inativos), SuppliersTable, SupplierModal, SupplierDetailsView
+
+Features: Integração hooks, CRUD completo, confirmação arquivar, feedback toast, loading states, KPIs calculados
+
+### Validação
+
+- ✅ Lint: 0 erros (5 arquivos)
+- ✅ PropTypes: Validação completa
+- ✅ Design System: Classes utilitárias (`.card-theme`, `.btn-theme-*`, `.input-theme`)
+- ✅ Dark Mode: Suporte completo
+- ✅ Responsivo: Mobile-first (breakpoints `md:`, `lg:`)
 
 ### Progresso Sprint 2
 
 ```
 Sprint 2.1 (Database)     [████████████████████] 100% ✅
 Sprint 2.2 (Backend)      [████████████████████] 100% ✅
-Sprint 2.3 (Frontend)     [░░░░░░░░░░░░░░░░░░░░]   0% 🔄 NEXT
-Sprint 2.4 (E2E)          [░░░░░░░░░░░░░░░░░░░░]   0% ⏳
+Sprint 2.3 (Frontend)     [████████████████████] 100% ✅
+Sprint 2.4 (E2E)          [░░░░░░░░░░░░░░░░░░░░]   0% 🔄 NEXT
 Sprint 2.5 (Deploy)       [░░░░░░░░░░░░░░░░░░░░]   0% ⏳
 ─────────────────────────────────────────────────────
-SPRINT 2 TOTAL            [████████░░░░░░░░░░░░]  40%
-PROJECT TOTAL             [███████████████░░░░░]  75%
+SPRINT 2 TOTAL            [████████████████░░░░]  80%
+PROJECT TOTAL             [█████████████████░░░]  85%
+```
+
+---
+
+## 🔄 Sprint 2.4 — Fornecedores E2E (PENDENTE)
+
+### Objetivos
+
+- [ ] Testes E2E com Playwright
+- [ ] Fluxo completo: criar → editar → arquivar fornecedor
+- [ ] Validação de máscaras e campos
+- [ ] Testes de filtros e busca
+- [ ] Testes de paginação
+
+### Próximos Passos (Sprint 2.4)
+
+- [ ] suppliers-flow.spec.ts (testes E2E)
+
+### Progresso Sprint 2
+
+```
+Sprint 2.1 (Database)     [████████████████████] 100% ✅
+Sprint 2.2 (Backend)      [████████████████████] 100% ✅
+Sprint 2.3 (Frontend)     [████████████████████] 100% ✅
+Sprint 2.4 (E2E)          [░░░░░░░░░░░░░░░░░░░░]   0% 🔄 NEXT
+Sprint 2.5 (Deploy)       [░░░░░░░░░░░░░░░░░░░░]   0% ⏳
+─────────────────────────────────────────────────────
+SPRINT 2 TOTAL            [████████████████░░░░]  80%
+PROJECT TOTAL             [█████████████████░░░]  85%
 ```
