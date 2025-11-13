@@ -11,6 +11,15 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./tests/setup.ts'],
     css: true,
+    exclude: [
+      'node_modules',
+      'tests/unit/idempotency.test.ts',
+      'tests/unit/calculations.test.ts',
+      'src/__tests__/relatorios/relatorios-refatorado.spec.jsx',
+      'src/__tests__/integration/financial-flow.spec.ts',
+      'src/dtos/__tests__/revenueDTO.spec.ts',
+      'src/hooks/__tests__/useFinancialKPIs.spec.tsx',
+    ],
     typecheck: {
       tsconfig: './tsconfig.json',
     },

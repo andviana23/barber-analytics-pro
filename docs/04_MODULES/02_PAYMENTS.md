@@ -1,8 +1,8 @@
 ---
 title: 'Barber Analytics Pro - Payments Module'
 author: 'Andrey Viana'
-version: '1.0.0'
-last_updated: '07/11/2025'
+version: '2.0.0'
+last_updated: '12/11/2025'
 license: 'Proprietary - All Rights Reserved © 2025 Andrey Viana'
 ---
 
