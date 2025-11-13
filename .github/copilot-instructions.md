@@ -4,11 +4,18 @@
 
 Você está colaborando no desenvolvimento do sistema **Barber Analytics Pro** — um sistema completo de gestão para barbearias premium, desenvolvido por **Andrey Viana**, com arquitetura limpa, modular e escalável.
 
-O sistema é **React 19 + Vite + TailwindCSS** no frontend, com **Supabase (PostgreSQL + Auth + Realtime + Edge Functions)** no backend.
+**Arquitetura:**
+- **Frontend:** React 19 + Vite + TailwindCSS
+- **Backend:** Express.js (Node.js 20) + Supabase (PostgreSQL + Auth + Realtime)
+- **Hosting:** VPS próprio (Ubuntu + Nginx + PM2)
+- **Domínio:** app.tratodebarbados.com
+- **Cron Jobs:** pg_cron (11 jobs automáticos)
+
 Adota **Clean Architecture**, **Domain-Driven Design (DDD)** e **Atomic Design**.
 **Package Manager**: **npm** (gerenciador de pacotes padrão do Node.js).
 
-**Data atual:** 10 de novembro de 2025
+**Data atual:** 12 de novembro de 2025
+**Versão:** 2.0.0 (Migrado para VPS)
 
 ---
 
@@ -990,11 +997,57 @@ Os testes são executados automaticamente no GitHub Actions:
 
 ---
 
+---
+
+## 📝 Documentação - REGRAS CRÍTICAS
+
+### ⚠️ NÃO DOCUMENTAR TODOS OS AJUSTES
+
+**REGRA IMPORTANTE:** Evite criar arquivos `.md` desnecessários para pequenos ajustes e correções.
+
+**✅ DOCUMENTAR (criar .md):**
+- Novas features significativas
+- Mudanças arquiteturais importantes
+- Novos módulos ou sistemas
+- Integrações com serviços externos
+- Alterações na infraestrutura (VPS, banco, etc.)
+- Guias de troubleshooting importantes
+
+**❌ NÃO DOCUMENTAR (não criar .md):**
+- Bugfixes simples
+- Ajustes de CSS/UI
+- Correções de typos
+- Refatorações menores
+- Pequenas melhorias de performance
+- Atualizações de dependências
+
+**📋 Alternativas à documentação .md:**
+- Comentários no código (`//` ou `/* */`)
+- Docstrings em funções (`/** */`)
+- Mensagens de commit descritivas
+- Pull request descriptions
+- CHANGELOG.md (para releases)
+
+**Exemplo:**
+
+```javascript
+// ❌ NÃO CRIAR: docs/BUGFIX_BUTTON_COLOR.md
+// ✅ USAR: Comentário + commit message
+/**
+ * Fix: Corrige cor do botão primário em dark mode
+ * Aplica classe btn-theme-primary correta
+ */
+```
+
+---
+
 ✨ **Autor & Contexto**
 
 **Autor:** Andrey Viana
 **Projeto:** Barber Analytics Pro
-**Estilo:** Enterprise, Clean Code, Atomic, Multi-tenant, Supabase-first
+**Estilo:** Enterprise, Clean Code, Atomic, Multi-tenant
+**Infraestrutura:** VPS próprio (app.tratodebarbados.com) + Supabase
 **Meta:** Sistema de gestão de barbearia completo, modular e escalável.
 
-**Última atualização:** 7 de novembro de 2025
+**Última atualização:** 12 de novembro de 2025
+**Versão:** 2.0.0 (Migrado para VPS)

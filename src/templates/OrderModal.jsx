@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Modal from '../atoms/Modal';
 import { OrderItemsTable } from '../organisms';
@@ -32,27 +32,20 @@ const OrderModal = ({
   // 'create' | 'edit' | 'view'
   loading = false,
 }) => {
-  const [clientName, setClientName] = useState('');
-  const [observations, setObservations] = useState('');
-  const [items, setItems] = useState([]);
+  const [clientName, setClientName] = useState(order?.client_name || '');
+  const [observations, setObservations] = useState(order?.observations || '');
+  const [items, setItems] = useState(order?.items || []);
   const [errors, setErrors] = useState({});
   const isEditMode = mode === 'create' || mode === 'edit';
   const isCreateMode = mode === 'create';
-  useEffect(() => {
-    if (order) {
-      setClientName(order.client_name || '');
-      setObservations(order.observations || '');
-      setItems(order.items || []);
-    } else {
-      handleReset();
-    }
-  }, [order, isOpen]);
+
   const handleReset = () => {
     setClientName('');
     setObservations('');
     setItems([]);
     setErrors({});
   };
+
   const handleClose = () => {
     if (!loading) {
       handleReset();

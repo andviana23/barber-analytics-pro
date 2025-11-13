@@ -1,5 +1,8 @@
 # 🧪 Testes - Barber Analytics Pro
 
+**Versão:** 2.0.0 (VPS)
+**Última atualização:** 12 de novembro de 2025
+
 ## 📋 Estrutura de Testes
 
 ```
@@ -32,27 +35,29 @@ tests/
 
 ## 📦 Scripts Disponíveis
 
+**⚠️ IMPORTANTE:** Use `npm` como gerenciador de pacotes (padrão do projeto)
+
 ```bash
 # Testes Unitários
-pnpm test                    # Watch mode
-pnpm test:run                # Run once
-pnpm test:unit               # Apenas unitários
-pnpm test:coverage           # Com coverage
+npm test                    # Watch mode
+npm run test:run            # Run once
+npm run test:unit           # Apenas unitários
+npm run test:coverage       # Com coverage
 
 # Testes de Integração
-pnpm test:integration        # API/Repository tests
+npm run test:integration    # API/Repository tests
 
 # Testes E2E
-pnpm test:e2e                # Playwright
-pnpm test:e2e:ui             # Playwright UI mode
+npm run test:e2e            # Playwright
+npm run test:e2e:ui         # Playwright UI mode
 
 # Testes de Carga (k6)
-pnpm test:load               # Basic load test
-pnpm test:stress             # Stress test
+npm run test:load           # Basic load test
+npm run test:stress         # Stress test
 
 # Validação Completa
-pnpm test:all                # Unit + Integration + E2E
-pnpm validate                # Lint + Format + TypeCheck
+npm run test:all            # Unit + Integration + E2E
+npm run validate            # Lint + Format + TypeCheck
 ```
 
 ## 🎯 Executar Testes
@@ -61,19 +66,19 @@ pnpm validate                # Lint + Format + TypeCheck
 
 ```bash
 # Watch mode (desenvolvimento)
-pnpm test
+npm run test
 
 # Run once (CI/CD)
-pnpm test:run
+npm run test:run
 
 # Com coverage
-pnpm test:coverage
+npm run test:coverage
 ```
 
 ### 2. Testes de Integração (Supertest)
 
 ```bash
-pnpm test:integration
+npm run test:integration
 ```
 
 ### 3. Testes de Carga (k6)
@@ -82,7 +87,7 @@ pnpm test:integration
 
 ```bash
 # Terminal 1: Iniciar aplicação
-pnpm dev
+npm run dev
 
 # Terminal 2: Executar testes de carga
 k6 run tests/load/basic-load.js
@@ -95,13 +100,13 @@ k6 run tests/load/stress-test.js
 
 ```bash
 # Headless mode
-pnpm test:e2e
+npm run test:e2e
 
 # UI mode (debug)
-pnpm test:e2e:ui
+npm run test:e2e:ui
 
 # Com relatório
-pnpm test:e2e:report
+npm run test:e2e:report
 ```
 
 ## 📊 Coverage
@@ -116,7 +121,7 @@ pnpm test:e2e:report
 **Ver relatório:**
 
 ```bash
-pnpm test:coverage
+npm run test:coverage
 # Abre: coverage/index.html
 ```
 
@@ -183,13 +188,13 @@ sudo dnf install k6 -y
 **Erro: Supertest não instalado**
 
 ```bash
-pnpm add -D supertest
+npm install -D supertest
 ```
 
 **Coverage baixo**
 
 ```bash
-pnpm test:coverage
+npm run test:coverage
 # Abra coverage/index.html e verifique arquivos não testados
 ```
 
@@ -197,8 +202,8 @@ pnpm test:coverage
 
 ```bash
 # Instalar navegadores
-pnpm exec playwright install
+npx playwright install
 
 # Debug mode
-pnpm test:e2e:debug
+npm run test:e2e:debug
 ```

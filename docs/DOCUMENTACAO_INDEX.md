@@ -1,6 +1,10 @@
 # Índice de Documentação - Barber Analytics Pro
 
-Acesso rápido a toda documentação do projeto. Data: 2025-11-11
+Acesso rápido a toda documentação do projeto.
+
+**Versão:** 2.0.0 (Migrado para VPS)
+**Data:** 2025-11-12
+**Hospedagem:** app.tratodebarbados.com
 
 ---
 
@@ -23,7 +27,7 @@ Contém:
 - 90+ custom hooks
 - 4 contextos globais
 - Utilitários e helpers
-- Configurações de projeto (Vite, Vercel, TypeScript, Tailwind)
+- Configurações de projeto (Vite, VPS, TypeScript, Tailwind, PM2, Nginx)
 - Padrões de arquitetura implementados
 - Testes e scripts
 - Fluxo de dados detalhado

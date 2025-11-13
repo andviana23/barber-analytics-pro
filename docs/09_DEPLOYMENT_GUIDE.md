@@ -1,24 +1,25 @@
 ---
 title: 'Barber Analytics Pro - Deployment Guide'
 author: 'Andrey Viana'
-version: '1.0.0'
-last_updated: '07/11/2025'
+version: '2.0.0'
+last_updated: '12/11/2025'
 license: 'Proprietary - All Rights Reserved © 2025 Andrey Viana'
 ---
 
 # 09 - Deployment Guide
 
-Guia completo de deployment do Barber Analytics Pro na **Vercel** com **Supabase** backend.
+Guia completo de deployment do Barber Analytics Pro no **VPS** com **Supabase** backend.
+
+**IMPORTANTE:** O sistema migrou do Vercel para VPS próprio hospedado em **app.tratodebarbados.com**
 
 ---
 
 ## 📋 Índice
 
 - [Pré-requisitos](#pré-requisitos)
-- [Vercel Deployment](#vercel-deployment)
+- [VPS Deployment](#vps-deployment)
 - [Environment Variables](#environment-variables)
 - [Database Migrations](#database-migrations)
-- [CI/CD Pipeline](#cicd-pipeline)
 - [Monitoring & Alerts](#monitoring--alerts)
 - [Rollback Strategy](#rollback-strategy)
 - [Performance Optimization](#performance-optimization)
@@ -34,149 +35,142 @@ Guia completo de deployment do Barber Analytics Pro na **Vercel** com **Supabase
 | Node.js      | 20.x          | Runtime JavaScript |
 | pnpm         | 8.x           | Package manager    |
 | Git          | 2.x           | Controle de versão |
-| Vercel CLI   | Latest        | Deploy local       |
+| PM2          | Latest        | Process manager    |
+| Nginx        | Latest        | Reverse proxy      |
 | Supabase CLI | Latest        | Migrations         |
 
-### Contas Necessárias
+### Requisitos do VPS
 
-- ✅ **GitHub Account** (repositório privado)
-- ✅ **Vercel Account** (Pro Plan recomendado)
+- ✅ **VPS Linux** (Ubuntu 20.04+ recomendado)
+- ✅ **Acesso SSH** (root ou sudo)
+- ✅ **Domínio configurado** (app.tratodebarbados.com)
+- ✅ **Certificado SSL** (Let's Encrypt)
 - ✅ **Supabase Account** (Pro Plan para produção)
-- ✅ **Sentry Account** (para error tracking)
 
 ---
 
-## 🚀 Vercel Deployment
+## 🚀 VPS Deployment
 
-### 1. Preparação do Repositório
+**Referência Completa:** Ver [VPS_DEPLOYMENT.md](./VPS_DEPLOYMENT.md) para guia detalhado
+
+### 1. Configuração Inicial do VPS
 
 ```bash
-# Garantir que o código está no GitHub
-git remote -v
-# origin  git@github.com:andviana23/barber-analytics-pro.git (fetch)
-# origin  git@github.com:andviana23/barber-analytics-pro.git (push)
+# SSH no VPS
+ssh seu-usuario@app.tratodebarbados.com
 
-# Criar branch de produção
-git checkout -b production
-git push origin production
+# Atualizar sistema
+sudo apt update && sudo apt upgrade -y
+
+# Instalar dependências
+sudo apt install -y nodejs npm nginx git certbot python3-certbot-nginx
+
+# Instalar Node.js 20.x
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# Instalar pnpm
+npm install -g pnpm
+
+# Instalar PM2
+npm install -g pm2
 ```
 
-### 2. Conectar Vercel ao GitHub
+### 2. Clonar Repositório
 
-**Via Vercel Dashboard:**
+```bash
+# Criar diretório do projeto
+sudo mkdir -p /var/www/barber-analytics-pro
+sudo chown $USER:$USER /var/www/barber-analytics-pro
 
-1. Acesse https://vercel.com/new
-2. Clique em **"Import Git Repository"**
-3. Selecione `andviana23/barber-analytics-pro`
-4. Configure o projeto:
+# Clonar repositório
+cd /var/www/barber-analytics-pro
+git clone https://github.com/andviana23/barber-analytics-pro.git .
 
-```yaml
-Framework Preset: Vite
-Build Command: pnpm build
-Output Directory: dist
-Install Command: pnpm install --frozen-lockfile
-Node.js Version: 20.x
+# Instalar dependências
+pnpm install
 ```
 
-### 3. Configuração do vercel.json
+### 3. Build do Frontend
 
-**Arquivo:** `vercel.json`
+```bash
+# Build para produção
+pnpm build
 
-```json
-{
-  "version": 2,
-  "buildCommand": "pnpm build",
-  "devCommand": "pnpm dev",
-  "installCommand": "pnpm install --frozen-lockfile",
-  "framework": "vite",
-  "outputDirectory": "dist",
-  "regions": ["gru1"],
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
+# Verificar dist/
+ls -la dist/
+```
+
+### 4. Configurar Nginx
+
+Ver configuração completa em [VPS_DEPLOYMENT.md](./VPS_DEPLOYMENT.md#3-configurar-nginx)
+
+```nginx
+# /etc/nginx/sites-available/tratodebarbados
+server {
+    listen 443 ssl http2;
+    server_name app.tratodebarbados.com;
+
+    ssl_certificate /etc/letsencrypt/live/app.tratodebarbados.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/app.tratodebarbados.com/privkey.pem;
+
+    root /var/www/barber-analytics-pro/dist;
+    index index.html;
+
+    # API (Express)
+    location /api/ {
+        proxy_pass http://localhost:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
     }
-  ],
-  "headers": [
-    {
-      "source": "/assets/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
-          "key": "X-XSS-Protection",
-          "value": "1; mode=block"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
-        },
-        {
-          "key": "Permissions-Policy",
-          "value": "camera=(), microphone=(), geolocation=()"
-        }
-      ]
+
+    # Frontend (SPA)
+    location / {
+        try_files $uri $uri/ /index.html;
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
 }
 ```
 
-### 4. Build Configuration
+### 5. Configurar PM2
 
-**Arquivo:** `vite.config.js`
+```bash
+# Criar ecosystem.config.js
+cat > ecosystem.config.js << 'EOF'
+module.exports = {
+  apps: [{
+    name: 'barber-api',
+    script: './server.js',
+    instances: 2,
+    exec_mode: 'cluster',
+    env: {
+      NODE_ENV: 'production',
+      API_PORT: 3001,
+    }
+  }]
+};
+EOF
 
-```javascript
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
+# Iniciar aplicação
+pm2 start ecosystem.config.js
 
-export default defineConfig({
-  plugins: [react()],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
-  build: {
-    outDir: 'dist',
-    sourcemap: true,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          // Vendor splitting para cache otimizado
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'query-vendor': ['@tanstack/react-query'],
-          'supabase-vendor': ['@supabase/supabase-js'],
-          'chart-vendor': ['recharts'],
-          'form-vendor': ['react-hook-form', 'zod'],
-        },
-      },
-    },
-    chunkSizeWarningLimit: 1000,
-  },
-  server: {
-    port: 5173,
-    host: true,
-  },
-});
+# Salvar configuração
+pm2 save
+
+# Configurar auto-start
+pm2 startup
+```
+
+### 6. SSL com Let's Encrypt
+
+```bash
+# Obter certificado SSL
+sudo certbot --nginx -d app.tratodebarbados.com
+
+# Testar renovação automática
+sudo certbot renew --dry-run
 ```
 
 ---
@@ -215,14 +209,18 @@ VITE_SENTRY_ENVIRONMENT=production
 VITE_SENTRY_RELEASE=barber-analytics-pro@1.0.0
 ```
 
-#### 3. Analytics & Monitoring
+#### 3. Cron Jobs & API
 
 ```bash
-# Vercel Analytics (incluído automaticamente)
-VITE_VERCEL_ANALYTICS_ID=auto
+# Cron secret para autenticação
+CRON_SECRET=sua_chave_secreta_aqui
 
-# Google Analytics (opcional)
-VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+# OpenAI para análises
+OPENAI_API_KEY=sk-...
+
+# Telegram para notificações
+TELEGRAM_BOT_TOKEN=123456:ABC-...
+TELEGRAM_CHAT_ID=123456789
 ```
 
 #### 4. Feature Flags
@@ -234,34 +232,47 @@ VITE_FEATURE_WHATSAPP_NOTIFICATIONS=true
 VITE_FEATURE_CLIENT_SUBSCRIPTIONS=false
 ```
 
-### Configurar no Vercel
+### Configurar no VPS
 
-**Via Dashboard:**
-
-1. Acesse: `https://vercel.com/andviana23/barber-analytics-pro/settings/environment-variables`
-2. Adicione cada variável:
-   - **Key:** Nome da variável
-   - **Value:** Valor secreto
-   - **Environments:** Production, Preview, Development
-
-**Via CLI:**
+**Criar arquivo .env:**
 
 ```bash
-# Instalar Vercel CLI
-pnpm add -g vercel
+# No VPS, criar arquivo .env
+cd /var/www/barber-analytics-pro
+nano .env
+```
 
-# Login
-vercel login
+**Adicionar todas as variáveis:**
 
-# Adicionar variável
-vercel env add VITE_SUPABASE_URL production
-# Cole o valor quando solicitado
+```bash
+# Supabase
+VITE_SUPABASE_URL=https://seu-projeto.supabase.co
+VITE_SUPABASE_ANON_KEY=sua_chave_publica
+SUPABASE_SERVICE_ROLE_KEY=sua_chave_servico
 
-# Listar variáveis
-vercel env ls
+# Cron Jobs
+CRON_SECRET=sua_chave_secreta
 
-# Remover variável
-vercel env rm VITE_SUPABASE_URL production
+# OpenAI
+OPENAI_API_KEY=sk-...
+
+# Telegram
+TELEGRAM_BOT_TOKEN=123456:ABC-...
+TELEGRAM_CHAT_ID=123456789
+
+# Node
+NODE_ENV=production
+API_PORT=3001
+```
+
+**Proteger arquivo .env:**
+
+```bash
+# Alterar permissões (somente leitura para owner)
+chmod 600 .env
+
+# Verificar
+ls -la .env
 ```
 
 ### Arquivo .env.example
@@ -401,196 +412,104 @@ supabase db reset --db-url "postgresql://..."
 
 ---
 
-## 🔄 CI/CD Pipeline
+## 🔄 Deploy Contínuo
 
-### GitHub Actions Workflow
+### Script de Deploy Automático
 
-**Arquivo:** `.github/workflows/deploy.yml`
-
-```yaml
-name: Deploy to Production
-
-on:
-  push:
-    branches:
-      - production
-  pull_request:
-    branches:
-      - production
-
-env:
-  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-
-jobs:
-  test:
-    name: Run Tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Run linter
-        run: pnpm lint
-
-      - name: Run unit tests
-        run: pnpm test:coverage
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./coverage/lcov.info
-          fail_ci_if_error: true
-
-  deploy-preview:
-    name: Deploy Preview
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    needs: test
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install Vercel CLI
-        run: npm install --global vercel@latest
-
-      - name: Pull Vercel Environment
-        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Build Project
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Deploy to Vercel
-        id: deploy
-        run: |
-          url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
-          echo "url=$url" >> $GITHUB_OUTPUT
-
-      - name: Comment PR with Preview URL
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `✅ Preview deployed to: ${{ steps.deploy.outputs.url }}`
-            })
-
-  deploy-production:
-    name: Deploy Production
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/production'
-    needs: test
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install Vercel CLI
-        run: npm install --global vercel@latest
-
-      - name: Pull Vercel Environment
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Build Project
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Deploy to Vercel
-        id: deploy
-        run: |
-          url=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
-          echo "url=$url" >> $GITHUB_OUTPUT
-
-      - name: Create Sentry Release
-        uses: getsentry/action-release@v1
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-          SENTRY_PROJECT: barber-analytics-pro
-        with:
-          environment: production
-          version: ${{ github.sha }}
-
-      - name: Notify Success
-        run: |
-          echo "✅ Deployed to: ${{ steps.deploy.outputs.url }}"
-
-  database-migrations:
-    name: Run Database Migrations
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/production'
-    needs: deploy-production
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
-        with:
-          version: latest
-
-      - name: Link to Supabase Project
-        run: supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-
-      - name: Run Migrations
-        run: supabase db push
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-```
-
-### Secrets Necessários
-
-Adicionar no GitHub: `Settings > Secrets and variables > Actions`
+**Criar script deploy.sh no VPS:**
 
 ```bash
-VERCEL_TOKEN              # Token da Vercel
-VERCEL_ORG_ID             # ID da organização Vercel
-VERCEL_PROJECT_ID         # ID do projeto Vercel
-SUPABASE_ACCESS_TOKEN     # Token de acesso Supabase
-SUPABASE_PROJECT_REF      # Referência do projeto Supabase
-SENTRY_AUTH_TOKEN         # Token Sentry
-SENTRY_ORG                # Organização Sentry
+#!/bin/bash
+# deploy.sh - Script de deploy automático
+
+set -e
+
+echo "🚀 Iniciando deploy..."
+
+# 1. Git pull
+echo "📥 Baixando código..."
+git pull origin main
+
+# 2. Instalar dependências
+echo "📦 Instalando dependências..."
+pnpm install --frozen-lockfile
+
+# 3. Build frontend
+echo "🏗️ Buildando frontend..."
+pnpm build
+
+# 4. Reload API
+echo "🔄 Recarregando API..."
+pm2 reload barber-api
+
+echo "✅ Deploy concluído!"
+```
+
+**Tornar executável:**
+
+```bash
+chmod +x deploy.sh
+```
+
+### Deploy Manual
+
+```bash
+# SSH no VPS
+ssh seu-usuario@app.tratodebarbados.com
+
+# Ir para pasta do projeto
+cd /var/www/barber-analytics-pro
+
+# Executar deploy
+./deploy.sh
 ```
 
 ---
 
 ## 📊 Monitoring & Alerts
 
-### 1. Vercel Analytics
+### 1. PM2 Monitoring
 
-**Ativação:**
+**Monitorar processos:**
 
-```javascript
-// src/main.jsx
-import { inject } from '@vercel/analytics';
+```bash
+# Status dos processos
+pm2 status
 
-inject(); // Adicionar antes do ReactDOM.render
+# Monit em tempo real
+pm2 monit
+
+# Logs
+pm2 logs barber-api
+
+# Últimas 100 linhas
+pm2 logs barber-api --lines 100
 ```
 
 **Métricas Disponíveis:**
 
-- ✅ Page Views
-- ✅ Unique Visitors
-- ✅ Top Pages
-- ✅ Traffic Sources
-- ✅ Device Types
+- ✅ CPU Usage
+- ✅ Memory Usage
+- ✅ Restarts
+- ✅ Uptime
+- ✅ Logs em tempo real
 
-### 2. Sentry Error Tracking
+### 2. Nginx Logs
+
+**Visualizar logs:**
+
+```bash
+# Access logs
+tail -f /var/log/nginx/barber-analytics-access.log
+
+# Error logs
+tail -f /var/log/nginx/barber-analytics-error.log
+
+# Filtrar por status 500
+grep "500" /var/log/nginx/barber-analytics-access.log
+```
+
+### 3. Sentry Error Tracking
 
 **Configuração:**
 
@@ -628,7 +547,7 @@ Sentry.init({
 });
 ```
 
-### 3. Supabase Monitoring
+### 4. Supabase Monitoring
 
 **Via Dashboard:**
 
@@ -652,55 +571,71 @@ ORDER BY total_time DESC
 LIMIT 10;
 ```
 
-### 4. Uptime Monitoring
+### 5. Uptime Monitoring
 
 **UptimeRobot (Recomendado):**
 
 1. Criar monitor HTTP(s)
-2. URL: `https://barber-analytics-pro.vercel.app/api/health`
+2. URL: `https://app.tratodebarbados.com/health`
 3. Intervalo: 5 minutos
-4. Alertas via: Email, SMS, Slack
+4. Alertas via: Email, SMS, Telegram
 
-**Endpoint de Health Check:**
+**Testar Health Check:**
 
-```javascript
-// src/pages/api/health.js
-export default function handler(req, res) {
-  res.status(200).json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    version: process.env.VITE_SENTRY_RELEASE || '1.0.0',
-    uptime: process.uptime(),
-  });
-}
+```bash
+curl https://app.tratodebarbados.com/health
 ```
 
 ---
 
 ## ⚠️ Rollback Strategy
 
-### 1. Rollback via Vercel Dashboard
+### 1. Rollback via Git
 
-**Passos:**
-
-1. Acesse: `https://vercel.com/andviana23/barber-analytics-pro/deployments`
-2. Encontre deployment anterior estável
-3. Clique em **"..."** → **"Promote to Production"**
-4. Confirme o rollback
-
-**Tempo estimado:** ~30 segundos
-
-### 2. Rollback via CLI
+**Voltar para commit anterior:**
 
 ```bash
-# Listar deployments
-vercel ls barber-analytics-pro
+# SSH no VPS
+ssh seu-usuario@app.tratodebarbados.com
+cd /var/www/barber-analytics-pro
 
-# Promover deployment específico
-vercel promote <deployment-url> --scope=andviana23
+# Ver histórico de commits
+git log --oneline -10
 
-# Exemplo:
-vercel promote barber-analytics-pro-abc123.vercel.app --scope=andviana23
+# Voltar para commit específico
+git reset --hard <commit-hash>
+
+# Rebuild
+pnpm install
+pnpm build
+
+# Reload API
+pm2 reload barber-api
+
+# Reload Nginx
+sudo systemctl reload nginx
+```
+
+### 2. Rollback com Backup
+
+**Criar backup antes de deploy:**
+
+```bash
+# Criar backup do dist/
+tar -czf backup-$(date +%Y%m%d-%H%M%S).tar.gz dist/
+
+# Listar backups
+ls -lh backup-*.tar.gz
+```
+
+**Restaurar backup:**
+
+```bash
+# Extrair backup
+tar -xzf backup-20251112-120000.tar.gz
+
+# Reload Nginx
+sudo systemctl reload nginx
 ```
 
 ### 3. Rollback de Database
@@ -722,12 +657,12 @@ psql $DATABASE_URL < backup-snapshot.sql
 
 **Checklist de Rollback:**
 
-- [ ] Notificar equipe no Slack/Discord
+- [ ] Notificar equipe
 - [ ] Verificar se há dados críticos em risco
 - [ ] Executar backup do banco antes de qualquer ação
-- [ ] Fazer rollback do frontend via Vercel
+- [ ] Fazer rollback via git ou backup
 - [ ] Se necessário, reverter migrations
-- [ ] Validar rollback em ambiente de preview
+- [ ] Testar aplicação após rollback
 - [ ] Comunicar stakeholders
 - [ ] Post-mortem: documentar causa e solução
 
@@ -817,22 +752,15 @@ const queryClient = new QueryClient({
 });
 ```
 
-### 5. CDN Headers
+### 5. Nginx Cache Headers
 
-```json
-// vercel.json
-{
-  "headers": [
-    {
-      "source": "/assets/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    }
-  ]
+**Configuração já incluída no nginx.conf:**
+
+```nginx
+# Cache de assets estáticos
+location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+    expires 1y;
+    add_header Cache-Control "public, immutable";
 }
 ```
 
@@ -852,19 +780,21 @@ const queryClient = new QueryClient({
 
 ### During Deployment
 
-- [ ] CI/CD pipeline executando
-- [ ] Testes automatizados passando
-- [ ] Deploy preview validado
+- [ ] Git pull executado
+- [ ] Dependências instaladas
+- [ ] Build concluído sem erros
 - [ ] Migrations aplicadas com sucesso
-- [ ] Health check retornando 200
+- [ ] PM2 reload bem-sucedido
+- [ ] Nginx reload bem-sucedido
 
 ### Post-Deployment
 
-- [ ] Validar URL de produção
+- [ ] Validar URL de produção (app.tratodebarbados.com)
 - [ ] Testar fluxos críticos manualmente
 - [ ] Verificar Sentry (sem erros novos)
-- [ ] Verificar Vercel Analytics
+- [ ] Verificar PM2 status
 - [ ] Monitorar logs por 30 minutos
+- [ ] Verificar cron jobs funcionando
 - [ ] Notificar stakeholders
 
 ---
@@ -879,12 +809,14 @@ const queryClient = new QueryClient({
 
 ## 📖 Referências
 
-1. **Vercel Documentation**. https://vercel.com/docs
-2. **Supabase CLI Reference**. https://supabase.com/docs/reference/cli
-3. **GitHub Actions**. https://docs.github.com/actions
+1. **PM2 Documentation**. https://pm2.keymetrics.io/
+2. **Nginx Documentation**. https://nginx.org/en/docs/
+3. **Supabase CLI Reference**. https://supabase.com/docs/reference/cli
+4. **Node.js Best Practices**. https://github.com/goldbergyoni/nodebestpractices
+5. **VPS_DEPLOYMENT.md**. Guia detalhado de deploy no VPS
 
 ---
 
-**Última atualização:** 7 de novembro de 2025
-**Versão:** 1.0.0
+**Última atualização:** 12 de novembro de 2025
+**Versão:** 2.0.0 (Migrado para VPS)
 **Autor:** Andrey Viana

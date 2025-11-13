@@ -1,14 +1,16 @@
 ---
 title: 'Barber Analytics Pro - Infrastructure'
 author: 'Andrey Viana'
-version: '1.0.0'
-last_updated: '07/11/2025'
+version: '2.0.0'
+last_updated: '12/11/2025'
 license: 'Proprietary - All Rights Reserved © 2025 Andrey Viana'
 ---
 
 # 05 - Infrastructure (Infraestrutura)
 
-Documentação técnica completa da **Infraestrutura** do Barber Analytics Pro, incluindo Supabase, PostgreSQL, autenticação, realtime e deployment.
+Documentação técnica completa da **Infraestrutura** do Barber Analytics Pro, incluindo VPS, Supabase, PostgreSQL, autenticação, realtime e deployment.
+
+**IMPORTANTE:** Sistema migrado do Vercel para VPS próprio (app.tratodebarbados.com)
 
 ---
 
@@ -28,16 +30,24 @@ Documentação técnica completa da **Infraestrutura** do Barber Analytics Pro, 
 
 ## 🎯 Visão Geral
 
-O Barber Analytics Pro utiliza **Supabase** como Backend-as-a-Service (BaaS), fornecendo:
+O Barber Analytics Pro utiliza uma arquitetura híbrida:
 
+### VPS (Hosting)
+- ✅ **Ubuntu VPS** - Servidor Linux dedicado
+- ✅ **Nginx** - Servidor web + proxy reverso + SSL
+- ✅ **PM2** - Process manager para Node.js
+- ✅ **Express API** - Servidor de cron jobs
+- ✅ **Domínio:** app.tratodebarbados.com
+
+### Supabase (Backend-as-a-Service)
 - ✅ PostgreSQL 17.6 (banco de dados relacional)
 - ✅ Autenticação JWT com RLS
 - ✅ Realtime WebSockets
-- ✅ Edge Functions (Deno runtime)
+- ✅ pg_cron (11 jobs automáticos)
 - ✅ Storage (arquivos estáticos)
 - ✅ Auto-backup e replicação
 
-**Região:** South America (São Paulo) - `sa-east-1`
+**Região Supabase:** South America (São Paulo) - `sa-east-1`
 **Plano:** Pro (escalável até 100GB)
 
 ---
@@ -66,10 +76,10 @@ cloud "Supabase Cloud" {
 }
 
 actor "Client (React)" as client
-cloud "Vercel Edge" as vercel
+cloud "VPS (Nginx)" as vps
 
-client --> vercel : HTTPS
-vercel --> api : REST/WebSocket
+client --> vps : HTTPS (app.tratodebarbados.com)
+vps --> api : REST/WebSocket
 @enduml
 ```
 

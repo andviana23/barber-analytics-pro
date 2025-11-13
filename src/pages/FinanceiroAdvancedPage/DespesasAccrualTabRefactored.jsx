@@ -4,8 +4,6 @@ import {
   Plus,
   Search,
   Calendar,
-  DollarSign,
-  Building2,
   Edit,
   Eye,
   X,
@@ -13,8 +11,6 @@ import {
   Clock,
   AlertCircle,
   Trash2,
-  Download,
-  Filter,
   TrendingUp,
   TrendingDown,
   AlertTriangle,
@@ -24,18 +20,14 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../services/supabase';
 import { useToast } from '../../context/ToastContext';
-import {
-  format,
-  parseISO,
-  startOfMonth,
-  endOfMonth,
-  isBefore,
-  isAfter,
-} from 'date-fns';
+import { format, parseISO, startOfMonth, endOfMonth, isBefore } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import expenseRepository from '../../repositories/expenseRepository';
-import expenseService from '../../services/expenseService';
 import { useToggleRecurring } from '../../hooks/useExpenses';
+import ImportExpensesFromOFXButton from '../../components/finance/ImportExpensesFromOFXButton';
+import ExpenseDetailsModal from '../../components/modals/ExpenseDetailsModal';
+import ExpenseEditModal from '../../components/modals/ExpenseEditModal';
+import DeleteConfirmationModal from '../../components/modals/DeleteConfirmationModal';
 
 /**
  * 💳 Tab de Despesas (Competência) - 100% REFATORADO COM DESIGN SYSTEM
@@ -551,7 +543,7 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
                   setSelectedExpenseForAction(null);
                   setIsEditModalOpen(true);
                 }}
-                className="text-dark-text-primary flex transform items-center gap-2 rounded-xl bg-gradient-primary bg-gradient-to-r px-5 py-3 font-semibold shadow-lg transition-all duration-200 hover:scale-105 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl"
+                className="text-dark-text-primary flex transform items-center gap-2 rounded-xl bg-gradient-primary px-5 py-3 font-semibold shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl"
               >
                 <Plus className="h-5 w-5" />
                 Nova Despesa
@@ -586,7 +578,7 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
 
               {selectedExpenses.length > 0 && (
                 <>
-                  <div className="h-8 w-px bg-gray-300 dark:bg-gray-600"></div>
+                  <div className="h-8 w-px border-l border-light-border dark:border-dark-border"></div>
                   <span className="text-theme-primary text-sm font-semibold">
                     {selectedExpenses.length} despesa
                     {selectedExpenses.length !== 1 ? 's' : ''} selecionada
@@ -658,7 +650,7 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
                         setSelectedExpenses(filteredExpenses.map(e => e.id));
                       }
                     }}
-                    className="card-theme h-4 w-4 cursor-pointer rounded border-light-border text-blue-600 transition-all focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
+                    className="card-theme h-4 w-4 cursor-pointer rounded border-light-border text-blue-600 transition-all focus:ring-2 focus:ring-blue-500 dark:border-dark-border"
                   />
                 </th>
                 <th className="text-theme-secondary px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
@@ -703,7 +695,7 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
                     className="text-theme-secondary px-6 py-16 text-center"
                   >
                     <div className="flex flex-col items-center gap-3">
-                      <CreditCard className="dark:text-theme-secondary h-12 w-12 text-gray-300 dark:text-gray-600" />
+                      <CreditCard className="text-theme-secondary h-12 w-12" />
                       <p className="font-medium">Nenhuma despesa encontrada</p>
                       <p className="text-xs">
                         Tente ajustar os filtros ou adicione uma nova despesa
@@ -733,7 +725,7 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
                               );
                             }
                           }}
-                          className="card-theme h-4 w-4 cursor-pointer rounded border-light-border text-blue-600 transition-all focus:ring-2 focus:ring-blue-500 dark:border-dark-border dark:bg-gray-700"
+                          className="card-theme h-4 w-4 cursor-pointer rounded border-light-border text-blue-600 transition-all focus:ring-2 focus:ring-blue-500 dark:border-dark-border"
                         />
                       </td>
                       <td className="px-6 py-4">
@@ -948,7 +940,7 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
       )}
 
       {isEditModalOpen && (
-        <NovaDespesaModal
+        <ExpenseEditModal
           isOpen={isEditModalOpen}
           onClose={() => {
             setIsEditModalOpen(false);
@@ -1008,7 +1000,7 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
                   setSelectedExpenseForAction(null);
                   setSelectedPaymentDate(format(new Date(), 'yyyy-MM-dd'));
                 }}
-                className="hover:card-theme rounded-lg p-1 transition-colors dark:hover:bg-gray-700"
+                className="rounded-lg p-1 transition-colors hover:bg-light-surface dark:hover:bg-dark-surface"
               >
                 <X className="text-theme-secondary h-5 w-5" />
               </button>
@@ -1017,7 +1009,7 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
             {/* Body */}
             <div className="space-y-4">
               <div>
-                <label className="dark:text-theme-secondary mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
+                <label className="text-theme-secondary mb-2 block text-sm font-medium">
                   Data do Pagamento *
                 </label>
                 <input
@@ -1026,7 +1018,7 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
                   onChange={e => setSelectedPaymentDate(e.target.value)}
                   max={format(new Date(), 'yyyy-MM-dd')} // Não permite datas futuras
                   min={format(startOfMonth(new Date()), 'yyyy-MM-dd')} // Apenas no mês atual
-                  className="card-theme text-theme-primary dark:text-dark-text-primary w-full rounded-lg border-2 border-light-border px-4 py-3 text-sm transition-all duration-200 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-green-500 dark:border-dark-border dark:bg-gray-700"
+                  className="card-theme text-theme-primary w-full rounded-lg border-2 border-light-border px-4 py-3 text-sm transition-all duration-200 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-green-500 dark:border-dark-border"
                 />
                 <p className="text-theme-secondary dark:text-light-text-muted dark:text-dark-text-muted mt-2 text-xs">
                   ⚠️ A data deve ser hoje ou anterior, dentro do mês atual.
@@ -1057,7 +1049,7 @@ const DespesasAccrualTabRefactored = ({ globalFilters }) => {
                   setSelectedExpenseForAction(null);
                   setSelectedPaymentDate(format(new Date(), 'yyyy-MM-dd'));
                 }}
-                className="dark:text-theme-secondary card-theme flex-1 rounded-lg px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:text-gray-600 dark:hover:bg-gray-600"
+                className="btn-theme-secondary flex-1"
               >
                 Cancelar
               </button>

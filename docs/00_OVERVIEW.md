@@ -5,8 +5,8 @@
 **Documento:** 00_OVERVIEW.md
 **Título:** Visão Geral do Sistema
 **Autor:** Andrey Viana
-**Versão:** 1.1.0
-**Última Atualização:** 8 de novembro de 2025
+**Versão:** 2.0.0
+**Última Atualização:** 12 de novembro de 2025
 **Licença:** Proprietary
 
 ---
@@ -29,7 +29,8 @@ O **Barber Analytics Pro** é um sistema SaaS (Software as a Service) completo d
 - **Experiência do Usuário**: Design intuitivo e responsivo
 - **Segurança**: RLS (Row Level Security), criptografia e auditoria completa
 - **Escalabilidade**: Multi-tenant architecture preparada para crescimento
-- **Inovação**: Uso de tecnologias modernas (React 19, Supabase, Edge Functions)
+- **Inovação**: Uso de tecnologias modernas (React 19, Supabase, VPS próprio)
+- **Controle Total**: Infraestrutura própria em VPS (app.tratodebarbados.com)
 
 ## 🏢 Contexto de Negócio
 
@@ -225,7 +226,9 @@ Barbearias enfrentam desafios críticos:
 | Serviço                   | Uso                      | Status       |
 | ------------------------- | ------------------------ | ------------ |
 | **Supabase**              | Database, Auth, Realtime | ✅ Ativo     |
-| **Vercel**                | Hosting, CI/CD, Cron     | ✅ Ativo     |
+| **VPS Próprio**           | Hosting (app.tratodebarbados.com) | ✅ Ativo |
+| **Nginx + PM2**           | Servidor web e API       | ✅ Ativo     |
+| **pg_cron**               | Cron jobs automáticos    | ✅ Ativo     |
 | **OpenAI**                | Análises e insights IA   | ✅ Ativo     |
 | **Telegram Bot API**      | Notificações e bot       | ✅ Ativo     |
 | **Asaas**                 | Gateway de pagamentos    | 🔄 Em Teste  |

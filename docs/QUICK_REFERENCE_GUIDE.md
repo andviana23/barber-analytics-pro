@@ -4,7 +4,7 @@
 
 ```
 barber-analytics-pro/
-├── app/                    # Vercel Serverless + Cron Jobs
+├── app/                    # Express API + Cron Jobs
 ├── src/                    # React Frontend (Vite)
 │   ├── atoms/             # Design System - Componentes básicos
 │   ├── molecules/         # Design System - Componentes compostos
@@ -26,13 +26,16 @@ barber-analytics-pro/
 
 | Camada | Tecnologia |
 |--------|-----------|
+| **Hosting** | **VPS Ubuntu + Nginx + PM2** |
+| **Domínio** | **app.tratodebarbados.com** |
 | Frontend | React 19 + TypeScript + Vite |
 | UI | Tailwind CSS + Atomic Design |
 | State | Context API + TanStack Query |
 | Forms | React Hook Form + Zod |
 | Routing | React Router DOM v7 |
-| Backend API | Next.js 15 (Vercel Serverless) |
+| Backend API | Express.js (Node.js 20) |
 | Database | Supabase (PostgreSQL + RLS) |
+| Cron Jobs | pg_cron (11 jobs automáticos) |
 | IA | OpenAI API (GPT-4o) |
 | Notifications | Telegram Bot |
 | Testes | Vitest + Playwright |
@@ -93,7 +96,7 @@ barber-analytics-pro/
 
 ---
 
-## CRON JOBS (Vercel Cron)
+## CRON JOBS (pg_cron - 11 Jobs Automáticos)
 
 ```
 02:00 BRT    Gerar despesas recorrentes
@@ -217,7 +220,7 @@ UnitContext          - Unidade selecionada
 | vite.config.js | Build/Dev configuration |
 | tsconfig.json | TypeScript compiler |
 | tailwind.config.js | Sistema design |
-| vercel.json | Deploy + cron jobs |
+| ecosystem.config.js | PM2 process config |
 | eslint.config.js | Linting rules |
 | playwright.config.ts | E2E tests |
 | package.json | Dependências (150+ packages) |
@@ -355,7 +358,7 @@ DATABASE (PostgreSQL)
 ### Deploy
 1. Commit em branch de feature
 2. Push para GitHub
-3. Vercel CI/CD executa testes
+3. Deploy manual ou automatizado no VPS
 4. Deploy automático na main
 5. Cron jobs já configurados
 
@@ -378,7 +381,7 @@ Frontend Root:      src/
 Backend API:        app/api/
 Backend Lib:        lib/
 Database:           Supabase (postgres)
-Deploy:             Vercel
+Deploy:             VPS (app.tratodebarbados.com)
 CI/CD:              GitHub Actions
 Package Manager:    pnpm
 Node Version:       >=20.0
