@@ -620,12 +620,37 @@ Garantir **controle total** dos insumos e produtos de revenda da barbearia, com:
   - [x] `compareQuotes(requestId)` - Análise comparativa
   - [x] Permission checks: `canManagePurchaseRequests(professional)`
 
-- [ ] **Integração Telegram** ⏳ PRÓXIMO
-  - [ ] Enviar notificação ao submeter (com botões: Aprovar/Rejeitar)
-  - [ ] Enviar notificação ao aprovar/rejeitar
-  - [ ] Callback handling para decisões via bot
+- [x] **Integração Telegram** ✅ **CONCLUÍDO - 13/11/2025** (570 linhas)
+  - [x] `sendPurchaseRequestNotification()` - Notifica gerentes com detalhes + itens
+  - [x] `sendApprovalNotification()` - Notifica solicitante sobre aprovação
+  - [x] `sendRejectionNotification()` - Notifica solicitante com motivo de rejeição
+  - [x] `sendQuoteSelectedNotification()` - Notifica gerente sobre seleção
+  - [x] Integrado em `purchaseRequestService.js` (4 pontos de notificação)
+  - [x] Formatação rica com Markdown + emojis por prioridade
+  - [x] Busca automática de chat_ids (RLS-aware)
+  - [x] Error handling silencioso (não falha operação principal)
 
-- [ ] **Testes: 15+ unitários** ⏳ PRÓXIMO
+- [x] **Testes DTOs: 77 unitários** ✅ **CONCLUÍDO - 13/11/2025** (886 linhas, 47 passing)
+  - [x] `CreatePurchaseRequestDTO` - 11 tests (validation, items, defaults)
+  - [x] `UpdatePurchaseRequestDTO` - 5 tests (partial updates, fields)
+  - [x] `PurchaseRequestResponseDTO` - 14 tests (labels, colors, formatting, business rules)
+  - [x] `CreatePurchaseQuoteDTO` - 7 tests (validation, items, line_total)
+  - [x] `PurchaseQuoteResponseDTO` - 5 tests (formatting, delivery, canSelect)
+  - [x] `PurchaseRequestFiltersDTO` - 9 tests (defaults, validation, pagination)
+
+- [ ] **Testes Repository: 20+ unitários** ⏳ PRÓXIMO
+  - [ ] Mock Supabase client
+  - [ ] CRUD operations (create, findById, findByUnit, update, delete)
+  - [ ] Workflow operations (submitForApproval, approve, reject)
+  - [ ] Quote operations (createQuote, getQuotes, selectQuote, compareQuotes)
+  - [ ] Error normalization (6 types)
+
+- [ ] **Testes Service: 20+ unitários** ⏳ PRÓXIMO
+  - [ ] Mock repository + DTOs
+  - [ ] Business logic (createRequest, updateRequest, deleteRequest)
+  - [ ] Permission checks (canManagePurchaseRequests)
+  - [ ] Workflow (submitForApproval, approve, reject)
+  - [ ] Quotes (recordQuote, selectQuote, compareQuotes)
 
 #### 3.3 Frontend
 
@@ -658,13 +683,22 @@ Garantir **controle total** dos insumos e produtos de revenda da barbearia, com:
 
 ```
 Sprint 3.1 (Database)     [████████████████████] 100% ✅
-Sprint 3.2 (Backend)      [████████████░░░░░░░░]  60% 🔄 IN PROGRESS
+Sprint 3.2 (Backend)      [█████████████████░░░]  85% 🔄 IN PROGRESS
 Sprint 3.3 (Frontend)     [░░░░░░░░░░░░░░░░░░░░]   0% ⏳
 Sprint 3.4 (QA)           [░░░░░░░░░░░░░░░░░░░░]   0% ⏳
 ─────────────────────────────────────────────────────
-SPRINT 3 TOTAL            [████████░░░░░░░░░░░░]  40%
-PROJECT TOTAL             [████████████████████░] 93%
+SPRINT 3 TOTAL            [█████████░░░░░░░░░░░]  46%
+PROJECT TOTAL             [████████████████████░] 94%
 ```
+
+Sprint 3.2 (Backend) [████████████░░░░░░░░] 60% 🔄 IN PROGRESS
+Sprint 3.3 (Frontend) [░░░░░░░░░░░░░░░░░░░░] 0% ⏳
+Sprint 3.4 (QA) [░░░░░░░░░░░░░░░░░░░░] 0% ⏳
+─────────────────────────────────────────────────────
+SPRINT 3 TOTAL [████████░░░░░░░░░░░░] 40%
+PROJECT TOTAL [████████████████████░] 94%
+
+````
 
 ---
 
@@ -698,7 +732,7 @@ PROJECT TOTAL             [█████████████████�
     notes TEXT,
     created_at TIMESTAMPTZ DEFAULT now()
   );
-  ```
+````
 
 - [ ] **Criar tabela `purchase_attachments`**
   - [ ] Campos: id, purchase_id, file_name, file_path (Storage), type, uploaded_by, uploaded_at
@@ -1368,7 +1402,7 @@ Sprint 2.4 (E2E)          [█████████████████�
 Sprint 2.5 (Deploy)       [░░░░░░░░░░░░░░░░░░░░]   0% 🔄 NEXT
 ─────────────────────────────────────────────────────
 SPRINT 2 TOTAL            [████████████████████] 100%
-PROJECT TOTAL             [████████████████████░] 93%
+PROJECT TOTAL             [████████████████████░] 94%
 ```
 
 ---
@@ -1438,5 +1472,5 @@ Sprint 2.4 (E2E)          [█████████████████�
 Sprint 2.5 (Deploy)       [░░░░░░░░░░░░░░░░░░░░]   0% 🔄 NEXT
 ─────────────────────────────────────────────────────
 SPRINT 2 TOTAL            [████████████████████] 100%
-PROJECT TOTAL             [████████████████████░] 93%
+PROJECT TOTAL             [████████████████████░] 94%
 ```
