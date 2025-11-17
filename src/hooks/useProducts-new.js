@@ -12,8 +12,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { toast } from 'react-hot-toast';
-import { supabase } from '../services/supabase';
-import { productsService } from '../services/productsService';
+import { supabase } from '../../lib/supabase';
+import { productService } from '../../lib/services/productService';
 import { useAuth } from '../context/AuthContext';
 
 // ========================================
@@ -47,7 +47,7 @@ export function useProducts(filters = {}, options = {}) {
   return useQuery({
     queryKey: productKeys.list(filters),
     queryFn: async () => {
-      const result = await productsService.getProducts(filters, user);
+      const result = await productService.getProducts(filters, user);
       if (result.error) throw new Error(result.error);
       return result.data;
     },
@@ -69,7 +69,7 @@ export function useProduct(id, options = {}) {
   return useQuery({
     queryKey: productKeys.detail(id),
     queryFn: async () => {
-      const result = await productsService.getProductById(id, user);
+      const result = await productService.getProductById(id, user);
       if (result.error) throw new Error(result.error);
       return result.data;
     },
@@ -91,7 +91,7 @@ export function useLowStockProducts(unitId, options = {}) {
   return useQuery({
     queryKey: productKeys.lowStock(unitId),
     queryFn: async () => {
-      const result = await productsService.getLowStockProducts(unitId, user);
+      const result = await productService.getLowStockProducts(unitId, user);
       if (result.error) throw new Error(result.error);
       return result.data || [];
     },
@@ -113,7 +113,7 @@ export function useOutOfStockProducts(unitId, options = {}) {
   return useQuery({
     queryKey: productKeys.outOfStock(unitId),
     queryFn: async () => {
-      const result = await productsService.getOutOfStockProducts(unitId, user);
+      const result = await productService.getOutOfStockProducts(unitId, user);
       if (result.error) throw new Error(result.error);
       return result.data || [];
     },
@@ -135,7 +135,7 @@ export function useProductStatistics(unitId, options = {}) {
   return useQuery({
     queryKey: productKeys.statistics(unitId),
     queryFn: async () => {
-      const result = await productsService.getProductStatistics(unitId, user);
+      const result = await productService.getProductStatistics(unitId, user);
       if (result.error) throw new Error(result.error);
       return result.data;
     },
@@ -160,7 +160,7 @@ export function useCreateProduct(options = {}) {
 
   return useMutation({
     mutationFn: async productData => {
-      const result = await productsService.createProduct(productData, user);
+      const result = await productService.createProduct(productData, user);
       if (result.error) throw new Error(result.error);
       return result.data;
     },
@@ -191,7 +191,7 @@ export function useUpdateProduct(options = {}) {
 
   return useMutation({
     mutationFn: async ({ id, updates }) => {
-      const result = await productsService.updateProduct(id, updates, user);
+      const result = await productService.updateProduct(id, updates, user);
       if (result.error) throw new Error(result.error);
       return result.data;
     },
@@ -225,7 +225,7 @@ export function useAdjustStock(options = {}) {
 
   return useMutation({
     mutationFn: async ({ id, quantity, operation }) => {
-      const result = await productsService.adjustStock(
+      const result = await productService.adjustStock(
         id,
         quantity,
         operation,
@@ -270,7 +270,7 @@ export function useDeleteProduct(options = {}) {
 
   return useMutation({
     mutationFn: async id => {
-      const result = await productsService.deleteProduct(id, user);
+      const result = await productService.deleteProduct(id, user);
       if (result.error) throw new Error(result.error);
       return result.data;
     },
@@ -302,7 +302,7 @@ export function useRestoreProduct(options = {}) {
 
   return useMutation({
     mutationFn: async id => {
-      const result = await productsService.restoreProduct(id, user);
+      const result = await productService.restoreProduct(id, user);
       if (result.error) throw new Error(result.error);
       return result.data;
     },

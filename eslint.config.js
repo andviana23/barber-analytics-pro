@@ -5,6 +5,29 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import barberDesignSystem from './eslint-plugin-barber-design-system/index.js';
 
 export default [
+  {
+    ignores: [
+      'dist/**',
+      'build/**',
+      'coverage/**',
+      'playwright-report/**',
+      'test-results/**',
+      'node_modules/**',
+      '.env',
+      '.env.local',
+      '.env.production',
+      '.env.development',
+      '*.config.js',
+      '*.config.ts',
+      'server.js',
+      'server/**',
+      'tests/**',
+      'e2e/**',
+      'scripts/**',
+      'docs/**',
+      'reports/**',
+    ],
+  },
   js.configs.recommended,
   {
     files: ['**/*.{js,jsx}'],

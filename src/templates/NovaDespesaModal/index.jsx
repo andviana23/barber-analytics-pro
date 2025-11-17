@@ -6,9 +6,9 @@
  * @date 07/11/2025
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { X, ChevronDown, ChevronUp, Upload, FileText } from 'lucide-react';
+import { X, ChevronDown, ChevronUp, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 import {
   useCreateExpense,
@@ -19,6 +19,7 @@ import { categoryRepository } from '@/repositories/categoryRepository';
 import AttachmentUploader from '@/components/molecules/AttachmentUploader';
 import AttachmentCard from '@/components/molecules/AttachmentCard';
 import { useFileUpload } from '@/hooks/useFileUpload';
+import { logger } from '@/utils/secureLogger';
 
 /**
  * Modal de Nova Despesa
@@ -77,7 +78,6 @@ function NovaDespesaModal({
   const {
     uploading,
     attachments,
-    loading: loadingAttachments,
     uploadProgress,
     uploadAttachment,
     removeAttachment,
@@ -92,18 +92,11 @@ function NovaDespesaModal({
   }, [createdExpenseId, loadAttachments]);
 
   /**
-   * Carregar categorias de despesas ao abrir modal
-   */
-  useEffect(() => {
-    if (isOpen && unitId) {
-      loadCategories();
-    }
-  }, [isOpen, unitId]);
-
-  /**
    * Buscar categorias de despesas
    */
-  const loadCategories = async () => {
+  const loadCategories = useCallback(async () => {
+    if (!unitId) return;
+
     setLoadingCategories(true);
     try {
       const { data, error } = await categoryRepository.findAll({
@@ -113,17 +106,32 @@ function NovaDespesaModal({
       });
 
       if (error) {
-        console.error('Erro ao carregar categorias:', error);
+        logger.error('Erro ao carregar categorias de despesas', error);
         return;
       }
 
       setExpenseCategories(data || []);
     } catch (err) {
-      console.error('Erro ao carregar categorias:', err);
+      logger.error('Erro inesperado ao carregar categorias de despesas', err);
     } finally {
       setLoadingCategories(false);
     }
-  };
+  }, [unitId]);
+
+  /**
+   * Carregar categorias de despesas ao abrir modal
+   */
+  useEffect(() => {
+    if (isOpen) {
+      loadCategories();
+    }
+  }, [isOpen, loadCategories]);
+
+  useEffect(() => {
+    if (categories?.length) {
+      setExpenseCategories(categories);
+    }
+  }, [categories]);
 
   /**
    * Toggle seção
@@ -224,7 +232,7 @@ function NovaDespesaModal({
       };
 
       createExpense(expenseData, {
-        onSuccess: (data) => {
+        onSuccess: data => {
           if (data?.id) {
             setCreatedExpenseId(data.id);
             // Modal permanece aberto para permitir anexar comprovantes
@@ -279,7 +287,7 @@ function NovaDespesaModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="card-theme relative flex max-h-[90vh] w-full max-w-3xl flex-col rounded-lg shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between rounded-t-lg border-b border-light-border bg-[#EF4444] px-6 py-4 dark:border-dark-border">
+        <div className="flex items-center justify-between rounded-t-lg border-b border-light-border bg-gradient-error px-6 py-4 text-light-surface dark:border-dark-border dark:text-dark-surface">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-light-surface/20 dark:bg-dark-surface/20">
               <FileText className="h-5 w-5 text-light-surface dark:text-dark-surface" />
@@ -308,17 +316,15 @@ function NovaDespesaModal({
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6">
           <div className="space-y-4">
             {/* Seção 1: Informações do lançamento */}
-            <div className="rounded-lg border border-light-border bg-[#3B82F6]/5 dark:border-dark-border">
+            <div className="card-theme rounded-lg">
               <button
                 type="button"
                 onClick={() => toggleSection('info')}
                 className="flex w-full items-center justify-between p-4"
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#3B82F6]">
-                    <span className="text-sm font-bold text-light-surface dark:text-dark-surface">
-                      1
-                    </span>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-light-surface dark:text-dark-surface">
+                    <span className="text-sm font-bold">1</span>
                   </div>
                   <span className="text-theme-primary text-sm font-semibold">
                     Informações do lançamento
@@ -354,7 +360,9 @@ function NovaDespesaModal({
                     <div>
                       <label className="text-theme-primary mb-1.5 block text-xs font-medium">
                         Data de competência{' '}
-                        <span className="text-[#EF4444]">*</span>
+                        <span className="text-feedback-light-error dark:text-feedback-dark-error">
+                          *
+                        </span>
                       </label>
                       <input
                         type="date"
@@ -363,14 +371,17 @@ function NovaDespesaModal({
                           handleChange('competence_date', e.target.value)
                         }
                         disabled={isLoading}
-                        className={`input-theme text-sm ${errors.competence_date ? 'border-[#EF4444]' : ''}`}
+                        className={`input-theme text-sm ${errors.competence_date ? 'border-feedback-light-error dark:border-feedback-dark-error' : ''}`}
                       />
                     </div>
 
                     {/* Descrição */}
                     <div>
                       <label className="text-theme-primary mb-1.5 block text-xs font-medium">
-                        Descrição <span className="text-[#EF4444]">*</span>
+                        Descrição{' '}
+                        <span className="text-feedback-light-error dark:text-feedback-dark-error">
+                          *
+                        </span>
                       </label>
                       <input
                         type="text"
@@ -380,14 +391,17 @@ function NovaDespesaModal({
                         }
                         placeholder="Ex: Aluguel, Material..."
                         disabled={isLoading}
-                        className={`input-theme text-sm ${errors.description ? 'border-[#EF4444]' : ''}`}
+                        className={`input-theme text-sm ${errors.description ? 'border-feedback-light-error dark:border-feedback-dark-error' : ''}`}
                       />
                     </div>
 
                     {/* Valor */}
                     <div>
                       <label className="text-theme-primary mb-1.5 block text-xs font-medium">
-                        Valor <span className="text-[#EF4444]">*</span>
+                        Valor{' '}
+                        <span className="text-feedback-light-error dark:text-feedback-dark-error">
+                          *
+                        </span>
                       </label>
                       <div className="relative">
                         <span className="text-theme-secondary absolute left-3 top-1/2 -translate-y-1/2 text-xs">
@@ -401,7 +415,7 @@ function NovaDespesaModal({
                           onChange={e => handleChange('value', e.target.value)}
                           placeholder="0,00"
                           disabled={isLoading}
-                          className={`input-theme pl-10 text-sm ${errors.value ? 'border-[#EF4444]' : ''}`}
+                          className={`input-theme pl-10 text-sm ${errors.value ? 'border-feedback-light-error dark:border-feedback-dark-error' : ''}`}
                         />
                       </div>
                     </div>
@@ -410,7 +424,10 @@ function NovaDespesaModal({
                   {/* Linha 2: Categoria */}
                   <div>
                     <label className="text-theme-primary mb-1.5 block text-xs font-medium">
-                      Categoria <span className="text-[#EF4444]">*</span>
+                      Categoria{' '}
+                      <span className="text-feedback-light-error dark:text-feedback-dark-error">
+                        *
+                      </span>
                     </label>
                     <select
                       value={formData.category_id}
@@ -418,7 +435,7 @@ function NovaDespesaModal({
                         handleChange('category_id', e.target.value)
                       }
                       disabled={isLoading || loadingCategories}
-                      className={`input-theme text-sm ${errors.category_id ? 'border-[#EF4444]' : ''}`}
+                      className={`input-theme text-sm ${errors.category_id ? 'border-feedback-light-error dark:border-feedback-dark-error' : ''}`}
                     >
                       <option value="">
                         {loadingCategories
@@ -437,7 +454,7 @@ function NovaDespesaModal({
             </div>
 
             {/* Seção 2: Despesa Recorrente */}
-            <div className="rounded-lg border border-light-border bg-[#8B5CF6]/5 dark:border-dark-border">
+            <div className="card-theme rounded-lg">
               <button
                 type="button"
                 onClick={() => {
@@ -447,10 +464,8 @@ function NovaDespesaModal({
                 className="flex w-full items-center justify-between p-4"
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#8B5CF6]">
-                    <span className="text-sm font-bold text-light-surface dark:text-dark-surface">
-                      2
-                    </span>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-purple text-light-surface dark:text-dark-surface">
+                    <span className="text-sm font-bold">2</span>
                   </div>
                   <span className="text-theme-primary text-sm font-semibold">
                     Despesa Recorrente
@@ -556,17 +571,15 @@ function NovaDespesaModal({
             </div>
 
             {/* Seção 3: Condição de pagamento */}
-            <div className="rounded-lg border border-light-border bg-[#F59E0B]/5 dark:border-dark-border">
+            <div className="card-theme rounded-lg">
               <button
                 type="button"
                 onClick={() => toggleSection('payment')}
                 className="flex w-full items-center justify-between p-4"
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F59E0B]">
-                    <span className="text-sm font-bold text-light-surface dark:text-dark-surface">
-                      3
-                    </span>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-feedback-light-warning text-light-surface dark:bg-feedback-dark-warning dark:text-dark-surface">
+                    <span className="text-sm font-bold">3</span>
                   </div>
                   <span className="text-theme-primary text-sm font-semibold">
                     Condição de pagamento
@@ -586,7 +599,9 @@ function NovaDespesaModal({
                     <div>
                       <label className="text-theme-primary mb-1.5 block text-xs font-medium">
                         Data de vencimento{' '}
-                        <span className="text-[#EF4444]">*</span>
+                        <span className="text-feedback-light-error dark:text-feedback-dark-error">
+                          *
+                        </span>
                       </label>
                       <input
                         type="date"
@@ -673,8 +688,8 @@ function NovaDespesaModal({
                     className="mb-3"
                   />
                   {attachments.length > 0 && (
-                    <div className="space-y-2 mt-3">
-                      {attachments.map((attachment) => (
+                    <div className="mt-3 space-y-2">
+                      {attachments.map(attachment => (
                         <AttachmentCard
                           key={attachment.id}
                           attachment={attachment}
@@ -686,7 +701,7 @@ function NovaDespesaModal({
                 </>
               ) : (
                 <div className="rounded-lg border border-light-border bg-light-bg/50 p-4 dark:border-dark-border dark:bg-dark-hover/50">
-                  <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary text-center">
+                  <p className="text-theme-secondary text-center text-xs">
                     Os comprovantes poderão ser anexados após criar a despesa
                   </p>
                 </div>
@@ -699,7 +714,7 @@ function NovaDespesaModal({
         <div className="flex items-center justify-between rounded-b-lg border-t border-light-border bg-light-surface px-6 py-4 dark:border-dark-border dark:bg-dark-surface">
           <div className="flex items-center gap-2 text-sm">
             <span className="text-theme-secondary">Status:</span>
-            <span className="rounded-full bg-[#F59E0B]/10 px-2 py-0.5 text-xs font-medium text-[#F59E0B]">
+            <span className="rounded-full bg-feedback-light-warning/10 px-2 py-0.5 text-xs font-medium text-feedback-light-warning dark:bg-feedback-dark-warning/10 dark:text-feedback-dark-warning">
               {status === 'pendente' ? '⏳ Pendente' : status}
             </span>
           </div>
@@ -720,7 +735,7 @@ function NovaDespesaModal({
                   onClose();
                   resetForm();
                 }}
-                className="flex items-center gap-2 rounded-lg bg-[#16A34A] px-6 py-2 text-sm font-semibold text-light-surface transition-colors hover:bg-[#15803D] dark:text-dark-surface"
+                className="flex items-center gap-2 rounded-lg bg-feedback-light-success px-6 py-2 text-sm font-semibold text-light-surface transition-colors hover:bg-feedback-light-success/90 dark:bg-feedback-dark-success dark:text-dark-surface dark:hover:bg-feedback-dark-success/90"
               >
                 <FileText className="h-4 w-4" />
                 Concluir
@@ -730,7 +745,7 @@ function NovaDespesaModal({
                 type="submit"
                 onClick={handleSubmit}
                 disabled={isLoading}
-                className="flex items-center gap-2 rounded-lg bg-[#EF4444] px-6 py-2 text-sm font-semibold text-light-surface transition-colors hover:bg-[#DC2626] dark:text-dark-surface"
+                className="flex items-center gap-2 rounded-lg bg-feedback-light-error px-6 py-2 text-sm font-semibold text-light-surface transition-colors hover:bg-feedback-light-error/90 dark:bg-feedback-dark-error dark:text-dark-surface dark:hover:bg-feedback-dark-error/90"
               >
                 <FileText className="h-4 w-4" />
                 {isLoading ? 'Salvando...' : 'Criar Despesa'}

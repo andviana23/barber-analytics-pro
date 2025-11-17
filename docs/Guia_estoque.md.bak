@@ -1,89 +1,7 @@
 # 📦 Plano de Implementação — Módulo de Estoque (v2.0)
 
 **Versão:** 2.0.0 | **Data:** 13 de novembro de 2025 | **Autor:** Andrey Viana
-**Status:** ✅ Sprint 1, 2 e UI Responsivo Concluídos (96%) | **Prioridade:** 🔴 Alta
-**Última Atualização:** 14 de novembro de 2025
-
----
-
-## 🎉 RESUMO EXECUTIVO — O Que Foi Completado
-
-### ✅ Fases Concluídas
-
-#### Fase 1: Fundação (Sprint 1) ✅ 100% COMPLETO
-
-- **Banco de Dados:** 3 tabelas + 5 enums + 1 view + 6 funções + 6 triggers + 12 policies RLS
-- **Backend:** Repository (498 linhas) + Service (623 linhas) + DTOs (520 linhas)
-- **Frontend:** Hook (466 linhas) + 3 Componentes (1058 linhas) + Página (297 linhas)
-- **Testes:** 56/56 passando (100% coverage)
-- **Validação:** Build ✅ | Lint ✅ | Coverage 100% ✅
-
-#### Fase 2: Fornecedores (Sprint 2) ✅ 100% COMPLETO
-
-- **Banco de Dados:** 3 tabelas + 2 enums + 12 policies RLS
-- **Backend:** Repository (498 linhas) + Service (610 linhas) + DTOs (598 linhas)
-- **Frontend:** Hook (462 linhas) + 3 Componentes (1195 linhas) + Página (179 linhas)
-- **Testes:** 49/49 passando (100% coverage)
-- **E2E:** 22 cenários de teste com Playwright ✅
-
-#### Fase 3: UI Responsivo (Sprint Especial) ✅ 100% COMPLETO
-
-- **StockMovementsPage.jsx:** Header, Tabs e Filtro 100% responsivos
-- **StockSummaryCard.jsx:** KPI Grid escalado por breakpoint
-- **tailwind.config.js:** Plugin scrollbar-hide adicionado
-- **Breakpoints:** xs (375px) → sm (640px) → md (768px) → lg (1024px)
-- **Validação:** Lint ✅ | Build ✅ | Dark mode ✅ | Acessibilidade ✅
-
-#### Fase 4: Compras (Sprint 3) 🟡 85% EM PROGRESSO
-
-- **Banco de Dados:** 100% concluído (tabelas, enums, views, funções, triggers, RLS)
-- **Backend:** DTOs 100% | Service 85% | Integração Telegram 85%
-- **Frontend:** Pendente (próximas sprints)
-- **Testes:** 77 unitários (47 passando DTOs + 30 integration pendentes)
-
-### � Progresso Global
-
-```
-Sprint 1 (Movimentações)      [████████████████████] 100% ✅
-Sprint 2 (Fornecedores)       [████████████████████] 100% ✅
-UI Responsivo (BONUS)         [████████████████████] 100% ✅ NEW
-Sprint 3 (Compras P1)         [██████░░░░░░░░░░░░░░]  85% 🟡 IN PROGRESS
-Sprint 4-8 (Backlog)          [░░░░░░░░░░░░░░░░░░░░]   0% ⏳
-─────────────────────────────────────────────────────────────────
-PROJETO TOTAL                 [████████████████████░]  96% 🎉
-```
-
-### 📁 Arquivos Completados (36+ arquivos)
-
-| Tipo             | Quantidade | Linhas      | Status |
-| ---------------- | ---------- | ----------- | ------ |
-| Backend Services | 8          | 4,500+      | ✅     |
-| React Components | 10         | 4,200+      | ✅     |
-| DTOs             | 6          | 3,500+      | ✅     |
-| Unit Tests       | 4          | 1,400+      | ✅     |
-| E2E Tests        | 1          | 650         | ✅     |
-| Config Files     | 2          | 200+        | ✅     |
-| Documentation    | 1          | 1,500+      | ✅     |
-| **TOTAL**        | **36+**    | **17,000+** | **✅** |
-
-### 🎯 Próximos Passos (Sprint 3 Continuation)
-
-1. **Frontend Compras** (Sprint 3.3) — Próximo:
-   - [ ] PurchaseRequestsPage.jsx
-   - [ ] PurchaseRequestModal.jsx
-   - [ ] PurchaseQuotesView.jsx
-
-2. **QA Compras** (Sprint 3.4):
-   - [ ] E2E: Criar solicitação → Submeter → Aprovar no Telegram
-   - [ ] Build, Lint, Tests
-   - [ ] Coverage ≥ 85%
-
-3. **Sprint 4-8** (Dezembro):
-   - Recebimento + Pagamento
-   - Integração com Vendas/Serviços
-   - Relatórios Gerenciais
-   - Alertas Inteligentes
-   - Deploy em Produção
+**Status:** ✅ Sprint 1 e 2 Concluídos (90%) | **Prioridade:** 🔴 Alta
 
 ---
 
@@ -94,7 +12,6 @@ PROJETO TOTAL                 [████████████████�
 | **Interface (UI)**       |      100% |       0% |   ✅   |
 | **CRUD Produtos**        |      100% |       0% |   ✅   |
 | **Controle Estoque**     |      100% |       0% |   ✅   |
-| **UI Responsivo**        |      100% |       0% | ✅ NEW |
 | **Alertas Básicos**      |        0% |     100% |   ❌   |
 | **Movimentações (DB)**   |      100% |       0% |   ✅   |
 | **Movimentações (BE)**   |      100% |       0% |   ✅   |
@@ -104,11 +21,11 @@ PROJETO TOTAL                 [████████████████�
 | **Fornecedores (BE)**    |      100% |       0% |   ✅   |
 | **Fornecedores (FE)**    |      100% |       0% |   ✅   |
 | **Fornecedores (E2E)**   |      100% |       0% |   ✅   |
-| **Compras**              |       85% |      15% |   🟡   |
+| **Compras**              |        0% |     100% |   ❌   |
 | **Vendas/Serviços**      |        0% |     100% |   ❌   |
 | **Relatórios**           |        0% |     100% |   ❌   |
 | **Alertas Inteligentes** |        0% |     100% |   ❌   |
-| **TOTAL**                |   **96%** |   **4%** |  🟢🎉  |
+| **TOTAL**                |   **90%** |  **10%** |   �    |
 
 ---
 
@@ -176,11 +93,11 @@ Garantir **controle total** dos insumos e produtos de revenda da barbearia, com:
 - ✅ Hooks + Componentes
 - ✅ Cobertura: 100% testes (56/56)
 
-### Semana 3-4: Fornecedores + Compras (Fase 1) � **EM PROGRESSO - 80%**
+### Semana 3-4: Fornecedores + Compras (Fase 1) 🟡 **PRÓXIMO**
 
-- ✅ Tabelas fornecedores (Sprint 2 - CONCLUÍDO)
-- ✅ Fluxo de solicitação e cotação (Sprint 3.1 + 3.2 - 80%)
-- ⏳ Integração Telegram (aprovação) - PRÓXIMO
+- [ ] Tabelas fornecedores
+- [ ] Fluxo de solicitação e cotação
+- [ ] Integração Telegram (aprovação)
 
 ### Semana 5-6: Compras (Fase 2) + Integração 🟡
 
@@ -594,240 +511,72 @@ Garantir **controle total** dos insumos e produtos de revenda da barbearia, com:
 
 ---
 
----
-
-## ✅ Melhorias Recentes — Responsividade Design System
-
-**Data:** 14 de novembro de 2025 | **Status:** 🟢 100% COMPLETO
-
-### Sprint Especial: Stock Page Responsive Design
-
-**Objetivo:** Implementar design responsivo completo na página de estoque com suporte full mobile-first
-
-#### Arquivos Modificados ✅
-
-**1. src/pages/StockMovementsPage.jsx**
-
-- Responsividade do Header:
-  - Mobile (xs-sm): Botões em grid 2x2 com textos curtos
-  - Desktop (lg+): Layout horizontal com textos completos
-  - Transição suave entre breakpoints
-
-- Responsividade das Tabs:
-  - Mobile: Scroll horizontal com `overflow-x-auto` e `scrollbar-hide`
-  - Desktop: Distribuição uniforme com flex-1
-  - Adaptação de textos por breakpoint
-
-- Responsividade do Filtro:
-  - Mobile: Campos empilhados verticalmente + botão full-width
-  - Tablet+: Layout horizontal com botão auto-width
-
-- Correções de Lint:
-  - [x] Case block com braces (switch statement)
-  - [x] Remoção de variável não utilizada (hasMore)
-  - [x] Substituição de console.log por toast notifications
-
-**2. src/components/stock/StockSummaryCard.jsx**
-
-- Header responsivo:
-  - Mobile: Padding reduzido + layout vertical flexível
-  - Desktop: Padding normal + layout horizontal
-
-- Grid de KPIs:
-  - Mobile (xs): 1 coluna
-  - Tablet (sm): 2 colunas (sm:grid-cols-2)
-  - Ícones e textos escalados responsivamente:
-    - Ícones: h-4→h-5, h-5→h-6
-    - Titles: text-base→text-lg
-    - Numbers: text-2xl→text-3xl
-    - Labels: text-xs→text-sm
-
-- Footer responsivo:
-  - Mobile: Layout vertical empilhado
-  - Desktop: Layout horizontal distribuído
-
-**3. tailwind.config.js**
-
-- Plugin `scrollbar-hide` adicionado:
-  ```javascript
-  '.scrollbar-hide': {
-    '-ms-overflow-style': 'none',    // IE/Edge
-    'scrollbar-width': 'none',       // Firefox
-    '&::-webkit-scrollbar': {        // Safari/Chrome
-      display: 'none'
-    }
-  }
-  ```
-
-#### Validação ✅
-
-- ✅ **Sem erros de lint** nos arquivos modificados
-- ✅ **Design System compliant** (tokens `.card-theme`, `.text-theme-*`, `.input-theme`)
-- ✅ **Responsivo mobile-first** (xs→sm→md→lg breakpoints)
-- ✅ **Acessibilidade preservada** (botões ≥44px em mobile)
-- ✅ **Dark mode funcional** (todas as classes theme-aware)
-
-#### Breakpoints Utilizados
-
-| Breakpoint | Tamanho | Aplicação                        |
-| ---------- | ------- | -------------------------------- |
-| `xs`       | 375px   | Texto curto nos botões           |
-| `sm`       | 640px   | Grid 2 colunas KPI, flex buttons |
-| `md`       | 768px   | Filtro horizontal                |
-| `lg`       | 1024px  | Header horizontal                |
-
-#### Progresso Global 📊
-
-```
-Sprint 1 (Movimentações)       [████████████████████] 100% ✅
-Sprint 2 (Fornecedores)        [████████████████████] 100% ✅
-Sprint 2.5 (UI Responsivo)     [████████████████████] 100% ✅ NEW
-─────────────────────────────────────────────────────
-PROJETO TOTAL                  [████████████████████░] 96%
-```
-
----
-
 ### 🏁 Sprint 3 — Compras (Solicitação + Cotação)
 
 **Duração:** 5 dias | **Fim Esperado:** 27 de novembro
 **Objetivo:** Fluxo de solicitação de compra e cotação com aprovação
 **Prioridade:** 🔴 CRÍTICA
 
-#### 3.1 Database Setup ✅ **CONCLUÍDO - 13/11/2025**
+#### 3.1 Database Setup
 
-- [x] **Criar ENUM `purchase_request_status_enum`** ✅
-  - [x] Valores: DRAFT, SUBMITTED, APPROVED, REJECTED, CANCELLED
+- [ ] **Criar tabela `purchase_requests`**
 
-- [x] **Criar tabela `purchase_requests`** ✅ (17 colunas)
-  - [x] Auto-numeração: `request_number` (REQ-YYYY-NNN)
-  - [x] Campos: id, unit_id, requested_by, approved_by, rejected_by
-  - [x] Status workflow: DRAFT → SUBMITTED → APPROVED/REJECTED
-  - [x] Priority: LOW, NORMAL, HIGH, URGENT
-  - [x] Campos audit: approved_at, rejected_at, rejection_reason
-  - [x] 6 índices criados (unit_id, requested_by, status, etc.)
+  ```sql
+  CREATE TABLE purchase_requests (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    unit_id UUID NOT NULL REFERENCES units(id),
+    requested_by UUID NOT NULL REFERENCES professionals(id),
+    status ENUM ('DRAFT', 'SUBMITTED', 'APPROVED', 'REJECTED', 'CANCELLED') DEFAULT 'DRAFT',
+    total_estimated DECIMAL(12,2),
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now()
+  );
+  ```
 
-- [x] **Criar tabela `purchase_request_items`** ✅ (11 colunas)
-  - [x] Campos: id, request_id, product_id, quantity, unit_measurement
-  - [x] Generated column: `estimated_total` (quantity \* unit_cost)
-  - [x] Unique constraint: (request_id, product_id)
-  - [x] 3 índices criados
+- [ ] **Criar tabela `purchase_request_items`**
+  - [ ] Campos: id, request_id, product_id, quantity, unit_measurement, notes
 
-- [x] **Criar tabela `purchase_quotes`** ✅ (16 colunas)
-  - [x] Auto-numeração: `quote_number` (COT-YYYY-NNN)
-  - [x] Campos: id, request_id, supplier_id, quoted_by
-  - [x] Commercial terms: delivery_days, payment_terms
-  - [x] Selection tracking: is_selected, selected_at, selected_by, selection_reason
-  - [x] Auto-calculated: `total_price` (soma dos items)
-  - [x] 6 índices criados
+- [ ] **Criar tabela `purchase_quotes`**
 
-- [x] **Criar tabela `purchase_quote_items`** ✅ (9 colunas)
-  - [x] Campos: id, quote_id, product_id, quantity, unit_cost
-  - [x] Generated column: `total_cost` (quantity \* unit_cost)
-  - [x] Unique constraint: (quote_id, product_id)
-  - [x] 2 índices criados
+  ```sql
+  CREATE TABLE purchase_quotes (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    purchase_request_id UUID NOT NULL REFERENCES purchase_requests(id),
+    supplier_id UUID NOT NULL REFERENCES suppliers(id),
+    unit_cost DECIMAL(10,2) NOT NULL,
+    total_price DECIMAL(12,2) NOT NULL,
+    delivery_days INT,
+    payment_terms VARCHAR(255),
+    notes TEXT,
+    is_selected BOOLEAN DEFAULT false,
+    created_at TIMESTAMPTZ DEFAULT now()
+  );
+  ```
 
-- [x] **Criar funções (6 total)** ✅
-  - [x] `fn_generate_request_number()` - Sequential REQ-YYYY-NNN
-  - [x] `fn_generate_quote_number()` - Sequential COT-YYYY-NNN
-  - [x] `fn_update_request_total_estimated()` - Auto-calc totals
-  - [x] `fn_update_quote_total_price()` - Auto-calc totals
-  - [x] `fn_ensure_single_selected_quote()` - Single selection
-  - [x] `update_updated_at_column()` - Audit timestamps
+- [ ] **Criar view `vw_pending_approvals`**
+  - [ ] Mostrar solicitações com status SUBMITTED aguardando aprovação
 
-- [x] **Criar triggers (13 total)** ✅
-  - [x] 2 number generation (BEFORE INSERT)
-  - [x] 3 audit timestamps (BEFORE UPDATE)
-  - [x] 6 total recalculation (AFTER INSERT/UPDATE/DELETE)
-  - [x] 2 business rules (single selection, auto-timestamps)
+#### 3.2 Backend
 
-- [x] **Criar views (2 total)** ✅
-  - [x] `vw_pending_approvals` - Dashboard de aprovações
-  - [x] `vw_quote_comparison` - Análise comparativa com ranking
+- [ ] **Criar `purchaseRequestService.js`**
+  - [ ] `createRequest(items, unitId, requestedBy)`
+  - [ ] `submitForApproval(requestId)`
+  - [ ] `approve(requestId, approvedBy)` → gera Purchase order
+  - [ ] `reject(requestId, reason, rejectedBy)`
+  - [ ] Notificação Telegram ao submeter (com botões: Aprovar/Rejeitar)
 
-- [x] **Criar RLS policies (16 total)** ✅
-  - [x] purchase_requests: 4 policies (unit-based + role-based)
-  - [x] purchase_request_items: 4 policies (DRAFT only edits)
-  - [x] purchase_quotes: 4 policies (manager/admin only)
-  - [x] purchase_quote_items: 4 policies (cascading checks)
+- [ ] **Criar `purchaseQuoteService.js`**
+  - [ ] `recordQuote(requestId, supplierId, items, terms)`
+  - [ ] `selectQuote(quoteId)` → marca como selecionada
+  - [ ] `compareQuotes(requestId)` → retorna análise de preços
 
-- [x] **Grants** ✅
-  - [x] All tables/views accessible to authenticated role
+- [ ] **Integração Telegram**
+  - [ ] Enviar notificação com tabela de cotações
+  - [ ] Botões inline para aprovar/rejeitar
+  - [ ] Callback handling para decisões
 
-#### 3.2 Backend ✅ **CONCLUÍDO - 13/11/2025**
-
-- [x] **Criar DTOs** ✅ (650 linhas)
-  - [x] `CreatePurchaseRequestDTO` - Validação de requisições + itens
-  - [x] `UpdatePurchaseRequestDTO` - Atualizações parciais (DRAFT apenas)
-  - [x] `PurchaseRequestResponseDTO` - Formatação para frontend
-  - [x] `CreatePurchaseQuoteDTO` - Validação de cotações + itens
-  - [x] `PurchaseQuoteResponseDTO` - Formatação com preço/prazo
-  - [x] `PurchaseRequestFiltersDTO` - Paginação + busca
-
-- [x] **Criar `purchaseRequestRepository.js`** ✅ (670 linhas)
-  - [x] `create(requestData, items)` - CRUD completo
-  - [x] `findById(id)` - Busca com JOINs (units, professionals, items)
-  - [x] `findByUnit(unitId, filters)` - Filtros + paginação
-  - [x] `update(id, updates)` - Atualização
-  - [x] `delete(id)` - Soft delete
-  - [x] `submitForApproval(id)` - DRAFT → SUBMITTED
-  - [x] `approve(id, approvedBy)` - SUBMITTED → APPROVED
-  - [x] `reject(id, rejectedBy, reason)` - SUBMITTED → REJECTED
-  - [x] `getPendingApprovals(unitId)` - Usa view vw_pending_approvals
-  - [x] Item management: `addItem`, `updateItem`, `removeItem`
-  - [x] `createQuote(quoteData, items)` - Criar cotação
-  - [x] `getQuotesByRequest(requestId)` - Listar cotações
-  - [x] `selectQuote(quoteId, selectedBy, reason)` - Selecionar
-  - [x] `compareQuotes(requestId)` - Usa view vw_quote_comparison
-  - [x] Error normalization (6 tipos)
-
-- [x] **Criar `purchaseRequestService.js`** ✅ (520 linhas)
-  - [x] `createRequest(data, user)` - Validação DTO + criação
-  - [x] `getRequest(id)` - Buscar por ID
-  - [x] `listRequests(unitId, filters)` - Listar com filtros
-  - [x] `updateRequest(id, updates, user)` - Atualizar (DRAFT apenas)
-  - [x] `submitForApproval(id, user)` - Enviar para aprovação
-  - [x] `approve(id, user)` - Aprovar (gerente/admin)
-  - [x] `reject(id, reason, user)` - Rejeitar com motivo
-  - [x] `getPendingApprovals(unitId)` - Dashboard aprovações
-  - [x] `deleteRequest(id, user)` - Soft delete (DRAFT apenas)
-  - [x] `recordQuote(data, user)` - Registrar cotação (gerente/admin)
-  - [x] `getQuotesByRequest(requestId)` - Listar cotações
-  - [x] `selectQuote(quoteId, reason, user)` - Selecionar + justificativa
-  - [x] `compareQuotes(requestId)` - Análise comparativa
-  - [x] Permission checks: `canManagePurchaseRequests(professional)`
-
-- [x] **Integração Telegram** ✅ **CONCLUÍDO - 13/11/2025** (570 linhas)
-  - [x] `sendPurchaseRequestNotification()` - Notifica gerentes com detalhes + itens
-  - [x] `sendApprovalNotification()` - Notifica solicitante sobre aprovação
-  - [x] `sendRejectionNotification()` - Notifica solicitante com motivo de rejeição
-  - [x] `sendQuoteSelectedNotification()` - Notifica gerente sobre seleção
-  - [x] Integrado em `purchaseRequestService.js` (4 pontos de notificação)
-  - [x] Formatação rica com Markdown + emojis por prioridade
-  - [x] Busca automática de chat_ids (RLS-aware)
-  - [x] Error handling silencioso (não falha operação principal)
-
-- [x] **Testes DTOs: 77 unitários** ✅ **CONCLUÍDO - 13/11/2025** (886 linhas, 47 passing)
-  - [x] `CreatePurchaseRequestDTO` - 11 tests (validation, items, defaults)
-  - [x] `UpdatePurchaseRequestDTO` - 5 tests (partial updates, fields)
-  - [x] `PurchaseRequestResponseDTO` - 14 tests (labels, colors, formatting, business rules)
-  - [x] `CreatePurchaseQuoteDTO` - 7 tests (validation, items, line_total)
-  - [x] `PurchaseQuoteResponseDTO` - 5 tests (formatting, delivery, canSelect)
-  - [x] `PurchaseRequestFiltersDTO` - 9 tests (defaults, validation, pagination)
-
-- [ ] **Testes Repository: 20+ unitários** ⏳ PRÓXIMO
-  - [ ] Mock Supabase client
-  - [ ] CRUD operations (create, findById, findByUnit, update, delete)
-  - [ ] Workflow operations (submitForApproval, approve, reject)
-  - [ ] Quote operations (createQuote, getQuotes, selectQuote, compareQuotes)
-  - [ ] Error normalization (6 types)
-
-- [ ] **Testes Service: 20+ unitários** ⏳ PRÓXIMO
-  - [ ] Mock repository + DTOs
-  - [ ] Business logic (createRequest, updateRequest, deleteRequest)
-  - [ ] Permission checks (canManagePurchaseRequests)
-  - [ ] Workflow (submitForApproval, approve, reject)
-  - [ ] Quotes (recordQuote, selectQuote, compareQuotes)
+- [ ] **Testes: 15+ unitários**
 
 #### 3.3 Frontend
 
@@ -855,27 +604,6 @@ PROJETO TOTAL                  [████████████████
 - [ ] E2E: Criar solicitação → Submeter → Receber no Telegram → Aprovar
 - [ ] Build, Lint, Tests: ✅
 - [ ] Cobertura ≥ 85%: ✅
-
-**📊 Progresso Sprint 3:**
-
-```
-Sprint 3.1 (Database)     [████████████████████] 100% ✅
-Sprint 3.2 (Backend)      [█████████████████░░░]  85% 🔄 IN PROGRESS
-Sprint 3.3 (Frontend)     [░░░░░░░░░░░░░░░░░░░░]   0% ⏳
-Sprint 3.4 (QA)           [░░░░░░░░░░░░░░░░░░░░]   0% ⏳
-─────────────────────────────────────────────────────
-SPRINT 3 TOTAL            [█████████░░░░░░░░░░░]  46%
-PROJECT TOTAL             [████████████████████░] 94%
-```
-
-Sprint 3.2 (Backend) [████████████░░░░░░░░] 60% 🔄 IN PROGRESS
-Sprint 3.3 (Frontend) [░░░░░░░░░░░░░░░░░░░░] 0% ⏳
-Sprint 3.4 (QA) [░░░░░░░░░░░░░░░░░░░░] 0% ⏳
-─────────────────────────────────────────────────────
-SPRINT 3 TOTAL [████████░░░░░░░░░░░░] 40%
-PROJECT TOTAL [████████████████████░] 94%
-
-````
 
 ---
 
@@ -909,7 +637,7 @@ PROJECT TOTAL [████████████████████░] 
     notes TEXT,
     created_at TIMESTAMPTZ DEFAULT now()
   );
-````
+  ```
 
 - [ ] **Criar tabela `purchase_attachments`**
   - [ ] Campos: id, purchase_id, file_name, file_path (Storage), type, uploaded_by, uploaded_at
@@ -1575,69 +1303,28 @@ Features: Integração hooks, CRUD completo, confirmação arquivar, feedback to
 Sprint 2.1 (Database)     [████████████████████] 100% ✅
 Sprint 2.2 (Backend)      [████████████████████] 100% ✅
 Sprint 2.3 (Frontend)     [████████████████████] 100% ✅
-Sprint 2.4 (E2E)          [████████████████████] 100% ✅
-Sprint 2.5 (Deploy)       [░░░░░░░░░░░░░░░░░░░░]   0% 🔄 NEXT
+Sprint 2.4 (E2E)          [░░░░░░░░░░░░░░░░░░░░]   0% 🔄 NEXT
+Sprint 2.5 (Deploy)       [░░░░░░░░░░░░░░░░░░░░]   0% ⏳
 ─────────────────────────────────────────────────────
-SPRINT 2 TOTAL            [████████████████████] 100%
-PROJECT TOTAL             [████████████████████░] 94%
+SPRINT 2 TOTAL            [████████████████░░░░]  80%
+PROJECT TOTAL             [█████████████████░░░]  85%
 ```
 
 ---
 
-## ✅ Sprint 2.4 — Fornecedores E2E (COMPLETO)
+## 🔄 Sprint 2.4 — Fornecedores E2E (PENDENTE)
 
-**Data Conclusão:** 13 de novembro de 2025
+### Objetivos
 
-### Objetivos ✅
+- [ ] Testes E2E com Playwright
+- [ ] Fluxo completo: criar → editar → arquivar fornecedor
+- [ ] Validação de máscaras e campos
+- [ ] Testes de filtros e busca
+- [ ] Testes de paginação
 
-- [x] **Testes E2E com Playwright** ✅
-  - [x] `suppliers-flow.spec.ts` — 650 linhas, 22 cenários de teste ✅
-  - [x] CRUD completo: Create, Read, Update, Archive ✅
-  - [x] Filtros: Status dropdown, busca por nome/CNPJ ✅
-  - [x] Paginação: Previous/Next, indicadores de página ✅
-  - [x] Validação: CNPJ MOD 11, detecção de duplicatas ✅
-  - [x] Responsividade: Desktop table + Mobile cards ✅
-  - [x] View de detalhes + histórico de compras ✅
-  - [x] Modal: Unsaved changes warning ✅
-  - [x] Empty states e loading skeleton ✅
-  - [x] Refresh functionality ✅
+### Próximos Passos (Sprint 2.4)
 
-### Estrutura dos Testes
-
-**Arquivo:** `e2e/suppliers-flow.spec.ts` (650 linhas, 0 erros)
-
-**22 Cenários de Teste:**
-
-1. ✅ Exibir página com elementos principais
-2. ✅ Criar novo fornecedor
-3. ✅ Validar CNPJ inválido
-4. ✅ Detectar CNPJ duplicado
-5. ✅ Editar fornecedor existente
-6. ✅ Visualizar detalhes do fornecedor
-7. ✅ Voltar da view de detalhes
-8. ✅ Filtrar por status (ATIVO/INATIVO/BLOQUEADO)
-9. ✅ Buscar por nome
-10. ✅ Buscar por CNPJ
-11. ✅ Limpar filtros
-12. ✅ Navegar paginação
-13. ✅ Arquivar fornecedor
-14. ✅ Mudar status na view de detalhes
-15. ✅ Exibir histórico de compras
-16. ✅ Atualizar lista (refresh button)
-17. ✅ Empty state
-18. ✅ Abrir modal do empty state
-19. ✅ Validar campos obrigatórios
-20. ✅ Cancelar criação
-21. ✅ Aviso de alterações não salvas
-22. ✅ Responsividade (mobile/desktop)
-
-**Status:** Todos os testes marcados como `.skip()` até integração backend completa
-
-### Arquivos Criados
-
-| Arquivo                      | Linhas | Status |
-| :--------------------------- | -----: | :----: |
-| `e2e/suppliers-flow.spec.ts` |    650 |   ✅   |
+- [ ] suppliers-flow.spec.ts (testes E2E)
 
 ### Progresso Sprint 2
 
@@ -1645,120 +1332,9 @@ PROJECT TOTAL             [█████████████████�
 Sprint 2.1 (Database)     [████████████████████] 100% ✅
 Sprint 2.2 (Backend)      [████████████████████] 100% ✅
 Sprint 2.3 (Frontend)     [████████████████████] 100% ✅
-Sprint 2.4 (E2E)          [████████████████████] 100% ✅
-Sprint 2.5 (Deploy)       [░░░░░░░░░░░░░░░░░░░░]   0% 🔄 NEXT
+Sprint 2.4 (E2E)          [░░░░░░░░░░░░░░░░░░░░]   0% 🔄 NEXT
+Sprint 2.5 (Deploy)       [░░░░░░░░░░░░░░░░░░░░]   0% ⏳
 ─────────────────────────────────────────────────────
-SPRINT 2 TOTAL            [████████████████████] 100%
-PROJECT TOTAL             [████████████████████░] 94%
+SPRINT 2 TOTAL            [████████████████░░░░]  80%
+PROJECT TOTAL             [█████████████████░░░]  85%
 ```
-
----
-
-## 📋 CHECKLIST DE PROGRESSO — Atualizações do Dia
-
-### ✅ 14 de Novembro de 2025
-
-#### Melhorias Implementadas
-
-1. **Responsividade da Página de Estoque** ✅
-   - [x] Header com botões responsivos (grid 2x2 mobile → horizontal desktop)
-   - [x] Tabs com scroll horizontal em mobile
-   - [x] Filtro de período vertical em mobile → horizontal em desktop
-   - [x] Breakpoints: xs, sm, md, lg
-   - [x] Dark mode preservado
-
-2. **StockSummaryCard Otimizado** ✅
-   - [x] KPI Grid: 1 coluna mobile → 2 colunas tablet
-   - [x] Padding responsivo
-   - [x] Ícones escalados por breakpoint
-   - [x] Design System compliant
-
-3. **Tailwind Config Atualizado** ✅
-   - [x] Plugin scrollbar-hide adicionado
-   - [x] Suporte a scroll horizontal hidden
-
-4. **Documentação Atualizada** ✅
-   - [x] Este arquivo (Guia_estoque.md) atualizado
-   - [x] Resumo executivo adicionado
-   - [x] Status de progresso clarificado
-
-#### Validações Executadas
-
-- ✅ **Lint:** 0 erros nas modificações
-- ✅ **Build:** PASSED
-- ✅ **Dark Mode:** 100% funcional
-- ✅ **Responsividade:** Todos os breakpoints testados
-- ✅ **Acessibilidade:** Preservada
-
----
-
-## 🚀 O QUE SEGUE (Sprint 3 - Próximas Tarefas)
-
-### Frontend Compras (3.3) — PRÓXIMO
-
-Após o responsivo, o próximo passo é implementar:
-
-1. **PurchaseRequestsPage.jsx**
-   - Dashboard com tabs (Drafts, Enviados, Aprovados, Rejeitados)
-   - Listagem com status visual
-   - Ações: Editar, Enviar, Ver detalhes
-
-2. **PurchaseRequestModal.jsx**
-   - Form para criar solicitação
-   - Adicionar items com autocomplete
-   - Salvação como draft + envio
-
-3. **PurchaseQuotesView.jsx**
-   - Tabela comparativa de cotações
-   - Seleção de melhor preço
-
-### QA Compras (3.4)
-
-- E2E completo: Criar solicitação → Submeter → Telegram → Aprovar
-- Build, Lint, Tests
-- Coverage ≥ 85%
-
-### Sprint 4+ (Dezembro)
-
-```
-Sprint 4 (Dez 1-5)    → Recebimento + Pagamento
-Sprint 5 (Dez 6-10)   → Integração Vendas/Serviços + Alertas
-Sprint 6 (Dez 11-15)  → Relatórios + Deploy
-```
-
----
-
-## 💾 Arquivos Modificados em 14/11/2025
-
-| Arquivo                                     | Tipo   | Modificações                         | Status |
-| ------------------------------------------- | ------ | ------------------------------------ | ------ |
-| `src/pages/StockMovementsPage.jsx`          | React  | Header, Tabs, Filtro responsivos     | ✅     |
-| `src/components/stock/StockSummaryCard.jsx` | React  | Grid escalável, padding responsivo   | ✅     |
-| `tailwind.config.js`                        | Config | Plugin scrollbar-hide                | ✅     |
-| `docs/Guia_estoque.md`                      | Doc    | Resumo executivo + status atualizado | ✅     |
-
----
-
-## 📞 Informações de Contato
-
-**Responsável:** Andrey Viana
-**Projeto:** Barber Analytics Pro v2.0.0
-**Data Início:** 13 de novembro de 2025
-**Data Atualização:** 14 de novembro de 2025
-
----
-
-## 🎯 KPIs Atualizados
-
-| Métrica                 | Meta     | Atual                  | Status |
-| ----------------------- | -------- | ---------------------- | ------ |
-| **Cobertura de Testes** | ≥ 85%    | 100% (Sprints 1-2)     | ✅     |
-| **Progresso Geral**     | 100%     | 96%                    | 🟡     |
-| **Build Status**        | PASSING  | PASSING                | ✅     |
-| **Lint Status**         | 0 errors | 0 errors               | ✅     |
-| **Responsividade**      | 100%     | 100% (Stock + Summary) | ✅     |
-
----
-
-**Última atualização:** 14 de novembro de 2025 às 15:30
-**Próxima atualização:** Quando Sprint 3.3 Frontend iniciar

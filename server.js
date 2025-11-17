@@ -1,3 +1,6 @@
+/* eslint-env node */
+/* eslint-disable no-console */
+
 /**
  * 🚀 Servidor de API para Cron Jobs
  *
@@ -18,6 +21,7 @@ import express from 'express';
 import cors from 'cors';
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
+import process from 'node:process';
 
 dotenv.config();
 
@@ -31,8 +35,15 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-// Middleware
-app.use(cors());
+// Middleware CORS (configurado para credentials)
+app.use(
+  cors({
+    origin: 'http://localhost:5173', // Frontend Vite
+    credentials: true, // Permitir cookies e headers de auth
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
 app.use(express.json());
 
 // Middleware de autenticação
@@ -288,6 +299,7 @@ app.use((req, res) => {
 });
 
 // Error handler
+// eslint-disable-next-line no-unused-vars
 app.use((error, req, res, next) => {
   console.error('❌ Erro no servidor:', error);
   res.status(500).json({

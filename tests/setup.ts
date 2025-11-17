@@ -13,26 +13,54 @@ afterEach(() => {
 });
 
 // Mock do Supabase Client
-vi.mock('@/lib/supabase', () => ({
-  supabase: {
-    from: vi.fn(() => ({
-      select: vi.fn().mockReturnThis(),
-      insert: vi.fn().mockReturnThis(),
-      update: vi.fn().mockReturnThis(),
-      delete: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      single: vi.fn(),
-    })),
-    auth: {
-      getSession: vi.fn(),
-      signOut: vi.fn(),
+vi.mock('@/services/supabase', () => {
+  const mockQuery = {
+    select: vi.fn(function () {
+      return this;
+    }),
+    insert: vi.fn(function () {
+      return this;
+    }),
+    update: vi.fn(function () {
+      return this;
+    }),
+    delete: vi.fn(function () {
+      return this;
+    }),
+    eq: vi.fn(function () {
+      return this;
+    }),
+    gte: vi.fn(function () {
+      return this;
+    }),
+    lte: vi.fn(function () {
+      return this;
+    }),
+    order: vi.fn(function () {
+      return this;
+    }),
+    range: vi.fn(function () {
+      return this;
+    }),
+    single: vi.fn(),
+    maybeSingle: vi.fn(),
+  };
+
+  return {
+    supabase: {
+      from: vi.fn(() => mockQuery),
+      rpc: vi.fn(),
+      auth: {
+        getSession: vi.fn(),
+        signOut: vi.fn(),
+      },
+      channel: vi.fn(() => ({
+        on: vi.fn().mockReturnThis(),
+        subscribe: vi.fn(),
+      })),
     },
-    channel: vi.fn(() => ({
-      on: vi.fn().mockReturnThis(),
-      subscribe: vi.fn(),
-    })),
-  },
-}));
+  };
+});
 
 // Mock de localStorage
 const localStorageMock = {
